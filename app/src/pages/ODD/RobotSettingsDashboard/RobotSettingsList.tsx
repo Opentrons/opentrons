@@ -1,6 +1,6 @@
-import * as React from 'react'
+import { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { I18nContext, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import {
@@ -31,13 +31,14 @@ import {
   toggleDevInternalFlag,
   toggleDevtools,
   toggleHistoricOffsets,
+  useFeatureFlag,
 } from '/app/redux/config'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { Navigation } from '/app/organisms/Navigation'
-import { useLEDLights } from '/app/organisms/Devices/hooks'
-import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
+import { Navigation } from '/app/organisms/ODD/Navigation'
+import { useLEDLights } from '/app/resources/robot-settings'
+import { useNetworkConnection } from '/app/resources/networking'
 import {
   RobotSettingButton,
   OnOffToggle,
@@ -212,6 +213,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => dispatch(toggleDevtools())}
         />
         {devToolsOn ? <FeatureFlags /> : null}
+        {/* TODO(bh, 2024-09-23): remove when localization setting designs implemented */}
+        <LanguageToggle />
       </Flex>
     </Flex>
   )
@@ -266,4 +269,22 @@ function FeatureFlags(): JSX.Element {
       ))}
     </>
   )
+}
+
+function LanguageToggle(): JSX.Element | null {
+  const enableLocalization = useFeatureFlag('enableLocalization')
+
+  const { i18n } = useContext(I18nContext)
+
+  return enableLocalization ? (
+    <RobotSettingButton
+      settingName={`Change Language: ${i18n.language}`}
+      onClick={() => {
+        void (i18n.language === 'en'
+          ? i18n.changeLanguage('zh')
+          : i18n.changeLanguage('en'))
+      }}
+      rightElement={<></>}
+    />
+  ) : null
 }

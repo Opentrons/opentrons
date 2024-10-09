@@ -16,7 +16,7 @@ import {
 
 import { useErrorName } from '../hooks'
 import { OddModal } from '/app/molecules/OddModal'
-import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
 import { ERROR_KINDS } from '../constants'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { StepInfo } from './StepInfo'
@@ -27,7 +27,7 @@ import type { IconProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
-import type { DesktopSizeType } from '../types'
+import type { DesktopSizeType, ErrorKind } from '../types'
 
 export function useErrorDetailsModal(): {
   showModal: boolean
@@ -59,11 +59,13 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
   const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
   const errorName = useErrorName(errorKind)
 
-  const getIsOverpressureErrorKind = (): boolean => {
+  const isNotificationErrorKind = (): boolean => {
     switch (errorKind) {
       case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
       case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
+      case ERROR_KINDS.TIP_NOT_DETECTED:
+      case ERROR_KINDS.GRIPPER_ERROR:
         return true
       default:
         return false
@@ -83,7 +85,9 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
           toggleModal={toggleModal}
           modalHeader={modalHeader}
         >
-          {getIsOverpressureErrorKind() ? <OverpressureBanner /> : null}
+          {isNotificationErrorKind() ? (
+            <NotificationBanner errorKind={errorKind} />
+          ) : null}
         </ErrorDetailsModalODD>,
         getTopPortalEl()
       )
@@ -94,7 +98,9 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
           toggleModal={toggleModal}
           modalHeader={modalHeader}
         >
-          {getIsOverpressureErrorKind() ? <OverpressureBanner /> : null}
+          {isNotificationErrorKind() ? (
+            <NotificationBanner errorKind={errorKind} />
+          ) : null}
         </ErrorDetailsModalDesktop>,
         getModalPortalEl()
       )
@@ -191,14 +197,62 @@ export function ErrorDetailsModalODD(
   )
 }
 
-export function OverpressureBanner(): JSX.Element | null {
+export function NotificationBanner({
+  errorKind,
+}: {
+  errorKind: ErrorKind
+}): JSX.Element {
+  const buildContent = (): JSX.Element => {
+    switch (errorKind) {
+      case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
+      case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
+      case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
+        return <OverpressureBanner />
+      case ERROR_KINDS.TIP_NOT_DETECTED:
+        return <TipNotDetectedBanner />
+      case ERROR_KINDS.GRIPPER_ERROR:
+        return <GripperErrorBanner />
+      default:
+        console.error('Handle error kind notification banners explicitly.')
+        return <div />
+    }
+  }
+
+  return buildContent()
+}
+
+export function OverpressureBanner(): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
   return (
     <InlineNotification
       type="alert"
       heading={t('overpressure_is_usually_caused')}
-      message={t('if_issue_persists')}
+      message={t('if_issue_persists_overpressure')}
+    />
+  )
+}
+
+export function TipNotDetectedBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('tip_presence_errors_are_caused')}
+      message={t('if_issue_persists_tip_not_detected')}
+    />
+  )
+}
+
+export function GripperErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('gripper_errors_occur_when')}
+      message={t('if_issue_persists_gripper_error')}
     />
   )
 }

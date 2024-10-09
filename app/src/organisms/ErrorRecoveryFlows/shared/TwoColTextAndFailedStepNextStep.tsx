@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
@@ -22,6 +21,9 @@ type TwoColTextAndFailedStepNextStepProps = RecoveryContentProps & {
   primaryBtnOnClick: () => void
   secondaryBtnOnClickOverride?: () => void
 }
+
+// TODO(jh, 10-01-24): In some views we inject copy and in others, we derive it in the view based on
+//  selected recovery option.
 
 /**
  * Left Column: Title + body text

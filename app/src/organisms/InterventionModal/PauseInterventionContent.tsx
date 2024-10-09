@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -81,7 +81,7 @@ interface PauseHeaderProps {
 
 function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
   const { t, i18n } = useTranslation('run_details')
-  const [now, setNow] = React.useState(Date())
+  const [now, setNow] = useState(Date())
   useInterval(
     () => {
       setNow(Date())

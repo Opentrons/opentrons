@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,7 +16,6 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
-  LiquidIcon,
   ListItem,
   ListItemDescriptor,
   Modal,
@@ -28,11 +27,7 @@ import {
   ToggleGroup,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getPipetteSpecsV2,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   getAdditionalEquipmentEntities,
@@ -58,8 +53,10 @@ import {
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 import { getWarningContent } from './UnusedModalContent'
+import { InstrumentsInfo } from './InstrumentsInfo'
+import { LiquidDefinitions } from './LiquidDefinitions'
 
-import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 
@@ -91,15 +88,13 @@ export function ProtocolOverview(): JSX.Element {
   const [
     showEditInstrumentsModal,
     setShowEditInstrumentsModal,
-  ] = React.useState<boolean>(false)
-  const [
-    showEditMetadataModal,
-    setShowEditMetadataModal,
-  ] = React.useState<boolean>(false)
-  const [
-    showExportWarningModal,
-    setShowExportWarningModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+  const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
+    false
+  )
+  const [showExportWarningModal, setShowExportWarningModal] = useState<boolean>(
+    false
+  )
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -107,11 +102,10 @@ export function ProtocolOverview(): JSX.Element {
     labwareIngredSelectors.allIngredientGroupFields
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [hover, setHover] = React.useState<DeckSlot | string | null>(null)
-  const [
-    showMaterialsListModal,
-    setShowMaterialsListModal,
-  ] = React.useState<boolean>(false)
+  const [hover, setHover] = useState<DeckSlot | string | null>(null)
+  const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
+    false
+  )
   const fileData = useSelector(fileSelectors.createFile)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
@@ -121,11 +115,11 @@ export function ProtocolOverview(): JSX.Element {
   const leftString = t('starting_deck_state:onDeck')
   const rightString = t('starting_deck_state:offDeck')
 
-  const [deckView, setDeckView] = React.useState<
+  const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formValues?.created == null) {
       console.warn(
         'formValues was refreshed while on the overview page, redirecting to landing page'
@@ -184,8 +178,6 @@ export function ProtocolOverview(): JSX.Element {
   }
 
   const pipettesOnDeck = Object.values(pipettes)
-  const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
-  const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
   const {
     protocolName,
     description,
@@ -226,8 +218,9 @@ export function ProtocolOverview(): JSX.Element {
   const cancelModal = (): void => {
     setShowExportWarningModal(false)
   }
+
   return (
-    <>
+    <Fragment>
       {showEditMetadataModal ? (
         <EditProtocolMetadataModal
           onClose={() => {
@@ -386,107 +379,15 @@ export function ProtocolOverview(): JSX.Element {
                 </ListItem>
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('instruments')}
-                </StyledText>
-                <Flex padding={SPACING.spacing4}>
-                  <Btn
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    onClick={() => {
-                      setShowEditInstrumentsModal(true)
-                    }}
-                    css={BUTTON_LINK_STYLE}
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('edit')}
-                    </StyledText>
-                  </Btn>
-                </Flex>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('robotType')}
-                    content={
-                      robotType === FLEX_ROBOT_TYPE
-                        ? t('shared:opentrons_flex')
-                        : t('shared:ot2')
-                    }
-                  />
-                </ListItem>
-                <ListItem type="noActive" key={`ProtocolOverview_left`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('left_pip')}
-                    content={
-                      leftPip != null
-                        ? getPipetteSpecsV2(leftPip.name as PipetteName)
-                            ?.displayName ?? t('na')
-                        : t('na')
-                    }
-                  />
-                </ListItem>
-                <ListItem type="noActive" key={`ProtocolOverview_right`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('right_pip')}
-                    content={
-                      rightPip != null
-                        ? getPipetteSpecsV2(rightPip.name as PipetteName)
-                            ?.displayName ?? t('na')
-                        : t('na')
-                    }
-                  />
-                </ListItem>
-                {robotType === FLEX_ROBOT_TYPE ? (
-                  <ListItem type="noActive" key={`ProtocolOverview_gripper`}>
-                    <ListItemDescriptor
-                      type="default"
-                      description={t('extension')}
-                      content={isGripperAttached ? t('gripper') : t('na')}
-                    />
-                  </ListItem>
-                ) : null}
-              </Flex>
-            </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <StyledText desktopStyle="headingSmallBold">
-                {t('liquid_defs')}
-              </StyledText>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.keys(allIngredientGroupFields).length > 0 ? (
-                  Object.values(allIngredientGroupFields).map(
-                    (liquid, index) => (
-                      <ListItem
-                        type="noActive"
-                        key={`${liquid.name}_${liquid.displayColor}_${index}`}
-                      >
-                        <ListItemDescriptor
-                          type="default"
-                          description={
-                            <Flex
-                              alignItems={ALIGN_CENTER}
-                              gridGap={SPACING.spacing8}
-                            >
-                              <LiquidIcon color={liquid.displayColor} />
-                              <StyledText desktopStyle="bodyDefaultRegular">
-                                {liquid.name}
-                              </StyledText>
-                            </Flex>
-                          }
-                          content={liquid.description ?? t('na')}
-                        />
-                      </ListItem>
-                    )
-                  )
-                ) : (
-                  <InfoScreen content={t('no_liquids_defined')} />
-                )}
-              </Flex>
-            </Flex>
+            <InstrumentsInfo
+              robotType={robotType}
+              pipettesOnDeck={pipettesOnDeck}
+              additionalEquipment={additionalEquipment}
+              setShowEditInstrumentsModal={setShowEditInstrumentsModal}
+            />
+            <LiquidDefinitions
+              allIngredientGroupFields={allIngredientGroupFields}
+            />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
               <Flex>
                 <StyledText desktopStyle="headingSmallBold">
@@ -565,7 +466,7 @@ export function ProtocolOverview(): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-    </>
+    </Fragment>
   )
 }
 

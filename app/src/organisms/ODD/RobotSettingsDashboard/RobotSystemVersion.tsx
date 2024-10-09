@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
 import type { RobotUpdateInfo } from '/app/redux/robot-update/types'
@@ -42,7 +42,7 @@ export function RobotSystemVersion({
     'app_settings',
     'branded',
   ])
-  const [showModal, setShowModal] = React.useState<boolean>(isUpdateAvailable)
+  const [showModal, setShowModal] = useState<boolean>(isUpdateAvailable)
 
   return (
     <>

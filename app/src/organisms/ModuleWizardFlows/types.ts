@@ -1,7 +1,7 @@
 import type { AttachedModule } from '@opentrons/api-client'
 import type { FLOWS, SECTIONS } from './constants'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { PipetteInformation } from '../Devices/hooks'
+import type { PipetteInformation } from '/app/redux/pipettes'
 
 export type ModuleCalibrationWizardStep =
   | BeforeBeginningStep

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
@@ -6,6 +6,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { updateConfigValue } from '/app/redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
@@ -61,6 +62,10 @@ describe('WelcomeModal', () => {
   it('should call a mock function when tapping next button', () => {
     render(props)
     fireEvent.click(screen.getByText('Next'))
+    expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
+      'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+      null
+    )
     expect(props.setShowWelcomeModal).toHaveBeenCalled()
   })
 })

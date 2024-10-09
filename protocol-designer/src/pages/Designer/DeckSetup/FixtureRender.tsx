@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import {
   COLORS,
   FlexTrash,
@@ -39,7 +39,7 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
     }
     case 'trashBin': {
       return (
-        <React.Fragment key={`fixtureRender_${fixture}`}>
+        <Fragment key={`fixtureRender_${fixture}`}>
           <SingleSlotFixture
             cutoutId={cutout}
             deckDefinition={deckDef}
@@ -52,7 +52,7 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
             trashCutoutId={cutout as TrashCutoutId}
             backgroundColor={COLORS.grey50}
           />
-        </React.Fragment>
+        </Fragment>
       )
     }
     case 'wasteChute': {

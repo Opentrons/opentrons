@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -19,7 +19,7 @@ import {
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
 import { getShellUpdateDataFiles } from '/app/redux/shell'
-import { ChildNavigation } from '../../../ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 
 import type {
@@ -78,7 +78,7 @@ export function ChooseCsvFile({
   const [
     csvFileSelected,
     setCsvFileSelected,
-  ] = React.useState<CsvFileParameterFileData>(initialFileObject)
+  ] = useState<CsvFileParameterFileData>(initialFileObject)
 
   const handleBackButton = (): void => {
     if (!isEqual(csvFileSelected, initialFileObject)) {
@@ -87,7 +87,7 @@ export function ChooseCsvFile({
     handleGoBack()
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (csvFilesOnUSB.length === 0) {
       setCsvFileSelected({})
     }
@@ -119,7 +119,7 @@ export function ChooseCsvFile({
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (
                 csvFilesOnRobot.map((csv: CsvFileData) => (
-                  <React.Fragment key={csv.id}>
+                  <Fragment key={csv.id}>
                     <RadioButton
                       buttonLabel={truncateString(
                         csv.name,
@@ -134,7 +134,7 @@ export function ChooseCsvFile({
                       isSelected={csvFileSelected?.id === csv.id}
                       maxLines={3}
                     />
-                  </React.Fragment>
+                  </Fragment>
                 ))
               ) : (
                 <EmptyFile />
@@ -150,7 +150,7 @@ export function ChooseCsvFile({
                 sortedCsvFilesOnUSB.map(csvFilePath => {
                   const fileName = last(csvFilePath.split('/'))
                   return (
-                    <React.Fragment key={fileName}>
+                    <Fragment key={fileName}>
                       {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
                           buttonLabel={truncateString(
@@ -170,7 +170,7 @@ export function ChooseCsvFile({
                           maxLines={3}
                         />
                       ) : null}
-                    </React.Fragment>
+                    </Fragment>
                   )
                 })
               ) : (

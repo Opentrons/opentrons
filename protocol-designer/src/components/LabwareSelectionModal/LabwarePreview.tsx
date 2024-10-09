@@ -1,4 +1,3 @@
-import * as React from 'react'
 import reduce from 'lodash/reduce'
 import { useTranslation } from 'react-i18next'
 import {

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { ICON_DATA_BY_NAME } from '../../icons'
 import { SPACING } from '../../ui-style-constants'
 import { Box } from '../../primitives'

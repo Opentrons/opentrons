@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Table, TableEntry, TABLE_COLUMN } from './Table'
 import { LabelText, LABEL_LEFT } from './LabelText'
 import { Value } from './Value'

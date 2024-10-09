@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { useRobot } from '/app/redux-resources/robots'
@@ -35,12 +35,12 @@ export function useRobotAnalyticsData(
     robot?.status != null ? getRobotSerialNumber(robot) : null
   const dispatch = useDispatch<Dispatch>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
 
   // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-  return React.useMemo(() => {
+  return useMemo(() => {
     if (robot != null) {
       return settings.reduce<RobotAnalyticsData>(
         (result, setting) => ({

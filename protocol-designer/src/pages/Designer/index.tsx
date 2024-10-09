@@ -1,20 +1,19 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   ALIGN_END,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   INFO_TOAST,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryButton,
   SPACING,
   SecondaryButton,
-  StyledText,
   Tabs,
   ToggleGroup,
   useOnClickOutside,
@@ -53,19 +52,15 @@ export function Designer(): JSX.Element {
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const isNewProtocol = useSelector(selectors.getIsNewProtocol)
-  const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
-    false
-  )
-  const [showDefineLiquidModal, setDefineLiquidModal] = React.useState<boolean>(
-    false
-  )
-  const [tab, setTab] = React.useState<'startingDeck' | 'protocolSteps'>(
+  const [liquidOverflowMenu, showLiquidOverflowMenu] = useState<boolean>(false)
+  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
+  const [tab, setTab] = useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
   )
   const leftString = t('onDeck')
   const rightString = t('offDeck')
 
-  const [deckView, setDeckView] = React.useState<
+  const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
 
@@ -100,7 +95,7 @@ export function Designer(): JSX.Element {
     Object.values(additionalEquipmentOnDeck).length > 1
 
   // only display toast if its a newly made protocol and has hardware
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasHardware && isNewProtocol) {
       bakeToast(t('add_rest') as string, INFO_TOAST, {
         heading: t('we_added_hardware'),
@@ -110,7 +105,7 @@ export function Designer(): JSX.Element {
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (fileMetadata?.created == null) {
       console.warn(
         'fileMetadata was refreshed while on the designer page, redirecting to landing page'
@@ -134,7 +129,7 @@ export function Designer(): JSX.Element {
       <OffDeck tab={tab} />
     )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (tab === 'startingDeck') {
       //  ensure that the starting deck page is always showing the initial deck setup
       dispatch(selectTerminalItem('__initial_setup__'))
@@ -170,21 +165,22 @@ export function Designer(): JSX.Element {
           {zoomIn.slot != null ? null : (
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
-          <ProtocolMetadataNav />
+          <ProtocolMetadataNav
+            isAddingHardwareOrLabware={
+              zoomIn.slot != null && zoomIn.cutout != null
+            }
+          />
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <SettingsIcon />
-            <PrimaryButton
+
+            <Btn
+              alignItems={ALIGN_CENTER}
               onClick={() => {
                 showLiquidOverflowMenu(true)
               }}
             >
-              <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                <Icon size="1rem" name="liquid" />
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('liquids')}
-                </StyledText>
-              </Flex>
-            </PrimaryButton>
+              <Icon size="1.5rem" name="water-drop" data-testid="water-drop" />
+            </Btn>
             <SecondaryButton
               onClick={() => {
                 if (hasTrashEntity) {

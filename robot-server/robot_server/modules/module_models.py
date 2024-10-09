@@ -2,7 +2,7 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
-from typing import Generic, Optional, TypeVar, Union
+from typing import Generic, List, Optional, TypeVar, Union
 from typing_extensions import Literal
 
 from opentrons.calibration_storage.types import SourceType
@@ -323,9 +323,17 @@ class AbsorbanceReaderModuleData(BaseModel):
         ...,
         description="Plate presence status.",
     )
-    sampleWavelength: int = Field(
+    measureMode: str = Field(
         ...,
-        description="The current sample wavelength, in nanometers.",
+        description="The measirement mode (single or multi) the device is configured for.",
+    )
+    sampleWavelengths: List[int] = Field(
+        ...,
+        description="The current list of sample wavelengths, in nanometers.",
+    )
+    referenceWavelength: Optional[int] = Field(
+        ...,
+        description="The reference wavelength used for single measurement mode.",
     )
 
 

@@ -3,14 +3,14 @@ from __future__ import annotations
 import logging
 from typing import List, Dict, Optional, Union, cast
 
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.legacy_commands import module_commands as cmds
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     requires_version,
@@ -628,6 +628,13 @@ class ThermocyclerContext(ModuleContext):
             ``hold_time_minutes`` and ``hold_time_seconds`` must be defined
             and for each step.
 
+        .. note:
+
+            Before API Version 2.21, Thermocycler profiles run with this command
+            would be listed in the app as having a number of repetitions equal to
+            their step count. At or above API Version 2.21, the structure of the
+            Thermocycler cycles is preserved.
+
         """
         repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
         validated_steps = validation.ensure_thermocycler_profile_steps(steps)
@@ -1003,11 +1010,31 @@ class AbsorbanceReaderContext(ModuleContext):
         return self._core.is_lid_on()
 
     @requires_version(2, 21)
-    def initialize(self, wavelength: int) -> None:
-        """Initialize the Absorbance Reader by taking zero reading."""
-        self._core.initialize(wavelength)
+    def initialize(
+        self,
+        mode: ABSMeasureMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """Take a zero reading on the Absorbance Plate Reader Module.
+
+        :param mode: Either ``"single"`` or ``"multi"``.
+
+             - In single measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               one sample wavelength and an optional reference wavelength.
+             - In multiple measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               a list of up to six sample wavelengths.
+        :param wavelengths: A list of wavelengths, in mm, to measure.
+             - Must contain only one item when initializing a single measurement.
+             - Must contain one to six items when initializing a multiple measurement.
+        :param reference_wavelength: An optional reference wavelength, in mm. Cannot be
+             used with multiple measurements.
+        """
+        self._core.initialize(
+            mode, wavelengths, reference_wavelength=reference_wavelength
+        )
 
     @requires_version(2, 21)
-    def read(self) -> Optional[Dict[str, float]]:
-        """Initiate read on the Absorbance Reader. Returns a dictionary of values ordered by well name."""
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
+        """Initiate read on the Absorbance Reader. Returns a dictionary of wavelengths to dictionary of values ordered by well name."""
         return self._core.read()

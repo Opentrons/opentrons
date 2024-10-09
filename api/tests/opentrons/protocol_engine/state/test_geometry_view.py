@@ -1,6 +1,10 @@
 """Test state getters for retrieving geometry views of state."""
 import inspect
 import json
+from opentrons.protocol_engine.state.update_types import (
+    LoadedLabwareUpdate,
+    StateUpdate,
+)
 import pytest
 from math import isclose
 from decoy import Decoy
@@ -2559,6 +2563,15 @@ def test_get_offset_location_deck_slot(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+                display_name=None,
+            )
+        ),
     )
     labware_store.handle_action(action)
     offset_location = subject.get_offset_location("labware-id-1")
@@ -2615,7 +2628,17 @@ def test_get_offset_location_module(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=ModuleLocation(moduleId="module-id-1"),
+                display_name=None,
+            )
+        ),
     )
+
     module_store.handle_action(load_module)
     labware_store.handle_action(load_labware)
     offset_location = subject.get_offset_location("labware-id-1")
@@ -2674,6 +2697,15 @@ def test_get_offset_location_module_with_adapter(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="adapter-id-1",
+                definition=nice_adapter_definition,
+                offset_id=None,
+                new_location=ModuleLocation(moduleId="module-id-1"),
+                display_name=None,
+            )
+        ),
     )
     load_labware = SucceedCommandAction(
         command=LoadLabware(
@@ -2694,6 +2726,15 @@ def test_get_offset_location_module_with_adapter(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=OnLabwareLocation(labwareId="adapter-id-1"),
+                display_name=None,
+            )
+        ),
     )
     module_store.handle_action(load_module)
     labware_store.handle_action(load_adapter)
@@ -2734,6 +2775,15 @@ def test_get_offset_fails_with_off_deck_labware(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=OFF_DECK_LOCATION,
+                display_name=None,
+            )
+        ),
     )
     labware_store.handle_action(action)
     offset_location = subject.get_offset_location("labware-id-1")

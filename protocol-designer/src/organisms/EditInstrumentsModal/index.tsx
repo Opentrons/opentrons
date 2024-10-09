@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components'
 import mapValues from 'lodash/mapValues'
 import {
   ALIGN_CENTER,
+  ALIGN_STRETCH,
   Box,
   Btn,
   Checkbox,
@@ -17,11 +18,13 @@ import {
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
   Modal,
+  OVERFLOW_AUTO,
   PrimaryButton,
   PRODUCT,
   RadioButton,
@@ -87,12 +90,12 @@ export function EditInstrumentsModal(
     'protocol_overview',
     'shared',
   ])
-  const [page, setPage] = React.useState<'add' | 'overview'>('overview')
-  const [mount, setMount] = React.useState<PipetteMount>('left')
-  const [pipetteType, setPipetteType] = React.useState<PipetteType | null>(null)
-  const [pipetteGen, setPipetteGen] = React.useState<Gen | 'flex'>('flex')
-  const [pipetteVolume, setPipetteVolume] = React.useState<string | null>(null)
-  const [selectedTips, setSelectedTips] = React.useState<string[]>([])
+  const [page, setPage] = useState<'add' | 'overview'>('overview')
+  const [mount, setMount] = useState<PipetteMount>('left')
+  const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
+  const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
+  const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
+  const [selectedTips, setSelectedTips] = useState<string[]>([])
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const robotType = useSelector(getRobotType)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
@@ -141,11 +144,24 @@ export function EditInstrumentsModal(
       ? getSectionsFromPipetteName(leftPip.name, leftPip.spec)
       : null
 
+  const removeOpentronsPhrases = (input: string): string => {
+    const phrasesToRemove = ['Opentrons Flex 96', 'Opentrons OT-2 96']
+
+    return phrasesToRemove
+      .reduce((text, phrase) => {
+        return text.replace(new RegExp(phrase, 'gi'), '')
+      }, input)
+      .trim()
+  }
+
   return createPortal(
     <Modal
-      title={t('shared:edit_instruments')}
+      title={
+        page === 'add' ? t('shared:edit_pipette') : t('shared:edit_instruments')
+      }
       type="info"
       closeOnOutsideClick
+      width="37.125rem"
       onClose={() => {
         resetFields()
         onClose()
@@ -154,7 +170,7 @@ export function EditInstrumentsModal(
         <Flex
           justifyContent={JUSTIFY_END}
           gridGap={SPACING.spacing8}
-          padding={SPACING.spacing24}
+          padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
         >
           {page === 'overview' ? null : (
             <SecondaryButton
@@ -199,15 +215,14 @@ export function EditInstrumentsModal(
       }
     >
       {page === 'overview' ? (
-        <>
-          <Flex marginTop={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginBottom={SPACING.spacing12}
               alignItems={ALIGN_CENTER}
             >
               <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('your_pips')}
+                {t('your_pipettes')}
               </StyledText>
               {has96Channel ? null : (
                 <Btn
@@ -242,7 +257,6 @@ export function EditInstrumentsModal(
               leftInfo != null ? (
                 <PipetteInfoItem
                   mount="left"
-                  pipetteOnDeck={pipettesOnDeck}
                   pipetteName={leftPip.name}
                   tiprackDefURIs={leftPip.tiprackDefURI}
                   editClick={() => {
@@ -267,10 +281,9 @@ export function EditInstrumentsModal(
                     setMount('left')
                     resetFields()
                   }}
-                  text={t('add_pip')}
+                  text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
-                  size="large"
                 />
               )}
               {rightPip != null &&
@@ -278,7 +291,6 @@ export function EditInstrumentsModal(
               rightInfo != null ? (
                 <PipetteInfoItem
                   mount="right"
-                  pipetteOnDeck={pipettesOnDeck}
                   pipetteName={rightPip.name}
                   tiprackDefURIs={rightPip.tiprackDefURI}
                   editClick={() => {
@@ -302,22 +314,17 @@ export function EditInstrumentsModal(
                     setPage('add')
                     setMount('right')
                   }}
-                  text={t('add_pip')}
+                  text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
-                  size="large"
                 />
               )}
             </Flex>
           </Flex>
           {robotType === FLEX_ROBOT_TYPE ? (
-            <Flex
-              marginTop={SPACING.spacing60}
-              flexDirection={DIRECTION_COLUMN}
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Flex
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
                 alignItems={ALIGN_CENTER}
               >
                 <StyledText desktopStyle="bodyLargeSemiBold">
@@ -367,25 +374,21 @@ export function EditInstrumentsModal(
                     text={t('protocol_overview:add_gripper')}
                     textAlignment="left"
                     iconName="plus"
-                    size="large"
                   />
                 )}
               </Flex>
             </Flex>
           ) : null}
-        </>
+        </Flex>
       ) : (
         <Flex
           flexDirection="column"
-          overflowY="scroll"
-          marginTop={SPACING.spacing24}
+          overflowY={OVERFLOW_AUTO}
+          gridGap={SPACING.spacing24}
         >
-          <>
-            <StyledText
-              desktopStyle="bodyLargeSemiBold"
-              marginBottom={SPACING.spacing16}
-            >
-              {t('pip_type')}
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <StyledText desktopStyle="bodyLargeSemiBold">
+              {t('pipette_type')}
             </StyledText>
             <Flex gridGap={SPACING.spacing4}>
               {PIPETTE_TYPES[robotType].map(type => {
@@ -405,17 +408,11 @@ export function EditInstrumentsModal(
                 )
               })}
             </Flex>
-          </>
+          </Flex>
           {pipetteType != null && robotType === OT2_ROBOT_TYPE ? (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              marginBottom={SPACING.spacing16}
-            >
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                marginBottom={SPACING.spacing16}
-              >
-                {t('pip_gen')}
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <StyledText desktopStyle="bodyLargeSemiBold">
+                {t('pipette_gen')}
               </StyledText>
               <Flex gridGap={SPACING.spacing4}>
                 {PIPETTE_GENS.map(gen => (
@@ -440,13 +437,11 @@ export function EditInstrumentsModal(
             robotType === OT2_ROBOT_TYPE) ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              marginTop={SPACING.spacing16}
+              gridGap={SPACING.spacing8}
+              id="volume"
             >
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                marginBottom={SPACING.spacing16}
-              >
-                {t('pip_vol')}
+              <StyledText desktopStyle="bodyLargeSemiBold">
+                {t('pipette_vol')}
               </StyledText>
               <Flex gridGap={SPACING.spacing4}>
                 {PIPETTE_VOLUMES[robotType]?.map(volume => {
@@ -493,26 +488,26 @@ export function EditInstrumentsModal(
           {allPipetteOptions.includes(selectedPip as PipetteName)
             ? (() => {
                 const tiprackOptions = getTiprackOptions({
-                  allLabware: allLabware,
-                  allowAllTipracks: allowAllTipracks,
+                  allLabware,
+                  allowAllTipracks,
                   selectedPipetteName: selectedPip,
                 })
                 return (
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
-                    marginTop={SPACING.spacing16}
+                    gridGap={SPACING.spacing8}
                   >
-                    <StyledText
-                      desktopStyle="bodyLargeSemiBold"
-                      marginBottom={SPACING.spacing16}
-                    >
-                      {t('pip_tips')}
+                    <StyledText desktopStyle="bodyLargeSemiBold">
+                      {t('pipette_tips')}
                     </StyledText>
                     <Box
                       css={css`
                         gap: ${SPACING.spacing4};
                         display: ${DISPLAY_FLEX};
                         flex-wrap: ${WRAP};
+                        align-items: ${ALIGN_CENTER};
+                        align-content: ${ALIGN_CENTER};
+                        align-self: ${ALIGN_STRETCH};
                       `}
                     >
                       {tiprackOptions.map(option => (
@@ -523,7 +518,7 @@ export function EditInstrumentsModal(
                             !selectedTips.includes(option.value)
                           }
                           isChecked={selectedTips.includes(option.value)}
-                          labelText={option.name}
+                          labelText={removeOpentronsPhrases(option.name)}
                           onClick={() => {
                             const updatedTips = selectedTips.includes(
                               option.value
@@ -534,41 +529,42 @@ export function EditInstrumentsModal(
                           }}
                         />
                       ))}
-                    </Box>
-                    <Flex
-                      gridGap={SPACING.spacing8}
-                      marginTop={SPACING.spacing4}
-                    >
-                      <StyledLabel>
-                        <StyledText desktopStyle="bodyDefaultRegular">
-                          {t('add_custom_tips')}
-                        </StyledText>
-                        <input
-                          data-testid="SelectPipettes_customTipInput"
-                          type="file"
-                          onChange={e => dispatch(createCustomTiprackDef(e))}
-                        />
-                      </StyledLabel>
-                      {pipetteVolume === 'p1000' &&
-                      robotType === FLEX_ROBOT_TYPE ? null : (
-                        <Btn
-                          onClick={() => {
-                            dispatch(
-                              setFeatureFlags({
-                                OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
-                              })
-                            )
-                          }}
-                          textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                        >
+                      <Flex
+                        gridGap={SPACING.spacing8}
+                        padding={SPACING.spacing4}
+                        width={FLEX_MAX_CONTENT}
+                      >
+                        <StyledLabel>
                           <StyledText desktopStyle="bodyDefaultRegular">
-                            {allowAllTipracks
-                              ? t('show_default_tips')
-                              : t('show_all_tips')}
+                            {t('add_custom_tips')}
                           </StyledText>
-                        </Btn>
-                      )}
-                    </Flex>
+                          <input
+                            data-testid="SelectPipettes_customTipInput"
+                            type="file"
+                            onChange={e => dispatch(createCustomTiprackDef(e))}
+                          />
+                        </StyledLabel>
+                        {pipetteVolume === 'p1000' &&
+                        robotType === FLEX_ROBOT_TYPE ? null : (
+                          <Btn
+                            onClick={() => {
+                              dispatch(
+                                setFeatureFlags({
+                                  OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
+                                })
+                              )
+                            }}
+                            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                          >
+                            <StyledText desktopStyle="bodyDefaultRegular">
+                              {allowAllTipracks
+                                ? t('show_default_tips')
+                                : t('show_all_tips')}
+                            </StyledText>
+                          </Btn>
+                        )}
+                      </Flex>
+                    </Box>
                   </Flex>
                 )
               })()

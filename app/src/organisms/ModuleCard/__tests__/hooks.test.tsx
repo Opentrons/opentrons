@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { when } from 'vitest-when'
 import { createStore } from 'redux'
@@ -17,9 +17,13 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
-import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useCurrentRunId } from '/app/resources/runs'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
+
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+  useRunStatuses,
+} from '/app/resources/runs'
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -30,9 +34,8 @@ import type { Store } from 'redux'
 import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',

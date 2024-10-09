@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Flex, COLORS } from '@opentrons/components'
 
 export function SleepScreen(): JSX.Element {

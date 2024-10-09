@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
@@ -7,10 +6,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { i18n } from '/app/i18n'
-import { useSyncRobotClock } from '/app/organisms/Devices/hooks'
-import { InstrumentsAndModules } from '/app/organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '/app/organisms/Devices/RobotOverview'
+import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
+import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { getScanning } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useRobot } from '/app/redux-resources/robots'
@@ -18,10 +17,10 @@ import { DeviceDetails } from '..'
 
 import type { State } from '/app/redux/types'
 
-vi.mock('/app/organisms/Devices/hooks')
-vi.mock('/app/organisms/Devices/InstrumentsAndModules')
-vi.mock('/app/organisms/Devices/RecentProtocolRuns')
-vi.mock('/app/organisms/Devices/RobotOverview')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/InstrumentsAndModules')
+vi.mock('/app/organisms/Desktop/Devices/RecentProtocolRuns')
+vi.mock('/app/organisms/Desktop/Devices/RobotOverview')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux-resources/robots')
 

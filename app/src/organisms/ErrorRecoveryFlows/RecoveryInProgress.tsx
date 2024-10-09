@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -18,6 +18,8 @@ import type { RobotMovingRoute, RecoveryContentProps } from './types'
 
 export function RecoveryInProgress({
   recoveryMap,
+  recoveryCommands,
+  routeUpdateActions,
 }: RecoveryContentProps): JSX.Element {
   const {
     ROBOT_CANCELING,
@@ -26,9 +28,16 @@ export function RecoveryInProgress({
     ROBOT_RETRYING_STEP,
     ROBOT_PICKING_UP_TIPS,
     ROBOT_SKIPPING_STEP,
+    ROBOT_RELEASING_LABWARE,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
+
+  const gripperReleaseCountdown = useGripperRelease({
+    recoveryMap,
+    recoveryCommands,
+    routeUpdateActions,
+  })
 
   const buildDescription = (): RobotMovingRoute => {
     switch (route) {
@@ -44,6 +53,15 @@ export function RecoveryInProgress({
         return t('stand_back_picking_up_tips')
       case ROBOT_SKIPPING_STEP.ROUTE:
         return t('stand_back_skipping_to_next_step')
+      case ROBOT_RELEASING_LABWARE.ROUTE: {
+        if (gripperReleaseCountdown > 0) {
+          return t('gripper_will_release_in_s', {
+            seconds: gripperReleaseCountdown,
+          })
+        } else {
+          return t('gripper_releasing_labware')
+        }
+      }
       default:
         return t('stand_back')
     }
@@ -58,6 +76,83 @@ export function RecoveryInProgress({
   )
 }
 
+const GRIPPER_RELEASE_COUNTDOWN_S = 5
+
+type UseGripperReleaseProps = Pick<
+  RecoveryContentProps,
+  'recoveryMap' | 'recoveryCommands' | 'routeUpdateActions'
+>
+
+// Handles the gripper release copy and action, which operates on an interval. At T=0, release the labware then proceed
+// to the next step in the active route.
+export function useGripperRelease({
+  recoveryMap,
+  recoveryCommands,
+  routeUpdateActions,
+}: UseGripperReleaseProps): number {
+  const { releaseGripperJaws } = recoveryCommands
+  const {
+    proceedToRouteAndStep,
+    proceedNextStep,
+    handleMotionRouting,
+    stashedMap,
+  } = routeUpdateActions
+  const { MANUAL_MOVE_AND_SKIP, MANUAL_REPLACE_AND_RETRY } = RECOVERY_MAP
+  const [countdown, setCountdown] = useState(GRIPPER_RELEASE_COUNTDOWN_S)
+
+  const proceedToValidNextStep = (): void => {
+    switch (stashedMap?.route) {
+      case MANUAL_MOVE_AND_SKIP.ROUTE:
+        void proceedToRouteAndStep(
+          MANUAL_MOVE_AND_SKIP.ROUTE,
+          MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE
+        )
+        break
+      case MANUAL_REPLACE_AND_RETRY.ROUTE:
+        void proceedToRouteAndStep(
+          MANUAL_REPLACE_AND_RETRY.ROUTE,
+          MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
+        )
+        break
+      default:
+        console.error('Unhandled post grip-release routing.')
+        void proceedNextStep()
+    }
+  }
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null
+
+    if (recoveryMap.route === RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE) {
+      intervalId = setInterval(() => {
+        setCountdown(prevCountdown => {
+          const updatedCountdown = prevCountdown - 1
+
+          if (updatedCountdown === 0) {
+            if (intervalId != null) {
+              clearInterval(intervalId)
+            }
+            void releaseGripperJaws()
+              .finally(() => handleMotionRouting(false))
+              .then(() => {
+                proceedToValidNextStep()
+              })
+          }
+
+          return updatedCountdown
+        })
+      }, 1000)
+    }
+
+    return () => {
+      if (intervalId != null) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [recoveryMap.route])
+
+  return countdown
+}
 const CONTAINER_STYLE = css`
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};

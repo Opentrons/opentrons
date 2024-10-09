@@ -193,9 +193,12 @@ class VirtualPipetteDataProvider:
             pipette_model.pipette_channels,
             pipette_model.pipette_version,
         )
-        nozzle_manager = NozzleConfigurationManager.build_from_config(
-            config, valid_nozzle_maps
-        )
+        if pipette_id not in self._nozzle_manager_layout_by_id:
+            nozzle_manager = NozzleConfigurationManager.build_from_config(
+                config, valid_nozzle_maps
+            )
+        else:
+            nozzle_manager = self._nozzle_manager_layout_by_id[pipette_id]
 
         tip_overlap_dict_for_tip_type = None
         for configuration in (

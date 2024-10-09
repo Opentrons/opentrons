@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, screen } from '@testing-library/react'
 
@@ -31,7 +31,7 @@ describe('DropTipWizardHeader', () => {
   it('renders appropriate copy and onClick behavior', () => {
     render(props)
     screen.getByText('Drop tips')
-    screen.getByText('Step 1 / 3')
+    screen.getByText('Step 1 / 5')
   })
 })
 

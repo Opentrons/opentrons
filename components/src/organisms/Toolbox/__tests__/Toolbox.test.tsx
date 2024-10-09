@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../testing/utils'
@@ -17,8 +17,9 @@ describe('Toolbox', () => {
       children: <div>mock children</div>,
       confirmButtonText: 'done',
       onCloseClick: vi.fn(),
-      closeButtonText: 'exit',
+      closeButton: <div>exit</div>,
       onConfirmClick: vi.fn(),
+      secondaryHeaderButton: <div>mock secondary header button</div>,
     }
     render(props)
     screen.getByText('mock header')
@@ -27,7 +28,8 @@ describe('Toolbox', () => {
     expect(props.onConfirmClick).toHaveBeenCalled()
     screen.getByText('mock children')
     screen.getByText('exit')
-    fireEvent.click(screen.getByTestId('Toolbox_exit'))
+    fireEvent.click(screen.getByTestId('Toolbox_closeButton'))
     expect(props.onCloseClick).toHaveBeenCalled()
+    screen.getByText('mock secondary header button')
   })
 })

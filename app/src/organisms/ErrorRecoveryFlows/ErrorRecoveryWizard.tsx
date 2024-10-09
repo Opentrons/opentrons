@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -17,6 +17,8 @@ import {
   SkipStepSameTips,
   SkipStepNewTips,
   IgnoreErrorSkipStep,
+  ManualMoveLwAndSkip,
+  ManualReplaceLwAndRetry,
 } from './RecoveryOptions'
 import {
   useErrorDetailsModal,
@@ -40,11 +42,11 @@ export interface UseERWizardResult {
 }
 
 export function useERWizard(): UseERWizardResult {
-  const [showERWizard, setShowERWizard] = React.useState(false)
+  const [showERWizard, setShowERWizard] = useState(false)
   // Because RunPausedSplash has access to some ER Wiz routes but is not a part of the ER wizard, the splash screen
   // is the "home" route as opposed to SelectRecoveryOption (accessed by pressing "go back" or "continue" enough times)
   // when recovery mode has not been launched.
-  const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
+  const [hasLaunchedRecovery, setHasLaunchedRecovery] = useState(false)
 
   const toggleERWizard = (
     isActive: boolean,
@@ -64,7 +66,6 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     robotType: RobotType
     isOnDevice: boolean
-    isDoorOpen: boolean
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   }
@@ -95,15 +96,16 @@ export function ErrorRecoveryComponent(
   const {
     recoveryMap,
     hasLaunchedRecovery,
-    isDoorOpen,
+    doorStatusUtils,
     isOnDevice,
     analytics,
   } = props
+  const { isProhibitedDoorOpen } = doorStatusUtils
   const { route, step } = recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (showModal) {
       analytics.reportViewErrorDetailsEvent(route, step)
     }
@@ -135,7 +137,7 @@ export function ErrorRecoveryComponent(
 
   // TODO(jh, 07-29-24): Make RecoveryDoorOpen render logic equivalent to RecoveryTakeover. Do not nest it in RecoveryWizard.
   const buildInterventionContent = (): JSX.Element => {
-    if (isDoorOpen) {
+    if (isProhibitedDoorOpen) {
       return <RecoveryDoorOpen {...props} />
     } else {
       return <ErrorRecoveryContent {...props} />
@@ -143,7 +145,7 @@ export function ErrorRecoveryComponent(
   }
 
   const isLargeDesktopStyle =
-    !isDoorOpen &&
+    !isProhibitedDoorOpen &&
     route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
     step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
   const desktopType = isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'
@@ -218,12 +220,24 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <IgnoreErrorSkipStep {...props} />
   }
 
+  const buildManualMoveLwAndSkip = (): JSX.Element => {
+    return <ManualMoveLwAndSkip {...props} />
+  }
+
+  const buildManualReplaceLwAndRetry = (): JSX.Element => {
+    return <ManualReplaceLwAndRetry {...props} />
+  }
+
+  const buildManuallyRouteToDoorOpen = (): JSX.Element => {
+    return <RecoveryDoorOpen {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
     case RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE:
       return buildRecoveryError()
-    case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
+    case RECOVERY_MAP.RETRY_STEP.ROUTE:
       return buildResumeRun()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
       return buildCancelRun()
@@ -233,7 +247,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildRetryNewTips()
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
       return buildRetrySameTips()
-    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
       return buildFillWellAndSkip()
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
       return buildSkipStepSameTips()
@@ -241,13 +255,20 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildSkipStepNewTips()
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
       return buildIgnoreErrorSkipStep()
+    case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
+      return buildManualMoveLwAndSkip()
+    case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
+      return buildManualReplaceLwAndRetry()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_CANCELING.ROUTE:
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
     case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
+    case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
       return buildRecoveryInProgress()
+    case RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE:
+      return buildManuallyRouteToDoorOpen()
     default:
       return buildSelectRecoveryOption()
   }
@@ -264,14 +285,14 @@ export function useInitialPipetteHome({
   routeUpdateActions,
 }: UseInitialPipetteHomeParams): void {
   const { homePipetteZAxes } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
+  const { handleMotionRouting } = routeUpdateActions
 
   // Synchronously set the recovery route to "robot in motion" before initial render to prevent screen flicker on ER launch.
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (hasLaunchedRecovery) {
-      void setRobotInMotion(true)
+      void handleMotionRouting(true)
         .then(() => homePipetteZAxes())
-        .finally(() => setRobotInMotion(false))
+        .finally(() => handleMotionRouting(false))
     }
   }, [hasLaunchedRecovery])
 }

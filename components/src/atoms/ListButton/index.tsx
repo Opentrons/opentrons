@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
@@ -50,8 +50,9 @@ export function ListButton(props: ListButtonProps): JSX.Element {
       ? COLORS.grey35
       : listButtonProps.backgroundColor};
     max-width: 26.875rem;
-    padding: ${SPACING.spacing20} ${SPACING.spacing24};
-    border-radius: ${BORDERS.borderRadius16};
+    padding: ${styleProps.padding ??
+    `${SPACING.spacing20} ${SPACING.spacing24}`};
+    border-radius: ${BORDERS.borderRadius8};
 
     &:hover {
       background-color: ${listButtonProps.hoverBackgroundColor};

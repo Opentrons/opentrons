@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -79,14 +77,14 @@ describe('Designer', () => {
     screen.getByText('Edit protocol')
     screen.getByText('Protocol steps')
     screen.getByText('Protocol starting deck')
-    screen.getByText('Liquids')
+    screen.getByTestId('water-drop')
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
     expect(mockNavigate).toHaveBeenCalledWith('/overview')
   })
 
   it('renders the liquids button overflow menu', () => {
     render()
-    fireEvent.click(screen.getByText('Liquids'))
+    fireEvent.click(screen.getByTestId('water-drop'))
     screen.getByText('mock LiquidsOverflowMenu')
   })
 

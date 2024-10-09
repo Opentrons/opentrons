@@ -25,10 +25,11 @@ describe('useRouteUpdateActions', () => {
       hasLaunchedRecovery: true,
       toggleERWizAsActiveUser: mockToggleERWizard,
       recoveryMap: {
-        route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+        route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+        step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
       },
       setRecoveryMap: mockSetRecoveryMap,
+      doorStatusUtils: { isProhibitedDoorOpen: false, isDoorOpen: false },
     }
   })
 
@@ -38,7 +39,7 @@ describe('useRouteUpdateActions', () => {
     )
     const { proceedNextStep } = result.current
 
-    proceedNextStep()
+    void proceedNextStep()
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: OPTION_SELECTION.ROUTE,
       step: OPTION_SELECTION.STEPS.SELECT,
@@ -56,7 +57,7 @@ describe('useRouteUpdateActions', () => {
 
     const { proceedNextStep } = result.current
 
-    proceedNextStep()
+    void proceedNextStep()
 
     expect(mockToggleERWizard).toHaveBeenCalled()
   })
@@ -67,7 +68,7 @@ describe('useRouteUpdateActions', () => {
     )
     const { goBackPrevStep } = result.current
 
-    goBackPrevStep()
+    void goBackPrevStep()
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: OPTION_SELECTION.ROUTE,
       step: OPTION_SELECTION.STEPS.SELECT,
@@ -85,7 +86,7 @@ describe('useRouteUpdateActions', () => {
 
     const { goBackPrevStep } = result.current
 
-    goBackPrevStep()
+    void goBackPrevStep()
 
     expect(mockToggleERWizard).toHaveBeenCalled()
   })
@@ -96,56 +97,106 @@ describe('useRouteUpdateActions', () => {
     )
     const { proceedToRouteAndStep } = result.current
 
-    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
+    void proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
     })
   })
 
-  it('routes to "robot in motion" when no other motion path is specified', () => {
+  it('routes to "robot in motion" when no other motion path is specified', async () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { setRobotInMotion } = result.current
+    const { handleMotionRouting } = result.current
 
-    setRobotInMotion(true)
+    await handleMotionRouting(true)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
     })
   })
 
-  it('routes to alternative motion routes if specified', () => {
+  it('rejects before routing to an "in motion" route if the door is open', async () => {
+    const params = {
+      ...useRouteUpdateActionsParams,
+      doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: false },
+    }
+
+    const { result } = renderHook(() => useRouteUpdateActions(params))
+    const { handleMotionRouting } = result.current
+
+    await expect(handleMotionRouting(true)).rejects.toThrow()
+
+    expect(mockSetRecoveryMap).toHaveBeenCalledWith({
+      route: RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE,
+      step: RECOVERY_MAP.ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN,
+    })
+  })
+
+  it(`does not reject if the door is open but the step is ${RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE}`, async () => {
+    const params = {
+      ...useRouteUpdateActionsParams,
+      doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: false },
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        step:
+          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
+      },
+    }
+
+    const { result } = renderHook(() => useRouteUpdateActions(params))
+    const { handleMotionRouting } = result.current
+
+    await expect(handleMotionRouting(true)).resolves.not.toThrow()
+  })
+
+  it(`does not reject if the door is open but the step is ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE}`, async () => {
+    const params = {
+      ...useRouteUpdateActionsParams,
+      doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: false },
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        step: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE,
+      },
+    }
+
+    const { result } = renderHook(() => useRouteUpdateActions(params))
+    const { handleMotionRouting } = result.current
+
+    await expect(handleMotionRouting(true)).resolves.not.toThrow()
+  })
+
+  it('routes to alternative motion routes if specified', async () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { setRobotInMotion } = result.current
+    const { handleMotionRouting } = result.current
 
-    setRobotInMotion(true, RECOVERY_MAP.ROBOT_RESUMING.ROUTE)
+    await handleMotionRouting(true, RECOVERY_MAP.ROBOT_RESUMING.ROUTE)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_RESUMING.ROUTE,
       step: RECOVERY_MAP.ROBOT_RESUMING.STEPS.RESUMING,
     })
   })
 
-  it('routes to the route prior to motion after the motion completes', () => {
+  it('routes to the route prior to motion after the motion completes', async () => {
     const { result, rerender } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { setRobotInMotion } = result.current
+    const { handleMotionRouting } = result.current
 
-    setRobotInMotion(true)
+    await handleMotionRouting(true)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
     })
 
-    setRobotInMotion(false)
+    void handleMotionRouting(false)
     rerender()
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
-      route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-      step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+      route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+      step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
     })
   })
 
@@ -155,7 +206,7 @@ describe('useRouteUpdateActions', () => {
     )
     const { proceedToRouteAndStep } = result.current
 
-    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
+    void proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
@@ -168,13 +219,13 @@ describe('useRouteUpdateActions', () => {
     )
     const { proceedToRouteAndStep } = result.current
 
-    proceedToRouteAndStep(
-      RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-      RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY
+    void proceedToRouteAndStep(
+      RECOVERY_MAP.RETRY_STEP.ROUTE,
+      RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY
     )
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
-      route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-      step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+      route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+      step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
     })
   })
 
@@ -184,7 +235,10 @@ describe('useRouteUpdateActions', () => {
     )
     const { proceedToRouteAndStep } = result.current
 
-    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE, 'invalid-step')
+    void proceedToRouteAndStep(
+      RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
+      'invalid-step' as any
+    )
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,

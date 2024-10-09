@@ -87,8 +87,22 @@ export interface Run {
   data: RunData
 }
 
+export interface RunCurrentState {
+  data: RunCurrentStateData
+  links: RunCommandLink
+}
+
 export interface RunsLinks {
   current?: ResourceLink
+}
+
+export interface RunCommandLink {
+  current: CommandLinkNoMeta
+}
+
+export interface CommandLinkNoMeta {
+  id: string
+  href: string
 }
 
 export interface GetRunsParams {
@@ -98,6 +112,10 @@ export interface GetRunsParams {
 export interface Runs {
   data: RunData[]
   links: RunsLinks
+}
+
+export interface RunCurrentStateData {
+  activeNozzleLayouts: Record<string, NozzleLayoutValues> // keyed by pipetteId
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
@@ -173,3 +191,13 @@ export interface UpdateErrorRecoveryPolicyRequest {
 }
 
 export type UpdateErrorRecoveryPolicyResponse = Record<string, never>
+
+/**
+ * Current Run State Data
+ */
+export interface NozzleLayoutValues {
+  startingNozzle: string
+  activeNozzles: string[]
+  config: NozzleLayoutConfig
+}
+export type NozzleLayoutConfig = 'column' | 'row' | 'full' | 'subrect'

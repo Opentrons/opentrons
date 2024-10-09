@@ -161,6 +161,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
     check_overpressure,
+    grab_pressure,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -368,6 +369,14 @@ class OT3Controller(FlexBackend):
         finally:
             self._move_manager.update_constraints(old_system_constraints)
             log.debug(f"Restore previous system constraints: {old_system_constraints}")
+
+    @asynccontextmanager
+    async def grab_pressure(
+        self, channels: int, mount: OT3Mount
+    ) -> AsyncIterator[None]:
+        tool = axis_to_node(Axis.of_main_tool_actuator(mount))
+        async with grab_pressure(channels, tool, self._messenger):
+            yield
 
     def update_constraints_for_calibration_with_gantry_load(
         self,

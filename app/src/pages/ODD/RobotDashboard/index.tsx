@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { Navigation } from '/app/organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
@@ -36,7 +36,7 @@ export function RobotDashboard(): JSX.Element {
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )
-  const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
+  const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(
     unfinishedUnboxingFlowRoute !== null
   )
 

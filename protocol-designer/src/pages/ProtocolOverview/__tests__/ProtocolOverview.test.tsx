@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -17,6 +16,8 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import { ProtocolOverview } from '../index'
 import { DeckThumbnail } from '../DeckThumbnail'
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
+import { InstrumentsInfo } from '../InstrumentsInfo'
+import { LiquidDefinitions } from '../LiquidDefinitions'
 
 import type { NavigateFunction } from 'react-router-dom'
 
@@ -28,6 +29,9 @@ vi.mock('../../../organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-ingred/selectors')
+vi.mock('../LiquidDefinitions')
+vi.mock('../InstrumentsInfo')
+
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -73,6 +77,10 @@ describe('ProtocolOverview', () => {
     vi.mocked(OffDeckThumbnail).mockReturnValue(
       <div>mock OffdeckThumbnail</div>
     )
+    vi.mocked(LiquidDefinitions).mockReturnValue(
+      <div>mock LiquidDefinitions</div>
+    )
+    vi.mocked(InstrumentsInfo).mockReturnValue(<div>mock InstrumentsInfo</div>)
   })
 
   it('renders each section with text', () => {
@@ -94,15 +102,13 @@ describe('ProtocolOverview', () => {
     screen.getByText('Last exported')
     screen.getByText('Required app version')
     screen.getByText('8.0.0 or higher')
+
     //  instruments
-    screen.getByText('Instruments')
-    screen.getByText('Robot type')
-    screen.getAllByText('Opentrons Flex')
-    screen.getByText('Left pipette')
-    screen.getByText('Right pipette')
-    screen.getByText('Extension mount')
+    screen.getByText('mock InstrumentsInfo')
+
     //   liquids
-    screen.getByText('Liquid Definitions')
+    screen.getByText('mock LiquidDefinitions')
+
     //  steps
     screen.getByText('Protocol steps')
   })
@@ -121,7 +127,8 @@ describe('ProtocolOverview', () => {
       description: undefined,
     })
     render()
-    expect(screen.getAllByText('N/A').length).toBe(7)
+    // ToDo (kk: 2024/10/07) this part should be replaced
+    expect(screen.getAllByText('N/A').length).toBe(4)
   })
 
   it('navigates to starting deck state', () => {

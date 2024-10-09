@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 
@@ -71,7 +71,7 @@ describe('IgnoreErrorSkipStep', () => {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: 'UNKNOWN_STEP',
+        step: 'UNKNOWN_STEP' as any,
       },
     }
     render(props)
@@ -109,8 +109,8 @@ describe('IgnoreErrorStepHome', () => {
     clickButtonLabeled('Continue')
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-        RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-        RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP
+        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP
       )
     })
   })
@@ -124,8 +124,8 @@ describe('IgnoreErrorStepHome', () => {
     })
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-        RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-        RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP
+        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP
       )
     })
   })

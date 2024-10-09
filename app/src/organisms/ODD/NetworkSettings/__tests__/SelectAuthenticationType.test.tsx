@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
-import { useIsUnboxingFlowOngoing } from '../../hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 import { SetWifiCred } from '../SetWifiCred'
@@ -20,7 +20,7 @@ vi.mock('../SetWifiCred')
 vi.mock('/app/redux/networking')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../AlternativeSecurityTypeModal')
-vi.mock('../../hooks')
+vi.mock('/app/redux-resources/config')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

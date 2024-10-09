@@ -1,17 +1,16 @@
-import * as React from 'react'
 import { vi, it, describe } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { ProtocolsEmptyState } from '/app/organisms/ProtocolsLanding/ProtocolsEmptyState'
+import { ProtocolsEmptyState } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolsEmptyState'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
-import { ProtocolList } from '/app/organisms/ProtocolsLanding/ProtocolList'
+import { ProtocolList } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolList'
 import { ProtocolsLanding } from '..'
 
 vi.mock('/app/redux/protocol-storage')
-vi.mock('/app/organisms/ProtocolsLanding/ProtocolsEmptyState')
-vi.mock('/app/organisms/ProtocolsLanding/ProtocolList')
+vi.mock('/app/organisms/Desktop/ProtocolsLanding/ProtocolsEmptyState')
+vi.mock('/app/organisms/Desktop/ProtocolsLanding/ProtocolList')
 
 const render = () => {
   return renderWithProviders(<ProtocolsLanding />)[0]

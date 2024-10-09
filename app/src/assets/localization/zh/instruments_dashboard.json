@@ -1,0 +1,10 @@
+{
+  "calibrate": "校准",
+  "detach": "卸载",
+  "firmware_version": "固件版本",
+  "last_calibrated": "上次校准",
+  "no_cal_data": "无校准数据",
+  "pipette_calibrations_differ": "<bold>建议重新校准移液器</bold> 已连接的移液器校准数据差异很大。正确校准时，这些数据应该近似。",
+  "recalibrate": "重新校准",
+  "serial_number": "序列号"
+}

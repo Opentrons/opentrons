@@ -249,6 +249,19 @@ describe('useRecoveryCommands', () => {
     )
   })
 
+  it('should call releaseGripperJaws and resolve the promise', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    const consoleLogSpy = vi.spyOn(console, 'log')
+
+    await act(async () => {
+      await result.current.releaseGripperJaws()
+    })
+
+    expect(consoleLogSpy).toHaveBeenCalledWith('PLACEHOLDER RELEASE THE JAWS')
+    consoleLogSpy.mockRestore()
+  })
+
   it('should call skipFailedCommand and show success toast on success', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 

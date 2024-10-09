@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -7,7 +7,18 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { SelectGripper } from '../SelectGripper'
 
+import type { NavigateFunction } from 'react-router-dom'
 import type { WizardFormState, WizardTileProps } from '../types'
+
+const mockLocation = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useLocation: () => mockLocation,
+  }
+})
 
 const render = (props: React.ComponentProps<typeof SelectGripper>) => {
   return renderWithProviders(<SelectGripper {...props} />, {

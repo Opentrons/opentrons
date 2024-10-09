@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Box, BORDERS, SPACING } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 

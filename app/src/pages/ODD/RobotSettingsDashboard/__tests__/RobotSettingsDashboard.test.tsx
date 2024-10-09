@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -10,7 +9,7 @@ import { getRobotSettings } from '/app/redux/robot-settings'
 import { getLocalRobot } from '/app/redux/discovery'
 import { toggleDevtools, toggleHistoricOffsets } from '/app/redux/config'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { Navigation } from '/app/organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -21,24 +20,27 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
-import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
-import { useLEDLights } from '/app/organisms/Devices/hooks'
+import { useNetworkConnection } from '/app/resources/networking'
+import { useLEDLights } from '/app/resources/robot-settings'
 
 import { RobotSettingsDashboard } from '../'
 
+vi.mock('/app/resources/networking', async () => {
+  const actual = await vi.importActual('/app/resources/networking')
+  return { ...actual, useNetworkConnection: vi.fn() }
+})
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/robot-settings')
-vi.mock('/app/resources/networking/hooks/useNetworkConnection')
-vi.mock('/app/organisms/Navigation')
+vi.mock('/app/resources/robot-settings')
+vi.mock('/app/organisms/ODD/Navigation')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/DeviceReset')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/RobotSystemVersion')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchscreenBrightness')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 
 const mockToggleLights = vi.fn()

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -13,11 +13,12 @@ import {
   setCommandIntent,
 } from './utils'
 import { getIsOnDevice } from '/app/redux/config'
+// TODO: refactor this so helper code doesn't spawn UI
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
-import type { ModulePrepCommandsType } from '/app/organisms/Devices/getModulePrepCommands'
 import type {
   CreateMaintenanceRunType,
   UseCreateMaintenanceRunMutationOptions,
@@ -72,7 +73,7 @@ export function useChainRunCommands(
   ) => ReturnType<typeof chainRunCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const { createRunCommand } = useCreateRunCommandMutation(
     runId,
@@ -95,16 +96,16 @@ export function useChainRunCommands(
 
 export function useChainLiveCommands(): {
   chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
+    commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => ReturnType<typeof chainLiveCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   return {
     chainLiveCommands: (
-      commands: ModulePrepCommandsType[],
+      commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ) =>
       chainLiveCommandsRecursive(

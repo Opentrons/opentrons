@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { SidePanel as SidePanelComponent } from './SidePanel'
 import { Text, Flex, JUSTIFY_CENTER, ALIGN_CENTER } from '@opentrons/components'
 

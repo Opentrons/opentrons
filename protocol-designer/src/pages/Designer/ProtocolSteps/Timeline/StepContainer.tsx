@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import {
   ALIGN_CENTER,
@@ -7,16 +6,16 @@ import {
   Box,
   Btn,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_START,
   OverflowBtn,
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getUnsavedForm } from '../../../../step-forms/selectors'
 import { getTopPortalEl } from '../../../../components/portals/TopPortal'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
@@ -32,16 +31,20 @@ export interface StepContainerProps {
   stepId?: string
   iconColor?: string
   onClick?: (event: React.MouseEvent) => void
+  onDoubleClick?: (event: React.MouseEvent) => void
   onMouseEnter?: (event: React.MouseEvent) => void
   onMouseLeave?: (event: React.MouseEvent) => void
   selected?: boolean
   hovered?: boolean
+  hasError?: boolean
+  isStepAfterError?: boolean
 }
 
 export function StepContainer(props: StepContainerProps): JSX.Element {
   const {
     stepId,
     iconName,
+    onDoubleClick,
     onMouseEnter,
     onMouseLeave,
     selected,
@@ -49,8 +52,9 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     hovered,
     iconColor,
     title,
+    hasError = false,
+    isStepAfterError = false,
   } = props
-  const formData = useSelector(getUnsavedForm)
   const [top, setTop] = React.useState<number>(0)
   const menuRootRef = React.useRef<HTMLDivElement | null>(null)
   const [stepOverflowMenu, setStepOverflowMenu] = React.useState<boolean>(false)
@@ -66,6 +70,10 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   if (hovered && !selected) {
     backgroundColor = COLORS.blue30
     color = COLORS.black90
+  }
+  if (hasError) {
+    backgroundColor = COLORS.red50
+    color = COLORS.white
   }
 
   const handleOverflowClick = (event: React.MouseEvent): void => {
@@ -103,14 +111,23 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
 
   return (
     <>
-      <Box id={stepId} {...{ onMouseEnter, onMouseLeave }}>
+      <Box
+        id={stepId}
+        {...{
+          onMouseEnter: isStepAfterError ? undefined : onMouseEnter,
+          onMouseLeave: isStepAfterError ? undefined : onMouseLeave,
+        }}
+      >
         <Btn
+          onDoubleClick={onDoubleClick}
           onClick={onClick}
           padding={SPACING.spacing12}
           borderRadius={BORDERS.borderRadius8}
-          width={formData != null ? '6rem' : '100%'}
+          width="100%"
           backgroundColor={backgroundColor}
           color={color}
+          opacity={isStepAfterError ? '50%' : '100%'}
+          cursor={isStepAfterError ? CURSOR_DEFAULT : CURSOR_POINTER}
         >
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -120,22 +137,20 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             <Flex
               alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing8}
-              justifyContent={formData != null ? JUSTIFY_CENTER : JUSTIFY_START}
+              justifyContent={JUSTIFY_START}
               width="100%"
             >
               {iconName && (
                 <Icon size="1rem" name={iconName} color={iconColor ?? color} />
               )}
-              {formData != null ? null : (
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {capitalizeFirstLetterAfterNumber(title)}
-                </StyledText>
-              )}
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {capitalizeFirstLetterAfterNumber(title)}
+              </StyledText>
             </Flex>
-            {hovered && !isStartingOrEndingState && formData == null ? (
+            {selected && !isStartingOrEndingState ? (
               <OverflowBtn
                 data-testid={`StepContainer_${stepId}`}
-                fillColor={hovered && !selected ? COLORS.grey50 : COLORS.white}
+                fillColor={COLORS.white}
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -150,6 +165,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       {stepOverflowMenu && stepId != null
         ? createPortal(
             <StepOverflowMenu
+              setStepOverflowMenu={setStepOverflowMenu}
               stepId={stepId}
               menuRootRef={menuRootRef}
               top={top}

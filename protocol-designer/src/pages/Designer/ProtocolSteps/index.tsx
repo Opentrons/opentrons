@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,24 +11,25 @@ import {
   ToggleGroup,
 } from '@opentrons/components'
 import { getUnsavedForm } from '../../../step-forms/selectors'
+import { getSelectedSubstep } from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
-import { TimelineToolbox } from './Timeline'
+import { TimelineToolbox, SubstepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
 
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state'])
   const formData = useSelector(getUnsavedForm)
+  const selectedSubstep = useSelector(getSelectedSubstep)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
-
-  const [deckView, setDeckView] = React.useState<
+  const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
 
   const formType = formData?.stepType
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formData != null && formType !== 'moveLabware') {
       setDeckView(leftString)
     }
@@ -36,6 +37,7 @@ export function ProtocolSteps(): JSX.Element {
 
   return (
     <>
+      {selectedSubstep ? <SubstepsToolbox stepId={selectedSubstep} /> : null}
       <StepForm />
       <Flex
         backgroundColor={COLORS.grey10}

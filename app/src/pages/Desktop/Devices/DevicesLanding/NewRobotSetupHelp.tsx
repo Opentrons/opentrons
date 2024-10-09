@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -14,7 +14,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =
@@ -24,9 +24,7 @@ const NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF =
 
 export function NewRobotSetupHelp(): JSX.Element {
   const { t } = useTranslation(['devices_landing', 'shared', 'branded'])
-  const [showNewRobotHelpModal, setShowNewRobotHelpModal] = React.useState(
-    false
-  )
+  const [showNewRobotHelpModal, setShowNewRobotHelpModal] = useState(false)
 
   return (
     <>

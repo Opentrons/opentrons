@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Markdown from 'react-markdown'
 
 import { Box, COLORS, SPACING, LegacyStyledText } from '@opentrons/components'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { it, describe, beforeEach, vi, afterEach, expect } from 'vitest'
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'

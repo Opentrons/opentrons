@@ -14,7 +14,7 @@ import {
   CURSOR_POINTER,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getDevtoolsEnabled,
   getUpdateChannel,

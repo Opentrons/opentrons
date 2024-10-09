@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -46,11 +46,10 @@ export const FilePage = (): JSX.Element => {
   )
   const modules = useSelector(stepFormSelectors.getModulesForEditModulesCard)
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const [
-    isEditPipetteModalOpen,
-    setEditPipetteModalOpen,
-  ] = React.useState<boolean>(false)
-  const [moduleToEdit, setModuleToEdit] = React.useState<{
+  const [isEditPipetteModalOpen, setEditPipetteModalOpen] = useState<boolean>(
+    false
+  )
+  const [moduleToEdit, setModuleToEdit] = useState<{
     moduleType: ModuleType
     moduleId?: string | null
   } | null>(null)
@@ -84,7 +83,7 @@ export const FilePage = (): JSX.Element => {
     dispatch(actions.saveFileMetadata(nextFormValues))
     setManualDirty(false)
   }
-  const [isManualDirty, setManualDirty] = React.useState<boolean>(false)
+  const [isManualDirty, setManualDirty] = useState<boolean>(false)
   const {
     handleSubmit,
     watch,
@@ -94,7 +93,7 @@ export const FilePage = (): JSX.Element => {
   } = useForm<FileMetadataFields>({ defaultValues: formValues })
   //  to ensure that values from watch are up to date if the defaultValues
   //  change
-  React.useEffect(() => {
+  useEffect(() => {
     setValue('protocolName', formValues.protocolName)
     setValue('created', formValues.created)
     setValue('lastModified', formValues.lastModified)

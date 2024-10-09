@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -24,13 +23,13 @@ import type { RecoveryContentProps } from '../types'
 export function FillWellAndSkip(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
-  const { FILL_MANUALLY_AND_SKIP, CANCEL_RUN } = RECOVERY_MAP
+  const { MANUAL_FILL_AND_SKIP, CANCEL_RUN } = RECOVERY_MAP
 
   const buildContent = (): JSX.Element => {
     switch (step) {
-      case FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL:
+      case MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL:
         return <FillWell {...props} />
-      case FILL_MANUALLY_AND_SKIP.STEPS.SKIP:
+      case MANUAL_FILL_AND_SKIP.STEPS.SKIP:
         return <SkipToNextStep {...props} />
       case CANCEL_RUN.STEPS.CONFIRM_CANCEL:
         return <CancelRun {...props} />
@@ -81,7 +80,7 @@ export function SkipToNextStep(
     currentRecoveryOptionUtils,
   } = props
   const {
-    setRobotInMotion,
+    handleMotionRouting,
     goBackPrevStep,
     proceedToRouteAndStep,
   } = routeUpdateActions
@@ -100,7 +99,7 @@ export function SkipToNextStep(
   }
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+    return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
       skipFailedCommand()
     })
   }

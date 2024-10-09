@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -7,33 +6,34 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
+import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { RunPreviewComponent } from '/app/organisms/Desktop/Devices/RunPreview'
+import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+  useRunHasStarted,
   useModuleRenderInfoForProtocolById,
   useRunStatuses,
-  useSyncRobotClock,
-  useRunHasStarted,
-} from '/app/organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { ProtocolRunSetup } from '/app/organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { RunPreviewComponent } from '/app/organisms/RunPreview'
-import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '/app/resources/runs'
+} from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useRobot } from '/app/redux-resources/robots'
 import { ProtocolRunDetails } from '..'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('/app/organisms/Devices/hooks')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunHeader')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunSetup')
-vi.mock('/app/organisms/RunPreview')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup')
+vi.mock('/app/organisms/Desktop/Devices/RunPreview')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls')
 vi.mock('/app/resources/runs')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters')
+vi.mock(
+  '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+)
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 

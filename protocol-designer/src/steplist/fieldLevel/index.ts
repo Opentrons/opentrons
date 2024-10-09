@@ -7,10 +7,12 @@ import {
   maxFieldValue,
   temperatureRangeFieldValue,
   realNumber,
+  isTimeFormat,
 } from './errors'
 import {
   maskToInteger,
   maskToFloat,
+  maskToTime,
   numberOrNull,
   onlyPositiveNumbers,
   defaultTo,
@@ -346,6 +348,11 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   pauseAction: {
     getErrors: composeErrors(requiredField),
   },
+  pauseTime: {
+    maskValue: composeMaskers(maskToTime),
+    getErrors: composeErrors(isTimeFormat),
+    castValue: String,
+  },
   pauseTemperature: {
     getErrors: composeErrors(
       minFieldValue(MIN_TEMP_MODULE_TEMP),
@@ -374,6 +381,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     ),
   },
   profileVolume: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     getErrors: composeErrors(
       minFieldValue(MIN_TC_PROFILE_VOLUME),
       maxFieldValue(MAX_TC_PROFILE_VOLUME)

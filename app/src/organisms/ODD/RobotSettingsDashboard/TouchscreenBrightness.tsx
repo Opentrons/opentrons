@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -16,7 +16,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
@@ -54,7 +54,7 @@ export function TouchscreenBrightness({
   const { t } = useTranslation(['device_settings'])
   const dispatch = useDispatch<Dispatch>()
   const initialBrightness = useSelector(getOnDeviceDisplaySettings).brightness
-  const [brightness, setBrightness] = React.useState<number>(initialBrightness)
+  const [brightness, setBrightness] = useState<number>(initialBrightness)
   const brightnessLevel = [6, 5, 4, 3, 2, 1]
 
   const handleClick = (changeType: 'up' | 'down'): void => {

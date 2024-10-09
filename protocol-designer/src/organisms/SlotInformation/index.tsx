@@ -1,4 +1,4 @@
-import React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import {
@@ -10,6 +10,7 @@ import {
   ListItemDescriptor,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type { RobotType } from '@opentrons/shared-data'
@@ -113,7 +114,18 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
     <ListItem type="noActive">
       <ListItemDescriptor
         type="mini"
-        content={stackInformation ?? t('none')}
+        content={
+          stackInformation != null ? (
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              textAlign={TYPOGRAPHY.textAlignRight}
+            >
+              {stackInformation}
+            </StyledText>
+          ) : (
+            t('none')
+          )
+        }
         description={title}
       />
     </ListItem>

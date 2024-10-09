@@ -1,13 +1,12 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RobotSettingsCalibration } from '/app/organisms/RobotSettingsCalibration'
-import { RobotSettingsNetworking } from '/app/organisms/Devices/RobotSettings/RobotSettingsNetworking'
-import { RobotSettingsAdvanced } from '/app/organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
+import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { useRobot } from '/app/redux-resources/robots'
 import { RobotSettings } from '..'
 import { when } from 'vitest-when'
@@ -18,9 +17,9 @@ import {
 } from '/app/redux/discovery/__fixtures__'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 
-vi.mock('/app/organisms/RobotSettingsCalibration')
-vi.mock('/app/organisms/Devices/RobotSettings/RobotSettingsNetworking')
-vi.mock('/app/organisms/Devices/RobotSettings/RobotSettingsAdvanced')
+vi.mock('/app/organisms/Desktop/RobotSettingsCalibration')
+vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking')
+vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/robot-update')

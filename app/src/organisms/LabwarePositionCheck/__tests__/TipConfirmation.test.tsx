@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { TipConfirmation } from '../TipConfirmation'

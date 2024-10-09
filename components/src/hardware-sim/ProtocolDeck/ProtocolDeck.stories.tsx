@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import analysisFileFixture from './__fixtures__/analysis_QIAseqFX24xv4_8.json'
 
 import { ProtocolDeck as ProtocolDeckComponent } from './'

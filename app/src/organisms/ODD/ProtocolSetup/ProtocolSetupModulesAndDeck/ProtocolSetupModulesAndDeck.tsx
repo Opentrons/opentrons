@@ -6,8 +6,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  JUSTIFY_CENTER,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -16,18 +17,20 @@ import {
 } from '@opentrons/shared-data'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { FloatingActionButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
-import { useAttachedModules } from '/app/organisms/Devices/hooks'
-import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '/app/resources/runs'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useAttachedModules } from '/app/resources/modules'
 import {
+  getProtocolModulesInfo,
   getAttachedProtocolModuleMatches,
-  getUnmatchedModulesForProtocol,
-} from './utils'
+} from '/app/transformations/analysis'
+import {
+  useRunStatus,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
+import { getUnmatchedModulesForProtocol } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
@@ -136,11 +139,13 @@ export function ProtocolSetupModulesAndDeck({
         marginBottom={SPACING.spacing80}
       >
         {showMapView ? (
-          <ModulesAndDeckMapView
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            runId={runId}
-            protocolAnalysis={mostRecentAnalysis}
-          />
+          <Flex height="55vh" justifyContent={JUSTIFY_CENTER}>
+            <ModulesAndDeckMapView
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              runId={runId}
+              protocolAnalysis={mostRecentAnalysis}
+            />
+          </Flex>
         ) : (
           <>
             {isModuleMismatch && !clearModuleMismatchBanner ? (

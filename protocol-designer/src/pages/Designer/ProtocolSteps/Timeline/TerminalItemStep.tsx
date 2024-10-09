@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
@@ -16,6 +15,10 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
 } from '../../../../components/modals/ConfirmDeleteModal'
+import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '../../../../ui/steps/actions/actions'
 import { StepContainer } from './StepContainer'
 
 import type {
@@ -41,14 +44,17 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
 
   const selectItem = (): SelectTerminalItemAction =>
     dispatch(stepsActions.selectTerminalItem(id))
-
   const onMouseEnter = (): HoverOnTerminalItemAction =>
     dispatch(stepsActions.hoverOnTerminalItem(id))
   const onMouseLeave = (): HoverOnTerminalItemAction =>
     dispatch(stepsActions.hoverOnTerminalItem(null))
-
+  const handleConfirm = (): void => {
+    dispatch(toggleViewSubstep(null))
+    dispatch(hoverOnStep(null))
+    selectItem()
+  }
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    selectItem,
+    handleConfirm,
     currentFormIsPresaved || formHasChanges
   )
 
@@ -70,7 +76,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
       <StepContainer
         {...{
           stepId: `TerminalItem_${id}`,
-          iconName: 'arrow-right',
+          iconName: title === 'Starting deck state' ? 'ot-start' : 'ot-end',
           hovered,
           selected,
           title,

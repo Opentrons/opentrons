@@ -1,5 +1,5 @@
 // labware load name with copy button
-import * as React from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { IconButton, DeprecatedTooltip } from '@opentrons/components'
 import { LabelText, LABEL_TOP } from '../ui'
 import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'
@@ -14,14 +14,14 @@ export interface LoadNameProps {
 
 export function LoadName(props: LoadNameProps): JSX.Element {
   const { loadName } = props
-  const [success, setSuccess] = React.useState(false)
-  const inputRef = React.useRef<HTMLInputElement>(null)
-  const successTimeout = React.useRef<NodeJS.Timeout | null>(null)
+  const [success, setSuccess] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const successTimeout = useRef<NodeJS.Timeout | null>(null)
   const cleanupSuccessTimeout = (): void => {
     if (successTimeout.current) clearTimeout(successTimeout.current)
   }
 
-  React.useEffect(() => cleanupSuccessTimeout, [])
+  useEffect(() => cleanupSuccessTimeout, [])
 
   // note: we could choose to always copy the entire loadName string here,
   // regardless of what the user selects, but the benefit of catching missed

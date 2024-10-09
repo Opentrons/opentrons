@@ -230,7 +230,7 @@ class WellDefinition(BaseModel):
 
 class SphericalSegment(BaseModel):
     shape: Literal["spherical"] = Field(..., description="Denote shape as spherical")
-    radius_of_curvature: _NonNegativeNumber = Field(
+    radiusOfCurvature: _NonNegativeNumber = Field(
         ...,
         description="radius of curvature of bottom subsection of wells",
     )

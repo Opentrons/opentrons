@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -11,22 +10,22 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { POSITION_AND_BLOWOUT } from '../constants'
-import { JogControls } from '../../../molecules/JogControls'
+import { DT_ROUTES } from '../constants'
+import { JogControls } from '/app/molecules/JogControls'
 import { DropTipFooterButtons } from '../shared'
 
 import type { DropTipWizardContainerProps } from '../types'
-import type { UseConfirmPositionResult } from '../ConfirmPosition'
+import type { UseConfirmPositionResult } from './ConfirmPosition'
 
 type JogToPositionProps = DropTipWizardContainerProps & UseConfirmPositionResult
 
 export const JogToPosition = ({
   goBackRunValid,
   dropTipCommands,
-  currentStep,
+  currentRoute,
   isOnDevice,
-  toggleShowConfirmPosition,
   modalStyle,
+  proceed,
 }: JogToPositionProps): JSX.Element | null => {
   const { handleJog } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
@@ -41,7 +40,7 @@ export const JogToPosition = ({
           {t('position_the_pipette')}
         </StyledText>
         <LegacyStyledText as="p">
-          {currentStep === POSITION_AND_BLOWOUT
+          {currentRoute === DT_ROUTES.BLOWOUT
             ? t('position_and_blowout')
             : t('position_and_drop_tip')}
         </LegacyStyledText>
@@ -59,7 +58,7 @@ export const JogToPosition = ({
           height={isOnDevice ? '80%' : '100%'}
         />
         <DropTipFooterButtons
-          primaryBtnOnClick={toggleShowConfirmPosition}
+          primaryBtnOnClick={proceed}
           primaryBtnTextOverride={t('shared:confirm_position')}
           secondaryBtnOnClick={goBackRunValid}
         />
