@@ -5,7 +5,7 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { getFailedCommandPipetteInfo, getNextSteps } from '../utils'
+import { getNextSteps } from '../utils'
 import { useDeckMapUtils } from './useDeckMapUtils'
 import {
   useNotifyAllCommandsQuery,
@@ -20,7 +20,6 @@ import { useShowDoorInfo } from './useShowDoorInfo'
 import { useCleanupRecoveryState } from './useCleanupRecoveryState'
 import { useFailedPipetteUtils } from './useFailedPipetteUtils'
 
-import type { PipetteData } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { IRecoveryMap, RouteStep, RecoveryRoute } from '../types'
 import type { ErrorRecoveryFlowsProps } from '..'
@@ -61,7 +60,6 @@ export interface ERUtilsResults {
   deckMapUtils: UseDeckMapUtilsResult
   getRecoveryOptionCopy: ReturnType<typeof useRecoveryOptionCopy>
   recoveryActionMutationUtils: RecoveryActionMutationResult
-  failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
@@ -117,11 +115,13 @@ export function useERUtils({
     robotType,
   })
 
-  const failedPipetteInfo = getFailedCommandPipetteInfo({
-    failedCommandByRunRecord,
+  const failedPipetteUtils = useFailedPipetteUtils({
+    runId,
+    failedCommandByRunRecord: failedCommand?.byRunRecord ?? null,
     runRecord,
     attachedInstruments,
   })
+  const { failedPipetteInfo } = failedPipetteUtils
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
@@ -145,11 +145,6 @@ export function useERUtils({
     runRecord,
     runCommands,
   })
-
-  const failedPipetteUtils = useFailedPipetteUtils(
-    runId,
-    failedCommand?.byRunRecord ?? null
-  )
 
   const recoveryCommands = useRecoveryCommands({
     runId,
@@ -199,7 +194,6 @@ export function useERUtils({
     tipStatusUtils,
     failedLabwareUtils,
     failedPipetteUtils,
-    failedPipetteInfo,
     deckMapUtils,
     getRecoveryOptionCopy,
     stepCounts,
