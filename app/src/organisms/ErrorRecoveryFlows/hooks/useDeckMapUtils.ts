@@ -21,6 +21,7 @@ import type {
   CutoutConfigProtocolSpec,
   LoadedLabware,
   RobotType,
+  LabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
@@ -255,18 +256,21 @@ export function getRunCurrentLabwareInfo({
   runRecord: UseDeckMapUtilsProps['runRecord']
   protocolAnalysis: UseDeckMapUtilsProps['protocolAnalysis']
 }): RunCurrentLabwareInfo[] {
-  console.log("runRecord: ", runRecord)
   if (runRecord == null || protocolAnalysis == null) {
     return []
   } else {
     return runRecord.data.labware.reduce((acc: RunCurrentLabwareInfo[], lw) => {
       const loc = lw.location
       const [slotName, labwareLocation] = getSlotNameAndLwLocFrom(loc, true) // Exclude modules since handled separately.
-      const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
-        protocolAnalysis.commands
-      )
-      if (!labwareDefinitionsByUri){
-        labwareDefinitionsByUri = getFixedTrashLabwareDefinitionsByUri(lw.definitionUri)
+      let labwareDefinitionsByUri: LabwareDefinitionsByUri
+      if (lw.id === 'fixedTrash') {
+        labwareDefinitionsByUri = getFixedTrashLabwareDefinitionsByUri(
+          lw.definitionUri
+        )
+      } else {
+        labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
+          protocolAnalysis.commands
+        )
       }
       const labwareDef = labwareDefinitionsByUri[lw.definitionUri]
 
