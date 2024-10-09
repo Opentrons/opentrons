@@ -75,11 +75,11 @@ export const SelectableLabware = (props: Props): JSX.Element => {
       const primaryWells: WellGroup = reduce(
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
-          const wellSet = getWellSetForMultichannel(
+          const wellSet = getWellSetForMultichannel({
             labwareDef,
             wellName,
-            channels
-          )
+            channels,
+          })
           if (!wellSet) return acc
           return { ...acc, [wellSet[0]]: null }
         },
@@ -109,7 +109,8 @@ export const SelectableLabware = (props: Props): JSX.Element => {
           selectedWells,
           (acc: WellGroup, _, wellName: string): WellGroup => {
             const wellSetForMulti =
-              getWellSetForMultichannel(labwareDef, wellName, channels) || []
+              getWellSetForMultichannel({ labwareDef, wellName, channels }) ||
+              []
             const channelWells = arrayToWellGroup(wellSetForMulti)
             return {
               ...acc,
@@ -144,11 +145,11 @@ export const SelectableLabware = (props: Props): JSX.Element => {
   const handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
     if (nozzleType != null) {
       const channels = getChannelsFromNozleType(nozzleType)
-      const wellSet = getWellSetForMultichannel(
+      const wellSet = getWellSetForMultichannel({
         labwareDef,
-        args.wellName,
-        channels
-      )
+        wellName: args.wellName,
+        channels,
+      })
       const nextHighlightedWells = arrayToWellGroup(wellSet || [])
       nextHighlightedWells && updateHighlightedWells(nextHighlightedWells)
     } else {
@@ -163,11 +164,11 @@ export const SelectableLabware = (props: Props): JSX.Element => {
           selectedPrimaryWells,
           (acc, _, wellName): WellGroup => {
             const channels = getChannelsFromNozleType(nozzleType)
-            const wellSet = getWellSetForMultichannel(
+            const wellSet = getWellSetForMultichannel({
               labwareDef,
               wellName,
-              channels
-            )
+              channels,
+            })
             if (!wellSet) return acc
             return { ...acc, ...arrayToWellGroup(wellSet) }
           },
