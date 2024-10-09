@@ -6,11 +6,11 @@ export function PlateReader(): JSX.Element {
       <g id="plateReader">
         <rect
           style={{
-            fill: '#cbcccc',
+            fill: '#DEDEDE',
           }}
           y="0"
           width="298.9"
-          height="95.5"
+          height="101"
           rx="4.7"
           ry="4.7"
         />
