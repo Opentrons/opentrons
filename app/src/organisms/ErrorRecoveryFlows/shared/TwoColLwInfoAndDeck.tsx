@@ -10,6 +10,8 @@ import { RECOVERY_MAP } from '../constants'
 
 import type { RecoveryContentProps } from '../types'
 
+// TODO(jh, 10-09-24): Add testing for this component.
+
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps
 ): JSX.Element | null {
