@@ -215,10 +215,9 @@ export function useRecoveryCommands({
     failedCommandByRunRecord?.commandType,
   ])
 
-  const releaseGripperJaws = useCallback((): Promise<void> => {
-    console.log('PLACEHOLDER RELEASE THE JAWS')
-    return Promise.resolve()
-  }, [])
+  const releaseGripperJaws = useCallback((): Promise<CommandData[]> => {
+    return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
+  }, [chainRunRecoveryCommands])
 
   return {
     resumeRun,
