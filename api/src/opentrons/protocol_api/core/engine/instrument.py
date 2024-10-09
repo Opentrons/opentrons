@@ -34,7 +34,7 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from . import deck_conflict, overlap_versions
+from . import overlap_versions, pipette_movement_conflict
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -153,7 +153,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     absolute_point=location.point,
                 )
             )
-            deck_conflict.check_safe_for_pipette_movement(
+            pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
@@ -244,7 +244,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     absolute_point=location.point,
                 )
             )
-            deck_conflict.check_safe_for_pipette_movement(
+            pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
@@ -321,7 +321,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     absolute_point=location.point,
                 )
             )
-            deck_conflict.check_safe_for_pipette_movement(
+            pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
@@ -371,7 +371,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=z_offset)
         )
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
             labware_id=labware_id,
@@ -421,12 +421,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             absolute_point=location.point,
         )
-        deck_conflict.check_safe_for_tip_pickup_and_return(
+        pipette_movement_conflict.check_safe_for_tip_pickup_and_return(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
             labware_id=labware_id,
         )
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
             labware_id=labware_id,
@@ -486,12 +486,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location = DropTipWellLocation()
 
         if self._engine_client.state.labware.is_tiprack(labware_id):
-            deck_conflict.check_safe_for_tip_pickup_and_return(
+            pipette_movement_conflict.check_safe_for_tip_pickup_and_return(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
             )
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
             labware_id=labware_id,
