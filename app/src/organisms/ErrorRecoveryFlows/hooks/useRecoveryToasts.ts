@@ -105,7 +105,7 @@ export function useRecoveryFullCommandText(
   const relevantCmdIdx = typeof stepNumber === 'number' ? stepNumber : -1
   const relevantCmd = commandTextData?.commands[relevantCmdIdx] ?? null
 
-  const { commandText, stepTexts } = useCommandTextString({
+  const { commandText, kind } = useCommandTextString({
     ...props,
     command: relevantCmd,
   })
@@ -117,7 +117,12 @@ export function useRecoveryFullCommandText(
   else if (relevantCmd === null) {
     return null
   } else {
-    return truncateIfTCCommand(commandText, stepTexts != null)
+    return truncateIfTCCommand(
+      commandText,
+      ['thermocycler/runProfile', 'thermocycler/runExtendedProfile'].includes(
+        kind
+      )
+    )
   }
 }
 
@@ -164,17 +169,20 @@ function handleRecoveryOptionAction<T>(
 }
 
 // Special case the TC text, so it make sense in a success toast.
-function truncateIfTCCommand(commandText: string, isTCText: boolean): string {
-  if (isTCText) {
-    const indexOfCycle = commandText.indexOf('cycle')
+function truncateIfTCCommand(
+  commandText: string,
+  isTCCommand: boolean
+): string {
+  if (isTCCommand) {
+    const indexOfProfile = commandText.indexOf('steps')
 
-    if (indexOfCycle === -1) {
+    if (indexOfProfile === -1) {
       console.warn(
         'TC cycle text has changed. Update Error Recovery TC text utility.'
       )
     }
 
-    return commandText.slice(0, indexOfCycle + 5) // +5 to include "cycle"
+    return commandText.slice(0, indexOfProfile + 5) // +5 to include "steps"
   } else {
     return commandText
   }

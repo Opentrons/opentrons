@@ -1,14 +1,13 @@
 """Protocol API module implementation logic."""
 from __future__ import annotations
 
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     TemperatureStatus,
     MagneticStatus,
-    ThermocyclerStep,
     SpeedStatus,
     module_model_from_string,
 )
@@ -27,7 +26,7 @@ from opentrons.protocol_engine.errors.exceptions import (
     CannotPerformModuleAction,
 )
 
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 
 from ... import validation
 from ..module import (
@@ -327,15 +326,13 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
             cmd.thermocycler.WaitForLidTemperatureParams(moduleId=self.module_id)
         )
 
-    def execute_profile(
+    def _execute_profile_pre_221(
         self,
         steps: List[ThermocyclerStep],
         repetitions: int,
-        block_max_volume: Optional[float] = None,
+        block_max_volume: Optional[float],
     ) -> None:
-        """Execute a Thermocycler Profile."""
-        self._repetitions = repetitions
-        self._step_count = len(steps)
+        """Execute a thermocycler profile using thermocycler/runProfile and flattened steps."""
         engine_steps = [
             cmd.thermocycler.RunProfileStepParams(
                 celsius=step["temperature"],
@@ -351,6 +348,49 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
                 blockMaxVolumeUl=block_max_volume,
             )
         )
+
+    def _execute_profile_post_221(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float],
+    ) -> None:
+        """Execute a thermocycler profile using thermocycler/runExtendedProfile."""
+        engine_steps: List[
+            Union[cmd.thermocycler.ProfileCycle, cmd.thermocycler.ProfileStep]
+        ] = [
+            cmd.thermocycler.ProfileCycle(
+                repetitions=repetitions,
+                steps=[
+                    cmd.thermocycler.ProfileStep(
+                        celsius=step["temperature"],
+                        holdSeconds=step["hold_time_seconds"],
+                    )
+                    for step in steps
+                ],
+            )
+        ]
+        self._engine_client.execute_command(
+            cmd.thermocycler.RunExtendedProfileParams(
+                moduleId=self.module_id,
+                profileElements=engine_steps,
+                blockMaxVolumeUl=block_max_volume,
+            )
+        )
+
+    def execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> None:
+        """Execute a Thermocycler Profile."""
+        self._repetitions = repetitions
+        self._step_count = len(steps)
+        if self.api_version >= APIVersion(2, 21):
+            return self._execute_profile_post_221(steps, repetitions, block_max_volume)
+        else:
+            return self._execute_profile_pre_221(steps, repetitions, block_max_volume)
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""

@@ -329,6 +329,67 @@ async def test_cycle_temperature(
     )
 
 
+async def test_execute_profile(
+    set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
+) -> None:
+    """It should send a series of set_plate_temperatures from a profile."""
+    await set_temperature_subject.execute_profile(
+        [
+            {"temperature": 42, "hold_time_seconds": 30},
+            {
+                "repetitions": 5,
+                "steps": [
+                    {"temperature": 20, "hold_time_minutes": 1},
+                    {"temperature": 30, "hold_time_seconds": 1},
+                ],
+            },
+            {"temperature": 90, "hold_time_seconds": 2},
+            {
+                "repetitions": 10,
+                "steps": [
+                    {"temperature": 10, "hold_time_minutes": 2},
+                    {"temperature": 20, "hold_time_seconds": 5},
+                ],
+            },
+        ],
+        volume=123,
+    )
+    assert set_plate_temp_spy.call_args_list == [
+        mock.call(temp=42, hold_time=30, volume=123),
+        mock.call(temp=20, hold_time=60, volume=123),
+        mock.call(temp=30, hold_time=1, volume=123),
+        mock.call(temp=20, hold_time=60, volume=123),
+        mock.call(temp=30, hold_time=1, volume=123),
+        mock.call(temp=20, hold_time=60, volume=123),
+        mock.call(temp=30, hold_time=1, volume=123),
+        mock.call(temp=20, hold_time=60, volume=123),
+        mock.call(temp=30, hold_time=1, volume=123),
+        mock.call(temp=20, hold_time=60, volume=123),
+        mock.call(temp=30, hold_time=1, volume=123),
+        mock.call(temp=90, hold_time=2, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=10, hold_time=120, volume=123),
+        mock.call(temp=20, hold_time=5, volume=123),
+    ]
+
+
 async def test_sync_error_response_to_poller(
     subject_mocked_driver: modules.Thermocycler,
     mock_driver: mock.AsyncMock,
