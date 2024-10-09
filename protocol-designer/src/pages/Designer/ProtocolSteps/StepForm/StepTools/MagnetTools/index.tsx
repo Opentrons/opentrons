@@ -69,8 +69,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           })
       : ''
   const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
-
-  // TODO (10-9-2024): Replace ListItem with ListItemDescriptor 
+  // TODO (10-9-2024): Replace ListItem with ListItemDescriptor
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
