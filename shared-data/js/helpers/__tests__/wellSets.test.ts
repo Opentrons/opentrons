@@ -226,53 +226,45 @@ describe('getWellSetForMultichannel (integration test)', () => {
   it('96-flat', () => {
     const labwareDef = fixture96Plate
 
-    expect(getWellSetForMultichannel(labwareDef, 'A1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'B1',
-      'C1',
-      'D1',
-      'E1',
-      'F1',
-      'G1',
-      'H1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'B1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'B1',
-      'C1',
-      'D1',
-      'E1',
-      'F1',
-      'G1',
-      'H1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'B1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'H1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'B1',
-      'C1',
-      'D1',
-      'E1',
-      'F1',
-      'G1',
-      'H1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'H1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'A2', EIGHT_CHANNEL)).toEqual([
-      'A2',
-      'B2',
-      'C2',
-      'D2',
-      'E2',
-      'F2',
-      'G2',
-      'H2',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A2',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2'])
 
     //  96-channel
     expect(
-      getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: NINETY_SIX_CHANNEL,
+      })
     ).toEqual(wellsFor96WellPlate)
   })
 
@@ -280,38 +272,40 @@ describe('getWellSetForMultichannel (integration test)', () => {
     const labwareDef = fixture96Plate
 
     expect(
-      getWellSetForMultichannel(labwareDef, 'A13', EIGHT_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A13',
+        channels: EIGHT_CHANNEL,
+      })
     ).toBeFalsy()
   })
 
   it('trough-12row', () => {
     const labwareDef = fixture12Trough
 
-    expect(getWellSetForMultichannel(labwareDef, 'A1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'A2', EIGHT_CHANNEL)).toEqual([
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A2',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A2', 'A2', 'A2', 'A2', 'A2', 'A2', 'A2', 'A2'])
 
     //  96-channel
     expect(
-      getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: NINETY_SIX_CHANNEL,
+      })
     ).toEqual(wellsForReservoir)
   })
 
@@ -324,31 +318,29 @@ describe('getWellSetForMultichannel (integration test)', () => {
       well96Channel
     )
 
-    expect(getWellSetForMultichannel(labwareDef, 'C1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'C1',
-      'E1',
-      'G1',
-      'I1',
-      'K1',
-      'M1',
-      'O1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'C1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'C1', 'E1', 'G1', 'I1', 'K1', 'M1', 'O1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'F2', EIGHT_CHANNEL)).toEqual([
-      'B2',
-      'D2',
-      'F2',
-      'H2',
-      'J2',
-      'L2',
-      'N2',
-      'P2',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'F2',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['B2', 'D2', 'F2', 'H2', 'J2', 'L2', 'N2', 'P2'])
 
     //  96-channel
     expect(
-      getWellSetForMultichannel(labwareDef, well96Channel, NINETY_SIX_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: well96Channel,
+        channels: NINETY_SIX_CHANNEL,
+      })
     ).toEqual(ninetySixChannelWells)
   })
 })

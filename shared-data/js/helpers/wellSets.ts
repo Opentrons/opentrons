@@ -44,9 +44,19 @@ function _getAllWellSetsForLabware(
 
 export interface NozzleLayoutDetails {
   nozzleConfig: NozzleLayoutConfig
-  /* The number of nozzles actively used by the pipette in the current configuration. */
+  /* The number of nozzles actively used by the pipette in the current configuration.
+   * Ex, if a 96-channel uses a column config, this will be 8.
+   * */
   activeNozzleCount: number
 }
+
+export interface WellSetForMultiChannelParams {
+  labwareDef: LabwareDefinition2
+  wellName: string
+  channels: 8 | 96
+  pipetteNozzleDetails?: NozzleLayoutDetails
+}
+
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
 export interface WellSetHelpers {
   getAllWellSetsForLabware: (
@@ -62,10 +72,7 @@ export interface WellSetHelpers {
    * nozzle configuration.
    **/
   getWellSetForMultichannel: (
-    labwareDef: LabwareDefinition2,
-    well: string,
-    channels: 8 | 96,
-    pipetteNozzleDetails?: NozzleLayoutDetails
+    params: WellSetForMultiChannelParams
   ) => string[] | null | undefined
 
   canPipetteUseLabware: (
@@ -104,17 +111,17 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
     return wellSetByPrimaryWell
   }
 
-  const getWellSetForMultichannel = (
-    labwareDef: LabwareDefinition2,
-    well: string,
-    channels: 8 | 96,
-    pipetteNozzleDetails?: NozzleLayoutDetails
-  ): string[] | null => {
+  const getWellSetForMultichannel = ({
+    labwareDef,
+    wellName,
+    channels,
+    pipetteNozzleDetails,
+  }: WellSetForMultiChannelParams): string[] | null => {
     // If the nozzle config isn't specified, assume the "full" config.
     const nozzleConfig = pipetteNozzleDetails?.nozzleConfig ?? null
 
     const getActiveRowFromWell = (wellSet: WellSetByPrimaryWell): string[] => {
-      const rowLetter = well.slice(0, 1)
+      const rowLetter = wellName.slice(0, 1)
       // A = 0, B = 1, Z = 25, etc.
       const rowIndex = rowLetter.toUpperCase().charCodeAt(0) - 65
 
@@ -127,12 +134,12 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       const activeNozzleCount = pipetteNozzleDetails?.activeNozzleCount ?? 0
 
       // Find the column that contains the given well.
-      const targetColumn = wellSet.find(column => column.includes(well))
+      const targetColumn = wellSet.find(column => column.includes(wellName))
       if (targetColumn == null || activeNozzleCount === 0) {
         return []
       }
 
-      const wellIndex = targetColumn.indexOf(well)
+      const wellIndex = targetColumn.indexOf(wellName)
       const totalWells = targetColumn.length
 
       if (activeNozzleCount >= totalWells) {
@@ -162,7 +169,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
           ) {
             return (
               allWellSetsFor8Channel.find((wellSet: string[]) =>
-                wellSet.includes(well)
+                wellSet.includes(wellName)
               ) ?? null
             )
           } else {
@@ -170,7 +177,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
           }
         }
         case 'single':
-          return [well]
+          return [wellName]
         case 'row':
           return getActiveRowFromWell(allWellSetsFor8Channel)
         case 'subrect':
@@ -193,15 +200,15 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
            * both on the x and y ases.
            */
           return orderedWellsFor96Channel.length === 384
-            ? get96Channel384WellPlateWells(orderedWellsFor96Channel, well)
+            ? get96Channel384WellPlateWells(orderedWellsFor96Channel, wellName)
             : orderedWellsFor96Channel
         }
         case 'single':
-          return [well]
+          return [wellName]
         case 'column':
           return (
             labwareDef.ordering.find((wellSet: string[]) =>
-              wellSet.includes(well)
+              wellSet.includes(wellName)
             ) ?? null
           )
         case 'row':
