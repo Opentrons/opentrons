@@ -83,8 +83,8 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         </StyledText>
         <ListItem type="noActive">
           <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing32}>
-            <Flex >
-            <DeckInfoLabel deckLabel={slotLocation} />
+            <Flex>
+              <DeckInfoLabel deckLabel={slotLocation} />
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <StyledText desktopStyle="bodyDefaultRegular">
