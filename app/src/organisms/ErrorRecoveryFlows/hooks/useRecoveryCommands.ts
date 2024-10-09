@@ -217,7 +217,6 @@ export function useRecoveryCommands({
   const releaseGripperJaws = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
-  
 
   return {
     resumeRun,
