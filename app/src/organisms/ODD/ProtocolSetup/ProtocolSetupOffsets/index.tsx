@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Chip,
@@ -12,15 +12,17 @@ import {
 } from '@opentrons/components'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import { useToaster } from '../../../../organisms/ToasterOven'
-import { ODDBackButton } from '../../../../molecules/ODDBackButton'
-import { FloatingActionButton, SmallButton } from '../../../../atoms/buttons'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import type { SetupScreens } from '../types'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { TerseOffsetTable } from '../../../../organisms/LabwarePositionCheck/ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '../../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
-import { useNotifyRunQuery } from '../../../../resources/runs'
-import { getLatestCurrentOffsets } from '../../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { TerseOffsetTable } from '/app/organisms/LabwarePositionCheck/ResultsSummary'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import {
+  useNotifyRunQuery,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
 
 export interface ProtocolSetupOffsetsProps {
   runId: string
@@ -120,7 +122,7 @@ export function ProtocolSetupOffsets({
                 />
               </>
             ) : (
-              <InfoScreen content={t('noLabwareOffsetDataYet')} />
+              <InfoScreen content={t('no_labware_offset_data')} />
             )}
           </Flex>
           <FloatingActionButton

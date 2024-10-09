@@ -15,6 +15,7 @@ export const MenuItem = styled.button<ButtonProps>`
   color: ${COLORS.black90};
   padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
     ${SPACING.spacing12};
+  border: ${props => (props.border != null ? props.border : 'inherit')};
 
   &:hover {
     background-color: ${COLORS.blue10};

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -35,7 +34,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
       borderRadius={`${BORDERS.borderRadius12} ${BORDERS.borderRadius12} 0px 0px`}
       {...styleProps}
     >
-      <Flex flexDirection={DIRECTION_ROW}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
         {iconName != null && iconColor != null ? (
           <Icon
             aria-label={`icon_${iconName}`}

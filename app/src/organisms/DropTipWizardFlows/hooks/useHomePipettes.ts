@@ -1,10 +1,10 @@
-import { useRobotControlCommands } from '../../../resources/maintenance_runs'
+import { useRobotControlCommands } from '/app/resources/maintenance_runs'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   UseRobotControlCommandsProps,
   UseRobotControlCommandsResult,
-} from '../../../resources/maintenance_runs'
+} from '/app/resources/maintenance_runs'
 
 interface UseHomePipettesResult {
   isHoming: UseRobotControlCommandsResult['isExecuting']

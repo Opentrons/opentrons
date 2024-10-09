@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import cx from 'classnames'
 import { Button, NotificationIcon } from '@opentrons/components'
 import type { IconName } from '@opentrons/components'

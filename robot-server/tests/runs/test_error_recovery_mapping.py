@@ -2,11 +2,9 @@
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocol_engine.commands.pipetting_common import (
-    LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.commands.command import (
     DefinedErrorData,
 )
@@ -15,6 +13,7 @@ from opentrons.protocol_engine.commands.liquid_probe import LiquidProbe
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType
+
 from robot_server.runs.error_recovery_mapping import (
     create_error_recovery_policy_from_rules,
 )
@@ -38,9 +37,7 @@ def mock_command(decoy: Decoy) -> LiquidProbe:
 @pytest.fixture
 def mock_error_data(decoy: Decoy) -> CommandDefinedErrorData:
     """Get a mock TipPhysicallyMissingError."""
-    mock = decoy.mock(
-        cls=DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData]
-    )
+    mock = decoy.mock(cls=DefinedErrorData[LiquidNotFoundError])
     mock_lnfe = decoy.mock(cls=LiquidNotFoundError)
     decoy.when(mock.public).then_return(mock_lnfe)
     decoy.when(mock_lnfe.errorType).then_return("liquidNotFound")
@@ -76,13 +73,13 @@ def test_create_error_recovery_policy_with_rules(
     mock_rule: ErrorRecoveryRule,
 ) -> None:
     """Should return IGNORE_AND_CONTINUE if that's what we specify as the rule."""
-    policy = create_error_recovery_policy_from_rules([mock_rule])
-    exampleConfig = Config(
+    policy = create_error_recovery_policy_from_rules([mock_rule], enabled=True)
+    example_config = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
     assert (
-        policy(exampleConfig, mock_command, mock_error_data)
+        policy(example_config, mock_command, mock_error_data)
         == ErrorRecoveryType.IGNORE_AND_CONTINUE
     )
 
@@ -91,26 +88,107 @@ def test_create_error_recovery_policy_undefined_error(
     decoy: Decoy, mock_command: LiquidProbe
 ) -> None:
     """Should return a FAIL_RUN policy when error is not defined."""
-    policy = create_error_recovery_policy_from_rules(rules=[])
-    exampleConfig = Config(
+    policy = create_error_recovery_policy_from_rules(rules=[], enabled=True)
+    example_config = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
 
-    assert policy(exampleConfig, mock_command, None) == ErrorRecoveryType.FAIL_RUN
+    assert policy(example_config, mock_command, None) == ErrorRecoveryType.FAIL_RUN
 
 
 def test_create_error_recovery_policy_defined_error(
     decoy: Decoy, mock_command: LiquidProbe, mock_error_data: CommandDefinedErrorData
 ) -> None:
     """Should return a WAIT_FOR_RECOVERY policy when error is defined."""
-    policy = create_error_recovery_policy_from_rules(rules=[])
-    exampleConfig = Config(
+    policy = create_error_recovery_policy_from_rules(rules=[], enabled=True)
+    example_config = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
 
     assert (
-        policy(exampleConfig, mock_command, mock_error_data)
+        policy(example_config, mock_command, mock_error_data)
         == ErrorRecoveryType.WAIT_FOR_RECOVERY
     )
+
+
+@pytest.mark.parametrize("enabled", [True, False])
+def test_enabled_boolean(enabled: bool) -> None:
+    """enabled=False should override any rules and always fail the run."""
+    command = LiquidProbe.construct()  # type: ignore[call-arg]
+    error_data = DefinedErrorData[LiquidNotFoundError](
+        public=LiquidNotFoundError.construct()  # type: ignore[call-arg]
+    )
+
+    rules = [
+        ErrorRecoveryRule(
+            matchCriteria=MatchCriteria(
+                command=CommandMatcher(
+                    commandType=command.commandType,
+                    error=ErrorMatcher(errorType=error_data.public.errorType),
+                ),
+            ),
+            ifMatch=ReactionIfMatch.IGNORE_AND_CONTINUE,
+        )
+    ]
+
+    example_config = Config(
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
+    )
+
+    policy = create_error_recovery_policy_from_rules(rules, enabled)
+    result = policy(example_config, command, error_data)
+    expected_result = (
+        ErrorRecoveryType.IGNORE_AND_CONTINUE if enabled else ErrorRecoveryType.FAIL_RUN
+    )
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    (
+        "robot_type",
+        "expect_error_recovery_to_be_enabled",
+    ),
+    [
+        ("OT-2 Standard", False),
+        ("OT-3 Standard", True),
+    ],
+)
+def test_enabled_on_flex_disabled_on_ot2(
+    robot_type: RobotType, expect_error_recovery_to_be_enabled: bool
+) -> None:
+    """On OT-2s, the run should always fail regardless of any input rules."""
+    command = LiquidProbe.construct()  # type: ignore[call-arg]
+    error_data = DefinedErrorData[LiquidNotFoundError](
+        public=LiquidNotFoundError.construct()  # type: ignore[call-arg]
+    )
+
+    rules = [
+        ErrorRecoveryRule(
+            matchCriteria=MatchCriteria(
+                command=CommandMatcher(
+                    commandType=command.commandType,
+                    error=ErrorMatcher(errorType=error_data.public.errorType),
+                ),
+            ),
+            ifMatch=ReactionIfMatch.IGNORE_AND_CONTINUE,
+        )
+    ]
+
+    example_config = Config(
+        robot_type=robot_type,
+        # This is a "wrong" deck_type that doesn't necessarily match robot_type
+        # but that shouldn't matter for our purposes.
+        deck_type=DeckType.OT3_STANDARD,
+    )
+
+    policy = create_error_recovery_policy_from_rules(rules, enabled=True)
+    result = policy(example_config, command, error_data)
+    expected_result = (
+        ErrorRecoveryType.IGNORE_AND_CONTINUE
+        if expect_error_recovery_to_be_enabled
+        else ErrorRecoveryType.FAIL_RUN
+    )
+    assert result == expected_result

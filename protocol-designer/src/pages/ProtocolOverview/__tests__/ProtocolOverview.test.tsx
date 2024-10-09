@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -12,12 +11,13 @@ import {
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../step-forms/selectors'
-import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
 import { MaterialsListModal } from '../../../organisms/MaterialsListModal'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { ProtocolOverview } from '../index'
 import { DeckThumbnail } from '../DeckThumbnail'
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
+import { InstrumentsInfo } from '../InstrumentsInfo'
+import { LiquidDefinitions } from '../LiquidDefinitions'
 
 import type { NavigateFunction } from 'react-router-dom'
 
@@ -25,11 +25,13 @@ vi.mock('../OffdeckThumbnail')
 vi.mock('../DeckThumbnail')
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
-vi.mock('../../../components/Hints/useBlockingHint')
 vi.mock('../../../organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-ingred/selectors')
+vi.mock('../LiquidDefinitions')
+vi.mock('../InstrumentsInfo')
+
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -66,8 +68,8 @@ describe('ProtocolOverview', () => {
       protocolName: 'mockName',
       author: 'mockAuthor',
       description: 'mockDescription',
+      created: 123,
     })
-    vi.mocked(useBlockingHint).mockReturnValue(null)
     vi.mocked(MaterialsListModal).mockReturnValue(
       <div>mock MaterialsListModal</div>
     )
@@ -75,6 +77,10 @@ describe('ProtocolOverview', () => {
     vi.mocked(OffDeckThumbnail).mockReturnValue(
       <div>mock OffdeckThumbnail</div>
     )
+    vi.mocked(LiquidDefinitions).mockReturnValue(
+      <div>mock LiquidDefinitions</div>
+    )
+    vi.mocked(InstrumentsInfo).mockReturnValue(<div>mock InstrumentsInfo</div>)
   })
 
   it('renders each section with text', () => {
@@ -96,15 +102,13 @@ describe('ProtocolOverview', () => {
     screen.getByText('Last exported')
     screen.getByText('Required app version')
     screen.getByText('8.0.0 or higher')
+
     //  instruments
-    screen.getByText('Instruments')
-    screen.getByText('Robot type')
-    screen.getAllByText('Opentrons Flex')
-    screen.getByText('Left pipette')
-    screen.getByText('Right pipette')
-    screen.getByText('Extension mount')
+    screen.getByText('mock InstrumentsInfo')
+
     //   liquids
-    screen.getByText('Liquid Definitions')
+    screen.getByText('mock LiquidDefinitions')
+
     //  steps
     screen.getByText('Protocol steps')
   })
@@ -123,7 +127,8 @@ describe('ProtocolOverview', () => {
       description: undefined,
     })
     render()
-    expect(screen.getAllByText('N/A').length).toBe(7)
+    // ToDo (kk: 2024/10/07) this part should be replaced
+    expect(screen.getAllByText('N/A').length).toBe(4)
   })
 
   it('navigates to starting deck state', () => {
@@ -131,14 +136,6 @@ describe('ProtocolOverview', () => {
     const button = screen.getByRole('button', { name: 'Edit protocol' })
     fireEvent.click(button)
     expect(mockNavigate).toHaveBeenCalledWith('/designer')
-  })
-
-  it('renders the file sidebar and exports with blocking hint for exporting', () => {
-    vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)
-    render()
-    fireEvent.click(screen.getByRole('button', { name: 'Export protocol' }))
-    expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
-    screen.getByText('mock blocking hint')
   })
 
   it('render mock materials list modal when clicking materials list', () => {

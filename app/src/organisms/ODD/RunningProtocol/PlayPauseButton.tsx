@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
@@ -10,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import type { RunStatus } from '@opentrons/api-client'
 

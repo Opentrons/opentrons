@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
@@ -8,15 +8,15 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { RecoveryTakeover, RecoveryTakeoverDesktop } from '../RecoveryTakeover'
-import { useUpdateClientDataRecovery } from '../../../resources/client_data'
+import { useUpdateClientDataRecovery } from '/app/resources/client_data'
 import { clickButtonLabeled } from './util'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../resources/client_data')
+vi.mock('/app/resources/client_data')
 
 const render = (props: React.ComponentProps<typeof RecoveryTakeover>) => {
   return renderWithProviders(<RecoveryTakeover {...props} />, {

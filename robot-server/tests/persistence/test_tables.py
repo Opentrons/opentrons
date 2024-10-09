@@ -142,7 +142,19 @@ EXPECTED_STATEMENTS_LATEST = [
         FOREIGN KEY(file_id) REFERENCES data_files (id)
     )
     """,
+    """
+    CREATE TABLE boolean_setting (
+        "key" VARCHAR(21) NOT NULL,
+        value BOOLEAN NOT NULL,
+        PRIMARY KEY ("key"),
+        CONSTRAINT booleansettingkey CHECK ("key" IN ('enable_error_recovery'))
+    )
+    """,
 ]
+
+
+EXPECTED_STATEMENTS_V7 = EXPECTED_STATEMENTS_LATEST
+
 
 EXPECTED_STATEMENTS_V6 = [
     """
@@ -257,8 +269,6 @@ EXPECTED_STATEMENTS_V6 = [
 ]
 
 
-EXPECTED_STATEMENTS_V7 = EXPECTED_STATEMENTS_LATEST
-
 EXPECTED_STATEMENTS_V5 = [
     """
     CREATE TABLE protocol (
@@ -333,6 +343,7 @@ EXPECTED_STATEMENTS_V5 = [
     )
     """,
 ]
+
 
 EXPECTED_STATEMENTS_V4 = [
     """

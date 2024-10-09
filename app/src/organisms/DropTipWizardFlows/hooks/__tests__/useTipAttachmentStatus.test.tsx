@@ -1,11 +1,10 @@
-import * as React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { getPipettesWithTipAttached } from '../useTipAttachmentStatus/getPipettesWithTipAttached'
 import { DropTipWizard } from '../../DropTipWizard'
 import { useTipAttachmentStatus } from '../useTipAttachmentStatus'

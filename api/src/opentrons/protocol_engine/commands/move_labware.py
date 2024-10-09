@@ -1,12 +1,19 @@
 """Models and implementation for the ``moveLabware`` command."""
 
 from __future__ import annotations
+from opentrons_shared_data.errors.exceptions import (
+    FailedGripperPickupError,
+    LabwareDroppedError,
+    StallOrCollisionDetectedError,
+)
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.types import Point
 from ..types import (
+    CurrentWell,
     LabwareLocation,
     DeckSlotLocation,
     OnLabwareLocation,
@@ -17,8 +24,15 @@ from ..types import (
 )
 from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
@@ -33,7 +47,6 @@ MoveLabwareCommandType = Literal["moveLabware"]
 _TRASH_CHUTE_DROP_BUFFER_MM = 8
 
 
-# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
 class MoveLabwareParams(BaseModel):
     """Input parameters for a ``moveLabware`` command."""
 
@@ -74,28 +87,44 @@ class MoveLabwareResult(BaseModel):
     )
 
 
-class MoveLabwareImplementation(
-    AbstractCommandImpl[MoveLabwareParams, SuccessData[MoveLabwareResult, None]]
-):
+class GripperMovementError(ErrorOccurrence):
+    """Returned when something physically goes wrong when the gripper moves labware.
+
+    When this error happens, the engine will leave the labware in its original place.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["gripperMovement"] = "gripperMovement"
+
+
+_ExecuteReturn = (
+    SuccessData[MoveLabwareResult, None] | DefinedErrorData[GripperMovementError]
+)
+
+
+class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteReturn]):
     """The execution implementation for ``moveLabware`` commands."""
 
     def __init__(
         self,
+        model_utils: ModelUtils,
         state_view: StateView,
         equipment: EquipmentHandler,
         labware_movement: LabwareMovementHandler,
         run_control: RunControlHandler,
         **kwargs: object,
     ) -> None:
+        self._model_utils = model_utils
         self._state_view = state_view
         self._equipment = equipment
         self._labware_movement = labware_movement
         self._run_control = run_control
 
-    async def execute(  # noqa: C901
-        self, params: MoveLabwareParams
-    ) -> SuccessData[MoveLabwareResult, None]:
+    async def execute(self, params: MoveLabwareParams) -> _ExecuteReturn:  # noqa: C901
         """Move a loaded labware to a new location."""
+        state_update = StateUpdate()
+
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
         current_labware_definition = self._state_view.labware.get_definition(
@@ -201,24 +230,81 @@ class MoveLabwareImplementation(
                 dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
             )
 
-            # Skips gripper moves when using virtual gripper
-            await self._labware_movement.move_labware_with_gripper(
-                labware_id=params.labwareId,
-                current_location=validated_current_loc,
-                new_location=validated_new_loc,
-                user_offset_data=user_offset_data,
-                post_drop_slide_offset=post_drop_slide_offset,
-            )
+            try:
+                # Skips gripper moves when using virtual gripper
+                await self._labware_movement.move_labware_with_gripper(
+                    labware_id=params.labwareId,
+                    current_location=validated_current_loc,
+                    new_location=validated_new_loc,
+                    user_offset_data=user_offset_data,
+                    post_drop_slide_offset=post_drop_slide_offset,
+                )
+            except (
+                FailedGripperPickupError,
+                LabwareDroppedError,
+                StallOrCollisionDetectedError,
+                # todo(mm, 2024-09-26): Catch LabwareNotPickedUpError when that exists and
+                # move_labware_with_gripper() raises it.
+            ) as exception:
+                gripper_movement_error: GripperMovementError | None = (
+                    GripperMovementError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        errorCode=exception.code.value.code,
+                        detail=exception.code.value.detail,
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=exception,
+                            )
+                        ],
+                    )
+                )
+            else:
+                gripper_movement_error = None
+
+            # All mounts will have been retracted as part of the gripper move.
+            state_update.clear_all_pipette_locations()
+
+            if gripper_movement_error:
+                return DefinedErrorData(
+                    public=gripper_movement_error,
+                    state_update=state_update,
+                )
+
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
             await self._run_control.wait_for_resume()
 
+        # We may have just moved the labware that contains the current well out from
+        # under the pipette. Clear the current location to reflect the fact that the
+        # pipette is no longer over any labware. This is necessary for safe path
+        # planning in case the next movement goes to the same labware (now in a new
+        # place).
+        pipette_location = self._state_view.pipettes.get_current_location()
+        if (
+            isinstance(pipette_location, CurrentWell)
+            and pipette_location.labware_id == params.labwareId
+        ):
+            state_update.clear_all_pipette_locations()
+
+        state_update.set_labware_location(
+            labware_id=params.labwareId,
+            new_location=available_new_location,
+            new_offset_id=new_offset_id,
+        )
+
         return SuccessData(
-            public=MoveLabwareResult(offsetId=new_offset_id), private=None
+            public=MoveLabwareResult(offsetId=new_offset_id),
+            private=None,
+            state_update=state_update,
         )
 
 
-class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult, ErrorOccurrence]):
+class MoveLabware(
+    BaseCommand[MoveLabwareParams, MoveLabwareResult, GripperMovementError]
+):
     """A ``moveLabware`` command."""
 
     commandType: MoveLabwareCommandType = "moveLabware"

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import cx from 'classnames'
 
 import WELLS_IMAGE from '../../../../assets/images/well_order_wells.svg'

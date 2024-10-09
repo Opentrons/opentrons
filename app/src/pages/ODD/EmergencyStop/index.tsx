@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
@@ -16,10 +15,10 @@ import {
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { MediumButton } from '../../../atoms/buttons'
-import { StepMeter } from '../../../atoms/StepMeter'
+import { MediumButton } from '/app/atoms/buttons'
+import { StepMeter } from '/app/atoms/StepMeter'
 
-import estopImg from '../../../assets/images/on-device-display/install_e_stop.png'
+import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
 
 const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Flex } from '../../../primitives'
 import { DIRECTION_COLUMN } from '../../../styles'
 import { SPACING } from '../../../ui-style-constants'

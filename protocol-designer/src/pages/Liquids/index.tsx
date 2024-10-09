@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -27,12 +27,8 @@ export function Liquids(): JSX.Element {
   const selectedLabware = useSelector(
     labwareIngredSelectors.getSelectedLabwareId
   )
-  const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
-    false
-  )
-  const [showDefineLiquidModal, setDefineLiquidModal] = React.useState<boolean>(
-    false
-  )
+  const [liquidOverflowMenu, showLiquidOverflowMenu] = useState<boolean>(false)
+  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       if (!showDefineLiquidModal) {
@@ -41,9 +37,10 @@ export function Liquids(): JSX.Element {
     },
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedLabware == null) {
-      navigate('/overview')
+      console.warn('selectedLabware was lost, navigate to deisgner page')
+      navigate('/designer')
     }
   })
 

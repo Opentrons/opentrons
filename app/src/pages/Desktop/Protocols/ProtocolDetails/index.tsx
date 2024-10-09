@@ -1,15 +1,12 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchProtocols,
-  getStoredProtocol,
-} from '../../../../redux/protocol-storage'
-import { ProtocolDetails as ProtocolDetailsContents } from '../../../../organisms/ProtocolDetails'
+import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
+import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
 
-import type { Dispatch, State } from '../../../../redux/types'
-import type { DesktopRouteParams } from '../../../../App/types'
+import type { Dispatch, State } from '/app/redux/types'
+import type { DesktopRouteParams } from '/app/App/types'
 
 export function ProtocolDetails(): JSX.Element {
   const { protocolKey } = useParams<
@@ -21,7 +18,7 @@ export function ProtocolDetails(): JSX.Element {
     getStoredProtocol(state, protocolKey)
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
 

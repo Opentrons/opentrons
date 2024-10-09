@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -35,7 +35,7 @@ export function BlowoutZOffsetField(
     name,
     updateValue,
   } = props
-  const [isModalOpen, setModalOpen] = React.useState<boolean>(false)
+  const [isModalOpen, setModalOpen] = useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const labwareEntities = useSelector(getLabwareEntities)
 

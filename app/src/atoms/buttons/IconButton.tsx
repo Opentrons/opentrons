@@ -1,9 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import {
   BORDERS,
   Btn,
   COLORS,
+  CURSOR_DEFAULT,
   Icon,
   RESPONSIVENESS,
 } from '@opentrons/components'
@@ -39,7 +40,7 @@ export function IconButton(props: IconButtonProps): JSX.Element {
           color: ${COLORS.grey50};
         }
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-          cursor: default;
+          cursor: ${CURSOR_DEFAULT};
         }
       `}
       {...buttonProps}

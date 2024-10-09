@@ -30,9 +30,6 @@ _VOLUME_ROUNDING_ERROR_TOLERANCE = 1e-9
 class PipettingHandler(TypingProtocol):
     """Liquid handling commands."""
 
-    def get_is_empty(self, pipette_id: str) -> bool:
-        """Get whether a pipette has an aspirated volume equal to 0."""
-
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
 
@@ -81,10 +78,6 @@ class HardwarePipettingHandler(PipettingHandler):
         """Initialize a PipettingHandler instance."""
         self._state_view = state_view
         self._hardware_api = hardware_api
-
-    def get_is_empty(self, pipette_id: str) -> bool:
-        """Get whether a pipette has an aspirated volume equal to 0."""
-        return self._state_view.pipettes.get_aspirated_volume(pipette_id) == 0
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
@@ -194,7 +187,9 @@ class HardwarePipettingHandler(PipettingHandler):
             mount=hw_pipette.mount,
             max_z_dist=well_depth - lld_min_height + well_location.offset.z,
         )
-        return float(z_pos)
+        labware_pos = self._state_view.geometry.get_labware_position(labware_id)
+        relative_height = z_pos - labware_pos.z - well_def.z
+        return float(relative_height)
 
     @contextmanager
     def _set_flow_rate(
@@ -236,10 +231,6 @@ class VirtualPipettingHandler(PipettingHandler):
     ) -> None:
         """Initialize a PipettingHandler instance."""
         self._state_view = state_view
-
-    def get_is_empty(self, pipette_id: str) -> bool:
-        """Get whether a pipette has an aspirated volume equal to 0."""
-        return self._state_view.pipettes.get_aspirated_volume(pipette_id) == 0
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""

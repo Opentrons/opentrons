@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { memo } from 'react'
 
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -176,4 +176,4 @@ const AlertsComponent = (props: Props): JSX.Element => {
   )
 }
 
-export const Alerts = React.memo(AlertsComponent)
+export const Alerts = memo(AlertsComponent)

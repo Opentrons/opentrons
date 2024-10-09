@@ -1,6 +1,6 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -10,45 +10,57 @@ import {
   DIRECTION_COLUMN,
   RESPONSIVENESS,
   Flex,
-  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   SPACING,
-  LegacyStyledText,
-  ModalShell,
   useConditionalConfirm,
+  ModalShell,
+  DISPLAY_FLEX,
+  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { getIsOnDevice } from '../../redux/config'
+import { getTopPortalEl } from '/app/App/portal'
+import { getIsOnDevice } from '/app/redux/config'
 import { ExitConfirmation } from './ExitConfirmation'
 import {
   BEFORE_BEGINNING,
   BLOWOUT_SUCCESS,
   CHOOSE_BLOWOUT_LOCATION,
   CHOOSE_DROP_TIP_LOCATION,
+  CHOOSE_LOCATION_OPTION,
+  CONFIRM_POSITION,
   DROP_TIP_SUCCESS,
   DT_ROUTES,
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
 } from './constants'
-import { BeforeBeginning } from './BeforeBeginning'
-import { ChooseLocation } from './ChooseLocation'
-import { JogToPosition } from './JogToPosition'
-import { Success } from './Success'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import {
+  BeforeBeginning,
+  ChooseLocation,
+  ChooseDeckLocation,
+  JogToPosition,
+  Success,
+  ConfirmPosition,
+  useConfirmPosition,
+} from './steps'
+import { InProgressModal } from '/app/molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
+import { ErrorInfo } from './ErrorInfo'
 
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
-import type { UseDropTipRoutingResult, UseDropTipWithTypeResult } from './hooks'
+import type {
+  UseDropTipRoutingResult,
+  UseDropTipWithTypeResult,
+  DropTipBlowoutLocationDetails,
+} from './hooks'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
   UseDropTipWithTypeResult &
   UseDropTipRoutingResult & {
     issuedCommandsType: IssuedCommandsType
+    dropTipCommandLocations: DropTipBlowoutLocationDetails[]
   }
 
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
@@ -111,8 +123,6 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   )
 }
 
-// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs.
-// Convince design not to use SimpleWizardBody. EXEC-520.
 export function DropTipWizardContainer(
   props: DropTipWizardContainerProps
 ): JSX.Element {
@@ -132,58 +142,32 @@ export function DropTipWizardContainer(
 export function DropTipWizardFixitType(
   props: DropTipWizardContainerProps
 ): JSX.Element {
-  return <DropTipWizardContent {...props} />
+  return (
+    <Flex css={INTERVENTION_CONTAINER_STYLE}>
+      <DropTipWizardContent {...props} />
+    </Flex>
+  )
 }
 
 export function DropTipWizardSetupType(
   props: DropTipWizardContainerProps
 ): JSX.Element {
-  const {
-    activeMaintenanceRunId,
-    isCommandInProgress,
-    isExiting,
-    showConfirmExit,
-    errorDetails,
-  } = props
-
-  // TODO(jh: 06-10-24): This is not ideal. See EXEC-520.
-  const inMotion =
-    isCommandInProgress || isExiting || activeMaintenanceRunId == null
-  const simpleWizardPaddingOverrides =
-    inMotion || showConfirmExit || errorDetails
-
   return createPortal(
     props.isOnDevice ? (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="992px"
-        height="568px"
-        left="14.5px"
-        top="16px"
-        border={BORDERS.lineBorder}
-        boxShadow={BORDERS.shadowSmall}
-        borderRadius={BORDERS.borderRadius16}
-        position={POSITION_ABSOLUTE}
-        backgroundColor={COLORS.white}
-      >
+      <Flex css={SIMPLE_CONTAINER_STYLE}>
         <DropTipWizardHeader {...props} />
-        <Flex
-          padding={simpleWizardPaddingOverrides ? 0 : SPACING.spacing32}
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          height="100%"
-          flex="1"
-        >
+        <Flex css={SIMPLE_CONTENT_CONTAINER_STYLE}>
           <DropTipWizardContent {...props} />
         </Flex>
       </Flex>
     ) : (
       <ModalShell
-        width="47rem"
+        css={SIMPLE_CONTAINER_STYLE}
         header={<DropTipWizardHeader {...props} />}
-        overflow="hidden"
       >
-        <DropTipWizardContent {...props} />
+        <Flex css={SIMPLE_CONTENT_CONTAINER_STYLE}>
+          <DropTipWizardContent {...props} />
+        </Flex>
       </ModalShell>
     ),
     getTopPortalEl()
@@ -194,69 +178,45 @@ export const DropTipWizardContent = (
   props: DropTipWizardContainerProps
 ): JSX.Element => {
   const {
-    isOnDevice,
     activeMaintenanceRunId,
     currentStep,
+    currentRoute,
     errorDetails,
     isCommandInProgress,
-    fixitCommandTypeUtils,
     issuedCommandsType,
     isExiting,
-    proceed,
-    proceedToRoute,
     showConfirmExit,
-    dropTipCommands,
-    proceedWithConditionalClose,
-    goBackRunValid,
-    confirmExit,
-    cancelExit,
-    toggleExitInitiated,
-    errorComponents,
   } = props
 
-  const { t, i18n } = useTranslation('drop_tip_wizard')
+  const { t } = useTranslation('drop_tip_wizard')
+  const confirmPositionUtils = useConfirmPosition(currentStep)
 
   function buildGettingReady(): JSX.Element {
     return <InProgressModal description={t('getting_ready')} />
   }
 
   function buildRobotInMotion(): JSX.Element {
-    return (
-      <>
-        {issuedCommandsType === 'fixit' ? <Flex /> : null}
-        <InProgressModal description={t('stand_back_robot_in_motion')} />
-      </>
-    )
+    return <InProgressModal description={t('stand_back_robot_in_motion')} />
   }
 
-  function buildShowExitConfirmation(): JSX.Element {
+  function buildRobotPipetteMoving(): JSX.Element {
     return (
-      <ExitConfirmation
-        {...props}
-        handleGoBack={cancelExit}
-        handleExit={() => {
-          toggleExitInitiated()
-          confirmExit()
-        }}
+      <InProgressModal
+        description={
+          currentRoute === DT_ROUTES.BLOWOUT
+            ? t('stand_back_blowing_out')
+            : t('stand_back_dropping_tips')
+        }
       />
     )
   }
 
-  function buildErrorScreen(): JSX.Element {
-    const { button, subHeader } = errorComponents
+  function buildShowExitConfirmation(): JSX.Element {
+    return <ExitConfirmation {...props} />
+  }
 
-    return (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={errorDetails?.header ?? t('error_dropping_tips')}
-        subHeader={subHeader}
-        justifyContentForOddButton={JUSTIFY_FLEX_END}
-        css={ERROR_MODAL_FIXIT_STYLE}
-      >
-        {button}
-      </SimpleWizardBody>
-    )
+  function buildErrorScreen(): JSX.Element {
+    return <ErrorInfo {...props} />
   }
 
   function buildBeforeBeginning(): JSX.Element {
@@ -264,100 +224,23 @@ export const DropTipWizardContent = (
   }
 
   function buildChooseLocation(): JSX.Element {
-    const { moveToAddressableArea } = dropTipCommands
+    return <ChooseLocation {...props} {...confirmPositionUtils} />
+  }
 
-    let bodyTextKey: string
-    if (currentStep === CHOOSE_BLOWOUT_LOCATION) {
-      bodyTextKey = isOnDevice
-        ? 'select_blowout_slot_odd'
-        : 'select_blowout_slot'
-    } else {
-      bodyTextKey = isOnDevice
-        ? 'select_drop_tip_slot_odd'
-        : 'select_drop_tip_slot'
-    }
-
-    return (
-      <ChooseLocation
-        {...props}
-        handleProceed={proceedWithConditionalClose}
-        handleGoBack={goBackRunValid}
-        title={
-          currentStep === CHOOSE_BLOWOUT_LOCATION
-            ? i18n.format(t('choose_blowout_location'), 'capitalize')
-            : i18n.format(t('choose_drop_tip_location'), 'capitalize')
-        }
-        body={
-          <Trans
-            t={t}
-            i18nKey={bodyTextKey}
-            components={{ block: <LegacyStyledText as="p" /> }}
-          />
-        }
-        moveToAddressableArea={moveToAddressableArea}
-      />
-    )
+  function buildChooseDeckLocation(): JSX.Element {
+    return <ChooseDeckLocation {...props} />
   }
 
   function buildJogToPosition(): JSX.Element {
-    const { handleJog, blowoutOrDropTip } = dropTipCommands
+    return <JogToPosition {...props} {...confirmPositionUtils} />
+  }
 
-    return (
-      <JogToPosition
-        {...props}
-        handleJog={handleJog}
-        handleProceed={() => blowoutOrDropTip(currentStep, proceed)}
-        handleGoBack={goBackRunValid}
-        body={
-          currentStep === POSITION_AND_BLOWOUT
-            ? t('position_and_blowout')
-            : t('position_and_drop_tip')
-        }
-      />
-    )
+  function buildConfirmPosition(): JSX.Element {
+    return <ConfirmPosition {...props} {...confirmPositionUtils} />
   }
 
   function buildSuccess(): JSX.Element {
-    const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
-
-    // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
-    const handleProceed = (): void => {
-      if (currentStep === BLOWOUT_SUCCESS) {
-        void proceedToRoute(DT_ROUTES.DROP_TIP)
-      } else {
-        // Clear the error recovery submap upon completion of drop tip wizard.
-        fixitCommandTypeUtils?.reportMap(null)
-
-        if (tipDropComplete != null) {
-          tipDropComplete()
-        } else {
-          proceedWithConditionalClose()
-        }
-      }
-    }
-
-    const buildProceedText = (): string => {
-      if (fixitCommandTypeUtils != null && currentStep === DROP_TIP_SUCCESS) {
-        return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
-      } else {
-        return currentStep === BLOWOUT_SUCCESS
-          ? i18n.format(t('shared:continue'), 'capitalize')
-          : i18n.format(t('shared:exit'), 'capitalize')
-      }
-    }
-
-    return (
-      <Success
-        {...props}
-        message={
-          currentStep === BLOWOUT_SUCCESS
-            ? t('blowout_complete')
-            : t('drop_tip_complete')
-        }
-        handleProceed={handleProceed}
-        proceedText={buildProceedText()}
-      />
-    )
+    return <Success {...props} />
   }
 
   function buildModalContent(): JSX.Element {
@@ -369,6 +252,8 @@ export const DropTipWizardContent = (
       issuedCommandsType === 'setup'
     ) {
       return buildGettingReady()
+    } else if (confirmPositionUtils.isRobotPipetteMoving) {
+      return buildRobotPipetteMoving()
     } else if (isCommandInProgress || isExiting) {
       return buildRobotInMotion()
     } else if (showConfirmExit) {
@@ -377,16 +262,20 @@ export const DropTipWizardContent = (
       return buildErrorScreen()
     } else if (currentStep === BEFORE_BEGINNING) {
       return buildBeforeBeginning()
+    } else if (currentStep === CHOOSE_LOCATION_OPTION) {
+      return buildChooseLocation()
     } else if (
       currentStep === CHOOSE_BLOWOUT_LOCATION ||
       currentStep === CHOOSE_DROP_TIP_LOCATION
     ) {
-      return buildChooseLocation()
+      return buildChooseDeckLocation()
     } else if (
       currentStep === POSITION_AND_BLOWOUT ||
       currentStep === POSITION_AND_DROP_TIP
     ) {
       return buildJogToPosition()
+    } else if (currentStep === CONFIRM_POSITION) {
+      return buildConfirmPosition()
     } else if (
       currentStep === BLOWOUT_SUCCESS ||
       currentStep === DROP_TIP_SUCCESS
@@ -406,7 +295,7 @@ function useInitiateExit(): {
   isExitInitiated: boolean
   toggleExitInitiated: () => void
 } {
-  const [isExitInitiated, setIsExitInitiated] = React.useState(false)
+  const [isExitInitiated, setIsExitInitiated] = useState(false)
 
   const toggleExitInitiated = (): void => {
     setIsExitInitiated(true)
@@ -415,8 +304,55 @@ function useInitiateExit(): {
   return { isExitInitiated, toggleExitInitiated }
 }
 
-const ERROR_MODAL_FIXIT_STYLE = css`
+const SHARED_STYLE = `
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
+  overflow: ${OVERFLOW_HIDDEN};
+`
+
+const INTERVENTION_CONTAINER_STYLE = css`
+  ${SHARED_STYLE}
+  padding: ${SPACING.spacing32};
+  grid-gap: ${SPACING.spacing24};
+  height: 100%;
+  width: 100%;
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    margin-top: -${SPACING.spacing68}; // See EXEC-520. This clearly isn't ideal.
+    grid-gap: ${SPACING.spacing32};
+  }
+`
+
+const SIMPLE_CONTAINER_STYLE = css`
+  ${SHARED_STYLE}
+  width: 47rem;
+  min-height: 26.75rem;
+
+  // TODO(jh 09-17-24): This is effectively making a ModalShell analogue on the ODD, since one does not exist.
+  //  Consider making one.
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    position: ${POSITION_ABSOLUTE};
+    width: 62rem;
+    height: 35.5rem;
+    left: 16px;
+    top: 16px;
+    border: ${BORDERS.lineBorder};
+    box-shadow: ${BORDERS.shadowSmall};
+    border-radius: ${BORDERS.borderRadius16};
+    background-color: ${COLORS.white};
+  }
+`
+
+const SIMPLE_CONTENT_CONTAINER_STYLE = css`
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  width: 100%;
+  height: 100%;
+  padding: ${SPACING.spacing32};
+  flex: 1;
+  grid-gap: ${SPACING.spacing24};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing32};
   }
 `

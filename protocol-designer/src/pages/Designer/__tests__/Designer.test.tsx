@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -12,11 +10,13 @@ import { generateNewProtocol } from '../../../labware-ingred/actions'
 import { DeckSetupContainer } from '../DeckSetup'
 import { Designer } from '../index'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
+import { ProtocolSteps } from '../ProtocolSteps'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
+vi.mock('../ProtocolSteps')
 vi.mock('../../../labware-ingred/actions')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../LiquidsOverflowMenu')
@@ -44,8 +44,10 @@ const render = () => {
 
 describe('Designer', () => {
   beforeEach(() => {
+    vi.mocked(ProtocolSteps).mockReturnValue(<div>mock ProtocolSteps</div>)
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mockProtocolName',
+      created: 123,
     })
     vi.mocked(selectors.getIsNewProtocol).mockReturnValue(true)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
@@ -75,14 +77,14 @@ describe('Designer', () => {
     screen.getByText('Edit protocol')
     screen.getByText('Protocol steps')
     screen.getByText('Protocol starting deck')
-    screen.getByText('Liquids')
+    screen.getByTestId('water-drop')
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
     expect(mockNavigate).toHaveBeenCalledWith('/overview')
   })
 
   it('renders the liquids button overflow menu', () => {
     render()
-    fireEvent.click(screen.getByText('Liquids'))
+    fireEvent.click(screen.getByTestId('water-drop'))
     screen.getByText('mock LiquidsOverflowMenu')
   })
 
@@ -100,5 +102,9 @@ describe('Designer', () => {
     expect(vi.mocked(generateNewProtocol)).toHaveBeenCalled()
   })
 
-  it.todo('renders the protocol steps page')
+  it('renders the protocol steps page', () => {
+    render()
+    fireEvent.click(screen.getByText('Protocol steps'))
+    screen.getByText('mock ProtocolSteps')
+  })
 })

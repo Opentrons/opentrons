@@ -1,8 +1,6 @@
-import * as React from 'react'
-
 import { Flex, BORDERS, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
-import { Skeleton } from '../../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 
 export function ProtocolDetailsHeaderChipSkeleton(): JSX.Element {
   return (

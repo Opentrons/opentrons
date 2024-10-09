@@ -1,8 +1,8 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { RunningProtocolSkeleton } from '../RunningProtocolSkeleton'
 
 const render = (

@@ -1,26 +1,25 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../../i18n'
-import { InstrumentsAndModules } from '../../../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../../../organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '../../../../../organisms/Devices/RobotOverview'
-import { DISENGAGED, NOT_PRESENT } from '../../../../../organisms/EmergencyStop'
-import { DeviceDetailsDeckConfiguration } from '../../../../../organisms/DeviceDetailsDeckConfiguration'
-import { useIsFlex } from '../../../../../organisms/Devices/hooks'
+import { i18n } from '/app/i18n'
+import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
+import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
+import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
+import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../organisms/Devices/hooks')
-vi.mock('../../../../../organisms/Devices/InstrumentsAndModules')
-vi.mock('../../../../../organisms/Devices/RecentProtocolRuns')
-vi.mock('../../../../../organisms/Devices/RobotOverview')
-vi.mock('../../../../../organisms/DeviceDetailsDeckConfiguration')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/Desktop/Devices/InstrumentsAndModules')
+vi.mock('/app/organisms/Desktop/Devices/RecentProtocolRuns')
+vi.mock('/app/organisms/Desktop/Devices/RobotOverview')
+vi.mock('/app/organisms/DeviceDetailsDeckConfiguration')
+vi.mock('/app/redux/discovery')
 
 const ROBOT_NAME = 'otie'
 const mockEstopStatus = {

@@ -29,6 +29,9 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
+from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
+    AbsorbanceReaderMeasureMode,
+)
 from opentrons.types import DeckSlotName, MountType
 from ..errors import ModuleNotConnectedError
 
@@ -319,7 +322,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             measured=prev_state.measured,
             is_lid_on=prev_state.is_lid_on,
             data=prev_state.data,
-            configured_wavelength=prev_state.configured_wavelength,
+            measure_mode=prev_state.measure_mode,
+            configured_wavelengths=prev_state.configured_wavelengths,
+            reference_wavelength=prev_state.reference_wavelength,
             lid_id=lid_id,
         )
 
@@ -382,29 +387,27 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=MagneticBlockId(module_id)
             )
         elif ModuleModel.is_absorbance_reader(actual_model):
+            lid_labware_id = None
             slot = self._state.slot_by_module_id[module_id]
             if slot is not None:
                 reader_addressable_area = f"absorbanceReaderV1{slot.value}"
-                lid_labware_id = None
                 for labware in self._state.deck_fixed_labware:
                     if labware.location == AddressableAreaLocation(
                         addressableAreaName=reader_addressable_area
                     ):
                         lid_labware_id = labware.labware_id
                         break
-                self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
-                    module_id=AbsorbanceReaderId(module_id),
-                    configured=False,
-                    measured=False,
-                    is_lid_on=True,
-                    data=None,
-                    configured_wavelength=None,
-                    lid_id=lid_labware_id,
-                )
-            else:
-                raise errors.ModuleNotOnDeckError(
-                    "Opentrons Plate Reader location did not return a valid Deck Slot."
-                )
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                configured=False,
+                measured=False,
+                is_lid_on=True,
+                data=None,
+                measure_mode=None,
+                configured_wavelengths=None,
+                reference_wavelength=None,
+                lid_id=lid_labware_id,
+            )
 
     def _update_additional_slots_occupied_by_thermocycler(
         self,
@@ -577,7 +580,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 target_block_temperature=block_temperature,
                 target_lid_temperature=None,
             )
-        # TODO (spp, 2022-08-01): set is_lid_open to False upon lid commands' failure
         elif isinstance(command.result, thermocycler.OpenLidResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
@@ -610,7 +612,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
         # Get current values
         configured = absorbance_reader_substate.configured
-        configured_wavelength = absorbance_reader_substate.configured_wavelength
+        measure_mode = absorbance_reader_substate.measure_mode
+        configured_wavelengths = absorbance_reader_substate.configured_wavelengths
+        reference_wavelength = absorbance_reader_substate.reference_wavelength
         is_lid_on = absorbance_reader_substate.is_lid_on
         lid_id = absorbance_reader_substate.lid_id
         data = absorbance_reader_substate.data
@@ -621,41 +625,49 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 configured=True,
                 measured=False,
                 is_lid_on=is_lid_on,
-                data=None,
-                configured_wavelength=command.params.sampleWavelength,
                 lid_id=lid_id,
+                measure_mode=AbsorbanceReaderMeasureMode(command.params.measureMode),
+                configured_wavelengths=command.params.sampleWavelengths,
+                reference_wavelength=command.params.referenceWavelength,
+                data=None,
             )
         elif isinstance(command.result, absorbance_reader.ReadAbsorbanceResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=configured,
-                configured_wavelength=configured_wavelength,
-                is_lid_on=is_lid_on,
                 measured=True,
-                data=command.result.data,
+                is_lid_on=is_lid_on,
                 lid_id=lid_id,
+                measure_mode=measure_mode,
+                configured_wavelengths=configured_wavelengths,
+                reference_wavelength=reference_wavelength,
+                data=command.result.data,
             )
 
         elif isinstance(command.result, absorbance_reader.OpenLidResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=configured,
-                configured_wavelength=configured_wavelength,
-                is_lid_on=False,
                 measured=True,
-                data=data,
+                is_lid_on=False,
                 lid_id=lid_id,
+                measure_mode=measure_mode,
+                configured_wavelengths=configured_wavelengths,
+                reference_wavelength=reference_wavelength,
+                data=data,
             )
 
         elif isinstance(command.result, absorbance_reader.CloseLidResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=configured,
-                configured_wavelength=configured_wavelength,
-                is_lid_on=True,
                 measured=True,
-                data=data,
+                is_lid_on=True,
                 lid_id=lid_id,
+                measure_mode=measure_mode,
+                configured_wavelengths=configured_wavelengths,
+                reference_wavelength=reference_wavelength,
+                data=data,
             )
 
 

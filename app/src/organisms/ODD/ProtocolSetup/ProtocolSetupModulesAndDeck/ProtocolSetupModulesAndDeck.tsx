@@ -6,8 +6,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  JUSTIFY_CENTER,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -16,23 +17,25 @@ import {
 } from '@opentrons/shared-data'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
-import { getTopPortalEl } from '../../../../App/portal'
-import { FloatingActionButton } from '../../../../atoms/buttons'
-import { InlineNotification } from '../../../../atoms/InlineNotification'
-import { ChildNavigation } from '../../../../organisms/ChildNavigation'
-import { useAttachedModules } from '../../../../organisms/Devices/hooks'
-import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { getTopPortalEl } from '/app/App/portal'
+import { FloatingActionButton } from '/app/atoms/buttons'
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useAttachedModules } from '/app/resources/modules'
 import {
+  getProtocolModulesInfo,
   getAttachedProtocolModuleMatches,
-  getUnmatchedModulesForProtocol,
-} from './utils'
+} from '/app/transformations/analysis'
+import {
+  useRunStatus,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
+import { getUnmatchedModulesForProtocol } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
 import { ModulesAndDeckMapView } from './ModulesAndDeckMapView'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
@@ -136,11 +139,13 @@ export function ProtocolSetupModulesAndDeck({
         marginBottom={SPACING.spacing80}
       >
         {showMapView ? (
-          <ModulesAndDeckMapView
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            runId={runId}
-            protocolAnalysis={mostRecentAnalysis}
-          />
+          <Flex height="55vh" justifyContent={JUSTIFY_CENTER}>
+            <ModulesAndDeckMapView
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              runId={runId}
+              protocolAnalysis={mostRecentAnalysis}
+            />
+          </Flex>
         ) : (
           <>
             {isModuleMismatch && !clearModuleMismatchBanner ? (

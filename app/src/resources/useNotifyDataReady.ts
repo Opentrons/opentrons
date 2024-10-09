@@ -1,20 +1,20 @@
-import * as React from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 
 import { useDispatch } from 'react-redux'
 
 import { useHost } from '@opentrons/react-api-client'
 
-import { appShellListener } from '../redux/shell/remote'
-import { notifySubscribeAction } from '../redux/shell'
+import { appShellListener } from '/app/redux/shell/remote'
+import { notifySubscribeAction } from '/app/redux/shell'
 import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
-} from '../redux/analytics'
-import { useFeatureFlag } from '../redux/config'
+} from '/app/redux/analytics'
+import { useFeatureFlag } from '/app/redux/config'
 
 import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
-import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
+import type { NotifyTopic, NotifyResponseData } from '/app/redux/shell/types'
 
 export type HTTPRefetchFrequency = 'once' | null
 
@@ -56,9 +56,9 @@ export function useNotifyDataReady<TData, TError = Error>({
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
   const forcePollingFF = useFeatureFlag('forceHttpPolling')
-  const seenHostname = React.useRef<string | null>(null)
-  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
-  const [isNotifyEnabled, setIsNotifyEnabled] = React.useState(true)
+  const seenHostname = useRef<string | null>(null)
+  const [refetch, setRefetch] = useState<HTTPRefetchFrequency>(null)
+  const [isNotifyEnabled, setIsNotifyEnabled] = useState(true)
 
   const { enabled, staleTime, forceHttpPolling } = options
 
@@ -69,13 +69,13 @@ export function useNotifyDataReady<TData, TError = Error>({
     staleTime !== Infinity &&
     !forcePollingFF
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (shouldUseNotifications) {
       // Always fetch on initial mount to keep latency as low as possible.
       setRefetch('once')
       appShellListener({
         hostname,
-        topic,
+        notifyTopic: topic,
         callback: onDataEvent,
       })
       dispatch(notifySubscribeAction(hostname, topic))
@@ -88,7 +88,7 @@ export function useNotifyDataReady<TData, TError = Error>({
       if (seenHostname.current != null) {
         appShellListener({
           hostname: seenHostname.current,
-          topic,
+          notifyTopic: topic,
           callback: onDataEvent,
           isDismounting: true,
         })
@@ -96,7 +96,7 @@ export function useNotifyDataReady<TData, TError = Error>({
     }
   }, [topic, hostname, shouldUseNotifications])
 
-  const onDataEvent = React.useCallback((data: NotifyResponseData): void => {
+  const onDataEvent = useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
       setIsNotifyEnabled(false)
       if (data === 'ECONNREFUSED') {
@@ -110,7 +110,7 @@ export function useNotifyDataReady<TData, TError = Error>({
     }
   }, [])
 
-  const notifyOnSettled = React.useCallback(
+  const notifyOnSettled = useCallback(
     (data: TData | undefined, error: TError | null) => {
       if (refetch === 'once') {
         setRefetch(null)

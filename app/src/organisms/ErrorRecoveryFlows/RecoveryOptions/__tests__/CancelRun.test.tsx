@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { CancelRun } from '../CancelRun'
 import { RECOVERY_MAP } from '../../constants'
@@ -23,16 +23,16 @@ describe('RecoveryFooterButtons', () => {
   const { CANCEL_RUN, ROBOT_CANCELING, DROP_TIP_FLOWS } = RECOVERY_MAP
   let props: React.ComponentProps<typeof CancelRun>
   let mockGoBackPrevStep: Mock
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockProceedToRouteAndStep: Mock
 
   beforeEach(() => {
     mockGoBackPrevStep = vi.fn()
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
     mockProceedToRouteAndStep = vi.fn()
     const mockRouteUpdateActions = {
       goBackPrevStep: mockGoBackPrevStep,
-      setRobotInMotion: mockSetRobotInMotion,
+      handleMotionRouting: mockhandleMotionRouting,
       proceedToRouteAndStep: mockProceedToRouteAndStep,
     } as any
 
@@ -56,7 +56,10 @@ describe('RecoveryFooterButtons', () => {
   })
 
   it('renders SelectRecoveryOption when the route is unknown', () => {
-    props = { ...props, recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' } }
+    props = {
+      ...props,
+      recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' as any },
+    }
     render(props)
 
     screen.getByText('MOCK SELECT RECOVERY OPTION')
@@ -76,7 +79,7 @@ describe('RecoveryFooterButtons', () => {
   })
 
   it('should call commands in the correct order for the primaryOnClick callback', async () => {
-    const setRobotInMotionMock = vi.fn(() => Promise.resolve())
+    const handleMotionRoutingMock = vi.fn(() => Promise.resolve())
     const cancelRunMock = vi.fn(() => Promise.resolve())
 
     const mockRecoveryCommands = {
@@ -84,7 +87,7 @@ describe('RecoveryFooterButtons', () => {
     } as any
 
     const mockRouteUpdateActions = {
-      setRobotInMotion: setRobotInMotionMock,
+      handleMotionRouting: handleMotionRoutingMock,
     } as any
 
     render({
@@ -96,10 +99,10 @@ describe('RecoveryFooterButtons', () => {
     clickButtonLabeled('Confirm')
 
     await waitFor(() => {
-      expect(setRobotInMotionMock).toHaveBeenCalledTimes(1)
+      expect(handleMotionRoutingMock).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(setRobotInMotionMock).toHaveBeenCalledWith(
+      expect(handleMotionRoutingMock).toHaveBeenCalledWith(
         true,
         ROBOT_CANCELING.ROUTE
       )
@@ -108,7 +111,7 @@ describe('RecoveryFooterButtons', () => {
       expect(cancelRunMock).toHaveBeenCalledTimes(1)
     })
 
-    expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(handleMotionRoutingMock.mock.invocationCallOrder[0]).toBeLessThan(
       cancelRunMock.mock.invocationCallOrder[0]
     )
   })
@@ -141,7 +144,7 @@ describe('RecoveryFooterButtons', () => {
 
     clickButtonLabeled('Confirm')
     expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
-    expect(mockSetRobotInMotion).not.toHaveBeenCalled()
+    expect(mockhandleMotionRouting).not.toHaveBeenCalled()
   })
 
   it('should will cancel the run if no tips are detected', () => {
@@ -157,6 +160,6 @@ describe('RecoveryFooterButtons', () => {
 
     clickButtonLabeled('Confirm')
     expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
-    expect(mockSetRobotInMotion).toHaveBeenCalled()
+    expect(mockhandleMotionRouting).toHaveBeenCalled()
   })
 })

@@ -1,14 +1,15 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
-import { Box, Btn } from '../../primitives'
+import { Btn } from '../../primitives'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { LegacyStyledText } from '../../atoms/StyledText'
-import { fontSizeBodyLargeSemiBold } from '../../helix-design-system/product/typography'
+import { StyledText } from '../StyledText'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
@@ -46,6 +47,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     type,
     ...buttonProps
   } = props
+
+  const computedDisabled = disabled || ariaDisabled
 
   const LARGE_BUTTON_PROPS_BY_TYPE: Record<
     LargeButtonTypes,
@@ -153,17 +156,37 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor}`
       : ''
 
+  // In order to keep button sizes consistent and expected, all large button types need an outline.
+  // The outline color is always the same as the background color unless the background color is uniquely different
+  // from the outline.
+  const computedBorderStyle = (): string => {
+    const borderColor = (): string => {
+      if (computedDisabled) {
+        return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor
+      } else if (buttonType === 'alertStroke') {
+        return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
+      } else {
+        return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+      }
+    }
+
+    const calculatedBorderRadius =
+      buttonType === 'stroke' ? BORDERS.borderRadius2 : BORDERS.borderRadius4
+
+    return `${calculatedBorderRadius} solid ${borderColor()}`
+  }
+
   const LARGE_BUTTON_STYLE = css`
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${
       LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
     };
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
-    text-align: ${TYPOGRAPHY.textAlignCenter};
+    text-align: ${TYPOGRAPHY.textAlignLeft};
     border-radius: ${BORDERS.borderRadiusFull};
     align-items: ${ALIGN_CENTER};
-    border: ${buttonType === 'stroke' ? `2px solid ${COLORS.blue50}` : 'none'};
+    border: ${computedBorderStyle()};
 
     &:active {
       background-color: ${
@@ -182,7 +205,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       };
 
       border: ${
-        buttonType === 'stroke' ? `2px solid ${COLORS.blue55}` : 'none'
+        buttonType === 'stroke'
+          ? `2px solid ${COLORS.blue55}`
+          : `${computedBorderStyle()}`
       };
     }
 
@@ -205,7 +230,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      cursor: default;
+      cursor: ${CURSOR_DEFAULT};
       align-items: ${ALIGN_FLEX_START};
       flex-direction: ${DIRECTION_COLUMN};
       border-radius: ${BORDERS.borderRadius16};
@@ -213,33 +238,17 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       padding: ${SPACING.spacing24};
       line-height: ${TYPOGRAPHY.lineHeight20};
       gap: ${SPACING.spacing60};
-      border: ${BORDERS.borderRadius4} solid
-        ${
-          buttonType === 'alertStroke' && !disabled
-            ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
-            : 'none'
-        };
-
-      ${TYPOGRAPHY.pSemiBold}
-
-      #btn-icon: {
-        color: ${
-          disabled
-            ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
-            : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
-        };
-      }
 
       &:active {
         background-color: ${
-          disabled
+          computedDisabled
             ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
         };
-        ${!disabled && activeColorFor(buttonType)};
-        border: ${BORDERS.borderRadius4} solid
+        ${!computedDisabled && activeColorFor(buttonType)};
+        outline: ${BORDERS.borderRadius4} solid
           ${
-            disabled
+            computedDisabled
               ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
               : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
           };
@@ -250,15 +259,15 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
       &:focus-visible {
         background-color: ${
-          disabled
+          computedDisabled
             ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleBackgroundColor
         };
-        ${!disabled && activeColorFor(buttonType)};
+        ${!computedDisabled && activeColorFor(buttonType)};
         padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
-        border: ${SPACING.spacing2} solid ${COLORS.transparent};
+        border: ${computedBorderStyle()};
         outline: ${
-          disabled
+          computedDisabled
             ? 'none'
             : `3px solid
     ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor}`
@@ -274,6 +283,11 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         };
       }
   `
+
+  const appliedIconColor = computedDisabled
+    ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+    : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+
   return (
     <Btn
       type={type}
@@ -284,31 +298,32 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       aria-disabled={ariaDisabled}
       {...buttonProps}
     >
-      <LegacyStyledText
+      <StyledText
+        oddStyle="level3HeaderSemiBold"
+        desktopStyle="bodyLargeSemiBold"
         css={css`
-          font-size: ${fontSizeBodyLargeSemiBold};
           padding-right: ${iconName != null ? SPACING.spacing8 : '0'};
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            ${TYPOGRAPHY.level3HeaderSemiBold}
-          }
         `}
       >
         {buttonText}
-      </LegacyStyledText>
+      </StyledText>
       {iconName ? (
-        <Box
-          css={css`
-            width: 1.5rem;
-            height: 1.5rem;
-            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              width: 5rem;
-              height: 5rem;
-            }
-          `}
-        >
-          <Icon name={iconName} aria-label={`${iconName} icon`} id="btn-icon" />
-        </Box>
+        <Icon
+          name={iconName}
+          aria-label={`${iconName} icon`}
+          color={appliedIconColor}
+          css={ICON_STYLE}
+        />
       ) : null}
     </Btn>
   )
 }
+
+const ICON_STYLE = css`
+  width: 1.5rem;
+  height: 1.5rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 5rem;
+    height: 5rem;
+  }
+`

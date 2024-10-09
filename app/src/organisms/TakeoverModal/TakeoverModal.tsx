@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -14,11 +14,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
+import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
   title: string

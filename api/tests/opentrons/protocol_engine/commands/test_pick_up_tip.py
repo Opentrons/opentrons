@@ -78,7 +78,11 @@ async def test_success(
                 pipette_id="pipette-id",
                 new_location=update_types.Well(labware_id="labware-id", well_name="A3"),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
-            )
+            ),
+            pipette_tip_state=update_types.PipetteTipStateUpdate(
+                pipette_id="pipette-id",
+                tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
+            ),
         ),
     )
 
@@ -128,7 +132,6 @@ async def test_tip_physically_missing_error(
         public=TipPhysicallyMissingError.construct(
             id=error_id, createdAt=error_created_at, wrappedErrors=[matchers.Anything()]
         ),
-        private=None,
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",

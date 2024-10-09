@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -15,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { useRequiredProtocolLabware } from '../../../pages/Desktop/Protocols/hooks'
+import { useRequiredProtocolLabware } from '/app/resources/protocols'
 import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`

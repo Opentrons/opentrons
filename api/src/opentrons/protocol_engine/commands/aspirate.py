@@ -53,7 +53,7 @@ class AspirateResult(BaseLiquidHandlingResult, DestinationPositionResult):
 
 _ExecuteReturn = Union[
     SuccessData[AspirateResult, None],
-    DefinedErrorData[OverpressureError, None],
+    DefinedErrorData[OverpressureError],
 ]
 
 
@@ -148,7 +148,6 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                     ],
                     errorInfo={"retryLocation": (position.x, position.y, position.z)},
                 ),
-                private=None,
                 state_update=state_update,
             )
         else:
@@ -162,7 +161,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             )
 
 
-class Aspirate(BaseCommand[AspirateParams, AspirateResult, ErrorOccurrence]):
+class Aspirate(BaseCommand[AspirateParams, AspirateResult, OverpressureError]):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"

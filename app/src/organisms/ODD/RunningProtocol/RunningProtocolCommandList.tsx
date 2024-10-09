@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { ViewportList } from 'react-viewport-list'
@@ -22,11 +22,11 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { CommandText, CommandIcon } from '../../../molecules/Command'
-import { getCommandTextData } from '../../../molecules/Command/utils/getCommandTextData'
+import { CommandText, CommandIcon } from '/app/molecules/Command'
+import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type {
@@ -34,8 +34,8 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
-import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.grey60};
@@ -102,14 +102,14 @@ export function RunningProtocolCommandList({
   currentRunCommandIndex,
 }: RunningProtocolCommandListProps): JSX.Element {
   const { t } = useTranslation('run_details')
-  const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const ref = React.useRef<ViewportListRef>(null)
+  const viewPortRef = useRef<HTMLDivElement | null>(null)
+  const ref = useRef<ViewportListRef>(null)
   const currentRunStatus = t(`status_${runStatus}`)
   const onStop = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
-  const [visibleRange, setVisibleRange] = React.useState<VisibleIndexRange>({
+  const [visibleRange, setVisibleRange] = useState<VisibleIndexRange>({
     lowestVisibleIndex: 0,
     highestVisibleIndex: 0,
   })
@@ -133,7 +133,7 @@ export function RunningProtocolCommandList({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Note (kk:09/25/2023) Need -1 because the element of highestVisibleIndex cannot really readable
     // due to limited space
     const isCurrentCommandVisible =

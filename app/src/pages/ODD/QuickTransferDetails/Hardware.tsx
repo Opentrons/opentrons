@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -26,13 +25,13 @@ import {
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
-} from '../../../resources/instruments/hooks'
-import { useRequiredProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
+} from '/app/local-resources/instruments'
+import { useRequiredProtocolHardware } from '/app/resources/protocols'
 
 import type {
   ProtocolHardware,
   ProtocolPipette,
-} from '../../../transformations/commands'
+} from '/app/transformations/commands'
 import type { TFunction } from 'i18next'
 
 const Table = styled('table')`

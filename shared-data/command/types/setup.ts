@@ -175,9 +175,9 @@ interface LoadLiquidResult {
 }
 
 export const COLUMN = 'COLUMN'
-const SINGLE = 'SINGLE'
-const ROW = 'ROW'
-const QUADRANT = 'QUADRANT'
+export const SINGLE = 'SINGLE'
+export const ROW = 'ROW'
+export const QUADRANT = 'QUADRANT'
 export const ALL = 'ALL'
 
 export type NozzleConfigurationStyle =

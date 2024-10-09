@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
@@ -40,7 +40,7 @@ export function useRobotControlCommands({
   continuePastCommandFailure,
   onSettled,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
-  const [isExecuting, setIsExecuting] = React.useState(false)
+  const [isExecuting, setIsExecuting] = useState(false)
 
   const { chainRunCommands } = useChainMaintenanceCommands()
   const {

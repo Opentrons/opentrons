@@ -1,13 +1,13 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 
-import { getUserId } from '../../../redux/config'
+import { getUserId } from '/app/redux/config'
 import {
   useClientDataRecovery,
   useUpdateClientDataRecovery,
-} from '../../../resources/client_data'
+} from '/app/resources/client_data'
 
-import type { ClientDataRecovery } from '../../../resources/client_data'
+import type { ClientDataRecovery } from '/app/resources/client_data'
 import type { UseERWizardResult } from '../ErrorRecoveryWizard'
 
 const CLIENT_DATA_INTERVAL_MS = 5000
@@ -40,7 +40,7 @@ export interface UseRecoveryTakeoverResult {
 export function useRecoveryTakeover(
   toggleERWiz: UseERWizardResult['toggleERWizard']
 ): UseRecoveryTakeoverResult {
-  const [isActiveUser, setIsActiveUser] = React.useState(false)
+  const [isActiveUser, setIsActiveUser] = useState(false)
 
   const thisUserId = useSelector(getUserId)
   const { userId: activeId, intent } = useClientDataRecovery({
@@ -49,14 +49,14 @@ export function useRecoveryTakeover(
   const { updateWithIntent, clearClientData } = useUpdateClientDataRecovery()
 
   // Update the client's active user status implicitly if revoked by a different client.
-  React.useEffect(() => {
+  useEffect(() => {
     if (isActiveUser && activeId !== thisUserId) {
       setIsActiveUser(false)
     }
   }, [activeId]) // Not all dependencies added for intended behavior!
 
   // If Error Recovery unrenders and this client is the active user, revoke the client's active user status.
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (isActiveUser) {
         clearClientData()

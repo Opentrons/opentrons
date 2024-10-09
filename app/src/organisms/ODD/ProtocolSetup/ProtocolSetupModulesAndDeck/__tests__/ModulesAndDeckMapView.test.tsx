@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
@@ -8,18 +8,17 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
-vi.mock('../../../../../redux/config')
-vi.mock('../../../../Devices/hooks')
-vi.mock('../../../../../resources/deck_configuration/utils')
-vi.mock('../../../../Devices/ModuleInfo')
-vi.mock('../../../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/deck_configuration/utils')
+vi.mock('/app/molecules/ModuleInfo')
+vi.mock('/app/transformations/analysis')
 
 const mockRunId = 'mockRunId'
 const PROTOCOL_ANALYSIS = {

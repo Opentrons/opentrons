@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -17,8 +16,8 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { getTopPortalEl } from '../../../../App/portal'
-import { OddModal } from '../../../../molecules/OddModal'
+import { getTopPortalEl } from '/app/App/portal'
+import { OddModal } from '/app/molecules/OddModal'
 
 import type {
   CompletedProtocolAnalysis,

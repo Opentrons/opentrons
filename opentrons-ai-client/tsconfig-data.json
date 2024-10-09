@@ -7,6 +7,6 @@
     "rootDir": ".",
     "outDir": "lib"
   },
-  "include": ["src/**/*.json", "fixtures/**/*.json", "vite.config.ts"],
+  "include": ["src/**/*.json", "fixtures/**/*.json", "vite.config.mts"],
   "exclude": ["**/*.ts", "**/*.tsx"]
 }

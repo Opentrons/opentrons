@@ -1,16 +1,16 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, render, fireEvent, screen } from '@testing-library/react'
-import { useTrackEvent } from '../../../redux/analytics'
+import { useTrackEvent } from '/app/redux/analytics'
 import { useToggleGroup } from '../useToggleGroup'
 
 import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 
 let mockTrackEvent: any
 

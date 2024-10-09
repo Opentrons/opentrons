@@ -10,8 +10,8 @@ import {
   getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import type { AspDispAirgapParams } from '@opentrons/shared-data'
 export function forAspirate(
   params: AspDispAirgapParams,
   invariantContext: InvariantContext,

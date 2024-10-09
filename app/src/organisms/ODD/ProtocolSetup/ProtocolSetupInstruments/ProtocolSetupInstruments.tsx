@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,16 +11,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { ODDBackButton } from '../../../../molecules/ODDBackButton'
-import { PipetteRecalibrationODDWarning } from '../../../../pages/ODD/InstrumentsDashboard/PipetteRecalibrationODDWarning'
-import { getShowPipetteCalibrationWarning } from '../../../Devices/utils'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolInstrumentMountItem } from '../../../InstrumentMountItem'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecalibrationODDWarning'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { ProtocolInstrumentMountItem } from '/app/organisms/ODD/InstrumentMountItem'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
-import { isGripperInCommands } from '../../../../resources/protocols/utils'
+import { isGripperInCommands } from '/app/resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string

@@ -14,6 +14,7 @@ import time as t
 import json
 import requests
 import sys
+from abr_testing.tools import plate_reader
 
 
 def lpc_data(
@@ -76,6 +77,36 @@ def command_time(command: Dict[str, str]) -> float:
     return start_to_complete
 
 
+def count_command_in_run_data(
+    commands: List[Dict[str, Any]], command_of_interest: str, find_avg_time: bool
+) -> Tuple[int, float]:
+    """Count number of times command occurs in a run."""
+    total_command = 0
+    total_time = 0.0
+    for command in commands:
+        command_type = command["commandType"]
+        if command_type == command_of_interest:
+            total_command += 1
+            if find_avg_time:
+                started_at = command.get("startedAt", "")
+                completed_at = command.get("completedAt", "")
+
+                if started_at and completed_at:
+                    try:
+                        start_time = datetime.strptime(
+                            started_at, "%Y-%m-%dT%H:%M:%S.%f%z"
+                        )
+                        end_time = datetime.strptime(
+                            completed_at, "%Y-%m-%dT%H:%M:%S.%f%z"
+                        )
+                        total_time += (end_time - start_time).total_seconds()
+                    except ValueError:
+                        # Handle case where date parsing fails
+                        pass
+    avg_time = total_time / total_command if total_command > 0 else 0.0
+    return total_command, avg_time
+
+
 def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     """Count number of pipette and gripper commands per run."""
     pipettes = file_results.get("pipettes", "")
@@ -89,6 +120,7 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     right_pipette_id = ""
     left_pipette_id = ""
     gripper_pickups = 0.0
+    avg_liquid_probe_time_sec = 0.0
     # Match pipette mount to id
     for pipette in pipettes:
         if pipette["mount"] == "right":
@@ -120,6 +152,9 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             and command["params"]["strategy"] == "usingGripper"
         ):
             gripper_pickups += 1
+    liquid_probes, avg_liquid_probe_time_sec = count_command_in_run_data(
+        commandData, "liquidProbe", True
+    )
     pipette_dict = {
         "Left Pipette Total Tip Pick Up(s)": left_tip_pick_up,
         "Left Pipette Total Aspirates": left_aspirate,
@@ -128,8 +163,73 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
         "Right Pipette Total Aspirates": right_aspirate,
         "Right Pipette Total Dispenses": right_dispense,
         "Gripper Pick Ups": gripper_pickups,
+        "Total Liquid Probes": liquid_probes,
+        "Average Liquid Probe Time (sec)": avg_liquid_probe_time_sec,
     }
     return pipette_dict
+
+
+def plate_reader_commands(
+    file_results: Dict[str, Any], hellma_plate_standards: List[Dict[str, Any]]
+) -> Dict[str, object]:
+    """Plate Reader Command Counts."""
+    commandData = file_results.get("commands", "")
+    move_lid_count: int = 0
+    initialize_count: int = 0
+    read = "no"
+    final_result = {}
+    # Count Number of Reads
+    read_count, avg_read_time = count_command_in_run_data(
+        commandData, "absorbanceReader/read", True
+    )
+    # Count Number of Initializations
+    initialize_count, avg_initialize_time = count_command_in_run_data(
+        commandData, "absorbanceReader/initialize", True
+    )
+    # Count Number of Lid Movements
+    for command in commandData:
+        commandType = command["commandType"]
+        if (
+            commandType == "absorbanceReader/openLid"
+            or commandType == "absorbanceReader/closeLid"
+        ):
+            move_lid_count += 1
+        elif commandType == "absorbanceReader/read":
+            read = "yes"
+        elif read == "yes" and commandType == "comment":
+            result = command["params"].get("message", "")
+            wavelength = result.split("result: {")[1].split(":")[0]
+            wavelength_str = wavelength + ": "
+            rest_of_string = result.split(wavelength_str)[1][:-1]
+            result_dict = eval(rest_of_string)
+            result_ndarray = plate_reader.convert_read_dictionary_to_array(result_dict)
+            for item in hellma_plate_standards:
+                wavelength_of_interest = item["wavelength"]
+                if str(wavelength) == str(wavelength_of_interest):
+                    error_cells = plate_reader.check_byonoy_data_accuracy(
+                        result_ndarray, item, False
+                    )
+                    if len(error_cells[0]) > 0:
+                        percent = (96 - len(error_cells)) / 96 * 100
+                        for cell in error_cells:
+                            print("FAIL: Cell " + str(cell) + " out of accuracy spec.")
+                    else:
+                        percent = 100
+                        print(
+                            f"PASS: {wavelength_of_interest} meet accuracy specification"
+                        )
+                    final_result[wavelength] = percent
+                    input("###########################")
+            read = "no"
+    plate_dict = {
+        "Plate Reader # of Reads": read_count,
+        "Plate Reader Avg Read Time (sec)": avg_read_time,
+        "Plate Reader # of Initializations": initialize_count,
+        "Plate Reader Avg Initialize Time (sec)": avg_initialize_time,
+        "Plate Reader # of Lid Movements": move_lid_count,
+        "Plate Reader Result": final_result,
+    }
+    return plate_dict
 
 
 def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
@@ -362,50 +462,58 @@ def create_abr_data_sheet(
     return sheet_location
 
 
-def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, str]:
+def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
     """Determines if errors exist in run log and documents them."""
-    error_levels = []
-    error_level = ""
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
-        error_levels = list(csv.reader(error_file))
-    num_of_errors = len(file_results["errors"])
-    if num_of_errors == 0:
-        error_type = ""
-        error_code = ""
-        error_instrument = ""
-        error_level = ""
-        return 0, error_type, error_code, error_instrument, error_level
+        error_levels = {row[1]: row[4] for row in csv.reader(error_file)}
+    # Initialize Variables
+    recoverable_errors: Dict[str, int] = dict()
+    total_recoverable_errors = 0
+    end_run_errors = len(file_results["errors"])
     commands_of_run: List[Dict[str, Any]] = file_results.get("commands", [])
+    error_recovery = file_results.get("hasEverEnteredErrorRecovery", False)
+    # Count recoverable errors
+    if error_recovery:
+        for command in commands_of_run:
+            error_info = command.get("error", {})
+            if error_info.get("isDefined"):
+                total_recoverable_errors += 1
+                error_type = error_info.get("errorType", "")
+                recoverable_errors[error_type] = (
+                    recoverable_errors.get(error_type, 0) + 1
+                )
+    # Get run-ending error info
     try:
-        run_command_error: Dict[str, Any] = commands_of_run[-1]
-        error_str: int = len(run_command_error.get("error", ""))
-    except IndexError:
-        error_str = 0
-    if error_str > 1:
-        error_type = run_command_error["error"].get("errorType", "")
+        run_command_error = commands_of_run[-1]["error"]
+        error_type = run_command_error.get("errorType", "")
         if error_type == "PythonException":
-            # Reassign error_type to be more descriptive
-            error_type = run_command_error.get("detail", "").split(":")[0]
-        error_code = run_command_error["error"].get("errorCode", "")
+            error_type = commands_of_run[-1].get("detail", "").split(":")[0]
+        error_code = run_command_error.get("errorCode", "")
+        error_instrument = run_command_error.get("errorInfo", {}).get(
+            "node", run_command_error.get("errorInfo", {}).get("port", "")
+        )
+    except (IndexError, KeyError):
         try:
-            # Instrument Error
-            error_instrument = run_command_error["error"]["errorInfo"]["node"]
-        except KeyError:
-            # Module
-            error_instrument = run_command_error["error"]["errorInfo"].get("port", "")
-    else:
-        error_type = file_results["errors"][0]["errorType"]
-        error_code = file_results["errors"][0]["errorCode"]
-        error_instrument = file_results["errors"][0]["detail"]
-    for error in error_levels:
-        code_error = error[1]
-        if code_error == error_code:
-            error_level = error[4]
-    if len(error_level) < 1:
-        error_level = str(4)
-
-    return num_of_errors, error_type, error_code, error_instrument, error_level
+            error_details = file_results.get("errors", [{}])[0]
+        except IndexError:
+            error_details = {}
+        error_type = error_details.get("errorType", "")
+        error_code = error_details.get("errorCode", "")
+        error_instrument = error_details.get("detail", "")
+    # Determine error level
+    error_level = error_levels.get(error_code, "4")
+    # Create dictionary with all error descriptions
+    error_dict = {
+        "Total Recoverable Error(s)": total_recoverable_errors,
+        "Recoverable Error(s) Description": recoverable_errors,
+        "Run Ending Error": end_run_errors,
+        "Error_Code": error_code,
+        "Error_Type": error_type,
+        "Error_Instrument": error_instrument,
+        "Error_Level": error_level,
+    }
+    return error_dict
 
 
 def write_to_local_and_google_sheet(
@@ -570,10 +678,10 @@ def get_calibration_offsets(
 def get_logs(storage_directory: str, ip: str) -> List[str]:
     """Get Robot logs."""
     log_types: List[Dict[str, Any]] = [
-        {"log type": "api.log", "records": 1000},
+        {"log type": "api.log", "records": 10000},
         {"log type": "server.log", "records": 10000},
         {"log type": "serial.log", "records": 10000},
-        {"log type": "touchscreen.log", "records": 1000},
+        {"log type": "touchscreen.log", "records": 10000},
     ]
     all_paths = []
     for log_type in log_types:

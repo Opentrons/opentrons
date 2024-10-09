@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { CURRENT_RUN_POLL } from './constants'
 import { useCurrentRunRoute } from './hooks'
 

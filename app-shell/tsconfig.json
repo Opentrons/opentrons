@@ -17,7 +17,10 @@
     "rootDir": "src",
     "outDir": "lib",
     "target": "esnext",
-    "module": "ESNext"
+    "module": "ESNext",
+    "paths": {
+      "/app/*": ["../app/src/*"]
+    }
   },
   "include": ["typings", "src"]
 }

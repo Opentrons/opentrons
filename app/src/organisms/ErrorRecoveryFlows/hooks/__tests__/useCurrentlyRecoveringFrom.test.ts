@@ -1,5 +1,6 @@
-import { vi, describe, it, expect } from 'vitest'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { useQueryClient } from 'react-query'
 
 import { useCommandQuery } from '@opentrons/react-api-client'
 import {
@@ -7,16 +8,28 @@ import {
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
 
-import { useNotifyAllCommandsQuery } from '../../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 import { useCurrentlyRecoveringFrom } from '../useCurrentlyRecoveringFrom'
 
+import type { Mock } from 'vitest'
+
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
+vi.mock('react-query')
 
 const MOCK_RUN_ID = 'runId'
 const MOCK_COMMAND_ID = 'commandId'
 
 describe('useCurrentlyRecoveringFrom', () => {
+  let mockInvalidateQueries: Mock
+
+  beforeEach(() => {
+    mockInvalidateQueries = vi.fn()
+    vi.mocked(useQueryClient).mockReturnValue({
+      invalidateQueries: mockInvalidateQueries,
+    } as any)
+  })
+
   it('disables all queries if the run is not awaiting-recovery', () => {
     vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
       data: {
@@ -96,5 +109,13 @@ describe('useCurrentlyRecoveringFrom', () => {
       { enabled: true }
     )
     expect(result.current).toStrictEqual('mockCommandDetails')
+  })
+
+  it('calls invalidateQueries when the run enters recovery mode', () => {
+    renderHook(() =>
+      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY)
+    )
+
+    expect(mockInvalidateQueries).toHaveBeenCalled()
   })
 })

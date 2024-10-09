@@ -1,15 +1,16 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
+
 import { screen } from '@testing-library/react'
 import { RUN_STATUS_AWAITING_RECOVERY_PAUSED } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRecoveryContentProps } from '../__fixtures__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
+import { clickButtonLabeled } from './util'
 
 import type { Mock } from 'vitest'
-import { clickButtonLabeled } from './util'
 
 const render = (props: React.ComponentProps<typeof RecoveryDoorOpen>) => {
   return renderWithProviders(<RecoveryDoorOpen {...props} />, {
@@ -20,9 +21,11 @@ const render = (props: React.ComponentProps<typeof RecoveryDoorOpen>) => {
 describe('RecoveryDoorOpen', () => {
   let props: React.ComponentProps<typeof RecoveryDoorOpen>
   let mockResumeRecovery: Mock
+  let mockProceedToRouteAndStep: Mock
 
   beforeEach(() => {
-    mockResumeRecovery = vi.fn()
+    mockResumeRecovery = vi.fn().mockResolvedValue(undefined)
+    mockProceedToRouteAndStep = vi.fn()
     props = {
       ...mockRecoveryContentProps,
       recoveryActionMutationUtils: {
@@ -30,6 +33,10 @@ describe('RecoveryDoorOpen', () => {
         isResumeRecoveryLoading: false,
       },
       runStatus: RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+      routeUpdateActions: {
+        stashedMap: null,
+        proceedToRouteAndStep: mockProceedToRouteAndStep,
+      } as any,
     }
   })
 
@@ -49,5 +56,23 @@ describe('RecoveryDoorOpen', () => {
     clickButtonLabeled('Resume')
 
     expect(mockResumeRecovery).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls proceedToRouteAndStep after resumeRecovery if stashedMap is provided', async () => {
+    const stashedMap = { route: 'testRoute', step: 'testStep' } as any
+    props.routeUpdateActions.stashedMap = stashedMap
+
+    render(props)
+
+    clickButtonLabeled('Resume')
+
+    await vi.waitFor(() => {
+      expect(mockResumeRecovery).toHaveBeenCalledTimes(1)
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledTimes(1)
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        stashedMap.route,
+        stashedMap.step
+      )
+    })
   })
 })

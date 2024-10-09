@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, useReducer } from 'react'
 import { createPortal } from 'react-dom'
 import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
@@ -11,13 +11,13 @@ import {
 } from '@opentrons/react-api-client'
 import { FIXED_TRASH_ID, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getTopPortalEl } from '../../App/portal'
-// import { useTrackEvent } from '../../redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
+// import { useTrackEvent } from '/app/redux/analytics'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { getIsOnDevice } from '../../redux/config'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { getIsOnDevice } from '/app/redux/config'
 import { AttachProbe } from './AttachProbe'
 import { DetachProbe } from './DetachProbe'
 import { PickUpTip } from './PickUpTip'
@@ -28,7 +28,7 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
-} from '../../resources/maintenance_runs'
+} from '/app/resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 
 import type {
@@ -43,7 +43,7 @@ import type {
   LabwareOffset,
   CommandData,
 } from '@opentrons/api-client'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -85,7 +85,7 @@ export const LabwarePositionCheckComponent = (
   const [
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
@@ -94,7 +94,7 @@ export const LabwarePositionCheckComponent = (
 
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       maintenanceRunId !== null &&
       maintenanceRunData?.data.id === maintenanceRunId
@@ -114,14 +114,9 @@ export const LabwarePositionCheckComponent = (
     setMaintenanceRunId,
   ])
 
-  const [fatalError, setFatalError] = React.useState<string | null>(null)
-  const [isApplyingOffsets, setIsApplyingOffsets] = React.useState<boolean>(
-    false
-  )
-  const [
-    { workingOffsets, tipPickUpOffset },
-    registerPosition,
-  ] = React.useReducer(
+  const [fatalError, setFatalError] = useState<string | null>(null)
+  const [isApplyingOffsets, setIsApplyingOffsets] = useState<boolean>(false)
+  const [{ workingOffsets, tipPickUpOffset }, registerPosition] = useReducer(
     (
       state: {
         workingOffsets: WorkingOffset[]
@@ -189,7 +184,7 @@ export const LabwarePositionCheckComponent = (
     },
     { workingOffsets: [], tipPickUpOffset: null }
   )
-  const [isExiting, setIsExiting] = React.useState(false)
+  const [isExiting, setIsExiting] = useState(false)
   const {
     createMaintenanceCommand: createSilentCommand,
   } = useCreateMaintenanceCommandMutation()
@@ -199,7 +194,7 @@ export const LabwarePositionCheckComponent = (
   } = useChainMaintenanceCommands()
 
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = shouldUseMetalProbe

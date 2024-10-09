@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { Flex } from '../../../primitives'
 import {
-  ALIGN_CENTER,
+  ALIGN_FLEX_START,
   DIRECTION_ROW,
   FLEX_AUTO,
   JUSTIFY_SPACE_BETWEEN,
@@ -23,7 +22,7 @@ export const ListItemDescriptor = (
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing8}
       width="100%"
-      alignItems={ALIGN_CENTER}
+      alignItems={ALIGN_FLEX_START}
       justifyContent={type === 'mini' ? JUSTIFY_SPACE_BETWEEN : 'none'}
       padding={
         type === 'mini'
@@ -37,7 +36,9 @@ export const ListItemDescriptor = (
       >
         {description}
       </Flex>
-      <Flex flex={type === 'default' && '1.95'}>{content}</Flex>
+      <Flex flex={type === 'default' && '1.95'} overflowWrap="anywhere">
+        {content}
+      </Flex>
     </Flex>
   )
 }

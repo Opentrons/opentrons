@@ -1,16 +1,16 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
 import type { RunData } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../RecentRunProtocolCard')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const mockRun = {
   actions: [],

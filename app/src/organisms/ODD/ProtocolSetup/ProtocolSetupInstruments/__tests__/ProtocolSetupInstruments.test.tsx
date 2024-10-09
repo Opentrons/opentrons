@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -9,18 +8,16 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { useMostRecentCompletedAnalysis } from '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useIsOEMMode } from '../../../../../resources/robot-settings/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import { mockRecentAnalysis } from '../__fixtures__'
 import { ProtocolSetupInstruments } from '..'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock(
-  '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
-vi.mock('../../../../../resources/robot-settings/hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/resources/robot-settings/hooks')
 
 const mockGripperData = {
   instrumentModel: 'gripper_v1',

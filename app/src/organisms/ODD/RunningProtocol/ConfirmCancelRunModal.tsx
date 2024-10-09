@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -18,15 +18,15 @@ import {
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
-import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
-import { getLocalRobot } from '../../../redux/discovery'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useRunStatus } from '/app/resources/runs'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from './CancelingRunModal'
 
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -66,7 +66,7 @@ export function ConfirmCancelRunModal({
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const navigate = useNavigate()
-  const [isCanceling, setIsCanceling] = React.useState(false)
+  const [isCanceling, setIsCanceling] = useState(false)
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('cancel_run_modal_heading'),
@@ -84,7 +84,7 @@ export function ConfirmCancelRunModal({
     })
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       if (!isActiveRun) {

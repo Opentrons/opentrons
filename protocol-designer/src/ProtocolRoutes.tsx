@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Route, Navigate, Routes } from 'react-router-dom'
 import { Box } from '@opentrons/components'
 import { Landing } from './pages/Landing'
@@ -7,6 +6,7 @@ import { Liquids } from './pages/Liquids'
 import { Designer } from './pages/Designer'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
 import { NavigationBar } from './NavigationBar'
+import { Settings } from './pages/Settings'
 import {
   Kitchen,
   FileUploadMessagesModal,
@@ -40,6 +40,12 @@ const pdRoutes: RouteProps[] = [
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',
+  },
+  {
+    Component: Settings,
+    name: 'Settings',
+    navLinkTo: '/settings',
+    path: '/settings',
   },
 ]
 

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useRef } from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -22,9 +22,9 @@ export default meta
 type Story = StoryObj<typeof IndividualKey>
 
 const Keyboard = ({ ...args }): JSX.Element => {
-  const [showKeyboard, setShowKeyboard] = React.useState(false)
-  const [value, setValue] = React.useState<string>('')
-  const keyboardRef = React.useRef(null)
+  const [showKeyboard, setShowKeyboard] = useState(false)
+  const [value, setValue] = useState<string>('')
+  const keyboardRef = useRef(null)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
       <form id="test_form">

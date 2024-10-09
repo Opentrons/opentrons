@@ -33,17 +33,14 @@ import {
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
 
+import { useRobotType } from '/app/redux-resources/robots'
 import {
-  useAttachedModules,
-  useLPCDisabledReason,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
   useRobotAnalyticsData,
-  useRobotType,
   useTrackProtocolRunEvent,
-} from '../../../organisms/Devices/hooks'
+} from '/app/redux-resources/analytics'
+import { useAttachedModules } from '/app/resources/modules'
 
-import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
   AnalysisFailedModal,
   ProtocolSetupDeckConfiguration,
@@ -58,45 +55,48 @@ import {
   getUnmatchedModulesForProtocol,
   getIncompleteInstrumentCount,
   ViewOnlyParameters,
-} from '../../../organisms/ODD/ProtocolSetup'
-import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { ConfirmCancelRunModal } from '../../../organisms/ODD/RunningProtocol'
-import {
-  useRunControls,
-  useRunStatus,
-} from '../../../organisms/RunTimeControl/hooks'
-import { useToaster } from '../../../organisms/ToasterOven'
-import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
-import { getLocalRobot, getRobotSerialNumber } from '../../../redux/discovery'
+} from '/app/organisms/ODD/ProtocolSetup'
+import { useLaunchLPC } from '/app/organisms/LabwarePositionCheck/useLaunchLPC'
+import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
-} from '../../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
+} from '/app/redux/analytics'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
-import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import { CloseButton, PlayButton } from './Buttons'
-import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '../../../resources/deck_configuration/utils'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
+import {
+  useNotifyRunQuery,
+  useRunStatus,
+  useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
+} from '/app/resources/runs'
 
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
-import type { OnDeviceRouteParams } from '../../../App/types'
-import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import type { SetupScreens } from '../../../organisms/ODD/ProtocolSetup'
+import type { OnDeviceRouteParams } from '/app/App/types'
+import type { ProtocolModuleInfo } from '/app/transformations/analysis'
+import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type {
   ProtocolHardware,
   ProtocolFixture,
-} from '../../../transformations/commands'
+} from '/app/transformations/commands'
 import {
   getLabwareSetupItemGroups,
   getProtocolUsesGripper,
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '../../../transformations/commands'
+} from '/app/transformations/commands'
 
 const FETCH_DURATION_MS = 5000
 

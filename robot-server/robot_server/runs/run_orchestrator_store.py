@@ -1,7 +1,7 @@
 """In-memory storage of ProtocolEngine instances."""
 import asyncio
 import logging
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Dict
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import (
@@ -16,6 +16,7 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.hardware_control.types import (
     EstopState,
     HardwareEvent,
@@ -51,8 +52,6 @@ from opentrons.protocol_engine.types import (
     EngineStatus,
 )
 from opentrons_shared_data.labware.types import LabwareUri
-
-from .error_recovery_mapping import default_error_recovery_policy
 
 _log = logging.getLogger(__name__)
 
@@ -118,8 +117,6 @@ def _get_estop_listener(
 class RunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    _run_orchestrator: Optional[RunOrchestrator] = None
-
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
@@ -137,6 +134,7 @@ class RunOrchestratorStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
+        self._run_orchestrator: Optional[RunOrchestrator] = None
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
@@ -178,6 +176,9 @@ class RunOrchestratorStore:
                     deck_type=self._deck_type,
                     block_on_door_open=False,
                 ),
+                # Error recovery mode would not make sense outside the context of a run--
+                # for example, there would be no equivalent to the `POST /runs/{id}/actions`
+                # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
@@ -190,6 +191,7 @@ class RunOrchestratorStore:
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
@@ -231,7 +233,7 @@ class RunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            error_recovery_policy=default_error_recovery_policy,
+            error_recovery_policy=initial_error_recovery_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
@@ -320,6 +322,10 @@ class RunOrchestratorStore:
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
         return self.run_orchestrator.get_loaded_labware_definitions()
+
+    def get_nozzle_maps(self) -> Dict[str, NozzleMap]:
+        """Get the current nozzle map keyed by pipette id."""
+        return self.run_orchestrator.get_nozzle_maps()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""

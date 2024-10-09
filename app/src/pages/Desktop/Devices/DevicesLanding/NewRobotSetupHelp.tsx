@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -14,8 +14,8 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../App/portal'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import { getTopPortalEl } from '/app/App/portal'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =
   'https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Quickstart%20Guide.pdf'
@@ -23,10 +23,8 @@ const NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF =
   'https://insights.opentrons.com/hubfs/Products/OT-2/OT-2%20Quick%20Start%20Guide.pdf'
 
 export function NewRobotSetupHelp(): JSX.Element {
-  const { t } = useTranslation(['devices_landing', 'shared'])
-  const [showNewRobotHelpModal, setShowNewRobotHelpModal] = React.useState(
-    false
-  )
+  const { t } = useTranslation(['devices_landing', 'shared', 'branded'])
+  const [showNewRobotHelpModal, setShowNewRobotHelpModal] = useState(false)
 
   return (
     <>
@@ -49,13 +47,13 @@ export function NewRobotSetupHelp(): JSX.Element {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
-                  {t('new_robot_instructions')}
+                  {t('branded:new_robot_instructions')}
                 </LegacyStyledText>
                 <ExternalLink
                   href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}
                   width={FLEX_MAX_CONTENT}
                 >
-                  {t('opentrons_flex_quickstart_guide')}
+                  {t('branded:opentrons_flex_quickstart_guide')}
                 </ExternalLink>
                 <ExternalLink
                   href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}

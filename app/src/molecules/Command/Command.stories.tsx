@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Command as CommandComponent } from '.'
 import type { CommandState } from './Command'
 import * as Fixtures from './__fixtures__'
@@ -19,7 +18,7 @@ interface StorybookArgs {
 }
 
 const availableCommandTypes = uniq(
-  Fixtures.mockQIASeqTextData.commands.map(command => command.commandType)
+  Fixtures.mockDoItAllTextData.commands.map(command => command.commandType)
 )
 const commandsByType: Partial<Record<CommandType, RunTimeCommand[]>> = {}
 
@@ -27,7 +26,7 @@ function commandsOfType(type: CommandType): RunTimeCommand[] {
   if (type in commandsByType) {
     return commandsByType[type]
   }
-  commandsByType[type] = Fixtures.mockQIASeqTextData.commands.filter(
+  commandsByType[type] = Fixtures.mockDoItAllTextData.commands.filter(
     command => command.commandType === type
   )
   return commandsByType[type]
@@ -44,8 +43,8 @@ function safeCommandOfType(type: CommandType, index: number): RunTimeCommand {
 function Wrapper(props: StorybookArgs): JSX.Element {
   const command =
     props.selectCommandBy === 'protocol index'
-      ? Fixtures.mockQIASeqTextData.commands[
-          props.commandIndex < Fixtures.mockQIASeqTextData.commands.length
+      ? Fixtures.mockDoItAllTextData.commands[
+          props.commandIndex < Fixtures.mockDoItAllTextData.commands.length
             ? props.commandIndex
             : -1
         ]
@@ -53,7 +52,7 @@ function Wrapper(props: StorybookArgs): JSX.Element {
   return command == null ? null : (
     <CommandComponent
       command={command}
-      commandTextData={Fixtures.mockQIASeqTextData}
+      commandTextData={Fixtures.mockDoItAllTextData}
       robotType="OT-3 Standard"
       state={props.state}
       aligned={props.aligned}
@@ -93,7 +92,7 @@ const meta: Meta<StorybookArgs> = {
       control: {
         type: 'range',
         min: 0,
-        max: Fixtures.mockQIASeqTextData.commands.length - 1,
+        max: Fixtures.mockDoItAllTextData.commands.length - 1,
       },
       defaultValue: 0,
       if: { arg: 'selectCommandBy', eq: 'protocol index' },
@@ -156,6 +155,16 @@ export const ThermocyclerProfile: Story = {
   args: {
     selectCommandBy: 'command type',
     commandType: 'thermocycler/runProfile',
+    commandTypeIndex: 0,
+    aligned: 'left',
+    state: 'current',
+  },
+}
+
+export const ThermocyclerExtendedProfile: Story = {
+  args: {
+    selectCommandBy: 'command type',
+    commandType: 'thermocycler/runExtendedProfile',
     commandTypeIndex: 0,
     aligned: 'left',
     state: 'current',

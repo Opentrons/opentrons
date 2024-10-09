@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -9,9 +9,9 @@ import {
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { useFeatureFlag } from '../../../../redux/config'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useFeatureFlag } from '/app/redux/config'
 import { ProtocolCard } from '../ProtocolCard'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -32,7 +32,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Chip>()
   return {

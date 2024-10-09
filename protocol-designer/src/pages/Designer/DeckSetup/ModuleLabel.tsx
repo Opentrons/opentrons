@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { DeckLabelSet } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -26,10 +26,10 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     isLast,
     labwareInfos = [],
   } = props
-  const labelContainerRef = React.useRef<HTMLDivElement>(null)
-  const [labelContainerHeight, setLabelContainerHeight] = React.useState(12)
+  const labelContainerRef = useRef<HTMLDivElement>(null)
+  const [labelContainerHeight, setLabelContainerHeight] = useState(12)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (labelContainerRef.current) {
       setLabelContainerHeight(labelContainerRef.current.offsetHeight)
     }
@@ -37,7 +37,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
 
   const def = getModuleDef2(moduleModel)
   const overhang =
-    def != null && def?.dimensions.labwareInterfaceXDimension != null
+    def?.dimensions.labwareInterfaceXDimension != null
       ? def.dimensions.xDimension - def?.dimensions.labwareInterfaceXDimension
       : 0
   //  TODO(ja 9/6/24): definitely need to refine these overhang values
@@ -55,21 +55,21 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
       ref={labelContainerRef}
       deckLabels={[
         {
-          text: def.displayName,
-          isSelected: isSelected,
-          isLast: isLast,
-          moduleModel: def.model,
+          text: def?.displayName,
+          isSelected,
+          isLast,
+          moduleModel: def?.model,
         },
         ...labwareInfos,
       ]}
       x={
         (orientation === 'right'
           ? position[0] - overhang
-          : position[0] - leftOverhang) - def.cornerOffsetFromSlot.x
+          : position[0] - leftOverhang) - def?.cornerOffsetFromSlot.x
       }
-      y={position[1] + def.cornerOffsetFromSlot.y - labelContainerHeight}
-      width={def.dimensions.xDimension + 2}
-      height={def.dimensions.yDimension + 2}
+      y={position[1] + def?.cornerOffsetFromSlot.y - labelContainerHeight}
+      width={def?.dimensions.xDimension + 2}
+      height={def?.dimensions.yDimension + 2}
     />
   )
 }

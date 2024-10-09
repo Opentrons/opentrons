@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,

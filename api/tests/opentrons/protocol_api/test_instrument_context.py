@@ -89,6 +89,20 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Get a mock instrument implementation core."""
     instrument_core = decoy.mock(cls=InstrumentCore)
     decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
+
+    # we need to add this for the mock of liquid_presence detection to actually work
+    # this replaces the mock with a a property again
+    instrument_core._liquid_presence_detection = False  # type: ignore[attr-defined]
+
+    def _setter(enable: bool) -> None:
+        instrument_core._liquid_presence_detection = enable  # type: ignore[attr-defined]
+
+    def _getter() -> bool:
+        return instrument_core._liquid_presence_detection  # type: ignore[attr-defined, no-any-return]
+
+    instrument_core.get_liquid_presence_detection = _getter  # type: ignore[method-assign]
+    instrument_core.set_liquid_presence_detection = _setter  # type: ignore[method-assign]
+
     return instrument_core
 
 
@@ -1476,3 +1490,104 @@ def test_96_tip_config_invalid(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(nozzle_map)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(96)
     assert subject._96_tip_config_valid() is True
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 21)])
+def test_mix_no_lpd(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate/dispense to a well several times."""
+    mock_well = decoy.mock(cls=Well)
+
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=last_location)
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.mix(repetitions=10, volume=10.0, location=input_location, rate=1.23)
+    decoy.verify(
+        mock_instrument_core.aspirate(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times=10,
+    )
+    decoy.verify(
+        mock_instrument_core.dispense(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times=10,
+    )
+
+    decoy.verify(
+        mock_instrument_core.liquid_probe_with_recovery(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times=0,
+    )
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize("api_version", [APIVersion(2, 21)])
+def test_mix_with_lpd(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate/dispense to a well several times and do 1 lpd."""
+    mock_well = decoy.mock(cls=Well)
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=last_location)
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.liquid_presence_detection = True
+    subject.mix(repetitions=10, volume=10.0, location=input_location, rate=1.23)
+    decoy.verify(
+        mock_instrument_core.aspirate(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times=10,
+    )
+    decoy.verify(
+        mock_instrument_core.dispense(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times=10,
+    )
+
+    decoy.verify(
+        mock_instrument_core.liquid_probe_with_recovery(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times=1,
+    )

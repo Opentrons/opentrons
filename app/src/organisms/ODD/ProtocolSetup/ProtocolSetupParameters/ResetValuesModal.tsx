@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -11,11 +10,11 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../../../atoms/buttons'
-import { OddModal } from '../../../../molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '../../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ResetValuesModalProps {
   runTimeParametersOverrides: RunTimeParameter[]

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -28,14 +28,14 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { Skeleton } from '../../../atoms/Skeleton'
-import { useMissingProtocolHardware } from '../../../transformations/commands'
-import { useCloneRun } from '../../ProtocolUpload/hooks'
+} from '/app/redux/analytics'
+import { Skeleton } from '/app/atoms/Skeleton'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+import { useCloneRun } from '/app/resources/runs'
 import { useRerunnableStatusText } from './hooks'
 
 import type { RunData, RunStatus } from '@opentrons/api-client'
@@ -90,7 +90,7 @@ export function ProtocolWithLastRun({
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const { cloneRun } = useCloneRun(runData.id)
-  const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
+  const [showSpinner, setShowSpinner] = useState<boolean>(false)
 
   const protocolName =
     protocolData.metadata.protocolName ?? protocolData.files[0].name

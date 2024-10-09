@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
-} from '../../../resources/maintenance_runs'
-import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs'
+} from '/app/resources/maintenance_runs'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -32,7 +32,7 @@ export function useDropTipMaintenanceRun({
 }: UseDropTipMaintenanceRunParams): string | null {
   const isMaintenanceRunType = issuedCommandsType === 'setup'
 
-  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
   >(null)
 
@@ -62,7 +62,7 @@ export function useDropTipMaintenanceRun({
 
 type UseCreateDropTipMaintenanceRunParams = Omit<
   UseDropTipMaintenanceRunParams,
-  'robotType' | 'closeFlow'
+  'robotType' | 'closeFlow' | 'modalStyle'
 > & {
   setCreatedMaintenanceRunId: (id: string) => void
   instrumentModelName?: PipetteModelSpecs['name']
@@ -101,7 +101,7 @@ function useCreateDropTipMaintenanceRun({
     },
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       issuedCommandsType === 'setup' &&
       mount != null &&
@@ -140,10 +140,10 @@ function useMonitorMaintenanceRunForDeletion({
   const [
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
-  ] = React.useState<boolean>(false)
-  const [closedOnce, setClosedOnce] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+  const [closedOnce, setClosedOnce] = useState<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMaintenanceRunType && !closedOnce) {
       if (
         createdMaintenanceRunId !== null &&

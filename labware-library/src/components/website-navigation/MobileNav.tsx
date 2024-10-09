@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Component } from 'react'
 import { MenuButton } from './MenuButton'
 import { MobileList } from './MobileList'
 
@@ -8,7 +8,7 @@ interface State {
 
 type Props = Record<string, never>
 
-export class MobileNav extends React.Component<Props, State> {
+export class MobileNav extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { isOpen: false }

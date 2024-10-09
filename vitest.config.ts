@@ -3,7 +3,7 @@
 /// <reference types="vite/client" />
 import path from 'path'
 import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
-import viteConfig from './vite.config'
+import viteConfig from './vite.config.mts'
 
 // eslint-disable-next-line import/no-default-export
 export default mergeConfig(
@@ -47,6 +47,9 @@ export default mergeConfig(
         '@opentrons/labware-library': path.resolve(
           './labware-library/src/labware-creator/index.tsx'
         ),
+        // "The resulting path (...) trailing slashes are removed unless the path is resolved to the root directory."
+        // https://nodejs.org/api/path.html#pathresolvepaths
+        '/app/': path.resolve('./app/src/') + '/',
       },
     },
   })

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
@@ -11,7 +10,7 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 

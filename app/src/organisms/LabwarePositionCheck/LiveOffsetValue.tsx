@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -14,7 +14,7 @@ import {
 
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -55,7 +55,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       >
         <Icon name="reticle" size={isOnDevice ? '1.5rem' : SIZE_1} />
         {[x, y, z].map((axis, index) => (
-          <React.Fragment key={index}>
+          <Fragment key={index}>
             <LegacyStyledText
               as="p"
               marginLeft={SPACING.spacing8}
@@ -65,7 +65,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
               {axisLabels[index]}
             </LegacyStyledText>
             <LegacyStyledText as="p">{axis.toFixed(1)}</LegacyStyledText>
-          </React.Fragment>
+          </Fragment>
         ))}
       </Flex>
     </Flex>

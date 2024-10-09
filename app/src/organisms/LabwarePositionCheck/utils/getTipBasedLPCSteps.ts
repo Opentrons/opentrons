@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash'
 import { SECTIONS } from '../constants'
-import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import {
   getLabwareDefURI,
   getIsTiprack,
@@ -18,8 +18,8 @@ import type {
 import type {
   RunTimeCommand,
   ProtocolAnalysisOutput,
+  PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 interface LPCArgs {

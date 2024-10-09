@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css, keyframes } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -20,14 +19,14 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { CommandText } from '../../../molecules/Command'
-import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
-import { getCommandTextData } from '../../../molecules/Command/utils/getCommandTextData'
+import { CommandText } from '/app/molecules/Command'
+import { RunTimer } from '/app/molecules/RunTimer'
+import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
-import { useRunningStepCounts } from '../../../resources/protocols/hooks'
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type {
   CompletedProtocolAnalysis,
@@ -35,8 +34,8 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
-import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
 const ODD_ANIMATION_OPTIMIZATIONS = `
   backface-visibility: hidden;

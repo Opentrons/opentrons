@@ -1,6 +1,5 @@
 import { useEstopQuery } from '@opentrons/react-api-client'
-import { useIsFlex } from '../../../organisms/Devices/hooks'
-import { DISENGAGED } from '../../../organisms/EmergencyStop'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 /**
  * Checks if the emergency stop is not disengaged.
@@ -21,6 +20,6 @@ export const useIsEstopNotDisengaged = (robotName: string): boolean => {
   })
 
   return isFlex
-    ? estopStatus?.data.status !== DISENGAGED || estopError !== null
+    ? estopStatus?.data.status !== 'disengaged' || estopError !== null
     : false
 }

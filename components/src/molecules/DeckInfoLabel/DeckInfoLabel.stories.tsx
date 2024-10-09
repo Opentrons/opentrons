@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'

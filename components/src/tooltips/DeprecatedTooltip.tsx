@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Manager, Reference, Popper } from 'react-popper'
 import cx from 'classnames'
 import styles from './tooltips.module.css'

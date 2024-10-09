@@ -1,11 +1,19 @@
-import * as React from 'react'
+import { useState } from 'react'
 
-import { useDropTipRouting, useDropTipWithType } from './hooks'
+import {
+  useDropTipLocations,
+  useDropTipRouting,
+  useDropTipWithType,
+} from './hooks'
 import { DropTipWizard } from './DropTipWizard'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
-import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
+import type {
+  DropTipModalStyle,
+  FixitCommandTypeUtils,
+  IssuedCommandsType,
+} from './types'
 
 /** Provides the user toggle for rendering Drop Tip Wizard Flows.
  *
@@ -16,7 +24,7 @@ export function useDropTipWizardFlows(): {
   showDTWiz: boolean
   toggleDTWiz: () => void
 } {
-  const [showDTWiz, setShowDTWiz] = React.useState(false)
+  const [showDTWiz, setShowDTWiz] = useState(false)
 
   const toggleDTWiz = (): void => {
     setShowDTWiz(!showDTWiz)
@@ -31,7 +39,8 @@ export interface DropTipWizardFlowsProps {
   instrumentModelSpecs: PipetteModelSpecs
   /* isTakeover allows for optionally specifying a different callback if a different client cancels the "setup" type flow. */
   closeFlow: (isTakeover?: boolean) => void
-  /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
+  modalStyle: DropTipModalStyle
+  /* Optional. If provided, DT will issue "fixit" commands. */
   fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
 
@@ -47,8 +56,8 @@ export function DropTipWizardFlows(
     ...props,
     issuedCommandsType,
   })
-
   const dropTipRoutingUtils = useDropTipRouting(fixitCommandTypeUtils)
+  const dropTipCommandLocations = useDropTipLocations(props.robotType) // Prefetch to reduce client latency
 
   return (
     <DropTipWizard
@@ -56,6 +65,7 @@ export function DropTipWizardFlows(
       {...dropTipWithTypeUtils}
       {...dropTipRoutingUtils}
       issuedCommandsType={issuedCommandsType}
+      dropTipCommandLocations={dropTipCommandLocations}
     />
   )
 }

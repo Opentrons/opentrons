@@ -1,9 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styled, { css } from 'styled-components'
 import { SPACING } from '../../../ui-style-constants'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { Flex } from '../../../primitives'
 import { StyledText } from '../../StyledText'
+import { CURSOR_POINTER } from '../../../styles'
 
 import type { StyleProps } from '../../../primitives'
 
@@ -62,7 +63,7 @@ export function ListButtonRadioButton(
 
   const SettingButtonLabel = styled.label`
     border-radius: ${BORDERS.borderRadius8};
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     padding: 14px ${SPACING.spacing12};
     width: 100%;
 

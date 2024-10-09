@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   SPACING,
@@ -8,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OddModal } from '../../../molecules/OddModal'
-import { SmallButton } from '../../../atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons'
 
 interface PipetteNotAttachedErrorModalProps {
   onExit: () => void

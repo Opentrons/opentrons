@@ -19,11 +19,11 @@ import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
-import { ODDBackButton } from '../../../../molecules/ODDBackButton'
-import { SmallButton } from '../../../../atoms/buttons'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { SmallButton } from '/app/atoms/buttons'
 
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getTotalVolumePerLiquidId } from '../../../Devices/ProtocolRun/SetupLiquids/utils'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { getTotalVolumePerLiquidId } from '/app/transformations/analysis'
 import { LiquidDetails } from './LiquidDetails'
 import type { ParsedLiquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'

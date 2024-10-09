@@ -1,5 +1,6 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   COLORS,
@@ -12,12 +13,14 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { updateConfigValue } from '/app/redux/config'
 
-import welcomeModalImage from '../../../assets/images/on-device-display/welcome_dashboard_modal.png'
+import welcomeModalImage from '/app/assets/images/on-device-display/welcome_dashboard_modal.png'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import type { Dispatch } from '/app/redux/types'
 
 interface WelcomeModalProps {
   setShowWelcomeModal: (showWelcomeModal: boolean) => void
@@ -27,6 +30,7 @@ export function WelcomeModal({
   setShowWelcomeModal,
 }: WelcomeModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
+  const dispatch = useDispatch<Dispatch>()
 
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const animationCommand: SetStatusBarCreateCommand = {
@@ -44,10 +48,16 @@ export function WelcomeModal({
   }
 
   const handleCloseModal = (): void => {
+    dispatch(
+      updateConfigValue(
+        'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+        null
+      )
+    )
     setShowWelcomeModal(false)
   }
 
-  React.useEffect(startDiscoAnimation, [])
+  useEffect(startDiscoAnimation, [])
 
   return (
     <OddModal modalSize="small" onOutsideClick={handleCloseModal}>

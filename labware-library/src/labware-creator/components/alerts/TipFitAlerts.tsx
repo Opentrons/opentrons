@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import type { FormikTouched } from 'formik'
 import type { LabwareFields } from '../../fields'

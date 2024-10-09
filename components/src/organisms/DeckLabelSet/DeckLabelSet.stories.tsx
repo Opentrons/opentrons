@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { BORDERS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -12,9 +10,10 @@ import {
 
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import { Skeleton } from '../../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 
-import type { ScreenOption } from '../../../pages/ODD/RunningProtocol'
+// eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
+import type { ScreenOption } from '/app/pages/ODD/RunningProtocol'
 
 const CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
 const RUNNING_PROTOCOL_COMMAND_LIST_SIZE = '389rem' // RunningProtocolCommandList screen

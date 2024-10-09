@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
@@ -60,6 +59,7 @@ export function EditProtocolMetadataModal(
         <Flex
           justifyContent={JUSTIFY_END}
           padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
+          gridGap={SPACING.spacing8}
         >
           <SecondaryButton onClick={onClose}>
             {t('shared:cancel')}

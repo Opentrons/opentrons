@@ -1,9 +1,9 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 
-import { EthernetConnectionDetails } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
+import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   DeviceReset,
   TouchscreenBrightness,
@@ -18,46 +18,24 @@ import {
   RobotSettingsWifiConnect,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../../organisms/RobotSettingsDashboard'
+} from '/app/organisms/ODD/RobotSettingsDashboard'
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
-} from '../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import {
   getLocalRobot,
   getRobotApiVersion,
   UNREACHABLE,
-} from '../../../redux/discovery'
-import { fetchStatus, postWifiConfigure } from '../../../redux/networking'
-import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
-import { useWifiList } from '../../../resources/networking/hooks'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+} from '/app/redux/discovery'
+import { fetchStatus, postWifiConfigure } from '/app/redux/networking'
+import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
+import { useWifiList, useNetworkConnection } from '/app/resources/networking'
 import { RobotSettingsList } from './RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '../../../redux/types'
-
-/**
- * a set of screen options for the robot settings dashboard page
- */
-export type SettingOption =
-  | 'NetworkSettings'
-  | 'RobotName'
-  | 'RobotSystemVersion'
-  | 'TouchscreenSleep'
-  | 'TouchscreenBrightness'
-  | 'TextSize'
-  | 'Privacy'
-  | 'DeviceReset'
-  | 'UpdateChannel'
-  | 'EthernetConnectionDetails'
-  | 'RobotSettingsSelectAuthenticationType'
-  | 'RobotSettingsJoinOtherNetwork'
-  | 'RobotSettingsSetWifiCred'
-  | 'RobotSettingsWifi'
-  | 'RobotSettingsWifiConnect'
-
-export type SetSettingOption = (option: SettingOption | null) => void
+import type { Dispatch, State } from '/app/redux/types'
+import type { SettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { i18n, t } = useTranslation('shared')
@@ -88,12 +66,11 @@ export function RobotSettingsDashboard(): JSX.Element {
     ?.securityType
 
   // LOCAL STATE MANAGEMENT for wi-fi user input
-  const [selectedSsid, setSelectedSsid] = React.useState<string>('')
-  const [
-    selectedAuthType,
-    setSelectedAuthType,
-  ] = React.useState<WifiSecurityType>('wpa-psk')
-  const [password, setPassword] = React.useState<string>('')
+  const [selectedSsid, setSelectedSsid] = useState<string>('')
+  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
+    'wpa-psk'
+  )
+  const [password, setPassword] = useState<string>('')
 
   // REQUESTS
   const dispatch = useDispatch<Dispatch>()
@@ -115,15 +92,12 @@ export function RobotSettingsDashboard(): JSX.Element {
     setPassword('')
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchStatus(robotName))
   }, [robotName, dispatch])
 
   // PAGE-LEVEL SWITCH MANAGEMENT
-  const [
-    currentOption,
-    setCurrentOption,
-  ] = React.useState<SettingOption | null>(null)
+  const [currentOption, setCurrentOption] = useState<SettingOption | null>(null)
 
   switch (currentOption) {
     case 'RobotName':

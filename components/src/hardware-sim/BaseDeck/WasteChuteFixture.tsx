@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'

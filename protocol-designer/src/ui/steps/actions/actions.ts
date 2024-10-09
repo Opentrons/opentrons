@@ -24,7 +24,10 @@ import type {
   ClearWellSelectionLabwareKeyAction,
   SelectStepAction,
   SelectMultipleStepsAction,
+  ToggleViewSubstepAction,
+  ViewSubstep,
 } from './types'
+
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
 // addAndSelectStepWithHints is probably what you want
@@ -101,6 +104,35 @@ export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyActi
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
 })
+export const resetSelectStep = (stepId: StepIdType): ThunkAction<any> => (
+  dispatch: ThunkDispatch<any>,
+  getState: GetState
+) => {
+  const selectStepAction: SelectStepAction = {
+    type: 'SELECT_STEP',
+    payload: stepId,
+  }
+  dispatch(selectStepAction)
+  dispatch({
+    type: 'POPULATE_FORM',
+    payload: null,
+  })
+  resetScrollElements()
+}
+
+export const populateForm = (stepId: StepIdType): ThunkAction<any> => (
+  dispatch: ThunkDispatch<any>,
+  getState: GetState
+) => {
+  const state = getState()
+  const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
+  dispatch({
+    type: 'POPULATE_FORM',
+    payload: formData,
+  })
+  resetScrollElements()
+}
+
 export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
   dispatch: ThunkDispatch<any>,
   getState: GetState
@@ -118,6 +150,7 @@ export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
   })
   resetScrollElements()
 }
+
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps = (
   stepIds: StepIdType[],
@@ -199,3 +232,10 @@ export const deselectAllSteps = (
     dispatch(analyticsEvent(deselectAllStepsEvent))
   }
 }
+
+export const toggleViewSubstep = (
+  stepId: ViewSubstep
+): ToggleViewSubstepAction => ({
+  type: 'TOGGLE_VIEW_SUBSTEP',
+  payload: stepId,
+})

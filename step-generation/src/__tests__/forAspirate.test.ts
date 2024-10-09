@@ -15,7 +15,7 @@ import type {
   InvariantContext,
   RobotState,
 } from '../types'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
+import type { AspDispAirgapParams } from '@opentrons/shared-data'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 

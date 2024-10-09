@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { COLORS } from '../../../helix-design-system'
@@ -33,7 +32,7 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
   } = props
   return (
     <Flex width="100%" alignItems={ALIGN_CENTER} padding={SPACING.spacing12}>
-      <Flex gridGap={SPACING.spacing8} width="50%" alignItems={ALIGN_CENTER}>
+      <Flex gridGap={SPACING.spacing16} width="50%" alignItems={ALIGN_CENTER}>
         {leftHeaderItem != null ? (
           <Flex size="3.75rem">{leftHeaderItem}</Flex>
         ) : null}

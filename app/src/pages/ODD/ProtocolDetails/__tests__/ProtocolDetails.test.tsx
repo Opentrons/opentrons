@@ -1,10 +1,9 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
@@ -12,19 +11,19 @@ import {
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import { i18n } from '../../../../i18n'
-import { useHardwareStatusText } from '../../../../organisms/ODD/RobotDashboard/hooks'
-import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRunTimeParameters } from '../../../../pages/Desktop/Protocols/hooks'
-import { ProtocolSetupParameters } from '../../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
-import { formatTimeWithUtcLabel } from '../../../../resources/runs'
-import { useMissingProtocolHardware } from '../../../../transformations/commands'
+import { i18n } from '/app/i18n'
+import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useRunTimeParameters } from '/app/resources/protocols'
+import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
+import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
-import { mockRunTimeParameterData } from '../fixtures'
 
 import type { HostConfig } from '@opentrons/api-client'
 
@@ -41,21 +40,21 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 vi.mock(
-  '../../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters/ProtocolSetupParameters'
+  '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters/ProtocolSetupParameters'
 )
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/ODD/RobotDashboard/hooks')
+vi.mock('/app/organisms/ODD/RobotDashboard/hooks')
 vi.mock(
-  '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+  '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
-vi.mock('../../../../pages/Desktop/Protocols/hooks')
-vi.mock('../../../../transformations/commands')
+vi.mock('/app/resources/protocols')
+vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')
 vi.mock('../Parameters')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})

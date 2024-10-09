@@ -1,13 +1,13 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '../../../../../i18n'
-import { useFeatureFlag } from '../../../../../redux/config'
+import { i18n } from '/app/i18n'
+import { useFeatureFlag } from '/app/redux/config'
 import { useHardwareStatusText } from '..'
 
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 
 describe('useHardwareStatusText', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>

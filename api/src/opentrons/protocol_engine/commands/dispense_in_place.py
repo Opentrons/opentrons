@@ -47,7 +47,7 @@ class DispenseInPlaceResult(BaseLiquidHandlingResult):
 
 _ExecuteReturn = Union[
     SuccessData[DispenseInPlaceResult, None],
-    DefinedErrorData[OverpressureError, None],
+    DefinedErrorData[OverpressureError],
 ]
 
 
@@ -99,7 +99,6 @@ class DispenseInPlaceImplementation(
                         }
                     ),
                 ),
-                private=None,
             )
         else:
             return SuccessData(
@@ -108,7 +107,7 @@ class DispenseInPlaceImplementation(
 
 
 class DispenseInPlace(
-    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, ErrorOccurrence]
+    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, OverpressureError]
 ):
     """DispenseInPlace command model."""
 

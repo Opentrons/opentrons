@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { css } from 'styled-components'
 import { CategorizedStepContent, TwoColumn } from '.'
@@ -14,7 +14,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 type CommandType = RunTimeCommand['commandType']
 
 const availableCommandTypes = uniq(
-  Fixtures.mockQIASeqTextData.commands.map(command => command.commandType)
+  Fixtures.mockDoItAllTextData.commands.map(command => command.commandType)
 )
 const commandsByType: Partial<Record<CommandType, RunTimeCommand[]>> = {}
 
@@ -22,7 +22,7 @@ function commandsOfType(type: CommandType): RunTimeCommand[] {
   if (type in commandsByType) {
     return commandsByType[type]
   }
-  commandsByType[type] = Fixtures.mockQIASeqTextData.commands.filter(
+  commandsByType[type] = Fixtures.mockDoItAllTextData.commands.filter(
     command => command.commandType === type
   )
   return commandsByType[type]
@@ -62,22 +62,22 @@ function Wrapper(props: WrapperProps): JSX.Element {
   const topCommandIndex =
     topCommand == null
       ? undefined
-      : Fixtures.mockQIASeqTextData.commands.indexOf(topCommand)
+      : Fixtures.mockDoItAllTextData.commands.indexOf(topCommand)
   const bottomCommand1Index =
     bottomCommand1 == null
       ? undefined
-      : Fixtures.mockQIASeqTextData.commands.indexOf(bottomCommand1)
+      : Fixtures.mockDoItAllTextData.commands.indexOf(bottomCommand1)
   const bottomCommand2Index =
     bottomCommand2 == null
       ? undefined
-      : Fixtures.mockQIASeqTextData.commands.indexOf(bottomCommand2)
+      : Fixtures.mockDoItAllTextData.commands.indexOf(bottomCommand2)
   return (
     <CategorizedStepContent
       topCategoryHeadline={props.topCategoryHeadline ?? 'Failed Step'}
       bottomCategoryHeadline={props.bottomCategoryHeadline ?? 'Next Steps'}
       topCategory={props.topCategory ?? 'failed'}
       bottomCategory={props.bottomCategory ?? 'future'}
-      commandTextData={Fixtures.mockQIASeqTextData}
+      commandTextData={Fixtures.mockDoItAllTextData}
       topCategoryCommand={
         props.topCategoryCommand === 'none'
           ? undefined
@@ -188,7 +188,7 @@ export const CategorizedStep: Story = {
     topCategoryCommand: 'aspirate',
     bottomCategoryHeadline: 'Next Step(s)',
     bottomCategoryCommand1: 'dispense',
-    bottomCategoryCommand2: 'dropTip',
+    bottomCategoryCommand2: 'dropTipInPlace',
     robotType: 'OT-3 Standard',
   },
 }
