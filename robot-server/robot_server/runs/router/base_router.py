@@ -235,6 +235,10 @@ async def create_run(  # noqa: C901
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
 
+    #CASEY NOTE: file provider store will begin here and be passed in
+    # we will need to depend upon thepersistence directory and the database
+    # 
+
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.
     if protocol_id is not None:
