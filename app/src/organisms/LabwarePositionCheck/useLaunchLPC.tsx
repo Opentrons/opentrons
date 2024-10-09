@@ -15,6 +15,8 @@ import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/
 
 import type { RobotType } from '@opentrons/shared-data'
 
+const filtered_labware = ['opentrons_tough_pcr_auto_sealing_lid']
+
 export function useLaunchLPC(
   runId: string,
   robotType: RobotType,
@@ -63,12 +65,13 @@ export function useLaunchLPC(
         Promise.all(
           getLabwareDefinitionsFromCommands(
             mostRecentAnalysis?.commands ?? []
-          ).map(def =>
-            createLabwareDefinition({
-              maintenanceRunId: maintenanceRun?.data?.id,
-              labwareDef: def,
-            })
-          )
+          ).map(def => {
+            if (!filtered_labware.includes(def.parameters.loadName))
+              createLabwareDefinition({
+                maintenanceRunId: maintenanceRun?.data?.id,
+                labwareDef: def,
+              })
+          })
         ).then(() => {
           setMaintenanceRunId(maintenanceRun.data.id)
         })
