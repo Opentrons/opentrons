@@ -441,7 +441,7 @@ describe('getWellSetForMultichannel with pipetteNozzleDetails', () => {
         activeNozzleCount: 4,
       },
     })
-    expect(bottomEdgeResult).toEqual(['E1', 'F1', 'G1', 'H1'])
+    expect(bottomEdgeResult).toEqual(['G1', 'H1'])
   })
 
   it('returns full plate for 96-channel pipette with no config', () => {

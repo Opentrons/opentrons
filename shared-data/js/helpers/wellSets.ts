@@ -140,20 +140,9 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       }
 
       const wellIndex = targetColumn.indexOf(wellName)
-      const totalWells = targetColumn.length
 
-      if (activeNozzleCount >= totalWells) {
-        return targetColumn
-      }
-
-      // Calculate how many wells we can include below the selected well, handling edge cases.
-      const wellsBelow = totalWells - wellIndex - 1
-      const wellsNeededAbove = Math.max(0, activeNozzleCount - wellsBelow - 1)
-
-      const startIndex = Math.max(0, wellIndex - wellsNeededAbove)
-      const endIndex = Math.min(totalWells, startIndex + activeNozzleCount)
-
-      return targetColumn.slice(startIndex, endIndex)
+      // If there are fewer wells than active nozzles, only select as many wells as there are nozzles.
+      return targetColumn.slice(wellIndex, wellIndex + activeNozzleCount)
     }
 
     if (channels === 8) {
