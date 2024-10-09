@@ -47,7 +47,6 @@ MoveLabwareCommandType = Literal["moveLabware"]
 _TRASH_CHUTE_DROP_BUFFER_MM = 8
 
 
-# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
 class MoveLabwareParams(BaseModel):
     """Input parameters for a ``moveLabware`` command."""
 

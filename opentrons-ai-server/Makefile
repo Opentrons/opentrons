@@ -115,7 +115,7 @@ run:
 	docker logs -f $(CONTAINER_NAME)
 
 .PHONY: clean
-clean:
+clean: gen-requirements
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 

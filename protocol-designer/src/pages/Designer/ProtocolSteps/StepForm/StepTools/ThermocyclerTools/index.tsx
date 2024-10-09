@@ -15,18 +15,13 @@ import { ThermocyclerState } from './ThermocyclerState'
 
 import type { StepFormProps } from '../../types'
 
-type ThermocyclerContentType =
-  | 'thermocyclerState'
-  | 'thermocyclerProfile'
-  | null
+type ThermocyclerContentType = 'thermocyclerState' | 'thermocyclerProfile'
 
 export function ThermocyclerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData, toolboxStep } = props
   const { t } = useTranslation('form')
 
-  console.log(formData)
   const [contentType, setContentType] = useState<ThermocyclerContentType>(
-    // (formData.thermocyclerFormType ?? null) as ThermocyclerContentType
     (formData.thermocyclerFormType as ThermocyclerContentType) ??
       'thermocyclerState'
   )

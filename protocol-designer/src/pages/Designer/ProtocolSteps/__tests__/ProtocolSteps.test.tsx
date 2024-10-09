@@ -15,6 +15,13 @@ vi.mock('../../../../ui/steps/selectors')
 vi.mock('../StepForm')
 vi.mock('../../DeckSetup')
 vi.mock('../Timeline')
+
+vi.mock('../../../../assets/localization', () => ({
+  t: vi.fn().mockReturnValue({
+    t: (key: string) => key,
+  }),
+}))
+
 const render = () => {
   return renderWithProviders(<ProtocolSteps />)[0]
 }

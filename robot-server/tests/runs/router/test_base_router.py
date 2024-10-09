@@ -1,17 +1,22 @@
 """Tests for base /runs routes."""
+from typing import Dict
+
 import pytest
 from datetime import datetime
 from decoy import Decoy
 from pathlib import Path
 
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     types as pe_types,
     errors as pe_errors,
     CommandErrorSlice,
+    CommandPointer,
 )
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
+
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType, NozzleMap
 
 from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
 
@@ -34,9 +39,20 @@ from robot_server.protocols.protocol_store import (
 
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 
-from robot_server.runs.run_models import Run, RunCreate, RunUpdate
+from robot_server.runs.run_models import (
+    Run,
+    RunCreate,
+    RunUpdate,
+    RunCurrentState,
+    ActiveNozzleLayout,
+    CommandLinkNoMeta,
+    NozzleLayoutConfig,
+)
 from robot_server.runs.run_orchestrator_store import RunConflictError
-from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
+from robot_server.runs.run_data_manager import (
+    RunDataManager,
+    RunNotCurrentError,
+)
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
@@ -48,6 +64,8 @@ from robot_server.runs.router.base_router import (
     update_run,
     put_error_recovery_policy,
     get_run_commands_error,
+    get_current_state,
+    CurrentStateLinks,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -82,6 +100,23 @@ def labware_offset_create() -> LabwareOffsetCreate:
         location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     )
+
+
+@pytest.fixture
+def mock_nozzle_maps() -> Dict[str, NozzleMap]:
+    """Get mock NozzleMaps."""
+    return {
+        "mock-pipette-id": NozzleMap(
+            configuration=NozzleConfigurationType.FULL,
+            columns={"1": ["A1"]},
+            rows={"A": ["A1"]},
+            map_store={"A1": Point(0, 0, 0)},
+            starting_nozzle="A1",
+            valid_map_key="mock-key",
+            full_instrument_map_store={},
+            full_instrument_rows={},
+        )
+    }
 
 
 async def test_create_run(
@@ -663,8 +698,8 @@ async def test_create_policies(
         run_data_manager=mock_run_data_manager,
     )
     decoy.verify(
-        mock_run_data_manager.set_policies(
-            run_id="rud-id", policies=policies.policyRules
+        mock_run_data_manager.set_error_recovery_rules(
+            run_id="rud-id", rules=policies.policyRules
         )
     )
 
@@ -675,8 +710,8 @@ async def test_create_policies_raises_not_active_run(
     """It should raise that the run is not current."""
     policies = decoy.mock(cls=ErrorRecoveryPolicy)
     decoy.when(
-        mock_run_data_manager.set_policies(
-            run_id="rud-id", policies=policies.policyRules
+        mock_run_data_manager.set_error_recovery_rules(
+            run_id="rud-id", rules=policies.policyRules
         )
     ).then_raise(RunNotCurrentError())
     with pytest.raises(ApiError) as exc_info:
@@ -803,3 +838,67 @@ async def test_get_run_commands_errors_defualt_cursor(
         cursor=expected_cursor_result, totalLength=3
     )
     assert result.status_code == 200
+
+
+async def test_get_current_state_success(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    mock_nozzle_maps: Dict[str, NozzleMap],
+) -> None:
+    """It should return the active nozzle layout for a specific pipette."""
+    run_id = "test-run-id"
+
+    decoy.when(mock_run_data_manager.get_nozzle_maps(run_id=run_id)).then_return(
+        mock_nozzle_maps
+    )
+    decoy.when(mock_run_data_manager.get_current_command(run_id=run_id)).then_return(
+        CommandPointer(
+            command_id="current-command-id",
+            command_key="current-command-key",
+            created_at=datetime(year=2024, month=4, day=4),
+            index=101,
+        )
+    )
+
+    result = await get_current_state(
+        runId=run_id,
+        run_data_manager=mock_run_data_manager,
+    )
+
+    assert result.status_code == 200
+    assert result.content.data == RunCurrentState.construct(
+        activeNozzleLayouts={
+            "mock-pipette-id": ActiveNozzleLayout(
+                startingNozzle="A1",
+                activeNozzles=["A1"],
+                config=NozzleLayoutConfig.FULL,
+            )
+        }
+    )
+    assert result.content.links == CurrentStateLinks(
+        current=CommandLinkNoMeta(
+            href="/runs/test-run-id/commands/current-command-id",
+            id="current-command-id",
+        )
+    )
+
+
+async def test_get_current_state_run_not_current(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should raise RunStopped when the run is not current."""
+    run_id = "non-current-run-id"
+
+    decoy.when(mock_run_data_manager.get_nozzle_maps(run_id=run_id)).then_raise(
+        RunNotCurrentError("Run is not current")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_current_state(
+            runId=run_id,
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"

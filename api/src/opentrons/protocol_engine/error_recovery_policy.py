@@ -40,6 +40,7 @@ class ErrorRecoveryPolicy(Protocol):
     and return an appropriate `ErrorRecoveryType`.
 
     Args:
+        config: The config of the calling `ProtocolEngine`.
         failed_command: The command that failed, in its final `status=="failed"` state.
         defined_error_data: If the command failed with a defined error, details about
             that error. If the command failed with an undefined error, `None`.

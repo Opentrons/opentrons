@@ -1,0 +1,6191 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
+      "notes": [],
+      "params": {
+        "loadName": "opentrons_flex_96_tiprack_1000ul",
+        "location": {
+          "slotName": "A2"
+        },
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.75,
+            "yDimension": 85.75,
+            "zDimension": 99
+          },
+          "gripForce": 16.0,
+          "gripHeightFromLabwareBottom": 23.9,
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {},
+              "wells": [
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9",
+                "B1",
+                "B10",
+                "B11",
+                "B12",
+                "B2",
+                "B3",
+                "B4",
+                "B5",
+                "B6",
+                "B7",
+                "B8",
+                "B9",
+                "C1",
+                "C10",
+                "C11",
+                "C12",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8",
+                "C9",
+                "D1",
+                "D10",
+                "D11",
+                "D12",
+                "D2",
+                "D3",
+                "D4",
+                "D5",
+                "D6",
+                "D7",
+                "D8",
+                "D9",
+                "E1",
+                "E10",
+                "E11",
+                "E12",
+                "E2",
+                "E3",
+                "E4",
+                "E5",
+                "E6",
+                "E7",
+                "E8",
+                "E9",
+                "F1",
+                "F10",
+                "F11",
+                "F12",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "G1",
+                "G10",
+                "G11",
+                "G12",
+                "G2",
+                "G3",
+                "G4",
+                "G5",
+                "G6",
+                "G7",
+                "G8",
+                "G9",
+                "H1",
+                "H10",
+                "H11",
+                "H12",
+                "H2",
+                "H3",
+                "H4",
+                "H5",
+                "H6",
+                "H7",
+                "H8",
+                "H9"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "tipRack",
+            "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
+            "displayVolumeUnits": "µL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
+          ],
+          "parameters": {
+            "format": "96Standard",
+            "isMagneticModuleCompatible": false,
+            "isTiprack": true,
+            "loadName": "opentrons_flex_96_tiprack_1000ul",
+            "quirks": [],
+            "tipLength": 95.6,
+            "tipOverlap": 10.5
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {
+            "opentrons_flex_96_tiprack_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 121
+            }
+          },
+          "stackingOffsetWithModule": {},
+          "version": 1,
+          "wells": {
+            "A1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "B1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "C1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "D1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "E1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "F1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "G1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "H1": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H10": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H11": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H12": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H2": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H3": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H4": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H5": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H6": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H7": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H8": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H9": {
+              "depth": 97.5,
+              "diameter": 5.47,
+              "shape": "circular",
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "y": 11.38,
+              "z": 1.5
+            }
+          }
+        },
+        "labwareId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50de88d471ad3910c29207fb6df4502e",
+      "notes": [],
+      "params": {
+        "loadName": "opentrons_flex_96_tiprack_50ul",
+        "location": {
+          "slotName": "B2"
+        },
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.75,
+            "yDimension": 85.75,
+            "zDimension": 99
+          },
+          "gripForce": 16.0,
+          "gripHeightFromLabwareBottom": 23.9,
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {},
+              "wells": [
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9",
+                "B1",
+                "B10",
+                "B11",
+                "B12",
+                "B2",
+                "B3",
+                "B4",
+                "B5",
+                "B6",
+                "B7",
+                "B8",
+                "B9",
+                "C1",
+                "C10",
+                "C11",
+                "C12",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8",
+                "C9",
+                "D1",
+                "D10",
+                "D11",
+                "D12",
+                "D2",
+                "D3",
+                "D4",
+                "D5",
+                "D6",
+                "D7",
+                "D8",
+                "D9",
+                "E1",
+                "E10",
+                "E11",
+                "E12",
+                "E2",
+                "E3",
+                "E4",
+                "E5",
+                "E6",
+                "E7",
+                "E8",
+                "E9",
+                "F1",
+                "F10",
+                "F11",
+                "F12",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "G1",
+                "G10",
+                "G11",
+                "G12",
+                "G2",
+                "G3",
+                "G4",
+                "G5",
+                "G6",
+                "G7",
+                "G8",
+                "G9",
+                "H1",
+                "H10",
+                "H11",
+                "H12",
+                "H2",
+                "H3",
+                "H4",
+                "H5",
+                "H6",
+                "H7",
+                "H8",
+                "H9"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "tipRack",
+            "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
+            "displayVolumeUnits": "µL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
+          ],
+          "parameters": {
+            "format": "96Standard",
+            "isMagneticModuleCompatible": false,
+            "isTiprack": true,
+            "loadName": "opentrons_flex_96_tiprack_50ul",
+            "quirks": [],
+            "tipLength": 57.9,
+            "tipOverlap": 10.5
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {
+            "opentrons_flex_96_tiprack_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 121
+            }
+          },
+          "stackingOffsetWithModule": {},
+          "version": 1,
+          "wells": {
+            "A1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "A9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 74.38,
+              "z": 1.5
+            },
+            "B1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "B9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 65.38,
+              "z": 1.5
+            },
+            "C1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "C9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 56.38,
+              "z": 1.5
+            },
+            "D1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "D9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 47.38,
+              "z": 1.5
+            },
+            "E1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "E9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 38.38,
+              "z": 1.5
+            },
+            "F1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "F9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 29.38,
+              "z": 1.5
+            },
+            "G1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "G9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 20.38,
+              "z": 1.5
+            },
+            "H1": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H10": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H11": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H12": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H2": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H3": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H4": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H5": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H6": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H7": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H8": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "y": 11.38,
+              "z": 1.5
+            },
+            "H9": {
+              "depth": 97.5,
+              "diameter": 5.58,
+              "shape": "circular",
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "y": 11.38,
+              "z": 1.5
+            }
+          }
+        },
+        "labwareId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a83392f86baf8cd5b4f0157c89d31dbd",
+      "notes": [],
+      "params": {
+        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "location": {
+          "slotName": "C3"
+        },
+        "namespace": "opentrons",
+        "version": 2
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "Thermo Scientific",
+            "brandId": [
+              "AB2396"
+            ],
+            "links": [
+              "https://www.fishersci.com/shop/products/armadillo-96-well-pcr-plate-1/AB2396"
+            ]
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.76,
+            "yDimension": 85.48,
+            "zDimension": 16.0
+          },
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 10.0,
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {
+                "wellBottomShape": "v"
+              },
+              "wells": [
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9",
+                "B1",
+                "B10",
+                "B11",
+                "B12",
+                "B2",
+                "B3",
+                "B4",
+                "B5",
+                "B6",
+                "B7",
+                "B8",
+                "B9",
+                "C1",
+                "C10",
+                "C11",
+                "C12",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8",
+                "C9",
+                "D1",
+                "D10",
+                "D11",
+                "D12",
+                "D2",
+                "D3",
+                "D4",
+                "D5",
+                "D6",
+                "D7",
+                "D8",
+                "D9",
+                "E1",
+                "E10",
+                "E11",
+                "E12",
+                "E2",
+                "E3",
+                "E4",
+                "E5",
+                "E6",
+                "E7",
+                "E8",
+                "E9",
+                "F1",
+                "F10",
+                "F11",
+                "F12",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "G1",
+                "G10",
+                "G11",
+                "G12",
+                "G2",
+                "G3",
+                "G4",
+                "G5",
+                "G6",
+                "G7",
+                "G8",
+                "G9",
+                "H1",
+                "H10",
+                "H11",
+                "H12",
+                "H2",
+                "H3",
+                "H4",
+                "H5",
+                "H6",
+                "H7",
+                "H8",
+                "H9"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "wellPlate",
+            "displayName": "Armadillo 96 Well Plate 200 µL PCR Full Skirt",
+            "displayVolumeUnits": "µL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
+          ],
+          "parameters": {
+            "format": "96Standard",
+            "isMagneticModuleCompatible": true,
+            "isTiprack": false,
+            "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt"
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {
+            "opentrons_96_pcr_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 10.95
+            },
+            "opentrons_96_well_aluminum_block": {
+              "x": 0,
+              "y": 0,
+              "z": 11.91
+            }
+          },
+          "stackingOffsetWithModule": {
+            "magneticBlockV1": {
+              "x": 0,
+              "y": 0,
+              "z": 3.54
+            },
+            "thermocyclerModuleV2": {
+              "x": 0,
+              "y": 0,
+              "z": 10.7
+            }
+          },
+          "version": 2,
+          "wells": {
+            "A1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "A9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 74.24,
+              "z": 1.05
+            },
+            "B1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "B9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 65.24,
+              "z": 1.05
+            },
+            "C1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "C9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 56.24,
+              "z": 1.05
+            },
+            "D1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "D9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 47.24,
+              "z": 1.05
+            },
+            "E1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "E9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 38.24,
+              "z": 1.05
+            },
+            "F1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "F9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 29.24,
+              "z": 1.05
+            },
+            "G1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "G9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 20.24,
+              "z": 1.05
+            },
+            "H1": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H10": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H11": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H12": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H2": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H3": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H4": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H5": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H6": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H7": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H8": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "y": 11.24,
+              "z": 1.05
+            },
+            "H9": {
+              "depth": 14.95,
+              "diameter": 5.5,
+              "shape": "circular",
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "y": 11.24,
+              "z": 1.05
+            }
+          }
+        },
+        "labwareId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "596b975cce05f1835b73fd3e2e9c04b0",
+      "notes": [],
+      "params": {
+        "loadName": "nest_1_reservoir_290ml",
+        "location": {
+          "slotName": "D3"
+        },
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "NEST",
+            "brandId": [
+              "360206",
+              "360266"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/reagent-reserviors"
+            ]
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.76,
+            "yDimension": 85.47,
+            "zDimension": 44.4
+          },
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {
+                "wellBottomShape": "v"
+              },
+              "wells": [
+                "A1"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "reservoir",
+            "displayName": "NEST 1 Well Reservoir 290 mL",
+            "displayVolumeUnits": "mL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1"
+            ]
+          ],
+          "parameters": {
+            "format": "trough",
+            "isMagneticModuleCompatible": false,
+            "isTiprack": false,
+            "loadName": "nest_1_reservoir_290ml",
+            "quirks": [
+              "centerMultichannelOnWells",
+              "touchTipDisabled"
+            ]
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {},
+          "stackingOffsetWithModule": {},
+          "version": 1,
+          "wells": {
+            "A1": {
+              "depth": 39.55,
+              "shape": "rectangular",
+              "totalLiquidVolume": 290000,
+              "x": 63.88,
+              "xDimension": 106.8,
+              "y": 42.74,
+              "yDimension": 71.2,
+              "z": 4.85
+            }
+          }
+        },
+        "labwareId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "43c0dcf1828d77562caa82b5e8a8c91e",
+      "notes": [],
+      "params": {
+        "loadName": "nest_12_reservoir_15ml",
+        "location": {
+          "slotName": "B3"
+        },
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "NEST",
+            "brandId": [
+              "360102"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/reagent-reserviors/59178414.html"
+            ]
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.76,
+            "yDimension": 85.48,
+            "zDimension": 31.4
+          },
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {
+                "wellBottomShape": "v"
+              },
+              "wells": [
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "reservoir",
+            "displayName": "NEST 12 Well Reservoir 15 mL",
+            "displayVolumeUnits": "mL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1"
+            ],
+            [
+              "A10"
+            ],
+            [
+              "A11"
+            ],
+            [
+              "A12"
+            ],
+            [
+              "A2"
+            ],
+            [
+              "A3"
+            ],
+            [
+              "A4"
+            ],
+            [
+              "A5"
+            ],
+            [
+              "A6"
+            ],
+            [
+              "A7"
+            ],
+            [
+              "A8"
+            ],
+            [
+              "A9"
+            ]
+          ],
+          "parameters": {
+            "format": "trough",
+            "isMagneticModuleCompatible": false,
+            "isTiprack": false,
+            "loadName": "nest_12_reservoir_15ml",
+            "quirks": [
+              "centerMultichannelOnWells",
+              "touchTipDisabled"
+            ]
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {},
+          "stackingOffsetWithModule": {},
+          "version": 1,
+          "wells": {
+            "A1": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 14.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A10": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 95.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A11": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 104.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A12": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 113.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A2": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 23.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A3": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 32.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A4": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 41.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A5": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 50.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A6": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 59.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A7": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 68.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A8": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 77.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            },
+            "A9": {
+              "depth": 26.85,
+              "shape": "rectangular",
+              "totalLiquidVolume": 15000,
+              "x": 86.38,
+              "xDimension": 8.2,
+              "y": 42.78,
+              "yDimension": 71.2,
+              "z": 4.55
+            }
+          }
+        },
+        "labwareId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5d3ae21e7b20c8d594290fcda36e0906",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A1": 800.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "660a0039e8fc361930633bfde72e7048",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A2": 800.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "688fe76a3082d775c9982d7bbaac7474",
+      "notes": [],
+      "params": {
+        "liquidPresenceDetection": false,
+        "mount": "left",
+        "pipetteName": "p1000_multi_flex",
+        "tipOverlapNotAfterVersion": "v3"
+      },
+      "result": {
+        "pipetteId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadPipette",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d2d8580716928e6cedf10922be675c01",
+      "notes": [],
+      "params": {
+        "liquidPresenceDetection": false,
+        "mount": "right",
+        "pipetteName": "p50_single_flex",
+        "tipOverlapNotAfterVersion": "v3"
+      },
+      "result": {
+        "pipetteId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "305bf2316d3fc7964ebdf17e5cb150fc",
+      "notes": [],
+      "params": {
+        "message": "This tests Tip Pick Up Failure (General Error for now)"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6627c460f2c1d181b2d6bce906457ae0",
+      "notes": [],
+      "params": {
+        "message": "Please remove tip rack from deck. When you're testing recovery, add tiprack back as necessary."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "748924f7bc1bc2293181fde240dd2497",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 395.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.92999999999999,
+        "tipVolume": 1000.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b9df600eccab4fa173cf714a9e113bac",
+      "notes": [],
+      "params": {
+        "message": "Overpressure - While Aspirating"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7058414b08572e4a67114c649fbc4baf",
+      "notes": [],
+      "params": {
+        "axes": [
+          "leftPlunger",
+          "leftZ"
+        ]
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f8432cddacf8e16c07eba0897f1eb9e4",
+      "notes": [],
+      "params": {
+        "message": "Use p50UL tips - Swap with tip(s) that are hot glued shut (you will need to swap the tips for retry recovery options)"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "64ac4c89015a5b101b05c9f241d2b01a",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dfbcaf24956ff601c54c8eca232341b8",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dc3fc81e61d1b082aff31b267536c7f0",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d5a40428312b4232069455942e7fc4fb",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "89153d8b32e4685dbc442e6591d02947",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a5b8fd811d0ef18cc2dfd021bd49f205",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6fb040ec1b86b7ccd93e803275eeaedb",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "489b07c38ce0381f99b57179d4e21479",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bedb30145351546caecd4fde02041d3e",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "14184571a28f9a7cbced653653a5e4c8",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fa062920af0726db7ad4887c27b36880",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0b302adfd08da748fe70219d2b2aec25",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2eb6e6298939a64ca99771710a0f796c",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "09e6b07abc76b0f47eca5bde4a073fc8",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f77abbc6fccb00d97c44105e4d0dc8c5",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cf010ab2b5036733a0536650b665ef0d",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7201cbd6da4b3a1f9f9a46b87e7f0406",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2ede2f094fbeec343eed731eef8194e7",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9d8af9e55efc49019e13e9deb41f8931",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "99f5375c033353b7601cae5b9aa65ac0",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8c2e09cbe90d48fa924fb8cc51ab6f2e",
+      "notes": [],
+      "params": {
+        "message": "This tests Liquid Presence Detection - PLEASE MAKE SURE YOU'RE USING 1000UL TIPS OR YOU WILL BREAK THE PIPETTE"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "113ace5134dc05770bbbc9f25616e4d2",
+      "notes": [],
+      "params": {
+        "message": "Make sure reservoir is empty, and have full reservoir on standby to switch out with for recovery"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "liquidProbe",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1c5720bacb264e3da2b314e18b3591c5",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 256.78,
+          "z": 33.4
+        },
+        "z_position": 0.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e0bbd11eb919a3804d1d23771f645a8d",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 256.78,
+          "z": 5.55
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b66c39dd7f7222e62b5c25ef63dc4eaa",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 256.78,
+          "z": 5.55
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1f47f37d8e4b3aea8bbea66e7014ab27",
+      "notes": [],
+      "params": {
+        "axes": [
+          "leftPlunger",
+          "leftZ"
+        ]
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0f904e31fcd8dcc7ac6778e30cb61bb8",
+      "notes": [],
+      "params": {
+        "message": "Overpressure - While Dispensing"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f04ecdcd9f9b5219d1cf73c37e540d9f",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 19.999999999999993
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 64.39999999999999
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "690df57327aeb3c16ca4ad85203d1ec5",
+      "notes": [],
+      "params": {
+        "message": "Swap with tip(s) that are hot glued shut (you will need to cut the tips for retry recovery options)"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "631e9e0a8230489d6abb8665f0f13463",
+      "notes": [],
+      "params": {
+        "flowRate": 716.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 900.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 19.999999999999993
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 64.39999999999999
+        },
+        "volume": 900.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0e801e389ac14f125f5ef5db2eae3d08",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": false,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 434.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "20b6b0a1dd75709308db2b292ec03992",
+      "notes": [],
+      "params": {
+        "message": "You will have to manually remove tips if you're using a modified pipette"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d7fecbae31209f6f04a2ee350e584c46",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": false,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 434.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c4e9dc65f4db718d38cf627ad786ac83",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "65bf172b33169e051174a2d2c6ff08f9",
+      "notes": [],
+      "params": {
+        "message": "This tests Tip Pick Up Failure (General Error for now)"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "eddba592c53196f06dd465abd040ab57",
+      "notes": [],
+      "params": {
+        "message": "Please remove tip rack from deck. When you're testing recovery, add tiprack back as necessary."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d3fb46eb1e9183a7897d150cc1ef5898",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 288.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.81,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5019b8a5d55914c4a86174b01c40d297",
+      "notes": [],
+      "params": {
+        "message": "Overpressure - While Aspirating"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7aafe07a40a3c427dee717cc84c6e303",
+      "notes": [],
+      "params": {
+        "axes": [
+          "rightPlunger",
+          "rightZ"
+        ]
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2630be2e9b808711cf5ff3c5d69815df",
+      "notes": [],
+      "params": {
+        "message": "Use p50UL tips - Swap with tip(s) that are hot glued shut (you will need to swap the tips for retry recovery options)"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2492d664f9c55efed5652b1cbcf9fdde",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b2d6eb28bc88f476044b1e7e4d6b4107",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "737fbfd381fa1576044bb4666a4c9483",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e45f68ed478fc9f9825f00ff31fcde46",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9dead7e7447f7a0dbdb9b2145d28c692",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f154f5a1679179fabd7a55e8e26d0992",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e20d2093cb882e562bdf5bc427646443",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b0a14d30a958196db673fa5ac8eae550",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dcba87cf3be1f8600a2dea25b0a83274",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c9c41ee06959a54f1aab7a8c5119912b",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e4c179da374f4f5ba047d341a2aa629e",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bd6698a069e856a66de54a83992d695f",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6d4f1b88b6955d6574e48e31084aeac4",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "147d5fc4adfbe0a46301abaa465df262",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b660287ab347393357863827d926402d",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "afaecd2d3f12f463dc0c1596fbec73d8",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "18a206fcf40b85ef77d65a95eb69b977",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a66f9c581041537d7c9a0b5b83b2a3bb",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ff3ce00c290b4f3a025b51cc08e87e7f",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0c2b7f9b5117e811de2ca8c708719a4f",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 44.4
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "16b3eb79760f3264be5d1d29a9405940",
+      "notes": [],
+      "params": {
+        "message": "This tests Liquid Presence Detection - PLEASE MAKE SURE YOU'RE USING 1000UL TIPS OR YOU WILL BREAK THE PIPETTE"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "448d8d14a4ba598c39cedae64f1a7d1d",
+      "notes": [],
+      "params": {
+        "message": "Make sure reservoir is empty, and have full reservoir on standby to switch out with for recovery"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "liquidProbe",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "de2087c49b77fe03a83649111113c157",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 256.78,
+          "z": 33.4
+        },
+        "z_position": 0.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bcb050e4952ef2d7f7c42dd6838c3c24",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 256.78,
+          "z": 5.55
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "48dbf180376bece74dd403b1407f9db6",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 256.78,
+          "z": 5.55
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "431a83945a647ae1699424f1b19555d4",
+      "notes": [],
+      "params": {
+        "axes": [
+          "rightPlunger",
+          "rightZ"
+        ]
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d291fec87c615fe4446dd14989ec6503",
+      "notes": [],
+      "params": {
+        "message": "Overpressure - While Dispensing"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "29849adcc3a3cc1c478077d9336f1037",
+      "notes": [],
+      "params": {
+        "flowRate": 35.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 19.999999999999993
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 64.39999999999999
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5a2ff23afb6c9e0d8d201e674d3ce9f3",
+      "notes": [],
+      "params": {
+        "message": "Swap with tip(s) that are hot glued shut (you will need to cut the tips for retry recovery options)"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "25dff8ae10364bc6e427439df62fd75e",
+      "notes": [],
+      "params": {
+        "flowRate": 57.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 19.999999999999993
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 391.88,
+          "y": 42.74,
+          "z": 64.39999999999999
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a3cd8b7881d952254804421be5e8229e",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": false,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 434.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "96228aa179a3137a865a4889db38242d",
+      "notes": [],
+      "params": {
+        "message": "You will have to manually remove tips if you're using a modified pipette"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c5ad2c9360fc17ec095d7bdc27b726d4",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": false,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 434.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f32667674c9e53f66e65233250b4e939",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      20
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [],
+  "files": [
+    {
+      "name": "Flex_S_v2_20_P8X1000_P50_LLD.py",
+      "role": "main"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "id": "UUID",
+      "loadName": "opentrons_flex_96_tiprack_1000ul",
+      "location": {
+        "slotName": "A2"
+      }
+    },
+    {
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "id": "UUID",
+      "loadName": "opentrons_flex_96_tiprack_50ul",
+      "location": {
+        "slotName": "B2"
+      }
+    },
+    {
+      "definitionUri": "opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/2",
+      "id": "UUID",
+      "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+      "location": {
+        "slotName": "C3"
+      }
+    },
+    {
+      "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
+      "id": "UUID",
+      "loadName": "nest_1_reservoir_290ml",
+      "location": {
+        "slotName": "D3"
+      }
+    },
+    {
+      "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
+      "id": "UUID",
+      "loadName": "nest_12_reservoir_15ml",
+      "location": {
+        "slotName": "B3"
+      }
+    }
+  ],
+  "liquids": [
+    {
+      "description": "water for ER testing",
+      "displayColor": "#90e0ef",
+      "displayName": "Water",
+      "id": "UUID"
+    },
+    {
+      "description": "Water for ER testing",
+      "displayColor": "#0077b6",
+      "displayName": "Water but more blue",
+      "id": "UUID"
+    }
+  ],
+  "metadata": {
+    "author": "Sara Kowalski",
+    "description": "Simple Protocol that user can use to Phase 1 Error Recovery options for single and multi channel pipettes. NOTE: YOU WILL NEED A MODIFIED PIPETTE (NO SHROUD), and changed order of operations to reduce impact of dispense ER failure",
+    "protocolName": "2.20 Error Recovery Testing Protocol - Modified"
+  },
+  "modules": [],
+  "pipettes": [
+    {
+      "id": "UUID",
+      "mount": "left",
+      "pipetteName": "p1000_multi_flex"
+    },
+    {
+      "id": "UUID",
+      "mount": "right",
+      "pipetteName": "p50_single_flex"
+    }
+  ],
+  "result": "ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

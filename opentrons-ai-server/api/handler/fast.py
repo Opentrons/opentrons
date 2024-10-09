@@ -1,9 +1,13 @@
 import asyncio
 import os
+import time
 from typing import Any, Awaitable, Callable, List, Literal, Union
 
-import ddtrace
+import structlog
+from asgi_correlation_id import CorrelationIdMiddleware
+from asgi_correlation_id.context import correlation_id
 from ddtrace import tracer
+from ddtrace.contrib.asgi.middleware import TraceMiddleware
 from fastapi import FastAPI, HTTPException, Query, Request, Response, Security, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,9 +15,10 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
+from uvicorn.protocols.utils import get_path_with_query_string
 
 from api.domain.openai_predict import OpenAIPredict
-from api.handler.logging_config import get_logger, setup_logging
+from api.handler.custom_logging import setup_logging
 from api.integration.auth import VerifyToken
 from api.models.chat_request import ChatRequest
 from api.models.chat_response import ChatResponse
@@ -21,10 +26,12 @@ from api.models.empty_request_error import EmptyRequestError
 from api.models.internal_server_error import InternalServerError
 from api.settings import Settings
 
-setup_logging()
-logger = get_logger(__name__)
-ddtrace.patch(logging=True)
 settings: Settings = Settings()
+setup_logging(json_logs=settings.json_logging, log_level=settings.log_level.upper())
+
+access_logger = structlog.stdlib.get_logger("api.access")
+logger = structlog.stdlib.get_logger(settings.logger_name)
+
 auth: VerifyToken = VerifyToken()
 openai: OpenAIPredict = OpenAIPredict(settings)
 
@@ -73,6 +80,61 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
 # 12 second before the uvicorn timeout (190 seconds)
 # 22 seconds before the ALB timeout (200 seconds)
 app.add_middleware(TimeoutMiddleware, timeout_s=178)
+
+
+@app.middleware("http")
+async def logging_middleware(request: Request, call_next) -> Response:  # type: ignore[no-untyped-def]
+    structlog.contextvars.clear_contextvars()
+    # These context vars will be added to all log entries emitted during the request
+    request_id = correlation_id.get()
+    structlog.contextvars.bind_contextvars(request_id=request_id)
+
+    start_time = time.perf_counter_ns()
+    # If the call_next raises an error, we still want to return our own 500 response,
+    # so we can add headers to it (process time, request ID...)
+    response = Response(status_code=500)
+    try:
+        response = await call_next(request)
+    except Exception:
+        structlog.stdlib.get_logger("api.error").exception("Uncaught exception")
+        raise
+    finally:
+        process_time = time.perf_counter_ns() - start_time
+        status_code = response.status_code
+        url = get_path_with_query_string(request.scope)  # type: ignore[arg-type]
+        client_host = request.client.host if request.client and request.client.host else "unknown"
+        client_port = request.client.port if request.client and request.client.port else "unknown"
+        http_method = request.method if request.method else "unknown"
+        http_version = request.scope["http_version"]
+        # Recreate the Uvicorn access log format, but add all parameters as structured information
+        access_logger.info(
+            f"""{client_host}:{client_port} - "{http_method} {url} HTTP/{http_version}" {status_code}""",
+            http={
+                "url": str(request.url),
+                "status_code": status_code,
+                "method": http_method,
+                "request_id": request_id,
+                "version": http_version,
+            },
+            network={"client": {"ip": client_host, "port": client_port}},
+            duration=process_time,
+        )
+        response.headers["X-Process-Time"] = str(process_time / 10**9)
+    return response
+
+
+# This middleware must be placed after the logging, to populate the context with the request ID
+# NOTE: Why last??
+# Answer: middlewares are applied in the reverse order of when they are added (you can verify this
+# by debugging `app.middleware_stack` and recursively drilling down the `app` property).
+app.add_middleware(CorrelationIdMiddleware)
+
+tracing_middleware = next((m for m in app.user_middleware if m.cls == TraceMiddleware), None)
+if tracing_middleware is not None:
+    app.user_middleware = [m for m in app.user_middleware if m.cls != TraceMiddleware]
+    structlog.stdlib.get_logger("api.datadog_patch").info("Patching Datadog tracing middleware to be the outermost middleware...")
+    app.user_middleware.insert(0, tracing_middleware)
+    app.middleware_stack = app.build_middleware_stack()
 
 
 # Models
@@ -134,7 +196,7 @@ async def create_chat_completion(
         return ChatResponse(reply=response, fake=body.fake)
 
     except Exception as e:
-        logger.exception(e)
+        logger.exception("Error processing chat completion")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
         ) from e
@@ -143,7 +205,7 @@ async def create_chat_completion(
 @app.get(
     "/health",
     response_model=Status,
-    summary="LB Health Check",
+    summary="Load Balancer Health Check",
     description="Check the health and version of the API.",
     include_in_schema=False,
 )
@@ -154,10 +216,14 @@ async def get_health(request: Request) -> Status:
 
     - **returns**: A Status containing the version of the API.
     """
-    logger.debug(f"{request.method} {request.url.path}")
+    if request.url.path == "/health":
+        pass  # This is a health check from the load balancer
+    else:
+        logger.info(f"{request.method} {request.url.path}", extra={"requestMethod": request.method, "requestPath": request.url.path})
     return Status(status="ok", version=settings.dd_version)
 
 
+@tracer.wrap()
 @app.get("/api/timeout", response_model=TimeoutResponse)
 async def timeout_endpoint(request: Request, seconds: conint(ge=1, le=300) = Query(..., description="Number of seconds to wait")):  # type: ignore # noqa: B008
     """

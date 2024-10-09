@@ -63,6 +63,7 @@
       "thermocycler/openLid": "#/definitions/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate",
       "thermocycler/closeLid": "#/definitions/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate",
       "thermocycler/runProfile": "#/definitions/RunProfileCreate",
+      "thermocycler/runExtendedProfile": "#/definitions/RunExtendedProfileCreate",
       "absorbanceReader/closeLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate",
       "absorbanceReader/openLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate",
       "absorbanceReader/initialize": "#/definitions/InitializeCreate",
@@ -74,7 +75,8 @@
       "unsafe/blowOutInPlace": "#/definitions/UnsafeBlowOutInPlaceCreate",
       "unsafe/dropTipInPlace": "#/definitions/UnsafeDropTipInPlaceCreate",
       "unsafe/updatePositionEstimators": "#/definitions/UpdatePositionEstimatorsCreate",
-      "unsafe/engageAxes": "#/definitions/UnsafeEngageAxesCreate"
+      "unsafe/engageAxes": "#/definitions/UnsafeEngageAxesCreate",
+      "unsafe/ungripLabware": "#/definitions/UnsafeUngripLabwareCreate"
     }
   },
   "oneOf": [
@@ -253,6 +255,9 @@
       "$ref": "#/definitions/RunProfileCreate"
     },
     {
+      "$ref": "#/definitions/RunExtendedProfileCreate"
+    },
+    {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate"
     },
     {
@@ -287,6 +292,9 @@
     },
     {
       "$ref": "#/definitions/UnsafeEngageAxesCreate"
+    },
+    {
+      "$ref": "#/definitions/UnsafeUngripLabwareCreate"
     }
   ],
   "definitions": {
@@ -3907,6 +3915,108 @@
       },
       "required": ["params"]
     },
+    "ProfileStep": {
+      "title": "ProfileStep",
+      "description": "An individual step in a Thermocycler extended profile.",
+      "type": "object",
+      "properties": {
+        "celsius": {
+          "title": "Celsius",
+          "description": "Target temperature in \u00b0C.",
+          "type": "number"
+        },
+        "holdSeconds": {
+          "title": "Holdseconds",
+          "description": "Time to hold target temperature in seconds.",
+          "type": "number"
+        }
+      },
+      "required": ["celsius", "holdSeconds"]
+    },
+    "ProfileCycle": {
+      "title": "ProfileCycle",
+      "description": "An individual cycle in a Thermocycler extended profile.",
+      "type": "object",
+      "properties": {
+        "steps": {
+          "title": "Steps",
+          "description": "Steps to repeat.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProfileStep"
+          }
+        },
+        "repetitions": {
+          "title": "Repetitions",
+          "description": "Number of times to repeat the steps.",
+          "type": "integer"
+        }
+      },
+      "required": ["steps", "repetitions"]
+    },
+    "RunExtendedProfileParams": {
+      "title": "RunExtendedProfileParams",
+      "description": "Input parameters for an individual Thermocycler profile step.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "Unique ID of the Thermocycler.",
+          "type": "string"
+        },
+        "profileElements": {
+          "title": "Profileelements",
+          "description": "Elements of the profile. Each can be either a step or a cycle.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/ProfileStep"
+              },
+              {
+                "$ref": "#/definitions/ProfileCycle"
+              }
+            ]
+          }
+        },
+        "blockMaxVolumeUl": {
+          "title": "Blockmaxvolumeul",
+          "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
+          "type": "number"
+        }
+      },
+      "required": ["moduleId", "profileElements"]
+    },
+    "RunExtendedProfileCreate": {
+      "title": "RunExtendedProfileCreate",
+      "description": "A request to execute a Thermocycler profile run.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "thermocycler/runExtendedProfile",
+          "enum": ["thermocycler/runExtendedProfile"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/RunExtendedProfileParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
     "opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidParams": {
       "title": "CloseLidParams",
       "description": "Input parameters to close the lid on an absorbance reading.",
@@ -4510,6 +4620,42 @@
         },
         "params": {
           "$ref": "#/definitions/UnsafeEngageAxesParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "UnsafeUngripLabwareParams": {
+      "title": "UnsafeUngripLabwareParams",
+      "description": "Payload required for an UngripLabware command.",
+      "type": "object",
+      "properties": {}
+    },
+    "UnsafeUngripLabwareCreate": {
+      "title": "UnsafeUngripLabwareCreate",
+      "description": "UnsafeEngageAxes command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "unsafe/ungripLabware",
+          "enum": ["unsafe/ungripLabware"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/UnsafeUngripLabwareParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
