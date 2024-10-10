@@ -216,7 +216,7 @@ class TipView(HasState[TipState]):
             critical_row: int,
             entry_well: str,
         ) -> Optional[List[str]]:
-            tip_cluster = []
+            tip_cluster: list[str] = []
             for i in range(active_columns):
                 if entry_well == "A1" or entry_well == "H1":
                     if critical_column - i >= 0:
@@ -267,12 +267,12 @@ class TipView(HasState[TipState]):
 
                 # In the case of a 96ch we can attempt to index in by singular rows and columns assuming that indexed direction is safe
                 # The tip cluster list is ordered: Each row from a column in order by columns
-                tip_cluster_final_column = []
+                tip_cluster_final_column: list[str] = []
                 for i in range(active_rows):
                     tip_cluster_final_column.append(
                         tip_cluster[((active_columns * active_rows) - 1) - i]
                     )
-                tip_cluster_final_row = []
+                tip_cluster_final_row: list[str] = []
                 for i in range(active_columns):
                     tip_cluster_final_row.append(
                         tip_cluster[(active_rows - 1) + (i * active_rows)]
