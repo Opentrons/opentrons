@@ -435,7 +435,10 @@ const toVersion25 = (prevConfig: ConfigV24): ConfigV25 => {
   const nextConfig = {
     ...prevConfig,
     version: 25 as const,
-    language: null,
+    language: {
+      appLanguage: null,
+      systemLanguage: null,
+    },
   }
   return nextConfig
 }

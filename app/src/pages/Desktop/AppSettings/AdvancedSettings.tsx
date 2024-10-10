@@ -77,7 +77,12 @@ function LocalizationSetting(): JSX.Element | null {
           `}
           value={i18n.language}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            dispatch(updateConfigValue('language', event.currentTarget.value))
+            dispatch(
+              updateConfigValue(
+                'language.appLanguage',
+                event.currentTarget.value
+              )
+            )
           }}
           options={[
             { name: 'EN', value: 'en' },

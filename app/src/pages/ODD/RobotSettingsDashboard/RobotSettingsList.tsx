@@ -283,8 +283,8 @@ function LanguageToggle(): JSX.Element | null {
       settingName={`Change Language: ${i18n.language}`}
       onClick={() => {
         i18n.language === 'en'
-          ? dispatch(updateConfigValue('language', 'zh'))
-          : dispatch(updateConfigValue('language', 'en'))
+          ? dispatch(updateConfigValue('language.appLanguage', 'zh'))
+          : dispatch(updateConfigValue('language.appLanguage', 'en'))
       }}
       rightElement={<></>}
     />

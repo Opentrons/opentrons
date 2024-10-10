@@ -278,7 +278,10 @@ export type ConfigV24 = Omit<ConfigV23, 'version' | 'support'> & {
 
 export type ConfigV25 = Omit<ConfigV24, 'version'> & {
   version: 25
-  language: Language | null
+  language: {
+    appLanguage: Language | null
+    systemLanguage: string | null
+  }
 }
 
 export type Config = ConfigV25

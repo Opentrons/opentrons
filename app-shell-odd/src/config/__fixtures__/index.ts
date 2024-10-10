@@ -176,5 +176,8 @@ export const MOCK_CONFIG_V24: ConfigV24 = {
 export const MOCK_CONFIG_V25: ConfigV25 = {
   ...MOCK_CONFIG_V24,
   version: 25,
-  language: null,
+  language: {
+    appLanguage: null,
+    systemLanguage: null,
+  },
 }
