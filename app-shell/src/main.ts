@@ -5,7 +5,7 @@ import dns from 'dns'
 import contextMenu from 'electron-context-menu'
 import * as electronDevtoolsInstaller from 'electron-devtools-installer'
 
-import { createUi, registerReloadUi } from './ui'
+import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
 import { initializeMenu } from './menu'
 import { createLogger } from './log'
 import { registerProtocolAnalysis } from './protocol-analysis'
@@ -110,6 +110,7 @@ function startUp(): void {
     registerUsb(dispatch),
     registerNotify(dispatch, mainWindow),
     registerReloadUi(mainWindow),
+    registerSystemLanguage(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
