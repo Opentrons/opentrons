@@ -42,6 +42,7 @@ import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
 import { HandleEnter } from './HandleEnter'
+import { removeOpentronsPhrases } from '../../utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
@@ -334,7 +335,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                                 <Checkbox
                                   key={value}
                                   isChecked={selectedValues.includes(value)}
-                                  labelText={name}
+                                  labelText={removeOpentronsPhrases(name)}
                                   onClick={() => {
                                     const updatedValues = selectedValues.includes(
                                       value
