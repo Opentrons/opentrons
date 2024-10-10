@@ -2412,6 +2412,7 @@ def test_get_final_labware_movement_offset_vectors(
     mock_module_view: ModuleView,
     mock_labware_view: LabwareView,
     subject: GeometryView,
+    well_plate_def: LabwareDefinition,
 ) -> None:
     """It should provide the final labware movement offset data based on locations."""
     decoy.when(mock_labware_view.get_deck_default_gripper_offsets()).then_return(
@@ -2427,6 +2428,10 @@ def test_get_final_labware_movement_offset_vectors(
         )
     )
 
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+
     final_offsets = subject.get_final_labware_movement_offset_vectors(
         from_location=DeckSlotLocation(slotName=DeckSlotName("D2")),
         to_location=ModuleLocation(moduleId="module-id"),
@@ -2434,6 +2439,7 @@ def test_get_final_labware_movement_offset_vectors(
             pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
             dropOffset=LabwareOffsetVector(x=400, y=500, z=600),
         ),
+        current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert final_offsets == LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=101, y=202, z=303),
@@ -2464,6 +2470,7 @@ def test_get_total_nominal_gripper_offset(
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     subject: GeometryView,
+    well_plate_def: LabwareDefinition,
 ) -> None:
     """It should calculate the correct gripper offsets given the location and move type.."""
     decoy.when(mock_labware_view.get_deck_default_gripper_offsets()).then_return(
@@ -2480,10 +2487,15 @@ def test_get_total_nominal_gripper_offset(
         )
     )
 
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+
     # Case 1: labware on deck
     result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         move_type=_GripperMoveType.PICK_UP_LABWARE,
+        current_labware=mock_labware_view.get_definition("labware-d"),
     )
     assert result1 == LabwareOffsetVector(x=1, y=2, z=3)
 
@@ -2491,6 +2503,7 @@ def test_get_total_nominal_gripper_offset(
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=ModuleLocation(moduleId="module-id"),
         move_type=_GripperMoveType.DROP_LABWARE,
+        current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result2 == LabwareOffsetVector(x=33, y=22, z=11)
 
@@ -2500,6 +2513,7 @@ def test_get_stacked_labware_total_nominal_offset_slot_specific(
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     subject: GeometryView,
+    well_plate_def: LabwareDefinition,
 ) -> None:
     """Get nominal offset for stacked labware."""
     # Case: labware on adapter on module, adapter has slot-specific offsets
@@ -2525,15 +2539,23 @@ def test_get_stacked_labware_total_nominal_offset_slot_specific(
     decoy.when(mock_labware_view.get_parent_location("adapter-id")).then_return(
         ModuleLocation(moduleId="module-id")
     )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_module_view._state.requested_model_by_id).then_return(
+        {"module-id": ModuleModel.HEATER_SHAKER_MODULE_V1}
+    )
     result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
         move_type=_GripperMoveType.PICK_UP_LABWARE,
+        current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
 
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
         move_type=_GripperMoveType.DROP_LABWARE,
+        current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result2 == LabwareOffsetVector(x=333, y=222, z=111)
 
@@ -2543,6 +2565,7 @@ def test_get_stacked_labware_total_nominal_offset_default(
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     subject: GeometryView,
+    well_plate_def: LabwareDefinition,
 ) -> None:
     """Get nominal offset for stacked labware."""
     # Case: labware on adapter on module, adapter has only default offsets
@@ -2573,15 +2596,23 @@ def test_get_stacked_labware_total_nominal_offset_default(
     decoy.when(mock_labware_view.get_parent_location("adapter-id")).then_return(
         ModuleLocation(moduleId="module-id")
     )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_module_view._state.requested_model_by_id).then_return(
+        {"module-id": ModuleModel.HEATER_SHAKER_MODULE_V1}
+    )
     result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
         move_type=_GripperMoveType.PICK_UP_LABWARE,
+        current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
 
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
         move_type=_GripperMoveType.DROP_LABWARE,
+        current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result2 == LabwareOffsetVector(x=333, y=222, z=111)
 

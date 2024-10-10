@@ -119,6 +119,7 @@ class LabwareRole(str, Enum):
     fixture = "fixture"
     adapter = "adapter"
     maintenance = "maintenance"
+    lid = "lid"
 
 
 class Metadata(BaseModel):

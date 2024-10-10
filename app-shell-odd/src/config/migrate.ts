@@ -17,13 +17,14 @@ import type {
   ConfigV22,
   ConfigV23,
   ConfigV24,
+  ConfigV25,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
 
-const CONFIG_VERSION_LATEST = 23 // update this after each config version bump
+const CONFIG_VERSION_LATEST = 25 // update this after each config version bump
 
 const PKG_VERSION: string = _PKG_VERSION_
 export const DEFAULTS_V12: ConfigV12 = {
@@ -226,6 +227,18 @@ const toVersion24 = (prevConfig: ConfigV23): ConfigV24 => {
   }
 }
 
+const toVersion25 = (prevConfig: ConfigV24): ConfigV25 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 25 as const,
+    language: {
+      appLanguage: null,
+      systemLanguage: null,
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
   (prevConfig: ConfigV13) => ConfigV14,
@@ -238,7 +251,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV20) => ConfigV21,
   (prevConfig: ConfigV21) => ConfigV22,
   (prevConfig: ConfigV22) => ConfigV23,
-  (prevConfig: ConfigV23) => ConfigV24
+  (prevConfig: ConfigV23) => ConfigV24,
+  (prevConfig: ConfigV24) => ConfigV25
 ] = [
   toVersion13,
   toVersion14,
@@ -252,6 +266,7 @@ const MIGRATIONS: [
   toVersion22,
   toVersion23,
   toVersion24,
+  toVersion25,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
@@ -271,6 +286,7 @@ export function migrate(
     | ConfigV22
     | ConfigV23
     | ConfigV24
+    | ConfigV25
 ): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary
