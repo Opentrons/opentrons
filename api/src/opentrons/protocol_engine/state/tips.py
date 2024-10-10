@@ -35,6 +35,11 @@ class TipRackWellState(Enum):
 TipRackStateByWellName = Dict[str, TipRackWellState]
 
 
+# todo(mm, 2024-10-10): This info is duplicated between here and PipetteState because
+# TipStore is using it to compute which tips a PickUpTip removes from the tip rack,
+# given the pipette's current nozzle map. We could avoid this duplication by moving the
+# computation to TipView, calling it from PickUpTipImplementation, and passing the
+# precomputed list of wells to TipStore.
 @dataclass
 class _PipetteInfo:
     channels: int
