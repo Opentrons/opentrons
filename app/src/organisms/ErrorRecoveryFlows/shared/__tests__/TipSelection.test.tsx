@@ -35,7 +35,7 @@ describe('TipSelection', () => {
     expect(vi.mocked(WellSelection)).toHaveBeenCalledWith(
       expect.objectContaining({
         definition: props.failedLabwareUtils.tipSelectorDef,
-        selectedPrimaryWell: 'A1',
+        selectedPrimaryWells: props.failedLabwareUtils.selectedTipLocations,
         channels: props.failedPipetteInfo?.data.channels ?? 1,
       }),
       {}

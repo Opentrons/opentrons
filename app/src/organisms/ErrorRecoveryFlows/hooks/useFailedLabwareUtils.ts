@@ -170,7 +170,7 @@ function getRelevantPickUpTipCommand(
 
 interface UseTipSelectionUtilsResult {
   /* Always returns null if the relevant labware is not relevant to tip pick up. */
-  selectedTipLocation: WellGroup | null
+  selectedTipLocations: WellGroup | null
   tipSelectorDef: LabwareDefinition2
   selectTips: (tipGroup: WellGroup) => void
   deselectTips: (locations: string[]) => void
@@ -220,7 +220,7 @@ function useTipSelectionUtils(
     selectedLocs != null && Object.keys(selectedLocs).length > 0
 
   return {
-    selectedTipLocation: selectedLocs,
+    selectedTipLocations: selectedLocs,
     tipSelectorDef,
     selectTips,
     deselectTips,

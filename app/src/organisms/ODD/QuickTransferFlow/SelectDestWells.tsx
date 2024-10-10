@@ -189,7 +189,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
                   )
                 )
               }}
-              selectedPrimaryWell={Object.keys(selectedWells)[0]}
+              selectedPrimaryWells={selectedWells}
               selectWells={wellGroup => {
                 if (Object.keys(wellGroup).length > 0) {
                   setIsNumberWellsSelectedError(false)
