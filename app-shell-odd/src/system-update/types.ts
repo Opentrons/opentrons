@@ -37,3 +37,41 @@ export interface UserFileInfo {
   // parsed contents of VERSION.json
   versionInfo: VersionInfo
 }
+
+export interface NoUpdate {
+  version: null
+  files: null
+  downloadProgress: 0
+}
+
+export interface FoundUpdate {
+  version: string
+  files: null
+  downloadProgress: number
+}
+
+export interface ReadyUpdate {
+  version: string
+  files: ReleaseSetFilepaths
+  downloadProgress: 100
+}
+
+export type ResolvedUpdate = NoUpdate | ReadyUpdate
+export type UnresolvedUpdate = ResolvedUpdate | FoundUpdate
+export type ProgressCallback = (status: UnresolvedUpdate) => void
+
+// Interface provided by the web and usb sourced updaters. Type variable is
+// specified by the updater implementation.
+export interface UpdateProvider<UpdateSourceDetails> {
+  // Call before disposing to make sure any temporary storage is removed
+  teardown: () => Promise<void>
+  // Scan an implementation-defined location for updates
+  refreshUpdateCache: (progress: ProgressCallback) => Promise<ResolvedUpdate>
+  // Get the details of a found update, if any.
+  getUpdateDetails: () => UnresolvedUpdate
+  // Lock the update cache, which will prevent anything from accidentally overwriting stuff
+  // while it's being sent as an update
+  lockUpdateCache: () => void
+  // Reverse lockUpdateCache()
+  unlockUpdateCache: () => void
+}

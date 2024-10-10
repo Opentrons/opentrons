@@ -1,29 +1,25 @@
 // system update files
+import assert from 'assert'
 import path from 'path'
-import { ensureDir } from 'fs-extra'
 import { readFile } from 'fs/promises'
+import { promisify } from 'util'
+
+import { ensureDir } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
-import Semver from 'semver'
+import getStream from 'get-stream'
+
 import { UI_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import { postFile } from '../http'
-import {
-  getLatestSystemUpdateUrls,
-  getLatestVersion,
-  isUpdateAvailable,
-  updateLatestVersion,
-} from './latest-update'
-import {
-  getReleaseFiles,
-  readUserFileInfo,
-  cleanupReleaseFiles,
-} from './release-files'
 import { getSystemUpdateDir } from './directories'
-import { REASONABLE_VERSION_FILE_SIZE_B, SYSTEM_FILENAME } from './constants'
+import { SYSTEM_FILENAME, VERSION_FILENAME } from './constants'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
-import type { ReleaseSetFilepaths } from './types'
+import type { UserFileInfo, ReleaseSetFilepaths } from './types'
+
+const PKG_VERSION = _PKG_VERSION_
+let LATEST_OT_SYSTEM_VERSION = PKG_VERSION
 
 const log = createLogger('systemUpdate/index')
 
@@ -31,7 +27,7 @@ let isGettingLatestSystemFiles = false
 const isGettingMassStorageUpdatesFrom = new Set<string>()
 let massStorageUpdateSet: ReleaseSetFilepaths | null = null
 let systemUpdateSet: ReleaseSetFilepaths | null = null
-
+/*
 const readFileInfoAndDispatch = (
   dispatch: Dispatch,
   fileName: string,
@@ -51,35 +47,13 @@ const readFileInfoAndDispatch = (
       payload: { message: error.message },
     }))
     .then(dispatch)
-
+*/
 export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
   log.info(`Running robot system updates storing to ${getSystemUpdateDir()}`)
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
-        // short circuit early if we're already downloading the latest system files
-        if (isGettingLatestSystemFiles) {
-          log.info(`system update download already in progress`)
-          return
-        }
-        updateLatestVersion()
-          .then(() => {
-            if (isUpdateAvailable() && !isGettingLatestSystemFiles) {
-              isGettingLatestSystemFiles = true
-              return getLatestSystemUpdateFiles(dispatch)
-            }
-          })
-          .then(() => {
-            isGettingLatestSystemFiles = false
-          })
-          .catch((error: Error) => {
-            log.warn('Error checking for update', {
-              error,
-            })
-            isGettingLatestSystemFiles = false
-          })
-
         break
 
       case 'robotUpdate:UPLOAD_FILE': {
@@ -116,7 +90,7 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
       case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        readFileInfoAndDispatch(dispatch, systemFile, true)
+        //readFileInfoAndDispatch(dispatch, systemFile, true)
         break
       }
       case 'robotUpdate:READ_SYSTEM_FILE': {
@@ -130,7 +104,7 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
           return
         }
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        readFileInfoAndDispatch(dispatch, systemFile)
+        //readFileInfoAndDispatch(dispatch, systemFile)
         break
       }
       case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
@@ -166,106 +140,6 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
   }
 }
 
-const getVersionFromOpenedZipIfValid = (zip: StreamZip): Promise<string> =>
-  new Promise((resolve, reject) => {
-    Object.values(zip.entries()).forEach(entry => {
-      if (
-        entry.isFile &&
-        entry.name === 'VERSION.json' &&
-        entry.size < REASONABLE_VERSION_FILE_SIZE_B
-      ) {
-        const contents = zip.entryDataSync(entry.name).toString('ascii')
-        try {
-          const parsedContents = JSON.parse(contents)
-          if (parsedContents?.robot_type !== 'OT-3 Standard') {
-            reject(new Error('not a Flex release file'))
-          }
-          const fileVersion = parsedContents?.opentrons_api_version
-          const version = Semver.valid(fileVersion as string)
-          if (version === null) {
-            reject(new Error(`${fileVersion} is not a valid version`))
-          } else {
-            resolve(version)
-          }
-        } catch (error) {
-          reject(error)
-        }
-      }
-    })
-  })
-
-interface FileDetails {
-  path: string
-  version: string
-}
-
-const getVersionFromZipIfValid = (path: string): Promise<FileDetails> =>
-  new Promise((resolve, reject) => {
-    const zip = new StreamZip({ file: path, storeEntries: true })
-    zip.on('ready', () => {
-      getVersionFromOpenedZipIfValid(zip)
-        .then(version => {
-          zip.close()
-          resolve({ version, path })
-        })
-        .catch(err => {
-          zip.close()
-          reject(err)
-        })
-    })
-    zip.on('error', err => {
-      zip.close()
-      reject(err)
-    })
-  })
-
-const fakeReleaseNotesForMassStorage = (version: string): string => `
-# Opentrons Robot Software Version ${version}
-
-This update is from a USB mass storage device connected to your Flex, and release notes cannot be shown.
-
-Don't remove the USB mass storage device while the update is in progress.
-`
-
-export const getLatestMassStorageUpdateFiles = (
-  filePaths: string[],
-  dispatch: Dispatch
-): Promise<unknown> =>
-  Promise.all(
-    filePaths.map(path =>
-      path.endsWith('.zip')
-        ? getVersionFromZipIfValid(path).catch(() => null)
-        : new Promise<null>(resolve => {
-            resolve(null)
-          })
-    )
-  ).then(values => {
-    const update = values.reduce(
-      (prev, current) =>
-        prev === null
-          ? current === null
-            ? prev
-            : current
-          : current === null
-          ? prev
-          : Semver.gt(current.version, prev.version)
-          ? current
-          : prev,
-      null
-    )
-    if (update === null) {
-      console.log('no updates found in mass storage device')
-    } else {
-      console.log(`found update to version ${update.version} on mass storage`)
-      const releaseNotes = fakeReleaseNotesForMassStorage(update.version)
-      massStorageUpdateSet = { system: update.path, releaseNotes }
-      dispatchUpdateInfo(
-        { version: update.version, releaseNotes, force: true },
-        dispatch
-      )
-    }
-  })
-
 const dispatchUpdateInfo = (
   info: { version: string | null; releaseNotes: string | null; force: boolean },
   dispatch: Dispatch
@@ -296,10 +170,12 @@ export function getLatestSystemUpdateFiles(
     'robot-system-updates'
   )
 
-  return ensureDir(getSystemUpdateDir())
-    .then(() => getLatestSystemUpdateUrls())
-    .then(urls => {
-      if (urls === null) {
+  return (
+    ensureDir(getSystemUpdateDir())
+      /*.then(() => getLatestSystemUpdateUrls())*/
+      .then(
+        /*urls*/ () => {
+          /*if (urls === null) {
         const latestVersion = getLatestVersion()
         log.warn('No release files in manifest', {
           version: latestVersion,
@@ -307,27 +183,27 @@ export function getLatestSystemUpdateFiles(
         return Promise.reject(
           new Error(`No release files in manifest for version ${latestVersion}`)
         )
-      }
+      }*/
 
-      let prevPercentDone = 0
+          let prevPercentDone = 0
 
-      const handleProgress = (progress: DownloadProgress): void => {
-        const { downloaded, size } = progress
-        if (size !== null) {
-          const percentDone = Math.round((downloaded / size) * 100)
-          if (Math.abs(percentDone - prevPercentDone) > 0) {
-            if (massStorageUpdateSet === null) {
-              dispatch({
-                // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
-                type: 'robotUpdate:DOWNLOAD_PROGRESS',
-                payload: { progress: percentDone, target: 'flex' },
-              })
+          const handleProgress = (progress: DownloadProgress): void => {
+            const { downloaded, size } = progress
+            if (size !== null) {
+              const percentDone = Math.round((downloaded / size) * 100)
+              if (Math.abs(percentDone - prevPercentDone) > 0) {
+                if (massStorageUpdateSet === null) {
+                  dispatch({
+                    // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
+                    type: 'robotUpdate:DOWNLOAD_PROGRESS',
+                    payload: { progress: percentDone, target: 'flex' },
+                  })
+                }
+                prevPercentDone = percentDone
+              }
             }
-            prevPercentDone = percentDone
           }
-        }
-      }
-
+          /*
       return getReleaseFiles(urls, fileDownloadDir, handleProgress)
         .then(filepaths => {
           return cacheUpdateSet(filepaths)
@@ -348,7 +224,10 @@ export function getLatestSystemUpdateFiles(
         .catch((error: Error) => {
           log.warn('Unable to cleanup old release files', { error })
         })
-    })
+        */
+        }
+      )
+  )
 }
 
 export function getCachedSystemUpdateFiles(
@@ -376,7 +255,7 @@ export function getCachedSystemUpdateFiles(
 function getInfoFromUpdateSet(
   filepaths: ReleaseSetFilepaths
 ): Promise<{ version: string; releaseNotes: string | null }> {
-  const version = getLatestVersion()
+  const version = '0.0.0' /*getLatestVersion()*/
   const releaseNotesContentPromise = filepaths.releaseNotes
     ? readFile(filepaths.releaseNotes, 'utf8')
     : new Promise<string | null>(resolve => {
@@ -395,4 +274,50 @@ function cacheUpdateSet(
 ): Promise<{ version: string; releaseNotes: string | null }> {
   systemUpdateSet = filepaths
   return getInfoFromUpdateSet(systemUpdateSet)
+}
+
+export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
+  const openZip = new Promise<StreamZip>((resolve, reject) => {
+    const zip = new StreamZip({ file: systemFile, storeEntries: true })
+      .once('ready', handleReady)
+      .once('error', handleError)
+
+    function handleReady(): void {
+      cleanup()
+      resolve(zip)
+    }
+
+    function handleError(error: Error): void {
+      cleanup()
+      zip.close()
+      reject(error)
+    }
+
+    function cleanup(): void {
+      zip.removeListener('ready', handleReady)
+      zip.removeListener('error', handleError)
+    }
+  })
+
+  return openZip.then(zip => {
+    const entries = zip.entries()
+    const streamFromZip = promisify(zip.stream.bind(zip))
+
+    assert(VERSION_FILENAME in entries, `${VERSION_FILENAME} not in archive`)
+
+    const result = streamFromZip(VERSION_FILENAME)
+      // @ts-expect-error(mc, 2021-02-17): stream may be undefined
+      .then(getStream)
+      .then(JSON.parse)
+      .then(versionInfo => ({
+        systemFile,
+        versionInfo,
+      }))
+
+    result.finally(() => {
+      zip.close()
+    })
+
+    return result
+  })
 }
