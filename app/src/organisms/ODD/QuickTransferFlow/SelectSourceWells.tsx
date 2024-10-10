@@ -117,7 +117,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
                   )
                 )
               }}
-              selectedPrimaryWells={selectedWells}
+              selectedPrimaryWell={Object.keys(selectedWells)[0]}
               selectWells={wellGroup => {
                 setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
               }}
