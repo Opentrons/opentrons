@@ -48,9 +48,9 @@ from ..types import (
 )
 from ..actions import (
     Action,
-    SucceedCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    get_state_update,
 )
 from ._abstract_store import HasState, HandlesActions
 from ._move_types import EdgePathType
@@ -63,8 +63,6 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
-
-_OT3_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_D1
 
 _RIGHT_SIDE_SLOTS = {
     # OT-2:
@@ -148,10 +146,12 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, SucceedCommandAction):
-            self._handle_command(action)
+        state_update = get_state_update(action)
+        if state_update is not None:
+            self._add_loaded_labware(state_update)
+            self._set_labware_location(state_update)
 
-        elif isinstance(action, AddLabwareOffsetAction):
+        if isinstance(action, AddLabwareOffsetAction):
             labware_offset = LabwareOffset.construct(
                 id=action.labware_offset_id,
                 createdAt=action.created_at,
@@ -169,11 +169,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             )
             self._state.definitions_by_uri[uri] = action.definition
 
-    def _handle_command(self, action: Action) -> None:
-        """Modify state in reaction to a command."""
-        self._add_loaded_labware(action)
-        self._set_labware_location(action)
-
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
 
@@ -185,56 +180,50 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
         self._state.labware_offsets_by_id[labware_offset.id] = labware_offset
 
-    def _add_loaded_labware(self, action: Action) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.loaded_labware != update_types.NO_CHANGE
-        ):
+    def _add_loaded_labware(self, state_update: update_types.StateUpdate) -> None:
+        loaded_labware_update = state_update.loaded_labware
+        if loaded_labware_update != update_types.NO_CHANGE:
             # If the labware load refers to an offset, that offset must actually exist.
-            if action.state_update.loaded_labware.offset_id is not None:
+            if loaded_labware_update.offset_id is not None:
                 assert (
-                    action.state_update.loaded_labware.offset_id
-                    in self._state.labware_offsets_by_id
+                    loaded_labware_update.offset_id in self._state.labware_offsets_by_id
                 )
 
             definition_uri = uri_from_details(
-                namespace=action.state_update.loaded_labware.definition.namespace,
-                load_name=action.state_update.loaded_labware.definition.parameters.loadName,
-                version=action.state_update.loaded_labware.definition.version,
+                namespace=loaded_labware_update.definition.namespace,
+                load_name=loaded_labware_update.definition.parameters.loadName,
+                version=loaded_labware_update.definition.version,
             )
 
             self._state.definitions_by_uri[
                 definition_uri
-            ] = action.state_update.loaded_labware.definition
+            ] = loaded_labware_update.definition
 
-            location = action.state_update.loaded_labware.new_location
+            location = loaded_labware_update.new_location
 
-            display_name = action.state_update.loaded_labware.display_name
+            display_name = loaded_labware_update.display_name
 
             self._state.labware_by_id[
-                action.state_update.loaded_labware.labware_id
+                loaded_labware_update.labware_id
             ] = LoadedLabware.construct(
-                id=action.state_update.loaded_labware.labware_id,
+                id=loaded_labware_update.labware_id,
                 location=location,
-                loadName=action.state_update.loaded_labware.definition.parameters.loadName,
+                loadName=loaded_labware_update.definition.parameters.loadName,
                 definitionUri=definition_uri,
-                offsetId=action.state_update.loaded_labware.offset_id,
+                offsetId=loaded_labware_update.offset_id,
                 displayName=display_name,
             )
 
-    def _set_labware_location(self, action: Action) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.labware_location != update_types.NO_CHANGE
-        ):
-
-            labware_id = action.state_update.labware_location.labware_id
-            new_offset_id = action.state_update.labware_location.offset_id
+    def _set_labware_location(self, state_update: update_types.StateUpdate) -> None:
+        labware_location_update = state_update.labware_location
+        if labware_location_update != update_types.NO_CHANGE:
+            labware_id = labware_location_update.labware_id
+            new_offset_id = labware_location_update.offset_id
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
-            if action.state_update.labware_location.new_location:
-                new_location = action.state_update.labware_location.new_location
+            if labware_location_update.new_location:
+                new_location = labware_location_update.new_location
 
                 if isinstance(
                     new_location, AddressableAreaLocation
