@@ -11,7 +11,7 @@ import thermoModuleGen1Opened from '/app/assets/images/thermocycler_open_transpa
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import thermoModuleGen2Closed from '/app/assets/images/thermocycler_gen_2_closed.png'
 import thermoModuleGen2Opened from '/app/assets/images/thermocycler_gen_2_opened.png'
-import absorbanceReader from 'app/assets/images/opentrons_plate_reader.png'
+import absorbanceReader from '/app/assets/images/opentrons_plate_reader.png'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 

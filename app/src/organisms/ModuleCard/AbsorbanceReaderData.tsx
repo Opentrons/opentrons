@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { StyledText, COLORS } from '@opentrons/components'
-import { StatusLabel } from '../../atoms/StatusLabel'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
 

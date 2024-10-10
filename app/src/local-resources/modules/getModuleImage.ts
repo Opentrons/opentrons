@@ -8,7 +8,7 @@ import thermoModuleGen1HighRes from '/app/assets/images/modules/thermocyclerModu
 import heaterShakerModuleHighRes from '/app/assets/images/modules/heaterShakerModuleV1@3x.png'
 import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
 import magneticBlockGen1 from '/app/assets/images/magnetic_block_gen_1.png'
-import absorbanceReader from 'app/assets/images/opentrons_plate_reader.png'
+import absorbanceReader from '/app/assets/images/opentrons_plate_reader.png'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 
