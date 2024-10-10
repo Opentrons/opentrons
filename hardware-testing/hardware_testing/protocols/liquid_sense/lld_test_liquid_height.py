@@ -8,7 +8,10 @@ from opentrons.protocol_api import (
     ParameterContext,
 )
 from opentrons.types import Point
-from abr_testing.automation import google_sheets_tool  # type: ignore[import]
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError
+)
+# from abr_testing.automation import google_sheets_tool  # type: ignore[import]
 
 
 ###########################################
@@ -107,7 +110,7 @@ def add_parameters(parameters: ParameterContext):
                 "value": "corning_96_wellplate_360ul_flat",
             },
         ],
-        default="nest_96_wellplate_2ml_deep",
+        default="nest_12_reservoir_15ml",
     )
 
 
@@ -129,7 +132,7 @@ TEST_WELLS = {
         "corning_96_wellplate_360ul_flat": _all_96_well_names,
         "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": _tube_names,
     },
-    8: {"nest_12_well_reservoir": _first_row_well_names},
+    8: {"nest_12_reservoir_15ml": _first_row_well_names},
 }
 
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
@@ -144,18 +147,18 @@ LIQUID_TYPE = ""
 VOLUMES = []
 
 
-def _set_up_google_sheet(
-    ctx: ProtocolContext,
-) -> Any:
-    """Connect to google sheet using credentials file in jupyter notebook."""
-    if ctx.is_simulating():
-        return None
-    credentials_path = "/var/lib/jupyter/notebooks/abr.json"
-    google_sheet = google_sheets_tool.google_sheet(
-        credentials_path, "Liquid Height Testing", tab_number=0
-    )
-    ctx.comment("Connected to the google sheet.")
-    return google_sheet
+# def _set_up_google_sheet(
+#     ctx: ProtocolContext,
+# ) -> Any:
+#     """Connect to google sheet using credentials file in jupyter notebook."""
+#     if ctx.is_simulating():
+#         return None
+#     credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+#     google_sheet = google_sheets_tool.google_sheet(
+#         credentials_path, "Liquid Height Testing", tab_number=0
+#     )
+#     ctx.comment("Connected to the google sheet.")
+#     return google_sheet
 
 
 def _setup(
@@ -179,7 +182,7 @@ def _setup(
     liquid_rack = ctx.load_labware(liquid_rack_name, SLOT_LIQUID_TIPRACK)
     probing_rack_name = f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL"
     probing_rack = ctx.load_labware(probing_rack_name, SLOT_PROBING_TIPRACK)
-    if LABWARE_TYPE == "nest_12_well_reservoir_15ml":
+    if LABWARE_TYPE == "nest_12_reservoir_15ml":
         liquid_pip_name = f"flex_8channel_{LIQUID_PIPETTE_SIZE}"
     else:
         liquid_pip_name = f"flex_1channel_{LIQUID_PIPETTE_SIZE}"
@@ -204,7 +207,7 @@ def _setup(
         NUM_TRIALS = 4
         # Actual Volumes = 250, 500, 1000, 2000, 3000, 4000, 5000, 6000
     elif LABWARE_TYPE == "nest_12_reservoir_15ml":
-        VOLUMES = [100, 150, 200, 250, 500, 700, 1000]
+        VOLUMES = [200, 300, 400, 500, 600, 700, 800, 1000]
 
     google_sheet = None
     if not ctx.is_simulating() and DIAL_PORT is None:
@@ -223,13 +226,13 @@ def _setup(
         _write_line_to_csv(ctx, [liquid_pip_name])
         _write_line_to_csv(ctx, [liquid_rack_name])
         _write_line_to_csv(ctx, [LABWARE_TYPE])
-        try:
-            res = _set_up_google_sheet(ctx)
-            if res:
-                google_sheet = res
-                ctx.comment("google sheet connected")
-        except google_sheets_tool.google_interaction_error:
-            ctx.comment("Did not connect to google sheet.")
+        # try:
+        #     res = _set_up_google_sheet(ctx)
+        #     if res:
+        #         google_sheet = res
+        #         ctx.comment("google sheet connected")
+        # except google_sheets_tool.google_interaction_error:
+        #     ctx.comment("Did not connect to google sheet.")
     return (
         liquid_pipette,
         liquid_rack,
@@ -251,16 +254,16 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
 
-def _write_line_to_google_sheet(
-    ctx: ProtocolContext,
-    google_sheet: Any,
-    line: List[Any],
-) -> None:
-    try:
-        google_sheet.write_to_row(line)
-        print(f"wrote row{line}")
-    except Exception as e:
-        ctx.comment(f"Google sheet not updated. Error {e}.")
+# def _write_line_to_google_sheet(
+#     ctx: ProtocolContext,
+#     google_sheet: Any,
+#     line: List[Any],
+# ) -> None:
+#     try:
+#         google_sheet.write_to_row(line)
+#         print(f"wrote row{line}")
+#     except Exception as e:
+#         ctx.comment(f"Google sheet not updated. Error {e}.")
 
 
 def _get_test_wells(labware: Labware, channels: int) -> List[Well]:
@@ -333,8 +336,12 @@ def _get_height_of_liquid_in_well(
     well: Well,
 ) -> float:
     # FIXME: calculate actual liquid height
-    return pipette.measure_liquid_height(well)
-
+    try:
+        height = pipette.measure_liquid_height(well)
+    except PipetteLiquidNotFoundError:
+        height = 0.0
+        
+    return height
 def _test_for_finding_liquid_height(
     ctx: ProtocolContext,
     volume: float,
@@ -429,7 +436,7 @@ def _test_for_finding_liquid_height(
     _write_line_to_csv(ctx, ["error (mm)", str(round(error_mm, 3))])
     _write_line_to_csv(ctx, ["error (%)", str(round(error_percent * 100, 1))])
 
-    _write_line_to_google_sheet(ctx, google_sheet, data_for_google_sheet)
+    # _write_line_to_google_sheet(ctx, google_sheet, data_for_google_sheet)
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -450,26 +457,45 @@ def run(ctx: ProtocolContext) -> None:
     liq_pipette.flow_rate.dispense = dispense_flow_rate
     probe_yes_or_no = ctx.params.probe_yes_or_no  # type: ignore[attr-defined]
     dispense_from_bottom = ctx.params.dispense_from_bottom  # type: ignore[attr-defined]
-    test_wells = _get_test_wells(labware, channels=1)
-    test_tips_liquid = _get_test_tips(liq_rack, channels=1)
-    test_tips_probe = _get_test_tips(probe_rack, channels=1)
+    test_wells = _get_test_wells(labware, channels=8)
+    test_tips_liquid = _get_test_tips(liq_rack, channels=8)
+    test_tips_probe = _get_test_tips(probe_rack, channels=8)
     stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
-    assert min(stuff_lengths) >= NUM_TRIALS * len(VOLUMES), f"{stuff_lengths}"
+    # assert min(stuff_lengths) >= NUM_TRIALS * len(VOLUMES), f"{stuff_lengths}"
+    
     for _vol in VOLUMES:
-        _test_for_finding_liquid_height(
-            ctx,
-            _vol,
-            liq_pipette,
-            probe_pipette,
-            dial,
-            liquid_tips=test_tips_liquid[:NUM_TRIALS],
-            probing_tips=test_tips_probe[:NUM_TRIALS],
-            src_well=reservoir["A1"],
-            wells=test_wells[:NUM_TRIALS],
-            dispense_from_bottom=dispense_from_bottom,
-            probe_yes_or_no=probe_yes_or_no,
-            google_sheet=google_sheet,
-        )
-        test_wells = test_wells[NUM_TRIALS:]
-        test_tips_liquid = test_tips_liquid[NUM_TRIALS:]
-        test_tips_probe = test_tips_probe[NUM_TRIALS:]
+        if LABWARE_TYPE == "nest_12_reservoir_15ml":
+            _test_for_finding_liquid_height(
+                ctx,
+                _vol,
+                liq_pipette,
+                probe_pipette,
+                dial,
+                liquid_tips=test_tips_liquid[:NUM_TRIALS],
+                probing_tips=test_tips_probe[:NUM_TRIALS],
+                src_well=reservoir["A1"],
+                wells=test_wells[:NUM_TRIALS],
+                dispense_from_bottom=dispense_from_bottom,
+                probe_yes_or_no=probe_yes_or_no,
+                google_sheet=google_sheet,
+            )
+            ctx.pause("Reset labware and tipracks.")
+        else:
+            _test_for_finding_liquid_height(
+                ctx,
+                _vol,
+                liq_pipette,
+                probe_pipette,
+                dial,
+                liquid_tips=test_tips_liquid[:NUM_TRIALS],
+                probing_tips=test_tips_probe[:NUM_TRIALS],
+                src_well=reservoir["A1"],
+                wells=test_wells[:NUM_TRIALS],
+                dispense_from_bottom=dispense_from_bottom,
+                probe_yes_or_no=probe_yes_or_no,
+                google_sheet=google_sheet,
+            )
+            test_wells = test_wells[NUM_TRIALS:]
+            test_tips_liquid = test_tips_liquid[NUM_TRIALS:]
+            test_tips_probe = test_tips_probe[NUM_TRIALS:]
+
