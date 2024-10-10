@@ -38,6 +38,8 @@ from opentrons.hardware_control.types import (
     StatusBarState,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons_hardware.sensors.types import SensorDataType
 from ..dev_types import OT3AttachedInstruments
 from .types import HWStopCondition
 
@@ -154,6 +156,9 @@ class FlexBackend(Protocol):
         num_baseline_reads: int,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+        ] = None,
     ) -> float:
         ...
 

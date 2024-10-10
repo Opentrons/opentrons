@@ -1,12 +1,10 @@
 """Test the tool-sensor coordination code."""
 import logging
 from mock import patch, AsyncMock, call
-import os
 import pytest
 from contextlib import asynccontextmanager
 from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict, Callable
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    AddLinearMoveRequest,
     ExecuteMoveGroupRequest,
     MoveCompleted,
     ReadFromSensorResponse,
@@ -50,7 +48,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     SensorThresholdMode,
     SensorOutputBinding,
-    MoveStopCondition,
 )
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
@@ -248,7 +245,6 @@ async def test_liquid_probe(
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
         mode=SensorThresholdMode.absolute,
     )
-
 
 
 @pytest.mark.parametrize(

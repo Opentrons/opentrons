@@ -703,12 +703,16 @@ async def test_ready_for_movement(
     assert controller.check_motor_status(axes) == ready
 
 
-def probe_move_group_run_side_effect(head: NodeId, tool: NodeId) -> Iterator[Dict[NodeId, MotorPositionStatus]]:
+def probe_move_group_run_side_effect(
+    head: NodeId, tool: NodeId
+) -> Iterator[Dict[NodeId, MotorPositionStatus]]:
     """Return homed position for axis that is present and was commanded to home."""
     positions = {
         head: MotorPositionStatus(0.0, 0.0, True, True, MoveCompleteAck(1)),
-        tool: MotorPositionStatus(0.0, 0.0, True, True, MoveCompleteAck(1))}
+        tool: MotorPositionStatus(0.0, 0.0, True, True, MoveCompleteAck(1)),
+    }
     yield positions
+
 
 @pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
 async def test_liquid_probe(
@@ -721,7 +725,9 @@ async def test_liquid_probe(
     fake_max_p_dist = 70
     head_node = axis_to_node(Axis.by_mount(mount))
     tool_node = sensor_node_for_mount(mount)
-    mock_move_group_run.side_effect = probe_move_group_run_side_effect(head_node, tool_node)
+    mock_move_group_run.side_effect = probe_move_group_run_side_effect(
+        head_node, tool_node
+    )
     try:
         await controller.liquid_probe(
             mount=mount,
@@ -740,7 +746,9 @@ async def test_liquid_probe(
     #  in tool_sensors, pipette moves down, then sensor move goes
     print(move_groups)
     assert move_groups[0][0][tool_node].stop_condition == MoveStopCondition.none
-    assert move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sensor_report
+    assert (
+        move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sensor_report
+    )
     assert len(move_groups) == 2
     assert move_groups[0][0][tool_node]
     assert move_groups[1][0][head_node], move_groups[2][0][tool_node]

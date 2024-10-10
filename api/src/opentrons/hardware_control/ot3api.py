@@ -143,7 +143,8 @@ from .backends.types import HWStopCondition
 from .backends.flex_protocol import FlexBackend
 from .backends.ot3simulator import OT3Simulator
 from .backends.errors import SubsystemUpdating
-
+from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons_hardware.sensors.types import SensorDataType
 
 mod_log = logging.getLogger(__name__)
 
@@ -2634,6 +2635,9 @@ class OT3API(
         probe: InstrumentProbeType,
         p_travel: float,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+        ] = None,
     ) -> float:
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         end_z = await self._backend.liquid_probe(
@@ -2646,6 +2650,7 @@ class OT3API(
             probe_settings.samples_for_baselining,
             probe=probe,
             force_both_sensors=force_both_sensors,
+            response_queue=response_queue,
         )
         machine_pos = await self._backend.update_position()
         machine_pos[Axis.by_mount(mount)] = end_z
@@ -2666,6 +2671,9 @@ class OT3API(
         probe_settings: Optional[LiquidProbeSettings] = None,
         probe: Optional[InstrumentProbeType] = None,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+        ] = None,
     ) -> float:
         """Search for and return liquid level height.
 
@@ -2791,6 +2799,8 @@ class OT3API(
                     probe_settings,
                     checked_probe,
                     plunger_travel_mm + sensor_baseline_plunger_move_mm,
+                    force_both_sensors,
+                    response_queue,
                 )
                 # if we made it here without an error we found the liquid
                 error = None

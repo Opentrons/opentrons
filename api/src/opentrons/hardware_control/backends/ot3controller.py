@@ -102,7 +102,9 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
     ErrorCode,
+    SensorId,
 )
+from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     StopRequest,
 )
@@ -1370,6 +1372,9 @@ class OT3Controller(FlexBackend):
         num_baseline_reads: int,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+        ] = None,
     ) -> float:
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
@@ -1385,6 +1390,7 @@ class OT3Controller(FlexBackend):
             num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
             force_both_sensors=force_both_sensors,
+            response_queue=response_queue,
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
