@@ -1609,13 +1609,13 @@ def test_get_well_position_with_meniscus_and_literal_volume_offset(
             offset=WellOffset(x=2, y=3, z=4),
             volumeOffset="operationVolume",
         ),
-        operation_volume=-323.0,
+        operation_volume=-1245.833,
     )
 
     assert result == Point(
         x=slot_pos[0] + 1 + well_def.x + 2,
         y=slot_pos[1] - 2 + well_def.y + 3,
-        z=slot_pos[2] + 3 + well_def.z + 4 + 40.0,
+        z=slot_pos[2] + 3 + well_def.z + 4 + 20.0,
     )
 
 
@@ -1654,7 +1654,7 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
     )
     decoy.when(
         mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
-    ).then_return(40.0)
+    ).then_return(45.0)
     labware_def = _load_labware_definition_data()
     assert labware_def.innerLabwareGeometry is not None
     inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
@@ -1668,14 +1668,14 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
         well_location=LiquidHandlingWellLocation(
             origin=WellOrigin.MENISCUS,
             offset=WellOffset(x=2, y=3, z=4),
-            volumeOffset=-323.0,
+            volumeOffset=-1245.833,
         ),
     )
 
     assert result == Point(
         x=slot_pos[0] + 1 + well_def.x + 2,
         y=slot_pos[1] - 2 + well_def.y + 3,
-        z=slot_pos[2] + 3 + well_def.z + 4 + 35.0,
+        z=slot_pos[2] + 3 + well_def.z + 4 + 20.0,
     )
 
 
@@ -1714,7 +1714,7 @@ def test_get_well_position_raises_validation_error(
     )
     decoy.when(
         mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
-    ).then_return(45.0)
+    ).then_return(40.0)
     labware_def = _load_labware_definition_data()
     assert labware_def.innerLabwareGeometry is not None
     inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
@@ -1728,10 +1728,10 @@ def test_get_well_position_raises_validation_error(
             well_name="B2",
             well_location=LiquidHandlingWellLocation(
                 origin=WellOrigin.MENISCUS,
-                offset=WellOffset(x=2, y=3, z=4),
+                offset=WellOffset(x=2, y=3, z=-40),
                 volumeOffset="operationVolume",
             ),
-            operation_volume=-3000.0,
+            operation_volume=-100.0,
         )
 
 
@@ -3059,7 +3059,7 @@ def test_validate_dispense_volume_into_well_meniscus(
     )
     decoy.when(
         mock_well_view.get_last_measured_liquid_height("labware-id", "A1")
-    ).then_return(45.0)
+    ).then_return(40.0)
 
     with pytest.raises(errors.InvalidDispenseVolumeError):
         subject.validate_dispense_volume_into_well(
@@ -3069,5 +3069,5 @@ def test_validate_dispense_volume_into_well_meniscus(
                 origin=WellOrigin.MENISCUS,
                 offset=WellOffset(x=2, y=3, z=4),
             ),
-            volume=2000000.0,
+            volume=1100000.0,
         )

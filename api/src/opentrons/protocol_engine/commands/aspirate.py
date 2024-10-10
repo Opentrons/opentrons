@@ -118,7 +118,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             well_location.volumeOffset = "operationVolume"
             if well_location.offset.z > 0.0:
                 raise InvalidAspirateLocationError(
-                    f"Cannot specify a meniscus-relative Aspirate with a z-offset of {well_location.offset.z}"
+                    f"Cannot specify a meniscus-relative Aspirate with a positive z-offset (specified {well_location.offset.z})"
                 )
 
         position = await self._movement.move_to_well(

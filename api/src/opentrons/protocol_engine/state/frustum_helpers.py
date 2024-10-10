@@ -375,18 +375,22 @@ def _find_height_in_partial_frustum(
     bottom_section_volume = 0.0
     for section, capacity in zip(sorted_well, volumetric_capacity):
         section_top_height, section_volume = capacity
-        if bottom_section_volume < target_volume < section_volume:
+        if (
+            bottom_section_volume
+            < target_volume
+            < (bottom_section_volume + section_volume)
+        ):
             relative_target_volume = target_volume - bottom_section_volume
-            relative_section_height = section.topHeight - section.bottomHeight
+            section_height = section.topHeight - section.bottomHeight
             partial_height = height_at_volume_within_section(
                 section=section,
                 target_volume_relative=relative_target_volume,
-                section_height=relative_section_height,
+                section_height=section_height,
             )
             return partial_height + section.bottomHeight
         # bottom section volume should always be the volume enclosed in the previously
         # viewed section
-        bottom_section_volume = section_volume
+        bottom_section_volume += section_volume
 
     # if we've looked through all sections and can't find the target volume, raise an error
     raise InvalidLiquidHeightFound(
@@ -399,7 +403,7 @@ def find_height_at_well_volume(
 ) -> float:
     """Find the height within a well, at a known volume."""
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
-    max_volume = volumetric_capacity[-1][1]
+    max_volume = sum(row[1] for row in volumetric_capacity)
     if target_volume < 0 or target_volume > max_volume:
         raise InvalidLiquidHeightFound("Invalid target volume.")
 
