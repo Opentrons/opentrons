@@ -121,6 +121,25 @@ _defaults: Dict[
                             delay=0.5,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=7.0,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=15.0,
+                            break_off=500,
+                            push_out=3.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
                 },
                 10: {  # 10uL
                     _WATER: LiquidClassSettings(  # water
@@ -161,6 +180,25 @@ _defaults: Dict[
                             delay=0.5,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=10.0,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=50.0,
+                            break_off=700,
+                            push_out=2,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
                 },
                 50: {  # 50uL
                     _WATER: LiquidClassSettings(  # water
@@ -183,6 +221,25 @@ _defaults: Dict[
                         ),
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=50.0,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=50.0,
+                            break_off=200,
+                            push_out=2.5,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=50.0,
@@ -245,6 +302,25 @@ _defaults: Dict[
                             delay=1.0,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=7.0,
+                            air_gap=0.0,  # ~3.1uL and it "slides" up during retract
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=2.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=50.0,
+                            break_off=2000,
+                            push_out=5.5,  # 8uL is minimum (and best performer?)
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                    ),
                 },
                 10: {  # 10uL
                     _WATER: LiquidClassSettings(  # water
@@ -285,6 +361,25 @@ _defaults: Dict[
                             delay=1.0,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=10.0,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=2.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=50,
+                            break_off=500,
+                            push_out=5.5,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                    ),
                 },
                 50: {  # 50uL
                     _WATER: LiquidClassSettings(  # water
@@ -307,6 +402,25 @@ _defaults: Dict[
                         ),
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=40,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=2.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=50,
+                            break_off=500,
+                            push_out=5.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                    ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=40,
@@ -371,6 +485,25 @@ _defaults: Dict[
                             delay=0.5,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=10.0,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=15.0,
+                            break_off=100,
+                            push_out=7.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
                 },
                 50: {  # 50uL
                     _WATER: LiquidClassSettings(  # water
@@ -411,6 +544,25 @@ _defaults: Dict[
                             delay=0.5,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=50,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=50,
+                            break_off=100,
+                            push_out=6.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
                 },
                 200: {  # 200uL
                     _WATER: LiquidClassSettings(  # water
@@ -433,6 +585,25 @@ _defaults: Dict[
                         ),
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=200,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=100,
+                            break_off=100,
+                            push_out=8.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=200,
@@ -497,6 +668,25 @@ _defaults: Dict[
                             delay=1.0,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=15.0,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=15,
+                            break_off=_default_accel_p1000_ul_sec_sec,
+                            push_out=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                    ),
                 },
                 100: {  # 100uL
                     _WATER: LiquidClassSettings(  # water
@@ -537,6 +727,25 @@ _defaults: Dict[
                             delay=0.5,
                         ),
                     ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=100,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=200,
+                            break_off=_default_accel_p1000_ul_sec_sec,
+                            push_out=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
                 },
                 1000: {  # 1000uL
                     _WATER: LiquidClassSettings(  # water
@@ -559,6 +768,25 @@ _defaults: Dict[
                         ),
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
+                        aspirate=AspirateSettings(
+                            z_speed=None,
+                            flow_rate=800,
+                            air_gap=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=1.0,
+                        ),
+                        dispense=DispenseSettings(
+                            z_speed=None,
+                            flow_rate=200,
+                            break_off=_default_accel_p1000_ul_sec_sec,
+                            push_out=0.0,
+                            submerge_mm=None,
+                            retract_mm=None,
+                            delay=0.5,
+                        ),
+                    ),
+                    _ETHANOL_70: LiquidClassSettings(  # ethanol-70
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=800,
