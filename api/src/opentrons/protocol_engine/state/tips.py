@@ -36,15 +36,20 @@ TipRackStateByWellName = Dict[str, TipRackWellState]
 
 
 @dataclass
+class _PipetteInfo:
+    channels: int
+    active_channels: int
+    nozzle_map: NozzleMap
+
+
+@dataclass
 class TipState:
     """State of all tips."""
 
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
     column_by_labware_id: Dict[str, List[List[str]]]
 
-    channels_by_pipette_id: Dict[str, int]
-    active_channels_by_pipette_id: Dict[str, int]
-    nozzle_map_by_pipette_id: Dict[str, NozzleMap]
+    pipette_info_by_pipette_id: Dict[str, _PipetteInfo]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -57,9 +62,7 @@ class TipStore(HasState[TipState], HandlesActions):
         self._state = TipState(
             tips_by_labware_id={},
             column_by_labware_id={},
-            channels_by_pipette_id={},
-            active_channels_by_pipette_id={},
-            nozzle_map_by_pipette_id={},
+            pipette_info_by_pipette_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -68,23 +71,25 @@ class TipStore(HasState[TipState], HandlesActions):
             if isinstance(action.private_result, PipetteConfigUpdateResultMixin):
                 pipette_id = action.private_result.pipette_id
                 config = action.private_result.config
-                self._state.channels_by_pipette_id[pipette_id] = config.channels
-                self._state.active_channels_by_pipette_id[pipette_id] = config.channels
-                self._state.nozzle_map_by_pipette_id[pipette_id] = config.nozzle_map
+                self._state.pipette_info_by_pipette_id[pipette_id] = _PipetteInfo(
+                    channels=config.channels,
+                    active_channels=config.channels,
+                    nozzle_map=config.nozzle_map,
+                )
+
             self._handle_succeeded_command(action.command)
 
             if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
                 pipette_id = action.private_result.pipette_id
                 nozzle_map = action.private_result.nozzle_map
+                pipette_info = self._state.pipette_info_by_pipette_id[pipette_id]
                 if nozzle_map:
-                    self._state.active_channels_by_pipette_id[
-                        pipette_id
-                    ] = nozzle_map.tip_count
-                    self._state.nozzle_map_by_pipette_id[pipette_id] = nozzle_map
+                    pipette_info.active_channels = nozzle_map.tip_count
+                    pipette_info.nozzle_map = nozzle_map
                 else:
-                    self._state.active_channels_by_pipette_id[
-                        pipette_id
-                    ] = self._state.channels_by_pipette_id[pipette_id]
+                    # todo(mm, 2024-10-10): nozzle_map looks always truthy--can this
+                    # else-block actually run?
+                    pipette_info.active_channels = pipette_info.channels
 
         elif isinstance(action, FailCommandAction):
             self._handle_failed_command(action)
@@ -148,7 +153,7 @@ class TipStore(HasState[TipState], HandlesActions):
     ) -> None:
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
-        nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
+        nozzle_map = self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
 
         # TODO (cb, 02-28-2024): Transition from using partial nozzle map to full instrument map for the set used logic
         num_nozzle_cols = len(nozzle_map.columns)
@@ -463,19 +468,22 @@ class TipView(HasState[TipState]):
 
     def get_pipette_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""
-        return self._state.channels_by_pipette_id[pipette_id]
+        return self._state.pipette_info_by_pipette_id[pipette_id].channels
 
     def get_pipette_active_channels(self, pipette_id: str) -> int:
         """Get the number of channels being used in the given pipette's configuration."""
-        return self._state.active_channels_by_pipette_id[pipette_id]
+        return self._state.pipette_info_by_pipette_id[pipette_id].active_channels
 
     def get_pipette_nozzle_map(self, pipette_id: str) -> NozzleMap:
         """Get the current nozzle map the given pipette's configuration."""
-        return self._state.nozzle_map_by_pipette_id[pipette_id]
+        return self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
 
     def get_pipette_nozzle_maps(self) -> Dict[str, NozzleMap]:
         """Get current nozzle maps keyed by pipette id."""
-        return self._state.nozzle_map_by_pipette_id
+        return {
+            pipette_id: pipette_info.nozzle_map
+            for pipette_id, pipette_info in self._state.pipette_info_by_pipette_id.items()
+        }
 
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
         """Get whether a well in a labware has a clean tip.
