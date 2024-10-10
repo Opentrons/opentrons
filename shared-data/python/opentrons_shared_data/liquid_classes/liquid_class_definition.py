@@ -73,9 +73,11 @@ class DelayProperties(BaseModel):
         None, description="Parameters for the delay function."
     )
 
-    @validator("enable")
-    def _validate_enable(cls, v: bool, values: Dict[str, Any]) -> bool:
-        if v and values["params"] is None:
+    @validator("params")
+    def _validate_params(
+        cls, v: Optional[DelayArguments], values: Dict[str, Any]
+    ) -> Optional[DelayArguments]:
+        if v is None and values["enable"]:
             raise ValueError("If enable is true parameters for delay must be defined.")
         return v
 
@@ -103,9 +105,11 @@ class TouchTipProperties(BaseModel):
         None, description="Parameters for the touch-tip function."
     )
 
-    @validator("enable")
-    def _validate_enable(cls, v: bool, values: Dict[str, Any]) -> bool:
-        if v and values["params"] is None:
+    @validator("params")
+    def _validate_params(
+        cls, v: Optional[TouchTipArguments], values: Dict[str, Any]
+    ) -> Optional[TouchTipArguments]:
+        if v is None and values["enable"]:
             raise ValueError(
                 "If enable is true parameters for touch tip must be defined."
             )
@@ -127,9 +131,11 @@ class MixProperties(BaseModel):
         None, description="Parameters for the mix function."
     )
 
-    @validator("enable")
-    def _validate_enable(cls, v: bool, values: Dict[str, Any]) -> bool:
-        if v and values["params"] is None:
+    @validator("params")
+    def _validate_params(
+        cls, v: Optional[MixArguments], values: Dict[str, Any]
+    ) -> Optional[MixArguments]:
+        if v is None and values["enable"]:
             raise ValueError("If enable is true parameters for mix must be defined.")
         return v
 
@@ -153,9 +159,11 @@ class BlowoutProperties(BaseModel):
         None, description="Parameters for the blowout function."
     )
 
-    @validator("enable")
-    def _validate_enable(cls, v: bool, values: Dict[str, Any]) -> bool:
-        if v and values["params"] is None:
+    @validator("params")
+    def _validate_params(
+        cls, v: Optional[BlowoutArguments], values: Dict[str, Any]
+    ) -> Optional[BlowoutArguments]:
+        if v is None and values["enable"]:
             raise ValueError(
                 "If enable is true parameters for blowout must be defined."
             )
@@ -265,7 +273,9 @@ class SingleDispenseParams(BaseModel):
     pushOutByVolume: LiquidHandlingPropertyByVolume = Field(
         ..., description="Settings for pushout keyed by target aspiration volume."
     )
-    delay: DelayProperties = Field(..., description="Delay settings after an aspirate")
+    delay: _NonNegativeNumber = Field(
+        ..., description="Delay after dispense, in seconds."
+    )
 
 
 class MultiDispenseParams(BaseModel):
