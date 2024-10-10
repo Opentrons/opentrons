@@ -1,4 +1,5 @@
 {
+  "allowedRoles": ["lid"],
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
