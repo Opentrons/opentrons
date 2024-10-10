@@ -63,9 +63,21 @@ export function massStorageReducer(
   return state
 }
 
+export function systemLanguageReducer(
+  state: string[] | null = null,
+  action: Action
+): string[] | null {
+  switch (action.type) {
+    case 'shell:SYSTEM_LANGUAGE':
+      return action.payload.systemLanguage
+  }
+  return state
+}
+
 // TODO: (sa 2021-15-18: remove any typed state in combineReducers)
 export const shellReducer = combineReducers<ShellState, Action>({
   update: shellUpdateReducer,
   isReady: robotSystemReducer,
   filePaths: massStorageReducer,
+  systemLanguage: systemLanguageReducer,
 })

@@ -3,10 +3,11 @@ import { I18nextProvider } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 
-import { resources } from './assets/localization'
-import { getLanguage } from './redux/config'
-import { useIsOEMMode } from './resources/robot-settings/hooks'
-import { i18n, i18nCb, i18nConfig } from './i18n'
+import { resources } from '/app/assets/localization'
+import { i18n, i18nCb, i18nConfig } from '/app/i18n'
+import { getAppLanguage, getStoredSystemLanguage } from '/app/redux/config'
+import { getSystemLanguage } from '/app/redux/shell'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 
 export interface LocalizationProviderProps {
   children?: React.ReactNode
@@ -20,7 +21,17 @@ export function LocalizationProvider(
 ): JSX.Element | null {
   const isOEMMode = useIsOEMMode()
 
-  const language = useSelector(getLanguage)
+  const language = useSelector(getAppLanguage)
+  const systemLanguage = useSelector(getSystemLanguage)
+  const storedSystemLanguage = useSelector(getStoredSystemLanguage)
+
+  // TODO(bh, 2024-10-09): desktop app, check for current system language vs stored config system language value, launch modal
+  console.log(
+    'redux systemLanguage',
+    systemLanguage,
+    'storedSystemLanguage',
+    storedSystemLanguage
+  )
 
   // iterate through language resources, nested files, substitute anonymous file for branded file for OEM mode
   const anonResources = reduce(
