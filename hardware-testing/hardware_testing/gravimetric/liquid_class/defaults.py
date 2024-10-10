@@ -66,7 +66,7 @@ _default_dispense: Dict[str, DispenseSettings] = {
         flow_rate=None,
         break_off=None,
         push_out=None,
-        submerge_mm=-3.0,  # contact dispense
+        submerge_mm=3.0,  # contact dispense
         retract_mm=3.0,
         delay=0.5,
     ),
