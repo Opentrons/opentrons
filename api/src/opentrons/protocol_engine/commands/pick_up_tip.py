@@ -130,7 +130,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 labware_id=labware_id,
                 well_name=well_name,
             )
-            state_update.update_tip_state(
+            state_update.update_pipette_tip_state(
                 pipette_id=pipette_id,
                 tip_geometry=tip_geometry,
             )

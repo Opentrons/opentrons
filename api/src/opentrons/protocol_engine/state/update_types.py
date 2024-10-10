@@ -274,7 +274,7 @@ class StateUpdate:
             pipette_id=pipette_id, nozzle_map=nozzle_map
         )
 
-    def update_tip_state(
+    def update_pipette_tip_state(
         self, pipette_id: str, tip_geometry: typing.Optional[TipGeometry]
     ) -> None:
         """Update tip state."""
