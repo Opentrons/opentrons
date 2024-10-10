@@ -78,8 +78,6 @@ def _get_approach_submerge_retract_heights(
     else:
         liq_submerge = liquid_class.dispense.submerge_mm
         liq_retract = liquid_class.dispense.retract_mm
-    approach = liquid_before + liq_retract
-    retract = liquid_after + liq_retract
     if dispense and liq_submerge > 0:
         # guarantee NON-contact dispensing does not touch liquid
         submerge = liquid_after + liq_submerge
@@ -88,6 +86,8 @@ def _get_approach_submerge_retract_heights(
         submerge = min(liquid_before, liquid_after) + liq_submerge
     # also make sure it doesn't hit the well's bottom
     submerge = max(submerge, config.LABWARE_BOTTOM_CLEARANCE)
+    approach = max(liquid_before + liq_retract, submerge)
+    retract = max(liquid_after + liq_retract, submerge)
     return approach, submerge, retract
 
 
