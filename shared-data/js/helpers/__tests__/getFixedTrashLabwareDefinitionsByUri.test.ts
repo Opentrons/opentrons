@@ -7,8 +7,6 @@ describe('getFixedTrashLabwareDefinitionsByUri', () => {
   it(`should return the fixed trash labware defition`, () => {
     expect(
       getFixedTrashLabwareDefinitionsByUri('opentrons_1_trash_3200ml_fixed')
-    ).toEqual({
-      opentrons_1_trash_3200ml_fixed: (fixedTrashUncasted as unknown) as LabwareDefinition2,
-    })
+    ).toEqual((fixedTrashUncasted as unknown) as LabwareDefinition2)
   })
 })

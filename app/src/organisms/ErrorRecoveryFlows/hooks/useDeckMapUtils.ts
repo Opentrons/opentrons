@@ -259,20 +259,14 @@ export function getRunCurrentLabwareInfo({
   if (runRecord == null || protocolAnalysis == null) {
     return []
   } else {
+    const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
+      protocolAnalysis.commands
+    )
+
     return runRecord.data.labware.reduce((acc: RunCurrentLabwareInfo[], lw) => {
       const loc = lw.location
       const [slotName, labwareLocation] = getSlotNameAndLwLocFrom(loc, true) // Exclude modules since handled separately.
-      let labwareDefinitionsByUri: LabwareDefinitionsByUri
-      if (lw.id === 'fixedTrash') {
-        labwareDefinitionsByUri = getFixedTrashLabwareDefinitionsByUri(
-          lw.definitionUri
-        )
-      } else {
-        labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
-          protocolAnalysis.commands
-        )
-      }
-      const labwareDef = labwareDefinitionsByUri[lw.definitionUri]
+      const labwareDef = getLabwareDefinition(lw, labwareDefinitionsByUri)
 
       if (slotName == null || labwareLocation == null) {
         return acc
@@ -287,6 +281,17 @@ export function getRunCurrentLabwareInfo({
         ]
       }
     }, [])
+  }
+}
+
+const getLabwareDefinition = (
+  labware: LoadedLabware,
+  protocolLabwareDefinitionsByUri: LabwareDefinitionsByUri
+): LabwareDefinition2 => {
+  if (labware.id === 'fixedTrash') {
+    return getFixedTrashLabwareDefinitionsByUri(labware.definitionUri)
+  } else {
+    return protocolLabwareDefinitionsByUri[labware.definitionUri]
   }
 }
 
