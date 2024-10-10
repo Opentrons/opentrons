@@ -430,14 +430,25 @@ class GeometryView:
     def validate_well_position(
         self,
         well_location: WellLocations,
-        well_depth: float,
         z_offset: float,
+        pipette_id: Optional[str] = None,
     ) -> None:
         """Raise exception if operation location is not within well.
 
         Primarily this checks if there is not enough liquid in a well to do meniscus-relative static aspiration.
         """
-        if z_offset < 0:
+        invalid = False
+        if well_location.origin == WellOrigin.MENISCUS:
+            assert pipette_id is not None
+            lld_min_height = self._pipettes.get_current_tip_lld_settings(
+                pipette_id=pipette_id
+            )
+            if z_offset < lld_min_height:
+                invalid = True
+        elif z_offset < 0:
+            invalid = True
+
+        if invalid:
             if isinstance(well_location, PickUpTipWellLocation):
                 raise OperationLocationNotInWellError(
                     f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location below the bottom of the well"
@@ -453,6 +464,7 @@ class GeometryView:
         well_name: str,
         well_location: Optional[WellLocations] = None,
         operation_volume: Optional[float] = None,
+        pipette_id: Optional[str] = None,
     ) -> Point:
         """Given relative well location in a labware, get absolute position."""
         labware_pos = self.get_labware_position(labware_id)
@@ -471,7 +483,7 @@ class GeometryView:
             )
             offset = offset.copy(update={"z": offset.z + offset_adjustment})
             self.validate_well_position(
-                well_location=well_location, well_depth=well_depth, z_offset=offset.z
+                well_location=well_location, z_offset=offset.z, pipette_id=pipette_id
             )
 
         return Point(

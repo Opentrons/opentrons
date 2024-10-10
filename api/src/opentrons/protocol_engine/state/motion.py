@@ -113,6 +113,7 @@ class MotionView:
             well_name=well_name,
             well_location=well_location,
             operation_volume=operation_volume,
+            pipette_id=pipette_id,
         )
 
         move_type = _move_types.get_move_type_to_well(

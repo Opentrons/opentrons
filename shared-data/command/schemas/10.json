@@ -326,9 +326,9 @@
         }
       }
     },
-    "WellLocation": {
-      "title": "WellLocation",
-      "description": "A relative location in reference to a well's location.",
+    "LiquidHandlingWellLocation": {
+      "title": "LiquidHandlingWellLocation",
+      "description": "A relative location in reference to a well's location.\n\nTo be used with commands that handle liquids.",
       "type": "object",
       "properties": {
         "origin": {
@@ -341,6 +341,20 @@
         },
         "offset": {
           "$ref": "#/definitions/WellOffset"
+        },
+        "volumeOffset": {
+          "title": "Volumeoffset",
+          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset. When \"operationVolume\" is specified, this volume is pulled from the volume command parameter.",
+          "default": 0.0,
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "enum": ["operationVolume"],
+              "type": "string"
+            }
+          ]
         }
       }
     },
@@ -364,7 +378,7 @@
           "description": "Relative well location at which to perform the operation",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/LiquidHandlingWellLocation"
             }
           ]
         },
@@ -800,7 +814,7 @@
           "description": "Relative well location at which to perform the operation",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/LiquidHandlingWellLocation"
             }
           ]
         },
@@ -939,7 +953,7 @@
           "description": "Relative well location at which to perform the operation",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/LiquidHandlingWellLocation"
             }
           ]
         },
@@ -2005,6 +2019,30 @@
       },
       "required": ["params"]
     },
+    "WellLocation": {
+      "title": "WellLocation",
+      "description": "A relative location in reference to a well's location.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "top",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        },
+        "volumeOffset": {
+          "title": "Volumeoffset",
+          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset.",
+          "default": 0.0,
+          "type": "number"
+        }
+      }
+    },
     "MoveToWellParams": {
       "title": "MoveToWellParams",
       "description": "Payload required to move a pipette to a specific well.",
@@ -2410,11 +2448,34 @@
       },
       "required": ["params"]
     },
+    "PickUpTipWellLocation": {
+      "title": "PickUpTipWellLocation",
+      "description": "A relative location in reference to a well's location.\n\nTo be used for picking up tips.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "top",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        }
+      }
+    },
     "PickUpTipParams": {
       "title": "PickUpTipParams",
       "description": "Payload needed to move a pipette to a specific well.",
       "type": "object",
       "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
         "labwareId": {
           "title": "Labwareid",
           "description": "Identifier of labware to use.",
@@ -2427,20 +2488,15 @@
         },
         "wellLocation": {
           "title": "Welllocation",
-          "description": "Relative well location at which to perform the operation",
+          "description": "Relative well location at which to pick up the tip.",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/PickUpTipWellLocation"
             }
           ]
-        },
-        "pipetteId": {
-          "title": "Pipetteid",
-          "description": "Identifier of pipette to use for liquid handling.",
-          "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"]
+      "required": ["pipetteId", "labwareId", "wellName"]
     },
     "PickUpTipCreate": {
       "title": "PickUpTipCreate",

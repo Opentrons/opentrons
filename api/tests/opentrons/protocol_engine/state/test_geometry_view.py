@@ -1511,6 +1511,7 @@ def test_get_well_position_with_meniscus_offset(
     mock_labware_view: LabwareView,
     mock_well_view: WellView,
     mock_addressable_area_view: AddressableAreaView,
+    mock_pipette_view: PipetteView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well meniscus in a labware."""
@@ -1541,6 +1542,9 @@ def test_get_well_position_with_meniscus_offset(
     decoy.when(
         mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
     ).then_return(70.5)
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.5)
 
     result = subject.get_well_position(
         labware_id="labware-id",
@@ -1549,6 +1553,7 @@ def test_get_well_position_with_meniscus_offset(
             origin=WellOrigin.MENISCUS,
             offset=WellOffset(x=2, y=3, z=4),
         ),
+        pipette_id="pipette-id",
     )
 
     assert result == Point(
@@ -1564,6 +1569,7 @@ def test_get_well_position_with_meniscus_and_literal_volume_offset(
     mock_labware_view: LabwareView,
     mock_well_view: WellView,
     mock_addressable_area_view: AddressableAreaView,
+    mock_pipette_view: PipetteView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well meniscus in a labware with a volume offset."""
@@ -1600,6 +1606,9 @@ def test_get_well_position_with_meniscus_and_literal_volume_offset(
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         inner_well_def
     )
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.5)
 
     result = subject.get_well_position(
         labware_id="labware-id",
@@ -1610,6 +1619,7 @@ def test_get_well_position_with_meniscus_and_literal_volume_offset(
             volumeOffset="operationVolume",
         ),
         operation_volume=-1245.833,
+        pipette_id="pipette-id",
     )
 
     assert result == Point(
@@ -1625,6 +1635,7 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
     mock_labware_view: LabwareView,
     mock_well_view: WellView,
     mock_addressable_area_view: AddressableAreaView,
+    mock_pipette_view: PipetteView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well meniscus in a labware with a volume offset."""
@@ -1661,6 +1672,9 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         inner_well_def
     )
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.5)
 
     result = subject.get_well_position(
         labware_id="labware-id",
@@ -1670,6 +1684,7 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
             offset=WellOffset(x=2, y=3, z=4),
             volumeOffset=-1245.833,
         ),
+        pipette_id="pipette-id",
     )
 
     assert result == Point(
@@ -1685,6 +1700,7 @@ def test_get_well_position_raises_validation_error(
     mock_labware_view: LabwareView,
     mock_well_view: WellView,
     mock_addressable_area_view: AddressableAreaView,
+    mock_pipette_view: PipetteView,
     subject: GeometryView,
 ) -> None:
     """It should raise a validation error when a volume offset is too large (ie location is below the well bottom)."""
@@ -1721,6 +1737,9 @@ def test_get_well_position_raises_validation_error(
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         inner_well_def
     )
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.5)
 
     with pytest.raises(errors.OperationLocationNotInWellError):
         subject.get_well_position(
@@ -1732,6 +1751,7 @@ def test_get_well_position_raises_validation_error(
                 volumeOffset="operationVolume",
             ),
             operation_volume=-100.0,
+            pipette_id="pipette-id",
         )
 
 
