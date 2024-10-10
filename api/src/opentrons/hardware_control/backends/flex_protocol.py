@@ -54,6 +54,10 @@ class FlexBackend(Protocol):
     def restore_system_constraints(self) -> AsyncIterator[None]:
         ...
 
+    @asynccontextmanager
+    def grab_pressure(self, channels: int, mount: OT3Mount) -> AsyncIterator[None]:
+        ...
+
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         ...
 

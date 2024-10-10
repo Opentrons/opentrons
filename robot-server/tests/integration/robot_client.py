@@ -377,6 +377,13 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def delete_error_recovery_settings(self) -> Response:
+        response = await self.httpx_client.delete(
+            url=f"{self.base_url}/errorRecovery/settings"
+        )
+        response.raise_for_status()
+        return response
+
 
 async def poll_until_run_completes(
     robot_client: RobotClient, run_id: str, poll_interval: float = _RUN_POLL_INTERVAL

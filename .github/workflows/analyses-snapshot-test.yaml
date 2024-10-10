@@ -48,8 +48,8 @@ jobs:
       ANALYSIS_REF: ${{ github.event.inputs.ANALYSIS_REF || github.head_ref || 'edge' }}
       SNAPSHOT_REF: ${{ github.event.inputs.SNAPSHOT_REF || github.head_ref || 'edge' }}
       # If we're running because of workflow_dispatch, use the user input to decide
-      # whether to open a PR on failure. Otherwise, there is no user input, so always
-      # open a PR on failure.
+      # whether to open a PR on failure. Otherwise, there is no user input,
+      # so we only open a PR if the PR has the label 'gen-analyses-snapshot-pr'
       OPEN_PR_ON_FAILURE: ${{ (github.event_name == 'workflow_dispatch' && github.events.inputs.OPEN_PR_ON_FAILURE) || ((github.event_name != 'workflow_dispatch') && (contains(github.event.pull_request.labels.*.name, 'gen-analyses-snapshot-pr'))) }}
       PR_TARGET_BRANCH: ${{ github.event.pull_request.base.ref || 'not a pr'}}
     steps:
@@ -75,10 +75,10 @@ jobs:
         working-directory: analyses-snapshot-testing
         run: make build-opentrons-analysis
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13.0'
           cache: 'pipenv'
           cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
 
@@ -107,7 +107,7 @@ jobs:
       - name: Create Snapshot update Request
         id: create_pull_request
         if: always() && steps.handle_failure.outcome == 'success' && env.OPEN_PR_ON_FAILURE == 'true' && github.event_name == 'pull_request'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
           title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
@@ -130,7 +130,7 @@ jobs:
 
       - name: Create Snapshot update Request on edge overnight failure
         if: always() && steps.handle_failure.outcome == 'success' && github.event_name == 'schedule'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with: # scheduled run uses the default values for ANALYSIS_REF and SNAPSHOT_REF which are edge
           commit-message: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
           title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'

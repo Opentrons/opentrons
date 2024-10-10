@@ -13,6 +13,7 @@ const EXPECTED_VALID_QUIRKS = [
   'fixedTrash',
   'gripperIncompatible',
   'tiprackAdapterFor96Channel',
+  'stackingMaxFive',
 ]
 
 describe('check quirks for all labware defs', () => {

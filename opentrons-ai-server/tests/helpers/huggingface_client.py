@@ -39,6 +39,7 @@ class HuggingfaceClient:
         return {"Authorization": f"Bearer {self.settings.HF_API_KEY}"}
 
     def post_simulate_protocol(self, protocol: Protocol) -> Response:
+        console.print(self.auth_headers)
         return self.httpx.post("https://opentrons-simulator.hf.space/protocol", headers=self.standard_headers, json=protocol.model_dump())
 
 

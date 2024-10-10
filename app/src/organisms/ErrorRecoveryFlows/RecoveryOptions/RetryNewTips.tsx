@@ -4,7 +4,7 @@ import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import {
-  ReplaceTips,
+  TwoColLwInfoAndDeck,
   SelectTips,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
@@ -29,7 +29,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
   const buildContent = (): JSX.Element => {
     switch (step) {
       case RETRY_NEW_TIPS.STEPS.REPLACE_TIPS:
-        return <ReplaceTips {...props} />
+        return <TwoColLwInfoAndDeck {...props} />
       case RETRY_NEW_TIPS.STEPS.SELECT_TIPS:
         return <SelectTips {...props} />
       case RETRY_NEW_TIPS.STEPS.RETRY:

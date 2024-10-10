@@ -1,5 +1,6 @@
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -7,8 +8,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { Toggle } from '../../atoms'
+
 import { InputStepFormField } from '../InputStepFormField'
+import { ToggleButton } from '../../atoms/ToggleButton'
 import type { FieldProps } from '../../pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ToggleExpandStepFormFieldProps extends FieldProps {
@@ -20,6 +22,8 @@ interface ToggleExpandStepFormFieldProps extends FieldProps {
   offLabel: string
   toggleUpdateValue: (value: unknown) => void
   toggleValue: unknown
+  caption?: string
+  islabel?: boolean
 }
 export function ToggleExpandStepFormField(
   props: ToggleExpandStepFormFieldProps
@@ -33,8 +37,19 @@ export function ToggleExpandStepFormField(
     units,
     toggleUpdateValue,
     toggleValue,
+    caption,
+    islabel,
     ...restProps
   } = props
+
+  const onToggleUpdateValue = (): void => {
+    if (typeof toggleValue === 'boolean') {
+      toggleUpdateValue(!toggleValue)
+    } else if (toggleValue === 'engage' || toggleValue === 'disengage') {
+      const newToggleValue = toggleValue === 'engage' ? 'disengage' : 'engage'
+      toggleUpdateValue(newToggleValue)
+    }
+  }
 
   return (
     <ListItem type="noActive">
@@ -45,23 +60,41 @@ export function ToggleExpandStepFormField(
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
-          <Toggle
-            onClick={() => {
-              toggleUpdateValue(!toggleValue)
-            }}
-            label={isSelected ? onLabel : offLabel}
-            isSelected={isSelected}
-          />
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+            {islabel ? (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                {isSelected ? onLabel : offLabel}
+              </StyledText>
+            ) : null}
+
+            <ToggleButton
+              onClick={() => {
+                onToggleUpdateValue()
+              }}
+              label={isSelected ? onLabel : offLabel}
+              toggledOn={isSelected}
+            />
+          </Flex>
         </Flex>
-        {isSelected ? (
-          <InputStepFormField
-            {...restProps}
-            padding="0"
-            showTooltip={false}
-            title={fieldTitle}
-            units={units}
-          />
-        ) : null}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
+          {isSelected ? (
+            <InputStepFormField
+              {...restProps}
+              padding="0"
+              showTooltip={false}
+              title={fieldTitle}
+              units={units}
+            />
+          ) : null}
+          {isSelected && caption != null ? (
+            <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+              {caption}
+            </StyledText>
+          ) : null}
+        </Flex>
       </Flex>
     </ListItem>
   )

@@ -161,7 +161,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             )
 
 
-class Aspirate(BaseCommand[AspirateParams, AspirateResult, ErrorOccurrence]):
+class Aspirate(BaseCommand[AspirateParams, AspirateResult, OverpressureError]):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"

@@ -1,97 +1,69 @@
 {
-  "generic": {
-    "labware_type": "Type",
-    "nickname": "Nickname",
-    "error": {
-      "required": "{{name}} is required",
-      "more_than_zero": "Must be more than 0"
-    },
-    "default_protocol_name": "Untitled"
+  "batch_edit_form": {
+    "settings_for": "settings for {{prefix}}"
   },
-  "pipette_mount_label": {
-    "left": "(L)",
-    "right": "(R)"
+  "generic": {
+    "default_protocol_name": "Untitled",
+    "error": {
+      "more_than_zero": "Must be more than 0",
+      "required": "{{name}} is required"
+    },
+    "labware_type": "Type",
+    "nickname": "Nickname"
   },
   "liquid_edit": {
-    "details": "Details",
     "description": "Description",
+    "details": "Details",
     "displayColor": "Color",
     "name": "Liquid name",
     "serialize": "Serialize",
-    "serialize_title": "Serialization",
-    "serialize_explanation": "Each placement of the liquid will get its own number. (\"Sample 1\", \"Sample 2\", \"Sample 3\")"
+    "serialize_explanation": "Each placement of the liquid will get its own number. (\"Sample 1\", \"Sample 2\", \"Sample 3\")",
+    "serialize_title": "Serialization"
   },
   "liquid_placement": {
     "liquid": "Liquid",
     "volume": "Volume",
     "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
   },
+  "pipette_mount_label": {
+    "left": "(L)",
+    "right": "(R)"
+  },
   "step_edit_form": {
-    "section": {
-      "sterility": "sterility",
-      "sterility&motion": "sterility & motion",
-      "dropTip": "drop tip",
-      "pickUpAndDrop": "pick up & drop tip"
-    },
-    "labwareLabel": {
-      "aspirate": "source",
-      "dispense": "destination",
-      "mixLabware": "labware",
-      "movedLabware": "labware",
-      "errors": {
-        "labwareSlotIncompatible": "The {{labwareName}} in {{slot}} is incompatible"
-      }
-    },
-    "mixVolumeLabel": "mix volume",
-    "mixRepetitions": "repetitions",
-    "multiDispenseOptionsLabel": "multi-dispense options",
-    "tipRack": "tip rack",
-    "wellSelectionLabel": {
-      "columns_aspirate_wells": "Select source columns",
-      "columns_dispense_wells": "Select destination columns",
-      "columns_mix_wells": "Select columns",
-      "columns": "columns",
-      "wells_aspirate_wells": "Select source wells",
-      "wells_dispense_wells": "Select destination wells",
-      "wells_mix_wells": "Select wells",
-      "wells": "wells"
-    },
     "field": {
-      "nozzles": {
-        "label": "nozzles",
-        "option": { "ALL": "All", "COLUMN": "Column" },
-        "option_tooltip": {
-          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
-        }
+      "airGap": {
+        "label": "air gap"
       },
-      "airGap": { "label": "air gap" },
-      "blowout": { "label": "blowout" },
-      "location": {
-        "label": "location",
-        "pickUp": "pick up tip",
-        "dropTip": "drop tip location"
+      "blowout": {
+        "label": "blowout"
       },
       "change_tip": {
         "label": "change tip",
         "option": {
           "always": "Before every aspirate",
+          "never": "Never",
           "once": "Once at the start of step",
-          "perSource": "Per source well",
           "perDest": "Per destination well",
-          "never": "Never"
+          "perSource": "Per source well"
         },
         "option_tooltip": {
           "always": "Always aspirate with a fresh tip.",
+          "never": "Use same tip as the previous step.",
           "once": "Get one new tip to use for the whole step.",
-          "perSource": "Get a new tip when aspirating from a new source well. Keep tip for repeat aspirations from the same source well.",
           "perDest": "Get a new tip when dispensing into a new destination well. Keep tip for repeat dispenses into the same destination well.",
-          "never": "Use same tip as the previous step."
+          "perSource": "Get a new tip when aspirating from a new source well. Keep tip for repeat aspirations from the same source well."
         }
+      },
+      "comment": {
+        "label": "comment"
       },
       "delay": {
         "label": "delay"
       },
-      "tip_position": { "label": "tip position" },
+      "engageHeight": {
+        "caption": "Recommended: 4mm",
+        "label": "Engage height"
+      },
       "flow_rate": {
         "default_text": "The default {{displayName}} flow rate is optimal for handling aqueous liquids",
         "error_decimals": "A max of {{decimals}} decimal places is allowed",
@@ -99,65 +71,96 @@
         "label": "Flow Rate",
         "range": "between {{min}} and {{max}}"
       },
-      "volume": { "label": "volume per well" },
-      "well_order": {
-        "label": "Well order",
-        "unknown": "unknown",
-        "option": {
-          "l2r": "Left to right",
-          "r2l": "Right to left",
-          "t2b": "Top to bottom",
-          "b2t": "Bottom to top"
+      "heaterShaker": {
+        "latch": {
+          "setLatch": "Labware Latch",
+          "toggleOff": "Closed & Locked",
+          "toggleOn": "Open"
+        },
+        "shaker": {
+          "setShake": "Set shake speed",
+          "toggleOff": "Deactivated",
+          "toggleOn": "Active"
+        },
+        "temperature": {
+          "setTemperature": "Set temperature",
+          "toggleOff": "Deactivated",
+          "toggleOn": "Active"
+        },
+        "timer": {
+          "heaterShakerSetTimer": "Set timer"
         }
       },
-      "step_name": { "label": "Step Name" },
-      "step_notes": { "label": "Step Notes" },
-      "mix": { "label": "mix" },
-      "comment": { "label": "comment" },
+      "location": {
+        "dropTip": "drop tip location",
+        "label": "location",
+        "pickUp": "pick up tip"
+      },
+      "magnetAction": {
+        "label": "Magnet state",
+        "options": {
+          "disengage": "Disengage",
+          "engage": "Engage"
+        }
+      },
+      "mix": {
+        "label": "mix"
+      },
+      "moduleActionLabware": {
+        "label": "module"
+      },
+      "moduleLabwarePrefix": {
+        "heaterShakerModuleType": "Heater-Shaker",
+        "magneticBlockType": "Magnetic Block",
+        "magneticModuleType": "Magnetic Module",
+        "temperatureModuleType": "Temperature Module",
+        "thermocyclerModuleType": "Thermocycler"
+      },
+      "newLocation": {
+        "label": "new location"
+      },
+      "nozzles": {
+        "label": "nozzles",
+        "option": {
+          "ALL": "All",
+          "COLUMN": "Column"
+        },
+        "option_tooltip": {
+          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
+        }
+      },
+      "path": {
+        "subtitle": {
+          "incompatible_with_per_dest": "Incompatible with \"Per Destination Well\" Change Tip setting",
+          "incompatible_with_per_source": "Incompatible with \"Per Source Well\" Change Tip setting",
+          "only_1_to_many": "Only compatible with 1-to-Many well ratios",
+          "only_many_to_1": "Only compatible with Many-to-1 well ratios",
+          "volume_too_high": "Transfer Volume too high"
+        },
+        "title": {
+          "multiAspirate": "Multi-Aspirate",
+          "multiDispense": "Multi-Dispense",
+          "single": "Single Transfers"
+        }
+      },
       "pauseAction": {
         "options": {
           "untilResume": "Pause until told to resume",
-          "untilTime": "Delay for an amount of time",
-          "untilTemperature": "Pause until temperature reached"
+          "untilTemperature": "Pause until temperature reached",
+          "untilTime": "Delay for an amount of time"
         }
       },
-      "pauseTemperature": { "label": "Temp" },
-      "pauseMessage": { "label": "message to display" },
-      "path": {
-        "title": {
-          "single": "Single Transfers",
-          "multiAspirate": "Multi-Aspirate",
-          "multiDispense": "Multi-Dispense"
-        },
-        "subtitle": {
-          "only_1_to_many": "Only compatible with 1-to-Many well ratios",
-          "only_many_to_1": "Only compatible with Many-to-1 well ratios",
-          "volume_too_high": "Transfer Volume too high",
-          "incompatible_with_per_dest": "Incompatible with \"Per Destination Well\" Change Tip setting",
-          "incompatible_with_per_source": "Incompatible with \"Per Source Well\" Change Tip setting"
-        }
+      "pauseMessage": {
+        "label": "message to display"
       },
-      "pipette": { "label": "pipette" },
-      "preWetTip": { "label": "pre-wet tip" },
-      "touchTip": { "label": "touch tip" },
-      "moduleActionLabware": { "label": "module" },
-      "moduleLabwarePrefix": {
-        "magneticModuleType": "Magnetic Module",
-        "temperatureModuleType": "Temperature Module",
-        "thermocyclerModuleType": "Thermocycler",
-        "heaterShakerModuleType": "Heater-Shaker",
-        "magneticBlockType": "Magnetic Block"
+      "pauseTemperature": {
+        "label": "Temp"
       },
-      "magnetAction": {
-        "label": "Magnet action",
-        "options": {
-          "engage": "Engage",
-          "disengage": "Disengage"
-        }
+      "pipette": {
+        "label": "pipette"
       },
-      "engageHeight": {
-        "label": "Engage height",
-        "caption": "Recommended: 4mm"
+      "preWetTip": {
+        "label": "pre-wet tip"
       },
       "setTemperature": {
         "options": {
@@ -165,68 +168,121 @@
           "true": "Change to temperature"
         }
       },
+      "step_name": {
+        "label": "Step Name"
+      },
+      "step_notes": {
+        "label": "Step Notes"
+      },
       "thermocyclerAction": {
         "options": {
-          "state": "Change Thermocycler state",
-          "profile": "Program a Thermocycler profile"
+          "profile": "Program a Thermocycler profile",
+          "state": "Change Thermocycler state"
         }
+      },
+      "thermocyclerProfile": {
+        "add_cycle": "Add cycle",
+        "add_cycle_button": "+ Cycle",
+        "add_cycle_step": "Add a cycle step",
+        "add_step": "Add step",
+        "add_step_button": "+ Step",
+        "cycle": "cycle",
+        "cycle_step": "cycle step",
+        "cycles": "Cycles {{repetitions}}x",
+        "delete": "delete",
+        "edit": "Edit Thermocycler profile steps",
+        "lid_closed": "Closed",
+        "lid_position": "lid position",
+        "lid_temp": "lid temp",
+        "name": "name",
+        "no_profile": "No profile defined",
+        "no_steps": "No steps defined",
+        "number_of_cycles": "number of cycles",
+        "step": "step",
+        "step_profile_defined": "{{steps}} step profile defined",
+        "steps": "Profile steps",
+        "time": "time",
+        "volume": "volume",
+        "well_volume": "Well volume"
       },
       "thermocyclerState": {
         "block": {
+          "engage": "Engage block temperature",
           "label": "Thermocycler block",
+          "temperature": "Block temperature",
           "toggleOff": "Deactivated",
-          "toggleOn": "Active"
+          "toggleOn": "Active",
+          "valid_range": "Valid range between 4 and 96ºC"
         },
+        "ending_hold": "Ending hold",
         "lid": {
+          "engage": "Engage lid temperature",
           "label": "Lid",
+          "temperature": "Lid temperature",
           "toggleOff": "Deactivated",
-          "toggleOn": "Active"
+          "toggleOn": "Active",
+          "valid_range": "Valid range between 37 and 110ºC"
         },
         "lidPosition": {
           "label": "Lid position",
           "toggleOff": "Closed",
           "toggleOn": "Open"
-        }
+        },
+        "state": "Thermocycler state"
       },
-      "thermocyclerProfile": {
-        "volume": "volume",
-        "lid_temp": "lid temp",
-        "lid_position": "lid position",
-        "lid_closed": "Closed",
-        "add_cycle_button": "+ Cycle",
-        "add_step_button": "+ Step"
+      "tip_position": {
+        "label": "tip position"
       },
-      "heaterShaker": {
-        "temperature": {
-          "setTemperature": "Set temperature",
-          "toggleOff": "Deactivated",
-          "toggleOn": "Active"
-        },
-        "shaker": {
-          "setShake": "Set shake speed",
-          "toggleOff": "Deactivated",
-          "toggleOn": "Active"
-        },
-        "latch": {
-          "setLatch": "Labware Latch",
-          "toggleOff": "Closed & Locked",
-          "toggleOn": "Open"
-        },
-        "timer": {
-          "heaterShakerSetTimer": "Set timer"
-        }
+      "touchTip": {
+        "label": "touch tip"
       },
       "useGripper": {
         "label": "use gripper",
         "toggleOff": "Move labware manually (protocol will pause and prompt)",
         "toggleOn": "Use gripper to move labware"
       },
-      "newLocation": {
-        "label": "new location"
+      "volume": {
+        "label": "volume per well"
+      },
+      "well_order": {
+        "label": "Well order",
+        "option": {
+          "b2t": "Bottom to top",
+          "l2r": "Left to right",
+          "r2l": "Right to left",
+          "t2b": "Top to bottom"
+        },
+        "unknown": "unknown"
       }
+    },
+    "labwareLabel": {
+      "aspirate": "source",
+      "dispense": "destination",
+      "errors": {
+        "labwareSlotIncompatible": "The {{labwareName}} in {{slot}} is incompatible"
+      },
+      "mixLabware": "labware",
+      "movedLabware": "labware"
+    },
+    "mixRepetitions": "repetitions",
+    "mixVolumeLabel": "mix volume",
+    "multiDispenseOptionsLabel": "multi-dispense options",
+    "section": {
+      "dropTip": "drop tip",
+      "pickUpAndDrop": "pick up & drop tip",
+      "sterility": "sterility",
+      "sterility&motion": "sterility & motion"
+    },
+    "tipRack": "tip rack",
+    "wellSelectionLabel": {
+      "columns": "columns",
+      "columns_aspirate_wells": "Select source columns",
+      "columns_dispense_wells": "Select destination columns",
+      "columns_mix_wells": "Select columns",
+      "wells": "wells",
+      "wells_aspirate_wells": "Select source wells",
+      "wells_dispense_wells": "Select destination wells",
+      "wells_mix_wells": "Select wells"
     }
-  },
-  "batch_edit_form": {
-    "settings_for": "settings for {{prefix}}"
   }
 }

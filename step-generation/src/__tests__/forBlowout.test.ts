@@ -7,7 +7,7 @@ import {
 } from '../fixtures'
 import { forBlowout as _forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
 import { makeImmutableStateUpdater } from '../__utils__'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { BlowoutParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 const forBlowout = makeImmutableStateUpdater(_forBlowout)

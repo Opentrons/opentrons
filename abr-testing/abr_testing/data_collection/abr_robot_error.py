@@ -13,6 +13,7 @@ import json
 import re
 import pandas as pd
 from statistics import mean, StatisticsError
+from abr_testing.tools import plate_reader
 
 
 def compare_current_trh_to_average(
@@ -525,7 +526,10 @@ if __name__ == "__main__":
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     print(robot)
-    parent_key = project_key + "-" + robot.split("ABR")[1]
+    try:
+        parent_key = project_key + "-" + robot.split("ABR")[1]
+    except IndexError:
+        parent_key = ""
 
     # Grab all previous issues
     all_issues = ticket.issues_on_board(project_key)
@@ -590,13 +594,21 @@ if __name__ == "__main__":
         except FileNotFoundError:
             print("Run file not uploaded.")
         run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
+        # Get hellma readings
+        file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+
         (
             runs_and_robots,
             headers,
             runs_and_lpc,
             headers_lpc,
         ) = abr_google_drive.create_data_dictionary(
-            run_id, error_folder_path, issue_url, "", ""
+            run_id,
+            error_folder_path,
+            issue_url,
+            "",
+            "",
+            hellma_plate_standards=file_values,
         )
 
         start_row = google_sheet.get_index_row() + 1

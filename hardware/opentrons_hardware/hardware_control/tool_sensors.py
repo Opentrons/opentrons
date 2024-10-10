@@ -10,12 +10,13 @@ from typing import (
     Callable,
     AsyncContextManager,
     Optional,
+    AsyncIterator,
 )
 from logging import getLogger
 from numpy import float64
 from math import copysign
 from typing_extensions import Literal
-
+from contextlib import asynccontextmanager
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
@@ -663,3 +664,55 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
+
+
+@asynccontextmanager
+async def grab_pressure(
+    channels: int, tool: NodeId, messenger: CanMessenger
+) -> AsyncIterator[None]:
+    """Run some task and log the pressure."""
+    sensor_driver = SensorDriver()
+    sensor_id = SensorId.BOTH if channels > 1 else SensorId.S0
+    sensors: List[SensorId] = []
+    if sensor_id == SensorId.BOTH:
+        sensors.append(SensorId.S0)
+        sensors.append(SensorId.S1)
+    else:
+        sensors.append(sensor_id)
+
+    for sensor in sensors:
+        pressure_sensor = PressureSensor.build(
+            sensor_id=sensor,
+            node_id=tool,
+        )
+        num_baseline_reads = 10
+        # TODO: RH log this baseline and remove noqa
+        pressure_baseline = await sensor_driver.get_baseline(  # noqa: F841
+            messenger, pressure_sensor, num_baseline_reads
+        )
+        await messenger.ensure_send(
+            node_id=tool,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(sensor),
+                    binding=SensorOutputBindingField(SensorOutputBinding.report),
+                )
+            ),
+            expected_nodes=[tool],
+        )
+    try:
+        yield
+    finally:
+        for sensor in sensors:
+            await messenger.ensure_send(
+                node_id=tool,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(SensorType.pressure),
+                        sensor_id=SensorIdField(sensor),
+                        binding=SensorOutputBindingField(SensorOutputBinding.none),
+                    )
+                ),
+                expected_nodes=[tool],
+            )

@@ -131,6 +131,7 @@ def _clean_server_state(base_url: str) -> None:
             await _delete_all_sessions(robot_client)
 
             await _reset_deck_configuration(robot_client)
+            await _reset_error_recovery_settings(robot_client)
 
             await _delete_client_data(robot_client)
 
@@ -174,3 +175,7 @@ async def _delete_client_data(robot_client: RobotClient) -> None:
 
 async def _reset_deck_configuration(robot_client: RobotClient) -> None:
     await robot_client.post_setting_reset_options({"deckConfiguration": True})
+
+
+async def _reset_error_recovery_settings(robot_client: RobotClient) -> None:
+    await robot_client.delete_error_recovery_settings()

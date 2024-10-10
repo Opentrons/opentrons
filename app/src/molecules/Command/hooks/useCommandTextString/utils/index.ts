@@ -1,6 +1,7 @@
 export { getLoadCommandText } from './getLoadCommandText'
 export { getTemperatureCommandText } from './getTemperatureCommandText'
 export { getTCRunProfileCommandText } from './getTCRunProfileCommandText'
+export { getTCRunExtendedProfileCommandText } from './getTCRunExtendedProfileCommandText'
 export { getHSShakeSpeedCommandText } from './getHSShakeSpeedCommandText'
 export { getMoveToSlotCommandText } from './getMoveToSlotCommandText'
 export { getMoveRelativeCommandText } from './getMoveRelativeCommandText'

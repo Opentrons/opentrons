@@ -117,8 +117,8 @@ describe('useShowDoorInfo', () => {
 
     const { result } = renderHook(() =>
       useShowDoorInfo(props, {
-        route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-        step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL,
+        route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+        step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL,
       })
     )
 

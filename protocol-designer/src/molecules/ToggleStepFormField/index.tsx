@@ -1,5 +1,6 @@
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -10,7 +11,8 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { Toggle } from '../../atoms'
+
+import { ToggleButton } from '../../atoms/ToggleButton'
 
 interface ToggleStepFormFieldProps {
   title: string
@@ -53,14 +55,22 @@ export function ToggleStepFormField(
             {...targetProps}
           >
             <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
-            <Toggle
-              disabled={isDisabled}
-              onClick={() => {
-                toggleUpdateValue(!toggleValue)
-              }}
-              label={isSelected ? onLabel : offLabel}
-              isSelected={isSelected}
-            />
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                {isSelected ? onLabel : offLabel}
+              </StyledText>
+              <ToggleButton
+                disabled={isDisabled}
+                onClick={() => {
+                  toggleUpdateValue(!toggleValue)
+                }}
+                label={isSelected ? onLabel : offLabel}
+                toggledOn={isSelected}
+              />
+            </Flex>
           </Flex>
         </Flex>
       </ListItem>
