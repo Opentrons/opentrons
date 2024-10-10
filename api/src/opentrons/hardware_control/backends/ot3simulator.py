@@ -17,7 +17,7 @@ from typing import (
     Mapping,
 )
 
-from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import gripper_config
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -347,8 +347,6 @@ class OT3Simulator(FlexBackend):
         threshold_pascals: float,
         plunger_impulse_time: float,
         num_baseline_reads: int,
-        output_format: OutputOptions = OutputOptions.can_bus_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
     ) -> float:
@@ -750,8 +748,6 @@ class OT3Simulator(FlexBackend):
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
-        output_format: OutputOptions = OutputOptions.sync_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
     ) -> bool:
         self._position[moving] += distance_mm
         return True

@@ -15,7 +15,7 @@ from typing import (
 from opentrons_shared_data.pipette.types import (
     PipetteName,
 )
-from opentrons.config.types import GantryLoad, OutputOptions
+from opentrons.config.types import GantryLoad
 from opentrons.hardware_control.types import (
     BoardRevision,
     Axis,
@@ -152,8 +152,6 @@ class FlexBackend(Protocol):
         threshold_pascals: float,
         plunger_impulse_time: float,
         num_baseline_reads: int,
-        output_format: OutputOptions = OutputOptions.can_bus_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
     ) -> float:
@@ -371,8 +369,6 @@ class FlexBackend(Protocol):
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
-        output_format: OutputOptions = OutputOptions.sync_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
     ) -> bool:
         ...
 

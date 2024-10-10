@@ -2644,8 +2644,6 @@ class OT3API(
             probe_settings.sensor_threshold_pascals,
             probe_settings.plunger_impulse_time,
             probe_settings.samples_for_baselining,
-            probe_settings.output_option,
-            probe_settings.data_files,
             probe=probe,
             force_both_sensors=force_both_sensors,
         )
@@ -2861,8 +2859,6 @@ class OT3API(
             pass_settings.speed_mm_per_s,
             pass_settings.sensor_threshold_pf,
             probe,
-            pass_settings.output_option,
-            pass_settings.data_files,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:
