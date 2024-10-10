@@ -10,7 +10,7 @@ The Opentrons AI application helps you to create a protocol with natural languag
 
 1. To get started: clone the `Opentrons/opentrons` repository
 1. Read [contributing guide][contributing-guide-setup]
-1. Follow [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
+1. Follow [DEV_SETUP.md](../DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
 
 ```shell
 # change into the cloned directory

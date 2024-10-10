@@ -56,11 +56,10 @@ The Opentrons AI server. This is a FastAPI server to handle RAG, integrations, a
 
 In the deployed environments the FastAPI server is run in a docker container. To run the server locally in a docker container:
 
-1. in the `opentrons-ai-server` directory
-1. `make build`
 1. get the .env file from a team member
 1. put the .env file in the `opentrons-ai-server` directory
-1. `make run`
+1. in the `opentrons-ai-server` directory
+1. `make rebuild`
 
 Now the API is running at <http://localhost:8000>
 View the API docs in a browser at <http://localhost:8000/docs>
