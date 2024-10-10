@@ -162,7 +162,9 @@ class LoadModuleImplementation(
         ):
             try:
                 abs_reader = self._equipment.get_module_hardware_api(
-                    self._state_view.modules.get_absorbance_reader_substate(params.moduleId).module_id
+                    self._state_view.modules.get_absorbance_reader_substate(
+                        params.moduleId
+                    ).module_id
                 )
             except ModuleNotLoadedError:
                 abs_reader = None
