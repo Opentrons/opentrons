@@ -171,7 +171,6 @@ describe('getRunCurrentModulesInfo', () => {
     },
   } as any
   const mockDeckDef = {} as any
-  const mockProtocolAnalysis = {} as any
 
   beforeEach(() => {
     vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({
@@ -205,7 +204,9 @@ describe('getRunCurrentModulesInfo', () => {
     const result = getRunCurrentModulesInfo({
       runRecord: mockRunRecord,
       deckDef: mockDeckDef,
-      labwareDefinitionsByUri: {} as any,
+      labwareDefinitionsByUri: {
+        'opentrons/opentrons_96_pcr_adapter/1': 'MOCK_LW_DEF',
+      } as any,
     })
 
     expect(result).toEqual([
@@ -293,7 +294,9 @@ describe('getRunCurrentLabwareInfo', () => {
 
     const result = getRunCurrentLabwareInfo({
       runRecord: { data: { labware: [mockPickUpTipLwSlotName] } } as any,
-      labwareDefinitionsByUri: {[mockPickUpTipLabware.definitionUri]: mockLabwareDef},
+      labwareDefinitionsByUri: {
+        [mockPickUpTipLabware.definitionUri]: mockLabwareDef,
+      },
     })
 
     expect(result).toEqual([
