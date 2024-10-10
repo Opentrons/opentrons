@@ -74,7 +74,7 @@ function getAllCheckSectionSteps(
   )
 
   // HACK: Remove LPC for plate reader to unblock science.
-  const filteredLabwareLocations = labwareLocations.filter((labware) => {
+  const filteredLabwareLocations = labwareLocations.filter(labware => {
     return labware.location?.moduleModel !== 'absorbanceReaderV1'
   })
 
