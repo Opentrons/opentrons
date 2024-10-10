@@ -137,6 +137,23 @@ class PipetteTipStateUpdate:
 
 
 @dataclasses.dataclass
+class TipsUsedUpdate:
+    """Represents an update that marks tips in a tip rack as used."""
+
+    pipette_id: str
+    """The pipette that did the tip pickup."""
+
+    labware_id: str
+
+    well_name: str
+    """The well that the pipette's primary nozzle targeted.
+
+    Wells in addition to this one will also be marked as used, depending on the
+    pipette's nozzle layout.
+    """
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
@@ -154,8 +171,10 @@ class StateUpdate:
 
     loaded_labware: LoadedLabwareUpdate | NoChangeType = NO_CHANGE
 
+    tips_used: TipsUsedUpdate | NoChangeType = NO_CHANGE
+
     # These convenience functions let the caller avoid the boilerplate of constructing a
-    # complicated dataclass tree, and they give us a
+    # complicated dataclass tree.
 
     @typing.overload
     def set_pipette_location(
@@ -280,4 +299,12 @@ class StateUpdate:
         """Update tip state."""
         self.pipette_tip_state = PipetteTipStateUpdate(
             pipette_id=pipette_id, tip_geometry=tip_geometry
+        )
+
+    def mark_tips_as_used(
+        self, pipette_id: str, labware_id: str, well_name: str
+    ) -> None:
+        """Mark tips in a tip rack as used. See `MarkTipsUsedState`."""
+        self.tips_used = TipsUsedUpdate(
+            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
         )
