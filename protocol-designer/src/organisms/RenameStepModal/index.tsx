@@ -19,7 +19,10 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../assets/localization'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
-import type { FormData } from '../../form-types'
+import { ThunkDispatch } from '../../types'
+import { renameStep } from '../../labware-ingred/actions'
+import { RenameStepAction } from '../../file-data'
+import type { FormData, StepFieldName } from '../../form-types'
 
 interface RenameStepModalProps {
   formData: FormData
@@ -27,18 +30,26 @@ interface RenameStepModalProps {
 }
 export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { onClose, formData } = props
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation(['form', 'shared'])
-  const [stepName, setStepName] = useState<string>('')
+  const initialName = i18n.format(t(formData.stepName), 'capitalize')
+  const [stepName, setStepName] = useState<string>(initialName)
 
-  //   const saveRenameStep = (nextFormValues: FileMetadataFields): void => {
-  //     dispatch(actions.saveFileMetadata(nextFormValues))
-  //     onClose()
-  //   }
-  //   const handleSave = (): void => {
-  //     dispatch()
-  //     close()
-  //   }
+  const makeSave = (fieldName: StepFieldName): void => {
+    const { stepId } = formData
+    const updatePayload: RenameStepAction = {
+      stepId,
+      update: {
+        [fieldName]: stepName,
+      },
+    }
+    dispatch(renameStep(updatePayload))
+  }
+
+  const handleSave = (): void => {
+    dispatch(renameStep({ update: { ...formData } }))
+    onClose()
+  }
 
   return createPortal(
     <Modal
@@ -60,7 +71,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
             data-testid="RenameStepModal_saveButton"
             disabled={false}
             onClick={() => {
-              //   handleSubmit(saveFileMetadata)()
+              handleSave()
             }}
           >
             {t('shared:save')}
@@ -75,12 +86,12 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
               {t('form:step_edit_form.field.step_name.label')}
             </StyledText>
             <InputField
-              placeholder={i18n.format(t(formData.stepName), 'capitalize')}
               value={stepName}
               autoFocus
               name="StepName"
               onChange={e => {
                 setStepName(e.target.value)
+                makeSave('stepName')
               }}
             />
           </Flex>

@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions'
 import { selectors } from '../selectors'
+import { RenameStepAction } from '../../file-data'
 import type { DeckSlot, ThunkAction } from '../../types'
 import type { Fixture, IngredInputs } from '../types'
 import type { CutoutId, ModuleModel } from '@opentrons/shared-data'
@@ -293,5 +294,17 @@ export const generateNewProtocol: (
   payload: GenerateNewProtocolAction['payload']
 ) => GenerateNewProtocolAction = payload => ({
   type: 'GENERATE_NEW_PROTOCOL',
+  payload,
+})
+
+export interface ChangeFormInputAction {
+  type: 'CHANGE_FORM_INPUT'
+  payload: RenameStepAction
+}
+
+export const renameStep = (
+  payload: RenameStepAction
+): ChangeFormInputAction => ({
+  type: 'CHANGE_FORM_INPUT',
   payload,
 })

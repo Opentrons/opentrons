@@ -210,7 +210,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <Icon size="1rem" name={icon} />
             <StyledText desktopStyle="bodyLargeSemiBold">
-              {i18n.format(t(`stepType.${formData.stepType}`), 'capitalize')}
+              {i18n.format(t(formData.stepName), 'capitalize')}
             </StyledText>
           </Flex>
         }
