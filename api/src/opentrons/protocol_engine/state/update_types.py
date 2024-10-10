@@ -207,6 +207,10 @@ class StateUpdate:
                 new_deck_point=new_deck_point,
             )
 
+    def clear_all_pipette_locations(self) -> None:
+        """Mark all pipettes as having an unknown location."""
+        self.pipette_location = CLEAR
+
     def set_labware_location(
         self,
         *,
@@ -237,10 +241,6 @@ class StateUpdate:
             new_location=location,
             display_name=display_name,
         )
-
-    def clear_all_pipette_locations(self) -> None:
-        """Mark all pipettes as having an unknown location."""
-        self.pipette_location = CLEAR
 
     def set_load_pipette(
         self,
