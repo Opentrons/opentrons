@@ -9,6 +9,7 @@ from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 def _host_config(level_value: int) -> Dict[str, Any]:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
+    sensor_log_filename = CONFIG["sensor_log_file"]
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -41,6 +42,14 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "backupCount": 5,
             },
+            "sensor": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "basic",
+                "filename": sensor_log_filename,
+                "maxBytes": 1000000,
+                "level": logging.DEBUG,
+                "backupCount": 5,
+            },
         },
         "loggers": {
             "opentrons": {
@@ -63,6 +72,16 @@ def _host_config(level_value: int) -> Dict[str, Any]:
             },
             "opentrons_hardware.drivers.binary_usb.bin_serial": {
                 "handlers": ["serial"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
+            "opentrons_hardware.sensors.sensor_driver": {
+                "handlers": ["sensor"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
+            "opentrons_hardware.hardware_control.tool_sensors": {
+                "handlers": ["sensor"],
                 "level": logging.DEBUG,
                 "propagate": False,
             },
@@ -106,6 +125,12 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
                 "formatter": "message_only",
                 "SYSLOG_IDENTIFIER": "opentrons-api-serial-usbbin",
             },
+            "sensor": {
+                "class": "systemd.journal.JournalHandler",
+                "level": logging.DEBUG,
+                "formatter": "message_only",
+                "SYSLOG_IDENTIFIER": "opentrons-api-sensor",
+            },
         },
         "loggers": {
             "opentrons.drivers.asyncio.communication.serial_connection": {
@@ -128,6 +153,16 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
             },
             "opentrons_hardware.drivers.binary_usb.bin_serial": {
                 "handlers": ["usbbin_serial"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
+            "opentrons_hardware.sensors.sensor_driver": {
+                "handlers": ["sensor"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
+            "opentrons_hardware.hardware_control.tool_sensors": {
+                "handlers": ["sensor"],
                 "level": logging.DEBUG,
                 "propagate": False,
             },
