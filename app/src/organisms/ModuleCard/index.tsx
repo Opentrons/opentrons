@@ -131,9 +131,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const requireModuleCalibration =
     isFlex &&
     !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
-    module.moduleOffset?.last_modified == null &&
-    !(module.moduleType === 'absorbanceReaderType')
-
+    module.moduleType !== ABSORBANCE_READER_TYPE &&
+    module.moduleOffset?.last_modified == null
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
     !Boolean(calibratePipetteRequired) &&
@@ -174,7 +173,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
-    case 'magneticModuleType': {
+    case MAGNETIC_MODULE_TYPE: {
       moduleData = (
         <MagneticModuleData
           moduleStatus={module.data.status}
@@ -185,7 +184,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       break
     }
 
-    case 'temperatureModuleType': {
+    case TEMPERATURE_MODULE_TYPE: {
       moduleData = (
         <TemperatureModuleData
           moduleStatus={module.data.status}
@@ -196,12 +195,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       break
     }
 
-    case 'thermocyclerModuleType': {
+    case THERMOCYCLER_MODULE_TYPE: {
       moduleData = <ThermocyclerModuleData data={module.data} />
       break
     }
 
-    case 'heaterShakerModuleType': {
+    case HEATERSHAKER_MODULE_TYPE: {
       moduleData = (
         <HeaterShakerModuleData
           moduleData={module.data}
@@ -211,7 +210,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       break
     }
 
-    case 'absorbanceReaderType': {
+    case ABSORBANCE_READER_TYPE: {
       moduleData = <AbsorbanceReaderData moduleData={module.data} />
       break
     }
