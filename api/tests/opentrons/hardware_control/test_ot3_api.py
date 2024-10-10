@@ -122,6 +122,10 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
+        z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
@@ -825,11 +829,17 @@ async def test_liquid_probe(
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
+            z_overlap_between_passes_mm=0.1,
+            plunger_reset_offset=2.0,
+            samples_for_baselining=20,
+            sample_time_sec=0.004,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 10.0
         non_responsive_z_mm = ot3_hardware.liquid_probe_non_responsive_z_distance(
-            fake_settings_aspirate.mount_speed
+            fake_settings_aspirate.mount_speed,
+            fake_settings_aspirate.samples_for_baselining,
+            fake_settings_aspirate.sample_time_sec,
         )
 
         probe_pass_overlap = 0.1
@@ -849,6 +859,7 @@ async def test_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.plunger_impulse_time,
+            fake_settings_aspirate.samples_for_baselining,
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
             probe=InstrumentProbeType.PRIMARY,
@@ -912,11 +923,15 @@ async def test_liquid_probe_plunger_moves(
         fake_max_z_dist = 75.0
         config = ot3_hardware.config.liquid_sense
         mount_speed = config.mount_speed
+        samples_for_baselining = config.samples_for_baselining
+        sample_time_sec = config.sample_time_sec
         non_responsive_z_mm = ot3_hardware.liquid_probe_non_responsive_z_distance(
-            mount_speed
+            mount_speed,
+            samples_for_baselining,
+            sample_time_sec,
         )
 
-        probe_pass_overlap = 0.1
+        probe_pass_overlap = config.z_overlap_between_passes_mm
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
@@ -1008,11 +1023,15 @@ async def test_liquid_probe_mount_moves(
         fake_max_z_dist = 10.0
         config = ot3_hardware.config.liquid_sense
         mount_speed = config.mount_speed
+        samples_for_baselining = config.samples_for_baselining
+        sample_time_sec = config.sample_time_sec
         non_responsive_z_mm = ot3_hardware.liquid_probe_non_responsive_z_distance(
-            mount_speed
+            mount_speed,
+            samples_for_baselining,
+            sample_time_sec,
         )
 
-        probe_pass_overlap = 0.1
+        probe_pass_overlap = config.z_overlap_between_passes_mm
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
@@ -1081,6 +1100,10 @@ async def test_multi_liquid_probe(
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
+            z_overlap_between_passes_mm=0.1,
+            plunger_reset_offset=2.0,
+            samples_for_baselining=20,
+            sample_time_sec=0.004,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 10.0
@@ -1095,6 +1118,7 @@ async def test_multi_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.plunger_impulse_time,
+            fake_settings_aspirate.samples_for_baselining,
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
             probe=InstrumentProbeType.PRIMARY,
@@ -1130,6 +1154,7 @@ async def test_liquid_not_found(
         plunger_speed: float,
         threshold_pascals: float,
         plunger_impulse_time: float,
+        num_baseline_reads: int,
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1153,6 +1178,10 @@ async def test_liquid_not_found(
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=True,
+        z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
     # with a mount speed of 5, pass overlap of 0.5 and a 0.2s delay on z
@@ -1676,13 +1705,11 @@ async def test_move_to_plunger_bottom(
     backlash_pos[pip_ax] += pipette.backlash_distance
 
     # plunger will move at different speeds, depending on if:
-    #  - no tip attached (max speed)
-    #  - tip attached and moving down (blowout speed)
+    #  - tip not attached (max speed)
+    #  - tip attached and moving down (max speed)
     #  - tip attached and moving up (aspirate speed)
     expected_speed_no_tip = max_speeds[ot3_hardware.gantry_load][OT3AxisKind.P]
-    expected_speed_moving_down = ot3_hardware._pipette_handler.plunger_speed(
-        pipette, pipette.blow_out_flow_rate, "dispense"
-    )
+    expected_speed_moving_down = expected_speed_no_tip
     expected_speed_moving_up = ot3_hardware._pipette_handler.plunger_speed(
         pipette, pipette.aspirate_flow_rate, "aspirate"
     )

@@ -38,3 +38,72 @@ class ProtocolsWithOverrides:
         override_variable_name="type_to_test",
         overrides=["str_default_no_matching_choices", "float_default_no_matching_choices", "int_default_no_matching_choices"],
     )
+
+    # analyses-snapshot-testing/files/protocols/Flex_X_v2_20_96_and_8_Overrides_InvalidConfigs.py
+
+    Flex_X_v2_20_96_and_8_Overrides_InvalidConfigs: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_X_v2_20_96_and_8_Overrides_InvalidConfigs",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "ninety_six_partial_column_1",
+            "ninety_six_partial_column_2",
+            "ninety_six_partial_column_3",
+            "eight_partial_column_bottom_left",
+            "eight_partial_column_bottom_right",
+            "eight_partial_column_no_end",
+            "return_tip_error",
+            "drop_tip_with_location",
+        ],
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_X_v2_20_96_None_Overrides_TooTallLabware.py
+
+    Flex_X_v2_20_96_None_Overrides_TooTallLabware: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_X_v2_20_96_None_Overrides_TooTallLabware",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "transfer_source_collision",
+            "transfer_destination_collision",
+            "c3_right_edge",
+            "north",
+            "north_west",
+            "west",
+            "south_west",
+            "south",
+            "south_east",
+            "east",
+            "east_column",
+            "west_column",
+            "north_row",
+            "south_row",
+            "top_edge",
+            "bottom_left_edge",
+            "bottom_left_edge",
+            "bottom_right_edge",
+            "mix_collision",
+            "consolidate_source_collision",
+            "consolidate_destination_collision",
+            "distribute_source_collision",
+            "distribute_destination_collision",
+        ],
+    )
+
+    # analyses-snapshot-testing/files/protocols/OT2_X_v2_20_8_Overrides_InvalidConfigs.py
+
+    OT2_X_v2_20_8_Overrides_InvalidConfigs: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="OT2_X_v2_20_8_Overrides_InvalidConfigs",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "eight_partial_column_bottom_left",
+            "eight_partial_column_bottom_right",
+            "eight_partial_column_no_end",
+            "return_tip_error",
+            "drop_tip_with_location",
+        ],
+    )

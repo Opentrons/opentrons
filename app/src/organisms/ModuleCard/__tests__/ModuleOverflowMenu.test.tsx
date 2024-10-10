@@ -1,29 +1,26 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
-import {
-  useRunStatuses,
-  useIsLegacySessionInProgress,
-  useIsFlex,
-} from '../../Devices/hooks'
-import { useCurrentRunId } from '../../../resources/runs'
+} from '/app/redux/modules/__fixtures__'
+import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
 import type { TemperatureStatus } from '@opentrons/api-client'
 
-vi.mock('../../Devices/hooks')
-vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/legacy_sessions')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/runs')
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {

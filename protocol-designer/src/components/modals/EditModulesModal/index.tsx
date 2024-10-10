@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import some from 'lodash/some'
@@ -8,7 +8,7 @@ import {
   FormGroup,
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   ModalShell,
   Flex,
@@ -292,7 +292,7 @@ const EditModulesModalComponent = (
 
   const prevSelectedModel = usePrevious(selectedModel)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       prevSelectedModel &&
       prevSelectedModel !== selectedModel &&
@@ -358,7 +358,9 @@ const EditModulesModalComponent = (
               {showSlotOption && (
                 <>
                   {!enableSlotSelection && (
-                    <Tooltip {...tooltipProps}>{slotOptionTooltip}</Tooltip>
+                    <LegacyTooltip {...tooltipProps}>
+                      {slotOptionTooltip}
+                    </LegacyTooltip>
                   )}
 
                   <Box {...targetProps} height="3.125rem">

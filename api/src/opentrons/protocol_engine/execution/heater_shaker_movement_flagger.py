@@ -13,7 +13,7 @@ from ..errors import (
     HeaterShakerLabwareLatchStatusUnknown,
     WrongModuleTypeError,
 )
-from ..state import StateStore
+from ..state.state import StateStore
 from ..state.module_substates import HeaterShakerModuleSubState
 from ..types import (
     HeaterShakerMovementRestrictors,
@@ -61,9 +61,6 @@ class HeaterShakerMovementFlagger:
             return  # Labware on a module, but not a Heater-Shaker.
 
         if hs_substate.labware_latch_status == HeaterShakerLatchStatus.CLOSED:
-            # TODO (spp, 2022-10-27): This only raises if latch status is 'idle_closed'.
-            #  We need to update the flagger to raise if latch status is anything other
-            #  than 'idle_open'
             raise HeaterShakerLabwareLatchNotOpenError(
                 "Heater-Shaker labware latch must be open when moving labware to/from it."
             )

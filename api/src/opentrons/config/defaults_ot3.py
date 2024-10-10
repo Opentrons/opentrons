@@ -29,6 +29,10 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     sensor_threshold_pascals=15,
     output_option=OutputOptions.sync_buffer_to_csv,
     aspirate_while_sensing=False,
+    z_overlap_between_passes_mm=0.1,
+    plunger_reset_offset=2.0,
+    samples_for_baselining=20,
+    sample_time_sec=0.004,
     data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
 
@@ -343,6 +347,16 @@ def _build_default_liquid_probe(
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
         ),
+        z_overlap_between_passes_mm=from_conf.get(
+            "z_overlap_between_passes_mm", default.z_overlap_between_passes_mm
+        ),
+        plunger_reset_offset=from_conf.get(
+            "plunger_reset_offset", default.plunger_reset_offset
+        ),
+        samples_for_baselining=from_conf.get(
+            "samples_for_baselining", default.samples_for_baselining
+        ),
+        sample_time_sec=from_conf.get("sample_time_sec", default.sample_time_sec),
         data_files=data_files,
     )
 

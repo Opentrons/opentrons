@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { when } from 'vitest-when'
 import { createStore } from 'redux'
@@ -9,17 +9,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
-import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useCurrentRunId } from '../../../resources/runs'
+} from '/app/redux/modules/__fixtures__'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
+
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+  useRunStatuses,
+} from '/app/resources/runs'
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -27,12 +31,11 @@ import {
 } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../resources/runs')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',

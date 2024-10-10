@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { TipConfirmation } from '../TipConfirmation'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '/app/i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof TipConfirmation>) => {
   return renderWithProviders(<TipConfirmation {...props} />, {

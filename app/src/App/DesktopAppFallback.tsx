@@ -1,9 +1,11 @@
-import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useTrackEvent, ANALYTICS_DESKTOP_APP_ERROR } from '../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_DESKTOP_APP_ERROR,
+} from '/app/redux/analytics'
 
 import type { FallbackProps } from 'react-error-boundary'
 
@@ -15,12 +17,12 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../molecules/LegacyModal'
-import { reloadUi } from '../redux/shell'
+import { reloadUi } from '/app/redux/shell'
 
-import type { Dispatch } from '../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -38,11 +40,7 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   }
 
   return (
-    <LegacyModal
-      type="warning"
-      title={t('error_boundary_title')}
-      marginLeft="0"
-    >
+    <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <LegacyStyledText as="p">
@@ -59,6 +57,6 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
           {t('reload_app')}
         </AlertPrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

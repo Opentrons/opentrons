@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { AlertModal } from '@opentrons/components'
-import { getModalPortalEl } from '../../App/portal'
+import { getModalPortalEl } from '/app/App/portal'
 
 import styles from './styles.module.css'
 import type { ButtonProps } from '@opentrons/components'

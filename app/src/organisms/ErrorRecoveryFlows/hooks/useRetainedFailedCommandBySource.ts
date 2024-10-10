@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
@@ -25,9 +25,9 @@ export function useRetainedFailedCommandBySource(
   const [
     retainedFailedCommand,
     setRetainedFailedCommand,
-  ] = React.useState<FailedCommandBySource | null>(null)
+  ] = useState<FailedCommandBySource | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (failedCommandByRunRecord !== null) {
       const failedCommandByAnalysis =
         protocolAnalysis?.commands.find(

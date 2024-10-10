@@ -9,6 +9,11 @@ def is_flex_trash(load_name: str) -> bool:
     return load_name == "opentrons_1_trash_3200ml_fixed"
 
 
+def is_absorbance_reader_lid(load_name: str) -> bool:
+    """Check if a labware is an absorbance reader lid."""
+    return load_name == "opentrons_flex_lid_absorbance_plate_reader_module"
+
+
 def validate_definition_is_labware(definition: LabwareDefinition) -> bool:
     """Validate that one of the definition's allowed roles is `labware`.
 
@@ -20,6 +25,11 @@ def validate_definition_is_labware(definition: LabwareDefinition) -> bool:
 def validate_definition_is_adapter(definition: LabwareDefinition) -> bool:
     """Validate that one of the definition's allowed roles is `adapter`."""
     return LabwareRole.adapter in definition.allowedRoles
+
+
+def validate_definition_is_lid(definition: LabwareDefinition) -> bool:
+    """Validate that one of the definition's allowed roles is `lid`."""
+    return LabwareRole.lid in definition.allowedRoles
 
 
 def validate_labware_can_be_stacked(

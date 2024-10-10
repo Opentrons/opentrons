@@ -1,58 +1,90 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { RemoveScroll } from 'react-remove-scroll'
+import type * as React from 'react'
+import { Box } from '../primitives'
+import { SPACING } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
+import { ModalHeader } from './ModalHeader'
+import { ModalShell } from './ModalShell'
+import type { IconProps } from '../icons'
+import type { StyleProps } from '../primitives'
 
-import { Overlay } from './Overlay'
-import styles from './modals.module.css'
+type ModalType = 'info' | 'warning' | 'error'
 
-export interface ModalProps {
-  /** handler to close the modal (attached to `Overlay` onClick) */
-  onCloseClick?: React.MouseEventHandler
-  /** Optional styled heading **/
-  heading?: string
-  /** modal contents */
-  children: React.ReactNode
-  /** classes to apply */
-  className?: string
-  /** classes to apply to the contents box */
-  contentsClassName?: string
-  /** lightens overlay (alert modal over existing modal) */
-  alertOverlay?: boolean
-  /** restricts scroll outside of Modal when open, true by default */
-  restrictOuterScroll?: boolean
-  innerRef?: React.Ref<HTMLDivElement>
+export interface ModalProps extends StyleProps {
+  type?: ModalType
+  onClose?: React.MouseEventHandler
+  closeOnOutsideClick?: boolean
+  title?: React.ReactNode
+  titleElement1?: JSX.Element
+  titleElement2?: JSX.Element
+  fullPage?: boolean
+  childrenPadding?: string | number
+  children?: React.ReactNode
+  footer?: React.ReactNode
+  zIndexOverlay?: number
 }
 
 /**
- * Base modal component that fills its nearest `display:relative` ancestor
- * with a dark overlay and displays `children` as its contents in a white box
+ * For Desktop app and Helix (which includes Protocol Designer) use only.
  */
-export function Modal(props: ModalProps): JSX.Element {
+export const Modal = (props: ModalProps): JSX.Element => {
   const {
-    contentsClassName,
-    alertOverlay,
-    onCloseClick,
-    heading,
-    innerRef,
-    restrictOuterScroll = true,
+    type = 'info',
+    onClose,
+    closeOnOutsideClick,
+    title,
+    childrenPadding = `${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24}`,
+    children,
+    footer,
+    titleElement1,
+    titleElement2,
+    zIndexOverlay,
+    ...styleProps
   } = props
-  const Wrapper = restrictOuterScroll ? RemoveScroll : React.Fragment
+
+  const iconColor = (type: ModalType): string => {
+    let iconColor: string = ''
+    switch (type) {
+      case 'warning':
+        iconColor = COLORS.yellow50
+        break
+      case 'error':
+        iconColor = COLORS.red50
+        break
+    }
+    return iconColor
+  }
+
+  const modalIcon: IconProps = {
+    name: 'ot-alert',
+    color: iconColor(type),
+    size: '1.25rem',
+    marginRight: SPACING.spacing8,
+  }
+
+  const modalHeader = (
+    <ModalHeader
+      onClose={onClose}
+      title={title}
+      titleElement1={titleElement1}
+      titleElement2={titleElement2}
+      icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
+      color={COLORS.black90}
+      backgroundColor={COLORS.white}
+    />
+  )
+
   return (
-    <Wrapper>
-      <div
-        className={cx(styles.modal, props.className, {
-          [styles.alert_modal]: alertOverlay,
-        })}
-      >
-        <Overlay onClick={onCloseClick} alertOverlay={alertOverlay} />
-        <div
-          ref={innerRef}
-          className={cx(styles.modal_contents, contentsClassName)}
-        >
-          {heading && <h3 className={styles.modal_heading}>{heading}</h3>}
-          {props.children}
-        </div>
-      </div>
-    </Wrapper>
+    <ModalShell
+      zIndexOverlay={zIndexOverlay}
+      width={styleProps.width ?? '31.25rem'}
+      header={modalHeader}
+      onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
+      // center within viewport aside from nav
+      marginLeft={styleProps.marginLeft ?? '5.656rem'}
+      {...styleProps}
+      footer={footer}
+    >
+      <Box padding={childrenPadding}>{children}</Box>
+    </ModalShell>
   )
 }

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -7,7 +6,7 @@ import {
   Flex,
   SPACING,
   useHoverTooltip,
-  Tooltip,
+  LegacyTooltip,
   TOOLTIP_BOTTOM,
 } from '@opentrons/components'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
@@ -140,9 +139,9 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
           </CheckboxRowField>
         </Flex>
         {propsForFields.latchOpen.disabled && (
-          <Tooltip {...tooltipLatchProps}>
+          <LegacyTooltip {...tooltipLatchProps}>
             {propsForFields.latchOpen.tooltipContent}
-          </Tooltip>
+          </LegacyTooltip>
         )}
       </Flex>
     </div>

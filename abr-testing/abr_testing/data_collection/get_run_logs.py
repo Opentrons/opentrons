@@ -47,7 +47,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
             params={"cursor": cursor, "pageLength": page_length},
         )
         command_data = response.json()
-        commands.extend(command_data["data"])
+        commands.extend(command_data.get("data", ""))
     run["commands"] = commands
     response = requests.get(
         f"http://{ip}:31950/runs/{one_run}", headers={"opentrons-version": "3"}

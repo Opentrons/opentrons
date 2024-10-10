@@ -30,7 +30,6 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 # remove when their usage is no longer needed
 from opentrons.protocols.labware import (  # noqa: F401
     get_labware_definition as get_labware_definition,
-    get_all_labware_definitions as get_all_labware_definitions,
     verify_definition as verify_definition,
     save_definition as save_definition,
 )
@@ -221,6 +220,19 @@ class Well:
             absolute position of the center of the well (in all three dimensions).
         """
         return Location(self._core.get_center(), self)
+
+    @requires_version(2, 21)
+    def meniscus(self, z: float = 0.0) -> Location:
+        """
+        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
+            negative offsets are lower.
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the meniscus-center of the well, plus the ``z`` offset
+            (if specified).
+
+        :meta private:
+        """
+        return Location(self._core.get_meniscus(z_offset=z), self)
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

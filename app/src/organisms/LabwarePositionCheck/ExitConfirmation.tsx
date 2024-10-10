@@ -1,4 +1,3 @@
-import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -19,8 +18,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
-import { SmallButton } from '../../atoms/buttons'
+import { getIsOnDevice } from '/app/redux/config'
+import { SmallButton } from '/app/atoms/buttons'
 
 interface ExitConfirmationProps {
   onGoBack: () => void

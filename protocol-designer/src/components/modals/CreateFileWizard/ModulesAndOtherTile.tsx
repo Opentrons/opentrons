@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'
@@ -12,7 +12,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   useHoverTooltip,
-  Tooltip,
+  LegacyTooltip,
   WRAP,
 } from '@opentrons/components'
 import {
@@ -33,9 +33,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getIsCrashablePipetteSelected } from '../../../step-forms'
-import gripperImage from '../../../images/flex_gripper.png'
-import wasteChuteImage from '../../../images/waste_chute.png'
-import trashBinImage from '../../../images/flex_trash_bin.png'
+import gripperImage from '../../../assets/images/flex_gripper.png'
+import wasteChuteImage from '../../../assets/images/waste_chute.png'
+import trashBinImage from '../../../assets/images/flex_trash_bin.png'
 import { uuid } from '../../../utils'
 import { getEnableMoam } from '../../../feature-flags/selectors'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -190,9 +190,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             {t('review_file_details')}
           </PrimaryButton>
           {!hasATrash ? (
-            <Tooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               {t(`tooltip:disabled_no_trash`)}
-            </Tooltip>
+            </LegacyTooltip>
           ) : null}
         </Flex>
       </Flex>
@@ -226,7 +226,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     modules,
     trashType: 'trashBin',
   })
-  React.useEffect(() => {
+  useEffect(() => {
     if (trashBinDisabled) {
       setValue('additionalEquipment', without(additionalEquipment, 'trashBin'))
     }

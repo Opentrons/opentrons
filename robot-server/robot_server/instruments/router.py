@@ -1,5 +1,5 @@
 """Instruments routes."""
-from typing import Optional, Dict, List, cast
+from typing import Annotated, Optional, Dict, List, cast
 
 from fastapi import APIRouter, status, Depends
 
@@ -265,12 +265,17 @@ async def _get_attached_instruments_ot2(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
 async def get_attached_instruments(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
-    """Get a list of all attached instruments."""
+    """Get a list of all attached instruments.
+
+    Note: This endpoint returns the full AttachedItem data for Flex instruments only.
+
+          On an OT-2, this endpoint will provide partial data of the OT-2 pipettes
+          (no pipette fw and calibration data), and will not fetch new data after
+          a pipette attachment/ removal.
+    """
     try:
-        # TODO (spp, 2023-01-06): revise according to
-        #  https://opentrons.atlassian.net/browse/RET-1295
         ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
         return await _get_attached_instruments_ot3(ot3_hardware)
     except HardwareNotSupportedError:

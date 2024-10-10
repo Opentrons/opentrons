@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,8 +7,8 @@ import {
   JUSTIFY_END,
   ALIGN_FLEX_END,
   PrimaryButton,
+  Modal,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
 import { Skeleton as SkeletonComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'

@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { TipSelection } from '../TipSelection'
 import { WellSelection } from '../../../WellSelection'
 
@@ -35,7 +35,7 @@ describe('TipSelection', () => {
     expect(vi.mocked(WellSelection)).toHaveBeenCalledWith(
       expect.objectContaining({
         definition: props.failedLabwareUtils.tipSelectorDef,
-        selectedPrimaryWells: props.failedLabwareUtils.selectedTipLocations,
+        selectedPrimaryWell: 'A1',
         channels: props.failedPipetteInfo?.data.channels ?? 1,
       }),
       {}

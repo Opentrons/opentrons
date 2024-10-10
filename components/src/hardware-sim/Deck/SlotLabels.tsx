@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { DeckInfoLabel } from '../../molecules'
 import { Flex } from '../../primitives'

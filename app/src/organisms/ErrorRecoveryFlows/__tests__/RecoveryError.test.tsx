@@ -1,11 +1,11 @@
 /* eslint-disable testing-library/prefer-presence-queries */
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../__fixtures__'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { RecoveryError } from '../RecoveryError'
 import { RECOVERY_MAP } from '../constants'
 
@@ -23,13 +23,13 @@ describe('RecoveryError', () => {
   let props: React.ComponentProps<typeof RecoveryError>
   let proceedToRouteAndStepMock: Mock
   let getRecoverOptionCopyMock: Mock
-  let setRobotInMotionMock: Mock
+  let handleMotionRoutingMock: Mock
   let homePipetteZAxesMock: Mock
 
   beforeEach(() => {
     proceedToRouteAndStepMock = vi.fn()
     getRecoverOptionCopyMock = vi.fn()
-    setRobotInMotionMock = vi.fn().mockResolvedValue(undefined)
+    handleMotionRoutingMock = vi.fn().mockResolvedValue(undefined)
     homePipetteZAxesMock = vi.fn().mockResolvedValue(undefined)
 
     props = {
@@ -37,7 +37,7 @@ describe('RecoveryError', () => {
       routeUpdateActions: {
         ...mockRecoveryContentProps.routeUpdateActions,
         proceedToRouteAndStep: proceedToRouteAndStepMock,
-        setRobotInMotion: setRobotInMotionMock,
+        handleMotionRouting: handleMotionRoutingMock,
       },
       recoveryCommands: {
         ...mockRecoveryContentProps.recoveryCommands,
@@ -151,14 +151,14 @@ describe('RecoveryError', () => {
 
     fireEvent.click(screen.queryAllByText('Back to menu')[0])
 
-    expect(setRobotInMotionMock).toHaveBeenCalledWith(true)
+    expect(handleMotionRoutingMock).toHaveBeenCalledWith(true)
 
     await waitFor(() => {
       expect(homePipetteZAxesMock).toHaveBeenCalled()
     })
 
     await waitFor(() => {
-      expect(setRobotInMotionMock).toHaveBeenCalledWith(false)
+      expect(handleMotionRoutingMock).toHaveBeenCalledWith(false)
     })
 
     await waitFor(() => {
@@ -167,17 +167,17 @@ describe('RecoveryError', () => {
       )
     })
 
-    expect(setRobotInMotionMock).toHaveBeenCalledTimes(2)
+    expect(handleMotionRoutingMock).toHaveBeenCalledTimes(2)
     expect(homePipetteZAxesMock).toHaveBeenCalledTimes(1)
     expect(proceedToRouteAndStepMock).toHaveBeenCalledTimes(1)
 
-    expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(handleMotionRoutingMock.mock.invocationCallOrder[0]).toBeLessThan(
       homePipetteZAxesMock.mock.invocationCallOrder[0]
     )
     expect(homePipetteZAxesMock.mock.invocationCallOrder[0]).toBeLessThan(
-      setRobotInMotionMock.mock.invocationCallOrder[1]
+      handleMotionRoutingMock.mock.invocationCallOrder[1]
     )
-    expect(setRobotInMotionMock.mock.invocationCallOrder[1]).toBeLessThan(
+    expect(handleMotionRoutingMock.mock.invocationCallOrder[1]).toBeLessThan(
       proceedToRouteAndStepMock.mock.invocationCallOrder[0]
     )
   })

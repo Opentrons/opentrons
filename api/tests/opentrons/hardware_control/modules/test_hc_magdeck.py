@@ -1,5 +1,6 @@
 import asyncio
 
+from opentrons.hardware_control.modules.magdeck import MagDeck
 import pytest
 
 from opentrons.hardware_control import modules, ExecutionManager
@@ -7,20 +8,19 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 @pytest.fixture
-def usb_port():
+def usb_port() -> USBPort:
     return USBPort(
         name="",
-        hub=None,
         port_number=0,
         device_path="/dev/ot_module_sim_magdeck0",
     )
 
 
-async def test_sim_initialization(usb_port):
+async def test_sim_initialization(usb_port: USBPort) -> None:
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        type=modules.ModuleType.MAGNETIC,
+        type=modules.ModuleType["MAGNETIC"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
@@ -28,11 +28,11 @@ async def test_sim_initialization(usb_port):
     assert isinstance(mag, modules.AbstractModule)
 
 
-async def test_sim_data(usb_port):
+async def test_sim_data(usb_port: USBPort) -> None:
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        type=modules.ModuleType.MAGNETIC,
+        type=modules.ModuleType["MAGNETIC"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
@@ -46,15 +46,16 @@ async def test_sim_data(usb_port):
     assert "data" in mag.live_data
 
 
-async def test_sim_state_update(usb_port):
+async def test_sim_state_update(usb_port: USBPort) -> None:
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        type=modules.ModuleType.MAGNETIC,
+        type=modules.ModuleType["MAGNETIC"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
+    assert isinstance(mag, MagDeck)
     await mag.calibrate()
     assert mag.status == "disengaged"
     await mag.engage(2)
@@ -63,15 +64,16 @@ async def test_sim_state_update(usb_port):
     assert mag.status == "disengaged"
 
 
-async def test_revision_model_parsing(usb_port):
+async def test_revision_model_parsing(usb_port: USBPort) -> None:
     mag = await modules.build(
         port="",
-        type=modules.ModuleType.MAGNETIC,
+        type=modules.ModuleType["MAGNETIC"],
         simulating=True,
         usb_port=usb_port,
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
+    assert isinstance(mag, MagDeck)
     mag._device_info["model"] = "mag_deck_v1.1"
     assert mag.model() == "magneticModuleV1"
     mag._device_info["model"] = "mag_deck_v20"

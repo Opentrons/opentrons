@@ -4,8 +4,12 @@ types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
 from typing import Dict, List, NewType, Union
-from typing_extensions import Literal, TypedDict
-
+from typing_extensions import Literal, TypedDict, NotRequired
+from .labware_definition import InnerWellGeometry
+from .constants import (
+    Circular,
+    Rectangular,
+)
 
 LabwareUri = NewType("LabwareUri", str)
 
@@ -33,11 +37,8 @@ LabwareRoles = Union[
     Literal["fixture"],
     Literal["adapter"],
     Literal["maintenance"],
+    Literal["lid"],
 ]
-
-Circular = Literal["circular"]
-Rectangular = Literal["rectangular"]
-WellShape = Union[Circular, Rectangular]
 
 
 class NamedOffset(TypedDict):
@@ -89,6 +90,7 @@ class CircularWellDefinition(TypedDict):
     y: float
     z: float
     diameter: float
+    geometryDefinitionId: NotRequired[str]
 
 
 class RectangularWellDefinition(TypedDict):
@@ -100,6 +102,7 @@ class RectangularWellDefinition(TypedDict):
     z: float
     xDimension: float
     yDimension: float
+    geometryDefinitionId: NotRequired[str]
 
 
 WellDefinition = Union[CircularWellDefinition, RectangularWellDefinition]
@@ -117,7 +120,7 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class _RequiredLabwareDefinition(TypedDict):
+class LabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
     namespace: str
@@ -129,12 +132,10 @@ class _RequiredLabwareDefinition(TypedDict):
     dimensions: LabwareDimensions
     wells: Dict[str, WellDefinition]
     groups: List[WellGroup]
-
-
-class LabwareDefinition(_RequiredLabwareDefinition, total=False):
-    stackingOffsetWithLabware: Dict[str, NamedOffset]
-    stackingOffsetWithModule: Dict[str, NamedOffset]
-    allowedRoles: List[LabwareRoles]
-    gripperOffsets: Dict[str, GripperOffsets]
-    gripForce: float
-    gripHeightFromLabwareBottom: float
+    stackingOffsetWithLabware: NotRequired[Dict[str, NamedOffset]]
+    stackingOffsetWithModule: NotRequired[Dict[str, NamedOffset]]
+    allowedRoles: NotRequired[List[LabwareRoles]]
+    gripperOffsets: NotRequired[Dict[str, GripperOffsets]]
+    gripForce: NotRequired[float]
+    gripHeightFromLabwareBottom: NotRequired[float]
+    innerLabwareGeometry: NotRequired[Dict[str, InnerWellGeometry]]

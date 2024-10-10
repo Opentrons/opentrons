@@ -63,16 +63,24 @@
 
 .labware_creator .labware_guide_button {
   /* from legacy --linkb-tn */
-  display: block;
-  width: 100%;
+  display: inline-block;
+  width: auto;
   margin: 1.5rem 0 0.5rem;
-  padding: 1rem;
+  padding: 1rem 2rem;
   border-radius: 3px;
+  background-color: var(--c-blue);
   font-size: var(--fs-body-2);
-  text-align: center;
+  color: white;
   font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
   text-transform: uppercase;
-  cursor: pointer;
+
+  &:visited {
+    color: white;
+  }
+
+  &:hover {
+    background-color: #00f;
+  }
 }
 
 .start_creating_btn:focus {

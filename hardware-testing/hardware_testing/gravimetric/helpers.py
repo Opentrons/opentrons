@@ -41,7 +41,7 @@ from opentrons.protocol_engine import (
     WellLocation,
     DropTipWellLocation,
 )
-from opentrons.protocol_api.core.engine import deck_conflict as DeckConflit
+from opentrons.protocol_api.core.engine import pipette_movement_conflict
 
 
 def _add_fake_simulate(
@@ -455,8 +455,8 @@ def _load_pipette(
             front_right_nozzle="A1",
             back_left_nozzle="A1",
         )
-        # override deck conflict checking cause we specially lay out our tipracks
-        DeckConflit.check_safe_for_pipette_movement = (
+        # override pipette movement conflict checking 'cause we specially lay out our tipracks
+        pipette_movement_conflict.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement
         )
     pipette.trash_container = trash

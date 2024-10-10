@@ -1,12 +1,12 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
-import HeaterShaker_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
-import HeaterShaker_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
-import TempModule_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
-import TempModule_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
-import Thermocycler_PlaceAdapter from '../../assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import HeaterShaker_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
+import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
+import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
+import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
+import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
 
 import {
   Flex,
@@ -27,8 +27,8 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { SimpleWizardInProgressBody } from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 
 import type { DeckConfiguration, CreateCommand } from '@opentrons/shared-data'
@@ -79,7 +79,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }

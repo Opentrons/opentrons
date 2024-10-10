@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -14,11 +14,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
   title: string
@@ -38,7 +38,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   } = props
   const { t } = useTranslation(['shared', 'branded'])
 
-  const terminateHeader: ModalHeaderBaseProps = {
+  const terminateHeader: OddModalHeaderBaseProps = {
     title: t('terminate') + '?',
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -47,7 +47,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   return createPortal(
     showConfirmTerminateModal ? (
       //    confirm terminate modal
-      <Modal header={terminateHeader}>
+      <OddModal header={terminateHeader}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
             {t('branded:confirm_terminate')}
@@ -71,9 +71,9 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             />
           </Flex>
         </Flex>
-      </Modal>
+      </OddModal>
     ) : (
-      <Modal>
+      <OddModal>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
@@ -115,7 +115,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             {t('terminate')}
           </LegacyStyledText>
         </Flex>
-      </Modal>
+      </OddModal>
     ),
     getTopPortalEl()
   )

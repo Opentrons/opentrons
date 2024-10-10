@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { when } from 'vitest-when'
@@ -18,12 +18,12 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useNotifyRunQuery,
-} from '../../../resources/runs'
-import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
@@ -33,8 +33,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../useMostRecentCompletedAnalysis')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const MOCK_RUN_ID = 'mockRunId'
 const MOCK_MAINTENANCE_RUN_ID = 'mockMaintenanceRunId'

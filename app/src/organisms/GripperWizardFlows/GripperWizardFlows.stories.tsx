@@ -1,14 +1,14 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
-} from '../../redux/discovery/constants'
-import { configReducer } from '../../redux/config/reducer'
+} from '/app/redux/discovery/constants'
+import { configReducer } from '/app/redux/config/reducer'
 import { GripperWizardFlows } from './'
 
 import type { Store, StoreEnhancer } from 'redux'

@@ -44,7 +44,7 @@ from opentrons.protocol_engine.errors import (
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
 )
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -87,9 +87,9 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 
 
 @pytest.fixture
-def hardware_gripper_offset_data() -> Tuple[
-    LabwareMovementOffsetData, LabwareMovementOffsetData
-]:
+def hardware_gripper_offset_data() -> (
+    Tuple[LabwareMovementOffsetData, LabwareMovementOffsetData]
+):
     """Get a set of mocked labware offset data."""
     user_offset_data = LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=123, y=234, z=345),
@@ -202,11 +202,16 @@ async def test_raise_error_if_gripper_pickup_failed(
         )
     ).then_return(mock_tc_context_manager)
 
+    current_labware = state_store.labware.get_definition(
+        labware_id="my-teleporting-labware"
+    )
+
     decoy.when(
         state_store.geometry.get_final_labware_movement_offset_vectors(
             from_location=starting_location,
             to_location=to_location,
             additional_offset_vector=user_offset_data,
+            current_labware=current_labware,
         )
     ).then_return(final_offset_data)
 
@@ -316,12 +321,15 @@ async def test_move_labware_with_gripper(
     await set_up_decoy_hardware_gripper(decoy, ot3_hardware_api, state_store)
 
     user_offset_data, final_offset_data = hardware_gripper_offset_data
-
+    current_labware = state_store.labware.get_definition(
+        labware_id="my-teleporting-labware"
+    )
     decoy.when(
         state_store.geometry.get_final_labware_movement_offset_vectors(
             from_location=from_location,
             to_location=to_location,
             additional_offset_vector=user_offset_data,
+            current_labware=current_labware,
         )
     ).then_return(final_offset_data)
 

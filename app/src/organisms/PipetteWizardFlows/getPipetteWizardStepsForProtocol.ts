@@ -1,8 +1,8 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { FLOWS, SECTIONS } from './constants'
 import type { LoadedPipette } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import type { Mount } from '/app/redux/pipettes/types'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type { PipetteWizardStep } from './types'
 
 const calibrateAlreadyAttachedPipetteOn = (

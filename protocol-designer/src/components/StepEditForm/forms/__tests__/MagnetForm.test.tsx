@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, afterEach, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { getMagneticLabwareOptions } from '../../../../ui/modules/selectors'
 import { getModuleEntities } from '../../../../step-forms/selectors'
 import { getMagnetLabwareEngageHeight } from '../../../../ui/modules/utils'
@@ -78,7 +78,7 @@ describe('MagnetForm', () => {
     screen.getByText('magnet')
     screen.getByText('module')
     screen.getByText('mock name')
-    screen.getByText('Magnet action')
+    screen.getByText('Magnet state')
     const engage = screen.getByText('Engage')
     screen.getByText('Disengage')
     fireEvent.click(engage)

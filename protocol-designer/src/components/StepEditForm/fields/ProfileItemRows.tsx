@@ -1,12 +1,12 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import {
   Icon,
-  InputField,
+  LegacyInputField,
   OutlineButton,
-  Tooltip,
+  LegacyTooltip,
   useConditionalConfirm,
   useHoverTooltip,
   TOOLTIP_TOP,
@@ -121,17 +121,17 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
               />
             </div>
           )}
-          <Tooltip {...addStepToCycleTooltipProps}>
+          <LegacyTooltip {...addStepToCycleTooltipProps}>
             {t('profile.add_step_to_cycle')}
-          </Tooltip>
+          </LegacyTooltip>
           <div className={styles.add_cycle_step} {...addStepToCycleTargetProps}>
             <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
           </div>
         </div>
         <div onClick={confirmDeleteCycle} {...deleteCycleTargetProps}>
-          <Tooltip {...deleteCycleTooltipProps}>
+          <LegacyTooltip {...deleteCycleTooltipProps}>
             {t('profile.delete_cycle')}
-          </Tooltip>
+          </LegacyTooltip>
           <Icon name="close" className={styles.delete_step_icon} />
         </div>
       </div>
@@ -205,8 +205,12 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
         </div>
       )}
       {rows}
-      <Tooltip {...addStepTooltipProps}>{t('profile.add_step')}</Tooltip>
-      <Tooltip {...addCycleTooltipProps}>{t('profile.add_cycle')}</Tooltip>
+      <LegacyTooltip {...addStepTooltipProps}>
+        {t('profile.add_step')}
+      </LegacyTooltip>
+      <LegacyTooltip {...addCycleTooltipProps}>
+        {t('profile.add_cycle')}
+      </LegacyTooltip>
       <div className={styles.profile_button_group}>
         <OutlineButton
           hoverTooltipHandlers={addStepTargetProps}
@@ -270,7 +274,7 @@ const ProfileField = (props: ProfileFieldProps): JSX.Element => {
   }
   return (
     <div className={styles.step_input_wrapper}>
-      <InputField
+      <LegacyInputField
         className={cx(styles.step_input, className)}
         error={errorToShow}
         units={units}
@@ -350,7 +354,9 @@ const ProfileStepRow = (props: ProfileStepRowProps): JSX.Element => {
         className={cx({ [styles.cycle_step_delete]: isCycle })}
         {...targetProps}
       >
-        <Tooltip {...tooltipProps}>{t('tooltip:profile.delete_step')}</Tooltip>
+        <LegacyTooltip {...tooltipProps}>
+          {t('tooltip:profile.delete_step')}
+        </LegacyTooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>
     </div>

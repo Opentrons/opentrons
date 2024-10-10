@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -16,7 +15,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 
 interface RecoveryFooterButtonProps {
   primaryBtnOnClick: () => void

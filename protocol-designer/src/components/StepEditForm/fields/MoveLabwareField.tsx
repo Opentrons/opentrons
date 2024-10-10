@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { getMoveLabwareOptions } from '../../../ui/labware/selectors'
 import { StepFormDropdown } from './StepFormDropdownField'

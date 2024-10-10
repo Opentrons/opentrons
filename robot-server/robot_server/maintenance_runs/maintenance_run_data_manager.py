@@ -32,13 +32,14 @@ def _build_run(
         pipettes=[],
         modules=[],
         liquids=[],
+        wells=[],
         hasEverEnteredErrorRecovery=False,
     )
     return MaintenanceRun.construct(
         id=run_id,
         createdAt=created_at,
         status=state_summary.status,
-        actions=[],  # TODO (spp, 2023-04-23): wire up actions once they are allowed
+        actions=[],
         errors=state_summary.errors,
         labware=state_summary.labware,
         labwareOffsets=state_summary.labwareOffsets,
@@ -158,7 +159,6 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-
             await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
 
         else:

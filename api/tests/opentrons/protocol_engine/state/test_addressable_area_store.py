@@ -17,7 +17,7 @@ from opentrons.protocol_engine.actions import (
     SucceedCommandAction,
     AddAddressableAreaAction,
 )
-from opentrons.protocol_engine.state import Config
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaState,

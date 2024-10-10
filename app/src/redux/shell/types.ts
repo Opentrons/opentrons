@@ -68,6 +68,7 @@ export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
   filePaths: string[]
+  systemLanguage: string[] | null
 }
 
 export interface UiInitializedAction {
@@ -91,6 +92,14 @@ export interface ReloadUiAction {
   type: 'shell:RELOAD_UI'
   payload: {
     message: string
+  }
+  meta: { shell: true }
+}
+
+export interface SystemLanguageAction {
+  type: 'shell:SYSTEM_LANGUAGE'
+  payload: {
+    systemLanguage: string[]
   }
   meta: { shell: true }
 }
@@ -177,6 +186,7 @@ export type ShellAction =
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
   | SendFilePathsAction
+  | SystemLanguageAction
 
 export type IPCSafeFormDataEntry =
   | {

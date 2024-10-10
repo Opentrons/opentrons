@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Callable, Optional, List, Dict, Mapping
+from typing import Callable, Optional, List, Dict, Mapping, Union, cast
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
-from opentrons.hardware_control.modules.types import TemperatureStatus
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    TemperatureStatus,
+)
 from opentrons.hardware_control.poller import Reader, Poller
 
 from ..execution_manager import ExecutionManager
@@ -64,6 +67,7 @@ class Thermocycler(mod_abc.AbstractModule):
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "Thermocycler":
         """
         Build and connect to a Thermocycler
@@ -77,6 +81,7 @@ class Thermocycler(mod_abc.AbstractModule):
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
 
         Returns:
             Thermocycler instance.
@@ -102,6 +107,7 @@ class Thermocycler(mod_abc.AbstractModule):
             device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
 
         try:
@@ -121,6 +127,7 @@ class Thermocycler(mod_abc.AbstractModule):
         poller: Poller,
         device_info: Dict[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> None:
         """
         Constructor
@@ -134,6 +141,7 @@ class Thermocycler(mod_abc.AbstractModule):
             poller: A poll controller for reads.
             device_info: The thermocycler device info.
             hw_control_loop: The event loop running in the hardware control thread.
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
         """
         self._driver = driver
         super().__init__(
@@ -141,6 +149,7 @@ class Thermocycler(mod_abc.AbstractModule):
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
         self._device_info = device_info
         self._reader = reader
@@ -351,6 +360,39 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count = len(steps)
 
         task = self._loop.create_task(self._execute_cycles(steps, repetitions, volume))
+        self.make_cancellable(task)
+        await task
+
+    async def execute_profile(
+        self,
+        profile: List[Union[types.ThermocyclerCycle, types.ThermocyclerStep]],
+        volume: Optional[float] = None,
+    ) -> None:
+        """Begin a set temperature profile, with both repeating and non-repeating steps.
+
+        Args:
+            profile: The temperature profile to follow.
+            volume: Optional volume
+
+        Returns: None
+        """
+        await self.wait_for_is_running()
+        self._total_cycle_count = 0
+        self._total_step_count = 0
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            if "steps" in step_or_cycle:
+                # basically https://github.com/python/mypy/issues/14766
+                this_cycle = cast(types.ThermocyclerCycle, step_or_cycle)
+                self._total_cycle_count += this_cycle["repetitions"]
+                self._total_step_count += (
+                    len(this_cycle["steps"]) * this_cycle["repetitions"]
+                )
+            else:
+                self._total_step_count += 1
+                self._total_cycle_count += 1
+        task = self._loop.create_task(self._execute_profile(profile, volume))
         self.make_cancellable(task)
         await task
 
@@ -565,7 +607,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self,
         steps: List[types.ThermocyclerStep],
         repetitions: int,
-        volume: Optional[float] = None,
+        volume: Optional[float],
     ) -> None:
         """
         Execute cycles.
@@ -582,6 +624,30 @@ class Thermocycler(mod_abc.AbstractModule):
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # science starts at 1
                 await self._execute_cycle_step(step, volume)
+
+    async def _execute_profile(
+        self,
+        profile: List[Union[types.ThermocyclerCycle, types.ThermocyclerStep]],
+        volume: Optional[float],
+    ) -> None:
+        """
+        Execute profiles.
+
+        Profiles command a thermocycler pattern that can contain multiple cycles and out-of-cycle steps.
+        """
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            self._current_cycle_index += 1
+            if "repetitions" in step_or_cycle:
+                # basically https://github.com/python/mypy/issues/14766
+                this_cycle = cast(types.ThermocyclerCycle, step_or_cycle)
+                for rep in range(this_cycle["repetitions"]):
+                    for step in this_cycle["steps"]:
+                        self._current_step_index += 1
+                        await self._execute_cycle_step(step, volume)
+            else:
+                await self._execute_cycle_step(step_or_cycle, volume)
 
     # TODO(mc, 2022-10-13): why does this exist?
     # Do the driver and poller really need to be disconnected?

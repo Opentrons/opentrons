@@ -1,15 +1,16 @@
 import json
-import logging
 import uuid
 from typing import Any, Dict, Iterable
 
 import requests
+import structlog
+from ddtrace import tracer
 from openai.types.chat import ChatCompletionToolParam
 
 from api.settings import Settings
 
 settings: Settings = Settings()
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(settings.logger_name)
 
 
 def generate_unique_name() -> str:
@@ -17,13 +18,14 @@ def generate_unique_name() -> str:
     return unique_name
 
 
+@tracer.wrap()
 def send_post_request(payload: str) -> str:
     url = "https://Opentrons-simulator.hf.space/protocol"
     protocol_name: str = generate_unique_name()
     data = {"name": protocol_name, "content": payload}
     hf_token: str = settings.huggingface_api_key.get_secret_value()
     headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(hf_token)}
-
+    logger.info("Sending POST request to the simulate API", extra={"url": url, "protocolName": data["name"]})
     response = requests.post(url, json=data, headers=headers)
 
     if response.status_code != 200:
@@ -99,7 +101,7 @@ using only this information.
 
 INSTRUCTIONS:
 
-1) All types of protocols are based on apiLevel 2.15,
+1) All types of protocols are based on apiLevel 2.19,
  thus prepend the following code block
 `metadata` and `requirements`:
 ```python
@@ -110,7 +112,7 @@ metadata = {
     'author': '[user name]',
     'description': "[what is the protocol about]"
 }
-requirements = {"robotType": "[Robot type]", "apiLevel": "2.15"}
+requirements = {"robotType": "[Robot type]", "apiLevel": "2.19"}
 ```
 
 2) See the transfer rules <<COMMON RULES for TRANSFER>> below.
@@ -126,6 +128,14 @@ Note that sometimes API names is very long eg.,
 
 
 5)  If the pipette is multi-channel eg., P20 Multi-Channel Gen2, please use `columns` method.
+
+6) <<< Load trash for Flex >>>
+For Flex protocols, NOT OT-2 protocols using API version 2.16 or later,
+load a trash bin in slot A3:
+```python
+trash = protocol.load_trash_bin("A3")
+```
+Note that you load trash before commands.
 \n\n
 """
 
@@ -313,7 +323,7 @@ metadata = {
     'author': 'chatGPT',
     'description': 'Transfer reagent',
 }
-requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
 
 def run(protocol):
     # labware

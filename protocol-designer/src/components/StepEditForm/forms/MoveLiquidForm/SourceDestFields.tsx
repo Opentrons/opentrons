@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'

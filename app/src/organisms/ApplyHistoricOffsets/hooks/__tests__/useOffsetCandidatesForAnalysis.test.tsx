@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
@@ -11,7 +11,7 @@ import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
 import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
 
 import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../../redux/protocol-storage/__fixtures__'
+import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
@@ -19,8 +19,8 @@ import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 vi.mock('../useAllHistoricOffsets')
 vi.mock('../getLabwareLocationCombos')
 vi.mock('@opentrons/shared-data')
-vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/useNotifyDataReady')
+vi.mock('/app/resources/runs')
+vi.mock('/app/resources/useNotifyDataReady')
 
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 

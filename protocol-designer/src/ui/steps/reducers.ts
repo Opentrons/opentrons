@@ -191,12 +191,25 @@ const wellSelectionLabwareKey: Reducer<string | null, any> = handleActions(
   },
   null
 )
+
+const selectedSubstep: Reducer<StepIdType | null, any> = handleActions(
+  {
+    TOGGLE_VIEW_SUBSTEP: (
+      state,
+      action: {
+        payload: StepIdType
+      }
+    ) => action.payload,
+  },
+  null
+)
 export interface StepsState {
   collapsedSteps: CollapsedStepsState
   selectedItem: SelectedItemState
   hoveredItem: HoveredItemState
   hoveredSubstep: SubstepIdentifier
   wellSelectionLabwareKey: string | null
+  selectedSubstep: StepIdType | null
 }
 export const _allReducers = {
   collapsedSteps,
@@ -204,6 +217,7 @@ export const _allReducers = {
   hoveredItem,
   hoveredSubstep,
   wellSelectionLabwareKey,
+  selectedSubstep,
 }
 export const rootReducer: Reducer<StepsState, Action> = combineReducers(
   _allReducers

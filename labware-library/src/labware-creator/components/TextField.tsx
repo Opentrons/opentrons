@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Field } from 'formik'
-import { InputField } from '@opentrons/components'
+import { LegacyInputField } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
 import { getLabel } from '../fields'
-import type { InputFieldProps } from '@opentrons/components'
+import type { LegacyInputFieldProps } from '@opentrons/components'
 import type { LabwareFields } from '../fields'
 import type { FieldProps } from 'formik'
 import fieldStyles from './fieldStyles.module.css'
@@ -13,9 +13,9 @@ interface Props {
   name: keyof LabwareFields
   label?: string
   placeholder?: string
-  caption?: InputFieldProps['caption']
+  caption?: LegacyInputFieldProps['caption']
   inputMasks?: Array<(prevValue: string, update: string) => string>
-  units?: InputFieldProps['units']
+  units?: LegacyInputFieldProps['units']
 }
 
 // NOTE(Ian 2019-07-23): per-field hide-when-autofilled is not yet necessary,
@@ -44,7 +44,7 @@ export const TextField = (props: Props): JSX.Element => {
           <div className={fieldStyles.field_wrapper}>
             <label className={fieldStyles.field_label}>
               {label ?? getLabel(props.name, form.values as LabwareFields)}
-              <InputField
+              <LegacyInputField
                 name={field.name}
                 value={field.value}
                 caption={caption}

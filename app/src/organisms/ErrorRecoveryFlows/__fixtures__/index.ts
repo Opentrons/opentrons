@@ -6,7 +6,7 @@ import {
 import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 
 import { RECOVERY_MAP } from '../constants'
-import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 
 import type { LoadedLabware, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FailedCommand, RecoveryContentProps } from '../types'
@@ -20,13 +20,13 @@ export const mockFailedCommand: FailedCommand = {
   error: {
     createdAt: '2024-05-24T13:55:32.595751+00:00',
     detail: 'No tip detected.',
-    isDefined: false,
+    isDefined: true,
     errorCode: '3003',
     errorType: 'tipPhysicallyMissing',
     errorInfo: {},
     wrappedErrors: [],
     id: '123',
-  },
+  } as any,
   startedAt: '2024-05-24T13:55:19.016799+00:00',
   id: '1',
   params: {
@@ -61,7 +61,7 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   errorKind: 'GENERAL_ERROR',
   robotType: FLEX_ROBOT_TYPE,
   runId: 'MOCK_RUN_ID',
-  isDoorOpen: false,
+  doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
   isOnDevice: true,
   runStatus: RUN_STATUS_AWAITING_RECOVERY,
   recoveryMap: {
@@ -72,7 +72,10 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   recoveryCommands: {} as any,
   tipStatusUtils: {} as any,
   currentRecoveryOptionUtils: {} as any,
-  failedLabwareUtils: { pickUpTipLabware: mockPickUpTipLabware } as any,
+  failedLabwareUtils: {
+    pickUpTipLabware: mockPickUpTipLabware,
+    selectedTipLocation: { A1: null },
+  } as any,
   failedPipetteInfo: {} as any,
   deckMapUtils: { setSelectedLocation: () => {} } as any,
   stepCounts: {} as any,

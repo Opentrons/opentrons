@@ -1,5 +1,11 @@
 """Run router dependency-injection wire-up."""
+from typing import Annotated
+
 from fastapi import Depends, status
+from robot_server.error_recovery.settings.store import (
+    ErrorRecoverySettingStore,
+    get_error_recovery_setting_store,
+)
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolStore
@@ -46,8 +52,8 @@ _light_control_accessor = AppStateAccessor[LightController]("light_controller")
 
 
 async def get_run_store(
-    app_state: AppState = Depends(get_app_state),
-    sql_engine: SQLEngine = Depends(get_sql_engine),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    sql_engine: Annotated[SQLEngine, Depends(get_sql_engine)],
 ) -> RunStore:
     """Get a singleton RunStore to keep track of created runs."""
     run_store = _run_store_accessor.get_from(app_state)
@@ -99,7 +105,7 @@ async def mark_light_control_startup_finished(
 
 
 async def get_light_controller(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> LightController:
     """Get the light controller as a dependency.
 
@@ -112,11 +118,11 @@ async def get_light_controller(
 
 
 async def get_run_orchestrator_store(
-    app_state: AppState = Depends(get_app_state),
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
-    robot_type: RobotType = Depends(get_robot_type),
-    deck_type: DeckType = Depends(get_deck_type),
-    light_controller: LightController = Depends(get_light_controller),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    hardware_api: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
+    deck_type: Annotated[DeckType, Depends(get_deck_type)],
+    light_controller: Annotated[LightController, Depends(get_light_controller)],
 ) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
@@ -135,7 +141,9 @@ async def get_run_orchestrator_store(
 
 
 async def get_is_okay_to_create_maintenance_run(
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
 ) -> bool:
     """Whether a maintenance run can be created if a protocol run already exists."""
     try:
@@ -146,23 +154,29 @@ async def get_is_okay_to_create_maintenance_run(
 
 
 async def get_run_data_manager(
-    task_runner: TaskRunner = Depends(get_task_runner),
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    run_store: RunStore = Depends(get_run_store),
-    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
+    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    runs_publisher: Annotated[RunsPublisher, Depends(get_runs_publisher)],
+    error_recovery_setting_store: Annotated[
+        ErrorRecoverySettingStore, Depends(get_error_recovery_setting_store)
+    ],
 ) -> RunDataManager:
     """Get a run data manager to keep track of current/historical run data."""
     return RunDataManager(
-        task_runner=task_runner,
         run_orchestrator_store=run_orchestrator_store,
         run_store=run_store,
+        error_recovery_setting_store=error_recovery_setting_store,
+        task_runner=task_runner,
         runs_publisher=runs_publisher,
     )
 
 
 async def get_run_auto_deleter(
-    run_store: RunStore = Depends(get_run_store),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> RunAutoDeleter:
     """Get an `AutoDeleter` to delete old runs."""
     return RunAutoDeleter(
@@ -174,8 +188,8 @@ async def get_run_auto_deleter(
 
 
 async def get_quick_transfer_run_auto_deleter(
-    run_store: RunStore = Depends(get_run_store),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> RunAutoDeleter:
     """Get an `AutoDeleter` to delete old runs for quick transfer prorotocols."""
     return RunAutoDeleter(

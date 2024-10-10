@@ -1,5 +1,6 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
+import type { WellLocation } from './support'
 import type {
   Coordinates,
   MotorAxes,
@@ -125,14 +126,7 @@ export interface MoveToWellParams {
   pipetteId: string
   labwareId: string
   wellName: string
-  wellLocation?: {
-    origin?: 'top' | 'bottom'
-    offset?: {
-      x?: number
-      y?: number
-      z?: number
-    }
-  }
+  wellLocation?: WellLocation
   minimumZHeight?: number
   forceDirect?: boolean
 }

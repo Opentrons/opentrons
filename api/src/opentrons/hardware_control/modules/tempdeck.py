@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Mapping, Optional
+from typing import Dict, Optional
 
-from opentrons.hardware_control.modules.types import TemperatureStatus
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    TemperatureStatus,
+)
 from opentrons.hardware_control.poller import Reader, Poller
 from typing_extensions import Final
 from opentrons.drivers.types import Temperature
@@ -15,7 +18,7 @@ from opentrons.drivers.temp_deck import (
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.modules import update, mod_abc, types
+from opentrons.hardware_control.modules import update, mod_abc, types, errors
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +29,7 @@ SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
 class TempDeck(mod_abc.AbstractModule):
     """Hardware control interface for an attached Temperature Module."""
 
-    MODULE_TYPE = types.ModuleType.TEMPERATURE
+    MODULE_TYPE = types.ModuleType["TEMPERATURE"]
     FIRST_GEN2_REVISION = 20
 
     @classmethod
@@ -40,6 +43,7 @@ class TempDeck(mod_abc.AbstractModule):
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "TempDeck":
         """
         Build a TempDeck
@@ -52,6 +56,7 @@ class TempDeck(mod_abc.AbstractModule):
             poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             sim_model: The model name used by simulator
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
 
         Returns:
             Tempdeck instance
@@ -77,6 +82,7 @@ class TempDeck(mod_abc.AbstractModule):
             poller=poller,
             device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
+            disconnected_callback=disconnected_callback,
         )
 
         try:
@@ -94,8 +100,9 @@ class TempDeck(mod_abc.AbstractModule):
         driver: AbstractTempDeckDriver,
         reader: TempDeckReader,
         poller: Poller,
-        device_info: Mapping[str, str],
+        device_info: Dict[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> None:
         """Constructor"""
         super().__init__(
@@ -103,6 +110,7 @@ class TempDeck(mod_abc.AbstractModule):
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
         self._device_info = device_info
         self._driver = driver
@@ -182,7 +190,7 @@ class TempDeck(mod_abc.AbstractModule):
         await self._reader.read()
 
     @property
-    def device_info(self) -> Mapping[str, str]:
+    def device_info(self) -> Dict[str, str]:
         return self._device_info
 
     @property
@@ -211,7 +219,7 @@ class TempDeck(mod_abc.AbstractModule):
     async def prep_for_update(self) -> str:
         model = self._device_info and self._device_info.get("model")
         if model in ("temp_deck_v1", "temp_deck_v1.1", "temp_deck_v2"):
-            raise types.UpdateError(
+            raise errors.UpdateError(
                 "This Temperature Module can't be updated."
                 "Please contact Opentrons Support."
             )

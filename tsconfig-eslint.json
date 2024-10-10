@@ -1,6 +1,9 @@
 {
   "extends": "./tsconfig-base.json",
   "compilerOptions": {
+    "paths": {
+      "/app/*": ["./app/src/*"]
+    },
     "emitDeclarationOnly": false,
     "noEmit": true
   },
@@ -36,6 +39,7 @@
     "usb-bridge/node-client/src",
     "**/*.js",
     "**/*.ts",
+    "**/*.mts",
     "*.js",
     ".*.js",
     "**/*.json"
@@ -47,6 +51,6 @@
     "**/dist/**/*",
     "**/lib/**/*",
     "**/build/**",
-    "**/venv/**",
+    "**/venv/**"
   ]
 }

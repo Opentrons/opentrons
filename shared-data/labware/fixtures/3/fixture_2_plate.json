@@ -1,0 +1,95 @@
+{
+  "ordering": [["A1"], ["A2"]],
+  "schemaVersion": 3,
+  "version": 3,
+  "namespace": "fixture",
+  "metadata": {
+    "displayName": "12 Channel Trough",
+    "displayVolumeUnits": "mL",
+    "displayCategory": "reservoir"
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.8,
+    "zDimension": 44.45
+  },
+  "parameters": {
+    "format": "trough",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "fixture_12_trough",
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
+  },
+  "wells": {
+    "A1": {
+      "shape": "circular",
+      "depth": 42.16,
+      "diameter": 35.0,
+      "totalLiquidVolume": 22000,
+      "x": 13.94,
+      "y": 42.9,
+      "z": 2.29,
+      "geometryDefinitionId": "iuweofiuwhfn"
+    },
+    "A2": {
+      "shape": "rectangular",
+      "depth": 42.16,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 23.03,
+      "y": 42.9,
+      "z": 2.29,
+      "geometryDefinitionId": "daiwudhadfhiew"
+    }
+  },
+  "brand": {
+    "brand": "USA Scientific",
+    "brandId": ["1061-8150"]
+  },
+  "groups": [
+    {
+      "wells": ["A1", "A2"],
+      "metadata": {
+        "wellBottomShape": "v"
+      }
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "innerLabwareGeometry": {
+    "daiwudhadfhiew": {
+      "sections": [
+        {
+          "shape": "cuboidal",
+          "topXDimension": 127.76,
+          "topYDimension": 85.8,
+          "bottomXDimension": 70.0,
+          "bottomYDimension": 50.0,
+          "topHeight": 42.16,
+          "bottomHeight": 20.0
+        }
+      ]
+    },
+    "iuweofiuwhfn": {
+      "sections": [
+        {
+          "shape": "conical",
+          "bottomDiameter": 35.0,
+          "topDiameter": 35.0,
+          "topHeight": 42.16,
+          "bottomHeight": 10.0
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 20.0,
+          "topHeight": 10.0,
+          "bottomHeight": 0.0
+        }
+      ]
+    }
+  }
+}

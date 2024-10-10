@@ -51,8 +51,12 @@ class JiraTicket:
     def match_issues(self, issue_ids: List[List[str]], ticket_summary: str) -> List:
         """Matches related ticket ID's."""
         to_link = []
-        error = ticket_summary.split("_")[3]
-        robot = ticket_summary.split("_")[0]
+        try:
+            error = ticket_summary.split("_")[3]
+            robot = ticket_summary.split("_")[0]
+        except IndexError:
+            error = ""
+            robot = ""
         # for every issue see if both match, if yes then grab issue ID and add it to a list
         for issue in issue_ids:
             summary = issue[1]
@@ -170,17 +174,20 @@ class JiraTicket:
 
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
-        # TODO: Ensure that file is actually uploaded.
-        file = {"file": open(attachment_path, "rb")}
-        JSON_headers = {"Accept": "application/json"}
+        file = {
+            "file": (attachment_path, open(attachment_path, "rb"), "application-type")
+        }
+        JSON_headers = {"Accept": "application/json", "X-Atlassian-Token": "no-check"}
+        attachment_url = f"{self.url}/rest/api/3/issue/{issue_id}/attachments"
         try:
-            response = requests.post(
-                f"{self.url}/rest/api/3/issue/{issue_id}/attachments",
+            response = requests.request(
+                "POST",
+                attachment_url,
                 headers=JSON_headers,
                 auth=self.auth,
                 files=file,
             )
-            print(response)
+            print(f"File: {attachment_path} posted to ticket {issue_id}.")
         except json.JSONDecodeError:
             error_message = str(response.content)
             print(f"JSON decoding error occurred. Response content: {error_message}.")
@@ -256,9 +263,9 @@ class JiraTicket:
         components_list = response.json()
         return components_list
 
-    def comment(self, content_list: List[Dict[str, Any]], issue_url: str) -> None:
+    def comment(self, content_list: List[Dict[str, Any]], issue_key: str) -> None:
         """Leave comment on JIRA Ticket."""
-        comment_url = issue_url + "/comment"
+        comment_url = f"{self.url}/rest/api/3/issue/{issue_key}/comment"
         payload = json.dumps(
             {
                 "body": {
@@ -271,6 +278,29 @@ class JiraTicket:
         requests.request(
             "POST", comment_url, data=payload, headers=self.headers, auth=self.auth
         )
+
+    def format_jira_comment(self, comment_info: Any) -> List[Dict[str, Any]]:
+        """Formats a string input to work with the "comment" function."""
+        content_list: List = []
+        line_1 = {
+            "type": "paragraph",
+            "content": [{"type": "text", "text": comment_info}],
+        }
+        content_list.insert(0, line_1)
+        return content_list
+
+    def get_ticket(self) -> str:
+        """Gets and confirms jira ticket number."""
+        while True:
+            issue_key = input("Ticket Key: ")
+            url = f"{self.url}/rest/api/3/issue/{issue_key}"
+            headers = {"Accept": "application/json"}
+            response = requests.request("GET", url, headers=headers, auth=self.auth)
+            if str(response) == "<Response [200]>":
+                break
+            else:
+                print("Please input a valid JIRA Key")
+        return issue_key
 
 
 if __name__ == "__main__":

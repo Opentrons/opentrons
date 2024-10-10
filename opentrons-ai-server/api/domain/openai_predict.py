@@ -1,7 +1,8 @@
-import logging
 from pathlib import Path
 from typing import List, Tuple
 
+import structlog
+from ddtrace import tracer
 from llama_index.core import Settings as li_settings
 from llama_index.core import StorageContext, load_index_from_storage
 from llama_index.embeddings.openai import OpenAIEmbedding
@@ -25,8 +26,8 @@ from api.domain.prompts import (
 from api.domain.utils import refine_characters
 from api.settings import Settings
 
-logger = logging.getLogger(__name__)
-
+settings: Settings = Settings()
+logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
 
 
@@ -38,13 +39,16 @@ class OpenAIPredict:
             model_name="text-embedding-3-large", api_key=self.settings.openai_api_key.get_secret_value()
         )
 
+    @tracer.wrap()
     def get_docs_all(self, query: str) -> Tuple[str, str, str]:
         commands = self.extract_atomic_description(query)
         logger.info("Commands", extra={"commands": commands})
 
         # define file paths for storage
         example_command_path = str(ROOT_PATH / "api" / "storage" / "index" / "commands")
-        documentation_path = str(ROOT_PATH / "api" / "storage" / "index" / "v215")
+        documentation_path = str(ROOT_PATH / "api" / "storage" / "index" / "v219")
+        documentation_ref_path = str(ROOT_PATH / "api" / "storage" / "index" / "v219_ref")
+
         labware_api_path = standard_labware_api
 
         # retrieve example commands
@@ -65,16 +69,25 @@ class OpenAIPredict:
         # retrieve documentation
         storage_context = StorageContext.from_defaults(persist_dir=documentation_path)
         index = load_index_from_storage(storage_context)
-        retriever = index.as_retriever(similarity_top_k=3)
+        retriever = index.as_retriever(similarity_top_k=2)
         nodes = retriever.retrieve(query)
         docs = "\n".join(node.text.strip() for node in nodes)
-        docs_v215 = f"\n{'='*15} DOCUMENTATION {'='*15}\n\n" + docs
+        docs = f"\n{'='*15} DOCUMENTATION {'='*15}\n\n" + docs
+
+        # retrieve reference
+        storage_context = StorageContext.from_defaults(persist_dir=documentation_ref_path)
+        index = load_index_from_storage(storage_context)
+        retriever = index.as_retriever(similarity_top_k=2)
+        nodes = retriever.retrieve(query)
+        docs_ref = "\n".join(node.text.strip() for node in nodes)
+        docs_ref = f"\n{'='*15} DOCUMENTATION REFERENCE {'='*15}\n\n" + docs_ref
 
         # standard api names
         standard_api_names = f"\n{'='*15} STANDARD API NAMES {'='*15}\n\n" + labware_api_path
 
-        return example_commands, docs_v215, standard_api_names
+        return example_commands, docs + docs_ref, standard_api_names
 
+    @tracer.wrap()
     def extract_atomic_description(self, protocol_description: str) -> List[str]:
         class atomic_descr(BaseModel):
             """
@@ -96,6 +109,7 @@ class OpenAIPredict:
                 descriptions.append(x)
         return descriptions
 
+    @tracer.wrap()
     def refine_response(self, assistant_message: str) -> str:
         if assistant_message is None:
             return ""
@@ -119,6 +133,7 @@ class OpenAIPredict:
 
         return response.choices[0].message.content if response.choices[0].message.content is not None else ""
 
+    @tracer.wrap()
     def predict(self, prompt: str, chat_completion_message_params: List[ChatCompletionMessageParam] | None = None) -> None | str:
 
         prompt = refine_characters(prompt)
@@ -126,13 +141,13 @@ class OpenAIPredict:
         if chat_completion_message_params:
             messages += chat_completion_message_params
 
-        example_commands, docs_v215, standard_api_names = self.get_docs_all(prompt)
+        example_commands, docs_refs, standard_api_names = self.get_docs_all(prompt)
 
         user_message: ChatCompletionMessageParam = {
             "role": "user",
             "content": f"QUESTION/DESCRIPTION: \n{prompt}\n\n"
             f"PYTHON API V2 DOCUMENTATION: \n{example_commands}\n"
-            f"{pipette_type}\n{example_pcr_1}\n\n{docs_v215}\n\n"
+            f"{pipette_type}\n{example_pcr_1}\n\n{docs_refs}\n\n"
             f"{rules_for_transfer}\n\n{standard_api_names}\n\n",
         }
 

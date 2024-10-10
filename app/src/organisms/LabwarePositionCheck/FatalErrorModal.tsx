@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -15,14 +14,14 @@ import {
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
+  ModalShell,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../App/portal'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { i18n } from '../../i18n'
+import { getTopPortalEl } from '/app/App/portal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { i18n } from '/app/i18n'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 interface FatalErrorProps {
@@ -40,15 +39,15 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
   const { onClose, isOnDevice } = props
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell fullPage>
+      <ModalShell fullPage>
         <WizardHeader
           title={t('labware_position_check_title')}
           onExit={onClose}
         />
         <FatalError {...props} />
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         header={
           <WizardHeader
@@ -58,7 +57,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
         }
       >
         <FatalError {...props} />
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

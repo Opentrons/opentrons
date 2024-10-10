@@ -1,5 +1,5 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import { useDropTipCommandErrors } from '.'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
@@ -41,10 +41,7 @@ export function useDropTipWithType(
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
   const { errorDetails, setErrorDetails } = useErrorDetails()
 
-  const {
-    activeMaintenanceRunId,
-    toggleClientEndRun,
-  } = useDropTipMaintenanceRun({
+  const activeMaintenanceRunId = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
   })
@@ -63,7 +60,6 @@ export function useDropTipWithType(
     setErrorDetails,
     toggleIsExiting,
     fixitCommandTypeUtils,
-    toggleClientEndRun,
   })
 
   useRegisterPipetteFixitType({ ...params, ...dtCreateCommandUtils })
@@ -82,9 +78,7 @@ function useErrorDetails(): {
   errorDetails: ErrorDetails | null
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
 } {
-  const [errorDetails, setErrorDetails] = React.useState<null | ErrorDetails>(
-    null
-  )
+  const [errorDetails, setErrorDetails] = useState<null | ErrorDetails>(null)
   const setRobustErrorDetails = useDropTipCommandErrors(setErrorDetails)
 
   return { errorDetails, setErrorDetails: setRobustErrorDetails }
@@ -102,7 +96,7 @@ function useIsExitingDT(
   isExiting: boolean
   toggleIsExiting: () => void
 } {
-  const [isExiting, setIsExiting] = React.useState<boolean>(false)
+  const [isExiting, setIsExiting] = useState<boolean>(false)
 
   const toggleIsExiting = (): void => {
     setIsExiting(!isExiting)
@@ -124,7 +118,7 @@ function useRegisterPipetteFixitType({
   chainRunCommands,
   fixitCommandTypeUtils,
 }: UseRegisterPipetteFixitType): void {
-  React.useEffect(() => {
+  useEffect(() => {
     if (issuedCommandsType === 'fixit') {
       const command = buildLoadPipetteCommand(
         instrumentModelSpecs.name,

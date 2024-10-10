@@ -14,6 +14,7 @@ from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
     ModuleType,
     TemperatureStatus,
     SpeedStatus,
@@ -50,6 +51,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "HeaterShaker":
         """
         Build a HeaterShaker
@@ -63,6 +65,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
 
         Returns:
             HeaterShaker instance
@@ -80,12 +83,13 @@ class HeaterShaker(mod_abc.AbstractModule):
         module = cls(
             port=port,
             usb_port=usb_port,
-            device_info=await driver.get_device_info(),
-            execution_manager=execution_manager,
             driver=driver,
             reader=reader,
             poller=poller,
+            device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
+            execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
 
         try:
@@ -105,12 +109,14 @@ class HeaterShaker(mod_abc.AbstractModule):
         poller: Poller,
         device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ):
         super().__init__(
             port=port,
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
         self._device_info = device_info
         self._driver = driver
@@ -195,7 +201,6 @@ class HeaterShaker(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         return {
-            # TODO (spp, 2022-2-22): Revise what status includes
             "status": self.status.value,
             "data": {
                 "temperatureStatus": self.temperature_status.value,

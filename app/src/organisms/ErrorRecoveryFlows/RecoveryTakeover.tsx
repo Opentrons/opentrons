@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -15,14 +15,14 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { useUpdateClientDataRecovery } from '../../resources/client_data'
-import { TakeoverModal } from '../TakeoverModal/TakeoverModal'
+import { useUpdateClientDataRecovery } from '/app/resources/client_data'
+import { TakeoverModal } from '/app/organisms/TakeoverModal/TakeoverModal'
 import { RecoveryInterventionModal } from './shared'
 
 import type {
   ClientDataRecovery,
   UseUpdateClientDataRecoveryResult,
-} from '../../resources/client_data'
+} from '/app/resources/client_data'
 import type { ErrorRecoveryFlowsProps } from '.'
 import {
   BANNER_TEXT_CONTAINER_STYLE,
@@ -99,7 +99,7 @@ export function RecoveryTakeoverODD({
   clearClientData,
   isRunStatusAwaitingRecovery,
 }: RecoveryTakeoverProps): JSX.Element {
-  const [showConfirmation, setShowConfirmation] = React.useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
   return (
     <TakeoverModal

@@ -1,8 +1,8 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { it, describe, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { GoBack } from '../GoBack'
 
 const render = (props: React.ComponentProps<typeof GoBack>) => {

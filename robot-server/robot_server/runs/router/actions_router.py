@@ -3,8 +3,7 @@ import logging
 
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
-from typing import Union
-from typing_extensions import Literal
+from typing import Annotated, Literal, Union
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -50,13 +49,15 @@ class RunActionNotAllowed(ErrorDetails):
 
 async def get_run_controller(
     runId: str,
-    task_runner: TaskRunner = Depends(get_task_runner),
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    run_store: RunStore = Depends(get_run_store),
-    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
-    maintenance_runs_publisher: MaintenanceRunsPublisher = Depends(
-        get_maintenance_runs_publisher
-    ),
+    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    runs_publisher: Annotated[RunsPublisher, Depends(get_runs_publisher)],
+    maintenance_runs_publisher: Annotated[
+        MaintenanceRunsPublisher, Depends(get_maintenance_runs_publisher)
+    ],
 ) -> RunController:
     """Get a RunController for the current run.
 
@@ -101,22 +102,22 @@ async def get_run_controller(
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
-    run_controller: RunController = Depends(get_run_controller),
-    action_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
-    maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
-    deck_configuration_store: DeckConfigurationStore = Depends(
-        get_deck_configuration_store
-    ),
-    check_estop: bool = Depends(require_estop_in_good_state),
+    run_controller: Annotated[RunController, Depends(get_run_controller)],
+    action_id: Annotated[str, Depends(get_unique_id)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
+    maintenance_run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    deck_configuration_store: Annotated[
+        DeckConfigurationStore, Depends(get_deck_configuration_store)
+    ],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
     When a play action is issued to a protocol run while a maintenance run is active,
     the protocol run is given priority and the maintenance run is deleted before
-    executing the protocol run play action..
+    executing the protocol run play action.
 
     Arguments:
         runId: Run ID pulled from the URL.

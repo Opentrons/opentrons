@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
@@ -9,7 +8,7 @@ import {
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
+  STAGING_AREA_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
   CONFIG_STYLE_SELECTED,
 } from './constants'
@@ -53,7 +52,6 @@ export function AbsorbanceReaderFixture(
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
    * the adjustment for x is different for right side/left side
    */
-  // TODO (AA): fix the slot length for the absorbance reader fixture
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
 
   const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
@@ -63,7 +61,7 @@ export function AbsorbanceReaderFixture(
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={STAGING_AREA_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}

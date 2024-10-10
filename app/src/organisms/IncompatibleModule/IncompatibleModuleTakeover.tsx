@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { IncompatibleModuleODDModalBody } from './IncompatibleModuleODDModalBody'
 import { IncompatibleModuleDesktopModalBody } from './IncompatibleModuleDesktopModalBody'
-import { getTopPortalEl, getModalPortalEl } from '../../App/portal'
+import { getTopPortalEl, getModalPortalEl } from '/app/App/portal'
 import { useIncompatibleModulesAttached } from './hooks'
 
 const POLL_INTERVAL_MS = 5000

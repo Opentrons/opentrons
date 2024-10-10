@@ -6,8 +6,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional, Union, Callable
-from typing_extensions import Literal, Final
+from typing import Annotated, Callable, Final, Literal, Optional, Union
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
@@ -38,6 +37,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     ResourceLink,
     PydanticResponse,
+    Body,
 )
 
 from robot_server.protocols.dependencies import get_protocol_store
@@ -47,11 +47,20 @@ from robot_server.protocols.protocol_store import (
 )
 from robot_server.protocols.router import ProtocolNotFound
 
-from ..run_models import RunNotFoundError
+from ..run_models import (
+    RunNotFoundError,
+    ActiveNozzleLayout,
+    RunCurrentState,
+    CommandLinkNoMeta,
+    NozzleLayoutConfig,
+)
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
 from ..run_orchestrator_store import RunConflictError
-from ..run_data_manager import RunDataManager, RunNotCurrentError
+from ..run_data_manager import (
+    RunDataManager,
+    RunNotCurrentError,
+)
 from ..dependencies import (
     get_run_data_manager,
     get_run_auto_deleter,
@@ -116,9 +125,18 @@ class AllRunsLinks(BaseModel):
     )
 
 
+class CurrentStateLinks(BaseModel):
+    """Links returned with the current state of a run."""
+
+    current: Optional[CommandLinkNoMeta] = Field(
+        None,
+        description="Path to the current command when current state was reported, if any.",
+    )
+
+
 async def get_run_data_from_url(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> Union[Run, BadRun]:
     """Get the data of a run.
 
@@ -155,22 +173,22 @@ async def get_run_data_from_url(
     },
 )
 async def create_run(  # noqa: C901
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    run_id: Annotated[str, Depends(get_unique_id)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
+    run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    quick_transfer_run_auto_deleter: Annotated[
+        RunAutoDeleter, Depends(get_quick_transfer_run_auto_deleter)
+    ],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    deck_configuration_store: Annotated[
+        DeckConfigurationStore, Depends(get_deck_configuration_store)
+    ],
+    notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    run_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
-    run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
-    quick_transfer_run_auto_deleter: RunAutoDeleter = Depends(
-        get_quick_transfer_run_auto_deleter
-    ),
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
-    check_estop: bool = Depends(require_estop_in_good_state),
-    deck_configuration_store: DeckConfigurationStore = Depends(
-        get_deck_configuration_store
-    ),
-    notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
 
@@ -272,16 +290,18 @@ async def create_run(  # noqa: C901
     },
 )
 async def get_runs(
-    pageLength: Optional[int] = Query(
-        None,
-        description=(
-            "The maximum number of runs to return."
-            " If this is less than the total number of runs,"
-            " the most-recently created runs will be returned."
-            " If this is omitted or `null`, all runs will be returned."
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    pageLength: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The maximum number of runs to return."
+                " If this is less than the total number of runs,"
+                " the most-recently created runs will be returned."
+                " If this is omitted or `null`, all runs will be returned."
+            ),
         ),
-    ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    ] = None,
 ) -> PydanticResponse[MultiBody[Union[Run, BadRun], AllRunsLinks]]:
     """Get all runs, in order from least-recently to most-recently created.
 
@@ -315,7 +335,7 @@ async def get_runs(
     },
 )
 async def get_run(
-    run_data: Run = Depends(get_run_data_from_url),
+    run_data: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Get a run by its ID.
 
@@ -340,7 +360,7 @@ async def get_run(
 )
 async def remove_run(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a run by its ID.
 
@@ -377,7 +397,7 @@ async def remove_run(
 async def update_run(
     runId: str,
     request_body: RequestModel[RunUpdate],
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -406,11 +426,13 @@ async def update_run(
 @PydanticResponse.wrap_route(
     base_router.put,
     path="/runs/{runId}/errorRecoveryPolicy",
-    summary="Set run policies",
+    summary="Set a run's error recovery policy",
     description=dedent(
         """
         Update how to handle different kinds of command failures.
-        The following rules will persist during the run.
+
+        For this to have any effect, error recovery must also be enabled globally.
+        See `PATCH /errorRecovery/settings`.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -422,7 +444,7 @@ async def update_run(
 async def put_error_recovery_policy(
     runId: str,
     request_body: RequestModel[ErrorRecoveryPolicy],
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.
 
@@ -431,12 +453,11 @@ async def put_error_recovery_policy(
         request_body:  Request body with run policies data.
         run_data_manager: Current and historical run data management.
     """
-    policies = request_body.data.policyRules
-    if policies:
-        try:
-            run_data_manager.set_policies(run_id=runId, policies=policies)
-        except RunNotCurrentError as e:
-            raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    rules = request_body.data.policyRules
+    try:
+        run_data_manager.set_error_recovery_rules(run_id=runId, rules=rules)
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.construct(),
@@ -463,20 +484,24 @@ async def put_error_recovery_policy(
     },
 )
 async def get_run_commands_error(
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     runId: str,
-    cursor: Optional[int] = Query(
-        None,
-        description=(
-            "The starting index of the desired first command error in the list."
-            " If unspecified, a cursor will be selected automatically"
-            " based on the last error added."
+    pageLength: Annotated[
+        int,
+        Query(
+            description="The maximum number of command errors in the list to return.",
         ),
-    ),
-    pageLength: int = Query(
-        _DEFAULT_COMMAND_ERROR_LIST_LENGTH,
-        description="The maximum number of command errors in the list to return.",
-    ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    ] = _DEFAULT_COMMAND_ERROR_LIST_LENGTH,
+    cursor: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The starting index of the desired first command error in the list."
+                " If unspecified, a cursor will be selected automatically"
+                " based on the last error added."
+            ),
+        ),
+    ] = None,
 ) -> PydanticResponse[SimpleMultiBody[pe_errors.ErrorOccurrence]]:
     """Get a summary of a set of command errors in a run.
 
@@ -515,6 +540,67 @@ async def get_run_commands_error(
         content=SimpleMultiBody.construct(
             data=command_error_slice.commands_errors,
             meta=meta,
+        ),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    base_router.get,
+    path="/runs/{runId}/currentState",
+    summary="Get a run's current state.",
+    description=dedent(
+        """
+        Get current state associated with a run if the run is current.
+        "\n\n"
+        Note that this endpoint is experimental and subject to change.
+        """
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[RunCurrentState]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+    },
+)
+async def get_current_state(
+    runId: str,
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[Body[RunCurrentState, CurrentStateLinks]]:
+    """Get current state associated with a run if the run is current.
+
+    Arguments:
+        runId: Run ID pulled from URL.
+        run_data_manager: Run data retrieval interface.
+    """
+    try:
+        active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
+
+        nozzle_layouts = {
+            pipetteId: ActiveNozzleLayout.construct(
+                startingNozzle=nozzle_map.starting_nozzle,
+                activeNozzles=list(nozzle_map.map_store.keys()),
+                config=NozzleLayoutConfig(nozzle_map.configuration.value.lower()),
+            )
+            for pipetteId, nozzle_map in active_nozzle_maps.items()
+        }
+
+        current_command = run_data_manager.get_current_command(run_id=runId)
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+
+    # TODO(jh, 03-11-24): Use `last_completed_command` instead of `current_command` to avoid concurrency gotchas.
+    links = CurrentStateLinks.construct(
+        current=CommandLinkNoMeta.construct(
+            id=current_command.command_id,
+            href=f"/runs/{runId}/commands/{current_command.command_id}",
+        )
+        if current_command is not None
+        else None
+    )
+
+    return await PydanticResponse.create(
+        content=Body.construct(
+            data=RunCurrentState.construct(activeNozzleLayouts=nozzle_layouts),
+            links=links,
         ),
         status_code=status.HTTP_200_OK,
     )

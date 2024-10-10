@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { SLEEP_NEVER_MS } from '../../App/constants'
+import { SLEEP_NEVER_MS } from '/app/local-resources/config'
 import type { State } from '../types'
 import type {
   Config,
@@ -8,9 +8,15 @@ import type {
   ProtocolsOnDeviceSortKey,
   QuickTransfersOnDeviceSortKey,
   OnDeviceDisplaySettings,
+  Language,
 } from './types'
-import type { SelectOption } from '../../atoms/SelectField/Select'
-import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
+import type { ProtocolSort } from '/app/redux/protocol-storage'
+
+export interface SelectOption {
+  value: string
+  label?: string
+  isDisabled?: boolean
+}
 
 export const getConfig = (state: State): Config | null => state.config
 
@@ -149,4 +155,16 @@ export const getOnDeviceDisplaySettings: (
 export const getUserId: (state: State) => string = createSelector(
   getConfig,
   config => config?.userInfo.userId ?? ''
+)
+
+export const getAppLanguage: (state: State) => Language | null = createSelector(
+  getConfig,
+  config => config?.language.appLanguage ?? 'en'
+)
+
+export const getStoredSystemLanguage: (
+  state: State
+) => string | null = createSelector(
+  getConfig,
+  config => config?.language.systemLanguage ?? null
 )

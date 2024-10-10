@@ -3,6 +3,7 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import (
     Dict,
+    List,
     NamedTuple,
     Callable,
     Any,
@@ -38,12 +39,20 @@ class ThermocyclerStep(ThermocyclerStepBase, total=False):
     hold_time_minutes: float
 
 
+class ThermocyclerCycle(TypedDict):
+    steps: List[ThermocyclerStep]
+    repetitions: int
+
+
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
+
+
+ModuleDisconnectedCallback = Optional[Callable[[str, str | None], None]]
 
 
 class LiveData(TypedDict):
     status: str
-    data: Dict[str, Union[float, str, bool, None]]
+    data: Dict[str, Union[float, str, bool, List[int], None]]
 
 
 class ModuleType(str, Enum):
@@ -135,6 +144,7 @@ def module_model_from_string(model_string: str) -> ModuleModel:
 class ModuleAtPort:
     port: str
     name: str
+    serial: Optional[str] = None
     usb_port: USBPort = USBPort(name="", port_number=0)
 
 
@@ -157,10 +167,6 @@ class BundledFirmware(NamedTuple):
 
     def __repr__(self) -> str:
         return f"<BundledFirmware {self.version}, path={self.path}>"
-
-
-class UpdateError(RuntimeError):
-    pass
 
 
 class ModuleInfo(NamedTuple):

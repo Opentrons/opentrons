@@ -19,7 +19,7 @@ from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     RunCommandAction,
@@ -219,7 +219,7 @@ class _TestCommandDefinedError(ErrorOccurrence):
 
 _TestCommandReturn = Union[
     SuccessData[_TestCommandResult, None],
-    DefinedErrorData[_TestCommandDefinedError, None],
+    DefinedErrorData[_TestCommandDefinedError],
 ]
 
 
@@ -561,7 +561,6 @@ async def test_execute_defined_error(
     error_id = "error-id"
     returned_error = DefinedErrorData(
         public=_TestCommandDefinedError(id=error_id, createdAt=failed_at),
-        private=None,
     )
     queued_command = cast(
         Command,

@@ -24,9 +24,13 @@ from opentrons.hardware_control.modules.types import LiveData
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_slot,
     get_west_slot,
+    get_adjacent_staging_slot,
 )
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
+)
+from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
+    AbsorbanceReaderMeasureMode,
 )
 from opentrons.types import DeckSlotName, MountType
 from ..errors import ModuleNotConnectedError
@@ -45,7 +49,10 @@ from ..types import (
     HeaterShakerMovementRestrictors,
     DeckType,
     LabwareMovementOffsetData,
+    AddressableAreaLocation,
 )
+
+from ..resources import DeckFixedLabware
 from .addressable_areas import AddressableAreaView
 from .. import errors
 from ..commands import (
@@ -56,8 +63,13 @@ from ..commands import (
     thermocycler,
     absorbance_reader,
 )
-from ..actions import Action, SucceedCommandAction, AddModuleAction
-from .abstract_store import HasState, HandlesActions
+from ..actions import (
+    Action,
+    SucceedCommandAction,
+    AddModuleAction,
+    AddAbsorbanceReaderLidAction,
+)
+from ._abstract_store import HasState, HandlesActions
 from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleSubState,
@@ -174,6 +186,15 @@ class ModuleState:
     deck_type: DeckType
     """Type of deck that the modules are on."""
 
+    deck_fixed_labware: Sequence[DeckFixedLabware]
+    """Fixed labware from the deck which may be assigned to a module.
+
+    The Opentrons Plate Reader module makes use of an electronic Lid labware which moves
+    between the Reader and Dock positions, and is pre-loaded into the engine as to persist
+    even when not in use. For this reason, we inject it here when an appropriate match
+    is identified.
+    """
+
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
     """Module state container."""
@@ -183,6 +204,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def __init__(
         self,
         config: Config,
+        deck_fixed_labware: Sequence[DeckFixedLabware],
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
     ) -> None:
         """Initialize a ModuleStore and its state."""
@@ -194,6 +216,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             substate_by_module_id={},
             module_offset_by_serial=module_calibration_offsets or {},
             deck_type=config.deck_type,
+            deck_fixed_labware=deck_fixed_labware,
         )
         self._robot_type = config.robot_type
 
@@ -210,6 +233,11 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 slot_name=None,
                 requested_model=None,
                 module_live_data=action.module_live_data,
+            )
+        elif isinstance(action, AddAbsorbanceReaderLidAction):
+            self._update_absorbance_reader_lid_id(
+                module_id=action.module_id,
+                lid_id=action.lid_id,
             )
 
     def _handle_command(self, command: Command) -> None:
@@ -269,13 +297,38 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(
             command.result,
             (
+                absorbance_reader.CloseLidResult,
+                absorbance_reader.OpenLidResult,
                 absorbance_reader.InitializeResult,
-                absorbance_reader.MeasureAbsorbanceResult,
+                absorbance_reader.ReadAbsorbanceResult,
             ),
         ):
             self._handle_absorbance_reader_commands(command)
 
-    def _add_module_substate(
+    def _update_absorbance_reader_lid_id(
+        self,
+        module_id: str,
+        lid_id: str,
+    ) -> None:
+        abs_substate = self._state.substate_by_module_id.get(module_id)
+        assert isinstance(
+            abs_substate, AbsorbanceReaderSubState
+        ), f"{module_id} is not an absorbance plate reader."
+
+        prev_state: AbsorbanceReaderSubState = abs_substate
+        self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+            module_id=AbsorbanceReaderId(module_id),
+            configured=prev_state.configured,
+            measured=prev_state.measured,
+            is_lid_on=prev_state.is_lid_on,
+            data=prev_state.data,
+            measure_mode=prev_state.measure_mode,
+            configured_wavelengths=prev_state.configured_wavelengths,
+            reference_wavelength=prev_state.reference_wavelength,
+            lid_id=lid_id,
+        )
+
+    def _add_module_substate(  # noqa: C901
         self,
         module_id: str,
         serial_number: Optional[str],
@@ -334,12 +387,26 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=MagneticBlockId(module_id)
             )
         elif ModuleModel.is_absorbance_reader(actual_model):
+            lid_labware_id = None
+            slot = self._state.slot_by_module_id[module_id]
+            if slot is not None:
+                reader_addressable_area = f"absorbanceReaderV1{slot.value}"
+                for labware in self._state.deck_fixed_labware:
+                    if labware.location == AddressableAreaLocation(
+                        addressableAreaName=reader_addressable_area
+                    ):
+                        lid_labware_id = labware.labware_id
+                        break
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=False,
                 measured=False,
+                is_lid_on=True,
                 data=None,
-                configured_wavelength=None,
+                measure_mode=None,
+                configured_wavelengths=None,
+                reference_wavelength=None,
+                lid_id=lid_labware_id,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -513,7 +580,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 target_block_temperature=block_temperature,
                 target_lid_temperature=None,
             )
-        # TODO (spp, 2022-08-01): set is_lid_open to False upon lid commands' failure
         elif isinstance(command.result, thermocycler.OpenLidResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
@@ -533,7 +599,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         self,
         command: Union[
             absorbance_reader.Initialize,
-            absorbance_reader.MeasureAbsorbance,
+            absorbance_reader.ReadAbsorbance,
+            absorbance_reader.CloseLid,
+            absorbance_reader.OpenLid,
         ],
     ) -> None:
         module_id = command.params.moduleId
@@ -544,23 +612,62 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
         # Get current values
         configured = absorbance_reader_substate.configured
-        configured_wavelength = absorbance_reader_substate.configured_wavelength
+        measure_mode = absorbance_reader_substate.measure_mode
+        configured_wavelengths = absorbance_reader_substate.configured_wavelengths
+        reference_wavelength = absorbance_reader_substate.reference_wavelength
+        is_lid_on = absorbance_reader_substate.is_lid_on
+        lid_id = absorbance_reader_substate.lid_id
+        data = absorbance_reader_substate.data
 
         if isinstance(command.result, absorbance_reader.InitializeResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=True,
                 measured=False,
+                is_lid_on=is_lid_on,
+                lid_id=lid_id,
+                measure_mode=AbsorbanceReaderMeasureMode(command.params.measureMode),
+                configured_wavelengths=command.params.sampleWavelengths,
+                reference_wavelength=command.params.referenceWavelength,
                 data=None,
-                configured_wavelength=command.params.sampleWavelength,
             )
-        elif isinstance(command.result, absorbance_reader.MeasureAbsorbanceResult):
+        elif isinstance(command.result, absorbance_reader.ReadAbsorbanceResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=configured,
-                configured_wavelength=configured_wavelength,
                 measured=True,
+                is_lid_on=is_lid_on,
+                lid_id=lid_id,
+                measure_mode=measure_mode,
+                configured_wavelengths=configured_wavelengths,
+                reference_wavelength=reference_wavelength,
                 data=command.result.data,
+            )
+
+        elif isinstance(command.result, absorbance_reader.OpenLidResult):
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                configured=configured,
+                measured=True,
+                is_lid_on=False,
+                lid_id=lid_id,
+                measure_mode=measure_mode,
+                configured_wavelengths=configured_wavelengths,
+                reference_wavelength=reference_wavelength,
+                data=data,
+            )
+
+        elif isinstance(command.result, absorbance_reader.CloseLidResult):
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                configured=configured,
+                measured=True,
+                is_lid_on=True,
+                lid_id=lid_id,
+                measure_mode=measure_mode,
+                configured_wavelengths=configured_wavelengths,
+                reference_wavelength=reference_wavelength,
+                data=data,
             )
 
 
@@ -711,7 +818,7 @@ class ModuleView(HasState[ModuleState]):
         return self._get_module_substate(
             module_id=module_id,
             expected_type=AbsorbanceReaderSubState,
-            expected_name="Thermocycler Module",
+            expected_name="Absorbance Reader",
         )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
@@ -1179,6 +1286,25 @@ class ModuleView(HasState[ModuleState]):
         else:
             return False
 
+    def convert_absorbance_reader_data_points(
+        self, data: List[float]
+    ) -> Dict[str, float]:
+        """Return the data from the Absorbance Reader module in a map of wells for each read value."""
+        if len(data) == 96:
+            # We have to reverse the reader values because the Opentrons Absorbance Reader is rotated 180 degrees on the deck
+            data.reverse()
+            well_map: Dict[str, float] = {}
+            for i, value in enumerate(data):
+                row = chr(ord("A") + i // 12)  # Convert index to row (A-H)
+                col = (i % 12) + 1  # Convert index to column (1-12)
+                well_key = f"{row}{col}"
+                well_map[well_key] = value
+            return well_map
+        else:
+            raise ValueError(
+                "Only readings of 96 Well labware are supported for conversion to map of values by well."
+            )
+
     def ensure_and_convert_module_fixture_location(
         self,
         deck_slot: DeckSlotName,
@@ -1194,84 +1320,40 @@ class ModuleView(HasState[ModuleState]):
                 f"Invalid Deck Type: {deck_type.name} - Does not support modules as fixtures."
             )
 
+        assert deck_slot in DeckSlotName.ot3_slots()
         if model == ModuleModel.MAGNETIC_BLOCK_V1:
-            valid_slots = [
-                slot
-                for slot in [
-                    "A1",
-                    "B1",
-                    "C1",
-                    "D1",
-                    "A2",
-                    "B2",
-                    "C2",
-                    "D2",
-                    "A3",
-                    "B3",
-                    "C3",
-                    "D3",
-                ]
-            ]
-            addressable_areas = [
-                "magneticBlockV1A1",
-                "magneticBlockV1B1",
-                "magneticBlockV1C1",
-                "magneticBlockV1D1",
-                "magneticBlockV1A2",
-                "magneticBlockV1B2",
-                "magneticBlockV1C2",
-                "magneticBlockV1D2",
-                "magneticBlockV1A3",
-                "magneticBlockV1B3",
-                "magneticBlockV1C3",
-                "magneticBlockV1D3",
-            ]
+            return f"magneticBlockV1{deck_slot.value}"
 
         elif model == ModuleModel.HEATER_SHAKER_MODULE_V1:
-            valid_slots = [
-                slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
-            ]
-            addressable_areas = [
-                "heaterShakerV1A1",
-                "heaterShakerV1B1",
-                "heaterShakerV1C1",
-                "heaterShakerV1D1",
-                "heaterShakerV1A3",
-                "heaterShakerV1B3",
-                "heaterShakerV1C3",
-                "heaterShakerV1D3",
-            ]
+            # only allowed in column 1 & 3
+            assert deck_slot.value[-1] in ("1", "3")
+            return f"heaterShakerV1{deck_slot.value}"
+
         elif model == ModuleModel.TEMPERATURE_MODULE_V2:
-            valid_slots = [
-                slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
-            ]
-            addressable_areas = [
-                "temperatureModuleV2A1",
-                "temperatureModuleV2B1",
-                "temperatureModuleV2C1",
-                "temperatureModuleV2D1",
-                "temperatureModuleV2A3",
-                "temperatureModuleV2B3",
-                "temperatureModuleV2C3",
-                "temperatureModuleV2D3",
-            ]
+            # only allowed in column 1 & 3
+            assert deck_slot.value[-1] in ("1", "3")
+            return f"temperatureModuleV2{deck_slot.value}"
+
         elif model == ModuleModel.THERMOCYCLER_MODULE_V2:
             return "thermocyclerModuleV2"
-        elif model == ModuleModel.ABSORBANCE_READER_V1:
-            valid_slots = ["A3", "B3", "C3", "D3"]
-            addressable_areas = [
-                "absorbanceReaderV1A3",
-                "absorbanceReaderV1B3",
-                "absorbanceReaderV1C3",
-                "absorbanceReaderV1D3",
-            ]
-        else:
-            raise ValueError(
-                f"Unknown module {model.name} has no addressable areas to provide."
-            )
 
-        map_addressable_area = {
-            slot: addressable_area
-            for slot, addressable_area in zip(valid_slots, addressable_areas)
-        }
-        return map_addressable_area[deck_slot.value]
+        elif model == ModuleModel.ABSORBANCE_READER_V1:
+            # only allowed in column 3
+            assert deck_slot.value[-1] == "3"
+            return f"absorbanceReaderV1{deck_slot.value}"
+
+        raise ValueError(
+            f"Unknown module {model.name} has no addressable areas to provide."
+        )
+
+    def absorbance_reader_dock_location(
+        self, module_id: str
+    ) -> AddressableAreaLocation:
+        """Get the addressable area for the absorbance reader dock."""
+        reader_slot = self.get_location(module_id)
+        lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)
+        assert lid_doc_slot is not None
+        lid_dock_area = AddressableAreaLocation(
+            addressableAreaName="absorbanceReaderV1LidDock" + lid_doc_slot.value
+        )
+        return lid_dock_area

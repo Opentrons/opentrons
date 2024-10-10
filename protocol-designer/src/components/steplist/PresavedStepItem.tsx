@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { StepItem } from './StepItem'
 import { PRESAVED_STEP_ID } from '../../steplist/types'

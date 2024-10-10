@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {

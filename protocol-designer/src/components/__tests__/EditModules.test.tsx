@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { vi, beforeEach, describe, it } from 'vitest'
 import {
@@ -6,7 +6,7 @@ import {
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
+import { i18n } from '../../assets/localization'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getDismissedHints } from '../../tutorial/selectors'
 import { getEnableMoam } from '../../feature-flags/selectors'

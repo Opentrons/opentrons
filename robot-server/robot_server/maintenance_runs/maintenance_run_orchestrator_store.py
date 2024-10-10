@@ -175,6 +175,9 @@ class MaintenanceRunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            # Maintenance runs have no `/actions` endpoint that a client can POST to
+            # to resume normal operation after it enters recovery mode, so they should
+            # never be allowed to enter recovery mode.
             error_recovery_policy=error_recovery_policy.never_recover,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
@@ -226,7 +229,9 @@ class MaintenanceRunOrchestratorStore:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
         """
-        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
+        return self.run_orchestrator.get_command_slice(
+            cursor=cursor, length=length, include_fixit_commands=False
+        )
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""

@@ -1,6 +1,6 @@
 """Router for /maintenance_runs commands endpoints."""
 import textwrap
-from typing import Optional, Union
+from typing import Annotated, Optional, Union
 from typing_extensions import Final, Literal
 
 from fastapi import APIRouter, Depends, Query, status
@@ -58,9 +58,9 @@ class CommandNotAllowed(ErrorDetails):
 
 async def get_current_run_from_url(
     runId: str,
-    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
 ) -> str:
     """Get run from url.
 
@@ -100,39 +100,43 @@ async def get_current_run_from_url(
 )
 async def create_run_command(
     request_body: RequestModelWithCommandCreate,
-    waitUntilComplete: bool = Query(
-        default=False,
-        description=(
-            "If `false`, return immediately, while the new command is still queued."
-            " If `true`, only return once the new command succeeds or fails,"
-            " or when the timeout is reached. See the `timeout` query parameter."
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    run_id: Annotated[str, Depends(get_current_run_from_url)],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    waitUntilComplete: Annotated[
+        bool,
+        Query(
+            description=(
+                "If `false`, return immediately, while the new command is still queued."
+                " If `true`, only return once the new command succeeds or fails,"
+                " or when the timeout is reached. See the `timeout` query parameter."
+            ),
         ),
-    ),
-    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
-    timeout: Optional[int] = Query(
-        default=None,
-        gt=0,
-        description=(
-            "If `waitUntilComplete` is `true`,"
-            " the maximum time in milliseconds to wait before returning."
-            " The default is infinite."
-            "\n\n"
-            "The timer starts as soon as you enqueue the new command with this request,"
-            " *not* when the new command starts running. So if there are other commands"
-            " in the queue before the new one, they will also count towards the"
-            " timeout."
-            "\n\n"
-            "If the timeout elapses before the command succeeds or fails,"
-            " the command will be returned with its current status."
-            "\n\n"
-            "Compatibility note: on robot software v6.2.0 and older,"
-            " the default was 30 seconds, not infinite."
+    ] = False,
+    timeout: Annotated[
+        Optional[int],
+        Query(
+            gt=0,
+            description=(
+                "If `waitUntilComplete` is `true`,"
+                " the maximum time in milliseconds to wait before returning."
+                " The default is infinite."
+                "\n\n"
+                "The timer starts as soon as you enqueue the new command with this request,"
+                " *not* when the new command starts running. So if there are other commands"
+                " in the queue before the new one, they will also count towards the"
+                " timeout."
+                "\n\n"
+                "If the timeout elapses before the command succeeds or fails,"
+                " the command will be returned with its current status."
+                "\n\n"
+                "Compatibility note: on robot software v6.2.0 and older,"
+                " the default was 30 seconds, not infinite."
+            ),
         ),
-    ),
-    run_id: str = Depends(get_current_run_from_url),
-    check_estop: bool = Depends(require_estop_in_good_state),
+    ] = None,
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -152,9 +156,6 @@ async def create_run_command(
     # behavior is to pass through `command_intent` without overriding it
     command_intent = pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
-
-    # TODO (spp): re-add `RunStoppedError` exception catching if/when maintenance runs
-    #  have actions.
     command = await run_orchestrator_store.add_command_and_wait_for_interval(
         request=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
     )
@@ -186,21 +187,25 @@ async def create_run_command(
 )
 async def get_run_commands(
     runId: str,
-    cursor: Optional[int] = Query(
-        None,
-        description=(
-            "The starting index of the desired first command in the list."
-            " If unspecified, a cursor will be selected automatically"
-            " based on the currently running or most recently executed command."
+    run_data_manager: Annotated[
+        MaintenanceRunDataManager, Depends(get_maintenance_run_data_manager)
+    ],
+    cursor: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The starting index of the desired first command in the list."
+                " If unspecified, a cursor will be selected automatically"
+                " based on the currently running or most recently executed command."
+            ),
         ),
-    ),
-    pageLength: int = Query(
-        _DEFAULT_COMMAND_LIST_LENGTH,
-        description="The maximum number of commands in the list to return.",
-    ),
-    run_data_manager: MaintenanceRunDataManager = Depends(
-        get_maintenance_run_data_manager
-    ),
+    ] = None,
+    pageLength: Annotated[
+        int,
+        Query(
+            description="The maximum number of commands in the list to return.",
+        ),
+    ] = _DEFAULT_COMMAND_LIST_LENGTH,
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
@@ -273,9 +278,9 @@ async def get_run_commands(
 async def get_run_command(
     runId: str,
     commandId: str,
-    run_data_manager: MaintenanceRunDataManager = Depends(
-        get_maintenance_run_data_manager
-    ),
+    run_data_manager: Annotated[
+        MaintenanceRunDataManager, Depends(get_maintenance_run_data_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 

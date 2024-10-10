@@ -5,16 +5,6 @@ marks:
       - ot2_server_base_url
 
 stages:
-  # The order of these data file uploads is important for this test,
-  # since the list of data files returned for the specified protocol is in upload order.
-  # The order in which the files are uploaded in this test is the same as the order in which
-  # these files are uploaded in the overall integration tests suite.
-  # Until we add data file cleanup after each test, maintaining this order within the suite
-  # will be important.
-
-  # sample_record -> test
-  # sample_plates -> sample_record
-  # test -> sample_plates
   - name: Upload data file 1
     request:
       url: '{ot2_server_base_url}/dataFiles'
@@ -28,7 +18,6 @@ stages:
           data_file_1_name: data.name
       status_code:
         - 201
-        - 200
 
   - name: Upload data file 2
     request:
@@ -43,7 +32,6 @@ stages:
           data_file_2_name: data.name
       status_code:
         - 201
-        - 200
 
   - name: Upload data file 3
     request:
@@ -58,7 +46,6 @@ stages:
           data_file_3_name: data.name
       status_code:
         - 201
-        - 200
 
   - name: Upload protocol with CSV file ID
     request:

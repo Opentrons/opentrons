@@ -883,8 +883,6 @@ def _run_file_non_pe(
     context.home()
     with scraper.scrape():
         try:
-            # TODO (spp, 2024-03-18): use true run-time param overrides once enabled
-            #  for cli protocol simulation/ execution
             execute.run_protocol(
                 protocol, context, run_time_parameters_with_overrides=None
             )
@@ -914,6 +912,7 @@ def _run_file_pe(
     log_level: str,
 ) -> _SimulateResult:
     """Run a protocol file with Protocol Engine."""
+    # TODO (spp, 2024-03-18): use run-time param overrides once enabled for cli protocol simulation.
 
     async def run(protocol_source: ProtocolSource) -> _SimulateResult:
         hardware_api_wrapped = hardware_api.wrapped()
@@ -1014,7 +1013,7 @@ def main() -> int:
     args = parser.parse_args()
 
     # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
-    duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
+    duration_estimator = DurationEstimator() if args.estimate_duration else None
 
     try:
         runlog, maybe_bundle = simulate(

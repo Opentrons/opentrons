@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { CheckPipetteButton } from '../CheckPipetteButton'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {

@@ -7,10 +7,11 @@ from functools import lru_cache
 from typing import Dict, List, Optional, Literal, Union
 
 import sqlalchemy
+from sqlalchemy import and_
 from pydantic import ValidationError
 
 from opentrons.util.helpers import utc_now
-from opentrons.protocol_engine import StateSummary, CommandSlice
+from opentrons.protocol_engine import StateSummary, CommandSlice, CommandIntent
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.types import RunTimeParameter
 
@@ -175,6 +176,9 @@ class RunStore:
                         "index_in_run": command_index,
                         "command_id": command.id,
                         "command": pydantic_to_json(command),
+                        "command_intent": str(command.intent.value)
+                        if command.intent
+                        else CommandIntent.PROTOCOL,
                     },
                 )
 
@@ -430,6 +434,7 @@ class RunStore:
         run_id: str,
         length: int,
         cursor: Optional[int],
+        include_fixit_commands: bool,
     ) -> CommandSlice:
         """Get a slice of run commands from the store.
 
@@ -439,6 +444,7 @@ class RunStore:
             cursor: The starting index of the slice in the whole collection.
                 If `None`, up to `length` elements at the end of the collection will
                 be returned.
+            include_fixit_commands: Wether we should include fixit command intent in the result.
 
         Returns:
             A collection of commands as well as the actual cursor used and
@@ -451,26 +457,47 @@ class RunStore:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
 
-            select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
-                run_command_table.c.run_id == run_id
-            )
+            if include_fixit_commands:
+                select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                    run_command_table.c.run_id == run_id
+                )
+            else:
+                select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                    and_(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.command_intent != "fixit",
+                    )
+                )
             count_result: int = transaction.execute(select_count).scalar_one()
 
             actual_cursor = cursor if cursor is not None else count_result - length
             # Clamp to [0, count_result).
             actual_cursor = max(0, min(actual_cursor, count_result - 1))
-
-            select_slice = (
-                sqlalchemy.select(
-                    run_command_table.c.index_in_run, run_command_table.c.command
+            if include_fixit_commands:
+                select_slice = (
+                    sqlalchemy.select(
+                        run_command_table.c.index_in_run, run_command_table.c.command
+                    )
+                    .where(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.index_in_run >= actual_cursor,
+                        run_command_table.c.index_in_run < actual_cursor + length,
+                    )
+                    .order_by(run_command_table.c.index_in_run)
                 )
-                .where(
-                    run_command_table.c.run_id == run_id,
-                    run_command_table.c.index_in_run >= actual_cursor,
-                    run_command_table.c.index_in_run < actual_cursor + length,
+            else:
+                select_slice = (
+                    sqlalchemy.select(
+                        run_command_table.c.index_in_run, run_command_table.c.command
+                    )
+                    .where(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.index_in_run >= actual_cursor,
+                        run_command_table.c.index_in_run < actual_cursor + length,
+                        run_command_table.c.command_intent != "fixit",
+                    )
+                    .order_by(run_command_table.c.index_in_run)
                 )
-                .order_by(run_command_table.c.index_in_run)
-            )
             slice_result = transaction.execute(select_slice).all()
 
         sliced_commands: List[Command] = [
@@ -484,16 +511,29 @@ class RunStore:
             commands=sliced_commands,
         )
 
-    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+    def get_all_commands_as_preserialized_list(
+        self, run_id: str, include_fixit_commands: bool
+    ) -> List[str]:
         """Get all commands of the run as a list of strings of json command objects."""
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
-            select_commands = (
-                sqlalchemy.select(run_command_table.c.command)
-                .where(run_command_table.c.run_id == run_id)
-                .order_by(run_command_table.c.index_in_run)
-            )
+            # TODO (tz, 8-21-24): consolidate into 1 query.
+            if include_fixit_commands:
+                select_commands = (
+                    sqlalchemy.select(run_command_table.c.command)
+                    .where(run_command_table.c.run_id == run_id)
+                    .order_by(run_command_table.c.index_in_run)
+                )
+            else:
+                select_commands = (
+                    sqlalchemy.select(run_command_table.c.command)
+                    .where(
+                        and_(run_command_table.c.run_id == run_id),
+                        run_command_table.c.command_intent != "fixit",
+                    )
+                    .order_by(run_command_table.c.index_in_run)
+                )
             commands_result = transaction.scalars(select_commands).all()
         return commands_result
 

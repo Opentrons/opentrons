@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { vi, it, expect, describe, beforeEach } from 'vitest'

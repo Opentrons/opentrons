@@ -1,9 +1,9 @@
 import cx from 'classnames'
-import * as React from 'react'
+import type * as React from 'react'
 import {
   Box,
   SelectField,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { Field } from 'formik'
@@ -54,7 +54,9 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
 
   return (
     <>
-      {tooltip != null && <Tooltip {...tooltipProps}>{tooltip}</Tooltip>}
+      {tooltip != null && (
+        <LegacyTooltip {...tooltipProps}>{tooltip}</LegacyTooltip>
+      )}
 
       <div {...targetProps} className={fieldStyles.field_wrapper}>
         <label

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { TiprackOption } from './TiprackOption'
 import type { Mount } from '@opentrons/components'
@@ -19,7 +19,7 @@ export const TiprackSelect = (
 
   let selectedValues = values[mount].tiprackDefURI ?? []
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedValues?.length === 0 && tiprackOptions.length > 0) {
       selectedValues = [tiprackOptions[0].value]
       onSetFieldValue(`pipettesByMount.${mount}.tiprackDefURI`, selectedValues)

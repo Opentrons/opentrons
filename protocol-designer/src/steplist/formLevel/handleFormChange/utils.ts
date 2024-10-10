@@ -28,7 +28,11 @@ export function getAllWellsFromPrimaryWells(
   channels: 8 | 96
 ): string[] {
   const allWells = primaryWells.reduce((acc: string[], well: string) => {
-    const nextWellSet = getWellSetForMultichannel(labwareDef, well, channels)
+    const nextWellSet = getWellSetForMultichannel({
+      labwareDef,
+      wellName: well,
+      channels,
+    })
 
     // filter out any nulls (but you shouldn't get any)
     if (!nextWellSet) {
@@ -65,8 +69,7 @@ export function getMaxDisposalVolumeForMultidispense(
     volume: string | null
     tipRack?: string | null
   },
-  pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
 ): number | null | undefined {
   // calculate max disposal volume for given volume & pipette. Might be negative!
   const pipetteId = values?.pipette
@@ -76,11 +79,7 @@ export function getMaxDisposalVolumeForMultidispense(
     `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${values.path}`
   )
   const pipetteEntity = pipetteEntities[pipetteId]
-  const pipetteCapacity = getPipetteCapacity(
-    pipetteEntity,
-    labwareEntities,
-    values.tipRack
-  )
+  const pipetteCapacity = getPipetteCapacity(pipetteEntity, values.tipRack)
   const volume = Number(values.volume)
   const airGapChecked = values.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0
@@ -92,8 +91,7 @@ export function getMaxDisposalVolumeForMultidispense(
 // is responsibility of dependentFieldsUpdateMoveLiquid's clamp fn
 export function volumeInCapacityForMulti(
   rawForm: FormData,
-  pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
 ): boolean {
   console.assert(
     rawForm.pipette in pipetteEntities,
@@ -102,11 +100,7 @@ export function volumeInCapacityForMulti(
   const pipetteEntity = pipetteEntities[rawForm.pipette]
   const pipetteCapacity =
     pipetteEntity &&
-    getPipetteCapacity(
-      pipetteEntity,
-      labwareEntities,
-      rawForm.tipRack as string
-    )
+    getPipetteCapacity(pipetteEntity, rawForm.tipRack as string)
   const volume = Number(rawForm.volume)
   const airGapChecked = rawForm.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(rawForm.aspirate_airGap_volume) : 0
@@ -141,6 +135,7 @@ export function volumeInCapacityForMultiDispense(args: {
   airGapVolume: number
 }): boolean {
   const { volume, pipetteCapacity, airGapVolume } = args
+
   return (
     volume > 0 &&
     pipetteCapacity > 0 &&

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { NavLink, NavButton } from './NavLink'
 import { supportLinkProps, salesLinkProps } from './nav-data'
 import styles from './styles.module.css'

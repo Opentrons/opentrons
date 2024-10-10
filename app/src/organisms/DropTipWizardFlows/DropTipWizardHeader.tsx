@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BEFORE_BEGINNING, BLOWOUT_SUCCESS, DT_ROUTES } from './constants'
-import { WizardHeader } from '../../molecules/WizardHeader'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 
 import type { DropTipWizardProps } from './DropTipWizard'
 import type { DropTipFlowsRoute, DropTipFlowsStep, ErrorDetails } from './types'
@@ -70,11 +70,9 @@ export function useSeenBlowoutSuccess({
   currentRoute,
   currentStepIdx,
 }: UseSeenBlowoutSuccessProps): UseSeenBlowoutSuccessResult {
-  const [hasSeenBlowoutSuccess, setHasSeenBlowoutSuccess] = React.useState(
-    false
-  )
+  const [hasSeenBlowoutSuccess, setHasSeenBlowoutSuccess] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentStep === BLOWOUT_SUCCESS) {
       setHasSeenBlowoutSuccess(true)
     } else if (currentStep === BEFORE_BEGINNING) {

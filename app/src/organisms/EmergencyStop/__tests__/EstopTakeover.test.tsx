@@ -1,29 +1,29 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { EstopMissingModal } from '../EstopMissingModal'
 import { EstopPressedModal } from '../EstopPressedModal'
-import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import {
   ENGAGED,
   LOGICALLY_ENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
 } from '../constants'
-import { getLocalRobot } from '../../../redux/discovery'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { EstopTakeover } from '../EstopTakeover'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../EstopMissingModal')
 vi.mock('../EstopPressedModal')
-vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
-vi.mock('../../../redux/discovery')
+vi.mock('/app/redux-resources/config')
+vi.mock('/app/redux/discovery')
 
 const mockPressed = {
   data: {

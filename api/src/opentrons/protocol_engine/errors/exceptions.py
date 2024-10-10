@@ -897,6 +897,19 @@ class LocationIsStagingSlotError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LocationIsLidDockSlotError(ProtocolEngineError):
+    """Raised when referencing a labware on a lid dock slot when trying to get standard deck slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationIsLidDockSlotError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class FirmwareUpdateRequired(ProtocolEngineError):
     """Raised when the firmware needs to be updated."""
 
@@ -989,6 +1002,32 @@ class InvalidAxisForRobotType(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidLiquidHeightFound(ProtocolEngineError):
+    """Raised when attempting to estimate liquid height based on volume fails."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidLiquidHeightFound error."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LiquidHeightUnknownError(ProtocolEngineError):
+    """Raised when attempting to specify WellOrigin.MENISCUS before liquid probing has been done."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LiquidHeightUnknownError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class EStopActivatedError(ProtocolEngineError):
     """Represents an E-stop event."""
 
@@ -1029,4 +1068,17 @@ class TipNotEmptyError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a TipNotEmptyError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidWellDefinitionError(ProtocolEngineError):
+    """Raised when an InnerWellGeometry definition is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidWellDefinitionError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)

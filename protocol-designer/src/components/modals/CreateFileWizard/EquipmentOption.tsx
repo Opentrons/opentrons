@@ -8,20 +8,21 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  Flex,
-  Text,
-  Icon,
-  SPACING,
   ALIGN_CENTER,
   BORDERS,
-  JUSTIFY_CENTER,
+  Box,
   COLORS,
+  CURSOR_POINTER,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
+  LegacyTooltip,
+  SPACING,
+  Text,
   TYPOGRAPHY,
   useHoverTooltip,
-  Tooltip,
-  DIRECTION_COLUMN,
-  Box,
-  LegacyStyledText,
 } from '@opentrons/components'
 import { MAX_MAGNETIC_BLOCKS, MAX_MOAM_MODULES } from './ModulesAndOtherTile'
 import type { StyleProps } from '@opentrons/components'
@@ -29,7 +30,7 @@ import type { ModuleType, RobotType } from '@opentrons/shared-data'
 
 const ARROW_STYLE = css`
   color: ${COLORS.grey50};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   &:hover {
     color: ${COLORS.black80};
   }
@@ -37,7 +38,7 @@ const ARROW_STYLE = css`
 
 const ARROW_STYLE_ACTIVE = css`
   color: ${COLORS.blue50};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   &:hover {
     color: ${COLORS.black80};
   }
@@ -203,9 +204,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           />
         </Flex>
         {isDisabled || numMultiples === maxMoam ? (
-          <Tooltip {...moamTooltipProps}>
+          <LegacyTooltip {...moamTooltipProps}>
             {t(`not_enough_space_for_${multiples.moduleType}`)}
-          </Tooltip>
+          </LegacyTooltip>
         ) : null}
       </Flex>
     )
@@ -277,7 +278,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         </Flex>
       </Flex>
       {disabled ? (
-        <Tooltip {...equipmentTooltipProps}>{optionTooltip}</Tooltip>
+        <LegacyTooltip {...equipmentTooltipProps}>
+          {optionTooltip}
+        </LegacyTooltip>
       ) : null}
     </>
   )

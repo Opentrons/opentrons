@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Pill } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'

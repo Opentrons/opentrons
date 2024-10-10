@@ -1,7 +1,7 @@
 """SQL database schemas."""
 
 # Re-export the latest schema.
-from .schema_6 import (
+from .schema_7 import (
     metadata,
     protocol_table,
     analysis_table,
@@ -12,8 +12,10 @@ from .schema_6 import (
     action_table,
     run_csv_rtp_table,
     data_files_table,
+    boolean_setting_table,
     PrimitiveParamSQLEnum,
     ProtocolKindSQLEnum,
+    BooleanSettingKey,
 )
 
 
@@ -28,6 +30,8 @@ __all__ = [
     "action_table",
     "run_csv_rtp_table",
     "data_files_table",
+    "boolean_setting_table",
     "PrimitiveParamSQLEnum",
     "ProtocolKindSQLEnum",
+    "BooleanSettingKey",
 ]

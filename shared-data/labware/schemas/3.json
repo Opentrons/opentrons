@@ -1,0 +1,575 @@
+{
+  "$id": "opentronsLabwareSchemaV3",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "brandData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brand"],
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand/manufacturer name"
+        },
+        "brandId": {
+          "type": "array",
+          "description": "An array of manufacture numbers pertaining to a given labware",
+          "items": {
+            "type": "string"
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "URLs for manufacturer page(s)",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "displayCategory": {
+      "type": "string",
+      "enum": [
+        "tipRack",
+        "tubeRack",
+        "reservoir",
+        "trash",
+        "wellPlate",
+        "aluminumBlock",
+        "adapter",
+        "other"
+      ]
+    },
+    "safeString": {
+      "description": "a string safe to use for loadName / namespace. Lowercase-only.",
+      "type": "string",
+      "pattern": "^[a-z0-9._]+$"
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
+    "SphericalSegment": {
+      "type": "object",
+      "description": "A partial sphere shaped section at the bottom of the well.",
+      "additionalProperties": false,
+      "required": ["shape", "radiusOfCurvature", "topHeight", "bottomHeight"],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["spherical"]
+        },
+        "radiusOfCurvature": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
+        }
+      }
+    },
+    "ConicalFrustum": {
+      "type": "object",
+      "description": "A cone or conical segment, bounded by two circles on the top and bottom.",
+      "required": [
+        "shape",
+        "bottomDiameter",
+        "topDiameter",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["conical"]
+        },
+        "bottomDiameter": {
+          "type": "number"
+        },
+        "topDiameter": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
+        }
+      }
+    },
+    "CuboidalFrustum": {
+      "type": "object",
+      "description": "A cuboidal shape bounded by two rectangles on the top and bottom",
+      "required": [
+        "shape",
+        "bottomXDimension",
+        "bottomYDimension",
+        "topXDimension",
+        "topYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["cuboidal"]
+        },
+        "bottomXDimension": {
+          "type": "number"
+        },
+        "bottomYDimension": {
+          "type": "number"
+        },
+        "topXDimension": {
+          "type": "number"
+        },
+        "topYDimension": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
+        }
+      }
+    },
+    "SquaredConeSegment": {
+      "type": "object",
+      "description": "The intersection of a pyramid and a cone that both share a central axis where one face is a circle and one face is a rectangle",
+      "required": [
+        "shape",
+        "bottomCrossSection",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["squaredcone"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"]
+        },
+        "circleDiameter": {
+          "type": "number"
+        },
+        "rectangleXDimension": {
+          "type": "number"
+        },
+        "rectangleYDimension": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
+        }
+      }
+    },
+    "RoundedCuboidSegment": {
+      "type": "object",
+      "description": "A cuboidal frustum where each corner is filleted out by circles with centers on the diagonals between opposite corners",
+      "required": [
+        "shape",
+        "bottomCrossSection",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["roundedcuboid"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"]
+        },
+        "circleDiameter": {
+          "type": "number"
+        },
+        "rectangleXDimension": {
+          "type": "number"
+        },
+        "rectangleYDimension": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
+        }
+      }
+    },
+    "InnerWellGeometry": {
+      "type": "object",
+      "required": ["sections"],
+      "properties": {
+        "sections": {
+          "description": "A list of all of the sections of the well that have a contiguous shape",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ConicalFrustum"
+              },
+              {
+                "$ref": "#/definitions/CuboidalFrustum"
+              },
+              {
+                "$ref": "#/definitions/SquaredConeSegment"
+              },
+              {
+                "$ref": "#/definitions/RoundedCuboidSegment"
+              },
+              {
+                "$ref": "#/definitions/SphericalSegment"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "version",
+    "namespace",
+    "metadata",
+    "brand",
+    "parameters",
+    "cornerOffsetFromSlot",
+    "ordering",
+    "dimensions",
+    "wells",
+    "groups"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "description": "Which schema version a labware is using",
+      "type": "number",
+      "enum": [3]
+    },
+    "version": {
+      "description": "Version of the labware definition itself (eg myPlate v1/v2/v3). An incrementing integer",
+      "type": "integer",
+      "minimum": 1
+    },
+    "namespace": {
+      "$ref": "#/definitions/safeString"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Properties used for search and display",
+      "additionalProperties": false,
+      "required": ["displayName", "displayCategory", "displayVolumeUnits"],
+      "properties": {
+        "displayName": {
+          "description": "Easy to remember name of labware",
+          "type": "string"
+        },
+        "displayCategory": {
+          "$ref": "#/definitions/displayCategory",
+          "description": "Label(s) used in UI to categorize labware"
+        },
+        "displayVolumeUnits": {
+          "description": "Volume units for display",
+          "type": "string",
+          "enum": ["µL", "mL", "L"]
+        },
+        "tags": {
+          "type": "array",
+          "description": "List of descriptions for a given labware",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "brand": {
+      "$ref": "#/definitions/brandData",
+      "description": "Real-world labware that the definition is modeled from and/or compatible with"
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Internal describers used to determine pipette movement to labware",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "isTiprack",
+        "loadName",
+        "isMagneticModuleCompatible"
+      ],
+      "properties": {
+        "format": {
+          "description": "Property to determine compatibility with multichannel pipette",
+          "type": "string",
+          "enum": ["96Standard", "384Standard", "trough", "irregular", "trash"]
+        },
+        "quirks": {
+          "description": "Property to classify a specific behavior this labware should have",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "isTiprack": {
+          "description": "Flag marking whether this labware is a tip rack or not",
+          "type": "boolean"
+        },
+        "tipLength": {
+          "description": "Required if this labware is a tip rack. Specifies the total length of one of this rack's tips, from top to bottom, as specified by technical drawings or as measured with calipers.",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "tipOverlap": {
+          "description": "Required if this labware is a tip rack. Specifies how far one of this rack's tips is expected to overlap with the nozzle of a pipette. In other words: tipLength, minus the distance between the bottom of the pipette and the bottom of the tip. A robot's positional calibration may fine-tune this estimate.",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "loadName": {
+          "description": "Name used to reference a labware definition",
+          "$ref": "#/definitions/safeString"
+        },
+        "isMagneticModuleCompatible": {
+          "description": "Flag marking whether a labware is compatible by default with the Magnetic Module",
+          "type": "boolean"
+        },
+        "magneticModuleEngageHeight": {
+          "description": "Distance to move magnetic module magnets to engage",
+          "$ref": "#/definitions/positiveNumber"
+        }
+      }
+    },
+    "ordering": {
+      "type": "array",
+      "description": "Generated array that keeps track of how wells should be ordered in a labware",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "cornerOffsetFromSlot": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.",
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Outer dimensions of a labware",
+      "required": ["xDimension", "yDimension", "zDimension"],
+      "properties": {
+        "yDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "zDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "xDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        }
+      }
+    },
+    "wells": {
+      "type": "object",
+      "description": "Unordered object of well objects with position and dimensional information",
+      "additionalProperties": false,
+      "patternProperties": {
+        "[A-Z]+[0-9]+": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["depth", "shape", "totalLiquidVolume", "x", "y", "z"],
+          "oneOf": [
+            { "required": ["xDimension", "yDimension"] },
+            { "required": ["diameter"] }
+          ],
+          "not": {
+            "anyOf": [
+              { "required": ["diameter", "xDimension"] },
+              { "required": ["diameter", "yDimension"] }
+            ]
+          },
+          "properties": {
+            "depth": {
+              "description": "The distance between the top and bottom of this well. If the labware is a tip rack, this will be ignored in favor of tipLength, but the values should match.",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "x": {
+              "description": "x location of center-bottom of well in reference to left-front-bottom of labware",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "y": {
+              "description": "y location of center-bottom of well in reference to left-front-bottom of labware",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "z": {
+              "description": "z location of center-bottom of well in reference to left-front-bottom of labware",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "totalLiquidVolume": {
+              "description": "Total well, tube, or tip volume in microliters",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "xDimension": {
+              "description": "x dimension of rectangular wells",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "yDimension": {
+              "description": "y dimension of rectangular wells",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "diameter": {
+              "description": "diameter of circular wells",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "shape": {
+              "description": "If 'rectangular', use xDimension and yDimension; if 'circular' use diameter",
+              "type": "string",
+              "enum": ["rectangular", "circular"]
+            },
+            "geometryDefinitionId": {
+              "description": "string id of the well's corresponding innerWellGeometry",
+              "type": ["string", "null"]
+            }
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "description": "Logical well groupings for metadata/display purposes; changes in groups do not affect protocol execution",
+      "items": {
+        "type": "object",
+        "required": ["wells", "metadata"],
+        "additionalProperties": false,
+        "properties": {
+          "wells": {
+            "type": "array",
+            "description": "An array of wells that contain the same metadata",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata specific to a grid of wells in a labware",
+            "required": [],
+            "additionalProperties": false,
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "description": "User-readable name for the well group"
+              },
+              "displayCategory": {
+                "$ref": "#/definitions/displayCategory",
+                "description": "Label(s) used in UI to categorize well groups"
+              },
+              "wellBottomShape": {
+                "type": "string",
+                "description": "Bottom shape of the well for UI purposes",
+                "enum": ["flat", "u", "v"]
+              }
+            }
+          },
+          "brand": {
+            "$ref": "#/definitions/brandData",
+            "description": "Brand data for the well group (e.g. for tubes)"
+          }
+        }
+      }
+    },
+    "allowedRoles": {
+      "type": "array",
+      "description": "Allowed behaviors and usage of a labware in a protocol.",
+      "items": {
+        "type": "string",
+        "enum": ["labware", "adapter", "fixture", "maintenance", "lid"]
+      }
+    },
+    "stackingOffsetWithLabware": {
+      "type": "object",
+      "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
+      "additionalProperties": {
+        "$ref": "#/definitions/coordinates"
+      }
+    },
+    "stackingOffsetWithModule": {
+      "type": "object",
+      "description": "Supported module that can be stacked upon, with overlap height between labware and module.",
+      "additionalProperties": {
+        "$ref": "#/definitions/coordinates"
+      }
+    },
+    "gripperOffsets": {
+      "type": "object",
+      "description": "Offsets to be added when calculating the coordinates a gripper should go to when picking up or dropping a labware on this labware.",
+      "properties": {
+        "default": {
+          "type": "object",
+          "properties": {
+            "pickUpOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate pick-up coordinates of a labware placed on this labware."
+            },
+            "dropOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate drop coordinates of a labware placed on this labware."
+            }
+          },
+          "required": ["pickUpOffset", "dropOffset"]
+        }
+      }
+    },
+    "gripForce": {
+      "type": "number",
+      "description": "Force, in Newtons, with which the gripper should grip the labware."
+    },
+    "gripHeightFromLabwareBottom": {
+      "type": "number",
+      "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+    },
+    "innerLabwareGeometry": {
+      "type": ["object", "null"],
+      "description": "A dictionary holding all unique inner well geometries in a labware.",
+      "additionalProperties": {
+        "$ref": "#/definitions/InnerWellGeometry"
+      }
+    }
+  }
+}

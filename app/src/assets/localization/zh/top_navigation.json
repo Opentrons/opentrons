@@ -1,0 +1,19 @@
+{
+  "all_protocols": "全部协议",
+  "attached_pipettes_do_not_match": "安装的移液器与加载的协议中指定的移液器不匹配",
+  "calibrate_deck_to_proceed": "校准甲板以继续",
+  "deck_setup": "甲板设置",
+  "devices": "设备",
+  "instruments": "硬件",
+  "labware": "耗材",
+  "modules": "模块",
+  "pipettes_not_calibrated": "请校准加载的协议中指定的所有移液器以继续",
+  "pipettes": "移液器",
+  "please_connect_to_a_robot": "请连接到工作站以继续",
+  "please_load_a_protocol": "请加载协议以继续",
+  "protocol_runs": "协议运行",
+  "protocols": "协议",
+  "robot_settings": "工作站设置",
+  "run": "运行",
+  "settings": "设置"
+}

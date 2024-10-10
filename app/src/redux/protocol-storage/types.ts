@@ -2,6 +2,14 @@
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
+export type ProtocolSort =
+  | 'alphabetical'
+  | 'reverse'
+  | 'recent'
+  | 'oldest'
+  | 'flex'
+  | 'ot2'
+
 export interface StoredProtocolDir {
   dirPath: string
   modified: number
