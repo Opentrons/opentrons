@@ -88,13 +88,8 @@ class TipStore(HasState[TipState], HandlesActions):
                 pipette_id = action.private_result.pipette_id
                 nozzle_map = action.private_result.nozzle_map
                 pipette_info = self._state.pipette_info_by_pipette_id[pipette_id]
-                if nozzle_map:
-                    pipette_info.active_channels = nozzle_map.tip_count
-                    pipette_info.nozzle_map = nozzle_map
-                else:
-                    # todo(mm, 2024-10-10): nozzle_map looks always truthy--can this
-                    # else-block actually run?
-                    pipette_info.active_channels = pipette_info.channels
+                pipette_info.active_channels = nozzle_map.tip_count
+                pipette_info.nozzle_map = nozzle_map
 
         elif isinstance(action, FailCommandAction):
             self._handle_failed_command(action)
