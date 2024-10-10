@@ -60,19 +60,24 @@ export function Icon(props: IconProps): JSX.Element | null {
     return null
   }
 
-  const { viewBox, path } = ICON_DATA_BY_NAME[name]
+  const { fill, viewBox, paths } = ICON_DATA_BY_NAME[name]
 
   return (
     <Svg
       aria-hidden="true"
-      fill="currentColor"
+      // fill="currentColor"
+      // fill="none"
+      fill={fill !== '' ? fill : 'currentColor'}
       viewBox={viewBox}
       className={cx(className, { spin })}
       css={spinStyle}
       {...svgProps}
       id={id}
     >
-      <path aria-roledescription={name} fillRule="evenodd" d={path} />
+      {/* <path aria-roledescription={name} fillRule="evenodd" d={path} /> */}
+      {paths.map((pathData, index) => (
+        <path key={index} {...pathData} />
+      ))}
       {props.children}
     </Svg>
   )
