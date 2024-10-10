@@ -15,9 +15,6 @@ from ..commands import (
     LoadLabwareResult,
     PickUpTip,
     PickUpTipResult,
-    DropTipResult,
-    DropTipInPlaceResult,
-    unsafe,
 )
 from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
@@ -123,12 +120,6 @@ class TipStore(HasState[TipState], HandlesActions):
             self._set_used_tips(
                 pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
             )
-
-        elif isinstance(
-            command.result,
-            (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
-        ):
-            pipette_id = command.params.pipetteId
 
     def _handle_failed_command(
         self,
