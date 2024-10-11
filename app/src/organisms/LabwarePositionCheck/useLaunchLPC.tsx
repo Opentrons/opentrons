@@ -15,7 +15,10 @@ import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/
 
 import type { RobotType } from '@opentrons/shared-data'
 
-const filteredLabware = ['opentrons_tough_pcr_auto_sealing_lid']
+const filteredLabware = [
+  'opentrons_tough_pcr_auto_sealing_lid',
+  'opentrons_flex_lid_absorbance_plate_reader_module',
+]
 
 export function useLaunchLPC(
   runId: string,
