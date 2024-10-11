@@ -46,7 +46,7 @@ import {
   getInitialDeckSetup,
   getPipetteEntities,
 } from '../../step-forms/selectors'
-import { getHas96Channel } from '../../utils'
+import { getHas96Channel, removeOpentronsPhrases } from '../../utils'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { PipetteInfoItem } from '../PipetteInfoItem'
@@ -67,6 +67,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { BUTTON_LINK_STYLE } from '../../atoms'
 import { getSectionsFromPipetteName } from './utils'
 import { editPipettes } from './editPipettes'
+
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {
   Gen,
@@ -143,16 +144,6 @@ export function EditInstrumentsModal(
     leftPip != null
       ? getSectionsFromPipetteName(leftPip.name, leftPip.spec)
       : null
-
-  const removeOpentronsPhrases = (input: string): string => {
-    const phrasesToRemove = ['Opentrons Flex 96', 'Opentrons OT-2 96']
-
-    return phrasesToRemove
-      .reduce((text, phrase) => {
-        return text.replace(new RegExp(phrase, 'gi'), '')
-      }, input)
-      .trim()
-  }
 
   return createPortal(
     <Modal
