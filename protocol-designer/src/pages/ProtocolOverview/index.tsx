@@ -410,11 +410,7 @@ export function ProtocolOverview(): JSX.Element {
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
               {deckView === leftString ? (
-                <DeckThumbnail
-                  hoverSlot={hover}
-                  setHoverSlot={setHover}
-                  width="100%"
-                />
+                <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
               ) : (
                 <OffDeckThumbnail
                   hover={hover}
