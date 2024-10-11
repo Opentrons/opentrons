@@ -217,13 +217,6 @@
               "10": 40,
               "20": 30
             },
-            "mix": {
-              "enable": true,
-              "params": {
-                "repetitions": 3,
-                "volume": 15
-              }
-            },
             "conditioningByVolume": {
               "default": 10,
               "5": 5

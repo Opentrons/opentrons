@@ -297,7 +297,6 @@ class MultiDispenseParams(BaseModel):
         ...,
         description="Settings for flow rate keyed by target dispense volume.",
     )
-    mix: MixProperties = Field(..., description="Mixing settings for after an aspirate")
     conditioningByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         description="Settings for conditioning volume keyed by target dispense volume.",

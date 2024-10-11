@@ -393,9 +393,6 @@
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
         },
-        "mix": {
-          "$ref": "#/definitions/mix"
-        },
         "conditioningByVolume": {
           "$ref": "#/definitions/conditioningByVolume"
         },
