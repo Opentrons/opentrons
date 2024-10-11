@@ -266,7 +266,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         show4thColumn={
           stagingAreaFixtures.length > 0 ||
           wasteChuteStagingAreaFixtures.length > 0 ||
-          magneticBlockStagingAreaFixtures.length > 0
+          magneticBlockStagingAreaFixtures.length > 0 ||
+          absorbanceReaderFixtures.length > 0
         }
       />
       {children}

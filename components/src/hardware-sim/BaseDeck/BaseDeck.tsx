@@ -168,7 +168,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               color={COLORS.black90}
               show4thColumn={
                 stagingAreaFixtures.length > 0 ||
-                wasteChuteStagingAreaFixtures.length > 0
+                wasteChuteStagingAreaFixtures.length > 0 ||
+                modulesOnDeck.findIndex(
+                  module => module.moduleModel === 'absorbanceReaderV1'
+                ) >= 0
               }
             />
           ) : null}
