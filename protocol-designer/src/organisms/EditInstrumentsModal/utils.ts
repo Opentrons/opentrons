@@ -34,7 +34,7 @@ export const getSectionsFromPipetteName = (
   }
 }
 
-export const shouldShowPipetteType = (
+export const getShouldShowPipetteType = (
   type: PipetteType,
   has96Channel: boolean,
   leftPipette?: PipetteOnDeck | null,

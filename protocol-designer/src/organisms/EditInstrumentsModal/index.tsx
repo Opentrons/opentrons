@@ -67,7 +67,7 @@ import { createCustomTiprackDef } from '../../labware-defs/actions'
 import { deleteContainer } from '../../labware-ingred/actions'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { BUTTON_LINK_STYLE } from '../../atoms'
-import { getSectionsFromPipetteName, shouldShowPipetteType } from './utils'
+import { getSectionsFromPipetteName, getShouldShowPipetteType } from './utils'
 import { editPipettes } from './editPipettes'
 
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
@@ -391,7 +391,7 @@ export function EditInstrumentsModal(
             </StyledText>
             <Flex gridGap={SPACING.spacing4}>
               {PIPETTE_TYPES[robotType].map(type => {
-                return shouldShowPipetteType(
+                return getShouldShowPipetteType(
                   type.value as PipetteType,
                   has96Channel,
                   leftPipette,

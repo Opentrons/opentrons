@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { shouldShowPipetteType } from '../utils'
+import { getShouldShowPipetteType } from '../utils'
 
 const mockLeftPipette = {
   mount: 'left',
@@ -12,7 +12,7 @@ const mockRightPiette = {
   name: 'p50_multi_flex',
 } as any
 
-describe('shouldShowPipetteType', () => {
+describe('getShouldShowPipetteType', () => {
   it('should always show 1-Channel and 8-Channel pipettes', () => {
     const scenarios = [
       {
@@ -31,7 +31,7 @@ describe('shouldShowPipetteType', () => {
 
     scenarios.forEach(scenario => {
       expect(
-        shouldShowPipetteType(
+        getShouldShowPipetteType(
           'single',
           scenario.has96Channel,
           scenario.leftPipette,
@@ -40,7 +40,7 @@ describe('shouldShowPipetteType', () => {
         )
       ).toBe(true)
       expect(
-        shouldShowPipetteType(
+        getShouldShowPipetteType(
           'multi',
           scenario.has96Channel,
           scenario.leftPipette,
@@ -52,40 +52,40 @@ describe('shouldShowPipetteType', () => {
   })
 
   it('should not show 96-Channel when has96Channel is true', () => {
-    expect(shouldShowPipetteType('96', true, null, null, null)).toBe(false)
+    expect(getShouldShowPipetteType('96', true, null, null, null)).toBe(false)
     expect(
-      shouldShowPipetteType('96', true, mockLeftPipette, null, 'right')
+      getShouldShowPipetteType('96', true, mockLeftPipette, null, 'right')
     ).toBe(false)
   })
 
   it('should show 96-Channel when adding a new pipette and both mounts are empty', () => {
-    expect(shouldShowPipetteType('96', false, null, null, null)).toBe(true)
+    expect(getShouldShowPipetteType('96', false, null, null, null)).toBe(true)
   })
 
   it('should not show 96-Channel when adding a new pipette and one mount is occupied', () => {
     expect(
-      shouldShowPipetteType('96', false, mockLeftPipette, null, null)
+      getShouldShowPipetteType('96', false, mockLeftPipette, null, null)
     ).toBe(false)
     expect(
-      shouldShowPipetteType('96', false, null, mockRightPiette, null)
+      getShouldShowPipetteType('96', false, null, mockRightPiette, null)
     ).toBe(false)
   })
 
   it('should show 96-Channel when editing left mount and right is empty', () => {
     expect(
-      shouldShowPipetteType('96', false, mockLeftPipette, null, 'left')
+      getShouldShowPipetteType('96', false, mockLeftPipette, null, 'left')
     ).toBe(true)
   })
 
   it('should show 96-Channel when editing right mount and left is empty', () => {
     expect(
-      shouldShowPipetteType('96', false, null, mockRightPiette, 'right')
+      getShouldShowPipetteType('96', false, null, mockRightPiette, 'right')
     ).toBe(true)
   })
 
   it('should not show 96-Channel when editing a mount and the other is occupied', () => {
     expect(
-      shouldShowPipetteType(
+      getShouldShowPipetteType(
         '96',
         false,
         mockLeftPipette,
@@ -94,7 +94,7 @@ describe('shouldShowPipetteType', () => {
       )
     ).toBe(false)
     expect(
-      shouldShowPipetteType(
+      getShouldShowPipetteType(
         '96',
         false,
         mockLeftPipette,
