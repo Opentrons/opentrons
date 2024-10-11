@@ -269,13 +269,12 @@ export const removeOpentronsPhrases = (input: string): string => {
     '96',
   ]
 
-  let updatedText = phrasesToRemove
+  const updatedText = phrasesToRemove
     .reduce((text, phrase) => {
       return text.replace(new RegExp(phrase, 'gi'), '')
     }, input)
     .trim()
-
-  updatedText = updatedText.replace(/\s+/g, ' ')
+    .replace(/\s+/g, ' ')
 
   return updatedText.trim()
 }
