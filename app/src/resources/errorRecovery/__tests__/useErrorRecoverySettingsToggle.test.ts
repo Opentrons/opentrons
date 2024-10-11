@@ -7,7 +7,6 @@ import {
 
 import { useErrorRecoverySettingsToggle } from '..'
 
-// Mock the external hooks
 vi.mock('@opentrons/react-api-client')
 
 describe('useErrorRecoverySettingsToggle', () => {
