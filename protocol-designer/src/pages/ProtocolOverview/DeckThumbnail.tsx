@@ -96,8 +96,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   )
   return (
     <Flex
-      height="404px"
-      width="520px"
+      height="25.25rem"
+      width="100%"
+      maxWidth="32.5rem"
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       backgroundColor={COLORS.grey10}

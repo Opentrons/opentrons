@@ -26,6 +26,7 @@ import {
   StyledText,
   ToggleGroup,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -328,10 +329,11 @@ export function ProtocolOverview(): JSX.Element {
             />
           </Flex>
         </Flex>
-        <Flex gridGap={SPACING.spacing80}>
+        <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
           <Flex
             flex="1.27"
             flexDirection={DIRECTION_COLUMN}
+            css={COLUMN_STYLE}
             gridGap={SPACING.spacing40}
           >
             <ProtocolMetadata
@@ -370,11 +372,7 @@ export function ProtocolOverview(): JSX.Element {
               </Flex>
             </Flex>
           </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            flex="1"
-            gridGap={SPACING.spacing12}
-          >
+          <Flex flexDirection={DIRECTION_COLUMN} css={COLUMN_STYLE}>
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
@@ -414,7 +412,11 @@ export function ProtocolOverview(): JSX.Element {
               {deckView === leftString ? (
                 <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
               ) : (
-                <OffDeckThumbnail hover={hover} setHover={setHover} />
+                <OffDeckThumbnail
+                  hover={hover}
+                  setHover={setHover}
+                  width="100%"
+                />
               )}
               <SlotDetailsContainer
                 robotType={robotType}
@@ -436,4 +438,12 @@ const PROTOCOL_NAME_TEXT_STYLE = css`
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: 3;
+`
+
+const MIN_OVERVIEW_WIDTH = '64rem'
+const COLUMN_GRID_GAP = '5rem'
+const COLUMN_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  min-width: calc((${MIN_OVERVIEW_WIDTH} - ${COLUMN_GRID_GAP}) * 0.5);
+  flex: 1;
 `
