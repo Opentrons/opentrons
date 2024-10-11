@@ -323,19 +323,15 @@
   },
   "innerLabwareGeometry": {
     "venirhgerug": {
-      "frusta": [
+      "sections": [
         {
-          "geometry": {
-            "shape": "circular",
-            "diameter": 16.26
-          },
-          "topHeight": 17.4
+          "shape": "conical",
+          "bottomDiameter": 16.26,
+          "topDiameter": 16.26,
+          "topHeight": 17.4,
+          "bottomHeight": 0.0
         }
-      ],
-      "bottomShape": {
-        "shape": "circular",
-        "diameter": 16.26
-      }
+      ]
     }
   }
 }

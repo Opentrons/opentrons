@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, afterEach, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { cleanup, fireEvent, screen } from '@testing-library/react'
@@ -78,7 +78,7 @@ describe('MagnetForm', () => {
     screen.getByText('magnet')
     screen.getByText('module')
     screen.getByText('mock name')
-    screen.getByText('Magnet action')
+    screen.getByText('Magnet state')
     const engage = screen.getByText('Engage')
     screen.getByText('Disengage')
     fireEvent.click(engage)

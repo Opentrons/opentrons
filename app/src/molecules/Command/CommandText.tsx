@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { pick } from 'lodash'
 
 import {
@@ -16,6 +16,10 @@ import { useCommandTextString } from './hooks'
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 import type { CommandTextData } from './types'
+import type {
+  GetTCRunExtendedProfileCommandTextResult,
+  GetTCRunProfileCommandTextResult,
+} from './hooks'
 
 interface LegacySTProps {
   as?: React.ComponentProps<typeof LegacyStyledText>['as']
@@ -39,22 +43,35 @@ interface BaseProps extends StyleProps {
   propagateTextLimit?: boolean
 }
 export function CommandText(props: BaseProps & STProps): JSX.Element | null {
-  const { commandText, stepTexts } = useCommandTextString({
+  const commandText = useCommandTextString({
     ...props,
   })
 
-  switch (props.command.commandType) {
+  switch (commandText.kind) {
     case 'thermocycler/runProfile': {
       return (
         <ThermocyclerRunProfile
           {...props}
-          commandText={commandText}
-          stepTexts={stepTexts}
+          commandText={commandText.commandText}
+          stepTexts={commandText.stepTexts}
+        />
+      )
+    }
+    case 'thermocycler/runExtendedProfile': {
+      return (
+        <ThermocyclerRunExtendedProfile
+          {...props}
+          commandText={commandText.commandText}
+          profileElementTexts={commandText.profileElementTexts}
         />
       )
     }
     default: {
-      return <CommandStyledText {...props}>{commandText}</CommandStyledText>
+      return (
+        <CommandStyledText {...props}>
+          {commandText.commandText}
+        </CommandStyledText>
+      )
     }
   }
 }
@@ -91,11 +108,18 @@ function CommandStyledText(
   }
 }
 
+const shouldPropagateCenter = (
+  propagateCenter: boolean,
+  isOnDevice?: boolean
+): boolean => isOnDevice === true || propagateCenter
+const shouldPropagateTextLimit = (
+  propagateTextLimit: boolean,
+  isOnDevice?: boolean
+): boolean => isOnDevice === true || propagateTextLimit
+
 type ThermocyclerRunProfileProps = BaseProps &
-  STProps & {
-    commandText: string
-    stepTexts?: string[]
-  }
+  STProps &
+  Omit<GetTCRunProfileCommandTextResult, 'kind'>
 
 function ThermocyclerRunProfile(
   props: ThermocyclerRunProfileProps
@@ -109,9 +133,6 @@ function ThermocyclerRunProfile(
     ...styleProps
   } = props
 
-  const shouldPropagateCenter = isOnDevice === true || propagateCenter
-  const shouldPropagateTextLimit = isOnDevice === true || propagateTextLimit
-
   // TODO(sfoster): Command sometimes wraps this in a cascaded display: -webkit-box
   // to achieve multiline text clipping with an automatically inserted ellipsis, which works
   // everywhere except for here where it overrides this property in the flex since this is
@@ -124,7 +145,11 @@ function ThermocyclerRunProfile(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       {...styleProps}
-      alignItems={shouldPropagateCenter ? ALIGN_CENTER : undefined}
+      alignItems={
+        shouldPropagateCenter(propagateCenter, isOnDevice)
+          ? ALIGN_CENTER
+          : undefined
+      }
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
@@ -143,16 +168,16 @@ function ThermocyclerRunProfile(
         marginLeft={SPACING.spacing16}
       >
         <ul>
-          {shouldPropagateTextLimit ? (
+          {shouldPropagateTextLimit(propagateTextLimit, isOnDevice) ? (
             <li
               css={`
                 margin-left: ${SPACING.spacing4};
               `}
             >
-              {stepTexts?.[0]}
+              {stepTexts[0]}
             </li>
           ) : (
-            stepTexts?.map((step: string, index: number) => (
+            stepTexts.map((step: string, index: number) => (
               <li
                 css={`
                   margin-left: ${SPACING.spacing4};
@@ -163,6 +188,112 @@ function ThermocyclerRunProfile(
                 {step}
               </li>
             ))
+          )}
+        </ul>
+      </CommandStyledText>
+    </Flex>
+  )
+}
+
+type ThermocyclerRunExtendedProfileProps = BaseProps &
+  STProps &
+  Omit<GetTCRunExtendedProfileCommandTextResult, 'kind'>
+
+function ThermocyclerRunExtendedProfile(
+  props: ThermocyclerRunExtendedProfileProps
+): JSX.Element {
+  const {
+    isOnDevice,
+    propagateCenter = false,
+    propagateTextLimit = false,
+    commandText,
+    profileElementTexts,
+    ...styleProps
+  } = props
+
+  // TODO(sfoster): Command sometimes wraps this in a cascaded display: -webkit-box
+  // to achieve multiline text clipping with an automatically inserted ellipsis, which works
+  // everywhere except for here where it overrides this property in the flex since this is
+  // the only place where CommandText uses a flex.
+  // The right way to handle this is probably to take the css that's in Command and make it
+  // live here instead, but that should be done in a followup since it would touch everything.
+  // See also the margin-left on the <li>s, which is needed to prevent their bullets from
+  // clipping if a container set overflow: hidden.
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      {...styleProps}
+      alignItems={
+        shouldPropagateCenter(propagateCenter, isOnDevice)
+          ? ALIGN_CENTER
+          : undefined
+      }
+      css={`
+        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          display: flex !important;
+        } ;
+      `}
+    >
+      <CommandStyledText
+        {...forwardSTProps(props)}
+        marginBottom={SPACING.spacing4}
+        {...styleProps}
+      >
+        {commandText}
+      </CommandStyledText>
+      <CommandStyledText
+        {...forwardSTProps(props)}
+        marginLeft={SPACING.spacing16}
+      >
+        <ul>
+          {shouldPropagateTextLimit(propagateTextLimit, isOnDevice) ? (
+            <li
+              css={`
+                margin-left: ${SPACING.spacing4};
+              `}
+            >
+              {profileElementTexts[0].kind === 'step'
+                ? profileElementTexts[0].stepText
+                : profileElementTexts[0].cycleText}
+            </li>
+          ) : (
+            profileElementTexts.map((element, index: number) =>
+              element.kind === 'step' ? (
+                <li
+                  css={`
+                    margin-left: ${SPACING.spacing4};
+                  `}
+                  key={`tc-outer-step-${index}`}
+                >
+                  {' '}
+                  {element.stepText}
+                </li>
+              ) : (
+                <li
+                  css={`
+                    margin-left: ${SPACING.spacing4};
+                  `}
+                  key={`tc-outer-step-${index}`}
+                >
+                  {element.cycleText}
+                  <ul>
+                    {element.stepTexts.map(
+                      ({ stepText }, stepIndex: number) => (
+                        <li
+                          css={`
+                            margin-left: ${SPACING.spacing8};
+                          `}
+                          key={`tc-inner-step-${index}.${stepIndex}`}
+                        >
+                          {' '}
+                          {stepText}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </li>
+              )
+            )
           )}
         </ul>
       </CommandStyledText>

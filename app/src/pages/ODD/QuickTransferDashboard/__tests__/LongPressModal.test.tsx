@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
@@ -7,8 +6,8 @@ import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { useLongPress } from '@opentrons/components'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { LongPressModal } from '../LongPressModal'
 
 import type { HostConfig } from '@opentrons/api-client'

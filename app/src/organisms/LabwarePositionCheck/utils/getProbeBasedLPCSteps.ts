@@ -2,7 +2,7 @@ import { isEqual } from 'lodash'
 import { SECTIONS } from '../constants'
 import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
-import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
 import type {
   CompletedProtocolAnalysis,
@@ -73,7 +73,12 @@ function getAllCheckSectionSteps(
     []
   )
 
-  return labwareLocations.map(
+  // HACK: Remove LPC for plate reader to unblock science.
+  const filteredLabwareLocations = labwareLocations.filter(labware => {
+    return labware.location?.moduleModel !== 'absorbanceReaderV1'
+  })
+
+  return filteredLabwareLocations.map(
     ({ location, labwareId, moduleId, adapterId, definitionUri }) => ({
       section: SECTIONS.CHECK_POSITIONS,
       labwareId: labwareId,

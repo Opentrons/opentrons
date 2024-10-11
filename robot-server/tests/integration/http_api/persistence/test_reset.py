@@ -4,10 +4,11 @@ from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
 
+import anyio
 import httpx
 
 from tests.integration.dev_server import DevServer
-from tests.integration.robot_client import RobotClient
+from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
@@ -29,22 +30,12 @@ def _get_corrupt_persistence_dir() -> Path:
 async def _assert_reset_was_successful(
     robot_client: RobotClient, persistence_directory: Path
 ) -> None:
-    # It should have no protocols.
+    # We really want to check that the server's persistence directory has been wiped
+    # clean, but testing that directly would rely on internal implementation details
+    # of file layout and tend to be brittle.
+    # As an approximation, just check that there are no protocols or runs left.
     assert (await robot_client.get_protocols()).json()["data"] == []
-
-    # It should have no runs.
     assert (await robot_client.get_runs()).json()["data"] == []
-
-    # There should be no files except for robot_server.db
-    # and an empty protocols/ directory.
-    all_files_and_directories = set(persistence_directory.glob("**/*"))
-    expected_files_and_directories = {
-        persistence_directory / "robot_server.db",
-        persistence_directory / "6",
-        persistence_directory / "6" / "protocols",
-        persistence_directory / "6" / "robot_server.db",
-    }
-    assert all_files_and_directories == expected_files_and_directories
 
 
 async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
@@ -97,6 +88,13 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
             with get_json_protocol(secrets.token_urlsafe(16)) as file:
                 await robot_client.post_protocol([Path(file.name)])
+
+            with anyio.fail_after(30):
+                # todo(mm, 2024-09-20): This works around a bug where robot-server
+                # shutdown will hang if there is an ongoing analysis. This slows down
+                # this test and should be removed when that bug is fixed.
+                # https://opentrons.atlassian.net/browse/EXEC-716
+                await poll_until_all_analyses_complete(robot_client)
 
             await robot_client.post_setting_reset_options({"runsHistory": True})
 

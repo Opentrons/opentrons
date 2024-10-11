@@ -1,14 +1,14 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
+import { i18n } from '/app/i18n'
+import { getIsOnDevice } from '/app/redux/config'
 import { EstopMissingModal } from '../EstopMissingModal'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof EstopMissingModal>) => {
   return renderWithProviders(<EstopMissingModal {...props} />, {

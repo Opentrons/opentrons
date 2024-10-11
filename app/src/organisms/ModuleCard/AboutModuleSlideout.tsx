@@ -1,9 +1,10 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
 import {
   ALIGN_START,
+  Banner,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
@@ -16,16 +17,15 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
-import { Banner } from '../../atoms/Banner'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface AboutModuleSlideoutProps {
   module: AttachedModule
-  onCloseClick: () => unknown
+  onCloseClick: () => void
   isExpanded: boolean
-  firmwareUpdateClick: () => unknown
+  firmwareUpdateClick: () => void
 }
 
 const ALERT_ITEM_STYLE = css`
@@ -40,7 +40,7 @@ export const AboutModuleSlideout = (
   const { i18n, t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showBanner, setShowBanner] = useState<boolean>(true)
   const isDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 

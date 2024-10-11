@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -12,7 +11,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import imgSrc from '../../../assets/images/on-device-display/empty_quick_transfer_dashboard.png'
+import imgSrc from '/app/assets/images/on-device-display/empty_quick_transfer_dashboard.png'
 
 export function NoQuickTransfers(): JSX.Element {
   const { t } = useTranslation('quick_transfer')

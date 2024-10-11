@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   MAGNETIC_BLOCK_TYPE,
   STAGING_AREA_CUTOUTS,
@@ -78,7 +77,8 @@ interface EquipmentProps {
   additionalEquipment: AdditionalEquipment
 }
 
-const DIMENSION = '60px'
+const IMAGE_WIDTH = '60px'
+const IMAGE_HEIGHT = '54px'
 
 export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
   const { additionalEquipment } = props
@@ -87,8 +87,8 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
     case 'wasteChute': {
       return (
         <img
-          width={DIMENSION}
-          height={DIMENSION}
+          width={IMAGE_WIDTH}
+          height={IMAGE_HEIGHT}
           src={wasteChuteImage}
           alt={additionalEquipment}
         />
@@ -97,8 +97,8 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
     case 'trashBin': {
       return (
         <img
-          width={DIMENSION}
-          height={DIMENSION}
+          width={IMAGE_WIDTH}
+          height={IMAGE_HEIGHT}
           src={trashBinImage}
           alt={additionalEquipment}
         />
@@ -107,8 +107,8 @@ export function AdditionalEquipmentDiagram(props: EquipmentProps): JSX.Element {
     default: {
       return (
         <img
-          width={DIMENSION}
-          height={DIMENSION}
+          width={IMAGE_WIDTH}
+          height={IMAGE_HEIGHT}
           src={stagingAreaImage}
           alt={additionalEquipment}
         />

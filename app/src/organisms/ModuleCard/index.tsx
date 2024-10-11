@@ -1,9 +1,10 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_START,
+  Banner,
   BORDERS,
   Box,
   COLORS,
@@ -40,14 +41,13 @@ import {
   getErrorResponseMessage,
   dismissRequest,
   SUCCESS,
-} from '../../redux/robot-api'
-import { Banner } from '../../atoms/Banner'
-import { UpdateBanner } from '../../molecules/UpdateBanner'
-import { useChainLiveCommands } from '../../resources/runs'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
-import { useIsFlex } from '../../organisms/Devices/hooks'
-import { getModuleTooHot } from '../Devices/getModuleTooHot'
-import { useToaster } from '../ToasterOven'
+} from '/app/redux/robot-api'
+import { UpdateBanner } from '/app/molecules/UpdateBanner'
+import { useChainLiveCommands } from '/app/resources/runs'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { getModuleTooHot } from '/app/transformations/modules'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -59,21 +59,21 @@ import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
-import { ModuleWizardFlows } from '../ModuleWizardFlows'
-import { getModulePrepCommands } from '../Devices/getModulePrepCommands'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,
-} from '../../redux/modules/types'
-import type { State, Dispatch } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
+} from '/app/redux/modules/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
 import { AbsorbanceReaderSlideout } from './AbsorbanceReaderSlideout'
 
@@ -116,13 +116,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       setShowOverflowMenu(false)
     },
   })
-  const [showSlideout, setShowSlideout] = React.useState(false)
-  const [hasSecondary, setHasSecondary] = React.useState(false)
-  const [showAboutModule, setShowAboutModule] = React.useState(false)
-  const [showTestShake, setShowTestShake] = React.useState(false)
-  const [showHSWizard, setShowHSWizard] = React.useState(false)
-  const [showFWBanner, setShowFWBanner] = React.useState(true)
-  const [showCalModal, setShowCalModal] = React.useState(false)
+  const [showSlideout, setShowSlideout] = useState(false)
+  const [hasSecondary, setHasSecondary] = useState(false)
+  const [showAboutModule, setShowAboutModule] = useState(false)
+  const [showTestShake, setShowTestShake] = useState(false)
+  const [showHSWizard, setShowHSWizard] = useState(false)
+  const [showFWBanner, setShowFWBanner] = useState(true)
+  const [showCalModal, setShowCalModal] = useState(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -131,6 +131,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const requireModuleCalibration =
     isFlex &&
     !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
+    module.moduleType !== ABSORBANCE_READER_TYPE &&
     module.moduleOffset?.last_modified == null
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
@@ -143,7 +144,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   const hasUpdated =
     !module.hasAvailableUpdate && latestRequest?.status === SUCCESS
-  const [showFirmwareToast, setShowFirmwareToast] = React.useState(hasUpdated)
+  const [showFirmwareToast, setShowFirmwareToast] = useState(hasUpdated)
   const { makeToast } = useToaster()
   if (showFirmwareToast) {
     makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
@@ -172,7 +173,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
-    case 'magneticModuleType': {
+    case MAGNETIC_MODULE_TYPE: {
       moduleData = (
         <MagneticModuleData
           moduleStatus={module.data.status}
@@ -183,7 +184,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       break
     }
 
-    case 'temperatureModuleType': {
+    case TEMPERATURE_MODULE_TYPE: {
       moduleData = (
         <TemperatureModuleData
           moduleStatus={module.data.status}
@@ -194,12 +195,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       break
     }
 
-    case 'thermocyclerModuleType': {
+    case THERMOCYCLER_MODULE_TYPE: {
       moduleData = <ThermocyclerModuleData data={module.data} />
       break
     }
 
-    case 'heaterShakerModuleType': {
+    case HEATERSHAKER_MODULE_TYPE: {
       moduleData = (
         <HeaterShakerModuleData
           moduleData={module.data}
@@ -209,7 +210,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       break
     }
 
-    case 'absorbanceReaderType': {
+    case ABSORBANCE_READER_TYPE: {
       moduleData = <AbsorbanceReaderData moduleData={module.data} />
       break
     }
@@ -240,7 +241,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
-  ] = React.useState<string>('')
+  ] = useState<string>('')
   const handleCalibrateClick = (): void => {
     if (getModulePrepCommands(module).length > 0) {
       chainLiveCommands(getModulePrepCommands(module), false).catch(

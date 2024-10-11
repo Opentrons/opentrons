@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
@@ -30,7 +30,7 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const nickNames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
   const savedNickname = nickNames[labwareId]
-  const [nickName, setNickName] = React.useState<string>(savedNickname)
+  const [nickName, setNickName] = useState<string>(savedNickname)
   const saveNickname = (): void => {
     dispatch(renameLabware({ labwareId, name: nickName }))
     onClose()
@@ -65,7 +65,7 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        girGap={SPACING.spacing12}
+        gridGap={SPACING.spacing12}
         height="3.75rem"
       >
         <Flex color={COLORS.grey60}>

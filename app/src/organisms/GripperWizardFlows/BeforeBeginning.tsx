@@ -1,13 +1,13 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+} from '/app/molecules/SimpleWizardBody'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import {
   GRIPPER_FLOW_TYPES,
   SCREWDRIVER_LOADNAME,
@@ -76,7 +76,7 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }

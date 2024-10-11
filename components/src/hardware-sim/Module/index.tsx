@@ -1,5 +1,6 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
+  ABSORBANCE_READER_TYPE,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -25,6 +26,7 @@ import { HeaterShaker } from './HeaterShaker'
 import { Temperature } from './Temperature'
 import { MagneticBlock } from './MagneticBlock'
 import { MagneticModule } from './MagneticModule'
+import { PlateReader } from './PlateReader'
 
 import type {
   ModuleDefinition,
@@ -144,7 +146,7 @@ export const Module = (props: Props): JSX.Element => {
   const rotationCenterY = (footprintYDimension ?? yDimension) / 2
 
   const orientationTransform =
-    orientation === 'left'
+    orientation === 'left' || moduleType === ABSORBANCE_READER_TYPE
       ? 'rotate(0, 0, 0)'
       : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
@@ -206,6 +208,8 @@ export const Module = (props: Props): JSX.Element => {
         {...(innerProps as React.ComponentProps<typeof Temperature>)}
       />
     )
+  } else if (moduleType === ABSORBANCE_READER_TYPE) {
+    moduleViz = <PlateReader />
   }
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>

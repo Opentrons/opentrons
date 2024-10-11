@@ -17,6 +17,9 @@ from opentrons.protocol_engine.actions.actions import (
     RunCommandAction,
     SetErrorRecoveryPolicyAction,
 )
+from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
+    UnsafeUngripLabwareCommandType,
+)
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
@@ -36,7 +39,7 @@ from ..actions import (
     DoorChangeAction,
 )
 
-from ..commands import Command, CommandStatus, CommandIntent
+from ..commands import Command, CommandStatus, CommandIntent, CommandCreate
 from ..errors import (
     RunStoppedError,
     ErrorOccurrence,
@@ -95,7 +98,9 @@ class QueueStatus(enum.Enum):
     AWAITING_RECOVERY_PAUSED = enum.auto()
     """Execution of fixit commands has been paused.
 
-    New protocol and fixit commands may be enqueued, but will wait to execute.
+    New protocol and fixit commands may be enqueued, but will usually wait to execute.
+    There are certain exceptions where fixit commands will still run.
+
     New setup commands may not be enqueued.
     """
 
@@ -580,18 +585,19 @@ class CommandView(HasState[CommandState]):
         return self._state.command_history.get_all_commands()
 
     def get_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command.
         """
+        command_ids = self._state.command_history.get_filtered_command_ids(
+            include_fixit_commands=include_fixit_commands
+        )
         running_command = self._state.command_history.get_running_command()
         queued_command_ids = self._state.command_history.get_queue_ids()
-        total_length = self._state.command_history.length()
+        total_length = len(command_ids)
 
         # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing
         # as self.get_current(), but in a different way. Can we unify them?
@@ -620,7 +626,9 @@ class CommandView(HasState[CommandState]):
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        commands = self._state.command_history.get_slice(start=actual_cursor, stop=stop)
+        commands = self._state.command_history.get_slice(
+            start=actual_cursor, stop=stop, command_ids=command_ids
+        )
 
         return CommandSlice(
             commands=commands,
@@ -736,6 +744,12 @@ class CommandView(HasState[CommandState]):
         # if queue is in recovery mode, return the next fixit command
         next_fixit_cmd = self._state.command_history.get_fixit_queue_ids().head(None)
         if next_fixit_cmd and self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
+            return next_fixit_cmd
+        if (
+            next_fixit_cmd
+            and self._state.queue_status == QueueStatus.AWAITING_RECOVERY_PAUSED
+            and self._may_run_with_door_open(fixit_command=self.get(next_fixit_cmd))
+        ):
             return next_fixit_cmd
 
         # if there is a setup command queued, prioritize it
@@ -967,12 +981,23 @@ class CommandView(HasState[CommandState]):
                     "Setup commands are not allowed after run has started."
                 )
             elif action.request.intent == CommandIntent.FIXIT:
-                if self._state.queue_status != QueueStatus.AWAITING_RECOVERY:
+                if self.get_status() == EngineStatus.AWAITING_RECOVERY:
+                    return action
+                elif self.get_status() in (
+                    EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+                    EngineStatus.AWAITING_RECOVERY_PAUSED,
+                ):
+                    if self._may_run_with_door_open(fixit_command=action.request):
+                        return action
+                    else:
+                        raise FixitCommandNotAllowedError(
+                            f"{action.request.commandType} fixit command may not run"
+                            " until the door is closed and the run is played again."
+                        )
+                else:
                     raise FixitCommandNotAllowedError(
                         "Fixit commands are not allowed when the run is not in a recoverable state."
                     )
-                else:
-                    return action
             else:
                 return action
 
@@ -1057,3 +1082,22 @@ class CommandView(HasState[CommandState]):
         higher-level code.
         """
         return self._state.error_recovery_policy
+
+    def _may_run_with_door_open(
+        self, *, fixit_command: Command | CommandCreate
+    ) -> bool:
+        """Return whether the given fixit command is exempt from the usual open-door auto pause.
+
+        This is required for certain error recovery flows, where we want the robot to
+        do stuff while the door is open.
+        """
+        # CommandIntent.PROTOCOL and CommandIntent.SETUP have their own rules for whether
+        # they run while the door is open. Passing one of those commands to this function
+        # is probably a mistake in the caller's logic.
+        assert fixit_command.intent == CommandIntent.FIXIT
+
+        # This type annotation is to make sure the string constant stays in sync and isn't typo'd.
+        required_command_type: UnsafeUngripLabwareCommandType = "unsafe/ungripLabware"
+        # todo(mm, 2024-10-04): Instead of allowlisting command types, maybe we should
+        # add a `mayRunWithDoorOpen: bool` field to command requests.
+        return fixit_command.commandType == required_command_type

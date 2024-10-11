@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
@@ -26,16 +25,16 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   OPENTRONS_USB,
-} from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
-import { RobotCard } from '../../../../organisms/Devices/RobotCard'
-import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
-import { CollapsibleSection } from '../../../../molecules/CollapsibleSection'
+} from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
+import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
+import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 
-import { Divider } from '../../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'

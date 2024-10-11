@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -30,17 +30,17 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   getLocalRobot,
-} from '../../../redux/discovery'
-import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../../redux/analytics'
-import { AlphanumericKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { SmallButton } from '../../../atoms/buttons'
-import { StepMeter } from '../../../atoms/StepMeter'
-import { useIsUnboxingFlowOngoing } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
-import { ConfirmRobotName } from '../../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
+} from '/app/redux/discovery'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
+import { AlphanumericKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { SmallButton } from '/app/atoms/buttons'
+import { StepMeter } from '/app/atoms/StepMeter'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 
 interface FormValues {
   newRobotName: string
@@ -53,12 +53,11 @@ export function NameRobot(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
-  const [newName, setNewName] = React.useState<string>('')
-  const [
-    isShowConfirmRobotName,
-    setIsShowConfirmRobotName,
-  ] = React.useState<boolean>(false)
-  const keyboardRef = React.useRef(null)
+  const [newName, setNewName] = useState<string>('')
+  const [isShowConfirmRobotName, setIsShowConfirmRobotName] = useState<boolean>(
+    false
+  )
+  const keyboardRef = useRef(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 

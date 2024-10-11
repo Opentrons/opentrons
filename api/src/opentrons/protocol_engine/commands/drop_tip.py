@@ -5,6 +5,7 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..state import update_types
 from ..types import DropTipWellLocation, DeckPoint
 from .pipetting_common import PipetteIdMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -76,6 +77,8 @@ class DropTipImplementation(
         well_name = params.wellName
         home_after = params.homeAfter
 
+        state_update = update_types.StateUpdate()
+
         if params.alternateDropLocation:
             well_location = self._state_view.geometry.get_next_tip_drop_location(
                 labware_id=labware_id,
@@ -101,14 +104,22 @@ class DropTipImplementation(
             well_name=well_name,
             well_location=tip_drop_location,
         )
+        deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
+        state_update.set_pipette_location(
+            pipette_id=pipette_id,
+            new_labware_id=labware_id,
+            new_well_name=well_name,
+            new_deck_point=deck_point,
+        )
 
         await self._tip_handler.drop_tip(pipette_id=pipette_id, home_after=home_after)
 
+        state_update.update_tip_state(pipette_id=params.pipetteId, tip_geometry=None)
+
         return SuccessData(
-            public=DropTipResult(
-                position=DeckPoint(x=position.x, y=position.y, z=position.z)
-            ),
+            public=DropTipResult(position=deck_point),
             private=None,
+            state_update=state_update,
         )
 
 

@@ -37,8 +37,6 @@ if TYPE_CHECKING:
 _GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
 
 
-# TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
-#  any non-gripper implementations
 class LabwareMovementHandler:
     """Implementation logic for labware movement."""
 
@@ -128,6 +126,7 @@ class LabwareMovementHandler:
             current_location=current_location,
         )
 
+        current_labware = self._state_store.labware.get_definition(labware_id)
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
@@ -136,6 +135,7 @@ class LabwareMovementHandler:
                     from_location=current_location,
                     to_location=new_location,
                     additional_offset_vector=user_offset_data,
+                    current_labware=current_labware,
                 )
             )
             from_labware_center = self._state_store.geometry.get_labware_grip_point(
@@ -177,6 +177,9 @@ class LabwareMovementHandler:
                             labware_id
                         )
                         well_bbox = self._state_store.labware.get_well_bbox(labware_id)
+                        # todo(mm, 2024-09-26): This currently raises a lower-level 2015 FailedGripperPickupError.
+                        # Convert this to a higher-level 3001 LabwareDroppedError or 3002 LabwareNotPickedUpError,
+                        # depending on what waypoint we're at, to propagate a more specific error code to users.
                         ot3api.raise_error_if_gripper_pickup_failed(
                             expected_grip_width=labware_bbox.y,
                             grip_width_uncertainty_wider=abs(

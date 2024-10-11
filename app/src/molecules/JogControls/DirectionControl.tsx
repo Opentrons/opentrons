@@ -13,16 +13,17 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_GRID,
   Flex,
   HandleKeypress,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TEXT_ALIGN_LEFT,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -302,7 +303,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
 }
 
 const ARROW_GRID_STYLES = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   max-width: 8.75rem;
   grid-template-columns: repeat(6, 1fr);
   grid-template-areas:

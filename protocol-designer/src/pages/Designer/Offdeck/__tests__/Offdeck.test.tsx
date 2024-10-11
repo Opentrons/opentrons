@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
@@ -21,7 +20,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 
 const render = () => {
-  return renderWithProviders(<OffDeck />)[0]
+  return renderWithProviders(<OffDeck tab="startingDeck" />)
 }
 
 describe('OffDeck', () => {

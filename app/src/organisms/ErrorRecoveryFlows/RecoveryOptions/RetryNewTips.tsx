@@ -1,11 +1,10 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import {
-  ReplaceTips,
+  TwoColLwInfoAndDeck,
   SelectTips,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
@@ -30,7 +29,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
   const buildContent = (): JSX.Element => {
     switch (step) {
       case RETRY_NEW_TIPS.STEPS.REPLACE_TIPS:
-        return <ReplaceTips {...props} />
+        return <TwoColLwInfoAndDeck {...props} />
       case RETRY_NEW_TIPS.STEPS.SELECT_TIPS:
         return <SelectTips {...props} />
       case RETRY_NEW_TIPS.STEPS.RETRY:
@@ -47,12 +46,12 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
 export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryCommands, routeUpdateActions } = props
   const { retryFailedCommand, resumeRun } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
+  const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
+    return handleMotionRouting(true, ROBOT_RETRYING_STEP.ROUTE)
       .then(() => retryFailedCommand())
       .then(() => {
         resumeRun()

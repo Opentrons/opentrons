@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -10,16 +9,13 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { DeviceDetailsDeckConfiguration } from '../../../../organisms/DeviceDetailsDeckConfiguration'
-import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
-import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
-import { EstopBanner } from '../../../../organisms/Devices/EstopBanner'
-import {
-  DISENGAGED,
-  useEstopContext,
-} from '../../../../organisms/EmergencyStop'
-import { useIsFlex } from '../../../../organisms/Devices/hooks'
+import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
+import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
+import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
+import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
+import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 interface DeviceDetailsComponentProps {
   robotName: string

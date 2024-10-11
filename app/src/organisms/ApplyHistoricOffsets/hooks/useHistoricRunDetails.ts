@@ -1,4 +1,4 @@
-import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
 
 import type { HostConfig, RunData } from '@opentrons/api-client'
 

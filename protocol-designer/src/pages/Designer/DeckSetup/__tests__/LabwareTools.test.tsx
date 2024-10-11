@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -123,7 +123,7 @@ describe('LabwareTools', () => {
 
   it('renders the custom labware flow', () => {
     render(props)
-    screen.getByText('Add custom labware')
+    screen.getByText('Upload custom labware')
     fireEvent.change(screen.getByTestId('customLabwareInput'))
     expect(vi.mocked(createCustomLabwareDef)).toHaveBeenCalled()
   })

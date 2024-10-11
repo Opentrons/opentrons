@@ -5,7 +5,11 @@ this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
 from typing import Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict, NotRequired
-
+from .labware_definition import InnerWellGeometry
+from .constants import (
+    Circular,
+    Rectangular,
+)
 
 LabwareUri = NewType("LabwareUri", str)
 
@@ -33,12 +37,8 @@ LabwareRoles = Union[
     Literal["fixture"],
     Literal["adapter"],
     Literal["maintenance"],
+    Literal["lid"],
 ]
-
-Circular = Literal["circular"]
-Rectangular = Literal["rectangular"]
-Spherical = Literal["spherical"]
-WellShape = Union[Circular, Rectangular]
 
 
 class NamedOffset(TypedDict):
@@ -118,37 +118,6 @@ class WellGroup(TypedDict, total=False):
     wells: List[str]
     metadata: WellGroupMetadata
     brand: LabwareBrandData
-
-
-class CircularCrossSection(TypedDict):
-    shape: Circular
-    diameter: float
-
-
-class RectangularCrossSection(TypedDict):
-    shape: Rectangular
-    xDimension: float
-    yDimension: float
-
-
-class SphericalSegment(TypedDict):
-    shape: Spherical
-    radiusOfCurvature: float
-    depth: float
-
-
-TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
-BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
-
-
-class BoundedSection(TypedDict):
-    geometry: TopCrossSection
-    topHeight: float
-
-
-class InnerWellGeometry(TypedDict):
-    frusta: List[BoundedSection]
-    bottomShape: BottomShape
 
 
 class LabwareDefinition(TypedDict):

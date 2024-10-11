@@ -11,7 +11,10 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "/app/*": ["../app/src/*"]
+    }
   },
   "include": ["typings", "src"]
 }

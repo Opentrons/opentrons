@@ -1,7 +1,9 @@
 """Request and response models for run resources."""
 from datetime import datetime
+
+from enum import Enum
 from pydantic import BaseModel, Field
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Dict
 
 from opentrons.protocol_engine import (
     CommandStatus,
@@ -278,6 +280,44 @@ class LabwareDefinitionSummary(BaseModel):
         ...,
         description="The definition's unique resource identifier in the run.",
     )
+
+
+class NozzleLayoutConfig(str, Enum):
+    """Possible valid nozzle configurations."""
+
+    COLUMN = "column"
+    ROW = "row"
+    SINGLE = "single"
+    FULL = "full"
+    SUBRECT = "subrect"
+
+
+class ActiveNozzleLayout(BaseModel):
+    """Details about the active nozzle layout for a pipette used in the current run."""
+
+    startingNozzle: str = Field(
+        ..., description="The nozzle used when issuing pipette commands."
+    )
+    activeNozzles: List[str] = Field(
+        ...,
+        description="A map of all the pipette nozzles active in the current configuration.",
+    )
+    config: NozzleLayoutConfig = Field(
+        ..., description="The active nozzle configuration."
+    )
+
+
+class RunCurrentState(BaseModel):
+    """Current details about a run."""
+
+    activeNozzleLayouts: Dict[str, ActiveNozzleLayout] = Field(..., description="")
+
+
+class CommandLinkNoMeta(BaseModel):
+    """A link to a command resource without a meta field."""
+
+    id: str = Field(..., description="The ID of the command.")
+    href: str = Field(..., description="The HTTP API path to the command.")
 
 
 class RunNotFoundError(GeneralError):

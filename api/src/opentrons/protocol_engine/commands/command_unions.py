@@ -10,9 +10,7 @@ from opentrons.util.get_union_elements import get_union_elements
 from .command import DefinedErrorData
 from .pipetting_common import (
     OverpressureError,
-    OverpressureErrorInternalData,
     LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
 )
 
 from . import absorbance_reader
@@ -146,6 +144,7 @@ from .load_pipette import (
 )
 
 from .move_labware import (
+    GripperMovementError,
     MoveLabware,
     MoveLabwareParams,
     MoveLabwareCreate,
@@ -216,7 +215,6 @@ from .pick_up_tip import (
     PickUpTipResult,
     PickUpTipCommandType,
     TipPhysicallyMissingError,
-    TipPhysicallyMissingErrorInternalData,
 )
 
 from .touch_tip import (
@@ -382,6 +380,7 @@ Command = Annotated[
         thermocycler.OpenLid,
         thermocycler.CloseLid,
         thermocycler.RunProfile,
+        thermocycler.RunExtendedProfile,
         absorbance_reader.CloseLid,
         absorbance_reader.OpenLid,
         absorbance_reader.Initialize,
@@ -394,6 +393,7 @@ Command = Annotated[
         unsafe.UnsafeDropTipInPlace,
         unsafe.UpdatePositionEstimators,
         unsafe.UnsafeEngageAxes,
+        unsafe.UnsafeUngripLabware,
     ],
     Field(discriminator="commandType"),
 ]
@@ -457,6 +457,7 @@ CommandParams = Union[
     thermocycler.OpenLidParams,
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
+    thermocycler.RunExtendedProfileParams,
     absorbance_reader.CloseLidParams,
     absorbance_reader.OpenLidParams,
     absorbance_reader.InitializeParams,
@@ -469,6 +470,7 @@ CommandParams = Union[
     unsafe.UnsafeDropTipInPlaceParams,
     unsafe.UpdatePositionEstimatorsParams,
     unsafe.UnsafeEngageAxesParams,
+    unsafe.UnsafeUngripLabwareParams,
 ]
 
 CommandType = Union[
@@ -530,6 +532,7 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    thermocycler.RunExtendedProfileCommandType,
     absorbance_reader.CloseLidCommandType,
     absorbance_reader.OpenLidCommandType,
     absorbance_reader.InitializeCommandType,
@@ -542,6 +545,7 @@ CommandType = Union[
     unsafe.UnsafeDropTipInPlaceCommandType,
     unsafe.UpdatePositionEstimatorsCommandType,
     unsafe.UnsafeEngageAxesCommandType,
+    unsafe.UnsafeUngripLabwareCommandType,
 ]
 
 CommandCreate = Annotated[
@@ -604,6 +608,7 @@ CommandCreate = Annotated[
         thermocycler.OpenLidCreate,
         thermocycler.CloseLidCreate,
         thermocycler.RunProfileCreate,
+        thermocycler.RunExtendedProfileCreate,
         absorbance_reader.CloseLidCreate,
         absorbance_reader.OpenLidCreate,
         absorbance_reader.InitializeCreate,
@@ -616,6 +621,7 @@ CommandCreate = Annotated[
         unsafe.UnsafeDropTipInPlaceCreate,
         unsafe.UpdatePositionEstimatorsCreate,
         unsafe.UnsafeEngageAxesCreate,
+        unsafe.UnsafeUngripLabwareCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -679,6 +685,7 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    thermocycler.RunExtendedProfileResult,
     absorbance_reader.CloseLidResult,
     absorbance_reader.OpenLidResult,
     absorbance_reader.InitializeResult,
@@ -691,6 +698,7 @@ CommandResult = Union[
     unsafe.UnsafeDropTipInPlaceResult,
     unsafe.UpdatePositionEstimatorsResult,
     unsafe.UnsafeEngageAxesResult,
+    unsafe.UnsafeUngripLabwareResult,
 ]
 
 # todo(mm, 2024-06-12): Ideally, command return types would have specific
@@ -706,9 +714,10 @@ CommandPrivateResult = Union[
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
-    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
-    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
+    DefinedErrorData[TipPhysicallyMissingError],
+    DefinedErrorData[OverpressureError],
+    DefinedErrorData[LiquidNotFoundError],
+    DefinedErrorData[GripperMovementError],
 ]
 
 

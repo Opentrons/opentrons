@@ -3,8 +3,8 @@
 import pytest
 
 from opentrons import simulate
-from opentrons.protocol_api import COLUMN, ALL, SINGLE
-from opentrons.protocol_api.core.engine.deck_conflict import (
+from opentrons.protocol_api import COLUMN, ALL, SINGLE, ROW
+from opentrons.protocol_api.core.engine.pipette_movement_conflict import (
     PartialTipMovementNotAllowedError,
 )
 
@@ -226,3 +226,104 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
 
     # No error NOW because of full config
     instrument.dispense(50, badly_placed_plate.wells_by_name()["A1"].bottom())
+
+
+@pytest.mark.ot3_only
+def test_deck_conflicts_for_96_ch_and_reservoirs() -> None:
+    """It should raise errors for expected deck conflicts when moving to reservoirs.
+
+    This test checks that the critical point of the pipette is taken into account,
+    specifically when it differs from the primary nozzle.
+    """
+    protocol = simulate.get_protocol_api(version="2.20", robot_type="Flex")
+    instrument = protocol.load_instrument("flex_96channel_1000", mount="left")
+    # trash_labware = protocol.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
+    # instrument.trash_container = trash_labware
+
+    protocol.load_trash_bin("A3")
+    right_tiprack = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C3")
+    front_tiprack = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "D2")
+    # Tall deck item in B3
+    protocol.load_labware(
+        "opentrons_flex_96_tiprack_50ul",
+        "B3",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
+    # Tall deck item in B1
+    protocol.load_labware(
+        "opentrons_flex_96_tiprack_50ul",
+        "B1",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
+
+    # ############  RESERVOIRS  ################
+    # These labware should be to the east of tall labware to avoid any partial tip deck conflicts
+    reservoir_1_well = protocol.load_labware("nest_1_reservoir_195ml", "C2")
+    reservoir_12_well = protocol.load_labware("nest_12_reservoir_15ml", "B2")
+
+    # ########### Use COLUMN A1 Config #############
+    instrument.configure_nozzle_layout(style=COLUMN, start="A1")
+
+    instrument.pick_up_tip(front_tiprack.wells_by_name()["A12"])
+
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="collision with items in deck slot"
+    ):
+        instrument.aspirate(10, reservoir_1_well.wells()[0])
+
+    instrument.aspirate(25, reservoir_12_well.wells()[0])
+    instrument.dispense(10, reservoir_12_well.wells()[1])
+
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="collision with items in deck slot"
+    ):
+        instrument.dispense(15, reservoir_12_well.wells()[3])
+
+    instrument.drop_tip()
+    front_tiprack.reset()
+
+    # ########### Use COLUMN A12 Config #############
+    instrument.configure_nozzle_layout(style=COLUMN, start="A12")
+
+    instrument.pick_up_tip(front_tiprack.wells_by_name()["A1"])
+    instrument.aspirate(50, reservoir_1_well.wells()[0])
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="collision with items in deck slot"
+    ):
+        instrument.dispense(10, reservoir_12_well.wells()[8])
+
+    instrument.dispense(15, reservoir_12_well.wells()[11])
+    instrument.dispense(10, reservoir_1_well.wells()[0])
+
+    instrument.drop_tip()
+    front_tiprack.reset()
+
+    # ######## CHANGE CONFIG TO ROW H1 #########
+    instrument.configure_nozzle_layout(style=ROW, start="H1", tip_racks=[front_tiprack])
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="collision with items in deck slot"
+    ):
+        instrument.pick_up_tip(right_tiprack.wells_by_name()["A1"])
+
+    instrument.pick_up_tip()
+    instrument.aspirate(25, reservoir_1_well.wells()[0])
+
+    instrument.drop_tip()
+    front_tiprack.reset()
+
+    # ######## CHANGE CONFIG TO ROW A1 #########
+    instrument.configure_nozzle_layout(style=ROW, start="A1", tip_racks=[front_tiprack])
+
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="outside of robot bounds"
+    ):
+        instrument.pick_up_tip()
+    instrument.pick_up_tip(right_tiprack.wells_by_name()["H1"])
+
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="collision with items in deck slot"
+    ):
+        instrument.aspirate(25, reservoir_1_well.wells()[0])
+
+    instrument.drop_tip()
+    front_tiprack.reset()

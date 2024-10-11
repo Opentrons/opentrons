@@ -1,22 +1,22 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
-import { StepMeter } from '../../../atoms/StepMeter'
-import { DisplayWifiList } from '../../../organisms/NetworkSettings'
-import * as Networking from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
-import * as RobotApi from '../../../redux/robot-api'
-import { useWifiList } from '../../../resources/networking/hooks'
+import { StepMeter } from '/app/atoms/StepMeter'
+import { DisplayWifiList } from '/app/organisms/ODD/NetworkSettings'
+import * as Networking from '/app/redux/networking'
+import { getLocalRobot } from '/app/redux/discovery'
+import * as RobotApi from '/app/redux/robot-api'
+import { useWifiList } from '/app/resources/networking/hooks'
 import { JoinOtherNetwork } from './JoinOtherNetwork'
 import { SelectAuthenticationType } from './SelectAuthenticationType'
 import { SetWifiCred } from './SetWifiCred'
 import { WifiConnectStatus } from './WifiConnectStatus'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 const WIFI_LIST_POLL_MS = 5000
 export type WifiScreenOption =
@@ -27,16 +27,15 @@ export type WifiScreenOption =
   | 'WifiConnectStatus'
 
 export function ConnectViaWifi(): JSX.Element {
-  const [selectedSsid, setSelectedSsid] = React.useState<string>('')
-  const [
-    selectedAuthType,
-    setSelectedAuthType,
-  ] = React.useState<WifiSecurityType>('wpa-psk')
+  const [selectedSsid, setSelectedSsid] = useState<string>('')
+  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
+    'wpa-psk'
+  )
 
-  const [currentOption, setCurrentOption] = React.useState<WifiScreenOption>(
+  const [currentOption, setCurrentOption] = useState<WifiScreenOption>(
     'WifiList'
   )
-  const [password, setPassword] = React.useState<string>('')
+  const [password, setPassword] = useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useWifiList(robotName, WIFI_LIST_POLL_MS)

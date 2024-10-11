@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -15,16 +15,16 @@ import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { getIsOnDevice } from '../../redux/config'
 import {
   useChainMaintenanceCommands,
-  useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs'
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
+import { getTopPortalEl } from '/app/App/portal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { getIsOnDevice } from '/app/redux/config'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -68,7 +68,7 @@ export function GripperWizardFlows(
     isLoading: isCommandLoading,
   } = useCreateMaintenanceCommandMutation()
 
-  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
   >(null)
 
@@ -77,7 +77,7 @@ export function GripperWizardFlows(
   const [
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const {
     createTargetedMaintenanceRun,
@@ -95,7 +95,7 @@ export function GripperWizardFlows(
 
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       createdMaintenanceRunId !== null &&
       maintenanceRunData?.data.id === createdMaintenanceRunId
@@ -116,16 +116,17 @@ export function GripperWizardFlows(
     closeFlow,
   ])
 
-  const [isExiting, setIsExiting] = React.useState<boolean>(false)
-  const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
+  const [isExiting, setIsExiting] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<null | string>(null)
 
   const handleClose = (): void => {
-    if (props?.onComplete != null) props.onComplete()
+    if (props?.onComplete != null) {
+      props.onComplete()
+    }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
-    } else {
-      closeFlow()
     }
+    closeFlow()
   }
 
   const {
@@ -141,19 +142,20 @@ export function GripperWizardFlows(
   })
 
   const handleCleanUpAndClose = (): void => {
-    if (maintenanceRunData?.data.id == null) handleClose()
-    else {
+    if (maintenanceRunData?.data.id == null) {
+      handleClose()
+    } else {
       chainRunCommands(
         maintenanceRunData?.data.id,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
-        .then(() => {
-          handleClose()
-        })
         .catch(error => {
           setIsExiting(true)
           setErrorMessage(error.message as string)
+        })
+        .finally(() => {
+          handleClose()
         })
     }
   }
@@ -234,11 +236,8 @@ export const GripperWizard = (
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
   const gripperWizardSteps = getGripperWizardSteps(flowType)
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const [
-    frontJawOffset,
-    setFrontJawOffset,
-  ] = React.useState<Coordinates | null>(null)
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
+  const [frontJawOffset, setFrontJawOffset] = useState<Coordinates | null>(null)
 
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]

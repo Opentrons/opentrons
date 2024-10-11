@@ -1,6 +1,7 @@
 """Test move relative commands."""
 from decoy import Decoy
 
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.types import DeckPoint, MovementAxis
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.types import Point
@@ -36,5 +37,13 @@ async def test_move_relative_implementation(
     result = await subject.execute(data)
 
     assert result == SuccessData(
-        public=MoveRelativeResult(position=DeckPoint(x=1, y=2, z=3)), private=None
+        public=MoveRelativeResult(position=DeckPoint(x=1, y=2, z=3)),
+        private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=update_types.NO_CHANGE,
+                new_deck_point=DeckPoint(x=1, y=2, z=3),
+            )
+        ),
     )

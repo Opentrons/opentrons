@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -29,9 +29,7 @@ import type { WellGroup } from '@opentrons/components'
 
 export function AssignLiquidsModal(): JSX.Element | null {
   const { t } = useTranslation('liquids')
-  const [highlightedWells, setHighlightedWells] = React.useState<
-    WellGroup | {}
-  >({})
+  const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
   const navigate = useNavigate()
   const labwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
@@ -81,8 +79,8 @@ export function AssignLiquidsModal(): JSX.Element | null {
               {t('click_and_drag')}
             </StyledText>
           </Flex>
-          {/* TODO(ja, 8/29/24): update this styling to match designs */}
           <SelectableLabware
+            showBorder={false}
             labwareProps={{
               wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
               definition: labwareDef,

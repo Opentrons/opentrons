@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -13,7 +12,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OddModal } from '../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {

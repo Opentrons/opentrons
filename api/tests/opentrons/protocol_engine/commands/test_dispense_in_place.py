@@ -14,11 +14,7 @@ from opentrons.protocol_engine.commands.dispense_in_place import (
     DispenseInPlaceResult,
     DispenseInPlaceImplementation,
 )
-from opentrons.protocol_engine.types import DeckPoint
-from opentrons.protocol_engine.commands.pipetting_common import (
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.resources import ModelUtils
 
 
@@ -96,8 +92,5 @@ async def test_overpressure_error(
             createdAt=error_timestamp,
             wrappedErrors=[matchers.Anything()],
             errorInfo={"retryLocation": (position.x, position.y, position.z)},
-        ),
-        private=OverpressureErrorInternalData(
-            position=DeckPoint(x=position.x, y=position.y, z=position.z)
         ),
     )

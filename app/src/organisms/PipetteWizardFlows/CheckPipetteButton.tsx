@@ -1,7 +1,7 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { PrimaryButton } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 
 interface CheckPipetteButtonProps {
   proceedButtonText: string

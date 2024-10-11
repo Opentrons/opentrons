@@ -9,6 +9,7 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -18,12 +19,12 @@ import {
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  ModalShell,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  ModalShell,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -32,15 +33,15 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../i18n'
-import { getIsOnDevice } from '../../redux/config'
-import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { ModalContentOneColSimpleButtons } from '../../molecules/InterventionModal'
-import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
-import ninetySixChannel from '../../assets/images/change-pip/ninety-six-channel.png'
-import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import { i18n } from '/app/i18n'
+import { getIsOnDevice } from '/app/redux/config'
+import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
+import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'
+import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
 import { getIsGantryEmpty } from './utils'
@@ -55,7 +56,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   border-radius: ${BORDERS.borderRadius8};
   height: 14.5625rem;
   width: 14.5625rem;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
@@ -6,7 +6,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import { PinnedProtocol } from './PinnedProtocol'
 
 import type { ProtocolResource } from '@opentrons/shared-data'

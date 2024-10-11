@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { SketchPicker } from 'react-color'
@@ -84,7 +84,7 @@ export function DefineLiquidsModal(
   const selectedLiquidGroupState = useSelector(
     labwareIngredSelectors.getSelectedLiquidGroupState
   )
-  const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false)
+  const [showColorPicker, setShowColorPicker] = useState<boolean>(false)
   const chooseColorWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowColorPicker(false)
@@ -241,14 +241,15 @@ export function DefineLiquidsModal(
                 <StyledText desktopStyle="bodyDefaultRegular">
                   {t('display_color')}
                 </StyledText>
-                <Btn
+
+                <LiquidIcon
                   onClick={() => {
                     setShowColorPicker(prev => !prev)
                   }}
                   width={FLEX_MIN_CONTENT}
-                >
-                  <LiquidIcon color={color} size="medium" />
-                </Btn>
+                  color={color}
+                  size="medium"
+                />
               </Flex>
               {/* NOTE: this is for serialization if we decide to add it back */}
               {/* <Controller

@@ -7,8 +7,8 @@ import omitBy from 'lodash/omitBy'
 import inRange from 'lodash/inRange'
 import type { AxiosError } from 'axios'
 
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { appShellRequestor } from '../../redux/shell/remote'
+import { OPENTRONS_USB } from '../discovery'
+import { appShellRequestor } from '../shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
 import type { Observable } from 'rxjs'

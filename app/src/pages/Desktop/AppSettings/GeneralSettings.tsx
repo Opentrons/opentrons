@@ -1,5 +1,5 @@
 // app info card with version and updated
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   ALIGN_START,
+  Banner,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -21,31 +22,30 @@ import {
   useMountEffect,
 } from '@opentrons/components'
 
-import { TertiaryButton, ToggleButton } from '../../../atoms/buttons'
-import { ExternalLink } from '../../../atoms/Link/ExternalLink'
-import { Divider } from '../../../atoms/structure'
-import { Banner } from '../../../atoms/Banner'
+import { TertiaryButton, ToggleButton } from '/app/atoms/buttons'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { Divider } from '/app/atoms/structure'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
   checkShellUpdate,
-} from '../../../redux/shell'
+} from '/app/redux/shell'
 import {
   ALERT_APP_UPDATE_AVAILABLE,
   getAlertIsPermanentlyIgnored,
   alertPermanentlyIgnored,
   alertUnignored,
-} from '../../../redux/alerts'
+} from '/app/redux/alerts'
 import {
   useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
-} from '../../../redux/analytics'
-import { UpdateAppModal } from '../../../organisms/UpdateAppModal'
-import { PreviousVersionModal } from '../../../organisms/AppSettings/PreviousVersionModal'
-import { ConnectRobotSlideout } from '../../../organisms/AppSettings/ConnectRobotSlideout'
-import { getTopPortalEl } from '../../../App/portal'
+} from '/app/redux/analytics'
+import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
+import { PreviousVersionModal } from '/app/organisms/Desktop/AppSettings/PreviousVersionModal'
+import { ConnectRobotSlideout } from '/app/organisms/Desktop/AppSettings/ConnectRobotSlideout'
+import { getTopPortalEl } from '/app/App/portal'
 
-import type { Dispatch, State } from '../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const SOFTWARE_SYNC_URL = 'https://support.opentrons.com/s/'
 const GITHUB_LINK =
@@ -60,22 +60,21 @@ export function GeneralSettings(): JSX.Element {
   const [
     showPreviousVersionModal,
     setShowPreviousVersionModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
+  const [showUpdateBanner, setShowUpdateBanner] = useState<boolean>(
     updateAvailable
   )
-  const [
-    showConnectRobotSlideout,
-    setShowConnectRobotSlideout,
-  ] = React.useState(false)
+  const [showConnectRobotSlideout, setShowConnectRobotSlideout] = useState(
+    false
+  )
 
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
   const handleToggle = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(

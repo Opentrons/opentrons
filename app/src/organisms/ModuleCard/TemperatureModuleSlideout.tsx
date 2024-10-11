@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -18,11 +18,11 @@ import {
   TEMP_MIN,
 } from '@opentrons/shared-data'
 
-import { Slideout } from '../../atoms/Slideout'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { SubmitPrimaryButton } from '/app/atoms/buttons'
 
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { TemperatureModule } from '../../redux/modules/types'
+import type { TemperatureModule } from '/app/redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
@@ -37,9 +37,7 @@ export const TemperatureModuleSlideout = (
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
-  const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
-    null
-  )
+  const [temperatureValue, setTemperatureValue] = useState<number | null>(null)
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {

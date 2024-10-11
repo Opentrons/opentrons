@@ -6,10 +6,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   MenuItem,
+  NO_WRAP,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -38,7 +39,7 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
       position={POSITION_ABSOLUTE}
       top="2.25rem"
       right="0"
-      whiteSpace="nowrap"
+      whiteSpace={NO_WRAP}
       zIndex={10}
       onClick={(e: React.MouseEvent) => {
         e.preventDefault()

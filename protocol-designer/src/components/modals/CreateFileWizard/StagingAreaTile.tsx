@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import without from 'lodash/without'
 import { useTranslation } from 'react-i18next'
 import {
@@ -77,7 +77,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
       ? savedStagingAreaSlots
       : unoccupiedStagingAreaSlots
 
-  const [updatedSlots, setUpdatedSlots] = React.useState<DeckConfiguration>(
+  const [updatedSlots, setUpdatedSlots] = useState<DeckConfiguration>(
     initialSlots
   )
 

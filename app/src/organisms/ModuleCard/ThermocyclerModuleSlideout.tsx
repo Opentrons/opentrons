@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   CELSIUS,
@@ -19,14 +19,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Slideout } from '../../atoms/Slideout'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { SubmitPrimaryButton } from '/app/atoms/buttons'
 
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
-import type { ThermocyclerModule } from '../../redux/modules/types'
+import type { ThermocyclerModule } from '/app/redux/modules/types'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
@@ -40,7 +40,7 @@ export const ThermocyclerModuleSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
-  const [tempValue, setTempValue] = React.useState<number | null>(null)
+  const [tempValue, setTempValue] = useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'

@@ -7,7 +7,7 @@ import {
   useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
 
-import { useChainRunCommands } from '../../../../resources/runs'
+import { useChainRunCommands } from '/app/resources/runs'
 import {
   useRecoveryCommands,
   HOME_PIPETTE_Z_AXES,
@@ -17,7 +17,7 @@ import {
 import { RECOVERY_MAP } from '../../constants'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 describe('useRecoveryCommands', () => {
   const mockFailedCommand = {
@@ -27,7 +27,7 @@ describe('useRecoveryCommands', () => {
   } as any
   const mockRunId = '123'
   const mockFailedLabwareUtils = {
-    selectedTipLocations: { A1: null },
+    selectedTipLocation: { A1: null },
     pickUpTipLabware: { id: 'MOCK_LW_ID' },
   } as any
   const mockProceedToRouteAndStep = vi.fn()
@@ -223,7 +223,7 @@ describe('useRecoveryCommands', () => {
     } as any
 
     const buildPickUpTipsCmd = buildPickUpTips(
-      mockFailedLabwareUtils.selectedTipLocations,
+      mockFailedLabwareUtils.selectedTipLocation,
       mockFailedCmdWithPipetteId,
       mockFailedLabware
     )
@@ -247,6 +247,19 @@ describe('useRecoveryCommands', () => {
       [buildPickUpTipsCmd],
       false
     )
+  })
+
+  it('should call releaseGripperJaws and resolve the promise', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    const consoleLogSpy = vi.spyOn(console, 'log')
+
+    await act(async () => {
+      await result.current.releaseGripperJaws()
+    })
+
+    expect(consoleLogSpy).toHaveBeenCalledWith('PLACEHOLDER RELEASE THE JAWS')
+    consoleLogSpy.mockRestore()
   })
 
   it('should call skipFailedCommand and show success toast on success', async () => {

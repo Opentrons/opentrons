@@ -17,7 +17,12 @@ from opentrons.motion_planning import Waypoint
 
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.motion import PipetteLocationData
-from opentrons.protocol_engine.types import MotorAxis, DeckPoint, CurrentWell
+from opentrons.protocol_engine.types import (
+    MotorAxis,
+    DeckPoint,
+    CurrentWell,
+    TipGeometry,
+)
 from opentrons.protocol_engine.errors import MustHomeError, InvalidAxisForRobotType
 
 from opentrons.protocol_engine.execution.gantry_mover import (
@@ -499,7 +504,9 @@ def test_virtual_get_max_travel_z_ot2(
     decoy.when(
         mock_state_view.pipettes.get_instrument_max_height_ot2("pipette-id")
     ).then_return(42)
-    decoy.when(mock_state_view.tips.get_tip_length("pipette-id")).then_return(20)
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=20, diameter=0, volume=0)
+    )
 
     result = virtual_subject.get_max_travel_z("pipette-id")
 
@@ -513,7 +520,9 @@ def test_virtual_get_max_travel_z_ot3(
 ) -> None:
     """It should get the max travel z height with the state store."""
     decoy.when(mock_state_view.config.robot_type).then_return("OT-3 Standard")
-    decoy.when(mock_state_view.tips.get_tip_length("pipette-id")).then_return(48)
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=48, diameter=0, volume=0)
+    )
 
     result = virtual_subject.get_max_travel_z("pipette-id")
 

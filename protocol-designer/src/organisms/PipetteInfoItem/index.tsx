@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -13,9 +12,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { FormPipettesByMount, PipetteOnDeck } from '../../step-forms'
 
 interface PipetteInfoItemProps {
   mount: PipetteMount
@@ -23,24 +22,14 @@ interface PipetteInfoItemProps {
   tiprackDefURIs: string[]
   editClick: () => void
   cleanForm: () => void
-  formPipettesByMount?: FormPipettesByMount
-  pipetteOnDeck?: PipetteOnDeck[]
 }
 
 export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
-  const {
-    mount,
-    pipetteName,
-    tiprackDefURIs,
-    editClick,
-    cleanForm,
-    formPipettesByMount,
-    pipetteOnDeck,
-  } = props
+  const { mount, pipetteName, tiprackDefURIs, editClick, cleanForm } = props
   const { t, i18n } = useTranslation('create_new_protocol')
-  const oppositeMount = mount === 'left' ? 'right' : 'left'
   const allLabware = useSelector(getLabwareDefsByURI)
   const is96Channel = pipetteName === 'p1000_96'
+
   return (
     <ListItem type="noActive">
       <Flex
@@ -52,9 +41,9 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {i18n.format(
               t('pip', {
-                mount: is96Channel ? t('left_right') : t(`${mount}`),
+                mount: is96Channel ? t('left_right') : mount,
               }),
-              'capitalize'
+              'titleCase'
             )}
           </StyledText>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
@@ -73,31 +62,31 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
           </Flex>
         </Flex>
         <Flex
-          gridGap={SPACING.spacing20}
+          gridGap={SPACING.spacing16}
           textDecoration={TYPOGRAPHY.textDecorationUnderline}
         >
           <Btn
             onClick={editClick}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            css={BUTTON_LINK_STYLE}
+            padding={SPACING.spacing4}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('edit')}
             </StyledText>
           </Btn>
-          {(formPipettesByMount != null &&
-            formPipettesByMount[oppositeMount].pipetteName == null) ||
-          (pipetteOnDeck != null && pipetteOnDeck.length === 1) ? null : (
-            <Btn
-              onClick={() => {
-                cleanForm()
-              }}
-              textDecoration={TYPOGRAPHY.textDecorationUnderline}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('remove')}
-              </StyledText>
-            </Btn>
-          )}
+          <Btn
+            onClick={() => {
+              cleanForm()
+            }}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            css={BUTTON_LINK_STYLE}
+            padding={SPACING.spacing4}
+          >
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('remove')}
+            </StyledText>
+          </Btn>
         </Flex>
       </Flex>
     </ListItem>

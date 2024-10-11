@@ -1,14 +1,14 @@
-import * as React from 'react'
 import {
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -74,7 +74,7 @@ const Template: Story<ColorsStorybookProps> = args => {
               margin={SPACING.spacing2} // Add some margin between color rows
               borderRadius={BORDERS.borderRadius4}
               style={{
-                cursor: 'pointer',
+                cursor: CURSOR_POINTER,
                 border: `1px solid ${COLORS.grey20}`,
               }}
             >

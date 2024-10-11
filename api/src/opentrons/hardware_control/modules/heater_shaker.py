@@ -201,7 +201,6 @@ class HeaterShaker(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         return {
-            # TODO (spp, 2022-2-22): Revise what status includes
             "status": self.status.value,
             "data": {
                 "temperatureStatus": self.temperature_status.value,

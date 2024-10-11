@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ToggleGroup } from '@opentrons/components'
-import { useTrackEvent } from '../../redux/analytics'
+import { useTrackEvent } from '/app/redux/analytics'
 
 export const useToggleGroup = (
   left: string,

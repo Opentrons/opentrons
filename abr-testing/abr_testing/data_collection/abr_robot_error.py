@@ -13,6 +13,7 @@ import json
 import re
 import pandas as pd
 from statistics import mean, StatisticsError
+from abr_testing.tools import plate_reader
 
 
 def compare_current_trh_to_average(
@@ -62,7 +63,9 @@ def compare_current_trh_to_average(
     df_all_run_data["Start_Time"] = pd.to_datetime(
         df_all_run_data["Start_Time"], format="mixed", utc=True
     ).dt.tz_localize(None)
-    df_all_run_data["Errors"] = pd.to_numeric(df_all_run_data["Errors"])
+    df_all_run_data["Run Ending Error"] = pd.to_numeric(
+        df_all_run_data["Run Ending Error"]
+    )
     df_all_run_data["Average Temp (oC)"] = pd.to_numeric(
         df_all_run_data["Average Temp (oC)"]
     )
@@ -70,7 +73,7 @@ def compare_current_trh_to_average(
         (df_all_run_data["Robot"] == robot)
         & (df_all_run_data["Start_Time"] >= weeks_ago_3)
         & (df_all_run_data["Start_Time"] <= start_time)
-        & (df_all_run_data["Errors"] < 1)
+        & (df_all_run_data["Run Ending Error"] < 1)
         & (df_all_run_data["Average Temp (oC)"] > 1)
     )
 
@@ -122,7 +125,7 @@ def compare_lpc_to_historical_data(
         & (df_lpc_data["Robot"] == robot)
         & (df_lpc_data["Module"] == labware_dict["Module"])
         & (df_lpc_data["Adapter"] == labware_dict["Adapter"])
-        & (df_lpc_data["Errors"] < 1)
+        & (df_lpc_data["Run Ending Error"] < 1)
     ]
     # Converts coordinates to floats and finds averages.
     x_float = [float(value) for value in relevant_lpc["X"]]
@@ -330,18 +333,17 @@ def get_run_error_info_from_robot(
         ip, results, storage_directory
     )
     # Error Printout
-    (
-        num_of_errors,
-        error_type,
-        error_code,
-        error_instrument,
-        error_level,
-    ) = read_robot_logs.get_error_info(results)
+    error_dict = read_robot_logs.get_error_info(results)
+    error_level = error_dict["Error_Level"]
+    error_type = error_dict["Error_Type"]
+    error_code = error_dict["Error_Code"]
+    error_instrument = error_dict["Error_Instrument"]
     # JIRA Ticket Fields
+
     failure_level = "Level " + str(error_level) + " Failure"
 
     components = [failure_level, "Flex-RABR"]
-    components = match_error_to_component("RABR", error_type, components)
+    components = match_error_to_component("RABR", str(error_type), components)
     print(components)
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
@@ -524,7 +526,10 @@ if __name__ == "__main__":
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     print(robot)
-    parent_key = project_key + "-" + robot.split("ABR")[1]
+    try:
+        parent_key = project_key + "-" + robot.split("ABR")[1]
+    except IndexError:
+        parent_key = ""
 
     # Grab all previous issues
     all_issues = ticket.issues_on_board(project_key)
@@ -589,13 +594,21 @@ if __name__ == "__main__":
         except FileNotFoundError:
             print("Run file not uploaded.")
         run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
+        # Get hellma readings
+        file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+
         (
             runs_and_robots,
             headers,
             runs_and_lpc,
             headers_lpc,
         ) = abr_google_drive.create_data_dictionary(
-            run_id, error_folder_path, issue_url, "", ""
+            run_id,
+            error_folder_path,
+            issue_url,
+            "",
+            "",
+            hellma_plate_standards=file_values,
         )
 
         start_row = google_sheet.get_index_row() + 1

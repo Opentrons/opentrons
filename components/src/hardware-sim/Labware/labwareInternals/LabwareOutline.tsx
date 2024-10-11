@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import { COLORS } from '../../../helix-design-system'
 

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -53,7 +51,7 @@ describe('Liquids', () => {
   it('calls navigate when there is no active labware', () => {
     vi.mocked(labwareIngredSelectors.getSelectedLabwareId).mockReturnValue(null)
     render()
-    expect(mockNavigate).toHaveBeenCalledWith('/overview')
+    expect(mockNavigate).toHaveBeenCalledWith('/designer')
   })
 
   it('renders nav and assign liquids modal', () => {

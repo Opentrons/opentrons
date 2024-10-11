@@ -1,30 +1,27 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-vi.mock('../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>

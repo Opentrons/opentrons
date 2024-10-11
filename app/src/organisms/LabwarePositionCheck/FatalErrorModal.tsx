@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -20,9 +19,9 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { i18n } from '../../i18n'
+import { getTopPortalEl } from '/app/App/portal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { i18n } from '/app/i18n'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 interface FatalErrorProps {

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import {
   ALIGN_CENTER,
@@ -18,7 +18,7 @@ import {
   TYPOGRAPHY,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-import flexGripper from '../../assets/images/flex_gripper.png'
+import flexGripper from '/app/assets/images/flex_gripper.png'
 
 import { MenuOverlay } from './MenuOverlay'
 

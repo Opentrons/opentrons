@@ -1,9 +1,11 @@
-import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useTrackEvent, ANALYTICS_DESKTOP_APP_ERROR } from '../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_DESKTOP_APP_ERROR,
+} from '/app/redux/analytics'
 
 import type { FallbackProps } from 'react-error-boundary'
 
@@ -18,9 +20,9 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { reloadUi } from '../redux/shell'
+import { reloadUi } from '/app/redux/shell'
 
-import type { Dispatch } from '../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   const { t } = useTranslation('app_settings')

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
@@ -26,38 +26,39 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 
-import { StepMeter } from '../../../atoms/StepMeter'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyRunQuery } from '../../../resources/runs'
-import {
-  InterventionModal,
-  useInterventionModal,
-} from '../../../organisms/InterventionModal'
+import { StepMeter } from '/app/atoms/StepMeter'
+
 import {
   useRunStatus,
   useRunTimestamps,
-} from '../../../organisms/RunTimeControl/hooks'
+  useNotifyRunQuery,
+  useMostRecentCompletedAnalysis,
+  useLastRunCommand,
+} from '/app/resources/runs'
+import {
+  InterventionModal,
+  useInterventionModal,
+} from '/app/organisms/InterventionModal'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
-} from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+} from '/app/organisms/ODD/RunningProtocol'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-  useRobotType,
-} from '../../../organisms/Devices/hooks'
-import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
-import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
-import { getLocalRobot } from '../../../redux/discovery'
-import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
+} from '/app/redux-resources/analytics'
+import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
+import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
+import { getLocalRobot } from '/app/redux/discovery'
+import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
-} from '../../../organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
+} from '/app/organisms/ErrorRecoveryFlows'
 
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
@@ -83,14 +84,14 @@ export function RunningProtocol(): JSX.Element {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
-  const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
+  const [currentOption, setCurrentOption] = useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
   const [
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
-  ] = React.useState<boolean>(false)
-  const lastAnimatedCommand = React.useRef<string | null>(null)
+  ] = useState<boolean>(false)
+  const lastAnimatedCommand = useRef<string | null>(null)
   const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const lastRunCommand = useLastRunCommand(runId, {
@@ -130,9 +131,10 @@ export function RunningProtocol(): JSX.Element {
     runData: runRecord?.data ?? null,
     robotName,
     analysis: robotSideAnalysis,
+    doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
       swipeType === 'swipe-left'
@@ -160,7 +162,7 @@ export function RunningProtocol(): JSX.Element {
           protocolAnalysis={robotSideAnalysis}
         />
       ) : null}
-      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && !showIntervention ? (
         <OpenDoorAlertModal />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
@@ -176,7 +178,7 @@ export function RunningProtocol(): JSX.Element {
       >
         {robotSideAnalysis != null ? (
           <StepMeter
-            totalSteps={totalIndex != null ? totalIndex : 0}
+            totalSteps={totalIndex ?? 0}
             currentStep={
               currentRunCommandIndex != null
                 ? Number(currentRunCommandIndex) + 1

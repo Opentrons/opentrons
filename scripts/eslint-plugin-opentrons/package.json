@@ -1,0 +1,36 @@
+{
+  "name": "eslint-plugin-opentrons",
+  "version": "0.0.0",
+  "description": "Rules about importing different parts of the app code",
+  "keywords": ["eslint", "eslintplugin", "eslint-plugin"],
+  "author": "Opentrons Engineering",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "files": ["lib"],
+  "scripts": {
+    "lint": "npm-run-all \"lint:*\"",
+    "lint:eslint-docs": "npm-run-all \"update:eslint-docs -- --check\"",
+    "lint:js": "eslint .",
+    "test": "mocha tests --recursive",
+    "update:eslint-docs": "eslint-doc-generator"
+  },
+  "dependencies": {
+    "requireindex": "^1.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "@eslint/js": "^9.0.0",
+    "eslint-doc-generator": "^1.0.0",
+    "eslint-plugin-eslint-plugin": "^6.0.0",
+    "eslint-plugin-n": "^17.0.0",
+    "mocha": "^10.0.0",
+    "npm-run-all2": "^6.1.2"
+  },
+  "engines": {
+    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+  },
+  "peerDependencies": {
+    "eslint": ">=8.57.0"
+  },
+  "license": "MIT"
+}

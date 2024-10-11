@@ -1,4 +1,5 @@
-import * as React from 'react'
+import type * as React from 'react'
+import { Link } from '@opentrons/components'
 
 export const KNOWLEDGEBASE_ROOT_URL =
   'https://support.opentrons.com/s/protocol-designer'
@@ -26,13 +27,13 @@ interface Props {
 /** Link which opens a page on the knowledge base to a new tab/window */
 export function KnowledgeBaseLink(props: Props): JSX.Element {
   return (
-    <a
+    <Link
       target="_blank"
       rel="noopener noreferrer"
       href={links[props.to]}
       className={props.className}
     >
       {props.children}
-    </a>
+    </Link>
   )
 }

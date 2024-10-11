@@ -5,12 +5,13 @@ import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
-  COLORS,
   CheckboxField,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
   InputField,
+  JUSTIFY_CENTER,
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
@@ -20,6 +21,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
@@ -30,6 +32,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
+import { BUTTON_LINK_STYLE } from '../../../atoms'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
@@ -60,6 +63,8 @@ import type { LabwareDefByDefURI } from '../../../labware-defs'
 const CUSTOM_CATEGORY = 'custom'
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
+const PLATE_READER_LOADNAME =
+  'opentrons_flex_lid_absorbance_plate_reader_module'
 interface LabwareToolsProps {
   slot: DeckSlotId
   setHoveredLabware: (defUri: string | null) => void
@@ -128,10 +133,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
       const isSmallXDimension = xDimension < STANDARD_X_DIMENSION
       const isSmallYDimension = yDimension < STANDARD_Y_DIMENSION
       const isIrregularSize = isSmallXDimension && isSmallYDimension
-
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
-
       return (
         (filterRecommended &&
           !getLabwareIsRecommended(labwareDef, selectedModuleModel)) ||
@@ -145,7 +148,9 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           isIrregularSize &&
           moduleType !== HEATERSHAKER_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
-        (slot === 'offDeck' && isAdapter)
+        (slot === 'offDeck' && isAdapter) ||
+        (PLATE_READER_LOADNAME === parameters.loadName &&
+          moduleType !== ABSORBANCE_READER_TYPE)
       )
     },
     [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
@@ -204,12 +209,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        marginY={SPACING.spacing16}
-        gridGap={SPACING.spacing8}
-      >
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('add_labware')}
         </StyledText>
@@ -247,7 +248,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           </Flex>
         ) : null}
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        paddingTop={SPACING.spacing8}
+      >
         {customLabwareURIs.length === 0 ? null : (
           <ListButton
             key={`ListButton_${CUSTOM_CATEGORY}`}
@@ -446,28 +451,34 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           }
         })}
       </Flex>
-      <StyledLabel>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {t('custom_labware')}
-        </StyledText>
-        <input
-          data-testid="customLabwareInput"
-          type="file"
-          onChange={e => {
-            setSelectedCategory(CUSTOM_CATEGORY)
-            dispatch(createCustomLabwareDef(e))
-          }}
-        />
-      </StyledLabel>
+      <Flex
+        padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+      >
+        <StyledLabel css={BUTTON_LINK_STYLE}>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('upload_custom_labware')}
+          </StyledText>
+          <input
+            data-testid="customLabwareInput"
+            type="file"
+            onChange={e => {
+              setSelectedCategory(CUSTOM_CATEGORY)
+              dispatch(createCustomLabwareDef(e))
+            }}
+          />
+        </StyledLabel>
+      </Flex>
     </Flex>
   )
 }
 
 const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-  text-align: ${TYPOGRAPHY.textAlignCenter}};
-  display: ${DISPLAY_INLINE_BLOCK}
-  cursor: pointer;
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+  display: ${DISPLAY_INLINE_BLOCK};
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

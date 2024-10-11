@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Box } from '@opentrons/components'
 import { CommandText as CommandTextComponent } from '.'
 import type { RobotType } from '@opentrons/shared-data'

@@ -1,6 +1,6 @@
-import React from 'react'
+import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { useAtom } from 'jotai'
 
 import {
@@ -19,9 +19,9 @@ import { chatDataAtom } from '../../resources/atoms'
 export function MainContentContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [chatData] = useAtom(chatDataAtom)
-  const scrollRef = React.useRef<HTMLSpanElement | null>(null)
+  const scrollRef = useRef<HTMLSpanElement | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (scrollRef.current != null)
       scrollRef.current.scrollIntoView({
         behavior: 'smooth',
@@ -45,9 +45,7 @@ export function MainContentContainer(): JSX.Element {
         width="100%"
         overflowY={OVERFLOW_AUTO}
         flexDirection={DIRECTION_COLUMN}
-        css={css`
-          flex-grow: 1;
-        `}
+        flexGrow="1"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           {/* Prompt Guide remain as a reference for users. */}

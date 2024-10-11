@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useLayoutEffect } from 'react'
 import {
   LabwareRender,
   LabwareOutline,
@@ -35,8 +35,8 @@ const calculateViewBox = (args: {
 
 export const ConditionalLabwareRender = (props: Props): JSX.Element => {
   const { definition } = props
-  const gRef = React.useRef<SVGGElement>(null)
-  const [bBox, updateBBox] = React.useState<DOMRect | undefined>(
+  const gRef = useRef<SVGGElement>(null)
+  const [bBox, updateBBox] = useState<DOMRect | undefined>(
     gRef.current ? gRef.current.getBBox() : undefined
   )
 
@@ -44,7 +44,7 @@ export const ConditionalLabwareRender = (props: Props): JSX.Element => {
   // So we have to actually render the child to get its bounding box. After that, we re-calculate the viewBox.
   // Once the viewBox is re-calculated, we use setState to force a re-render.
   const nextBBox = gRef.current?.getBBox()
-  React.useLayoutEffect((): void => {
+  useLayoutEffect((): void => {
     if (
       nextBBox != null &&
       (nextBBox.width !== bBox?.width || nextBBox.height !== bBox?.height)

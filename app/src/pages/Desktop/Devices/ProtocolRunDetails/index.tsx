@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -22,35 +22,31 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import {
-  useModuleRenderInfoForProtocolById,
-  useRobot,
-  useRobotType,
-  useRunHasStarted,
-  useRunStatuses,
-  useSyncRobotClock,
-} from '../../../../organisms/Devices/hooks'
-import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '../../../../organisms/RunPreview'
+import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
+import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import {
   ProtocolRunSetup,
   initialMissingSteps,
-} from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { BackToTopButton } from '../../../../organisms/Devices/ProtocolRun/BackToTopButton'
-import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../../resources/runs'
-import { OPENTRONS_USB } from '../../../../redux/discovery'
-import { fetchProtocols } from '../../../../redux/protocol-storage'
-import { appShellRequestor } from '../../../../redux/shell/remote'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+  useRunHasStarted,
+  useModuleRenderInfoForProtocolById,
+  useRunStatuses,
+} from '/app/resources/runs'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { fetchProtocols } from '/app/redux/protocol-storage'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
 
 import type { ViewportListRef } from 'react-viewport-list'
-import type {
-  DesktopRouteParams,
-  ProtocolRunDetailsTab,
-} from '../../../../App/types'
-import type { Dispatch } from '../../../../redux/types'
+import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
+import type { Dispatch } from '/app/redux/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -138,7 +134,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
 
   const robot = useRobot(robotName)
   useSyncRobotClock(robotName)
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
   return robot != null ? (
@@ -179,11 +175,11 @@ interface PageContentsProps {
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
-  const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
-  const listRef = React.useRef<ViewportListRef | null>(null)
-  const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
+  const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<ViewportListRef | null>(null)
+  const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (jumpedIndex != null) {
       setTimeout(() => {
         setJumpedIndex(null)
@@ -191,7 +187,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
     }
   }, [jumpedIndex])
 
-  const [missingSteps, setMissingSteps] = React.useState<
+  const [missingSteps, setMissingSteps] = useState<
     ReturnType<typeof initialMissingSteps>
   >(initialMissingSteps())
 
@@ -324,7 +320,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
 
   // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
   // If "run again" is clicked, the user should NOT be directed back to the "setup" tab.
-  React.useEffect(() => {
+  useEffect(() => {
     if (runHasStarted && protocolRunDetailsTab !== 'run-preview') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     }
@@ -353,7 +349,7 @@ const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
   const navigate = useNavigate()
   const disabled = mostRecentAnalysis == null
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (disabled && protocolRunDetailsTab === 'runtime-parameters') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`, {
         replace: true,
@@ -395,7 +391,7 @@ const ModuleControlsTab = (
       : 'not_available_for_a_run_in_progress'
   )}`
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (disabled && protocolRunDetailsTab === 'module-controls')
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
   }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])

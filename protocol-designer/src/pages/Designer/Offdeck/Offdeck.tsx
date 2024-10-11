@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -22,15 +22,15 @@ import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
+import type { DeckSetupTabType } from '../types'
 
 const STANDARD_X_WIDTH = '127.76px'
 const STANDARD_Y_HEIGHT = '85.48px'
 
-export function OffDeck(): JSX.Element {
+export function OffDeck(props: DeckSetupTabType): JSX.Element {
+  const { tab } = props
   const { t, i18n } = useTranslation('starting_deck_state')
-  const [hoveredLabware, setHoveredLabware] = React.useState<string | null>(
-    null
-  )
+  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
   const dispatch = useDispatch()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
@@ -159,6 +159,7 @@ export function OffDeck(): JSX.Element {
         </>
       ) : (
         <OffDeckDetails
+          tab={tab}
           addLabware={() => {
             dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
           }}

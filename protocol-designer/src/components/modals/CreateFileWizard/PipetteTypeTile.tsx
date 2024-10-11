@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -141,7 +141,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
 
-  const pipetteOptions = React.useMemo(() => {
+  const pipetteOptions = useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
         (fields.robotType === OT2_ROBOT_TYPE
@@ -163,7 +163,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   }, [fields.robotType])
 
   const currentValue = pipettesByMount[mount].pipetteName
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentValue === undefined) {
       setValue(
         `pipettesByMount.${mount}.pipetteName`,

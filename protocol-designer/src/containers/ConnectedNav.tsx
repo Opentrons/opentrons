@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
@@ -18,7 +18,7 @@ export function ConnectedNav(): JSX.Element {
   )
   const dispatch = useDispatch()
 
-  const handleClick = React.useMemo(
+  const handleClick = useMemo(
     () => (pageName: Page) => () => {
       dispatch(actions.navigateToPage(pageName))
     },

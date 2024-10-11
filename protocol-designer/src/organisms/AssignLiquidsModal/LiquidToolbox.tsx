@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -224,7 +224,11 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
       onConfirmClick={onClose}
       onCloseClick={handleClearSelectedWells}
       height="calc(100vh - 64px)"
-      closeButtonText={t('clear_wells')}
+      closeButton={
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('clear_wells')}
+        </StyledText>
+      }
       disableCloseButton={
         !(labwareId != null && selectedWells != null && selectionHasLiquids)
       }

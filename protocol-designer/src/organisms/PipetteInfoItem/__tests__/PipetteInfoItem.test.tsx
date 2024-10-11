@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -25,10 +25,6 @@ describe('PipetteInfoItem', () => {
       tiprackDefURIs: ['mockDefUri'],
       pipetteName: 'p1000_single',
       mount: 'left',
-      formPipettesByMount: {
-        left: { pipetteName: 'p1000_single' },
-        right: { pipetteName: 'p50_single' },
-      },
     }
 
     vi.mocked(getLabwareDefsByURI).mockReturnValue({
@@ -38,7 +34,22 @@ describe('PipetteInfoItem', () => {
   it('renders pipette with edit and remove buttons', () => {
     render(props)
     screen.getByText('P1000 Single-Channel GEN1')
-    screen.getByText('Left pipette')
+    screen.getByText('Left Pipette')
+    screen.getByText('mock display name')
+    fireEvent.click(screen.getByText('Edit'))
+    expect(props.editClick).toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Remove'))
+    expect(props.cleanForm).toHaveBeenCalled()
+  })
+
+  it('renders pipette with edit and remove buttons right pipette', () => {
+    props = {
+      ...props,
+      mount: 'right',
+    }
+    render(props)
+    screen.getByText('P1000 Single-Channel GEN1')
+    screen.getByText('Right Pipette')
     screen.getByText('mock display name')
     fireEvent.click(screen.getByText('Edit'))
     expect(props.editClick).toHaveBeenCalled()

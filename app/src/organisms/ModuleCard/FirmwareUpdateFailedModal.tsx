@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
@@ -15,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface FirmwareUpdateFailedModalProps {
   onCloseClick: () => void

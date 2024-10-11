@@ -33,14 +33,10 @@ const checkGeometryDefinitions = (
       expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
 
       const wellDepth = labwareDef.wells[wellName].depth
-      const wellShape = labwareDef.wells[wellName].shape
       const topFrustumHeight =
-        labwareDef.innerLabwareGeometry[wellGeometryId].frusta[0].topHeight
-      const topFrustumShape =
-        labwareDef.innerLabwareGeometry[wellGeometryId].frusta[0].geometry.shape
+        labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
 
       expect(wellDepth).toEqual(topFrustumHeight)
-      expect(wellShape).toEqual(topFrustumShape)
     }
   })
 }

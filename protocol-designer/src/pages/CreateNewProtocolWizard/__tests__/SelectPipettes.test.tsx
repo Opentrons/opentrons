@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -12,6 +12,7 @@ import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { SelectPipettes } from '../SelectPipettes'
 import { getTiprackOptions } from '../utils'
 
+import type { NavigateFunction } from 'react-router-dom'
 import type { WizardFormState, WizardTileProps } from '../types'
 
 vi.mock('../../../labware-defs/selectors')
@@ -19,6 +20,15 @@ vi.mock('../../../feature-flags/selectors')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-defs/actions')
 vi.mock('../utils')
+const mockLocation = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useLocation: () => mockLocation,
+  }
+})
 
 const render = (props: React.ComponentProps<typeof SelectPipettes>) => {
   return renderWithProviders(<SelectPipettes {...props} />, {
@@ -67,7 +77,7 @@ describe('SelectPipettes', () => {
   it('renders the first page of select pipettes for a Flex', () => {
     render(props)
     screen.getByText('Step 2')
-    screen.getByText('Add a pipette and tips')
+    screen.getByText('Add a pipette')
     screen.getByText(
       'Pick your first pipette. If you need a second pipette, you can add it next.'
     )
@@ -115,7 +125,7 @@ describe('SelectPipettes', () => {
     }
     render(props)
     screen.getByText('Step 2')
-    screen.getByText('Add a pipette and tips')
+    screen.getByText('Add a pipette')
     screen.getByText(
       'Pick your first pipette. If you need a second pipette, you can add it next.'
     )

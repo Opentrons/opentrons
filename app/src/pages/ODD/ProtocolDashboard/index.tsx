@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -16,22 +16,22 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { Navigation } from '../../../organisms/Navigation'
+import { SmallButton } from '/app/atoms/buttons'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
 import { NoProtocols } from './NoProtocols'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import type { Dispatch } from '../../../redux/types'
-import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
+import type { Dispatch } from '/app/redux/types'
+import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 export function ProtocolDashboard(): JSX.Element {
@@ -39,17 +39,16 @@ export function ProtocolDashboard(): JSX.Element {
   const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
-  const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
-  const [
-    longPressModalIsOpened,
-    setLongPressModalOpened,
-  ] = React.useState<boolean>(false)
+  const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
+  const [longPressModalIsOpened, setLongPressModalOpened] = useState<boolean>(
+    false
+  )
   const [
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,
-  ] = React.useState<boolean>(false)
-  const [targetProtocolId, setTargetProtocolId] = React.useState<string>('')
-  const [isRequiredCSV, setIsRequiredCSV] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+  const [targetProtocolId, setTargetProtocolId] = useState<string>('')
+  const [isRequiredCSV, setIsRequiredCSV] = useState<boolean>(false)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData =
     protocols.data?.data.filter(
@@ -182,6 +181,7 @@ export function ProtocolDashboard(): JSX.Element {
                 alignItems={ALIGN_CENTER}
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
+                paddingTop={SPACING.spacing16}
                 paddingBottom={SPACING.spacing16}
                 position={
                   navMenuIsOpened || longPressModalIsOpened
@@ -189,7 +189,7 @@ export function ProtocolDashboard(): JSX.Element {
                     : POSITION_STICKY
                 }
                 top="7.75rem"
-                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
+                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 2.5}
                 width="100%"
               >
                 <Flex width="32.3125rem">

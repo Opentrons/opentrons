@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -25,10 +25,10 @@ import {
   MM,
 } from '@opentrons/shared-data'
 
-import { Slideout } from '../../atoms/Slideout'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { SubmitPrimaryButton } from '/app/atoms/buttons'
 
-import type { MagneticModule } from '../../redux/modules/types'
+import type { MagneticModule } from '/app/redux/modules/types'
 import type {
   MagneticModuleEngageMagnetCreateCommand,
   MagneticModuleModel,
@@ -73,9 +73,9 @@ export const MagneticModuleSlideout = (
   const { module, isExpanded, onCloseClick } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const [engageHeightValue, setEngageHeightValue] = React.useState<
-    string | null
-  >(null)
+  const [engageHeightValue, setEngageHeightValue] = useState<string | null>(
+    null
+  )
 
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)

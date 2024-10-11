@@ -62,52 +62,34 @@
   },
   "innerLabwareGeometry": {
     "daiwudhadfhiew": {
-      "frusta": [
+      "sections": [
         {
-          "geometry": {
-            "shape": "rectangular",
-            "xDimension": 127.76,
-            "yDimension": 85.8
-          },
-          "topHeight": 42.16
-        },
-        {
-          "geometry": {
-            "shape": "rectangular",
-            "xDimension": 70.0,
-            "yDimension": 50.0
-          },
-          "topHeight": 20.0
+          "shape": "cuboidal",
+          "topXDimension": 127.76,
+          "topYDimension": 85.8,
+          "bottomXDimension": 70.0,
+          "bottomYDimension": 50.0,
+          "topHeight": 42.16,
+          "bottomHeight": 20.0
         }
-      ],
-      "bottomShape": {
-        "shape": "rectangular",
-        "xDimension": 2.0,
-        "yDimension": 3.0
-      }
+      ]
     },
     "iuweofiuwhfn": {
-      "frusta": [
+      "sections": [
         {
-          "geometry": {
-            "shape": "circular",
-            "diameter": 35.0
-          },
-          "topHeight": 42.16
+          "shape": "conical",
+          "bottomDiameter": 35.0,
+          "topDiameter": 35.0,
+          "topHeight": 42.16,
+          "bottomHeight": 10.0
         },
         {
-          "geometry": {
-            "shape": "circular",
-            "diameter": 22.0
-          },
-          "topHeight": 20.0
+          "shape": "spherical",
+          "radiusOfCurvature": 20.0,
+          "topHeight": 10.0,
+          "bottomHeight": 0.0
         }
-      ],
-      "bottomShape": {
-        "shape": "spherical",
-        "radiusOfCurvature": 20.0,
-        "depth": 6.0
-      }
+      ]
     }
   }
 }

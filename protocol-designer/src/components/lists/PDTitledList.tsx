@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import cx from 'classnames'
 import { TitledList } from '@opentrons/components'
 import styles from './styles.module.css'

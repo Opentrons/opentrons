@@ -1,8 +1,9 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, Navigate } from 'react-router-dom'
 
 import {
+  Banner,
   BORDERS,
   Box,
   COLORS,
@@ -21,24 +22,20 @@ import {
   UNREACHABLE,
   REACHABLE,
   OPENTRONS_USB,
-} from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
-import { getRobotUpdateSession } from '../../../../redux/robot-update'
-import { getDevtoolsEnabled } from '../../../../redux/config'
-import { Banner } from '../../../../atoms/Banner'
-import { useRobot } from '../../../../organisms/Devices/hooks'
-import { Line } from '../../../../atoms/structure'
-import { NavTab } from '../../../../molecules/NavTab'
-import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
-import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
-import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
-import { RobotSettingsFeatureFlags } from '../../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
-import { ReachableBanner } from '../../../../organisms/Devices/ReachableBanner'
+} from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { getRobotUpdateSession } from '/app/redux/robot-update'
+import { getDevtoolsEnabled } from '/app/redux/config'
+import { useRobot } from '/app/redux-resources/robots'
+import { Line } from '/app/atoms/structure'
+import { NavTab } from '/app/molecules/NavTab'
+import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
+import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
+import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 
-import type {
-  DesktopRouteParams,
-  RobotSettingsTab,
-} from '../../../../App/types'
+import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
@@ -48,9 +45,7 @@ export function RobotSettings(): JSX.Element | null {
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
-  const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
-    false
-  )
+  const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {

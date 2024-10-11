@@ -44,7 +44,6 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 
 const lightFill = COLORS.grey35
-const darkFill = COLORS.grey60
 
 interface DeckThumbnailProps {
   hoverSlot: DeckSlotId | null
@@ -136,7 +135,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                       deckDefinition={deckDef}
                       showExpansion={cutoutId === 'cutoutA1'}
                       fixtureBaseColor={lightFill}
-                      slotClipColor={darkFill}
                     />
                   ) : null
                 })}
@@ -145,7 +143,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     key={fixture.id}
                     cutoutId={fixture.location as StagingAreaLocation}
                     deckDefinition={deckDef}
-                    slotClipColor={darkFill}
                     fixtureBaseColor={lightFill}
                   />
                 ))}
@@ -182,7 +179,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     key={fixture.id}
                     cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
                     deckDefinition={deckDef}
-                    slotClipColor={darkFill}
                     fixtureBaseColor={lightFill}
                   />
                 ))}

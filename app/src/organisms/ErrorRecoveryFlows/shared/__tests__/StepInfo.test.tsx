@@ -1,14 +1,14 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRecoveryContentProps, mockFailedCommand } from '../../__fixtures__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { StepInfo } from '../StepInfo'
-import { CommandText } from '../../../../molecules/Command'
+import { CommandText } from '/app/molecules/Command'
 
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 
 const render = (props: React.ComponentProps<typeof StepInfo>) => {
   return renderWithProviders(<StepInfo {...props} />, {

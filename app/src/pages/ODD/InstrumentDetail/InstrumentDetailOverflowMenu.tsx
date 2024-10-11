@@ -1,6 +1,8 @@
 import * as React from 'react'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { useTranslation } from 'react-i18next'
+import { createPortal } from 'react-dom'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,19 +17,14 @@ import {
 import {
   SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
-  FLEX_ROBOT_TYPE,
-  getPipetteModelSpecs,
 } from '@opentrons/shared-data'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
-import {
-  DropTipWizardFlows,
-  useDropTipWizardFlows,
-} from '../../../organisms/DropTipWizardFlows'
-import { FLOWS } from '../../../organisms/PipetteWizardFlows/constants'
-import { GRIPPER_FLOW_TYPES } from '../../../organisms/GripperWizardFlows/constants'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
+import { getTopPortalEl } from '/app/App/portal'
 
 import type {
   PipetteData,
@@ -38,18 +35,24 @@ import type {
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData
   host: HostConfig | null
+  toggleDTWiz: () => void
 }
 
 export const handleInstrumentDetailOverflowMenu = (
   instrument: InstrumentDetailsOverflowMenuProps['instrument'],
-  host: InstrumentDetailsOverflowMenuProps['host']
+  host: InstrumentDetailsOverflowMenuProps['host'],
+  toggleDTWiz: () => void
 ): void => {
-  NiceModal.show(InstrumentDetailsOverflowMenu, { instrument, host })
+  NiceModal.show(InstrumentDetailsOverflowMenu, {
+    instrument,
+    host,
+    toggleDTWiz,
+  })
 }
 
 const InstrumentDetailsOverflowMenu = NiceModal.create(
   (props: InstrumentDetailsOverflowMenuProps): JSX.Element => {
-    const { instrument, host } = props
+    const { instrument, host, toggleDTWiz } = props
     const { t } = useTranslation('robot_controls')
     const modal = useModal()
     const [wizardProps, setWizardProps] = React.useState<
@@ -66,9 +69,6 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         modal.remove()
       },
     }
-    const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
-    const pipetteModelSpecs =
-      getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ?? null
 
     const is96Channel =
       instrument?.ok &&
@@ -97,62 +97,61 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
       }
     }
 
+    const handleDropTip = (): void => {
+      toggleDTWiz()
+      modal.remove()
+    }
+
+    // TODO(jh 09-24-24): Create an ODD-specific component that wraps MenuList with a portal.
     return (
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
-        <MenuList onClick={modal.remove} isOnDevice={true}>
-          {instrument.data.calibratedOffset?.last_modified != null ? (
-            <MenuItem key="recalibrate" onClick={handleRecalibrate}>
-              <Flex alignItems={ALIGN_CENTER}>
-                <Icon
-                  name="restart"
-                  size="2.5rem"
-                  color={COLORS.black90}
-                  aria-label="restart_icon"
-                />
-                <LegacyStyledText
-                  as="h4"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  marginLeft={SPACING.spacing12}
-                >
-                  {t('recalibrate')}
-                </LegacyStyledText>
-              </Flex>
-            </MenuItem>
-          ) : null}
-          {instrument.mount !== 'extension' ? (
-            <MenuItem key="drop-tips" onClick={toggleDTWiz}>
-              <Flex alignItems={ALIGN_CENTER}>
-                <Icon
-                  name="reset-position"
-                  aria-label="reset-position_icon"
-                  size="2.5rem"
-                />
-                <LegacyStyledText
-                  as="h4"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  marginLeft={SPACING.spacing12}
-                >
-                  {t('drop_tips')}
-                </LegacyStyledText>
-              </Flex>
-            </MenuItem>
-          ) : null}
-        </MenuList>
+        {createPortal(
+          <MenuList onClick={modal.remove} isOnDevice={true}>
+            {instrument.data.calibratedOffset?.last_modified != null ? (
+              <MenuItem key="recalibrate" onClick={handleRecalibrate}>
+                <Flex alignItems={ALIGN_CENTER}>
+                  <Icon
+                    name="restart"
+                    size="2.5rem"
+                    color={COLORS.black90}
+                    aria-label="restart_icon"
+                  />
+                  <LegacyStyledText
+                    as="h4"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    marginLeft={SPACING.spacing12}
+                  >
+                    {t('recalibrate')}
+                  </LegacyStyledText>
+                </Flex>
+              </MenuItem>
+            ) : null}
+            {instrument.mount !== 'extension' ? (
+              <MenuItem key="drop-tips" onClick={handleDropTip}>
+                <Flex alignItems={ALIGN_CENTER}>
+                  <Icon
+                    name="reset-position"
+                    aria-label="reset-position_icon"
+                    size="2.5rem"
+                  />
+                  <LegacyStyledText
+                    as="h4"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    marginLeft={SPACING.spacing12}
+                  >
+                    {t('drop_tips')}
+                  </LegacyStyledText>
+                </Flex>
+              </MenuItem>
+            ) : null}
+          </MenuList>,
+          getTopPortalEl()
+        )}
         {wizardProps != null && 'mount' in wizardProps ? (
           <PipetteWizardFlows {...wizardProps} />
         ) : null}
         {wizardProps != null && !('mount' in wizardProps) ? (
           <GripperWizardFlows {...wizardProps} />
-        ) : null}
-        {showDTWiz &&
-        instrument.mount !== 'extension' &&
-        pipetteModelSpecs != null ? (
-          <DropTipWizardFlows
-            robotType={FLEX_ROBOT_TYPE}
-            mount={instrument.mount}
-            instrumentModelSpecs={pipetteModelSpecs}
-            closeFlow={modal.remove}
-          />
         ) : null}
       </ApiHostProvider>
     )

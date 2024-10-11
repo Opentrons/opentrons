@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
 import {
   MAGNETIC_BLOCK_V1,
@@ -97,12 +96,15 @@ export function StackingOffsets(): JSX.Element | null {
   if (
     isFlatBottom &&
     isCircular &&
-    values.labwareType !== 'reservoir' &&
+    values.labwareType === 'wellPlate' &&
     has96Wells
   ) {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
       definition =>
-        definition.parameters.loadName === 'opentrons_96_flat_bottom_adapter'
+        definition.parameters.loadName === 'opentrons_96_flat_bottom_adapter' ||
+        definition.parameters.loadName ===
+          'opentrons_aluminum_flat_bottom_plate' ||
+        definition.parameters.loadName === 'opentrons_universal_flat_adapter'
     )
   }
   if (!isCircular && isVBottom && has96Wells) {
@@ -248,7 +250,6 @@ export function StackingOffsets(): JSX.Element | null {
                       {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.2rem',
                             height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
@@ -334,7 +335,6 @@ export function StackingOffsets(): JSX.Element | null {
                       {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.2rem',
                             height: '2.0rem',
                             fontSize: '0.75rem',
                           }}

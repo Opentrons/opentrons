@@ -2,11 +2,11 @@ import { useTranslation } from 'react-i18next'
 
 import { useToaster } from '../../ToasterOven'
 import { RECOVERY_MAP } from '../constants'
-import { useCommandTextString } from '../../../molecules/Command'
+import { useCommandTextString } from '/app/molecules/Command'
 
-import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
-import type { UseCommandTextStringParams } from '../../../molecules/Command'
+import type { UseCommandTextStringParams } from '/app/molecules/Command'
 
 export type BuildToast = Omit<UseCommandTextStringParams, 'command'> & {
   isOnDevice: boolean
@@ -105,7 +105,7 @@ export function useRecoveryFullCommandText(
   const relevantCmdIdx = typeof stepNumber === 'number' ? stepNumber : -1
   const relevantCmd = commandTextData?.commands[relevantCmdIdx] ?? null
 
-  const { commandText, stepTexts } = useCommandTextString({
+  const { commandText, kind } = useCommandTextString({
     ...props,
     command: relevantCmd,
   })
@@ -117,7 +117,12 @@ export function useRecoveryFullCommandText(
   else if (relevantCmd === null) {
     return null
   } else {
-    return truncateIfTCCommand(commandText, stepTexts != null)
+    return truncateIfTCCommand(
+      commandText,
+      ['thermocycler/runProfile', 'thermocycler/runExtendedProfile'].includes(
+        kind
+      )
+    )
   }
 }
 
@@ -146,15 +151,17 @@ function handleRecoveryOptionAction<T>(
   nextStepReturnVal: T
 ): T | string {
   switch (selectedRecoveryOption) {
-    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       return nextStepReturnVal
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
-    case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
+    case RECOVERY_MAP.RETRY_STEP.ROUTE:
+    case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
       return currentStepReturnVal
     default:
       return 'HANDLE RECOVERY TOAST OPTION EXPLICITLY.'
@@ -162,17 +169,20 @@ function handleRecoveryOptionAction<T>(
 }
 
 // Special case the TC text, so it make sense in a success toast.
-function truncateIfTCCommand(commandText: string, isTCText: boolean): string {
-  if (isTCText) {
-    const indexOfCycle = commandText.indexOf('cycle')
+function truncateIfTCCommand(
+  commandText: string,
+  isTCCommand: boolean
+): string {
+  if (isTCCommand) {
+    const indexOfProfile = commandText.indexOf('steps')
 
-    if (indexOfCycle === -1) {
+    if (indexOfProfile === -1) {
       console.warn(
         'TC cycle text has changed. Update Error Recovery TC text utility.'
       )
     }
 
-    return commandText.slice(0, indexOfCycle + 5) // +5 to include "cycle"
+    return commandText.slice(0, indexOfProfile + 5) // +5 to include "steps"
   } else {
     return commandText
   }

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
@@ -7,13 +7,14 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { useRequiredProtocolHardware } from '../../../../pages/Desktop/Protocols/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useRequiredProtocolHardware } from '/app/resources/protocols'
 import { Hardware } from '../Hardware'
 
-vi.mock('../../../../pages/Desktop/Protocols/hooks')
-vi.mock('../../../../redux/config')
+vi.mock('/app/transformations/commands')
+vi.mock('/app/resources/protocols')
+vi.mock('/app/redux/config')
 
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 

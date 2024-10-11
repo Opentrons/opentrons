@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
 
@@ -9,19 +9,19 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
-// import { NeedHelpLink } from '../../CalibrationPanels'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
+// import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { FLOWS } from '../constants'
 import { getIsGantryEmpty } from '../utils'
 
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('/app/molecules/InProgressModal/InProgressModal')
 vi.mock('../utils')
 
 const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {

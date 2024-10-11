@@ -1,22 +1,22 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
-  Text,
-  COLORS,
-  BORDERS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  RESPONSIVENESS,
+  BORDERS,
+  COLORS,
+  CURSOR_POINTER,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  JUSTIFY_FLEX_END,
+  RESPONSIVENESS,
+  SPACING,
+  Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_DISPLAY_NAME,
@@ -137,7 +137,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   border-radius: ${BORDERS.borderRadius8};
   height: 14.5625rem;
   width: 14.5625rem;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};

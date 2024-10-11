@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -14,6 +14,7 @@ import { EditNickNameModal } from '../../../../organisms'
 import { deleteModule } from '../../../../step-forms/actions'
 import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { SlotOverflowMenu } from '../SlotOverflowMenu'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -24,6 +25,7 @@ const mockNavigate = vi.fn()
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../labware-ingred/actions')
+vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../step-forms/actions/additionalItems')
 vi.mock('../../../../organisms')
 vi.mock('react-router-dom', async importOriginal => {
@@ -82,7 +84,9 @@ describe('SlotOverflowMenu', () => {
     vi.mocked(EditNickNameModal).mockReturnValue(
       <div>mockEditNickNameModal</div>
     )
+    vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({})
   })
+
   it('should renders all buttons as enabled and clicking on them calls ctas', () => {
     render(props)
     fireEvent.click(
@@ -113,5 +117,18 @@ describe('SlotOverflowMenu', () => {
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
     expect(screen.getAllByRole('button')).toHaveLength(2)
+  })
+  it('renders Edit liquid button when there is liquid on the labware', () => {
+    vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({
+      labId2: { well1: { '0': { volume: 10 } } },
+    })
+    render(props)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Edit hardware/labware' })
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit liquid' }))
+    expect(mockNavigate).toHaveBeenCalled()
+    expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
   })
 })

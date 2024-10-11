@@ -1,10 +1,12 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import { COLORS, BORDERS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { Icon } from '../../icons'
 import {
   ALIGN_CENTER,
+  CURSOR_AUTO,
+  CURSOR_POINTER,
   DIRECTION_ROW,
   FLEX_MAX_CONTENT,
   JUSTIFY_SPACE_BETWEEN,
@@ -24,6 +26,10 @@ export interface CheckboxProps {
   tabIndex?: number
   /** if disabled is true, mouse events will not trigger onClick callback */
   disabled?: boolean
+  /** optional borderRadius type */
+  type?: 'round' | 'neutral'
+  /** optional width for helix */
+  width?: string
 }
 export function Checkbox(props: CheckboxProps): JSX.Element {
   const {
@@ -32,21 +38,25 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     onClick,
     tabIndex = 0,
     disabled = false,
+    width = FLEX_MAX_CONTENT,
+    type = 'round',
   } = props
   const truncatedLabel = truncateString(labelText, 25)
 
   const CHECKBOX_STYLE = css`
-    width: ${FLEX_MAX_CONTENT};
+    width: ${width};
     grid-gap: ${SPACING.spacing12};
     border: none;
     align-items: ${ALIGN_CENTER};
     flex-direction: ${DIRECTION_ROW};
     color: ${isChecked ? COLORS.white : COLORS.black90};
     background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
-    border-radius: ${BORDERS.borderRadiusFull};
+    border-radius: ${type === 'round'
+      ? BORDERS.borderRadiusFull
+      : BORDERS.borderRadius8};
     padding: ${SPACING.spacing12} ${SPACING.spacing16};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
 
     &:active {
       background-color: ${isChecked ? COLORS.blue55 : COLORS.blue40};
@@ -65,7 +75,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       padding: ${SPACING.spacing20};
       border-radius: ${BORDERS.borderRadius16};
       width: 100%;
-      cursor: auto;
+      cursor: ${CURSOR_AUTO};
     }
   `
 
@@ -88,11 +98,13 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
 interface CheckProps {
   isChecked: boolean
+  color?: string
 }
-function Check(props: CheckProps): JSX.Element {
-  return props.isChecked ? (
+export function Check(props: CheckProps): JSX.Element {
+  const { isChecked, color = COLORS.white } = props
+  return isChecked ? (
     <Flex css={CHECK_STYLE}>
-      <Icon name="ot-checkbox" color={COLORS.white} />
+      <Icon name="ot-checkbox" color={color} />
     </Flex>
   ) : (
     <Flex

@@ -23,6 +23,7 @@ import { getStagingAreaAddressableAreas } from '../../../utils'
 import { editSlotInfo } from '../../../labware-ingred/actions'
 import { getRobotType } from '../../../file-data/selectors'
 import { getSlotInformation } from '../utils'
+import { HighlightLabware } from '../HighlightLabware'
 import { DeckItemHover } from './DeckItemHover'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { HoveredItems } from './HoveredItems'
@@ -43,10 +44,10 @@ import type {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../../step-forms'
-import type { TerminalItemId } from '../../../steplist'
+import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 
-interface DeckSetupDetailsProps {
+interface DeckSetupDetailsProps extends DeckSetupTabType {
   activeDeckSetup: InitialDeckSetup
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
@@ -57,11 +58,10 @@ interface DeckSetupDetailsProps {
   setHover: React.Dispatch<React.SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
-  selectedTerminalItemId?: TerminalItemId | null
   selectedZoomInSlot?: DeckSlotId
 }
 
-export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
+export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const {
     activeDeckSetup,
     addEquipment,
@@ -70,8 +70,8 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
     hoveredFixture,
     hoveredLabware,
     hoveredModule,
-    selectedTerminalItemId,
     selectedZoomInSlot,
+    tab,
     setHover,
     showGen1MultichannelCollisionWarnings,
     stagingAreaCutoutIds,
@@ -149,10 +149,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
         ): React.ComponentProps<typeof Module>['innerProps'] => {
           if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
             let lidMotorState = 'unknown'
-            if (
-              selectedTerminalItemId === '__initial_setup__' ||
-              moduleState.lidOpen === true
-            ) {
+            if (tab === 'startingDeck' || moduleState.lidOpen) {
               lidMotorState = 'open'
             } else if (moduleState.lidOpen === false) {
               lidMotorState = 'closed'
@@ -209,6 +206,10 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                     y={0}
                     labwareOnDeck={labwareLoadedOnModule}
                   />
+                  <HighlightLabware
+                    labwareOnDeck={labwareLoadedOnModule}
+                    position={[0, 0, 0]}
+                  />
                   <DeckItemHover
                     isSelected={selectedZoomInSlot != null}
                     hover={hover}
@@ -218,7 +219,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                     slotBoundingBox={controlSelectDimensions}
                     slotPosition={[0, 0, 0]}
                     itemId={slotId}
-                    selectedTerminalItemId={props.selectedTerminalItemId}
+                    tab={tab}
                   />
                 </>
               ) : null}
@@ -233,7 +234,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                   slotBoundingBox={labwareInterfaceBoundingBox}
                   slotPosition={[0, 0, 0]}
                   itemId={slotId}
-                  selectedTerminalItemId={props.selectedTerminalItemId}
+                  tab={tab}
                 />
               ) : null}
             </Module>
@@ -288,7 +289,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                   deckDef
                 )}
                 itemId={addressableArea.id}
-                selectedTerminalItemId={props.selectedTerminalItemId}
+                tab={tab}
               />
             </React.Fragment>
           )
@@ -318,6 +319,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
+            <HighlightLabware labwareOnDeck={labware} position={slotPosition} />
             <DeckItemHover
               isSelected={selectedZoomInSlot != null}
               hover={hover}
@@ -327,7 +329,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               slotBoundingBox={slotBoundingBox}
               slotPosition={slotPosition}
               itemId={labware.slot}
-              selectedTerminalItemId={props.selectedTerminalItemId}
+              tab={tab}
             />
           </React.Fragment>
         ) : null
@@ -380,6 +382,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
+            <HighlightLabware labwareOnDeck={labware} position={slotPosition} />
             <DeckItemHover
               isSelected={selectedZoomInSlot != null}
               hover={hover}
@@ -389,7 +392,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               slotBoundingBox={slotBoundingBox}
               slotPosition={slotPosition}
               itemId={slotOnDeck ?? ''}
-              selectedTerminalItemId={props.selectedTerminalItemId}
+              tab={tab}
             />
           </React.Fragment>
         )

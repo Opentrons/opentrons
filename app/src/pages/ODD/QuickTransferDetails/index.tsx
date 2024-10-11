@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, useRef } from 'react'
 import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
@@ -30,32 +30,37 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import { MediumButton, SmallButton } from '../../../atoms/buttons'
+import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
+import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
-} from '../../../organisms/OnDeviceDisplay/ProtocolDetails'
-import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { SmallModalChildren } from '../../../molecules/OddModal'
-import { useToaster } from '../../../organisms/ToasterOven'
+} from '/app/organisms/ODD/ProtocolDetails'
+import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { SmallModalChildren } from '/app/molecules/OddModal'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
   getPinnedQuickTransferIds,
   updateConfigValue,
-} from '../../../redux/config'
-import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
+} from '/app/redux/config'
+import {
+  ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+  ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+} from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
-import { formatTimeWithUtcLabel } from '../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { Dispatch } from '../../../redux/types'
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { Dispatch } from '/app/redux/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 
 interface QuickTransferHeaderProps {
   title?: string | null
@@ -73,9 +78,10 @@ const QuickTransferHeader = ({
   isTransferFetching,
 }: QuickTransferHeaderProps): JSX.Element => {
   const navigate = useNavigate()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { t } = useTranslation('protocol_details')
-  const [truncate, setTruncate] = React.useState<boolean>(true)
-  const [startSetup, setStartSetup] = React.useState<boolean>(false)
+  const [truncate, setTruncate] = useState<boolean>(true)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
   const toggleTruncate = (): void => {
     setTruncate(value => !value)
   }
@@ -84,6 +90,15 @@ const QuickTransferHeader = ({
   if (displayedTitle !== null && displayedTitle.length > 92 && truncate) {
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
+
+  useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+      properties: {
+        name: title,
+      },
+    })
+  }, [])
 
   return (
     <Flex
@@ -147,6 +162,12 @@ const QuickTransferHeader = ({
         onClick={() => {
           setStartSetup(true)
           handleRunTransfer()
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+            properties: {
+              name: title,
+            },
+          })
         }}
         buttonText={t('start_setup')}
         disabled={isTransferFetching}
@@ -287,11 +308,11 @@ export function QuickTransferDetails(): JSX.Element | null {
   const host = useHost()
   const { makeSnackbar } = useToaster()
   const queryClient = useQueryClient()
-  const [currentOption, setCurrentOption] = React.useState<TabOption>(
+  const [currentOption, setCurrentOption] = useState<TabOption>(
     transferSectionTabOptions[0]
   )
 
-  const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
+  const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
   const {
     data: protocolRecord,
     isLoading: isTransferFetching,
@@ -300,8 +321,8 @@ export function QuickTransferDetails(): JSX.Element | null {
   })
 
   // Watch for scrolling to toggle dropshadow
-  const scrollRef = React.useRef<HTMLDivElement>(null)
-  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = useState<boolean>(false)
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
@@ -363,7 +384,7 @@ export function QuickTransferDetails(): JSX.Element | null {
   const [
     showConfirmDeleteTransfer,
     setShowConfirmationDeleteTransfer,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const displayName =
     !isTransferFetching && protocolRecord != null

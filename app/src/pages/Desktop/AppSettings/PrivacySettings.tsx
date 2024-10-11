@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -15,10 +14,10 @@ import {
 import {
   toggleAnalyticsOptedIn,
   getAnalyticsOptedIn,
-} from '../../../redux/analytics'
-import { ToggleButton } from '../../../atoms/buttons'
+} from '/app/redux/analytics'
+import { ToggleButton } from '/app/atoms/buttons'
 
-import type { Dispatch, State } from '../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function PrivacySettings(): JSX.Element {
   const { t } = useTranslation('branded')

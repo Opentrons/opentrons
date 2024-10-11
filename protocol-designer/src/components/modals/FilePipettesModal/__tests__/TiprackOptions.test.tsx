@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, beforeEach, it, expect } from 'vitest'
 import { BORDERS, COLORS } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'

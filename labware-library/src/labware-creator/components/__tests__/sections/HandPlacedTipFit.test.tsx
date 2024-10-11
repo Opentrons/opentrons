@@ -1,4 +1,3 @@
-import React from 'react'
 import isEqual from 'lodash/isEqual'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'

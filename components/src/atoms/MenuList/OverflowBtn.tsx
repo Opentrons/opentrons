@@ -5,14 +5,18 @@ import { Btn } from '../../primitives'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING } from '../../ui-style-constants'
 
+interface OverflowBtnProps extends React.ComponentProps<typeof Btn> {
+  fillColor?: string
+}
 export const OverflowBtn: (
-  props: React.ComponentProps<typeof Btn>,
+  props: OverflowBtnProps,
   ref: React.ForwardedRef<HTMLInputElement>
 ) => React.ReactNode = React.forwardRef(
   (
-    props: React.ComponentProps<typeof Btn>,
+    props: OverflowBtnProps,
     ref: React.ForwardedRef<HTMLInputElement>
   ): JSX.Element => {
+    const { fillColor } = props
     return (
       <Btn
         css={css`
@@ -59,7 +63,7 @@ export const OverflowBtn: (
           width="19"
           height="31"
           viewBox="0 0 19 31"
-          fill={COLORS.grey50}
+          fill={fillColor ?? COLORS.grey50}
           xmlns="http://www.w3.org/2000/svg"
         >
           <circle cx="9.5" cy="9.5" r="1.5" />

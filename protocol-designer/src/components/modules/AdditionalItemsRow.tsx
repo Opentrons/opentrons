@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -52,7 +52,7 @@ export function AdditionalItemsRow(
   } = props
   const { t } = useTranslation(['modules', 'shared', 'tooltip'])
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [trashModal, openTrashModal] = React.useState<boolean>(false)
+  const [trashModal, openTrashModal] = useState<boolean>(false)
   const addTrash = name !== 'gripper' && !isEquipmentAdded
   const disabledRemoveButton =
     (name === 'trashBin' && isEquipmentAdded && !hasWasteChute) ||

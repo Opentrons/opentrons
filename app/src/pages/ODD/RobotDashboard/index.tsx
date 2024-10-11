@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -12,15 +12,15 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { Navigation } from '../../../organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
-} from '../../../organisms/OnDeviceDisplay/RobotDashboard'
-import { getOnDeviceDisplaySettings } from '../../../redux/config'
+} from '/app/organisms/ODD/RobotDashboard'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from './WelcomeModal'
-import { ServerInitializing } from '../../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { ServerInitializing } from '/app/organisms/ODD/RobotDashboard/ServerInitializing'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import type { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
@@ -36,7 +36,7 @@ export function RobotDashboard(): JSX.Element {
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )
-  const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
+  const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(
     unfinishedUnboxingFlowRoute !== null
   )
 

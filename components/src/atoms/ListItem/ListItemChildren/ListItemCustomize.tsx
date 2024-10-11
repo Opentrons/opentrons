@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { css } from 'styled-components'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { COLORS } from '../../../helix-design-system'
 import { Flex, Link } from '../../../primitives'
@@ -32,7 +32,7 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
   } = props
   return (
     <Flex width="100%" alignItems={ALIGN_CENTER} padding={SPACING.spacing12}>
-      <Flex gridGap={SPACING.spacing8} width="50%" alignItems={ALIGN_CENTER}>
+      <Flex gridGap={SPACING.spacing16} width="50%" alignItems={ALIGN_CENTER}>
         {leftHeaderItem != null ? (
           <Flex size="3.75rem">{leftHeaderItem}</Flex>
         ) : null}
@@ -53,13 +53,20 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
         {tag != null ? <Tag {...tag} /> : null}
       </Flex>
       {onClick != null && linkText != null ? (
-        <Flex width="10%" textDecoration={TYPOGRAPHY.textDecorationUnderline}>
-          <Link role="button" onClick={onClick}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {linkText}
-            </StyledText>
-          </Link>
-        </Flex>
+        <Link
+          role="button"
+          onClick={onClick}
+          css={css`
+            width: 10%;
+            text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+            color: ${COLORS.grey60};
+            &:hover {
+              color: ${COLORS.grey40};
+            }
+          `}
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">{linkText}</StyledText>
+        </Link>
       ) : null}
     </Flex>
   )

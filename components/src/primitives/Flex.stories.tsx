@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { BORDERS, COLORS } from '../helix-design-system'
 import { SPACING } from '../ui-style-constants'
 import { DIRECTION_COLUMN, JUSTIFY_SPACE_AROUND } from '../styles'

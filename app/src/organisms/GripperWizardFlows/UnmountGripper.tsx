@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -16,14 +16,14 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
-import { getIsOnDevice } from '../../redux/config'
-import { SmallButton } from '../../atoms/buttons'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { getIsOnDevice } from '/app/redux/config'
+import { SmallButton } from '/app/atoms/buttons'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
-import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
+} from '/app/molecules/SimpleWizardBody'
+import unmountGripper from '/app/assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
 import type { GripperData } from '@opentrons/api-client'
@@ -55,7 +55,7 @@ export const UnmountGripper = (
   const { proceed, isRobotMoving, goBack, chainRunCommands } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
-  const [isPending, setIsPending] = React.useState<boolean>(false)
+  const [isPending, setIsPending] = useState<boolean>(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
     refetchInterval: QUICK_GRIPPER_POLL_MS,
   })
@@ -63,10 +63,9 @@ export const UnmountGripper = (
     (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
   )
 
-  const [
-    showGripperStillDetected,
-    setShowGripperStillDetected,
-  ] = React.useState(false)
+  const [showGripperStillDetected, setShowGripperStillDetected] = useState(
+    false
+  )
   const handleContinue = (): void => {
     setIsPending(true)
     refetch()

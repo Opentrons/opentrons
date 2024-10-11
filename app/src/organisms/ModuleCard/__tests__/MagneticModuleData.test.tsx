@@ -1,14 +1,14 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { StatusLabel } from '../../../atoms/StatusLabel'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { MagneticModuleData } from '../MagneticModuleData'
-import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 
-vi.mock('../../../atoms/StatusLabel')
+vi.mock('/app/atoms/StatusLabel')
 
 const render = (props: React.ComponentProps<typeof MagneticModuleData>) => {
   return renderWithProviders(<MagneticModuleData {...props} />, {

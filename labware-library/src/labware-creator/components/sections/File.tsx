@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { maskLoadName } from '../../fieldMasks'
 import { getDefaultDisplayName, getDefaultLoadName } from '../../formSelectors'

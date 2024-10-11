@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -10,9 +9,9 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { MediumButton } from '../../../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 
-import screenImage from '../../../assets/images/on-device-display/welcome_background.png'
+import screenImage from '/app/assets/images/on-device-display/welcome_background.png'
 
 const IMAGE_ALT = 'Welcome screen background image'
 

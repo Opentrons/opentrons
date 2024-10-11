@@ -1,33 +1,25 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
-} from '../../../redux/modules/__fixtures__'
-import { mockRobot } from '../../../redux/robot-api/__fixtures__'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
-import {
-  FAILURE,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '../../../redux/robot-api'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
-import { useToaster } from '../../ToasterOven'
-import { useIsFlex } from '../../Devices/hooks'
+} from '/app/redux/modules/__fixtures__'
+import { mockRobot } from '/app/redux/robot-api/__fixtures__'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
@@ -37,12 +29,11 @@ import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { ErrorInfo } from '../ErrorInfo'
 import { ModuleCard } from '..'
 
-import type { NavigateFunction } from 'react-router-dom'
 import type {
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
-} from '../../../redux/modules/types'
+} from '/app/redux/modules/types'
 import type { Mock } from 'vitest'
 
 vi.mock('../ErrorInfo')
@@ -50,21 +41,14 @@ vi.mock('../MagneticModuleData')
 vi.mock('../TemperatureModuleData')
 vi.mock('../ThermocyclerModuleData')
 vi.mock('../HeaterShakerModuleData')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../ModuleOverflowMenu')
-vi.mock('../../RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl')
 vi.mock('../FirmwareUpdateFailedModal')
-vi.mock('../../../redux/robot-api')
-vi.mock('../../../organisms/ToasterOven')
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<NavigateFunction>()
-  return {
-    ...actual,
-    useNavigate: () => vi.fn(),
-  }
-})
+vi.mock('/app/redux/robot-api')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/ToasterOven')
+vi.mock('/app/resources/devices')
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',

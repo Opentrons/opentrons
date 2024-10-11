@@ -4,26 +4,34 @@ from serial.tools.list_ports import comports  # type: ignore[import]
 from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
 
 
-def list_ports_and_select(device_name: str = "") -> str:
+def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str:
     """List serial ports and display list for user to select from."""
     ports = comports()
     assert ports, "no serial ports found"
     ports.sort(key=lambda p: p.device)
     print("found ports:")
+
+    idx = 0
+    idx_str = ""
     for i, p in enumerate(ports):
         print(f"\t{i + 1}) {p.device}")
-    if not device_name:
-        device_name = "desired"
-    idx_str = input(
-        f"\nenter number next to {device_name} port (or ENTER to re-scan): "
-    )
-    if not idx_str:
-        return list_ports_and_select(device_name)
-    try:
-        idx = int(idx_str.strip())
-        return ports[idx - 1].device
-    except (ValueError, IndexError):
-        return list_ports_and_select()
+    if port_substr:
+        for i, p in enumerate(ports):
+            if port_substr in p.device:
+                return p.device
+
+    while True:
+        idx_str = input(
+            f"\nEnter number next to {device_name} port (or ENTER to re-scan): "
+        )
+        if not idx_str:
+            return list_ports_and_select(device_name, port_substr)
+
+        try:
+            idx = int(idx_str.strip())
+            return ports[idx - 1].device
+        except (ValueError, IndexError):
+            print("Invalid selection. Please try again.")
 
 
 def find_port(vid: int, pid: int) -> str:

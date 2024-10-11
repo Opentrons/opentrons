@@ -8,6 +8,18 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.1.0
+
+Welcome to the v8.1.0 release of the Opentrons App!
+
+There are no new features in the Opentrons App in v8.1.0, but it is required for updating the robot software to support the latest production version of Flex robots.
+
+### Bug Fixes
+
+- Prevented Flex from showing the first-run screen when powering on a robot that's already set up.
+
+---
+
 ## Opentrons App Changes in 8.0.0
 
 Welcome to the v8.0.0 release of the Opentrons App!
@@ -27,8 +39,9 @@ Welcome to the v8.0.0 release of the Opentrons App!
 
 ### Known Issues
 
-- Labware offsets can't be applied to protocols that require selecting a CSV file as a runtime parameter value. Write the protocol in such a way that it passes analysis with or without the CSV file, or run Labware Position Check after confirming parameter values.
+- Stored labware offsets can't be applied to protocols that require selecting a CSV file as a runtime parameter value. Write the protocol in such a way that it passes analysis with or without the CSV file, or run Labware Position Check after confirming parameter values.
 - Error recovery can't perform partial tip pickup, because it doesn't account for the pipette nozzle configuration of 8- and 96-channel pipettes. If a recovery step requires partial tip pickup, cancel the protocol instead.
+- Downloading robot logs via USB may take up to 2 minutes on macOS, and may fail entirely on Windows. Use an Ethernet or Wi-Fi connection to download logs if needed.
 
 ---
 

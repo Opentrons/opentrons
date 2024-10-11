@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -16,8 +15,8 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { useToaster } from '../../../organisms/ToasterOven'
-import { useRunTimeParameters } from '../../../pages/Desktop/Protocols/hooks'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useRunTimeParameters } from '/app/resources/protocols'
 import { EmptySection } from './EmptySection'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
