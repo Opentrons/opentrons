@@ -24,6 +24,7 @@ import { renameStep } from '../../labware-ingred/actions'
 import { RenameStepAction } from '../../file-data'
 import type { FormData, StepFieldName } from '../../form-types'
 
+const MAX_STEP_NAME_LENGTH = 115
 interface RenameStepModalProps {
   formData: FormData
   onClose: () => void
@@ -69,7 +70,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
           </SecondaryButton>
           <PrimaryButton
             data-testid="RenameStepModal_saveButton"
-            disabled={false}
+            disabled={stepName.length >= MAX_STEP_NAME_LENGTH}
             onClick={() => {
               handleSave()
             }}
@@ -86,6 +87,11 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
               {t('form:step_edit_form.field.step_name.label')}
             </StyledText>
             <InputField
+              error={
+                stepName.length >= MAX_STEP_NAME_LENGTH
+                  ? t('rename_error')
+                  : null
+              }
               value={stepName}
               autoFocus
               name="StepName"
@@ -93,6 +99,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
                 setStepName(e.target.value)
                 makeSave('stepName')
               }}
+              type="text"
             />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
