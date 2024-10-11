@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import styled, { css } from 'styled-components'
 import mapValues from 'lodash/mapValues'
+
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
@@ -17,8 +18,8 @@ import {
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
-  Flex,
   FLEX_MAX_CONTENT,
+  Flex,
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -36,9 +37,10 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   getAllPipetteNames,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 import { getAllowAllTipracks } from '../../feature-flags/selectors'
 import {
@@ -46,7 +48,7 @@ import {
   getInitialDeckSetup,
   getPipetteEntities,
 } from '../../step-forms/selectors'
-import { getHas96Channel } from '../../utils'
+import { getHas96Channel, removeOpentronsPhrases } from '../../utils'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { PipetteInfoItem } from '../PipetteInfoItem'
@@ -65,8 +67,9 @@ import { createCustomTiprackDef } from '../../labware-defs/actions'
 import { deleteContainer } from '../../labware-ingred/actions'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { BUTTON_LINK_STYLE } from '../../atoms'
-import { getSectionsFromPipetteName } from './utils'
+import { getSectionsFromPipetteName, getShouldShowPipetteType } from './utils'
 import { editPipettes } from './editPipettes'
+
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {
   Gen,
@@ -107,8 +110,8 @@ export function EditInstrumentsModal(
   const { pipettes, labware } = initialDeckSetup
   const pipettesOnDeck = Object.values(pipettes)
   const has96Channel = getHas96Channel(pipetteEntities)
-  const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
-  const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
+  const leftPipette = pipettesOnDeck.find(pipette => pipette.mount === 'left')
+  const rightPipette = pipettesOnDeck.find(pipette => pipette.mount === 'right')
   const gripper = Object.values(additionalEquipment).find(
     ae => ae.name === 'gripper'
   )
@@ -130,29 +133,23 @@ export function EditInstrumentsModal(
 
   const previousLeftPipetteTipracks = Object.values(labware)
     .filter(lw => lw.def.parameters.isTiprack)
-    .filter(tip => leftPip?.tiprackDefURI.includes(tip.labwareDefURI))
+    .filter(tip => leftPipette?.tiprackDefURI.includes(tip.labwareDefURI))
   const previousRightPipetteTipracks = Object.values(labware)
     .filter(lw => lw.def.parameters.isTiprack)
-    .filter(tip => rightPip?.tiprackDefURI.includes(tip.labwareDefURI))
+    .filter(tip => rightPipette?.tiprackDefURI.includes(tip.labwareDefURI))
 
   const rightInfo =
-    rightPip != null
-      ? getSectionsFromPipetteName(rightPip.name, rightPip.spec)
+    rightPipette != null
+      ? getSectionsFromPipetteName(rightPipette.name, rightPipette.spec)
       : null
   const leftInfo =
-    leftPip != null
-      ? getSectionsFromPipetteName(leftPip.name, leftPip.spec)
+    leftPipette != null
+      ? getSectionsFromPipetteName(leftPipette.name, leftPipette.spec)
       : null
 
-  const removeOpentronsPhrases = (input: string): string => {
-    const phrasesToRemove = ['Opentrons Flex 96', 'Opentrons OT-2 96']
-
-    return phrasesToRemove
-      .reduce((text, phrase) => {
-        return text.replace(new RegExp(phrase, 'gi'), '')
-      }, input)
-      .trim()
-  }
+  // Note (kk:2024/10/09)
+  // if a user removes all pipettes, left mount is the first target.
+  const targetPipetteMount = leftPipette == null ? 'left' : 'right'
 
   return createPortal(
     <Modal
@@ -172,16 +169,18 @@ export function EditInstrumentsModal(
           gridGap={SPACING.spacing8}
           padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
         >
-          {page === 'overview' ? null : (
-            <SecondaryButton
-              onClick={() => {
+          <SecondaryButton
+            onClick={() => {
+              if (page === 'overview') {
+                onClose()
+              } else {
                 setPage('overview')
                 resetFields()
-              }}
-            >
-              {t('shared:cancel')}
-            </SecondaryButton>
-          )}
+              }
+            }}
+          >
+            {page === 'overview' ? t('shared:cancel') : t('shared:back')}
+          </SecondaryButton>
           <PrimaryButton
             disabled={
               page === 'add' &&
@@ -203,13 +202,13 @@ export function EditInstrumentsModal(
                   mount,
                   selectedPip as PipetteName,
                   selectedTips,
-                  leftPip,
-                  rightPip
+                  leftPipette,
+                  rightPipette
                 )
               }
             }}
           >
-            {t(page === 'overview' ? 'shared:close' : 'shared:save')}
+            {t('shared:save')}
           </PrimaryButton>
         </Flex>
       }
@@ -224,7 +223,8 @@ export function EditInstrumentsModal(
               <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('your_pipettes')}
               </StyledText>
-              {has96Channel ? null : (
+              {has96Channel ||
+              (leftPipette == null && rightPipette == null) ? null : (
                 <Btn
                   css={BUTTON_LINK_STYLE}
                   onClick={() =>
@@ -252,67 +252,54 @@ export function EditInstrumentsModal(
               )}
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {leftPip != null &&
-              leftPip.tiprackDefURI != null &&
-              leftInfo != null ? (
+              {leftPipette?.tiprackDefURI != null && leftInfo != null ? (
                 <PipetteInfoItem
                   mount="left"
-                  pipetteName={leftPip.name}
-                  tiprackDefURIs={leftPip.tiprackDefURI}
+                  pipetteName={leftPipette.name}
+                  tiprackDefURIs={leftPipette.tiprackDefURI}
                   editClick={() => {
                     setPage('add')
                     setMount('left')
                     setPipetteType(leftInfo.type)
                     setPipetteGen(leftInfo.gen)
                     setPipetteVolume(leftInfo.volume)
-                    setSelectedTips(leftPip.tiprackDefURI)
+                    setSelectedTips(leftPipette.tiprackDefURI as string[])
                   }}
                   cleanForm={() => {
-                    dispatch(deletePipettes([leftPip.id]))
+                    dispatch(deletePipettes([leftPipette.id as string]))
                     previousLeftPipetteTipracks.forEach(tip =>
                       dispatch(deleteContainer({ labwareId: tip.id }))
                     )
                   }}
                 />
-              ) : (
-                <EmptySelectorButton
-                  onClick={() => {
-                    setPage('add')
-                    setMount('left')
-                    resetFields()
-                  }}
-                  text={t('add_pipette')}
-                  textAlignment="left"
-                  iconName="plus"
-                />
-              )}
-              {rightPip != null &&
-              rightPip.tiprackDefURI != null &&
-              rightInfo != null ? (
+              ) : null}
+              {rightPipette?.tiprackDefURI != null && rightInfo != null ? (
                 <PipetteInfoItem
                   mount="right"
-                  pipetteName={rightPip.name}
-                  tiprackDefURIs={rightPip.tiprackDefURI}
+                  pipetteName={rightPipette.name}
+                  tiprackDefURIs={rightPipette.tiprackDefURI}
                   editClick={() => {
                     setPage('add')
                     setMount('right')
                     setPipetteType(rightInfo.type)
                     setPipetteGen(rightInfo.gen)
                     setPipetteVolume(rightInfo.volume)
-                    setSelectedTips(rightPip.tiprackDefURI)
+                    setSelectedTips(rightPipette.tiprackDefURI as string[])
                   }}
                   cleanForm={() => {
-                    dispatch(deletePipettes([rightPip.id]))
+                    dispatch(deletePipettes([rightPipette.id as string]))
                     previousRightPipetteTipracks.forEach(tip =>
                       dispatch(deleteContainer({ labwareId: tip.id }))
                     )
                   }}
                 />
-              ) : has96Channel ? null : (
+              ) : null}
+              {has96Channel ||
+              (leftPipette != null && rightPipette != null) ? null : (
                 <EmptySelectorButton
                   onClick={() => {
                     setPage('add')
-                    setMount('right')
+                    setMount(targetPipetteMount)
                   }}
                   text={t('add_pipette')}
                   textAlignment="left"
@@ -356,6 +343,8 @@ export function EditInstrumentsModal(
                       <Btn
                         css={BUTTON_LINK_STYLE}
                         textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                        padding={SPACING.spacing4}
+                        id="hello"
                         onClick={() => {
                           dispatch(toggleIsGripperRequired())
                         }}
@@ -392,7 +381,13 @@ export function EditInstrumentsModal(
             </StyledText>
             <Flex gridGap={SPACING.spacing4}>
               {PIPETTE_TYPES[robotType].map(type => {
-                return type.value === '96' && has96Channel ? null : (
+                return getShouldShowPipetteType(
+                  type.value as PipetteType,
+                  has96Channel,
+                  leftPipette,
+                  rightPipette,
+                  mount
+                ) ? (
                   <RadioButton
                     key={`${type.label}_${type.value}`}
                     onChange={() => {
@@ -405,7 +400,7 @@ export function EditInstrumentsModal(
                     buttonValue="single"
                     isSelected={pipetteType === type.value}
                   />
-                )
+                ) : null
               })}
             </Flex>
           </Flex>

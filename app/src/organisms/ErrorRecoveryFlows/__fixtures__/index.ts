@@ -72,7 +72,10 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   recoveryCommands: {} as any,
   tipStatusUtils: {} as any,
   currentRecoveryOptionUtils: {} as any,
-  failedLabwareUtils: { pickUpTipLabware: mockPickUpTipLabware } as any,
+  failedLabwareUtils: {
+    pickUpTipLabware: mockPickUpTipLabware,
+    selectedTipLocation: { A1: null },
+  } as any,
   failedPipetteInfo: {} as any,
   deckMapUtils: { setSelectedLocation: () => {} } as any,
   stepCounts: {} as any,
