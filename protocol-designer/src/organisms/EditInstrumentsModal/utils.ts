@@ -43,7 +43,9 @@ export const getShouldShowPipetteType = (
 ): boolean => {
   if (type === '96') {
     // if a protocol has 96-Channel, no 96-Channel button
-    if (has96Channel) return false
+    if (has96Channel) {
+      return false
+    }
 
     // If no mount is being edited (adding a new pipette)
     if (currentEditingMount == null) {
