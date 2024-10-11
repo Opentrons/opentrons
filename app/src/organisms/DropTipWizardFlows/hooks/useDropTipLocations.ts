@@ -70,10 +70,22 @@ export function useDropTipLocations(
         )
         .map(config => createLocation(config, validLocation))
 
-    return [
-      ...filterAndMap(TRASH_BIN_ADAPTER_FIXTURE, 'trash-bin'),
-      ...filterAndMap(WASTE_CHUTE_FIXTURES, 'waste-chute'),
-      { location: 'deck', slotName: 'CHOOSE_DECK_LOCATION' },
-    ]
+    return robotType === OT2_ROBOT_TYPE
+      ? [FIXED_TRASH_LOCATION, CHOOSE_DECK_LOCATION]
+      : [
+          ...filterAndMap(TRASH_BIN_ADAPTER_FIXTURE, 'trash-bin'),
+          ...filterAndMap(WASTE_CHUTE_FIXTURES, 'waste-chute'),
+          CHOOSE_DECK_LOCATION,
+        ]
   }, [deckConfig, deckDef, robotType])
+}
+
+const FIXED_TRASH_LOCATION: DropTipBlowoutLocationDetails = {
+  location: 'fixed-trash',
+  slotName: 'fixedTrash',
+}
+
+const CHOOSE_DECK_LOCATION: DropTipBlowoutLocationDetails = {
+  location: 'deck',
+  slotName: 'CHOOSE_DECK_LOCATION',
 }

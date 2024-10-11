@@ -18,6 +18,7 @@ import { OffDeckThumbnail } from '../OffdeckThumbnail'
 import { ProtocolMetadata } from '../ProtocolMetadata'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 import { LiquidDefinitions } from '../LiquidDefinitions'
+import { StepsInfo } from '../StepsInfo'
 
 import type { NavigateFunction } from 'react-router-dom'
 
@@ -29,9 +30,10 @@ vi.mock('../../../organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-ingred/selectors')
+vi.mock('../ProtocolMetadata')
 vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')
-vi.mock('../ProtocolMetadata')
+vi.mock('../StepsInfo')
 
 const mockNavigate = vi.fn()
 
@@ -82,6 +84,7 @@ describe('ProtocolOverview', () => {
       <div>mock LiquidDefinitions</div>
     )
     vi.mocked(InstrumentsInfo).mockReturnValue(<div>mock InstrumentsInfo</div>)
+    vi.mocked(StepsInfo).mockReturnValue(<div>mock StepsInfo</div>)
     vi.mocked(ProtocolMetadata).mockReturnValue(
       <div>mock ProtocolMetadata</div>
     )
@@ -105,7 +108,7 @@ describe('ProtocolOverview', () => {
     screen.getByText('mock LiquidDefinitions')
 
     //  steps
-    screen.getByText('Protocol steps')
+    screen.getByText('mock StepsInfo')
   })
 
   it('should render the deck thumbnail and offdeck thumbnail', () => {
