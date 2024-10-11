@@ -339,33 +339,27 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                                     const isCurrentlySelected = selectedValues.includes(
                                       value
                                     )
-                                    let updatedValues
 
                                     if (isCurrentlySelected) {
-                                      updatedValues = selectedValues.filter(
-                                        v => v !== value
+                                      setValue(
+                                        `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                                        selectedValues.filter(v => v !== value)
                                       )
                                     } else {
-                                      updatedValues = [...selectedValues, value]
-
                                       if (
-                                        updatedValues.length >
+                                        selectedValues.length ===
                                         MAX_TIPRACKS_ALLOWED
                                       ) {
                                         makeSnackbar(
                                           t('up_to_3_tipracks') as string
                                         )
-                                        updatedValues = updatedValues.slice(
-                                          0,
-                                          MAX_TIPRACKS_ALLOWED
+                                      } else {
+                                        setValue(
+                                          `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                                          [...selectedValues, value]
                                         )
                                       }
                                     }
-
-                                    setValue(
-                                      `pipettesByMount.${defaultMount}.tiprackDefURI`,
-                                      updatedValues
-                                    )
                                   }}
                                 />
                               )
