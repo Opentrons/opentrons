@@ -1,5 +1,3 @@
-import { fill } from 'lodash'
-
 // icon data
 export const ICON_DATA_BY_NAME = {
   add: {
