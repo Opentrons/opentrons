@@ -162,10 +162,10 @@ export function useRecoveryCommands({
 
   // Pick up the user-selected tips
   const pickUpTips = useCallback((): Promise<CommandData[]> => {
-    const { selectedTipLocation, failedLabware } = failedLabwareUtils
+    const { selectedTipLocations, failedLabware } = failedLabwareUtils
 
     const pickUpTipCmd = buildPickUpTips(
-      selectedTipLocation,
+      selectedTipLocations,
       failedCommandByRunRecord,
       failedLabware
     )

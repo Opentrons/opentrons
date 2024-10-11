@@ -12,7 +12,7 @@ export function TipSelection(props: TipSelectionProps): JSX.Element {
   const { failedLabwareUtils, failedPipetteUtils, allowTipSelection } = props
   const {
     tipSelectorDef,
-    selectedTipLocation,
+    selectedTipLocations,
     selectTips,
     deselectTips,
   } = failedLabwareUtils
@@ -30,7 +30,7 @@ export function TipSelection(props: TipSelectionProps): JSX.Element {
     <WellSelection
       definition={tipSelectorDef}
       deselectWells={onDeselectTips}
-      selectedPrimaryWell={Object.keys(selectedTipLocation as WellGroup)[0]}
+      selectedPrimaryWells={selectedTipLocations as WellGroup}
       selectWells={onSelectTips}
       channels={failedPipetteInfo?.data.channels ?? 1}
       pipetteNozzleDetails={buildNozzleLayoutDetails(

@@ -21,6 +21,7 @@ import type { GenericRect } from './types'
 interface WellSelectionProps {
   definition: LabwareDefinition2
   deselectWells: (wells: string[]) => void
+  /* The actual wells that are clicked. */
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
@@ -127,7 +128,9 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
               channels,
               pipetteNozzleDetails,
             })
-            if (!wellSet) return acc
+            if (!wellSet) {
+              return acc
+            }
             return { ...acc, ...arrayToWellGroup(wellSet) }
           },
           {}
