@@ -112,7 +112,7 @@ class PipetteState:
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
-    nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
+    nozzle_configuration_by_id: Dict[str, NozzleMap]
     liquid_presence_detection_by_id: Dict[str, bool]
 
 
