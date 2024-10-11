@@ -337,22 +337,29 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                                   isChecked={selectedValues.includes(value)}
                                   labelText={removeOpentronsPhrases(name)}
                                   onClick={() => {
-                                    const updatedValues = selectedValues.includes(
+                                    const isCurrentlySelected = selectedValues.includes(
                                       value
                                     )
-                                      ? selectedValues.filter(v => v !== value)
-                                      : [...selectedValues, value]
-                                    setValue(
-                                      `pipettesByMount.${defaultMount}.tiprackDefURI`,
-                                      updatedValues.slice(0, 3)
-                                    )
-                                    if (
-                                      selectedValues.length ===
-                                      MAX_TIPRACKS_ALLOWED
-                                    ) {
-                                      makeSnackbar(
-                                        t('up_to_3_tipracks') as string
+
+                                    if (isCurrentlySelected) {
+                                      setValue(
+                                        `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                                        selectedValues.filter(v => v !== value)
                                       )
+                                    } else {
+                                      if (
+                                        selectedValues.length ===
+                                        MAX_TIPRACKS_ALLOWED
+                                      ) {
+                                        makeSnackbar(
+                                          t('up_to_3_tipracks') as string
+                                        )
+                                      } else {
+                                        setValue(
+                                          `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                                          [...selectedValues, value]
+                                        )
+                                      }
                                     }
                                   }}
                                 />
