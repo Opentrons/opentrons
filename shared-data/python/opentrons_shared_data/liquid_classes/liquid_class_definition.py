@@ -29,7 +29,7 @@ _NonNegativeNumber = Union[_StrictNonNegativeInt, _StrictNonNegativeFloat]
 """Non-negative JSON number type, written to preserve lack of decimal point."""
 
 LiquidHandlingPropertyByVolume = Dict[str, _NonNegativeNumber]
-"""Settings for liquid class settings keyed by target aspiration volume."""
+"""Settings for liquid class settings keyed by target aspiration/dispense volume."""
 
 
 class PositionReference(Enum):
@@ -209,7 +209,7 @@ class RetractAspirate(BaseModel):
 
 
 class RetractDispense(BaseModel):
-    """Shared properties for the retract function after aspiration."""
+    """Shared properties for the retract function after dispense."""
 
     positionReference: PositionReference = Field(
         ..., description="Position reference for retract after dispense."
@@ -247,10 +247,12 @@ class AspirateParams(BaseModel):
     offset: Coordinate = Field(..., description="Relative offset for aspiration.")
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
-        description="Settings for flow rate keyed by target aspiration/dispense volume.",
+        description="Settings for flow rate keyed by target aspiration volume.",
     )
     preWet: bool = Field(..., description="Whether to perform a pre-wet action.")
-    mix: MixProperties = Field(..., description="Mixing settings for after an aspirate")
+    mix: MixProperties = Field(
+        ..., description="Mixing settings for before an aspirate"
+    )
     delay: DelayProperties = Field(..., description="Delay settings after an aspirate")
 
 
@@ -269,11 +271,11 @@ class SingleDispenseParams(BaseModel):
     offset: Coordinate = Field(..., description="Relative offset for single dispense.")
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
-        description="Settings for flow rate keyed by target aspiration/dispense volume.",
+        description="Settings for flow rate keyed by target dispense volume.",
     )
-    mix: MixProperties = Field(..., description="Mixing settings for after an aspirate")
+    mix: MixProperties = Field(..., description="Mixing settings for after a dispense")
     pushOutByVolume: LiquidHandlingPropertyByVolume = Field(
-        ..., description="Settings for pushout keyed by target aspiration volume."
+        ..., description="Settings for pushout keyed by target dispense volume."
     )
     delay: DelayProperties = Field(..., description="Delay after dispense, in seconds.")
 
@@ -293,7 +295,7 @@ class MultiDispenseParams(BaseModel):
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
-        description="Settings for flow rate keyed by target aspiration/dispense volume.",
+        description="Settings for flow rate keyed by target dispense volume.",
     )
     mix: MixProperties = Field(..., description="Mixing settings for after an aspirate")
     conditioningByVolume: LiquidHandlingPropertyByVolume = Field(
@@ -303,7 +305,9 @@ class MultiDispenseParams(BaseModel):
     disposalByVolume: LiquidHandlingPropertyByVolume = Field(
         ..., description="Settings for disposal volume keyed by target dispense volume."
     )
-    delay: DelayProperties = Field(..., description="Delay settings after an aspirate")
+    delay: DelayProperties = Field(
+        ..., description="Delay settings after each dispense"
+    )
 
 
 class ByTipTypeSetting(BaseModel):
@@ -325,7 +329,7 @@ class ByTipTypeSetting(BaseModel):
 
 
 class ByPipetteSetting(BaseModel):
-    """The settings for a specific kind of pipette when interacting with this liquid class."""
+    """The settings for this liquid class when used with a specific kind of pipette."""
 
     pipetteModel: str = Field(..., description="The pipette model this applies to.")
     byTipType: Sequence[ByTipTypeSetting] = Field(
