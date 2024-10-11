@@ -11,13 +11,10 @@ import {
   Btn,
   DIRECTION_COLUMN,
   Flex,
-  InfoScreen,
   JUSTIFY_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
-  ListItem,
-  ListItemDescriptor,
   Modal,
   NO_WRAP,
   PrimaryButton,
@@ -57,6 +54,7 @@ import { getWarningContent } from './UnusedModalContent'
 import { ProtocolMetadata } from './ProtocolMetadata'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
+import { StepsInfo } from './StepsInfo'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
@@ -349,28 +347,7 @@ export function ProtocolOverview(): JSX.Element {
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <Flex>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('step')}
-                </StyledText>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.keys(savedStepForms).length <= 1 ? (
-                  <InfoScreen content={t('no_steps')} />
-                ) : (
-                  <ListItem type="noActive" key="ProtocolOverview_Step">
-                    <ListItemDescriptor
-                      type="default"
-                      description={'Steps:'}
-                      content={(
-                        Object.keys(savedStepForms).length - 1
-                      ).toString()}
-                    />
-                  </ListItem>
-                )}
-              </Flex>
-            </Flex>
+            <StepsInfo savedStepForms={savedStepForms} />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} css={COLUMN_STYLE}>
             <Flex
