@@ -28,7 +28,7 @@ export function StepsInfo({ savedStepForms }: StepsInfoProps): JSX.Element {
         </StyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        {Object.keys(savedStepForms).length < 1 ? (
+        {Object.keys(savedStepForms).length <= 1 ? (
           <InfoScreen content={t('no_steps')} />
         ) : (
           <ListItem type="noActive" key="ProtocolOverview_Step">
@@ -45,7 +45,7 @@ export function StepsInfo({ savedStepForms }: StepsInfoProps): JSX.Element {
               content={
                 <StyledText desktopStyle="bodyDefaultRegular">
                   {t('steps', {
-                    count: Object.keys(savedStepForms).length.toString(),
+                    count: (Object.keys(savedStepForms).length - 1).toString(),
                   })}
                 </StyledText>
               }

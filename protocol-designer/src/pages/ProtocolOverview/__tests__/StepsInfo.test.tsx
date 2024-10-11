@@ -96,6 +96,6 @@ describe('StepsInfo', () => {
     }
     render(props)
     screen.getByText('Number of steps')
-    screen.getByText('4 steps')
+    screen.getByText('3 steps')
   })
 })
