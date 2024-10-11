@@ -7,19 +7,9 @@ import { ICON_DATA_BY_NAME } from './icon-data'
 
 import type { SvgProps } from '../primitives'
 
-interface PathData {
-  d: string
+export interface IconData {
   fill?: string
-  stroke?: string
-  strokeWidth?: string
-  strokeDasharray?: string
-  strokeLinecap?: string
-  strokeLinejoin?: string
-}
-
-interface IconData {
-  fill?: string
-  paths: PathData[]
+  paths: Array<React.SVGProps<SVGPathElement>>
   viewBox: string
 }
 
@@ -79,6 +69,10 @@ export function Icon(props: IconProps): JSX.Element | null {
   const { fill = 'currentColor', viewBox, paths } = ICON_DATA_BY_NAME[
     name
   ] as IconData
+
+  if (paths.length < 1) {
+    return null
+  }
 
   return (
     <Svg

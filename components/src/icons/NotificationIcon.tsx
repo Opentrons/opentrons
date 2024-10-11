@@ -2,7 +2,7 @@ import { COLOR_WARNING } from '../styles'
 import { Icon } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
-import type { IconProps, IconName } from './Icon'
+import type { IconProps, IconName, IconData } from './Icon'
 
 export interface NotificationIconProps extends IconProps {
   /** name constant of the optional notifcation icon to display */
@@ -19,7 +19,7 @@ const SCALE_FACTOR = 3
  */
 export function NotificationIcon(props: NotificationIconProps): JSX.Element {
   const { childName, childColor, ...iconProps } = props
-  const { viewBox } = ICON_DATA_BY_NAME[iconProps.name]
+  const { viewBox } = ICON_DATA_BY_NAME[iconProps.name] as IconData
   const [x, y, width, height] = viewBox.split(' ').map(Number)
   const scaledWidth = width / SCALE_FACTOR
   const scaledHeight = height / SCALE_FACTOR
