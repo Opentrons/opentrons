@@ -152,7 +152,12 @@
               "10": 7,
               "20": 10
             },
-            "delay": 1
+            "delay": {
+              "enable": true,
+              "params": {
+                "duration": 2.5
+              }
+            }
           },
           "multiDispense": {
             "submerge": {

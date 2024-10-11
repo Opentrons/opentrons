@@ -273,9 +273,7 @@ class SingleDispenseParams(BaseModel):
     pushOutByVolume: LiquidHandlingPropertyByVolume = Field(
         ..., description="Settings for pushout keyed by target aspiration volume."
     )
-    delay: _NonNegativeNumber = Field(
-        ..., description="Delay after dispense, in seconds."
-    )
+    delay: DelayProperties = Field(..., description="Delay after dispense, in seconds.")
 
 
 class MultiDispenseParams(BaseModel):
