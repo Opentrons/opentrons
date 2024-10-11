@@ -15,8 +15,6 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
-  ListItem,
-  ListItemDescriptor,
   Modal,
   NO_WRAP,
   PrimaryButton,
