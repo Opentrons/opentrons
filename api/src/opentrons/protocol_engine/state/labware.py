@@ -500,6 +500,7 @@ class LabwareView(HasState[LabwareState]):
         self, labware_id: str, well_name: Optional[str] = None
     ) -> InnerWellGeometry:
         """Get a well's inner geometry by labware and well name."""
+        # TODO(pbm, 10-11-24): wordsmith this error
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
             raise errors.InvalidWellDefinitionError(

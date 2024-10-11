@@ -437,18 +437,21 @@ class GeometryView:
 
         Primarily this checks if there is not enough liquid in a well to do meniscus-relative static aspiration.
         """
-        invalid = False
         if well_location.origin == WellOrigin.MENISCUS:
             assert pipette_id is not None
             lld_min_height = self._pipettes.get_current_tip_lld_settings(
                 pipette_id=pipette_id
             )
             if z_offset < lld_min_height:
-                invalid = True
+                if isinstance(well_location, PickUpTipWellLocation):
+                    raise OperationLocationNotInWellError(
+                        f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location that could be below the bottom of the well"
+                    )
+                else:
+                    raise OperationLocationNotInWellError(
+                        f"Specifying {well_location.origin} with an offset of {well_location.offset} and a volume offset of {well_location.volumeOffset} results in an operation location that could be below the bottom of the well"
+                    )
         elif z_offset < 0:
-            invalid = True
-
-        if invalid:
             if isinstance(well_location, PickUpTipWellLocation):
                 raise OperationLocationNotInWellError(
                     f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location below the bottom of the well"

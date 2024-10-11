@@ -83,8 +83,6 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
         well_name = params.wellName
         volume = params.volume
 
-        if well_location.origin == WellOrigin.MENISCUS:
-            well_location.volumeOffset = 0.0
         self._state_view.geometry.validate_dispense_volume_into_well(
             labware_id=labware_id,
             well_name=well_name,

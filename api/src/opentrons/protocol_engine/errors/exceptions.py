@@ -1095,19 +1095,3 @@ class OperationLocationNotInWellError(ProtocolEngineError):
     ) -> None:
         """Build an OperationLocationNotInWellError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
-class InvalidAspirateLocationError(ProtocolEngineError):
-    """Raised when a meniscus-relative Aspirate's z-offset is greater than 0.0.
-
-    This would result in aspiration above the meniscus (in air), which should not be allowed.
-    """
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build an InvalidAspirateLocationError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
