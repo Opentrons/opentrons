@@ -32,7 +32,6 @@ from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.types import CurrentWell, LoadedPipette
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.notes import CommandNoteAdder
-from opentrons.protocol_engine.errors import InvalidAspirateLocationError
 
 
 @pytest.fixture
@@ -382,32 +381,3 @@ async def test_aspirate_implementation_meniscus(
             )
         ),
     )
-
-
-async def test_aspirate_implementation_invalid_meniscus_location_error(
-    decoy: Decoy,
-    state_view: StateView,
-    hardware_api: HardwareControlAPI,
-    movement: MovementHandler,
-    pipetting: PipettingHandler,
-    subject: AspirateImplementation,
-    mock_command_note_adder: CommandNoteAdder,
-) -> None:
-    """Aspirate should raise InvalidAspirateLocationError when called with WellOrigin.MENISCUS and a WellOffset greater than 0.0 (ie aspiration from air)."""
-    location = LiquidHandlingWellLocation(
-        origin=WellOrigin.MENISCUS, offset=WellOffset(x=0, y=0, z=1)
-    )
-
-    data = AspirateParams(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-        wellLocation=location,
-        volume=50,
-        flowRate=1.23,
-    )
-
-    decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
-
-    with pytest.raises(InvalidAspirateLocationError):
-        await subject.execute(data)

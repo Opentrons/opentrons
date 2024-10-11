@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
 from typing_extensions import Literal
 from enum import Enum
 from pydantic import BaseModel
@@ -90,23 +90,6 @@ class ProfileStep(BaseModel):
 
 
 class WellLocation(BaseModel):
-    origin: Optional[str]
-    offset: Optional[OffsetVector]
-    volumeOffset: Optional[float]
-
-
-class LiquidHandlingWellLocation(BaseModel):
-    origin: Optional[str]
-    offset: Optional[OffsetVector]
-    volumeOffset: Optional[Union[float, Literal["operationVolume"]]]
-
-
-class DropTipWellLocation(BaseModel):
-    origin: Optional[str]
-    offset: Optional[OffsetVector]
-
-
-class PickUpTipWellLocation(BaseModel):
     origin: Optional[str]
     offset: Optional[OffsetVector]
 

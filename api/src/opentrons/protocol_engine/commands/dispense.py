@@ -7,7 +7,7 @@ from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
 from pydantic import Field
 
-from ..types import DeckPoint, WellOrigin
+from ..types import DeckPoint
 from ..state.update_types import StateUpdate
 from .pipetting_common import (
     PipetteIdMixin,
