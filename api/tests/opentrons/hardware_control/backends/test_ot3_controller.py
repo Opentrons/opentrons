@@ -744,7 +744,6 @@ async def test_liquid_probe(
         pass
     move_groups = mock_move_group_run.call_args_list[0][0][0]._move_groups
     #  in tool_sensors, pipette moves down, then sensor move goes
-    print(move_groups)
     assert move_groups[0][0][tool_node].stop_condition == MoveStopCondition.none
     assert (
         move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sensor_report
