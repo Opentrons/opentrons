@@ -53,7 +53,7 @@ import {
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 import { getWarningContent } from './UnusedModalContent'
-import { ProtocolMetaData } from './ProtocolMetaData'
+import { ProtocolMetadata } from './ProtocolMetadata'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 
@@ -334,7 +334,7 @@ export function ProtocolOverview(): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing40}
           >
-            <ProtocolMetaData
+            <ProtocolMetadata
               metaDataInfo={metaDataInfo}
               setShowEditMetadataModal={setShowEditMetadataModal}
             />

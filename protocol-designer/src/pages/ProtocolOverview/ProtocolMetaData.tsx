@@ -15,22 +15,22 @@ import { BUTTON_LINK_STYLE } from '../../atoms'
 
 const REQUIRED_APP_VERSION = '8.0.0'
 
-type MetaDataInfo = Array<{
+type MetadataInfo = Array<{
   author?: string
   description?: string | null
   created?: string
   modified?: string
 }>
 
-interface ProtocolMetaDataProps {
+interface ProtocolMetadataProps {
   setShowEditMetadataModal: (showEditMetadataModal: boolean) => void
-  metaDataInfo: MetaDataInfo
+  metaDataInfo: MetadataInfo
 }
 
-export function ProtocolMetaData({
+export function ProtocolMetadata({
   setShowEditMetadataModal,
   metaDataInfo,
-}: ProtocolMetaDataProps): JSX.Element {
+}: ProtocolMetadataProps): JSX.Element {
   const { t } = useTranslation('protocol_overview')
 
   return (

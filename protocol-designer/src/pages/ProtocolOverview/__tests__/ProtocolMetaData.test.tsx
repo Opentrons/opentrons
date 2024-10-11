@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { ProtocolMetaData } from '../ProtocolMetaData'
+import { ProtocolMetadata } from '../ProtocolMetadata'
 
 import type { ComponentProps } from 'react'
 
@@ -24,14 +24,14 @@ const mockMetaDataInfo = [
   },
 ] as any
 
-const render = (props: ComponentProps<typeof ProtocolMetaData>) => {
-  return renderWithProviders(<ProtocolMetaData {...props} />, {
+const render = (props: ComponentProps<typeof ProtocolMetadata>) => {
+  return renderWithProviders(<ProtocolMetadata {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('ProtocolMetaData', () => {
-  let props: ComponentProps<typeof ProtocolMetaData>
+describe('ProtocolMetadata', () => {
+  let props: ComponentProps<typeof ProtocolMetadata>
 
   beforeEach(() => {
     props = {

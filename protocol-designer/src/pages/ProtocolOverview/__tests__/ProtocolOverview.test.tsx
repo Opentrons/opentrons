@@ -15,7 +15,7 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import { ProtocolOverview } from '../index'
 import { DeckThumbnail } from '../DeckThumbnail'
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
-import { ProtocolMetaData } from '../ProtocolMetaData'
+import { ProtocolMetadata } from '../ProtocolMetadata'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 import { LiquidDefinitions } from '../LiquidDefinitions'
 
@@ -31,7 +31,7 @@ vi.mock('../../../organisms')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')
-vi.mock('../ProtocolMetaData')
+vi.mock('../ProtocolMetadata')
 
 const mockNavigate = vi.fn()
 
@@ -82,8 +82,8 @@ describe('ProtocolOverview', () => {
       <div>mock LiquidDefinitions</div>
     )
     vi.mocked(InstrumentsInfo).mockReturnValue(<div>mock InstrumentsInfo</div>)
-    vi.mocked(ProtocolMetaData).mockReturnValue(
-      <div>mock ProtocolMetaData</div>
+    vi.mocked(ProtocolMetadata).mockReturnValue(
+      <div>mock ProtocolMetadata</div>
     )
   })
 
@@ -96,7 +96,7 @@ describe('ProtocolOverview', () => {
 
     //  metadata
     screen.getByText('mockName')
-    screen.getByText('mock ProtocolMetaData')
+    screen.getByText('mock ProtocolMetadata')
 
     //  instruments
     screen.getByText('mock InstrumentsInfo')
