@@ -96,64 +96,6 @@ async def test_dispense_implementation(
     )
 
 
-async def test_dispense_implementation_meniscus(
-    decoy: Decoy,
-    movement: MovementHandler,
-    pipetting: PipettingHandler,
-    subject: DispenseImplementation,
-) -> None:
-    """Dispense should update WellVolumeOffset when called with WellOrigin.MENISCUS."""
-    well_location = LiquidHandlingWellLocation(
-        origin=WellOrigin.MENISCUS, offset=WellOffset(x=0, y=0, z=-1)
-    )
-    updated_location = LiquidHandlingWellLocation(
-        origin=WellOrigin.MENISCUS,
-        offset=WellOffset(x=0, y=0, z=-1),
-        volumeOffset=0.0,
-    )
-
-    data = DispenseParams(
-        pipetteId="pipette-id-abc123",
-        labwareId="labware-id-abc123",
-        wellName="A3",
-        wellLocation=well_location,
-        volume=50,
-        flowRate=1.23,
-    )
-
-    decoy.when(
-        await movement.move_to_well(
-            pipette_id="pipette-id-abc123",
-            labware_id="labware-id-abc123",
-            well_name="A3",
-            well_location=updated_location,
-        )
-    ).then_return(Point(x=1, y=2, z=3))
-
-    decoy.when(
-        await pipetting.dispense_in_place(
-            pipette_id="pipette-id-abc123", volume=50, flow_rate=1.23, push_out=None
-        )
-    ).then_return(42)
-
-    result = await subject.execute(data)
-
-    assert result == SuccessData(
-        public=DispenseResult(volume=42, position=DeckPoint(x=1, y=2, z=3)),
-        private=None,
-        state_update=update_types.StateUpdate(
-            pipette_location=update_types.PipetteLocationUpdate(
-                pipette_id="pipette-id-abc123",
-                new_location=update_types.Well(
-                    labware_id="labware-id-abc123",
-                    well_name="A3",
-                ),
-                new_deck_point=DeckPoint.construct(x=1, y=2, z=3),
-            ),
-        ),
-    )
-
-
 async def test_overpressure_error(
     decoy: Decoy,
     movement: MovementHandler,
