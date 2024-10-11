@@ -76,41 +76,6 @@ def _dummy_command() -> commands.Command:
     return commands.Comment.construct()  # type: ignore[call-arg]
 
 
-@pytest.fixture
-def drop_tip_command() -> commands.DropTip:
-    """Get a drop tip command value object."""
-    return commands.DropTip.construct(  # type: ignore[call-arg]
-        params=commands.DropTipParams.construct(
-            pipetteId="pipette-id",
-            labwareId="cool-labware",
-            wellName="A1",
-        ),
-        result=commands.DropTipResult.construct(position=DeckPoint(x=0, y=0, z=0)),
-    )
-
-
-@pytest.fixture
-def drop_tip_in_place_command() -> commands.DropTipInPlace:
-    """Get a drop tip in place command object."""
-    return commands.DropTipInPlace.construct(  # type: ignore[call-arg]
-        params=commands.DropTipInPlaceParams.construct(
-            pipetteId="pipette-id",
-        ),
-        result=commands.DropTipInPlaceResult.construct(),
-    )
-
-
-@pytest.fixture
-def unsafe_drop_tip_in_place_command() -> commands.unsafe.UnsafeDropTipInPlace:
-    """Get an unsafe drop-tip-in-place command."""
-    return commands.unsafe.UnsafeDropTipInPlace.construct(  # type: ignore[call-arg]
-        params=commands.unsafe.UnsafeDropTipInPlaceParams.construct(
-            pipetteId="pipette-id"
-        ),
-        result=commands.unsafe.UnsafeDropTipInPlaceResult.construct(),
-    )
-
-
 @pytest.mark.parametrize(
     "labware_definition",
     [
