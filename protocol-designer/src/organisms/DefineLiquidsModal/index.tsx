@@ -246,7 +246,6 @@ export function DefineLiquidsModal(
                   onClick={() => {
                     setShowColorPicker(prev => !prev)
                   }}
-                  width={FLEX_MIN_CONTENT}
                   color={color}
                   size="medium"
                 />
