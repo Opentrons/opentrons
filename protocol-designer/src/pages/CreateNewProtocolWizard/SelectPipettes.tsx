@@ -336,23 +336,36 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                                   isChecked={selectedValues.includes(value)}
                                   labelText={name}
                                   onClick={() => {
-                                    const updatedValues = selectedValues.includes(
+                                    const isCurrentlySelected = selectedValues.includes(
                                       value
                                     )
-                                      ? selectedValues.filter(v => v !== value)
-                                      : [...selectedValues, value]
+                                    let updatedValues
+
+                                    if (isCurrentlySelected) {
+                                      updatedValues = selectedValues.filter(
+                                        v => v !== value
+                                      )
+                                    } else {
+                                      updatedValues = [...selectedValues, value]
+
+                                      if (
+                                        updatedValues.length >
+                                        MAX_TIPRACKS_ALLOWED
+                                      ) {
+                                        makeSnackbar(
+                                          t('up_to_3_tipracks') as string
+                                        )
+                                        updatedValues = updatedValues.slice(
+                                          0,
+                                          MAX_TIPRACKS_ALLOWED
+                                        )
+                                      }
+                                    }
+
                                     setValue(
                                       `pipettesByMount.${defaultMount}.tiprackDefURI`,
-                                      updatedValues.slice(0, 3)
+                                      updatedValues
                                     )
-                                    if (
-                                      selectedValues.length ===
-                                      MAX_TIPRACKS_ALLOWED
-                                    ) {
-                                      makeSnackbar(
-                                        t('up_to_3_tipracks') as string
-                                      )
-                                    }
                                   }}
                                 />
                               )
