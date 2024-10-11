@@ -119,7 +119,9 @@ class TouchTipProperties(BaseModel):
 class MixArguments(BaseModel):
     """Arguments for mix."""
 
-    repetitions: int = Field(..., description="Number of mixing repetitions.", ge=0)
+    repetitions: _StrictNonNegativeInt = Field(
+        ..., description="Number of mixing repetitions."
+    )
     volume: _Number = Field(..., description="Volume used for mixing, in microliters.")
 
 
