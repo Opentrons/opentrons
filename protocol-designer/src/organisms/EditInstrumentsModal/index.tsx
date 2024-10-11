@@ -18,8 +18,8 @@ import {
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
-  Flex,
   FLEX_MAX_CONTENT,
+  Flex,
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -48,7 +48,7 @@ import {
   getInitialDeckSetup,
   getPipetteEntities,
 } from '../../step-forms/selectors'
-import { getHas96Channel } from '../../utils'
+import { getHas96Channel, removeOpentronsPhrases } from '../../utils'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { PipetteInfoItem } from '../PipetteInfoItem'
@@ -146,16 +146,6 @@ export function EditInstrumentsModal(
     leftPipette != null
       ? getSectionsFromPipetteName(leftPipette.name, leftPipette.spec)
       : null
-
-  const removeOpentronsPhrases = (input: string): string => {
-    const phrasesToRemove = ['Opentrons Flex 96', 'Opentrons OT-2 96']
-
-    return phrasesToRemove
-      .reduce((text, phrase) => {
-        return text.replace(new RegExp(phrase, 'gi'), '')
-      }, input)
-      .trim()
-  }
 
   // Note (kk:2024/10/09)
   // if a user removes all pipettes, left mount is the first target.

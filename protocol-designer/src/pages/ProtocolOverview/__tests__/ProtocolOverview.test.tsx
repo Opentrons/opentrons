@@ -2,7 +2,6 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { EditProtocolMetadataModal } from '../../../organisms'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
@@ -16,6 +15,7 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import { ProtocolOverview } from '../index'
 import { DeckThumbnail } from '../DeckThumbnail'
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
+import { ProtocolMetadata } from '../ProtocolMetadata'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 import { LiquidDefinitions } from '../LiquidDefinitions'
 
@@ -31,6 +31,7 @@ vi.mock('../../../organisms')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')
+vi.mock('../ProtocolMetadata')
 
 const mockNavigate = vi.fn()
 
@@ -81,6 +82,9 @@ describe('ProtocolOverview', () => {
       <div>mock LiquidDefinitions</div>
     )
     vi.mocked(InstrumentsInfo).mockReturnValue(<div>mock InstrumentsInfo</div>)
+    vi.mocked(ProtocolMetadata).mockReturnValue(
+      <div>mock ProtocolMetadata</div>
+    )
   })
 
   it('renders each section with text', () => {
@@ -92,16 +96,7 @@ describe('ProtocolOverview', () => {
 
     //  metadata
     screen.getByText('mockName')
-    screen.getByText('Protocol Metadata')
-    screen.getAllByText('Edit')
-    screen.getByText('Description')
-    screen.getByText('mockDescription')
-    screen.getByText('Organization/Author')
-    screen.getByText('mockAuthor')
-    screen.getByText('Date created')
-    screen.getByText('Last exported')
-    screen.getByText('Required app version')
-    screen.getByText('8.0.0 or higher')
+    screen.getByText('mock ProtocolMetadata')
 
     //  instruments
     screen.getByText('mock InstrumentsInfo')
@@ -120,17 +115,6 @@ describe('ProtocolOverview', () => {
     screen.getByText('mock OffdeckThumbnail')
   })
 
-  it('should render text N/A if there is no data', () => {
-    vi.mocked(getFileMetadata).mockReturnValue({
-      protocolName: undefined,
-      author: undefined,
-      description: undefined,
-    })
-    render()
-    // ToDo (kk: 2024/10/07) this part should be replaced
-    expect(screen.getAllByText('N/A').length).toBe(4)
-  })
-
   it('navigates to starting deck state', () => {
     render()
     const button = screen.getByRole('button', { name: 'Edit protocol' })
@@ -142,14 +126,5 @@ describe('ProtocolOverview', () => {
     render()
     fireEvent.click(screen.getByText('Materials list'))
     screen.getByText('mock MaterialsListModal')
-  })
-
-  it('renders the edit protocol metadata modal', () => {
-    vi.mocked(EditProtocolMetadataModal).mockReturnValue(
-      <div>mock EditProtocolMetadataModal</div>
-    )
-    render()
-    fireEvent.click(screen.getByTestId('ProtocolOverview_MetadataEditButton'))
-    screen.getByText('mock EditProtocolMetadataModal')
   })
 })

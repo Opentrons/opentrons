@@ -119,7 +119,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-        <Box borderBottom={`1px solid ${COLORS.grey30}`} />
         <Box
           padding={childrenPadding}
           flex="1 1 auto"

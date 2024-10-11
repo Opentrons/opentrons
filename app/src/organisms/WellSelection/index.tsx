@@ -20,7 +20,9 @@ import type { GenericRect } from './types'
 interface WellSelectionProps {
   definition: LabwareDefinition2
   deselectWells: (wells: string[]) => void
-  selectedPrimaryWells: WellGroup
+  /* A well from which to derive the well set.
+   * If utilizing this component specifically in the context of a command, this should be the 'wellName'. */
+  selectedPrimaryWell: string
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
 }
@@ -29,7 +31,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   const {
     definition,
     deselectWells,
-    selectedPrimaryWells,
+    selectedPrimaryWell,
     selectWells,
     channels,
   } = props
@@ -45,12 +47,14 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
       const primaryWells: WellGroup = reduce(
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
-          const wellSet = getWellSetForMultichannel(
-            definition,
+          const wellSet = getWellSetForMultichannel({
+            labwareDef: definition,
             wellName,
-            channels
-          )
-          if (!wellSet) return acc
+            channels,
+          })
+          if (!wellSet) {
+            return acc
+          }
           return { ...acc, [wellSet[0]]: null }
         },
         {}
@@ -74,7 +78,11 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
           const wellSetForMulti =
-            getWellSetForMultichannel(definition, wellName, channels) || []
+            getWellSetForMultichannel({
+              labwareDef: definition,
+              wellName,
+              channels,
+            }) || []
           const channelWells = arrayToWellGroup(wellSetForMulti)
           return {
             ...acc,
@@ -96,23 +104,22 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     setHighlightedWells({})
   }
 
-  // For rendering, show all wells not just primary wells
-  const allSelectedWells =
-    channels === 8 || channels === 96
-      ? reduce<WellGroup, WellGroup>(
-          selectedPrimaryWells,
-          (acc, _, wellName): WellGroup => {
-            const wellSet = getWellSetForMultichannel(
-              definition,
-              wellName,
-              channels
-            )
-            if (!wellSet) return acc
-            return { ...acc, ...arrayToWellGroup(wellSet) }
-          },
-          {}
-        )
-      : selectedPrimaryWells
+  // For rendering, show all valid wells, not just primary wells
+  const buildAllSelectedWells = (): WellGroup => {
+    if (channels === 8 || channels === 96) {
+      const wellSet = getWellSetForMultichannel({
+        labwareDef: definition,
+        wellName: selectedPrimaryWell,
+        channels,
+      })
+
+      return wellSet != null ? arrayToWellGroup(wellSet) : {}
+    } else {
+      return { [selectedPrimaryWell]: null }
+    }
+  }
+
+  const allSelectedWells = buildAllSelectedWells()
 
   const wellFill: WellFill = {}
   const wellStroke: WellStroke = {}

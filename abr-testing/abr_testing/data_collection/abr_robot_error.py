@@ -526,7 +526,10 @@ if __name__ == "__main__":
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     print(robot)
-    parent_key = project_key + "-" + robot.split("ABR")[1]
+    try:
+        parent_key = project_key + "-" + robot.split("ABR")[1]
+    except IndexError:
+        parent_key = ""
 
     # Grab all previous issues
     all_issues = ticket.issues_on_board(project_key)

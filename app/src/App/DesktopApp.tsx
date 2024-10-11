@@ -1,7 +1,6 @@
 import { useState, Fragment } from 'react'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
-import { I18nextProvider } from 'react-i18next'
 
 import {
   Box,
@@ -12,7 +11,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
-import { i18n } from '/app/i18n'
+import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { ToasterOven } from '/app/organisms/ToasterOven'
@@ -106,7 +105,7 @@ export const DesktopApp = (): JSX.Element => {
 
   return (
     <NiceModal.Provider>
-      <I18nextProvider i18n={i18n}>
+      <LocalizationProvider>
         <ErrorBoundary FallbackComponent={DesktopAppFallback}>
           <Navbar routes={desktopRoutes} />
           <ToasterOven>
@@ -155,7 +154,7 @@ export const DesktopApp = (): JSX.Element => {
             </EmergencyStopContext.Provider>
           </ToasterOven>
         </ErrorBoundary>
-      </I18nextProvider>
+      </LocalizationProvider>
     </NiceModal.Provider>
   )
 }

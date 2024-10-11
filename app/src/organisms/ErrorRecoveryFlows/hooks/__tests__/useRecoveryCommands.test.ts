@@ -27,7 +27,7 @@ describe('useRecoveryCommands', () => {
   } as any
   const mockRunId = '123'
   const mockFailedLabwareUtils = {
-    selectedTipLocations: { A1: null },
+    selectedTipLocation: { A1: null },
     pickUpTipLabware: { id: 'MOCK_LW_ID' },
   } as any
   const mockProceedToRouteAndStep = vi.fn()
@@ -223,7 +223,7 @@ describe('useRecoveryCommands', () => {
     } as any
 
     const buildPickUpTipsCmd = buildPickUpTips(
-      mockFailedLabwareUtils.selectedTipLocations,
+      mockFailedLabwareUtils.selectedTipLocation,
       mockFailedCmdWithPipetteId,
       mockFailedLabware
     )

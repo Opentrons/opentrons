@@ -2,24 +2,25 @@ import pytest
 from math import pi, isclose
 from typing import Any, List
 
-from opentrons_shared_data.labware.types import (
-    RectangularBoundedSection,
-    CircularBoundedSection,
+from opentrons_shared_data.labware.labware_definition import (
+    ConicalFrustum,
+    CuboidalFrustum,
     SphericalSegment,
 )
 from opentrons.protocol_engine.state.frustum_helpers import (
-    cross_section_area_rectangular,
-    cross_section_area_circular,
-    reject_unacceptable_heights,
-    get_boundary_pairs,
-    circular_frustum_polynomial_roots,
-    rectangular_frustum_polynomial_roots,
-    volume_from_height_rectangular,
-    volume_from_height_circular,
-    volume_from_height_spherical,
-    height_from_volume_circular,
-    height_from_volume_rectangular,
-    height_from_volume_spherical,
+    _cross_section_area_rectangular,
+    _cross_section_area_circular,
+    _reject_unacceptable_heights,
+    _circular_frustum_polynomial_roots,
+    _rectangular_frustum_polynomial_roots,
+    _volume_from_height_rectangular,
+    _volume_from_height_circular,
+    _volume_from_height_spherical,
+    _height_from_volume_circular,
+    _height_from_volume_rectangular,
+    _height_from_volume_spherical,
+    height_at_volume_within_section,
+    _get_segment_capacity,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
@@ -29,59 +30,130 @@ def fake_frusta() -> List[List[Any]]:
     frusta = []
     frusta.append(
         [
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=9.0, yDimension=10.0, topHeight=10.0
+            CuboidalFrustum(
+                shape="cuboidal",
+                topXDimension=9.0,
+                topYDimension=10.0,
+                bottomXDimension=8.0,
+                bottomYDimension=9.0,
+                topHeight=10.0,
+                bottomHeight=5.0,
             ),
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=8.0, yDimension=9.0, topHeight=5.0
+            CuboidalFrustum(
+                shape="cuboidal",
+                topXDimension=8.0,
+                topYDimension=9.0,
+                bottomXDimension=15.0,
+                bottomYDimension=18.0,
+                topHeight=5.0,
+                bottomHeight=1.0,
             ),
-            CircularBoundedSection(shape="circular", diameter=23.0, topHeight=1.0),
-            SphericalSegment(shape="spherical", radiusOfCurvature=4.0, depth=1.0),
+            ConicalFrustum(
+                shape="conical",
+                topDiameter=23.0,
+                bottomDiameter=3.0,
+                topHeight=2.0,
+                bottomHeight=1.0,
+            ),
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=4.0,
+                topHeight=1.0,
+                bottomHeight=0.0,
+            ),
         ]
     )
     frusta.append(
         [
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=8.0, yDimension=70.0, topHeight=3.5
+            CuboidalFrustum(
+                shape="cuboidal",
+                topXDimension=8.0,
+                topYDimension=70.0,
+                bottomXDimension=7.0,
+                bottomYDimension=75.0,
+                topHeight=3.5,
+                bottomHeight=2.0,
             ),
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=8.0, yDimension=75.0, topHeight=2.0
-            ),
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=8.0, yDimension=80.0, topHeight=1.0
-            ),
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=8.0, yDimension=90.0, topHeight=0.0
+            CuboidalFrustum(
+                shape="cuboidal",
+                topXDimension=8.0,
+                topYDimension=80.0,
+                bottomXDimension=8.0,
+                bottomYDimension=90.0,
+                topHeight=1.0,
+                bottomHeight=0.0,
             ),
         ]
     )
     frusta.append(
         [
-            CircularBoundedSection(shape="circular", diameter=23.0, topHeight=7.5),
-            CircularBoundedSection(shape="circular", diameter=11.5, topHeight=5.0),
-            CircularBoundedSection(shape="circular", diameter=23.0, topHeight=2.5),
-            CircularBoundedSection(shape="circular", diameter=11.5, topHeight=0.0),
+            ConicalFrustum(
+                shape="conical",
+                topDiameter=23.0,
+                bottomDiameter=11.5,
+                topHeight=7.5,
+                bottomHeight=5.0,
+            ),
+            ConicalFrustum(
+                shape="conical",
+                topDiameter=11.5,
+                bottomDiameter=23.0,
+                topHeight=5.0,
+                bottomHeight=2.5,
+            ),
+            ConicalFrustum(
+                shape="conical",
+                topDiameter=23.0,
+                bottomDiameter=11.5,
+                topHeight=2.5,
+                bottomHeight=0.0,
+            ),
         ]
     )
     frusta.append(
         [
-            CircularBoundedSection(shape="circular", diameter=4.0, topHeight=3.0),
-            CircularBoundedSection(shape="circular", diameter=5.0, topHeight=2.0),
-            SphericalSegment(shape="spherical", radiusOfCurvature=3.5, depth=2.0),
+            ConicalFrustum(
+                shape="conical",
+                topDiameter=4.0,
+                bottomDiameter=5.0,
+                topHeight=3.0,
+                bottomHeight=2.0,
+            ),
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=3.5,
+                topHeight=2.0,
+                bottomHeight=0.0,
+            ),
         ]
     )
     frusta.append(
-        [SphericalSegment(shape="spherical", radiusOfCurvature=4.0, depth=3.0)]
+        [
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=4.0,
+                topHeight=3.0,
+                bottomHeight=0.0,
+            )
+        ]
     )
     frusta.append(
         [
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=27.0, yDimension=36.0, topHeight=3.5
+            CuboidalFrustum(
+                shape="cuboidal",
+                topXDimension=27.0,
+                topYDimension=36.0,
+                bottomXDimension=36.0,
+                bottomYDimension=26.0,
+                topHeight=3.5,
+                bottomHeight=1.5,
             ),
-            RectangularBoundedSection(
-                shape="rectangular", xDimension=36.0, yDimension=26.0, topHeight=1.5
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=4.0,
+                topHeight=1.5,
+                bottomHeight=0.0,
             ),
-            SphericalSegment(shape="spherical", radiusOfCurvature=4.0, depth=1.5),
         ]
     )
     return frusta
@@ -103,11 +175,11 @@ def test_reject_unacceptable_heights(
     """Make sure we reject all mathematical solutions that are physically not possible."""
     if len(expected_heights) != 1:
         with pytest.raises(InvalidLiquidHeightFound):
-            reject_unacceptable_heights(
+            _reject_unacceptable_heights(
                 max_height=max_height, potential_heights=potential_heights
             )
     else:
-        found_heights = reject_unacceptable_heights(
+        found_heights = _reject_unacceptable_heights(
             max_height=max_height, potential_heights=potential_heights
         )
         assert found_heights == expected_heights[0]
@@ -117,7 +189,7 @@ def test_reject_unacceptable_heights(
 def test_cross_section_area_circular(diameter: float) -> None:
     """Test circular area calculation."""
     expected_area = pi * (diameter / 2) ** 2
-    assert cross_section_area_circular(diameter) == expected_area
+    assert _cross_section_area_circular(diameter) == expected_area
 
 
 @pytest.mark.parametrize(
@@ -127,35 +199,27 @@ def test_cross_section_area_rectangular(x_dimension: float, y_dimension: float) 
     """Test rectangular area calculation."""
     expected_area = x_dimension * y_dimension
     assert (
-        cross_section_area_rectangular(x_dimension=x_dimension, y_dimension=y_dimension)
+        _cross_section_area_rectangular(
+            x_dimension=x_dimension, y_dimension=y_dimension
+        )
         == expected_area
     )
 
 
 @pytest.mark.parametrize("well", fake_frusta())
-def test_get_cross_section_boundaries(well: List[List[Any]]) -> None:
-    """Make sure get_cross_section_boundaries returns the expected list indices."""
-    i = 0
-    for f, next_f in get_boundary_pairs(well):
-        assert f == well[i]
-        assert next_f == well[i + 1]
-        i += 1
-
-
-@pytest.mark.parametrize("well", fake_frusta())
 def test_volume_and_height_circular(well: List[Any]) -> None:
     """Test both volume and height calculations for circular frusta."""
-    if well[-1]["shape"] == "spherical":
+    if well[-1].shape == "spherical":
         return
-    total_height = well[0]["topHeight"]
-    for f, next_f in get_boundary_pairs(well):
-        if f["shape"] == next_f["shape"] == "circular":
-            top_radius = next_f["diameter"] / 2
-            bottom_radius = f["diameter"] / 2
+    total_height = well[0].topHeight
+    for segment in well:
+        if segment.shape == "conical":
+            top_radius = segment.topDiameter / 2
+            bottom_radius = segment.bottomDiameter / 2
             a = pi * ((top_radius - bottom_radius) ** 2) / (3 * total_height**2)
             b = pi * bottom_radius * (top_radius - bottom_radius) / total_height
             c = pi * bottom_radius**2
-            assert circular_frustum_polynomial_roots(
+            assert _circular_frustum_polynomial_roots(
                 top_radius=top_radius,
                 bottom_radius=bottom_radius,
                 total_frustum_height=total_height,
@@ -167,7 +231,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
                     + b * (target_height**2)
                     + c * target_height
                 )
-                found_volume = volume_from_height_circular(
+                found_volume = _volume_from_height_circular(
                     target_height=target_height,
                     total_frustum_height=total_height,
                     bottom_radius=bottom_radius,
@@ -175,7 +239,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
                 )
                 assert found_volume == expected_volume
                 # test going backwards to get height back
-                found_height = height_from_volume_circular(
+                found_height = _height_from_volume_circular(
                     volume=found_volume,
                     total_frustum_height=total_height,
                     bottom_radius=bottom_radius,
@@ -187,15 +251,15 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
 @pytest.mark.parametrize("well", fake_frusta())
 def test_volume_and_height_rectangular(well: List[Any]) -> None:
     """Test both volume and height calculations for rectangular frusta."""
-    if well[-1]["shape"] == "spherical":
+    if well[-1].shape == "spherical":
         return
-    total_height = well[0]["topHeight"]
-    for f, next_f in get_boundary_pairs(well):
-        if f["shape"] == next_f["shape"] == "rectangular":
-            top_length = next_f["yDimension"]
-            top_width = next_f["xDimension"]
-            bottom_length = f["yDimension"]
-            bottom_width = f["xDimension"]
+    total_height = well[0].topHeight
+    for segment in well:
+        if segment.shape == "cuboidal":
+            top_length = segment.topYDimension
+            top_width = segment.topXDimension
+            bottom_length = segment.bottomYDimension
+            bottom_width = segment.bottomXDimension
             a = (
                 (top_length - bottom_length)
                 * (top_width - bottom_width)
@@ -206,7 +270,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
                 + (bottom_width * (top_length - bottom_length))
             ) / (2 * total_height)
             c = bottom_length * bottom_width
-            assert rectangular_frustum_polynomial_roots(
+            assert _rectangular_frustum_polynomial_roots(
                 top_length=top_length,
                 bottom_length=bottom_length,
                 top_width=top_width,
@@ -220,7 +284,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
                     + b * (target_height**2)
                     + c * target_height
                 )
-                found_volume = volume_from_height_rectangular(
+                found_volume = _volume_from_height_rectangular(
                     target_height=target_height,
                     total_frustum_height=total_height,
                     bottom_length=bottom_length,
@@ -230,7 +294,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
                 )
                 assert found_volume == expected_volume
                 # test going backwards to get height back
-                found_height = height_from_volume_rectangular(
+                found_height = _height_from_volume_rectangular(
                     volume=found_volume,
                     total_frustum_height=total_height,
                     bottom_length=bottom_length,
@@ -244,22 +308,33 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
 @pytest.mark.parametrize("well", fake_frusta())
 def test_volume_and_height_spherical(well: List[Any]) -> None:
     """Test both volume and height calculations for spherical segments."""
-    if well[0]["shape"] == "spherical":
-        for target_height in range(round(well[0]["depth"])):
+    if well[0].shape == "spherical":
+        for target_height in range(round(well[0].topHeight)):
             expected_volume = (
                 (1 / 3)
                 * pi
                 * (target_height**2)
-                * (3 * well[0]["radiusOfCurvature"] - target_height)
+                * (3 * well[0].radiusOfCurvature - target_height)
             )
-            found_volume = volume_from_height_spherical(
+            found_volume = _volume_from_height_spherical(
                 target_height=target_height,
-                radius_of_curvature=well[0]["radiusOfCurvature"],
+                radius_of_curvature=well[0].radiusOfCurvature,
             )
             assert found_volume == expected_volume
-            found_height = height_from_volume_spherical(
+            found_height = _height_from_volume_spherical(
                 volume=found_volume,
-                radius_of_curvature=well[0]["radiusOfCurvature"],
-                total_frustum_height=well[0]["depth"],
+                radius_of_curvature=well[0].radiusOfCurvature,
+                total_frustum_height=well[0].topHeight,
             )
             assert isclose(found_height, target_height)
+
+
+@pytest.mark.parametrize("well", fake_frusta())
+def test_height_at_volume_within_section(well: List[Any]) -> None:
+    """Test that finding the height when volume ~= capacity  works."""
+    for segment in well:
+        segment_height = segment.topHeight - segment.bottomHeight
+        height = height_at_volume_within_section(
+            segment, _get_segment_capacity(segment), segment_height
+        )
+        assert isclose(height, segment_height)
