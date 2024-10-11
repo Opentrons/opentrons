@@ -14,26 +14,32 @@ import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteChannels,
+  NozzleLayoutDetails,
 } from '@opentrons/shared-data'
 import type { GenericRect } from './types'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
   deselectWells: (wells: string[]) => void
-  /* A well from which to derive the well set.
-   * If utilizing this component specifically in the context of a command, this should be the 'wellName'. */
-  selectedPrimaryWell: string
+  /* The actual wells that are clicked. */
+  selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
+  /* Highlight only valid wells given the current pipette nozzle configuration. */
+  pipetteNozzleDetails?: NozzleLayoutDetails
+  /* Whether highlighting and selectWells() updates are permitted. */
+  allowSelect?: boolean
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
   const {
     definition,
     deselectWells,
-    selectedPrimaryWell,
+    selectedPrimaryWells,
     selectWells,
     channels,
+    pipetteNozzleDetails,
+    allowSelect = true,
   } = props
   const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
 
@@ -51,6 +57,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
             labwareDef: definition,
             wellName,
             channels,
+            pipetteNozzleDetails,
           })
           if (!wellSet) {
             return acc
@@ -72,54 +79,63 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   }
 
   const handleSelectionMove: (rect: GenericRect) => void = rect => {
-    if (channels === 8 || channels === 96) {
-      const selectedWells = _getWellsFromRect(rect)
-      const allWellsForMulti: WellGroup = reduce(
-        selectedWells,
-        (acc: WellGroup, _, wellName: string): WellGroup => {
-          const wellSetForMulti =
-            getWellSetForMultichannel({
-              labwareDef: definition,
-              wellName,
-              channels,
-            }) || []
-          const channelWells = arrayToWellGroup(wellSetForMulti)
-          return {
-            ...acc,
-            ...channelWells,
-          }
-        },
-        {}
-      )
-      setHighlightedWells(allWellsForMulti)
-    } else {
-      setHighlightedWells(_getWellsFromRect(rect))
+    if (allowSelect) {
+      if (channels === 8 || channels === 96) {
+        const selectedWells = _getWellsFromRect(rect)
+        const allWellsForMulti: WellGroup = reduce(
+          selectedWells,
+          (acc: WellGroup, _, wellName: string): WellGroup => {
+            const wellSetForMulti =
+              getWellSetForMultichannel({
+                labwareDef: definition,
+                wellName,
+                channels,
+                pipetteNozzleDetails,
+              }) || []
+            const channelWells = arrayToWellGroup(wellSetForMulti)
+            return {
+              ...acc,
+              ...channelWells,
+            }
+          },
+          {}
+        )
+        setHighlightedWells(allWellsForMulti)
+      } else {
+        setHighlightedWells(_getWellsFromRect(rect))
+      }
     }
   }
 
   const handleSelectionDone: (rect: GenericRect) => void = rect => {
     const wells = _wellsFromSelected(_getWellsFromRect(rect))
 
-    selectWells(wells)
-    setHighlightedWells({})
-  }
-
-  // For rendering, show all valid wells, not just primary wells
-  const buildAllSelectedWells = (): WellGroup => {
-    if (channels === 8 || channels === 96) {
-      const wellSet = getWellSetForMultichannel({
-        labwareDef: definition,
-        wellName: selectedPrimaryWell,
-        channels,
-      })
-
-      return wellSet != null ? arrayToWellGroup(wellSet) : {}
-    } else {
-      return { [selectedPrimaryWell]: null }
+    if (allowSelect) {
+      selectWells(wells)
+      setHighlightedWells({})
     }
   }
 
-  const allSelectedWells = buildAllSelectedWells()
+  // For rendering, show all valid wells, not just primary wells
+  const allSelectedWells =
+    channels === 8 || channels === 96
+      ? reduce<WellGroup, WellGroup>(
+          selectedPrimaryWells,
+          (acc, _, wellName): WellGroup => {
+            const wellSet = getWellSetForMultichannel({
+              labwareDef: definition,
+              wellName,
+              channels,
+              pipetteNozzleDetails,
+            })
+            if (!wellSet) {
+              return acc
+            }
+            return { ...acc, ...arrayToWellGroup(wellSet) }
+          },
+          {}
+        )
+      : selectedPrimaryWells
 
   const wellFill: WellFill = {}
   const wellStroke: WellStroke = {}
