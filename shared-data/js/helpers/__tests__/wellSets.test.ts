@@ -421,19 +421,6 @@ describe('getWellSetForMultichannel with pipetteNozzleDetails', () => {
   it('returns partial column for 8-channel pipette with partial column config', () => {
     const result = getWellSetForMultichannel({
       labwareDef: labwareDef,
-      wellName: 'C1',
-      channels: 8,
-      pipetteNozzleDetails: {
-        nozzleConfig: 'column',
-        activeNozzleCount: 4,
-      },
-    })
-    expect(result).toEqual(['C1', 'D1', 'E1', 'F1'])
-  })
-
-  it('handles edge cases for 8-channel partial column selection', () => {
-    const bottomEdgeResult = getWellSetForMultichannel({
-      labwareDef: labwareDef,
       wellName: 'G1',
       channels: 8,
       pipetteNozzleDetails: {
@@ -441,7 +428,20 @@ describe('getWellSetForMultichannel with pipetteNozzleDetails', () => {
         activeNozzleCount: 4,
       },
     })
-    expect(bottomEdgeResult).toEqual(['G1', 'H1'])
+    expect(result).toEqual(['D1', 'E1', 'F1', 'G1'])
+  })
+
+  it('handles edge cases for 8-channel partial column selection', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'column',
+        activeNozzleCount: 4,
+      },
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1'])
   })
 
   it('returns full plate for 96-channel pipette with no config', () => {

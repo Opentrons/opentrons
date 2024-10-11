@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 
 import {
+  ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
@@ -119,6 +120,7 @@ export const ModuleOverflowMenu = (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
         {isFlex &&
+        module.moduleType !== ABSORBANCE_READER_TYPE &&
         !MODULE_MODELS_OT2_ONLY.some(
           modModel => modModel === module.moduleModel
         ) ? (
