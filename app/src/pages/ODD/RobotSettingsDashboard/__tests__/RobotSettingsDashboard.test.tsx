@@ -22,6 +22,7 @@ import {
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useNetworkConnection } from '/app/resources/networking'
 import { useLEDLights } from '/app/resources/robot-settings'
+import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 
 import { RobotSettingsDashboard } from '../'
 
@@ -34,6 +35,7 @@ vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/robot-settings')
 vi.mock('/app/resources/robot-settings')
+vi.mock('/app/resources/errorRecovery')
 vi.mock('/app/organisms/ODD/Navigation')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
@@ -44,6 +46,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 
 const mockToggleLights = vi.fn()
+const mockToggleER = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -74,6 +77,10 @@ describe('RobotSettingsDashboard', () => {
       toggleLights: mockToggleLights,
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
+    vi.mocked(useErrorRecoverySettingsToggle).mockReturnValue({
+      isEREnabled: true,
+      toggleERSettings: mockToggleER,
+    })
   })
 
   afterEach(() => {
@@ -92,6 +99,7 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Robot System Version')
     screen.getByText('Network Settings')
     screen.getByText('Status LEDs')
+    screen.getByText('Error Recovery Mode')
     screen.getByText(
       'Control the strip of color lights on the front of the robot.'
     )
@@ -137,6 +145,31 @@ describe('RobotSettingsDashboard', () => {
     expect(
       screen.getByTestId('RobotSettingButton_display_led_lights')
     ).toHaveTextContent('On')
+  })
+
+  it('should render appropriate error recovery mode copy, and calls the toggle', () => {
+    render()
+    const toggle = screen.getByTestId('RobotSettingButton_error_recovery_mode')
+    fireEvent.click(toggle)
+    expect(mockToggleER).toHaveBeenCalled()
+  })
+
+  it('should render the on toggle when ER mode is enabled', () => {
+    render()
+    expect(
+      screen.getByTestId('RobotSettingButton_error_recovery_mode')
+    ).toHaveTextContent('On')
+  })
+
+  it('should render the off toggle when ER mode is disabled', () => {
+    vi.mocked(useErrorRecoverySettingsToggle).mockReturnValue({
+      isEREnabled: false,
+      toggleERSettings: mockToggleER,
+    })
+    render()
+    expect(
+      screen.getByTestId('RobotSettingButton_error_recovery_mode')
+    ).toHaveTextContent('Off')
   })
 
   it('should render component when tapping network settings', () => {
