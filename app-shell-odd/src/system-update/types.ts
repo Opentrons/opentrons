@@ -41,18 +41,21 @@ export interface UserFileInfo {
 export interface NoUpdate {
   version: null
   files: null
+  releaseNotes: null
   downloadProgress: 0
 }
 
 export interface FoundUpdate {
   version: string
   files: null
+  releaseNotes: null
   downloadProgress: number
 }
 
 export interface ReadyUpdate {
   version: string
   files: ReleaseSetFilepaths
+  releaseNotes: string | null
   downloadProgress: 100
 }
 
@@ -74,4 +77,6 @@ export interface UpdateProvider<UpdateSourceDetails> {
   lockUpdateCache: () => void
   // Reverse lockUpdateCache()
   unlockUpdateCache: () => void
+  // get an identifier for logging
+  name: () => string
 }

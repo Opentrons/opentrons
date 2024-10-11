@@ -8,18 +8,32 @@ import { ensureDir } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import getStream from 'get-stream'
 
-import { UI_INITIALIZED } from '../constants'
+import { CONFIG_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import { postFile } from '../http'
+import { getConfig } from '../config'
 import { getSystemUpdateDir } from './directories'
-import { SYSTEM_FILENAME, VERSION_FILENAME } from './constants'
+import {
+  SYSTEM_FILENAME,
+  VERSION_FILENAME,
+  FLEX_MANIFEST_URL,
+  SYSTEM_UPDATE_DIRECTORY,
+} from './constants'
+import { getProvider as getWebUpdateProvider } from './from-web'
+import { getProvider as getUsbUpdateProvider } from './from-usb'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
-import type { UserFileInfo, ReleaseSetFilepaths } from './types'
+import type {
+  UserFileInfo,
+  ReleaseSetFilepaths,
+  UpdateProvider,
+  UnresolvedUpdate,
+} from './types'
+import type { WebUpdateSource } from './from-web'
+import type { USBUpdateSource } from './from-usb'
 
-const PKG_VERSION = _PKG_VERSION_
-let LATEST_OT_SYSTEM_VERSION = PKG_VERSION
+const CURRENT_SYSTEM_VERSION = _PKG_VERSION_
 
 const log = createLogger('systemUpdate/index')
 
@@ -48,14 +62,86 @@ const readFileInfoAndDispatch = (
     }))
     .then(dispatch)
 */
-export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
+
+export function registerUpdateDriver(dispatch: Dispatch): Dispatch {
   log.info(`Running robot system updates storing to ${getSystemUpdateDir()}`)
+  let webUpdate: UnresolvedUpdate = {
+    version: null,
+    files: null,
+    releaseNotes: null,
+    downloadProgress: 0,
+  }
+  let webProvider = getWebUpdateProvider({
+    manifestUrl: FLEX_MANIFEST_URL,
+    channel: getConfig('update').channel,
+    updateCacheDirectory: SYSTEM_UPDATE_DIRECTORY,
+    currentVersion: CURRENT_SYSTEM_VERSION,
+  })
+  let usbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {}
+
   return function handleAction(action: Action) {
     switch (action.type) {
-      case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
+        webProvider
+          .refreshUpdateCache(updateStatus => {
+            webUpdate = updateStatus
+            if (updateStatus.files != null) {
+              dispatchUpdateInfo(
+                {
+                  force: false,
+                  version: updateStatus.version,
+                  releaseNotes: updateStatus.releaseNotes,
+                },
+                dispatch
+              )
+            }
+          })
+          .catch(err =>
+            log.warning(
+              `Error finding updates with ${webProvider.name()}: ${err.name}: ${
+                err.message
+              }`
+            )
+          )
         break
+      case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
+        if (usbProviders[action.payload.rootPath] == null) {
+          return
+        }
+        usbProviders[action.payload.rootPath] = getUsbUpdateProvider({
+          currentVersion: CURRENT_SYSTEM_VERSION,
+          massStorageDeviceRoot: action.payload.rootPath,
+          massStorageDeviceFiles: action.payload.filePaths,
+        })
 
+        if (isGettingMassStorageUpdatesFrom.has(action.payload.rootPath)) {
+          return
+        }
+        isGettingMassStorageUpdatesFrom.add(action.payload.rootPath)
+        getLatestMassStorageUpdateFiles(action.payload.filePaths, dispatch)
+          .then(() => {
+            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
+          })
+          .catch(() => {
+            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
+          })
+        break
+      case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
+        if (
+          massStorageUpdateSet !== null &&
+          massStorageUpdateSet.system.startsWith(action.payload.rootPath)
+        ) {
+          console.log(
+            `Mass storage device ${action.payload.rootPath} removed, reverting to non-usb updates`
+          )
+          massStorageUpdateSet = null
+          getCachedSystemUpdateFiles(dispatch)
+        } else {
+          console.log(
+            `Mass storage device ${action.payload.rootPath} removed but this was not an update source`
+          )
+        }
+        break
       case 'robotUpdate:UPLOAD_FILE': {
         const { host, path, systemFile } = action.payload
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -107,36 +193,18 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
         //readFileInfoAndDispatch(dispatch, systemFile)
         break
       }
-      case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
-        if (isGettingMassStorageUpdatesFrom.has(action.payload.rootPath)) {
-          return
-        }
-        isGettingMassStorageUpdatesFrom.add(action.payload.rootPath)
-        getLatestMassStorageUpdateFiles(action.payload.filePaths, dispatch)
-          .then(() => {
-            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
-          })
-          .catch(() => {
-            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
-          })
-        break
-      case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
-        if (
-          massStorageUpdateSet !== null &&
-          massStorageUpdateSet.system.startsWith(action.payload.rootPath)
-        ) {
-          console.log(
-            `Mass storage device ${action.payload.rootPath} removed, reverting to non-usb updates`
-          )
-          massStorageUpdateSet = null
-          getCachedSystemUpdateFiles(dispatch)
-        } else {
-          console.log(
-            `Mass storage device ${action.payload.rootPath} removed but this was not an update source`
-          )
-        }
-        break
     }
+  }
+}
+
+export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
+  let updateDriver: Dispatch | null = null
+
+  return function handleAction(action: Action) {
+    if (action.type === CONFIG_INITIALIZED) {
+      updateDriver = registerUpdateDriver(dispatch)
+    }
+    updateDriver != null && updateDriver(action)
   }
 }
 

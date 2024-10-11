@@ -1,5 +1,5 @@
 import path from 'path'
-import { rm } from 'fs/promises'
+import { rm, readFile } from 'fs/promises'
 
 import { createLogger } from '../../log'
 import { LocalAbortError } from '../../http'
@@ -41,6 +41,7 @@ export function getProvider(
   const noUpdate = {
     version: null,
     files: null,
+    releaseNotes: null,
     downloadProgress: 0,
   } as const
   let currentUpdate: UnresolvedUpdate = noUpdate
@@ -49,7 +50,8 @@ export function getProvider(
     const myCanceller = canceller
     const previousUpdate = {
       version: currentUpdate.version,
-      files: currentUpdate?.files == null ? null : { ...currentUpdate.files },
+      files: currentUpdate.files == null ? null : { ...currentUpdate.files },
+      releaseNotes: currentUpdate.releaseNotes,
       downloadProgress: currentUpdate.downloadProgress,
     } as ResolvedUpdate
     if (locked) {
@@ -95,7 +97,15 @@ export function getProvider(
       log.debug(`no release urls found, returning`)
       return returnNoUpdate()
     }
-    progress({ version: latestVersion, files: null, downloadProgress: 0 })
+    const downloadingUpdate = {
+      version: latestVersion,
+      files: null,
+      releaseNotes: null,
+      downloadProgress: 0,
+    } as const
+    progress(downloadingUpdate)
+    currentUpdate = downloadingUpdate
+
     if (myCanceller.signal.aborted) {
       log.info('aborted cache update because cache was locked')
       currentUpdate = previousUpdate
@@ -110,6 +120,7 @@ export function getProvider(
         const update = {
           version: versionToUpdate,
           files: null,
+          releaseNotes: null,
           downloadProgress:
             downloadProgress.size == null || downloadProgress.size === 0.0
               ? 0
@@ -137,9 +148,14 @@ export function getProvider(
       progress(previousUpdate)
       throw new LocalAbortError('cache locked')
     }
+
     const updateDetails = {
       version: versionToUpdate,
-      files: localFiles,
+      files: {
+        system: localFiles.system,
+        releaseNotes: localFiles.releaseNotes,
+      },
+      releaseNotes: localFiles.releaseNotesContent,
       downloadProgress: 100,
     } as const
     currentUpdate = updateDetails
@@ -170,5 +186,9 @@ export function getProvider(
     unlockUpdateCache: () => {
       locked = false
     },
+    name: () =>
+      `WebUpdateProvider from ${from.manifestUrl} channel ${from.channel}`,
   }
 }
+
+const NO_NOTES = 'No release notes are available for this release.'

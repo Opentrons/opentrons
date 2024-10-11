@@ -24,6 +24,7 @@ export function getProvider(
   const noUpdate = {
     version: null,
     files: null,
+    releaseNotes: null,
     downloadProgress: 0,
   } as const
   let currentUpdate: ResolvedUpdate = noUpdate
@@ -70,6 +71,7 @@ export function getProvider(
         system: updateFile.path,
         releaseNotes: path.join(tempdir, 'dummy-release-notes.md'),
       },
+      releaseNotes: fakeReleaseNotesForMassStorage(updateFile.version),
       downloadProgress: 100,
     } as const
     currentUpdate = update
@@ -96,5 +98,6 @@ export function getProvider(
       canceller.abort()
       return rm(tempdir, { recursive: true, force: true })
     },
+    name: () => `USBUpdateProvider from ${from.massStorageDeviceRoot}`,
   }
 }

@@ -2,7 +2,7 @@
 
 import path from 'path'
 import tempy from 'tempy'
-import { move, readdir, rm, mkdirp } from 'fs-extra'
+import { move, readdir, rm, mkdirp, readFile } from 'fs-extra'
 import { fetchToFile } from '../../http'
 import { createLogger } from '../../log'
 
@@ -59,12 +59,32 @@ export const ensureCleanReleaseCacheForVersion = (
     .then(() => mkdirp(directoryForRelease(baseDirectory, version)))
     .then(() => directoryForRelease(baseDirectory, version))
 
+export interface ReleaseSetData extends ReleaseSetFilepaths {
+  releaseNotesContent: string | null
+}
+
+export const augmentWithReleaseNotesContent = (
+  releaseFiles: ReleaseSetFilepaths
+): Promise<ReleaseSetData> =>
+  releaseFiles.releaseNotes == null
+    ? new Promise(resolve =>
+        resolve({ ...releaseFiles, releaseNotesContent: null })
+      )
+    : readReleaseNotes(releaseFiles.releaseNotes)
+        .then(releaseNotesContent => ({ ...releaseFiles, releaseNotesContent }))
+        .catch(err => {
+          log.error(
+            `Release notes should be present but cannot be read: ${err.name}: ${err.message}`
+          )
+          return { ...releaseFiles, releaseNotesContent: null }
+        })
+
 // checks `directory` for system update files matching the given `urls`, and
 // downloads them if they can't be found
 export function getReleaseFiles(
   urls: ReleaseSetUrls,
   directory: string
-): Promise<ReleaseSetFilepaths> {
+): Promise<ReleaseSetData> {
   return readdir(directory).then((files: string[]) => {
     log.debug('Files in system update download directory', { files })
     const expected = {
@@ -91,13 +111,14 @@ export function getReleaseFiles(
       {} as Partial<ReleaseSetFilepaths>
     )
     if (foundFiles?.system != null) {
-      return {
+      const files = {
         system: outPath(directory, foundFiles.system),
         releaseNotes:
-          foundFiles?.releaseNotes == null
-            ? null
-            : outPath(directory, foundFiles.releaseNotes),
+          foundFiles?.releaseNotes != null
+            ? outPath(directory, foundFiles.releaseNotes)
+            : null,
       }
+      return augmentWithReleaseNotesContent(files)
     }
 
     throw new Error(
@@ -117,7 +138,7 @@ export function downloadReleaseFiles(
   // `onProgress` will be called with download progress as the files are read
   onProgress: (progress: DownloadProgress) => void,
   canceller: AbortController
-): Promise<ReleaseSetFilepaths> {
+): Promise<ReleaseSetData> {
   const tempDir: string = tempy.directory()
   const tempSystemPath = outPath(tempDir, urls.system)
   const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')
@@ -151,10 +172,12 @@ export function downloadReleaseFiles(
 
       log.debug('renaming directory', { from: tempDir, to: directory })
 
-      return move(tempDir, directory, { overwrite: true }).then(() => ({
-        system: systemPath,
-        releaseNotes: notesPath,
-      }))
+      return move(tempDir, directory, { overwrite: true }).then(() =>
+        augmentWithReleaseNotesContent({
+          system: systemPath,
+          releaseNotes: notesPath,
+        })
+      )
     })
     .catch(error => {
       log.error(
@@ -171,7 +194,7 @@ export async function getOrDownloadReleaseFiles(
   releaseCacheDirectory: string,
   onProgress: (progress: DownloadProgress) => void,
   canceller: AbortController
-): Promise<ReleaseSetFilepaths> {
+): Promise<ReleaseSetData> {
   try {
     return await getReleaseFiles(urls, releaseCacheDirectory)
   } catch (error: any) {
@@ -193,7 +216,17 @@ export const cleanUpAndGetOrDownloadReleaseFiles = (
   version: string,
   onProgress: (progress: DownloadProgress) => void,
   canceller: AbortController
-): Promise<ReleaseSetFilepaths> =>
+): Promise<ReleaseSetData> =>
   ensureCleanReleaseCacheForVersion(baseDirectory, version).then(versionCache =>
     getOrDownloadReleaseFiles(urls, versionCache, onProgress, canceller)
   )
+
+const readReleaseNotes = (path: string | null): Promise<string | null> =>
+  path == null
+    ? new Promise(resolve => resolve(null))
+    : readFile(path, { encoding: 'utf-8' }).catch(err => {
+        log.warning(
+          `Could not read release notes from ${path}: ${err.name}: ${err.message}`
+        )
+        return null
+      })

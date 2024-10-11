@@ -183,6 +183,7 @@ describe('getReleaseFiles', () => {
           ).resolves.toEqual({
             system: path.join(directory, 'ot3-system.zip'),
             releaseNotes: null,
+            releaseNotesContent: null,
           })
         )
     ))
@@ -207,6 +208,7 @@ describe('getReleaseFiles', () => {
           ).resolves.toEqual({
             system: path.join(directory, 'ot3-system.zip'),
             releaseNotes: path.join(directory, 'releaseNotes.md'),
+            releaseNotesContent: 'asdasda',
           })
         )
     ))
@@ -252,10 +254,11 @@ describe('downloadReleaseFiles', () => {
         progress,
         new AbortController()
       ).then(files => {
-        expect(files.system).toEqual(path.join(directory, 'ot3-system.zip'))
-        expect(files.releaseNotes).toEqual(
-          path.join(directory, 'releaseNotes.md')
-        )
+        expect(files).toEqual({
+          system: path.join(directory, 'ot3-system.zip'),
+          releaseNotes: path.join(directory, 'releaseNotes.md'),
+          releaseNotesContent: 'this is the contents of the release notes',
+        })
         return Promise.all([
           fs
             .readFile(files.system, { encoding: 'utf-8' })
@@ -295,8 +298,11 @@ describe('downloadReleaseFiles', () => {
         progress,
         new AbortController()
       ).then(files => {
-        expect(files?.releaseNotes ?? null).toBeNull()
-        expect(files.system).toEqual(path.join(directory, 'ot3-system.zip'))
+        expect(files).toEqual({
+          system: path.join(directory, 'ot3-system.zip'),
+          releaseNotes: null,
+          releaseNotesContent: null,
+        })
         return fs
           .readFile(files.system, { encoding: 'utf-8' })
           .then(contents =>
@@ -336,8 +342,11 @@ describe('downloadReleaseFiles', () => {
         progress,
         new AbortController()
       ).then(files => {
-        expect(files.system).toEqual(path.join(directory, 'ot3-system.zip'))
-        expect(files?.releaseNotes ?? null).toBeNull()
+        expect(files).toEqual({
+          system: path.join(directory, 'ot3-system.zip'),
+          releaseNotes: null,
+          releaseNotesContent: null,
+        })
         return fs
           .readFile(files.system, { encoding: 'utf-8' })
           .then(contents =>
@@ -419,7 +428,7 @@ describe('downloadReleaseFiles', () => {
     }))
 })
 
-describe('getOrDownloadReleraseFiles', () => {
+describe('getOrDownloadReleaseFiles', () => {
   it('should not download release files if they are cached', () =>
     directoryWithCleanup(directory =>
       fs
@@ -439,6 +448,7 @@ describe('getOrDownloadReleraseFiles', () => {
             .resolves.toEqual({
               system: path.join(directory, 'ot3-system.zip'),
               releaseNotes: null,
+              releaseNotesContent: null,
             })
             .then(() => expect(fetchToFile).not.toHaveBeenCalled())
         )
@@ -470,6 +480,7 @@ describe('getOrDownloadReleraseFiles', () => {
         .resolves.toEqual({
           system: path.join(directory, 'ot3-system.zip'),
           releaseNotes: null,
+          releaseNotesContent: null,
         })
         .then(() =>
           fs

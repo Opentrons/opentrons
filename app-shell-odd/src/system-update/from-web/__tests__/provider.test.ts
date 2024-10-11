@@ -58,19 +58,27 @@ describe('provider.refreshUpdateCache happy paths', () => {
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     })
     return expect(provider.refreshUpdateCache(progressCallback))
-      .resolves.toEqual({ version: null, files: null, downloadProgress: 0 })
+      .resolves.toEqual({
+        version: null,
+        files: null,
+        releaseNotes: null,
+        downloadProgress: 0,
+      })
       .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: null,
           files: null,
+          releaseNotes: null,
           downloadProgress: 0,
         })
         expect(provider.getUpdateDetails()).toEqual({
           version: null,
           files: null,
+          releaseNotes: null,
           downloadProgress: 0,
         })
         expect(cleanUpAndGetOrDownloadReleaseFiles).not.toHaveBeenCalled()
@@ -87,6 +95,10 @@ describe('provider.refreshUpdateCache happy paths', () => {
       system: '/some/random/directory/cached-release-1.2.3/ot3-system.zip',
       releaseNotes:
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
+    }
+    const releaseData = {
+      ...releaseFiles,
+      releaseNotesContent: 'oh look some release notes cool',
     }
     when(getOrDownloadManifest)
       .calledWith(
@@ -108,7 +120,7 @@ describe('provider.refreshUpdateCache happy paths', () => {
         expect.any(Function),
         expect.any(Object)
       )
-      .thenResolve(releaseFiles)
+      .thenResolve(releaseData)
 
     const progressCallback = vi.fn()
     const provider = getProvider({
@@ -120,18 +132,21 @@ describe('provider.refreshUpdateCache happy paths', () => {
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     })
     return expect(provider.refreshUpdateCache(progressCallback))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
+        releaseNotes: 'oh look some release notes cool',
         downloadProgress: 100,
       })
       .then(() =>
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
           files: releaseFiles,
+          releaseNotes: 'oh look some release notes cool',
           downloadProgress: 100,
         })
       )
@@ -147,6 +162,10 @@ describe('provider.refreshUpdateCache happy paths', () => {
       system: '/some/random/directory/cached-release-1.2.3/ot3-system.zip',
       releaseNotes:
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
+    }
+    const releaseData = {
+      ...releaseFiles,
+      releaseNotesContent: 'oh look some release notes sweet',
     }
     when(getOrDownloadManifest)
       .calledWith(
@@ -191,7 +210,7 @@ describe('provider.refreshUpdateCache happy paths', () => {
               () =>
                 new Promise(resolve => {
                   progressCallback({ size: 100, downloaded: 100 })
-                  resolve(releaseFiles)
+                  resolve(releaseData)
                 })
             )
       )
@@ -206,38 +225,45 @@ describe('provider.refreshUpdateCache happy paths', () => {
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     })
     return expect(provider.refreshUpdateCache(progressCallback))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
+        releaseNotes: 'oh look some release notes sweet',
         downloadProgress: 100,
       })
       .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
           files: null,
+          releaseNotes: null,
           downloadProgress: 0,
         })
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
           files: null,
+          releaseNotes: null,
           downloadProgress: 50,
         })
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
           files: null,
+          releaseNotes: null,
           downloadProgress: 100,
         })
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
           files: releaseFiles,
+          releaseNotes: 'oh look some release notes sweet',
           downloadProgress: 100,
         })
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
           files: releaseFiles,
+          releaseNotes: 'oh look some release notes sweet',
           downloadProgress: 100,
         })
       })
@@ -286,6 +312,7 @@ describe('provider.refreshUpdateCache locking', () => {
     return expect(provider.refreshUpdateCache(vi.fn())).resolves.toEqual({
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     })
   })
@@ -318,6 +345,7 @@ describe('provider.refreshUpdateCache locking', () => {
       releaseNotes:
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
     }
+    const releaseData = { ...releaseFiles, releaseNotesContent: 'oh hello' }
     when(cleanUpAndGetOrDownloadReleaseFiles)
       .calledWith(
         releaseUrls,
@@ -326,12 +354,13 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(Function),
         expect.any(Object)
       )
-      .thenResolve(releaseFiles)
+      .thenResolve(releaseData)
 
     return expect(provider.refreshUpdateCache(vi.fn()))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
+        releaseNotes: 'oh hello',
         downloadProgress: 100,
       })
       .then(() => {
@@ -360,6 +389,7 @@ describe('provider.refreshUpdateCache locking', () => {
             expect(progress).toHaveBeenCalledWith({
               version: '1.2.3',
               files: releaseFiles,
+              releaseNotes: 'oh hello',
               downloadProgress: 100,
             })
           )
@@ -368,11 +398,12 @@ describe('provider.refreshUpdateCache locking', () => {
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
           files: releaseFiles,
+          releaseNotes: 'oh hello',
           downloadProgress: 100,
         })
       )
   })
-  it('will abort when locked between manifest and download phases and reutrn the previous update', () => {
+  it('will abort when locked between manifest and download phases and return the previous update', () => {
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
       channel: 'release',
@@ -401,6 +432,7 @@ describe('provider.refreshUpdateCache locking', () => {
       releaseNotes:
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
     }
+    const releaseData = { ...releaseFiles, releaseNotesContent: 'hi' }
     when(cleanUpAndGetOrDownloadReleaseFiles)
       .calledWith(
         releaseUrls,
@@ -409,12 +441,13 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(Function),
         expect.any(Object)
       )
-      .thenResolve(releaseFiles)
+      .thenResolve(releaseData)
 
     return expect(provider.refreshUpdateCache(vi.fn()))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
+        releaseNotes: 'hi',
         downloadProgress: 100,
       })
       .then(() => {
@@ -438,6 +471,7 @@ describe('provider.refreshUpdateCache locking', () => {
             expect(progress).toHaveBeenCalledWith({
               version: '1.2.3',
               files: releaseFiles,
+              releaseNotes: 'hi',
               downloadProgress: 100,
             })
           )
@@ -446,6 +480,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
           files: releaseFiles,
+          releaseNotes: 'hi',
           downloadProgress: 100,
         })
       )
@@ -479,6 +514,10 @@ describe('provider.refreshUpdateCache locking', () => {
       releaseNotes:
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
     }
+    const releaseData = {
+      ...releaseFiles,
+      releaseNotesContent: 'content',
+    }
     when(cleanUpAndGetOrDownloadReleaseFiles)
       .calledWith(
         releaseUrls,
@@ -487,12 +526,13 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(Function),
         expect.any(Object)
       )
-      .thenResolve(releaseFiles)
+      .thenResolve(releaseData)
 
     return expect(provider.refreshUpdateCache(vi.fn()))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
+        releaseNotes: 'content',
         downloadProgress: 100,
       })
       .then(() => {
@@ -540,6 +580,7 @@ describe('provider.refreshUpdateCache locking', () => {
             expect(progress).toHaveBeenCalledWith({
               version: '1.2.3',
               files: releaseFiles,
+              releaseNotes: 'content',
               downloadProgress: 100,
             })
           )
@@ -548,6 +589,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
           files: releaseFiles,
+          releaseNotes: 'content',
           downloadProgress: 100,
         })
       )
@@ -581,6 +623,10 @@ describe('provider.refreshUpdateCache locking', () => {
       releaseNotes:
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
     }
+    const releaseData = {
+      ...releaseFiles,
+      releaseNotesContent: 'there is some',
+    }
     when(cleanUpAndGetOrDownloadReleaseFiles)
       .calledWith(
         releaseUrls,
@@ -589,12 +635,13 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(Function),
         expect.any(Object)
       )
-      .thenResolve(releaseFiles)
+      .thenResolve(releaseData)
 
     return expect(provider.refreshUpdateCache(vi.fn()))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
+        releaseNotes: 'there is some',
         downloadProgress: 100,
       })
       .then(() => {
@@ -627,7 +674,7 @@ describe('provider.refreshUpdateCache locking', () => {
             ) =>
               new Promise(resolve => {
                 provider.lockUpdateCache()
-                resolve(releaseFiles)
+                resolve(releaseData)
               })
           )
         const progress = vi.fn()
@@ -637,6 +684,7 @@ describe('provider.refreshUpdateCache locking', () => {
             expect(progress).toHaveBeenCalledWith({
               version: '1.2.3',
               files: releaseFiles,
+              releaseNotes: 'there is some',
               downloadProgress: 100,
             })
           )
@@ -645,6 +693,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
           files: releaseFiles,
+          releaseNotes: 'there is some',
           downloadProgress: 100,
         })
       )
@@ -679,6 +728,7 @@ describe('provider.refreshUpdateCache locking', () => {
       expect(first).resolves.toEqual({
         version: null,
         files: null,
+        releaseNotes: null,
         downloadProgress: 0,
       }),
       expect(second).rejects.toThrow(),
@@ -709,11 +759,17 @@ describe('provider.refreshUpdateCache locking', () => {
       currentVersion: '1.2.3',
     })
     return expect(provider.refreshUpdateCache(progressCallback))
-      .resolves.toEqual({ version: null, files: null, downloadProgress: 0 })
+      .resolves.toEqual({
+        version: null,
+        files: null,
+        releaseNotes: null,
+        downloadProgress: 0,
+      })
       .then(() =>
         expect(provider.refreshUpdateCache(progressCallback)).resolves.toEqual({
           version: null,
           files: null,
+          releaseNotes: null,
           downloadProgress: 0,
         })
       )
