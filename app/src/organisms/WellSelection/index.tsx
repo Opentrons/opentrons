@@ -58,7 +58,9 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
             channels,
             pipetteNozzleDetails,
           })
-          if (!wellSet) return acc
+          if (!wellSet) {
+            return acc
+          }
           return { ...acc, [wellSet[0]]: null }
         },
         {}

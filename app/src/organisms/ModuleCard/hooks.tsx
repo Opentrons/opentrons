@@ -354,7 +354,14 @@ export function useModuleOverflowMenu(
               },
       },
     ],
-    absorbanceReaderType: [],
+    absorbanceReaderType: [
+      {
+        setSetting: t('overflow_menu_about'),
+        isSecondary: false,
+        menuButtons: [],
+        onClick: handleAboutClick,
+      },
+    ],
   }
 
   return {

@@ -27,6 +27,11 @@ def validate_definition_is_adapter(definition: LabwareDefinition) -> bool:
     return LabwareRole.adapter in definition.allowedRoles
 
 
+def validate_definition_is_lid(definition: LabwareDefinition) -> bool:
+    """Validate that one of the definition's allowed roles is `lid`."""
+    return LabwareRole.lid in definition.allowedRoles
+
+
 def validate_labware_can_be_stacked(
     top_labware_definition: LabwareDefinition, below_labware_load_name: str
 ) -> bool:

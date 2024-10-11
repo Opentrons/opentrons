@@ -21,6 +21,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import {
+  ABSORBANCE_READER_TYPE,
   FLEX_ROBOT_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
@@ -260,6 +261,7 @@ export function ModulesListItem({
   if (
     isFlex &&
     attachedModuleMatch != null &&
+    attachedModuleMatch.moduleType !== ABSORBANCE_READER_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
   ) {
     renderModuleStatus = (

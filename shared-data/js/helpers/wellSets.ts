@@ -111,6 +111,8 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
     return wellSetByPrimaryWell
   }
 
+  // TODO(jh 10-10-24): The partial tip logic is strongly coupled to lower-level partial tip API changes.
+  //  Consider alternative methods for deriving well sets when in partial nozzle configurations.
   const getWellSetForMultichannel = ({
     labwareDef,
     wellName,
@@ -142,7 +144,10 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       const wellIndex = targetColumn.indexOf(wellName)
 
       // If there are fewer wells than active nozzles, only select as many wells as there are nozzles.
-      return targetColumn.slice(wellIndex, wellIndex + activeNozzleCount)
+      return targetColumn.slice(
+        Math.max(wellIndex - activeNozzleCount + 1, 0),
+        wellIndex + 1
+      )
     }
 
     if (channels === 8) {
