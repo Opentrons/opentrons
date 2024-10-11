@@ -11,10 +11,7 @@ from ..commands import (
     Command,
     LoadLabwareResult,
 )
-from ..commands.configuring_common import (
-    PipetteConfigUpdateResultMixin,
-    PipetteNozzleLayoutResultMixin,
-)
+from ..commands.configuring_common import PipetteConfigUpdateResultMixin
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
@@ -82,13 +79,6 @@ class TipStore(HasState[TipState], HandlesActions):
 
             self._handle_succeeded_command(action.command)
 
-            if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
-                pipette_id = action.private_result.pipette_id
-                nozzle_map = action.private_result.nozzle_map
-                pipette_info = self._state.pipette_info_by_pipette_id[pipette_id]
-                pipette_info.active_channels = nozzle_map.tip_count
-                pipette_info.nozzle_map = nozzle_map
-
         elif isinstance(action, ResetTipsAction):
             labware_id = action.labware_id
 
@@ -120,6 +110,15 @@ class TipStore(HasState[TipState], HandlesActions):
                 labware_id=state_update.tips_used.labware_id,
                 well_name=state_update.tips_used.well_name,
             )
+
+        if state_update.pipette_nozzle_map != update_types.NO_CHANGE:
+            pipette_info = self._state.pipette_info_by_pipette_id[
+                state_update.pipette_nozzle_map.pipette_id
+            ]
+            pipette_info.active_channels = (
+                state_update.pipette_nozzle_map.nozzle_map.tip_count
+            )
+            pipette_info.nozzle_map = state_update.pipette_nozzle_map.nozzle_map
 
     def _set_used_tips(  # noqa: C901
         self, pipette_id: str, well_name: str, labware_id: str
