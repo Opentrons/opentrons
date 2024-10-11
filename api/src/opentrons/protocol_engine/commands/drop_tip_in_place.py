@@ -57,7 +57,9 @@ class DropTipInPlaceImplementation(
 
         state_update = update_types.StateUpdate()
 
-        state_update.update_tip_state(pipette_id=params.pipetteId, tip_geometry=None)
+        state_update.update_pipette_tip_state(
+            pipette_id=params.pipetteId, tip_geometry=None
+        )
 
         return SuccessData(
             public=DropTipInPlaceResult(), private=None, state_update=state_update
