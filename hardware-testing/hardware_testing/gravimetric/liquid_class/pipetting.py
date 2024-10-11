@@ -129,7 +129,6 @@ def _pipette_with_liquid_settings(  # noqa: C901
     aspirate: Optional[float] = None,
     dispense: Optional[float] = None,
     blank: bool = True,
-    added_blow_out: bool = True,
     touch_tip: bool = False,
     mode: str = "",
     clear_accuracy_function: bool = False,
@@ -195,10 +194,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
         callbacks.on_mixing()
         _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         _num_mixes = 5
-        if added_blow_out:
-            push_out = min(liquid_class.dispense.push_out, _get_max_blow_out_ul())
-        else:
-            push_out = 0
+        push_out = min(liquid_class.dispense.push_out, _get_max_blow_out_ul())
         for i in range(_num_mixes):
             pipette.aspirate(mix)
             ctx.delay(liquid_class.aspirate.delay)
@@ -236,14 +232,21 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
-        push_out = None
-        if added_blow_out:
-            _max_push = _get_max_blow_out_ul()
+        # FIXME: hack to enable "break-off" deceleration during dispense
+        #        ideally this would only decelerate, while acceleration
+        #        would remain at the higher default "flow-acceleration"
+        #        from shared-data
+        default_flow_accel = float(hw_pipette.flow_acceleration)
+        if liquid_class.dispense.break_off:
+            hw_pipette.flow_acceleration = liquid_class.dispense.break_off
+        try:
             push_out = liquid_class.dispense.push_out
             assert (
-                push_out <= _max_push
-            ), f"push-out ({push_out}) cannot exceed {_max_push}"
-        pipette.dispense(dispense, push_out=push_out)
+                push_out is None or push_out <= _get_max_blow_out_ul()
+            ), f"push-out ({push_out}) cannot exceed {_get_max_blow_out_ul()}"
+            pipette.dispense(dispense, push_out=push_out)
+        finally:
+            hw_pipette.flow_acceleration = default_flow_accel
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
             well, dispense=dispense, channels=channel_count
@@ -255,9 +258,9 @@ def _pipette_with_liquid_settings(  # noqa: C901
         # NOTE: both the plunger reset or tje trailing-air-gap
         #       pull remaining droplets inside the tip upwards
         if pipette.current_volume <= 0:
-            # if do_a_blow_out:
-            #     callbacks.on_blowing_out()
-            #     pipette.blow_out()
+            if liquid_class.dispense.blow_out:
+                callbacks.on_blowing_out()
+                pipette.blow_out()
             pipette.prepare_to_aspirate()
         else:
             pipette.air_gap(liquid_class.aspirate.air_gap, height=0)
@@ -269,32 +272,25 @@ def _pipette_with_liquid_settings(  # noqa: C901
     pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
     pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
 
-    # FIXME: hack to enable "break-off" deceleration during dispense
-    default_flow_accel = float(hw_pipette.flow_acceleration)
-    if dispense and liquid_class.dispense.break_off:
-        hw_pipette.flow_acceleration = liquid_class.dispense.break_off
-    try:
-        pipette.move_to(well.bottom(approach_mm).move(channel_offset))
-        _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
+    pipette.move_to(well.bottom(approach_mm).move(channel_offset))
+    _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
 
-        if mix:
-            # PHASE 2A: MIXING
-            _aspirate_on_mix()
-        else:
-            # PHASE 2B: ASPIRATE or DISPENSE
-            callbacks.on_submerging()
-            _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
-            _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
+    if mix:
+        # PHASE 2A: MIXING
+        _aspirate_on_mix()
+    else:
+        # PHASE 2B: ASPIRATE or DISPENSE
+        callbacks.on_submerging()
+        _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
+        _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
-            # PHASE 3: RETRACT
-            callbacks.on_retracting()
-            _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed)
-            _aspirate_on_retract() if aspirate else _dispense_on_retract()
+        # PHASE 3: RETRACT
+        callbacks.on_retracting()
+        _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed)
+        _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
-        # EXIT
-        callbacks.on_exiting()
-    finally:
-        hw_pipette.flow_acceleration = default_flow_accel
+    # EXIT
+    callbacks.on_exiting()
 
 
 def mix_with_liquid_class(
@@ -374,7 +370,6 @@ def dispense_with_liquid_class(
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
-    added_blow_out: bool = True,
     touch_tip: bool = False,
     mode: str = "",
     clear_accuracy_function: bool = False,
@@ -391,7 +386,6 @@ def dispense_with_liquid_class(
         callbacks,
         dispense=dispense_volume,
         blank=blank,
-        added_blow_out=added_blow_out,
         touch_tip=touch_tip,
         mode=mode,
         clear_accuracy_function=clear_accuracy_function,

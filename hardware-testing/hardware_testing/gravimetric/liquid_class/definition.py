@@ -27,6 +27,7 @@ class DispenseSettings(LiquidSettings):
 
     push_out: Optional[float]  # microliters
     break_off: Optional[float]  # ul/sec^2
+    blow_out: Optional[bool]
 
 
 @dataclass
@@ -62,5 +63,7 @@ def interpolate(
             delay=_interp(a.dispense.delay, b.dispense.delay),
             retract_mm=_interp(a.dispense.retract_mm, b.dispense.retract_mm),
             push_out=_interp(a.dispense.push_out, b.dispense.push_out),
+            blow_out=a.dispense.blow_out
+            or b.dispense.blow_out,  # blow-out if either specifies
         ),
     )
