@@ -58,7 +58,7 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   pickUpTips: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
-  releaseGripperJaws: () => Promise<void>
+  releaseGripperJaws: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -215,10 +215,9 @@ export function useRecoveryCommands({
     failedCommandByRunRecord?.commandType,
   ])
 
-  const releaseGripperJaws = useCallback((): Promise<void> => {
-    console.log('PLACEHOLDER RELEASE THE JAWS')
-    return Promise.resolve()
-  }, [])
+  const releaseGripperJaws = useCallback((): Promise<CommandData[]> => {
+    return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
+  }, [chainRunRecoveryCommands])
 
   return {
     resumeRun,
@@ -235,6 +234,12 @@ export function useRecoveryCommands({
 export const HOME_PIPETTE_Z_AXES: CreateCommand = {
   commandType: 'home',
   params: { axes: ['leftZ', 'rightZ'] },
+  intent: 'fixit',
+}
+
+export const RELEASE_GRIPPER_JAW: CreateCommand = {
+  commandType: 'unsafe/ungripLabware',
+  params: {},
   intent: 'fixit',
 }
 
