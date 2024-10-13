@@ -48,6 +48,12 @@ export const getLabwareRenderInfo = (
           )} but could not`
         )
       }
+      if (
+        command.params.loadName ===
+        'opentrons_flex_lid_absorbance_plate_reader_module'
+      ) {
+        return acc
+      }
 
       const slotName =
         'addressableAreaName' in location
