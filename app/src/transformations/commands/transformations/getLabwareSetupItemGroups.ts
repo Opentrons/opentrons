@@ -43,7 +43,9 @@ export function getLabwareSetupItemGroups(
     commands.reduce<LabwareSetupItem[]>((acc, c) => {
       if (
         c.commandType === 'loadLabware' &&
-        c.result?.definition?.metadata?.displayCategory !== 'trash'
+        c.result?.definition?.metadata?.displayCategory !== 'trash' &&
+        c.result?.params?.loadName !==
+          'opentrons_flex_lid_absorbance_plate_reader_module'
       ) {
         const { location, displayName } = c.params
         const { definition } = c.result ?? {}

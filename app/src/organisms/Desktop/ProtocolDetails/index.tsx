@@ -284,7 +284,10 @@ export function ProtocolDetails(
               : []
           ),
         }).filter(
-          labware => labware.result?.definition?.parameters?.format !== 'trash'
+          labware =>
+            labware.result?.definition?.parameters?.format !== 'trash' &&
+            labware?.params?.loadName !==
+              'opentrons_flex_lid_absorbance_plate_reader_module'
         )
       : []
 
