@@ -643,7 +643,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             z_speed=None,
-                            flow_rate=200.0,
+                            flow_rate=50.0,
                             break_off=_default_accel_p1000_ul_sec_sec,
                             push_out=1.0,
                             submerge_mm=None,

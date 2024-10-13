@@ -9,13 +9,25 @@ from .definition import (
 
 
 def _user_input_value_for_attribute(attribute: str, default: Optional[float]) -> float:
+    if isinstance(default, bool):
+        def_str = "y" if default else "n"
+        type_str = "y/n"
+    elif isinstance(default, float):
+        def_str = str(default)
+        type_str = "float"
+    else:
+        raise ValueError(f"unexpected default ({default}) type: {type(default)}")
+    _inp = input(
+        f"\t{attribute} = {def_str} ... <ENTER> to keep, or type new value ({type_str}): "
+    )
+    if not _inp:
+        assert default is not None
+        return default
     try:
-        _inp = input(
-            f"\t{attribute} = {default} ... <ENTER> to keep, or type new value: "
-        )
-        if not _inp:
-            return float(default)
-        return float(_inp.strip())
+        if isinstance(default, float):
+            return float(_inp.strip())
+        elif isinstance(default, bool):
+            return bool(_inp.strip()[0].lower() == "y")
     except ValueError as e:
         print(e)
         return _user_input_value_for_attribute(attribute, default)
