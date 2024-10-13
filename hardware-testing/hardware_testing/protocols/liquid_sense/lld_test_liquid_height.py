@@ -22,7 +22,7 @@ ASPIRATE_MM_FROM_BOTTOM = 5
 RESERVOIR = "nest_1_reservoir_195ml"
 
 LIQUID_MOUNT = "right"
-LIQUID_TIP_SIZE = 1000
+LIQUID_TIP_SIZE = 200
 LIQUID_PIPETTE_SIZE = 1000
 
 PROBING_MOUNT = "left"
@@ -39,7 +39,7 @@ SLOT_DIAL = "B3"
 #  VARIABLES - END
 ###########################################
 
-metadata = {"protocolName": "lld-test-liquid-height"}
+metadata = {"protocolName": "SIGLER-lld-test-liquid-height"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 _all_96_well_names = [f"{r}{c + 1}" for c in range(12) for r in "ABCDEFGH"]
@@ -212,9 +212,7 @@ def _test_for_finding_liquid_height(
     assert len(liquid_tips) == len(
         probing_tips
     ), f"{len(liquid_tips)},{len(probing_tips)}"
-    assert len(liquid_tips) == len(
-        wells
-    ), f"{len(liquid_tips)},{len(wells)}"
+    assert len(liquid_tips) == len(wells), f"{len(liquid_tips)},{len(wells)}"
     trial_counter = 0
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -227,9 +225,20 @@ def _test_for_finding_liquid_height(
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
         # pickup liquid tip, then immediately transfer liquid
         liquid_pipette.pick_up_tip(liq_tip)
+        liquid_pipette.flow_rate.aspirate = min(volume, 10)
+        liquid_pipette.flow_rate.dispense = min(liquid_pipette.flow_rate.aspirate, 50)
+        liquid_pipette.flow_rate.blow_out = 100
         liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
+        if volume <= 195:
+            liquid_pipette.aspirate(5, src_well.top(2))
+            liquid_pipette.dispense(5, well.top(5))
         liquid_pipette.dispense(volume, well.bottom(DISPENSE_MM_FROM_BOTTOM))
-        liquid_pipette.blow_out(well.top()).prepare_to_aspirate()
+        ctx.delay(seconds=1.5)
+        liquid_pipette.move_to(well.top())
+        ctx.delay(seconds=1.5)
+        liquid_pipette.blow_out(well.top())
+        ctx.delay(seconds=1.5)
+        liquid_pipette.prepare_to_aspirate()
         # get height of liquid
         height = _get_height_of_liquid_in_well(probing_pipette, well)
         corrected_height = height + tip_z_error
