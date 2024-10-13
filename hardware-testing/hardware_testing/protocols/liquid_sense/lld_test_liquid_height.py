@@ -194,8 +194,7 @@ def _get_height_of_liquid_in_well(
     pipette: InstrumentContext,
     well: Well,
 ) -> float:
-    # FIXME: calculate actual liquid height
-    return pipette.measure_liquid_height(well)
+    return pipette.measure_liquid_height(well) - well.bottom().point.z
 
 
 def _test_for_finding_liquid_height(
