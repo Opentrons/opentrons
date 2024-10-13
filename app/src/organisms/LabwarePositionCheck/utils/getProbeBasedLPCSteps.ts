@@ -58,7 +58,10 @@ function getAllCheckSectionSteps(
       const labwareDef = labwareDefinitions.find(
         def => getLabwareDefURI(def) === labwareLocationCombo.definitionUri
       )
-      if ((labwareDef?.allowedRoles ?? []).includes('adapter')) {
+      if (
+        (labwareDef?.allowedRoles ?? []).includes('adapter') ||
+        (labwareDef?.allowedRoles ?? []).inlcudes('lid')
+      ) {
         return acc
       }
       // remove duplicate definitionUri in same location
