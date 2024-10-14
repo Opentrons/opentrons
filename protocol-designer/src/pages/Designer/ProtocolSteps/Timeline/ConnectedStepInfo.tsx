@@ -10,6 +10,8 @@ import {
   getHoveredSubstep,
   getMultiSelectItemIds,
   getSelectedStepId,
+  getMultiSelectLastSelected,
+  getIsMultiSelectMode,
 } from '../../../../ui/steps'
 import { selectors as fileDataSelectors } from '../../../../file-data'
 import {
@@ -24,9 +26,18 @@ import {
 } from '../../../../ui/steps/actions/actions'
 import { getOrderedStepIds } from '../../../../step-forms/selectors'
 import { StepContainer } from './StepContainer'
+import {
+  getMetaSelectedSteps,
+  getMouseClickKeyInfo,
+  getShiftSelectedSteps,
+  nonePressed,
+} from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { HoverOnStepAction } from '../../../../ui/steps'
+import type {
+  HoverOnStepAction,
+  SelectMultipleStepsAction,
+} from '../../../../ui/steps'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
 import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
@@ -65,6 +76,9 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const hoveredStep = useSelector(getHoveredStepId)
   const selectedStepId = useSelector(getSelectedStepId)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
+  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
+  const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
+  const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selected: boolean = multiSelectItemIds?.length
     ? multiSelectItemIds.includes(stepId)
     : selectedStepId === stepId
@@ -74,6 +88,15 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const singleEditFormHasUnsavedChanges = useSelector(
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
+  const batchEditFormHasUnsavedChanges = useSelector(
+    stepFormSelectors.getBatchEditFormHasUnsavedChanges
+  )
+  const selectMultipleSteps = (
+    steps: StepIdType[],
+    lastSelected: StepIdType
+  ): ThunkAction<SelectMultipleStepsAction> =>
+    dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
+
   const selectStep = (): ThunkAction<any> =>
     dispatch(stepsActions.resetSelectStep(stepId))
   const selectStepOnDoubleClick = (): ThunkAction<any> =>
@@ -82,15 +105,51 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
-  const handleSelectStep = (): void => {
-    selectStep()
+  const handleSelectStep = (event: any): void => {
     if (selectedStep !== stepId) {
       dispatch(toggleViewSubstep(null))
       dispatch(hoverOnStep(null))
     }
+    const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
+    let stepsToSelect: StepIdType[] = []
+
+    // if user clicked on the last multi-selected step, shift/meta keys don't matter
+    const toggledLastSelected = stepId === lastMultiSelectedStepId
+    const noModifierKeys =
+      nonePressed([isShiftKeyPressed, isMetaKeyPressed]) || toggledLastSelected
+
+    if (noModifierKeys) {
+      selectStep()
+    } else if (
+      (isMetaKeyPressed || isShiftKeyPressed) &&
+      currentFormIsPresaved
+    ) {
+      // current form is presaved, enter batch edit mode with only the clicked
+      stepsToSelect = [stepId]
+    } else {
+      if (isShiftKeyPressed) {
+        stepsToSelect = getShiftSelectedSteps(
+          selectedStepId,
+          orderedStepIds,
+          stepId,
+          multiSelectItemIds,
+          lastMultiSelectedStepId
+        )
+      } else if (isMetaKeyPressed) {
+        stepsToSelect = getMetaSelectedSteps(
+          multiSelectItemIds,
+          stepId,
+          selectedStepId
+        )
+      }
+    }
+    if (stepsToSelect.length > 0) {
+      selectMultipleSteps(stepsToSelect, stepId)
+    }
   }
   const handleSelectDoubleStep = (): void => {
     selectStepOnDoubleClick()
+
     if (selectedStep !== stepId) {
       dispatch(toggleViewSubstep(null))
       dispatch(hoverOnStep(null))
@@ -105,9 +164,12 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     handleSelectDoubleStep,
     currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
+
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     handleSelectStep,
-    currentFormIsPresaved || singleEditFormHasUnsavedChanges
+    isMultiSelectMode
+      ? batchEditFormHasUnsavedChanges
+      : currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
 
   const getModalType = (): DeleteModalType => {

@@ -14,16 +14,21 @@ import {
   ToggleGroup,
 } from '@opentrons/components'
 import { getUnsavedForm } from '../../../step-forms/selectors'
-import { getSelectedSubstep } from '../../../ui/steps/selectors'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
+import {
+  getIsMultiSelectMode,
+  getSelectedSubstep,
+} from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
 import { TimelineToolbox, SubstepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
+import { BatchEditToolbox } from './BatchEditToolbox'
 
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
+  const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selectedSubstep = useSelector(getSelectedSubstep)
   const enableHoyKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const leftString = t('onDeck')
@@ -54,6 +59,7 @@ export function ProtocolSteps(): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
       >
         <TimelineToolbox />
+        {isMultiSelectMode ? <BatchEditToolbox /> : null}
         {formData == null || formType === 'moveLabware' ? (
           <ToggleGroup
             selectedValue={deckView}
