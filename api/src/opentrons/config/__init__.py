@@ -204,10 +204,10 @@ CONFIG_ELEMENTS = (
     ),
     ConfigElement(
         "sensor_log_file",
-        "SENSOR Log File",
+        "Sensor Log File",
         Path("logs") / "sensor.log",
         ConfigElementType.FILE,
-        "The location of the file to save SENSOR logs to. If this is an"
+        "The location of the file to save sensor logs to. If this is an"
         " absolute path, it will be used directly. If it is a "
         "relative path it will be relative to log_dir",
     ),

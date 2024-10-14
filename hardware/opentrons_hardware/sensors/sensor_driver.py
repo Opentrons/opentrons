@@ -49,8 +49,10 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from .sensor_abc import AbstractSensorDriver
 from .scheduler import SensorScheduler
+from . import SENSOR_LOG_NAME
 
 LOG = getLogger(__name__)
+SENSOR_LOG = getLogger(SENSOR_LOG_NAME)
 
 
 class SensorDriver(AbstractSensorDriver):
@@ -255,12 +257,12 @@ class LogListener:
         """Start logging sensor readings."""
         self.messenger.add_listener(self, None)
         self.start_time = time.time()
-        LOG.info(f"Data capture for {self.tool.name} started {self.start_time}")
+        SENSOR_LOG.info(f"Data capture for {self.tool.name} started {self.start_time}")
 
     async def __aexit__(self, *args: Any) -> None:
         """Finish the capture."""
         self.messenger.remove_listener(self)
-        LOG.info(f"Data capture for {self.tool.name} ended {time.time()}")
+        SENSOR_LOG.info(f"Data capture for {self.tool.name} ended {time.time()}")
 
     def set_stop_ack(self, message_index: int = 0) -> None:
         """Tell the Listener which message index to wait for."""
@@ -272,7 +274,7 @@ class LogListener:
         with suppress(asyncio.TimeoutError):
             await asyncio.wait_for(self.event.wait(), wait_time)
         if not self.event.is_set():
-            LOG.error("Did not receive the full data set from the sensor")
+            SENSOR_LOG.error("Did not receive the full data set from the sensor")
         self.event = None
 
     def __call__(
@@ -295,7 +297,7 @@ class LogListener:
                 message.payload.sensor_data, message.payload.sensor
             )
             self.response_queue.put_nowait(data)
-            LOG.info(
+            SENSOR_LOG.info(
                 f"Revieved from {arbitration_id}: {message.payload.sensor_id}:{message.payload.sensor}: {data}"
             )
         if isinstance(message, message_definitions.BatchReadFromSensorResponse):
@@ -312,7 +314,7 @@ class LogListener:
 
             for d in data:
                 self.response_queue.put_nowait(d)
-            LOG.info(
+            SENSOR_LOG.info(
                 f"Revieved from {arbitration_id}: {message.payload.sensor_id}:{message.payload.sensor}: {data}"
             )
         if isinstance(message, message_definitions.Acknowledgement):
@@ -320,5 +322,5 @@ class LogListener:
                 self.event is not None
                 and message.payload.message_index.value == self.expected_ack
             ):
-                LOG.info("Finished receiving sensor data")
+                SENSOR_LOG.info("Finished receiving sensor data")
                 self.event.set()

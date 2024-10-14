@@ -5,6 +5,8 @@ from typing import Any, Dict
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
+from opentrons_hardware.sensors import SENSOR_LOG_NAME
+
 
 def _host_config(level_value: int) -> Dict[str, Any]:
     serial_log_filename = CONFIG["serial_log_file"]
@@ -75,12 +77,7 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
-            "opentrons_hardware.sensors.sensor_driver": {
-                "handlers": ["sensor"],
-                "level": logging.DEBUG,
-                "propagate": False,
-            },
-            "opentrons_hardware.hardware_control.tool_sensors": {
+            SENSOR_LOG_NAME: {
                 "handlers": ["sensor"],
                 "level": logging.DEBUG,
                 "propagate": False,
@@ -156,12 +153,7 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
-            "opentrons_hardware.sensors.sensor_driver": {
-                "handlers": ["sensor"],
-                "level": logging.DEBUG,
-                "propagate": False,
-            },
-            "opentrons_hardware.hardware_control.tool_sensors": {
+            SENSOR_LOG_NAME: {
                 "handlers": ["sensor"],
                 "level": logging.DEBUG,
                 "propagate": False,
