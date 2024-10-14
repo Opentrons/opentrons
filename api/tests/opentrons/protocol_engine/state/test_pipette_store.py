@@ -191,25 +191,52 @@ def test_location_state_update(subject: PipetteStore) -> None:
     )
 
 
-def test_handles_load_pipette(subject: PipetteStore) -> None:
+def test_handles_load_pipette(
+    subject: PipetteStore,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """It should add the pipette data to the state."""
-    command = create_load_pipette_command(
+    dummy_command = create_succeeded_command()
+
+    load_pipette_update = update_types.LoadPipetteUpdate(
         pipette_id="pipette-id",
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
+        liquid_presence_detection=None,
+    )
+
+    config = LoadedStaticPipetteData(
+        model="pipette-model",
+        display_name="pipette name",
+        min_volume=1.23,
+        max_volume=4.56,
+        channels=7,
+        flow_rates=FlowRates(
+            default_aspirate={"a": 1},
+            default_dispense={"b": 2},
+            default_blow_out={"c": 3},
+        ),
+        tip_configuration_lookup_table={4: supported_tip_fixture},
+        nominal_tip_overlap={"default": 5},
+        home_position=8.9,
+        nozzle_offset_z=10.11,
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+        back_left_corner_offset=Point(x=1, y=2, z=3),
+        front_right_corner_offset=Point(x=4, y=5, z=6),
+        pipette_lld_settings={},
+    )
+    config_update = update_types.PipetteConfigUpdate(
+        pipette_id="pipette-id",
+        config=config,
+        serial_number="pipette-serial",
     )
 
     subject.handle_action(
         SucceedCommandAction(
             private_result=None,
-            command=command,
+            command=dummy_command,
             state_update=update_types.StateUpdate(
-                loaded_pipette=update_types.LoadPipetteUpdate(
-                    pipette_id="pipette-id",
-                    pipette_name=PipetteNameType.P300_SINGLE,
-                    mount=MountType.LEFT,
-                    liquid_presence_detection=None,
-                )
+                loaded_pipette=load_pipette_update, pipette_config=config_update
             ),
         )
     )
