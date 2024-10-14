@@ -17,6 +17,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { CommandTextData } from '../types'
 
+// TODO(jh, 10-14-24): Refactor this util and related copy utils out of Command.
 export function getLabwareDisplayLocation(
   commandTextData: Omit<CommandTextData, 'commands'>,
   allRunDefs: LabwareDefinition2[],

@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { renderHook } from '@testing-library/react'
 
 import {
   getRelevantWellName,
   getRelevantFailedLabwareCmdFrom,
+  useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
 import { DEFINED_ERROR_TYPES } from '../../constants'
 
@@ -120,6 +122,22 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
       expect(result).toBe(pickUpTipCommand)
     })
   })
+
+  it('should return the failedCommand for GRIPPER_ERROR error kind', () => {
+    const failedGripperCommand = {
+      ...failedCommand,
+      commandType: 'moveLabware',
+      error: {
+        isDefined: true,
+        errorType: DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT,
+      },
+    }
+    const result = getRelevantFailedLabwareCmdFrom({
+      failedCommandByRunRecord: failedGripperCommand,
+    })
+    expect(result).toEqual(failedGripperCommand)
+  })
+
   it('should return null for GENERAL_ERROR error kind', () => {
     const result = getRelevantFailedLabwareCmdFrom({
       failedCommandByRunRecord: {
@@ -138,5 +156,57 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
       },
     })
     expect(result).toBeNull()
+  })
+})
+
+// TODO(jh 10-15-24): This testing will can more useful once translation is refactored out of this function.
+describe('useRelevantFailedLwLocations', () => {
+  const mockProtocolAnalysis = {} as any
+  const mockAllRunDefs = [] as any
+  const mockFailedLabware = {
+    location: { slot: 'D1' },
+  } as any
+
+  it('should return current location for non-moveLabware commands', () => {
+    const mockFailedCommand = {
+      commandType: 'aspirate',
+    } as any
+
+    const { result } = renderHook(() =>
+      useRelevantFailedLwLocations({
+        failedLabware: mockFailedLabware,
+        failedCommandByRunRecord: mockFailedCommand,
+        protocolAnalysis: mockProtocolAnalysis,
+        allRunDefs: mockAllRunDefs,
+      })
+    )
+
+    expect(result.current).toEqual({
+      currentLoc: '',
+      newLoc: null,
+    })
+  })
+
+  it('should return current and new location for moveLabware commands', () => {
+    const mockFailedCommand = {
+      commandType: 'moveLabware',
+      params: {
+        newLocation: { slot: 'C2' },
+      },
+    } as any
+
+    const { result } = renderHook(() =>
+      useRelevantFailedLwLocations({
+        failedLabware: mockFailedLabware,
+        failedCommandByRunRecord: mockFailedCommand,
+        protocolAnalysis: mockProtocolAnalysis,
+        allRunDefs: mockAllRunDefs,
+      })
+    )
+
+    expect(result.current).toEqual({
+      currentLoc: '',
+      newLoc: '',
+    })
   })
 })
