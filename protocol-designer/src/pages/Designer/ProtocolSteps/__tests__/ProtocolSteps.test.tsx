@@ -70,6 +70,6 @@ describe('ProtocolSteps', () => {
     render()
     screen.getByText('Double-click to edit')
     screen.getByText('Shift + Click to select all')
-    screen.getByText('Option + Click for multi-select')
+    screen.getByText('Command + Click for multi-select')
   })
 })

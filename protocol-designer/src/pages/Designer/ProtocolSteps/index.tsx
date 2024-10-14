@@ -77,7 +77,7 @@ export function ProtocolSteps(): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <Tag text={t('double_click_to_edit')} type="default" />
               <Tag text={t('shift_click_to_select_all')} type="default" />
-              <Tag text={t('option_click_to_multi_select')} type="default" />
+              <Tag text={t('command_click_to_multi_select')} type="default" />
             </Flex>
           </Box>
         ) : null}

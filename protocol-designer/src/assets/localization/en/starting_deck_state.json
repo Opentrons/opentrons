@@ -37,7 +37,7 @@
   "onDeck": "On deck",
   "one_item": "No more than 1 {{hardware}} allowed on the deck at one time",
   "only_display_rec": "Only display recommended labware",
-  "option_click_to_multi_select": "Option + Click for multi-select",
+  "command_click_to_multi_select": "Command + Click for multi-select",
   "protocol_starting_deck": "Protocol starting deck",
   "rename_lab": "Rename labware",
   "reservoir": "Reservoir",
