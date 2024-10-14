@@ -38,7 +38,9 @@ export const getProtocolModulesInfo = (
         protocolData.commands
           .filter(
             (command): command is LoadLabwareRunTimeCommand =>
-              command.commandType === 'loadLabware'
+              command.commandType === 'loadLabware' &&
+              command.params.loadName !==
+                'opentrons_flex_lid_absorbance_plate_reader_module'
           )
           .find(
             (command: LoadLabwareRunTimeCommand) =>

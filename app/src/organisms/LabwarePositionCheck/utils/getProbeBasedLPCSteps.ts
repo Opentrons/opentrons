@@ -60,7 +60,7 @@ function getAllCheckSectionSteps(
       )
       if (
         (labwareDef?.allowedRoles ?? []).includes('adapter') ||
-        (labwareDef?.allowedRoles ?? []).inlcudes('lid')
+        (labwareDef?.allowedRoles ?? []).includes('lid')
       ) {
         return acc
       }
@@ -76,12 +76,7 @@ function getAllCheckSectionSteps(
     []
   )
 
-  // HACK: Remove LPC for plate reader to unblock science.
-  const filteredLabwareLocations = labwareLocations.filter(labware => {
-    return labware.location?.moduleModel !== 'absorbanceReaderV1'
-  })
-
-  return filteredLabwareLocations.map(
+  return labwareLocations.map(
     ({ location, labwareId, moduleId, adapterId, definitionUri }) => ({
       section: SECTIONS.CHECK_POSITIONS,
       labwareId: labwareId,
