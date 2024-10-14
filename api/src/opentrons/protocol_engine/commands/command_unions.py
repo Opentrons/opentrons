@@ -84,6 +84,7 @@ from .drop_tip import (
     DropTipCreate,
     DropTipResult,
     DropTipCommandType,
+    TipPhysicallyAttachedError,
 )
 
 from .drop_tip_in_place import (
@@ -713,6 +714,7 @@ CommandPrivateResult = Union[
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError],
+    DefinedErrorData[TipPhysicallyAttachedError],
     DefinedErrorData[OverpressureError],
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],
