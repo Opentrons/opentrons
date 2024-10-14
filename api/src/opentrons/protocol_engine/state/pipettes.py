@@ -96,7 +96,7 @@ class StaticPipetteConfig:
     nozzle_offset_z: float
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
-    default_nozzle_map: NozzleMap
+    default_nozzle_map: NozzleMap  # todo(mm, 2024-10-14): unused, remove?
     lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
@@ -170,15 +170,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
-            # TODO(mm, 2024-10-11): This seems wrong--because of the order in which
-            # we process the individual attributes of StateUpdate, when we process a
-            # loadPipette command, won't we always reach here before static_config is
-            # populated?
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                self._state.nozzle_configuration_by_id[
-                    pipette_id
-                ] = static_config.default_nozzle_map
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
