@@ -13,7 +13,11 @@ import {
 
 import { useCommandTextString } from './hooks'
 
-import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 import type { CommandTextData } from './types'
 import type {
@@ -36,6 +40,7 @@ type STProps = LegacySTProps | ModernSTProps
 
 interface BaseProps extends StyleProps {
   command: RunTimeCommand
+  allRunDefs: LabwareDefinition2[]
   commandTextData: CommandTextData
   robotType: RobotType
   isOnDevice?: boolean
