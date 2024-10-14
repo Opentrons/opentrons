@@ -675,7 +675,9 @@ class GeometryView:
         self, well_location: PickUpTipWellLocation
     ) -> WellLocation:
         """Convert PickUpTipWellLocation to WellLocation."""
-        return WellLocation(origin=well_location.origin, offset=well_location.offset)
+        return WellLocation(
+            origin=WellOrigin(well_location.origin.value), offset=well_location.offset
+        )
 
     # TODO(jbl 11-30-2023) fold this function into get_ancestor_slot_name see RSS-411
     def _get_staging_slot_name(self, labware_id: str) -> str:

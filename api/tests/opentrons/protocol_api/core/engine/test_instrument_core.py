@@ -20,6 +20,7 @@ from opentrons.protocol_engine import (
     PickUpTipWellLocation,
     WellOffset,
     WellOrigin,
+    PickUpTipWellOrigin,
     DropTipWellLocation,
     DropTipWellOrigin,
 )
@@ -266,7 +267,9 @@ def test_pick_up_tip(
             absolute_point=Point(1, 2, 3),
         )
     ).then_return(
-        PickUpTipWellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1))
+        PickUpTipWellLocation(
+            origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+        )
     )
 
     subject.pick_up_tip(
@@ -288,7 +291,7 @@ def test_pick_up_tip(
             labware_id="labware-id",
             well_name="well-name",
             well_location=PickUpTipWellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
         mock_engine_client.execute_command(
@@ -297,7 +300,7 @@ def test_pick_up_tip(
                 labwareId="labware-id",
                 wellName="well-name",
                 wellLocation=PickUpTipWellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                    origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
             )
         ),
@@ -620,14 +623,10 @@ def test_blow_out_to_well(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
         )
-    ).then_return(
-        LiquidHandlingWellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-        )
-    )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
     subject.blow_out(location=location, well_core=well_core, in_place=False)
 
@@ -646,7 +645,7 @@ def test_blow_out_to_well(
                 pipetteId="abc123",
                 labwareId="123abc",
                 wellName="my cool well",
-                wellLocation=LiquidHandlingWellLocation(
+                wellLocation=WellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
                 flowRate=6.7,

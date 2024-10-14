@@ -441,7 +441,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=LiquidHandlingWellLocation(
+                wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),

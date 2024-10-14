@@ -300,7 +300,7 @@
   "definitions": {
     "WellOrigin": {
       "title": "WellOrigin",
-      "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well",
+      "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    MENISCUS: the meniscus-center of the well",
       "enum": ["top", "bottom", "center", "meniscus"],
       "type": "string"
     },
@@ -344,7 +344,7 @@
         },
         "volumeOffset": {
           "title": "Volumeoffset",
-          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset. When \"operationVolume\" is specified, this volume is pulled from the volume command parameter.",
+          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset. When \"operationVolume\" is specified, this volume is pulled from the command volume parameter.",
           "default": 0.0,
           "anyOf": [
             {
@@ -933,6 +933,30 @@
       },
       "required": ["params"]
     },
+    "WellLocation": {
+      "title": "WellLocation",
+      "description": "A relative location in reference to a well's location.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "top",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        },
+        "volumeOffset": {
+          "title": "Volumeoffset",
+          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset.",
+          "default": 0.0,
+          "type": "number"
+        }
+      }
+    },
     "BlowOutParams": {
       "title": "BlowOutParams",
       "description": "Payload required to blow-out a specific well.",
@@ -953,7 +977,7 @@
           "description": "Relative well location at which to perform the operation",
           "allOf": [
             {
-              "$ref": "#/definitions/LiquidHandlingWellLocation"
+              "$ref": "#/definitions/WellLocation"
             }
           ]
         },
@@ -2019,30 +2043,6 @@
       },
       "required": ["params"]
     },
-    "WellLocation": {
-      "title": "WellLocation",
-      "description": "A relative location in reference to a well's location.",
-      "type": "object",
-      "properties": {
-        "origin": {
-          "default": "top",
-          "allOf": [
-            {
-              "$ref": "#/definitions/WellOrigin"
-            }
-          ]
-        },
-        "offset": {
-          "$ref": "#/definitions/WellOffset"
-        },
-        "volumeOffset": {
-          "title": "Volumeoffset",
-          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset.",
-          "default": 0.0,
-          "type": "number"
-        }
-      }
-    },
     "MoveToWellParams": {
       "title": "MoveToWellParams",
       "description": "Payload required to move a pipette to a specific well.",
@@ -2448,6 +2448,12 @@
       },
       "required": ["params"]
     },
+    "PickUpTipWellOrigin": {
+      "title": "PickUpTipWellOrigin",
+      "description": "The origin of a PickUpTipWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well",
+      "enum": ["top", "bottom", "center"],
+      "type": "string"
+    },
     "PickUpTipWellLocation": {
       "title": "PickUpTipWellLocation",
       "description": "A relative location in reference to a well's location.\n\nTo be used for picking up tips.",
@@ -2457,7 +2463,7 @@
           "default": "top",
           "allOf": [
             {
-              "$ref": "#/definitions/WellOrigin"
+              "$ref": "#/definitions/PickUpTipWellOrigin"
             }
           ]
         },

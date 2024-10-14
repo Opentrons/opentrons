@@ -310,10 +310,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
-            well_location = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
-                labware_id=labware_id,
-                well_name=well_name,
-                absolute_point=location.point,
+            well_location = (
+                self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=location.point,
+                )
             )
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,

@@ -205,12 +205,27 @@ class WellOrigin(str, Enum):
         TOP: the top-center of the well
         BOTTOM: the bottom-center of the well
         CENTER: the middle-center of the well
+        MENISCUS: the meniscus-center of the well
     """
 
     TOP = "top"
     BOTTOM = "bottom"
     CENTER = "center"
     MENISCUS = "meniscus"
+
+
+class PickUpTipWellOrigin(str, Enum):
+    """The origin of a PickUpTipWellLocation offset.
+
+    Props:
+        TOP: the top-center of the well
+        BOTTOM: the bottom-center of the well
+        CENTER: the middle-center of the well
+    """
+
+    TOP = "top"
+    BOTTOM = "bottom"
+    CENTER = "center"
 
 
 class DropTipWellOrigin(str, Enum):
@@ -260,7 +275,7 @@ class LiquidHandlingWellLocation(BaseModel):
     offset: WellOffset = Field(default_factory=WellOffset)
     volumeOffset: Union[float, Literal["operationVolume"]] = Field(
         default=0.0,
-        description="""A volume of liquid, in µL, to offset the z-axis offset. When "operationVolume" is specified, this volume is pulled from the volume command parameter.""",
+        description="""A volume of liquid, in µL, to offset the z-axis offset. When "operationVolume" is specified, this volume is pulled from the command volume parameter.""",
     )
 
 
@@ -270,7 +285,7 @@ class PickUpTipWellLocation(BaseModel):
     To be used for picking up tips.
     """
 
-    origin: WellOrigin = WellOrigin.TOP
+    origin: PickUpTipWellOrigin = PickUpTipWellOrigin.TOP
     offset: WellOffset = Field(default_factory=WellOffset)
 
 
