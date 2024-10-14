@@ -57,8 +57,8 @@ class Coordinate(BaseModel):
     z: _Number
 
 
-class DelayArguments(BaseModel):
-    """Arguments for delay."""
+class DelayParams(BaseModel):
+    """Parameters for delay."""
 
     duration: _NonNegativeNumber = Field(
         ..., description="Duration of delay, in seconds."
@@ -69,21 +69,21 @@ class DelayProperties(BaseModel):
     """Shared properties for delay.."""
 
     enable: bool = Field(..., description="Whether delay is enabled.")
-    params: Optional[DelayArguments] = Field(
+    params: Optional[DelayParams] = Field(
         None, description="Parameters for the delay function."
     )
 
     @validator("params")
     def _validate_params(
-        cls, v: Optional[DelayArguments], values: Dict[str, Any]
-    ) -> Optional[DelayArguments]:
+        cls, v: Optional[DelayParams], values: Dict[str, Any]
+    ) -> Optional[DelayParams]:
         if v is None and values["enable"]:
             raise ValueError("If enable is true parameters for delay must be defined.")
         return v
 
 
-class TouchTipArguments(BaseModel):
-    """Arguments for touch-tip."""
+class TouchTipParams(BaseModel):
+    """Parameters for touch-tip."""
 
     zOffset: _Number = Field(
         ...,
@@ -101,14 +101,14 @@ class TouchTipProperties(BaseModel):
     """Shared properties for the touch-tip function."""
 
     enable: bool = Field(..., description="Whether touch-tip is enabled.")
-    params: Optional[TouchTipArguments] = Field(
+    params: Optional[TouchTipParams] = Field(
         None, description="Parameters for the touch-tip function."
     )
 
     @validator("params")
     def _validate_params(
-        cls, v: Optional[TouchTipArguments], values: Dict[str, Any]
-    ) -> Optional[TouchTipArguments]:
+        cls, v: Optional[TouchTipParams], values: Dict[str, Any]
+    ) -> Optional[TouchTipParams]:
         if v is None and values["enable"]:
             raise ValueError(
                 "If enable is true parameters for touch tip must be defined."
@@ -116,8 +116,8 @@ class TouchTipProperties(BaseModel):
         return v
 
 
-class MixArguments(BaseModel):
-    """Arguments for mix."""
+class MixParams(BaseModel):
+    """Parameters for mix."""
 
     repetitions: _StrictNonNegativeInt = Field(
         ..., description="Number of mixing repetitions."
@@ -129,21 +129,21 @@ class MixProperties(BaseModel):
     """Mixing properties."""
 
     enable: bool = Field(..., description="Whether mix is enabled.")
-    params: Optional[MixArguments] = Field(
+    params: Optional[MixParams] = Field(
         None, description="Parameters for the mix function."
     )
 
     @validator("params")
     def _validate_params(
-        cls, v: Optional[MixArguments], values: Dict[str, Any]
-    ) -> Optional[MixArguments]:
+        cls, v: Optional[MixParams], values: Dict[str, Any]
+    ) -> Optional[MixParams]:
         if v is None and values["enable"]:
             raise ValueError("If enable is true parameters for mix must be defined.")
         return v
 
 
-class BlowoutArguments(BaseModel):
-    """Arguments for blowout."""
+class BlowoutParams(BaseModel):
+    """Parameters for blowout."""
 
     location: BlowoutLocation = Field(
         ..., description="Location well or trash entity for blow out."
@@ -157,14 +157,14 @@ class BlowoutProperties(BaseModel):
     """Blowout properties."""
 
     enable: bool = Field(..., description="Whether blow-out is enabled.")
-    params: Optional[BlowoutArguments] = Field(
+    params: Optional[BlowoutParams] = Field(
         None, description="Parameters for the blowout function."
     )
 
     @validator("params")
     def _validate_params(
-        cls, v: Optional[BlowoutArguments], values: Dict[str, Any]
-    ) -> Optional[BlowoutArguments]:
+        cls, v: Optional[BlowoutParams], values: Dict[str, Any]
+    ) -> Optional[BlowoutParams]:
         if v is None and values["enable"]:
             raise ValueError(
                 "If enable is true parameters for blowout must be defined."
@@ -234,8 +234,8 @@ class RetractDispense(BaseModel):
     )
 
 
-class AspirateParams(BaseModel):
-    """Parameters specific to the aspirate function."""
+class AspirateProperties(BaseModel):
+    """Properties specific to the aspirate function."""
 
     submerge: Submerge = Field(..., description="Submerge settings for aspirate.")
     retract: RetractAspirate = Field(
@@ -256,8 +256,8 @@ class AspirateParams(BaseModel):
     delay: DelayProperties = Field(..., description="Delay settings after an aspirate")
 
 
-class SingleDispenseParams(BaseModel):
-    """Parameters specific to the single-dispense function."""
+class SingleDispenseProperties(BaseModel):
+    """Properties specific to the single-dispense function."""
 
     submerge: Submerge = Field(
         ..., description="Submerge settings for single dispense."
@@ -280,8 +280,8 @@ class SingleDispenseParams(BaseModel):
     delay: DelayProperties = Field(..., description="Delay after dispense, in seconds.")
 
 
-class MultiDispenseParams(BaseModel):
-    """Parameters specific to the multi-dispense function."""
+class MultiDispenseProperties(BaseModel):
+    """Properties specific to the multi-dispense function."""
 
     submerge: Submerge = Field(..., description="Submerge settings for multi-dispense.")
     retract: RetractDispense = Field(
@@ -316,13 +316,13 @@ class ByTipTypeSetting(BaseModel):
         ...,
         description="The tip type whose properties will be used when handling this specific liquid class with this pipette",
     )
-    aspirate: AspirateParams = Field(
+    aspirate: AspirateProperties = Field(
         ..., description="Aspirate parameters for this tip type."
     )
-    singleDispense: SingleDispenseParams = Field(
+    singleDispense: SingleDispenseProperties = Field(
         ..., description="Single dispense parameters for this tip type."
     )
-    multiDispense: Optional[MultiDispenseParams] = Field(
+    multiDispense: Optional[MultiDispenseProperties] = Field(
         None, description="Optional multi-dispense parameters for this tip type."
     )
 
