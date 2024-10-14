@@ -359,8 +359,7 @@
           "$ref": "#/definitions/pushOutByVolume"
         },
         "delay": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Delay after dispense, in seconds."
+          "$ref": "#/definitions/delay"
         }
       },
       "required": [
@@ -393,9 +392,6 @@
         },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
-        },
-        "mix": {
-          "$ref": "#/definitions/mix"
         },
         "conditioningByVolume": {
           "$ref": "#/definitions/conditioningByVolume"
