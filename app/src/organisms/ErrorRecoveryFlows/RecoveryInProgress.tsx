@@ -76,7 +76,7 @@ export function RecoveryInProgress({
   )
 }
 
-const GRIPPER_RELEASE_COUNTDOWN_S = 5
+export const GRIPPER_RELEASE_COUNTDOWN_S = 3
 
 type UseGripperReleaseProps = Pick<
   RecoveryContentProps,

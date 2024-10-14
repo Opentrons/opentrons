@@ -5,7 +5,11 @@ import { act, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
-import { RecoveryInProgress, useGripperRelease } from '../RecoveryInProgress'
+import {
+  RecoveryInProgress,
+  useGripperRelease,
+  GRIPPER_RELEASE_COUNTDOWN_S,
+} from '../RecoveryInProgress'
 import { RECOVERY_MAP } from '../constants'
 
 const render = (props: React.ComponentProps<typeof RecoveryInProgress>) => {
@@ -124,7 +128,7 @@ describe('RecoveryInProgress', () => {
     }
     render(props)
 
-    screen.getByText('Gripper will release labware in 5 seconds')
+    screen.getByText('Gripper will release labware in 3 seconds')
   })
 
   it('updates countdown for gripper release', () => {
@@ -138,16 +142,16 @@ describe('RecoveryInProgress', () => {
     }
     render(props)
 
-    screen.getByText('Gripper will release labware in 5 seconds')
+    screen.getByText('Gripper will release labware in 3 seconds')
 
     act(() => {
       vi.advanceTimersByTime(1000)
     })
 
-    screen.getByText('Gripper will release labware in 4 seconds')
+    screen.getByText('Gripper will release labware in 2 seconds')
 
     act(() => {
-      vi.advanceTimersByTime(4000)
+      vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000 - 1000)
     })
 
     screen.getByText('Gripper releasing labware')
@@ -181,19 +185,19 @@ describe('useGripperRelease', () => {
     vi.useRealTimers()
   })
 
-  it('counts down from 5 seconds', () => {
+  it('counts down from 3 seconds', () => {
     const { result } = renderHook(() => useGripperRelease(mockProps))
 
-    expect(result.current).toBe(5)
+    expect(result.current).toBe(3)
 
     act(() => {
       vi.advanceTimersByTime(1000)
     })
 
-    expect(result.current).toBe(4)
+    expect(result.current).toBe(2)
 
     act(() => {
-      vi.advanceTimersByTime(4000)
+      vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000 - 1000)
     })
 
     expect(result.current).toBe(0)
@@ -203,7 +207,7 @@ describe('useGripperRelease', () => {
     renderHook(() => useGripperRelease(mockProps))
 
     act(() => {
-      vi.advanceTimersByTime(5000)
+      vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S)
     })
 
     await vi.runAllTimersAsync()
@@ -234,7 +238,7 @@ describe('useGripperRelease', () => {
     renderHook(() => useGripperRelease(modifiedProps))
 
     act(() => {
-      vi.advanceTimersByTime(5000)
+      vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000)
     })
 
     await vi.runAllTimersAsync()
@@ -261,7 +265,7 @@ describe('useGripperRelease', () => {
     renderHook(() => useGripperRelease(modifiedProps))
 
     act(() => {
-      vi.advanceTimersByTime(5000)
+      vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000)
     })
 
     await vi.runAllTimersAsync()
