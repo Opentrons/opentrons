@@ -79,4 +79,6 @@ export interface UpdateProvider<UpdateSourceDetails> {
   unlockUpdateCache: () => void
   // get an identifier for logging
   name: () => string
+  // get the current source
+  source: () => UpdateSourceDetails
 }

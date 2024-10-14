@@ -99,5 +99,6 @@ export function getProvider(
       return rm(tempdir, { recursive: true, force: true })
     },
     name: () => `USBUpdateProvider from ${from.massStorageDeviceRoot}`,
+    source: () => from,
   }
 }

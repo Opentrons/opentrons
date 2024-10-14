@@ -1,69 +1,33 @@
-// system update files
-import assert from 'assert'
-import path from 'path'
-import { readFile } from 'fs/promises'
-import { promisify } from 'util'
+// system update handler
 
-import { ensureDir } from 'fs-extra'
-import StreamZip from 'node-stream-zip'
-import getStream from 'get-stream'
+import Semver from 'semver'
 
 import { CONFIG_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import { postFile } from '../http'
 import { getConfig } from '../config'
 import { getSystemUpdateDir } from './directories'
-import {
-  SYSTEM_FILENAME,
-  VERSION_FILENAME,
-  FLEX_MANIFEST_URL,
-  SYSTEM_UPDATE_DIRECTORY,
-} from './constants'
+import { SYSTEM_FILENAME, FLEX_MANIFEST_URL } from './constants'
 import { getProvider as getWebUpdateProvider } from './from-web'
 import { getProvider as getUsbUpdateProvider } from './from-usb'
 
-import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
-import type {
-  UserFileInfo,
-  ReleaseSetFilepaths,
-  UpdateProvider,
-  UnresolvedUpdate,
-} from './types'
-import type { WebUpdateSource } from './from-web'
+import type { UpdateProvider, UnresolvedUpdate, ReadyUpdate } from './types'
 import type { USBUpdateSource } from './from-usb'
+import { VALUE_UPDATED } from '@opentrons/app/src/redux/config'
 
-const CURRENT_SYSTEM_VERSION = _PKG_VERSION_
+export const CURRENT_SYSTEM_VERSION = _PKG_VERSION_
 
-const log = createLogger('systemUpdate/index')
+const log = createLogger('system-update/handler')
 
-let isGettingLatestSystemFiles = false
-const isGettingMassStorageUpdatesFrom = new Set<string>()
-let massStorageUpdateSet: ReleaseSetFilepaths | null = null
-let systemUpdateSet: ReleaseSetFilepaths | null = null
-/*
-const readFileInfoAndDispatch = (
-  dispatch: Dispatch,
-  fileName: string,
-  isManualFile: boolean = false
-): Promise<unknown> =>
-  readUserFileInfo(fileName)
-    .then(fileInfo => ({
-      type: 'robotUpdate:FILE_INFO' as const,
-      payload: {
-        systemFile: fileInfo.systemFile,
-        version: fileInfo.versionInfo.opentrons_api_version,
-        isManualFile,
-      },
-    }))
-    .catch((error: Error) => ({
-      type: 'robotUpdate:UNEXPECTED_ERROR' as const,
-      payload: { message: error.message },
-    }))
-    .then(dispatch)
-*/
+export interface UpdateDriver {
+  handleAction: (action: Action) => Promise<void>
+  reload: () => Promise<void>
+  shouldReload: () => boolean
+  teardown: () => Promise<void>
+}
 
-export function registerUpdateDriver(dispatch: Dispatch): Dispatch {
+export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
   log.info(`Running robot system updates storing to ${getSystemUpdateDir()}`)
   let webUpdate: UnresolvedUpdate = {
     version: null,
@@ -74,138 +38,316 @@ export function registerUpdateDriver(dispatch: Dispatch): Dispatch {
   let webProvider = getWebUpdateProvider({
     manifestUrl: FLEX_MANIFEST_URL,
     channel: getConfig('update').channel,
-    updateCacheDirectory: SYSTEM_UPDATE_DIRECTORY,
+    updateCacheDirectory: getSystemUpdateDir(),
     currentVersion: CURRENT_SYSTEM_VERSION,
   })
   let usbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {}
+  let currentBestUsbUpdate:
+    | (ReadyUpdate & { providerName: string })
+    | null = null
 
-  return function handleAction(action: Action) {
-    switch (action.type) {
-      case 'shell:CHECK_UPDATE':
-        webProvider
-          .refreshUpdateCache(updateStatus => {
-            webUpdate = updateStatus
-            if (updateStatus.files != null) {
-              dispatchUpdateInfo(
-                {
-                  force: false,
-                  version: updateStatus.version,
-                  releaseNotes: updateStatus.releaseNotes,
-                },
-                dispatch
+  const updateBestUsbUpdate = () => {
+    currentBestUsbUpdate = null
+    Object.values(usbProviders).forEach(provider => {
+      const providerUpdate = provider.getUpdateDetails()
+      if (providerUpdate.files == null) {
+        return
+      } else if (currentBestUsbUpdate == null) {
+        currentBestUsbUpdate = {
+          ...(providerUpdate as ReadyUpdate),
+          providerName: provider.name(),
+        }
+      } else if (
+        Semver.gt(providerUpdate.version, currentBestUsbUpdate.version)
+      ) {
+        currentBestUsbUpdate = {
+          ...(providerUpdate as ReadyUpdate),
+          providerName: provider.name(),
+        }
+      }
+    })
+  }
+
+  const dispatchStaticUpdateData = () => {
+    if (currentBestUsbUpdate != null) {
+      dispatchUpdateInfo(
+        {
+          version: currentBestUsbUpdate.version,
+          releaseNotes: currentBestUsbUpdate.releaseNotes,
+          force: true,
+        },
+        dispatch
+      )
+    } else {
+      dispatchUpdateInfo(
+        {
+          version: webUpdate.version,
+          releaseNotes: webUpdate.releaseNotes,
+          force: false,
+        },
+        dispatch
+      )
+    }
+  }
+
+  return {
+    handleAction: action => {
+      switch (action.type) {
+        case 'shell:CHECK_UPDATE':
+          return webProvider
+            .refreshUpdateCache(updateStatus => {
+              webUpdate = updateStatus
+              if (currentBestUsbUpdate == null) {
+                if (
+                  updateStatus.version != null &&
+                  updateStatus.files == null &&
+                  updateStatus.downloadProgress == 0
+                ) {
+                  dispatch({
+                    type: 'robotUpdate:UPDATE_VERSION',
+                    payload: {
+                      version: updateStatus.version,
+                      force: false,
+                      target: 'flex',
+                    },
+                  })
+                } else if (
+                  updateStatus.version != null &&
+                  updateStatus.files == null &&
+                  updateStatus.downloadProgress != 0
+                ) {
+                  dispatch({
+                    // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
+                    type: 'robotUpdate:DOWNLOAD_PROGRESS',
+                    payload: {
+                      progress: updateStatus.downloadProgress,
+                      target: 'flex',
+                    },
+                  })
+                } else if (updateStatus.files != null) {
+                  dispatchStaticUpdateData()
+                }
+              }
+            })
+            .catch(err => {
+              log.warning(
+                `Error finding updates with ${webProvider.name()}: ${
+                  err.name
+                }: ${err.message}`
               )
-            }
+              return {
+                version: null,
+                files: null,
+                downloadProgress: 0,
+                releaseNotes: null,
+              } as const
+            })
+            .then(result => {
+              webUpdate = result
+              dispatchStaticUpdateData()
+            })
+        case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
+          if (usbProviders[action.payload.rootPath] != null) {
+            return new Promise(resolve => resolve())
+          }
+          usbProviders[action.payload.rootPath] = getUsbUpdateProvider({
+            currentVersion: CURRENT_SYSTEM_VERSION,
+            massStorageDeviceRoot: action.payload.rootPath,
+            massStorageDeviceFiles: action.payload.filePaths,
           })
-          .catch(err =>
-            log.warning(
-              `Error finding updates with ${webProvider.name()}: ${err.name}: ${
-                err.message
-              }`
-            )
-          )
-        break
-      case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
-        if (usbProviders[action.payload.rootPath] == null) {
-          return
-        }
-        usbProviders[action.payload.rootPath] = getUsbUpdateProvider({
-          currentVersion: CURRENT_SYSTEM_VERSION,
-          massStorageDeviceRoot: action.payload.rootPath,
-          massStorageDeviceFiles: action.payload.filePaths,
-        })
+          return usbProviders[action.payload.rootPath]
+            .refreshUpdateCache(() => {})
+            .then(results => {
+              updateBestUsbUpdate()
 
-        if (isGettingMassStorageUpdatesFrom.has(action.payload.rootPath)) {
-          return
-        }
-        isGettingMassStorageUpdatesFrom.add(action.payload.rootPath)
-        getLatestMassStorageUpdateFiles(action.payload.filePaths, dispatch)
-          .then(() => {
-            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
-          })
-          .catch(() => {
-            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
-          })
-        break
-      case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
-        if (
-          massStorageUpdateSet !== null &&
-          massStorageUpdateSet.system.startsWith(action.payload.rootPath)
-        ) {
-          console.log(
-            `Mass storage device ${action.payload.rootPath} removed, reverting to non-usb updates`
-          )
-          massStorageUpdateSet = null
-          getCachedSystemUpdateFiles(dispatch)
-        } else {
-          console.log(
-            `Mass storage device ${action.payload.rootPath} removed but this was not an update source`
-          )
-        }
-        break
-      case 'robotUpdate:UPLOAD_FILE': {
-        const { host, path, systemFile } = action.payload
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        postFile(
-          `http://${host.ip}:${host.port}${path}`,
-          SYSTEM_FILENAME,
-          systemFile
-        )
-          .then(() => ({
-            type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
-            payload: host.name,
-          }))
-          .catch((error: Error) => {
-            log.warn('Error uploading update to robot', {
-              path,
-              systemFile,
-              error,
+              dispatchStaticUpdateData()
+            })
+            .catch(err => {
+              log.error(
+                `Failed to get updates from ${action.payload.rootPath}: ${err.name}: ${err.message}`
+              )
             })
 
-            return {
-              type: 'robotUpdate:UNEXPECTED_ERROR' as const,
-              payload: {
-                message: `Error uploading update to robot: ${error.message}`,
-              },
+        case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
+          const provider = usbProviders[action.payload.rootPath]
+          if (provider != null) {
+            return provider
+              .teardown()
+              .then(() => {
+                delete usbProviders[action.payload.rootPath]
+                updateBestUsbUpdate()
+              })
+              .catch(err => {
+                log.error(
+                  `Failed to tear down provider ${provider.name()}: ${
+                    err.name
+                  }: ${err.message}`
+                )
+              })
+          }
+          return new Promise(resolve => resolve())
+        case 'robotUpdate:UPLOAD_FILE': {
+          const { host, path, systemFile } = action.payload
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          return postFile(
+            `http://${host.ip}:${host.port}${path}`,
+            SYSTEM_FILENAME,
+            systemFile
+          )
+            .then(() => ({
+              type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
+              payload: host.name,
+            }))
+            .catch((error: Error) => {
+              log.warn('Error uploading update to robot', {
+                path,
+                systemFile,
+                error,
+              })
+
+              return {
+                type: 'robotUpdate:UNEXPECTED_ERROR' as const,
+                payload: {
+                  message: `Error uploading update to robot: ${error.message}`,
+                },
+              }
+            })
+            .then(dispatch)
+        }
+        case 'robotUpdate:READ_SYSTEM_FILE': {
+          const getDetails = (): {
+            systemFile: string
+            version: string
+            isManualFile: false
+          } | null => {
+            if (currentBestUsbUpdate) {
+              return {
+                systemFile: currentBestUsbUpdate.files.system,
+                version: currentBestUsbUpdate.version,
+                isManualFile: false,
+              }
+            } else if (webUpdate.files?.system != null) {
+              return {
+                systemFile: webUpdate.files.system,
+                version: webUpdate.version as string, // version is string if files is not null
+                isManualFile: false,
+              }
+            } else {
+              return null
             }
+          }
+          return new Promise(resolve => {
+            const details = getDetails()
+            if (details == null) {
+              dispatch({
+                type: 'robotUpdate:UNEXPECTED_ERROR',
+                payload: { message: 'System update file not downloaded' },
+              })
+              resolve()
+              return
+            }
+
+            dispatch({
+              type: 'robotUpdate:FILE_INFO' as const,
+              payload: details,
+            })
+            resolve()
           })
-          .then(dispatch)
-
-        break
+        }
+        case 'robotUpdate:READ_USER_FILE': {
+          return new Promise(resolve => {
+            dispatch({
+              type: 'robotUpdate:UNEXPECTED_ERROR',
+              payload: {
+                message: 'Updates of this kind are not implemented for ODD',
+              },
+            })
+            resolve()
+          })
+        }
       }
-
-      case 'robotUpdate:READ_USER_FILE': {
-        const { systemFile } = action.payload as { systemFile: string }
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        //readFileInfoAndDispatch(dispatch, systemFile, true)
-        break
-      }
-      case 'robotUpdate:READ_SYSTEM_FILE': {
-        const systemFile =
-          massStorageUpdateSet?.system ?? systemUpdateSet?.system
-        if (systemFile == null) {
+      return new Promise(resolve => resolve())
+    },
+    reload: () => {
+      webProvider.lockUpdateCache()
+      return webProvider
+        .teardown()
+        .catch(err => {
+          log.error(
+            `Failed to tear down web provider ${webProvider.name()}: ${
+              err.name
+            }: ${err.message}`
+          )
+        })
+        .then(() => {
+          webProvider = getWebUpdateProvider({
+            manifestUrl: FLEX_MANIFEST_URL,
+            channel: getConfig('update').channel,
+            updateCacheDirectory: getSystemUpdateDir(),
+            currentVersion: CURRENT_SYSTEM_VERSION,
+          })
+        })
+        .catch(err => {
+          const message = `System updates failed to handle config change: ${err.name}: ${err.message}`
+          log.error(message)
           dispatch({
             type: 'robotUpdate:UNEXPECTED_ERROR',
-            payload: { message: 'System update file not downloaded' },
+            payload: { message: message },
           })
-          return
+        })
+    },
+    shouldReload: () =>
+      getConfig('update').channel !== webProvider.source().channel,
+    teardown: () => {
+      return Promise.allSettled([
+        webProvider.teardown(),
+        ...Object.values(usbProviders).map(provider => provider.teardown()),
+      ])
+        .catch(errs => {
+          log.error(`Failed to tear down some providers: ${errs}`)
+        })
+        .then(results => {
+          log.info('all providers town down')
+        })
+    },
+  }
+}
+
+export interface UpdatableDriver {
+  getUpdateDriver: () => UpdateDriver | null
+  handleAction: (action: Action) => Promise<void>
+}
+
+export function manageDriver(dispatch: Dispatch): UpdatableDriver {
+  let updateDriver: UpdateDriver | null = null
+  return {
+    handleAction: action => {
+      if (action.type === CONFIG_INITIALIZED) {
+        return new Promise(resolve => {
+          updateDriver = registerUpdateDriver(dispatch)
+          resolve()
+        })
+      } else if (updateDriver != null) {
+        if (action.type === VALUE_UPDATED && updateDriver.shouldReload()) {
+          return updateDriver.reload()
+        } else {
+          return updateDriver.handleAction(action)
         }
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        //readFileInfoAndDispatch(dispatch, systemFile)
-        break
+      } else {
+        return new Promise(resolve => {
+          log.warning(
+            `update driver manager received action ${action.type} before initialization`
+          )
+          resolve()
+        })
       }
-    }
+    },
+    getUpdateDriver: () => updateDriver,
   }
 }
 
 export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
-  let updateDriver: Dispatch | null = null
-
-  return function handleAction(action: Action) {
-    if (action.type === CONFIG_INITIALIZED) {
-      updateDriver = registerUpdateDriver(dispatch)
-    }
-    updateDriver != null && updateDriver(action)
-  }
+  return manageDriver(dispatch).handleAction
 }
 
 const dispatchUpdateInfo = (
@@ -220,172 +362,5 @@ const dispatchUpdateInfo = (
   dispatch({
     type: 'robotUpdate:UPDATE_VERSION',
     payload: { version, force, target: 'flex' },
-  })
-}
-
-// Get latest system update version
-//   1. Ensure the system update directory exists
-//   2. Get the manifest file from the local cache
-//   3. Get the release files according to the manifest
-//      a. If the files need downloading, dispatch progress updates to UI
-//   4. Cache the filepaths of the update files in memory
-//   5. Dispatch info or error to UI
-export function getLatestSystemUpdateFiles(
-  dispatch: Dispatch
-): Promise<unknown> {
-  const fileDownloadDir = path.join(
-    getSystemUpdateDir(),
-    'robot-system-updates'
-  )
-
-  return (
-    ensureDir(getSystemUpdateDir())
-      /*.then(() => getLatestSystemUpdateUrls())*/
-      .then(
-        /*urls*/ () => {
-          /*if (urls === null) {
-        const latestVersion = getLatestVersion()
-        log.warn('No release files in manifest', {
-          version: latestVersion,
-        })
-        return Promise.reject(
-          new Error(`No release files in manifest for version ${latestVersion}`)
-        )
-      }*/
-
-          let prevPercentDone = 0
-
-          const handleProgress = (progress: DownloadProgress): void => {
-            const { downloaded, size } = progress
-            if (size !== null) {
-              const percentDone = Math.round((downloaded / size) * 100)
-              if (Math.abs(percentDone - prevPercentDone) > 0) {
-                if (massStorageUpdateSet === null) {
-                  dispatch({
-                    // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
-                    type: 'robotUpdate:DOWNLOAD_PROGRESS',
-                    payload: { progress: percentDone, target: 'flex' },
-                  })
-                }
-                prevPercentDone = percentDone
-              }
-            }
-          }
-          /*
-      return getReleaseFiles(urls, fileDownloadDir, handleProgress)
-        .then(filepaths => {
-          return cacheUpdateSet(filepaths)
-        })
-        .then(updateInfo => {
-          massStorageUpdateSet === null &&
-            dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
-        })
-        .catch((error: Error) => {
-          dispatch({
-            type: 'robotUpdate:DOWNLOAD_ERROR',
-            payload: { error: error.message, target: 'flex' },
-          })
-        })
-        .then(() =>
-          cleanupReleaseFiles(getSystemUpdateDir(), 'robot-system-updates')
-        )
-        .catch((error: Error) => {
-          log.warn('Unable to cleanup old release files', { error })
-        })
-        */
-        }
-      )
-  )
-}
-
-export function getCachedSystemUpdateFiles(
-  dispatch: Dispatch
-): Promise<unknown> {
-  if (systemUpdateSet) {
-    return getInfoFromUpdateSet(systemUpdateSet)
-      .then(updateInfo => {
-        dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
-      })
-      .catch(err => {
-        console.log(`Could not get info from update set: ${err}`)
-      })
-  } else {
-    dispatchUpdateInfo(
-      { version: null, releaseNotes: null, force: false },
-      dispatch
-    )
-    return new Promise(resolve => {
-      resolve('no files')
-    })
-  }
-}
-
-function getInfoFromUpdateSet(
-  filepaths: ReleaseSetFilepaths
-): Promise<{ version: string; releaseNotes: string | null }> {
-  const version = '0.0.0' /*getLatestVersion()*/
-  const releaseNotesContentPromise = filepaths.releaseNotes
-    ? readFile(filepaths.releaseNotes, 'utf8')
-    : new Promise<string | null>(resolve => {
-        resolve(null)
-      })
-  return releaseNotesContentPromise
-    .then(releaseNotes => ({
-      version: version,
-      releaseNotes,
-    }))
-    .catch(() => ({ version: version, releaseNotes: '' }))
-}
-
-function cacheUpdateSet(
-  filepaths: ReleaseSetFilepaths
-): Promise<{ version: string; releaseNotes: string | null }> {
-  systemUpdateSet = filepaths
-  return getInfoFromUpdateSet(systemUpdateSet)
-}
-
-export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
-  const openZip = new Promise<StreamZip>((resolve, reject) => {
-    const zip = new StreamZip({ file: systemFile, storeEntries: true })
-      .once('ready', handleReady)
-      .once('error', handleError)
-
-    function handleReady(): void {
-      cleanup()
-      resolve(zip)
-    }
-
-    function handleError(error: Error): void {
-      cleanup()
-      zip.close()
-      reject(error)
-    }
-
-    function cleanup(): void {
-      zip.removeListener('ready', handleReady)
-      zip.removeListener('error', handleError)
-    }
-  })
-
-  return openZip.then(zip => {
-    const entries = zip.entries()
-    const streamFromZip = promisify(zip.stream.bind(zip))
-
-    assert(VERSION_FILENAME in entries, `${VERSION_FILENAME} not in archive`)
-
-    const result = streamFromZip(VERSION_FILENAME)
-      // @ts-expect-error(mc, 2021-02-17): stream may be undefined
-      .then(getStream)
-      .then(JSON.parse)
-      .then(versionInfo => ({
-        systemFile,
-        versionInfo,
-      }))
-
-    result.finally(() => {
-      zip.close()
-    })
-
-    return result
   })
 }

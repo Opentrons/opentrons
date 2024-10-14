@@ -188,6 +188,7 @@ export function getProvider(
     },
     name: () =>
       `WebUpdateProvider from ${from.manifestUrl} channel ${from.channel}`,
+    source: () => from,
   }
 }
 
