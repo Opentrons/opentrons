@@ -288,7 +288,6 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
     ConfigureNozzleLayoutCommandType,
-    ConfigureNozzleLayoutPrivateResult,
 )
 
 from .verify_tip_presence import (
@@ -709,7 +708,6 @@ CommandPrivateResult = Union[
     None,
     LoadPipettePrivateResult,
     ConfigureForVolumePrivateResult,
-    ConfigureNozzleLayoutPrivateResult,
 ]
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
