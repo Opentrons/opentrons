@@ -632,31 +632,23 @@ class PipetteView(HasState[PipetteState]):
 
     def get_nozzle_layout_type(self, pipette_id: str) -> NozzleConfigurationType:
         """Get the current set nozzle layout configuration."""
-        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
-        if nozzle_map_for_pipette:
-            return nozzle_map_for_pipette.configuration
-        else:
-            return NozzleConfigurationType.FULL
+        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map_for_pipette.configuration
 
     def get_is_partially_configured(self, pipette_id: str) -> bool:
         """Determine if the provided pipette is partially configured."""
         return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
 
-    def get_primary_nozzle(self, pipette_id: str) -> Optional[str]:
+    def get_primary_nozzle(self, pipette_id: str) -> str:
         """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
-        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
-        return nozzle_map.starting_nozzle if nozzle_map else None
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map.starting_nozzle
 
     def _get_critical_point_offset_without_tip(
         self, pipette_id: str, critical_point: Optional[CriticalPoint]
     ) -> Point:
         """Get the offset of the specified critical point from pipette's mount position."""
-        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
-        # Nozzle map is unavailable only when there's no pipette loaded
-        # so this is merely for satisfying the type checker
-        assert (
-            nozzle_map is not None
-        ), "Error getting critical point offset. Nozzle map not found."
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
         match critical_point:
             case CriticalPoint.INSTRUMENT_XY_CENTER:
                 return nozzle_map.instrument_xy_center_offset
