@@ -27,7 +27,7 @@ export function LeftColumnLabwareInfo({
   const buildNewLocation = (): React.ComponentProps<
     typeof InterventionContent
   >['infoProps']['newLocationProps'] =>
-    newLoc != null ? { deckLabel: newLoc } : undefined
+    newLoc != null ? { deckLabel: newLoc.toUpperCase() } : undefined
 
   return (
     <InterventionContent
@@ -36,7 +36,7 @@ export function LeftColumnLabwareInfo({
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: { deckLabel: currentLoc },
+        currentLocationProps: { deckLabel: currentLoc.toUpperCase() },
         newLocationProps: buildNewLocation(),
       }}
       notificationProps={

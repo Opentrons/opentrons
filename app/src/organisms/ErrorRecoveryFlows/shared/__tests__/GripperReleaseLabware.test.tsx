@@ -38,7 +38,7 @@ describe('GripperReleaseLabware', () => {
     screen.getByText(
       'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
     )
-    screen.getByText('The labware will be released from its current height')
+    screen.getByText('The labware will be released from its current height.')
   })
 
   it('clicking the primary button has correct behavior', () => {

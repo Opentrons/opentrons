@@ -10,7 +10,7 @@ import { RECOVERY_MAP } from '../constants'
 
 import type { RecoveryContentProps } from '../types'
 import type * as React from 'react'
-import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps

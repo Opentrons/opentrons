@@ -27,8 +27,8 @@ describe('LeftColumnLabwareInfo', () => {
         failedLabwareName: 'MOCK_LW_NAME',
         failedLabwareNickname: 'MOCK_LW_NICKNAME',
         failedLabwareLocations: {
-          currentLoc: 'A1',
-          newLoc: 'B2',
+          currentLoc: 'slot A1',
+          newLoc: 'slot B2',
         },
       } as any,
       type: 'location',
@@ -51,8 +51,8 @@ describe('LeftColumnLabwareInfo', () => {
           type: 'location',
           labwareName: 'MOCK_LW_NAME',
           labwareNickname: 'MOCK_LW_NICKNAME',
-          currentLocationProps: { deckLabel: 'A1' },
-          newLocationProps: { deckLabel: 'B2' },
+          currentLocationProps: { deckLabel: 'SLOT A1' },
+          newLocationProps: { deckLabel: 'SLOT B2' },
         },
         notificationProps: {
           type: 'alert',
@@ -91,16 +91,16 @@ describe('LeftColumnLabwareInfo', () => {
 
   it('converts location labels to uppercase', () => {
     props.failedLabwareUtils.failedLabwareLocations = {
-      currentLoc: 'A1',
-      newLoc: 'B2',
+      currentLoc: 'slot A1',
+      newLoc: 'slot B2',
     }
     render(props)
 
     expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
       expect.objectContaining({
         infoProps: expect.objectContaining({
-          currentLocationProps: { deckLabel: 'A1' },
-          newLocationProps: { deckLabel: 'B2' },
+          currentLocationProps: { deckLabel: 'SLOT A1' },
+          newLocationProps: { deckLabel: 'SLOT B2' },
         }),
       }),
       {}

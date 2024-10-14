@@ -107,7 +107,11 @@ export function useERUtils({
     ...subMapUtils
   } = useRecoveryRouting()
 
-  const doorStatusUtils = useShowDoorInfo(runStatus, recoveryMap)
+  const doorStatusUtils = useShowDoorInfo(
+    runStatus,
+    recoveryMap,
+    recoveryMap.step
+  )
 
   const recoveryToastUtils = useRecoveryToasts({
     currentStepCount: stepCounts.currentStepNumber,

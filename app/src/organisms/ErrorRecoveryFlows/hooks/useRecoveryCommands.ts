@@ -59,6 +59,8 @@ export interface UseRecoveryCommandsResult {
   pickUpTips: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   releaseGripperJaws: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
+  homeGripperZAxis: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -219,6 +221,10 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
 
+  const homeGripperZAxis = useCallback((): Promise<CommandData[]> => {
+    return chainRunRecoveryCommands([HOME_GRIPPER_Z_AXIS])
+  }, [chainRunRecoveryCommands])
+
   return {
     resumeRun,
     cancelRun,
@@ -226,6 +232,7 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     releaseGripperJaws,
+    homeGripperZAxis,
     skipFailedCommand,
     ignoreErrorKindThisRun,
   }
@@ -240,6 +247,12 @@ export const HOME_PIPETTE_Z_AXES: CreateCommand = {
 export const RELEASE_GRIPPER_JAW: CreateCommand = {
   commandType: 'unsafe/ungripLabware',
   params: {},
+  intent: 'fixit',
+}
+
+export const HOME_GRIPPER_Z_AXIS: CreateCommand = {
+  commandType: 'home',
+  params: { axes: ['extensionZ'] },
   intent: 'fixit',
 }
 

@@ -148,6 +148,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const isDisabled = (): boolean => {
     switch (runStatus) {
       case RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR:
+      case RUN_STATUS_AWAITING_RECOVERY_PAUSED:
         return true
       default:
         return false

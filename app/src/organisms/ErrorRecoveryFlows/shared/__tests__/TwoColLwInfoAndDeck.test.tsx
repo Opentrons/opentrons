@@ -1,5 +1,4 @@
 import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
