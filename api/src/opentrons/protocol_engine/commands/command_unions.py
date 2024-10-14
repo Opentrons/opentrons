@@ -11,6 +11,7 @@ from .command import DefinedErrorData
 from .pipetting_common import (
     OverpressureError,
     LiquidNotFoundError,
+    TipPhysicallyAttachedError,
 )
 
 from . import absorbance_reader
@@ -84,7 +85,6 @@ from .drop_tip import (
     DropTipCreate,
     DropTipResult,
     DropTipCommandType,
-    TipPhysicallyAttachedError,
 )
 
 from .drop_tip_in_place import (

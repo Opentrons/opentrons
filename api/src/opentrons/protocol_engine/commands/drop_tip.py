@@ -1,7 +1,6 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
 
-from opentrons_shared_data.errors import ErrorCodes
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
@@ -11,7 +10,11 @@ from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 from ..state import update_types
 from ..types import DropTipWellLocation, DeckPoint
-from .pipetting_common import PipetteIdMixin, DestinationPositionResult
+from .pipetting_common import (
+    PipetteIdMixin,
+    DestinationPositionResult,
+    TipPhysicallyAttachedError,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -62,20 +65,6 @@ class DropTipResult(DestinationPositionResult):
     """Result data from the execution of a DropTip command."""
 
     pass
-
-
-class TipPhysicallyAttachedError(ErrorOccurrence):
-    """Returned when sensors determine that a tip remains on the pipette after a drop attempt.
-
-    The pipette will act as if the tip was not dropped. So, you won't be able to pick
-    up a new tip without dropping the current one, and movement commands will assume
-    there is a tip hanging off the bottom of the pipette.
-    """
-
-    isDefined: bool = True
-    errorType: Literal["tipPhysicallyAttached"] = "tipPhysicallyAttached"
-    errorCode: str = ErrorCodes.TIP_DROP_FAILED.value.code
-    detail: str = "Tip still detected after trying to drop it."
 
 
 _ExecuteReturn = (
