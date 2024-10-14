@@ -16,6 +16,9 @@ if (!$root) {
   throw new Error('fatal: :root not found')
 }
 
+const basePath = import.meta.env.BASE_URL
+console.log({ basePath })
+
 const Root = (): JSX.Element => (
   <BrowserRouter>
     <Routes>
