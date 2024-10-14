@@ -36,6 +36,7 @@ describe('RunningProtocolCommandList', () => {
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
       robotType: FLEX_ROBOT_TYPE,
+      allRunDefs: [],
     }
   })
   it('should render text and buttons', () => {

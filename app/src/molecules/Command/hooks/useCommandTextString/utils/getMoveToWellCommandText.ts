@@ -10,6 +10,7 @@ import type { HandlesCommands } from './types'
 
 export function getMoveToWellCommandText({
   command,
+  allRunDefs,
   t,
   commandTextData,
   robotType,
@@ -27,6 +28,7 @@ export function getMoveToWellCommandText({
     labwareLocation != null && commandTextData != null
       ? getLabwareDisplayLocation(
           commandTextData,
+          allRunDefs,
           labwareLocation,
           t as TFunction,
           robotType
