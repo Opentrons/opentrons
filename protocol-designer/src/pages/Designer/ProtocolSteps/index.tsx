@@ -3,24 +3,29 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
+  POSITION_FIXED,
   SPACING,
+  Tag,
   ToggleGroup,
 } from '@opentrons/components'
 import { getUnsavedForm } from '../../../step-forms/selectors'
 import { getSelectedSubstep } from '../../../ui/steps/selectors'
+import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
 import { TimelineToolbox, SubstepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
 
 export function ProtocolSteps(): JSX.Element {
-  const { t } = useTranslation(['starting_deck_state'])
+  const { t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
   const selectedSubstep = useSelector(getSelectedSubstep)
+  const enableHoyKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -67,6 +72,15 @@ export function ProtocolSteps(): JSX.Element {
         ) : (
           <OffDeck tab="protocolSteps" />
         )}
+        {enableHoyKeyDisplay ? (
+          <Box position={POSITION_FIXED} left="20.25rem" bottom="0.75rem">
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <Tag text={t('double_click_to_edit')} type="default" />
+              <Tag text={t('shift_click_to_select_all')} type="default" />
+              <Tag text={t('option_click_to_multi_select')} type="default" />
+            </Flex>
+          </Box>
+        ) : null}
       </Flex>
     </>
   )
