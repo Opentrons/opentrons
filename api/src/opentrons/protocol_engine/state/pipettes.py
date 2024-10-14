@@ -143,9 +143,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         """Modify state in reaction to an action."""
         state_update = get_state_update(action)
         if state_update is not None:
-            self._set_load_pipette(state_update)
+            self._load_pipette_or_update_config(state_update)
             self._update_current_location(state_update)
-            self._update_pipette_config(state_update)
             self._update_pipette_nozzle_map(state_update)
             self._update_tip_state(state_update)
 
@@ -155,7 +154,52 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
-    def _set_load_pipette(self, state_update: update_types.StateUpdate) -> None:
+    def _load_pipette_or_update_config(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        if state_update.pipette_config != update_types.NO_CHANGE:
+            config = state_update.pipette_config.config
+            self._state.static_config_by_id[
+                state_update.pipette_config.pipette_id
+            ] = StaticPipetteConfig(
+                serial_number=state_update.pipette_config.serial_number,
+                model=config.model,
+                display_name=config.display_name,
+                min_volume=config.min_volume,
+                max_volume=config.max_volume,
+                channels=config.channels,
+                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
+                nominal_tip_overlap=config.nominal_tip_overlap,
+                home_position=config.home_position,
+                nozzle_offset_z=config.nozzle_offset_z,
+                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                    back_left_corner=config.back_left_corner_offset,
+                    front_right_corner=config.front_right_corner_offset,
+                    back_right_corner=Point(
+                        config.front_right_corner_offset.x,
+                        config.back_left_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                    front_left_corner=Point(
+                        config.back_left_corner_offset.x,
+                        config.front_right_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                ),
+                bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
+                ),
+                default_nozzle_map=config.nozzle_map,
+                lld_settings=config.pipette_lld_settings,
+            )
+            self._state.flow_rates_by_id[
+                state_update.pipette_config.pipette_id
+            ] = config.flow_rates
+            self._state.nozzle_configuration_by_id[
+                state_update.pipette_config.pipette_id
+            ] = config.nozzle_map
+
         if state_update.loaded_pipette != update_types.NO_CHANGE:
             pipette_id = state_update.loaded_pipette.pipette_id
 
@@ -170,10 +214,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
-            # TODO(mm, 2024-10-11): This seems wrong--because of the order in which
-            # we process the individual attributes of StateUpdate, when we process a
-            # loadPipette command, won't we always reach here before static_config is
-            # populated?
+
+            # This should always be truthy because LoadPipetteImplementation always
+            # supplies state_update.pipette_config, which we process above,
+            # populating self._state.static_config_by_id[pipette_id].
+            #
+            # todo(mm, 2024-10-14): Formalize this expectation by having
+            # state_update.loaded_pipette incorporate all the stuff in
+            # state_update.pipette_config, so LoadPipetteImplementation only has to
+            # supply state_update.loaded_pipette.
             static_config = self._state.static_config_by_id.get(pipette_id)
             if static_config:
                 self._state.nozzle_configuration_by_id[
@@ -265,50 +314,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 self._state.current_deck_point = CurrentDeckPoint(
                     mount=loaded_pipette.mount, deck_point=new_deck_point
                 )
-
-    def _update_pipette_config(self, state_update: update_types.StateUpdate) -> None:
-        if state_update.pipette_config != update_types.NO_CHANGE:
-            config = state_update.pipette_config.config
-            self._state.static_config_by_id[
-                state_update.pipette_config.pipette_id
-            ] = StaticPipetteConfig(
-                serial_number=state_update.pipette_config.serial_number,
-                model=config.model,
-                display_name=config.display_name,
-                min_volume=config.min_volume,
-                max_volume=config.max_volume,
-                channels=config.channels,
-                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
-                nominal_tip_overlap=config.nominal_tip_overlap,
-                home_position=config.home_position,
-                nozzle_offset_z=config.nozzle_offset_z,
-                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
-                    back_left_corner=config.back_left_corner_offset,
-                    front_right_corner=config.front_right_corner_offset,
-                    back_right_corner=Point(
-                        config.front_right_corner_offset.x,
-                        config.back_left_corner_offset.y,
-                        config.back_left_corner_offset.z,
-                    ),
-                    front_left_corner=Point(
-                        config.back_left_corner_offset.x,
-                        config.front_right_corner_offset.y,
-                        config.back_left_corner_offset.z,
-                    ),
-                ),
-                bounding_nozzle_offsets=BoundingNozzlesOffsets(
-                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
-                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
-                ),
-                default_nozzle_map=config.nozzle_map,
-                lld_settings=config.pipette_lld_settings,
-            )
-            self._state.flow_rates_by_id[
-                state_update.pipette_config.pipette_id
-            ] = config.flow_rates
-            self._state.nozzle_configuration_by_id[
-                state_update.pipette_config.pipette_id
-            ] = config.nozzle_map
 
     def _update_pipette_nozzle_map(
         self, state_update: update_types.StateUpdate
