@@ -33,6 +33,7 @@ import {
   nonePressed,
 } from './utils'
 
+import type * as React from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
 import type {
   HoverOnStepAction,
@@ -105,7 +106,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
-  const handleSelectStep = (event: any): void => {
+  const handleSelectStep = (event: React.MouseEvent): void => {
     if (selectedStep !== stepId) {
       dispatch(toggleViewSubstep(null))
       dispatch(hoverOnStep(null))

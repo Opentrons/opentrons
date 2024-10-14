@@ -21,12 +21,6 @@ import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
 import type { IconName } from '@opentrons/components'
-import { useSelector } from 'react-redux'
-import {
-  getIsMultiSelectMode,
-  getMultiSelectItemIds,
-  getMultiSelectLastSelected,
-} from '../../../../ui/steps'
 
 const STARTING_DECK_STATE = 'Starting deck state'
 const FINAL_DECK_STATE = 'Final deck state'
