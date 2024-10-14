@@ -104,6 +104,9 @@ class StaticPipetteConfig:
 class PipetteState:
     """Basic pipette data state and getter methods."""
 
+    # todo(mm, 2024-10-14): It's getting difficult to ensure that all of these
+    # attributes are populated at the appropriate times. Refactor to a
+    # single dict-of-many-things instead of many dicts-of-single-things.
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, Optional[float]]
     current_location: Optional[CurrentPipetteLocation]
