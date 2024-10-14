@@ -10,12 +10,19 @@ import {
   SPACING,
   ToggleGroup,
 } from '@opentrons/components'
-import { getUnsavedForm } from '../../../step-forms/selectors'
-import { getSelectedSubstep } from '../../../ui/steps/selectors'
+import {
+  getSavedStepForms,
+  getUnsavedForm,
+} from '../../../step-forms/selectors'
+import {
+  getSelectedStepId,
+  getSelectedSubstep,
+} from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
 import { TimelineToolbox, SubstepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
+import { StepSummary } from './StepSummary'
 
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state'])
@@ -34,6 +41,11 @@ export function ProtocolSteps(): JSX.Element {
       setDeckView(leftString)
     }
   }, [formData, formType, deckView])
+
+  const currentStepId = useSelector(getSelectedStepId)
+  const savedStepForms = useSelector(getSavedStepForms)
+  const currentStep =
+    currentStepId != null ? savedStepForms[currentStepId] : null
 
   return (
     <>
@@ -62,11 +74,18 @@ export function ProtocolSteps(): JSX.Element {
             }}
           />
         ) : null}
-        {deckView === leftString ? (
-          <DeckSetupContainer tab="protocolSteps" />
-        ) : (
-          <OffDeck tab="protocolSteps" />
-        )}
+        <Flex
+          width="751px"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+        >
+          {deckView === leftString ? (
+            <DeckSetupContainer tab="protocolSteps" />
+          ) : (
+            <OffDeck tab="protocolSteps" />
+          )}
+          <StepSummary currentStep={currentStep} />
+        </Flex>
       </Flex>
     </>
   )
