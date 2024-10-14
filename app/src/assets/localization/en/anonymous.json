@@ -68,6 +68,8 @@
   "show_labware_offset_snippets_description": "Only for users who need to apply labware offset data outside of the app. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.",
   "something_seems_wrong": "There may be a problem with your pipette. Exit setup and contact support for assistance.",
   "storage_limit_reached_description": "Your robot has reached the limit of quick transfers that it can store. You must delete an existing quick transfer before creating a new one.",
+  "system_language_preferences_description": "Would you like to use your system language as the default for the app?",
+  "system_language_preferences_update_description": "Your system’s language was recently updated. Would you like to use the updated language as the default for the app?",
   "these_are_advanced_settings": "<block>These are advanced settings. Please do not attempt to adjust without assistance from support. Changing these settings may affect the lifespan of your pipette.</block><block>These settings do not override any pipette settings defined in protocols.</block>",
   "update_requires_restarting_app": "Updating requires restarting the app.",
   "update_robot_software_description": "Bypass the auto-update process and update the robot software manually.",

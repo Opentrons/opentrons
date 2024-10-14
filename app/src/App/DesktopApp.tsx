@@ -14,6 +14,7 @@ import NiceModal from '@ebay/nice-modal-react'
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
+import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguageModals'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
@@ -107,6 +108,7 @@ export const DesktopApp = (): JSX.Element => {
     <NiceModal.Provider>
       <LocalizationProvider>
         <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+          <SystemLanguagePreferenceModal />
           <Navbar routes={desktopRoutes} />
           <ToasterOven>
             <EmergencyStopContext.Provider
