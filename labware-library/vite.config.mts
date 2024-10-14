@@ -17,7 +17,7 @@ const testAliases: {} | { 'file-saver': string } =
 
 export default defineConfig({
   // this makes imports relative rather than absolute
-  base: '',
+  base: '/',
   build: {
     // Relative to the root
     outDir: 'dist',
