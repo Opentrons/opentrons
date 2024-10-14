@@ -14,6 +14,8 @@ import {
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
 } from '../../../../step-forms/actions'
+import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
+import { BatchEditMixTools } from './BatchEditMixTools'
 // import { maskField } from '../../../../steplist/fieldLevel'
 
 // import type { StepFieldName } from '../../../../steplist/fieldLevel'
@@ -72,7 +74,11 @@ export const BatchEditToolbox = (): JSX.Element | null => {
             </PrimaryButton>
           }
         >
-          TODO: wire this up
+          {stepType === 'moveLiquid' ? (
+            <BatchEditMoveLiquidTools />
+          ) : (
+            <BatchEditMixTools />
+          )}
         </Toolbox>
       )
     } else {

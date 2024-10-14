@@ -159,7 +159,6 @@ export const selectMultipleSteps = (
   dispatch: ThunkDispatch<any>,
   getState: GetState
 ) => {
-  console.log('hi')
   const selectStepAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
     payload: {
