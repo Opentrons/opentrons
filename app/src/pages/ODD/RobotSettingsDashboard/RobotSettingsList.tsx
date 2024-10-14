@@ -23,6 +23,7 @@ import {
 
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
+import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import {
   DEV_INTERNAL_FLAGS,
   getApplyHistoricOffsets,
@@ -85,6 +86,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation />
@@ -176,6 +179,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="reticle"
           rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
           onClick={() => dispatch(toggleHistoricOffsets())}
+        />
+        <RobotSettingButton
+          settingName={t('app_settings:error_recovery_mode')}
+          dataTestId="RobotSettingButton_error_recovery_mode"
+          settingInfo={t('app_settings:error_recovery_mode_description')}
+          iconName="recovery"
+          rightElement={<OnOffToggle isOn={isEREnabled} />}
+          onClick={toggleERSettings}
         />
         <RobotSettingButton
           settingName={t('device_reset')}
