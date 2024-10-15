@@ -21,12 +21,14 @@ export const isNumeric = (str: string): boolean => {
 export const orderRuntimeParameterRangeOptions = (
   choices: Choice[]
 ): string => {
-  // when this function is called, the array length is always 2
+  // when this function is called, the array length is always in [1,2]
   if (choices.length > 2) {
-    console.error(`expected to have length 2 but has length ${choices.length}`)
+    console.error(
+      `expected to have length [1,2] but has length ${choices.length}`
+    )
     return ''
   }
-  const displayNames = [choices[0].displayName, choices[1].displayName]
+  const displayNames = choices.map(({ displayName }) => displayName)
   if (isNumeric(displayNames[0])) {
     return displayNames
       .sort((a, b) => {
