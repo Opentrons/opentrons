@@ -1,5 +1,6 @@
 import {
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
@@ -32,7 +33,8 @@ export function getShowGenericRunHeaderBanners({
     isDoorOpen &&
     runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
     runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
-    isCancellableStatus(runStatus)
+    runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
+  isCancellableStatus(runStatus)
 
   const showDoorOpenDuringRunBanner =
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR

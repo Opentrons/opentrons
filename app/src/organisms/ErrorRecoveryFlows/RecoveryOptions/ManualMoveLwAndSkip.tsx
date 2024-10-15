@@ -4,6 +4,7 @@ import {
   GripperReleaseLabware,
   SkipStepInfo,
   TwoColLwInfoAndDeck,
+  RecoveryDoorOpenSpecial,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
@@ -20,6 +21,8 @@ export function ManualMoveLwAndSkip(props: RecoveryContentProps): JSX.Element {
         return <GripperIsHoldingLabware {...props} />
       case MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE:
         return <GripperReleaseLabware {...props} />
+      case MANUAL_MOVE_AND_SKIP.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME:
+        return <RecoveryDoorOpenSpecial {...props} />
       case MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE:
         return <TwoColLwInfoAndDeck {...props} />
       case MANUAL_MOVE_AND_SKIP.STEPS.SKIP:
