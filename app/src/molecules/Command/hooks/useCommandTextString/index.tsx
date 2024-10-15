@@ -127,7 +127,17 @@ export function useCommandTextString(
           command,
         }),
       }
-
+    case 'absorbanceReader/openLid':
+    case 'absorbanceReader/closeLid':
+    case 'absorbanceReader/initialize':
+    case 'absorbanceReader/read':
+      return {
+        kind: 'generic',
+        commandText: utils.getAbsorbanceReaderCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
     case 'thermocycler/runProfile':
       return utils.getTCRunProfileCommandText({ ...fullParams, command })
 
