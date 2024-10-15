@@ -14,7 +14,7 @@ import { getProvider as getUsbUpdateProvider } from './from-usb'
 import type { Action, Dispatch } from '../types'
 import type { UpdateProvider, UnresolvedUpdate, ReadyUpdate } from './types'
 import type { USBUpdateSource } from './from-usb'
-import { VALUE_UPDATED } from '@opentrons/app/src/redux/config'
+import { VALUE_UPDATED } from '../constants'
 
 export const CURRENT_SYSTEM_VERSION = _PKG_VERSION_
 

@@ -5,13 +5,12 @@ import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import tempy from 'tempy'
 
 import * as Cfg from '../../config'
-import { CONFIG_INITIALIZED } from '../../constants'
+import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../../constants'
 import {
   manageDriver,
   registerUpdateDriver,
   CURRENT_SYSTEM_VERSION,
 } from '../handler'
-import { VALUE_UPDATED } from '@opentrons/app/src/redux/config'
 import { FLEX_MANIFEST_URL } from '../constants'
 import { getSystemUpdateDir as _getSystemUpdateDir } from '../directories'
 import { getProvider as _getWebProvider } from '../from-web'
