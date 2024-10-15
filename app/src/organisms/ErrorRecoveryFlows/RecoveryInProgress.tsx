@@ -102,6 +102,7 @@ export function useGripperRelease({
   recoveryMap,
 }: UseGripperReleaseProps): number {
   const { releaseGripperJaws } = recoveryCommands
+  const { moveLabwareWithoutPause } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     proceedToRouteAndStep,
@@ -116,6 +117,8 @@ export function useGripperRelease({
     if (isDoorOpen) {
       switch (selectedRecoveryOption) {
         case MANUAL_MOVE_AND_SKIP.ROUTE:
+          console.log("moveLabwareWithoutPause in route")
+          void moveLabwareWithoutPause()
           void proceedToRouteAndStep(
             MANUAL_MOVE_AND_SKIP.ROUTE,
             MANUAL_MOVE_AND_SKIP.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME
@@ -137,6 +140,8 @@ export function useGripperRelease({
     } else {
       switch (selectedRecoveryOption) {
         case MANUAL_MOVE_AND_SKIP.ROUTE:
+          console.log("moveLabwareWithoutPause in route")
+          void moveLabwareWithoutPause()
           void proceedToRouteAndStep(
             MANUAL_MOVE_AND_SKIP.ROUTE,
             MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE

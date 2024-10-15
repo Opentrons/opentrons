@@ -19,6 +19,7 @@ import type {
   DispenseInPlaceRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
   CommandData,
@@ -61,6 +62,8 @@ export interface UseRecoveryCommandsResult {
   releaseGripperJaws: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   homeGripperZAxis: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
+  moveLabwareWithoutPause: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -225,6 +228,20 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([HOME_GRIPPER_Z_AXIS])
   }, [chainRunRecoveryCommands])
 
+  const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
+    console.log("moveLabwareWithoutPause")
+    const moveLabwareCmd = buildMoveLabwareWithoutPause(
+      failedCommandByRunRecord
+    )
+    console.log("moveLabwareCmd: ", moveLabwareCmd)
+
+    if (moveLabwareCmd == null) {
+      return Promise.reject(new Error('Invalid use of MoveLabware command'))
+    } else {
+      return chainRunRecoveryCommands([moveLabwareCmd])
+    }
+  }, [chainRunRecoveryCommands, failedCommandByRunRecord])
+
   return {
     resumeRun,
     cancelRun,
@@ -233,6 +250,7 @@ export function useRecoveryCommands({
     pickUpTips,
     releaseGripperJaws,
     homeGripperZAxis,
+    moveLabwareWithoutPause,
     skipFailedCommand,
     ignoreErrorKindThisRun,
   }
@@ -254,6 +272,21 @@ export const HOME_GRIPPER_Z_AXIS: CreateCommand = {
   commandType: 'home',
   params: { axes: ['extensionZ'] },
   intent: 'fixit',
+}
+
+const buildMoveLabwareWithoutPause = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) return null
+  return {
+    commandType: 'moveLabware',
+    params: {
+      labwareId: failedCommand.params.labwareId,
+      newLocation: failedCommand.params.newLocation,
+      strategy: 'manualMoveWithoutPause',
+    },
+    intent: 'fixit',
+  }
 }
 
 export const buildPickUpTips = (
