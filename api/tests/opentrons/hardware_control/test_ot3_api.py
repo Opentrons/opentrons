@@ -1,5 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
+import asyncio
 from typing import (
     AsyncIterator,
     Iterator,
@@ -97,6 +98,8 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.backends.types import HWStopCondition
 
+from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons_hardware.sensors.types import SensorDataType
 
 # TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
 
@@ -854,6 +857,7 @@ async def test_liquid_probe(
             fake_settings_aspirate.samples_for_baselining,
             probe=InstrumentProbeType.PRIMARY,
             force_both_sensors=False,
+            response_queue=None,
         )
 
         await ot3_hardware.liquid_probe(
@@ -1109,6 +1113,7 @@ async def test_multi_liquid_probe(
             fake_settings_aspirate.samples_for_baselining,
             probe=InstrumentProbeType.PRIMARY,
             force_both_sensors=False,
+            response_queue=None,
         )
         assert mock_liquid_probe.call_count == 3
 
@@ -1143,6 +1148,9 @@ async def test_liquid_not_found(
         num_baseline_reads: int,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+        ] = None,
     ) -> float:
         pos = self._position
         pos[Axis.by_mount(mount)] += mount_speed * (
