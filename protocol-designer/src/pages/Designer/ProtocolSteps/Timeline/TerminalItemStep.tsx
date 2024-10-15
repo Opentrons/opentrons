@@ -16,6 +16,7 @@ import {
   ConfirmDeleteModal,
 } from '../../../../components/modals/ConfirmDeleteModal'
 import {
+  deselectAllSteps,
   hoverOnStep,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
@@ -26,6 +27,7 @@ import type {
   HoverOnTerminalItemAction,
 } from '../../../../ui/steps'
 import type { TerminalItemId } from '../../../../steplist'
+import type { ThunkDispatch } from '../../../../types'
 
 export interface TerminalItemStepProps {
   id: TerminalItemId
@@ -40,7 +42,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
   const formHasChanges = useSelector(getCurrentFormHasUnsavedChanges)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const selectItem = (): SelectTerminalItemAction =>
     dispatch(stepsActions.selectTerminalItem(id))
@@ -58,7 +60,12 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
     currentFormIsPresaved || formHasChanges
   )
 
-  const onClick = isMultiSelectMode ? () => null : confirm
+  const onClick = isMultiSelectMode
+    ? () => {
+        dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
+        handleConfirm()
+      }
+    : confirm
 
   return (
     <>
