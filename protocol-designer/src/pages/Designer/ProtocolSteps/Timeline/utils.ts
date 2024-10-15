@@ -54,11 +54,11 @@ export const compactPreIngreds = (
   })
 }
 
-export function getMetaSelectedSteps(
+export const getMetaSelectedSteps = (
   multiSelectItemIds: StepIdType[] | null,
   stepId: StepIdType,
   selectedStepId: StepIdType | null
-): StepIdType[] {
+): StepIdType[] => {
   let stepsToSelect: StepIdType[]
   if (multiSelectItemIds?.length) {
     // already have a selection, add/remove the meta-clicked item
@@ -78,13 +78,13 @@ export function getMetaSelectedSteps(
   return stepsToSelect
 }
 
-export function getShiftSelectedSteps(
+export const getShiftSelectedSteps = (
   selectedStepId: StepIdType | null,
   orderedStepIds: StepIdType[],
   stepId: StepIdType,
   multiSelectItemIds: StepIdType[] | null,
   lastMultiSelectedStepId: StepIdType | null
-): StepIdType[] {
+): StepIdType[] => {
   let stepsToSelect: StepIdType[]
   if (selectedStepId) {
     stepsToSelect = getOrderedStepsInRange(
@@ -122,11 +122,11 @@ export function getShiftSelectedSteps(
   return stepsToSelect
 }
 
-function getOrderedStepsInRange(
+const getOrderedStepsInRange = (
   lastSelectedStepId: StepIdType,
   stepId: StepIdType,
   orderedStepIds: StepIdType[]
-): StepIdType[] {
+): StepIdType[] => {
   const prevIndex: number = orderedStepIds.indexOf(lastSelectedStepId)
   const currentIndex: number = orderedStepIds.indexOf(stepId)
 
