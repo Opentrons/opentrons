@@ -72,6 +72,11 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.file_provider.fastapi_dependencies import (
+    get_file_provider,
+)
+from robot_server.file_provider.provider import FileProviderWrapper
+from opentrons.protocol_engine.resources.file_provider import FileProvider
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
@@ -187,6 +192,7 @@ async def create_run(  # noqa: C901
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
+    file_provider_wrapper: Annotated[FileProviderWrapper, Depends(get_file_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
@@ -235,10 +241,6 @@ async def create_run(  # noqa: C901
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
 
-    #CASEY NOTE: file provider store will begin here and be passed in
-    # we will need to depend upon thepersistence directory and the database
-    # 
-
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.
     if protocol_id is not None:
@@ -258,12 +260,18 @@ async def create_run(  # noqa: C901
         run_deleter = quick_transfer_run_auto_deleter
     run_deleter.make_room_for_new_run()
 
+    file_provider = FileProvider(
+        data_files_write_csv_callback=file_provider_wrapper.write_csv_callback,
+        data_files_filecount=file_provider_wrapper.csv_filecount_callback,
+    )
+
     try:
         run_data = await run_data_manager.create(
             run_id=run_id,
             created_at=created_at,
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
+            file_provider=file_provider,
             run_time_param_values=rtp_values,
             run_time_param_paths=rtp_paths,
             protocol=protocol_resource,

@@ -34,6 +34,7 @@ from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
 from .run_models import Run, BadRun, RunDataError
 
 from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
+from opentrons.protocol_engine.resources.file_provider import FileProvider
 
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
@@ -170,6 +171,7 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        file_provider: FileProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
@@ -217,6 +219,7 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             initial_error_recovery_policy=initial_error_recovery_policy,
             deck_configuration=deck_configuration,
+            file_provider=file_provider,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,

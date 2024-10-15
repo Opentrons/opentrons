@@ -365,7 +365,7 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
         """Initialize the Absorbance Reader by taking zero reading."""
 
     @abstractmethod
-    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
+    def read(self, filename: Optional[str]) -> Optional[Dict[int, Dict[str, float]]]:
         """Get an absorbance reading from the Absorbance Reader."""
 
     @abstractmethod

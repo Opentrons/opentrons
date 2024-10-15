@@ -1,5 +1,6 @@
 """Command models to read absorbance."""
 from __future__ import annotations
+from datetime import datetime
 from typing import Optional, Dict, TYPE_CHECKING
 from typing_extensions import Literal, Type
 
@@ -8,6 +9,9 @@ from pydantic import BaseModel, Field
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors import CannotPerformModuleAction
 from ...errors.error_occurrence import ErrorOccurrence
+
+from ...resources.file_provider import PlateReaderDataTransform, ReadData
+from ...resources import FileProvider
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
@@ -21,6 +25,10 @@ class ReadAbsorbanceParams(BaseModel):
     """Input parameters for an absorbance reading."""
 
     moduleId: str = Field(..., description="Unique ID of the Absorbance Reader.")
+    fileName: Optional[str] = Field(
+        None,
+        description="Optional file name to use when storing the results of a measurement.",
+    )
 
 
 class ReadAbsorbanceResult(BaseModel):
@@ -40,10 +48,12 @@ class ReadAbsorbanceImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        file_provider: FileProvider,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._file_provider = file_provider
 
     async def execute(
         self, params: ReadAbsorbanceParams
@@ -63,10 +73,13 @@ class ReadAbsorbanceImpl(
             )
 
         if abs_reader is not None:
+            start_time = datetime.now()
             results = await abs_reader.start_measure()
+            finish_time = datetime.now()
             if abs_reader._measurement_config is not None:
                 asbsorbance_result: Dict[int, Dict[str, float]] = {}
                 sample_wavelengths = abs_reader._measurement_config.sample_wavelengths
+                transform_results = []
                 for wavelength, result in zip(sample_wavelengths, results):
                     converted_values = (
                         self._state_view.modules.convert_absorbance_reader_data_points(
@@ -74,6 +87,31 @@ class ReadAbsorbanceImpl(
                         )
                     )
                     asbsorbance_result[wavelength] = converted_values
+                    transform_results.append(
+                        ReadData.build(wavelength=wavelength, data=converted_values)
+                    )
+
+                # Begin interfacing with the file provider if the user provided a filename
+                if params.fileName is not None and abs_reader.serial_number is not None:
+                    plate_read_result = PlateReaderDataTransform.build(
+                        read_results=transform_results,
+                        reference_wavelength=abs_reader_substate.reference_wavelength,
+                        start_time=start_time,
+                        finish_time=finish_time,
+                        serial_number=abs_reader.serial_number,
+                    )
+
+                    if isinstance(plate_read_result, PlateReaderDataTransform):
+                        # Write a CSV file for each of the measurements taken
+                        for measurement in plate_read_result.read_results:
+                            await self._file_provider.write_csv(
+                                write_data=plate_read_result.build_generic_csv(
+                                    filename=params.fileName,
+                                    measurement=measurement,
+                                )
+                            )
+
+                # Return success data to api
                 return SuccessData(
                     public=ReadAbsorbanceResult(data=asbsorbance_result),
                     private=None,
