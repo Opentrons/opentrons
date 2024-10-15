@@ -19,7 +19,7 @@ import type {
   DispenseInPlaceRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
-  LabwareLocation,
+  MoveLabwareParams,
 } from '@opentrons/shared-data'
 import type {
   CommandData,
@@ -229,12 +229,9 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands])
 
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
-    console.log("moveLabwareWithoutPause")
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
       failedCommandByRunRecord
     )
-    console.log("moveLabwareCmd: ", moveLabwareCmd)
-
     if (moveLabwareCmd == null) {
       return Promise.reject(new Error('Invalid use of MoveLabware command'))
     } else {
@@ -278,11 +275,12 @@ const buildMoveLabwareWithoutPause = (
   failedCommand: FailedCommand | null
 ): CreateCommand | null => {
   if (failedCommand == null) return null
+  const moveLabwareParams = failedCommand.params as MoveLabwareParams
   return {
     commandType: 'moveLabware',
     params: {
-      labwareId: failedCommand.params.labwareId,
-      newLocation: failedCommand.params.newLocation,
+      labwareId: moveLabwareParams.labwareId,
+      newLocation: moveLabwareParams.newLocation,
       strategy: 'manualMoveWithoutPause',
     },
     intent: 'fixit',
