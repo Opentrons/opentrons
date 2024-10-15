@@ -66,7 +66,7 @@ from .robot_calibration import (
     RobotCalibrationProvider,
     RobotCalibration,
 )
-from .protocols import HardwareControlInterface
+from .protocols import HardwareControlInterface, OT2RobotType
 from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
@@ -143,6 +143,9 @@ class API(
         PipetteHandlerProvider.__init__(
             self, {top_types.Mount.LEFT: None, top_types.Mount.RIGHT: None}
         )
+
+    def get_robot_type(self) -> Type[OT2RobotType]:
+        return OT2RobotType
 
     @property
     def door_state(self) -> DoorState:

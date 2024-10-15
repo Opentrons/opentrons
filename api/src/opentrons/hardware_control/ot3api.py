@@ -107,7 +107,7 @@ from .errors import (
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
-from .protocols import FlexHardwareControlInterface
+from .protocols import FlexHardwareControlInterface, FlexRobotType
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
@@ -243,6 +243,9 @@ class OT3API(
         self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
+
+    def get_robot_type(self) -> Type[FlexRobotType]:
+        return FlexRobotType
 
     def is_idle_mount(self, mount: Union[top_types.Mount, OT3Mount]) -> bool:
         """Only the gripper mount or the 96-channel pipette mount would be idle
