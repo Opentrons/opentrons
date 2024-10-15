@@ -1,0 +1,45 @@
+import type {
+  AbsorbanceReaderOpenLidRunTimeCommand,
+  AbsorbanceReaderCloseLidRunTimeCommand,
+  AbsorbanceReaderInitializeRunTimeCommand,
+  AbsorbanceReaderReadRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { HandlesCommands } from './types'
+
+export type AbsorbanceCreateCommand =
+  | AbsorbanceReaderOpenLidRunTimeCommand
+  | AbsorbanceReaderCloseLidRunTimeCommand
+  | AbsorbanceReaderInitializeRunTimeCommand
+  | AbsorbanceReaderReadRunTimeCommand
+
+const KEYS_BY_COMMAND_TYPE: {
+  [commandType in AbsorbanceCreateCommand['commandType']]: string
+} = {
+  'absorbanceReader/openLid': 'absorbance_reader_open_lid',
+  'absorbanceReader/closeLid': 'absorbance_reader_close_lid',
+  'absorbanceReader/initialize': 'absorbance_reader_initialize',
+  'absorbanceReader/read': 'absorbance_reader_read',
+}
+
+type HandledCommands = Extract<
+  RunTimeCommand,
+  { commandType: keyof typeof KEYS_BY_COMMAND_TYPE }
+>
+
+type GetAbsorbanceReaderCommandText = HandlesCommands<HandledCommands>
+
+export const getAbsorbanceReaderCommandText = ({
+  command,
+  t,
+}: GetAbsorbanceReaderCommandText): string => {
+  console.log(t(KEYS_BY_COMMAND_TYPE[command.commandType]))
+  if (command.commandType === 'absorbanceReader/initialize') {
+    const wavelengths = command.params.sampleWavelengths.join(' nm, ') + ` nm`
+    return t('absorbance_reader_initialize', {
+      mode: command.params.measureMode,
+      wavelengths: wavelengths,
+    })
+  }
+  return t(KEYS_BY_COMMAND_TYPE[command.commandType])
+}

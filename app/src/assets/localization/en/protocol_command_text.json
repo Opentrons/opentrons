@@ -1,4 +1,8 @@
 {
+  "absorbance_reader_open_lid": "Opening Absorbance Reader lid",
+  "absorbance_reader_close_lid": "Closing Absorbance Reader lid",
+  "absorbance_reader_initialize": "Initializing Absorbance Reader to perform {{mode}} measurement at {{wavelengths}}",
+  "absorbance_reader_read": "Reading plate in Absorbance Reader",
   "adapter_in_mod_in_slot": "{{adapter}} on {{module}} in {{slot}}",
   "adapter_in_slot": "{{adapter}} in {{slot}}",
   "aspirate": "Aspirating {{volume}} µL from well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
