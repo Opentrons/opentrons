@@ -23,7 +23,7 @@ interface StyledTransProps {
   tagText?: string
   values?: object
 }
-function StyledTrans(props: StyledTransProps) {
+function StyledTrans(props: StyledTransProps): JSX.Element {
   const { i18nKey, tagText, values } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
   return (
