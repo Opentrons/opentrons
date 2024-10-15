@@ -20,6 +20,7 @@ import {
 import { stepIconsByType } from '../../../../form-types'
 import { FormAlerts } from '../../../../organisms'
 import { useKitchen } from '../../../../organisms/Kitchen/hooks'
+import { RenameStepModal } from '../../../../organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
@@ -38,7 +39,6 @@ import {
 import { getSaveStepSnackbarText } from './utils'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FormData, StepType } from '../../../../form-types'
-import { RenameStepModal } from '../../../../organisms/RenameStepModal'
 import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
 type StepFormMap = {

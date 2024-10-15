@@ -1,9 +1,10 @@
 import { createAction } from 'redux-actions'
 import { selectors } from '../selectors'
-import { RenameStepAction } from '../../file-data'
+import type { StepFieldName } from '../../form-types'
 import type { DeckSlot, ThunkAction } from '../../types'
 import type { Fixture, IngredInputs } from '../types'
 import type { CutoutId, ModuleModel } from '@opentrons/shared-data'
+
 // ===== Labware selector actions =====
 export interface OpenAddLabwareModalAction {
   type: 'OPEN_ADD_LABWARE_MODAL'
@@ -297,14 +298,17 @@ export const generateNewProtocol: (
   payload,
 })
 
-export interface ChangeFormInputAction {
+export interface RenameStepAction {
   type: 'CHANGE_FORM_INPUT'
-  payload: RenameStepAction
+  payload: {
+    stepId?: string
+    update: Partial<Record<StepFieldName, unknown | null>>
+  }
 }
 
-export const renameStep = (
-  payload: RenameStepAction
-): ChangeFormInputAction => ({
+export const renameStep: (
+  payload: RenameStepAction['payload']
+) => RenameStepAction = payload => ({
   type: 'CHANGE_FORM_INPUT',
   payload,
 })

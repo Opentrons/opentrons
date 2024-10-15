@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
@@ -20,9 +20,9 @@ import {
 import { i18n } from '../../assets/localization'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 import { ThunkDispatch } from '../../types'
-import { renameStep } from '../../labware-ingred/actions'
-import { RenameStepAction } from '../../file-data'
-import type { FormData, StepFieldName } from '../../form-types'
+import { renameStep, RenameStepAction } from '../../labware-ingred/actions'
+// import { RenameStepAction } from '../../file-data'
+import type { FormData } from '../../form-types'
 
 const MAX_STEP_NAME_LENGTH = 115
 interface RenameStepModalProps {
@@ -35,20 +35,18 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { t } = useTranslation(['form', 'shared'])
   const initialName = i18n.format(t(formData.stepName), 'capitalize')
   const [stepName, setStepName] = useState<string>(initialName)
+  const [stepDetails, setStepDetails] = useState<string>(formData.stepDetails)
 
-  const makeSave = (fieldName: StepFieldName): void => {
+  const handleSave = (): void => {
     const { stepId } = formData
-    const updatePayload: RenameStepAction = {
+    const updatePayload: RenameStepAction['payload'] = {
       stepId,
       update: {
-        [fieldName]: stepName,
+        stepName: stepName,
+        stepDetails: stepDetails,
       },
     }
     dispatch(renameStep(updatePayload))
-  }
-
-  const handleSave = (): void => {
-    dispatch(renameStep({ update: { ...formData } }))
     onClose()
   }
 
@@ -94,10 +92,8 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
               }
               value={stepName}
               autoFocus
-              name="StepName"
               onChange={e => {
                 setStepName(e.target.value)
-                makeSave('stepName')
               }}
               type="text"
             />
@@ -107,7 +103,12 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
               {t('form:step_edit_form.field.step_notes.label')}
             </StyledText>
 
-            <DescriptionField />
+            <DescriptionField
+              value={stepDetails}
+              onChange={e => {
+                setStepDetails(e.target.value)
+              }}
+            />
           </Flex>
         </Flex>
       </form>
