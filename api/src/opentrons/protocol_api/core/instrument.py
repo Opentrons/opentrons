@@ -33,6 +33,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        is_meniscus: Optional[bool] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:

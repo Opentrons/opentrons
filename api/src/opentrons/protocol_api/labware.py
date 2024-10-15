@@ -232,7 +232,7 @@ class Well:
 
         :meta private:
         """
-        return Location(self._core.get_meniscus(z_offset=z), self)
+        return Location(self._core.get_meniscus(z_offset=z), self, True)
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

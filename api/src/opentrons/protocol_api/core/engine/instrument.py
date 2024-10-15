@@ -112,6 +112,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        is_meniscus: Optional[bool] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -151,6 +152,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 well_name=well_name,
                 absolute_point=location.point,
             )
+            if is_meniscus:
+                well_location.volumeOffset = "operationVolume"
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,

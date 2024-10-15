@@ -418,6 +418,7 @@ class WellTarget(NamedTuple):
     well: Well
     location: Optional[Location]
     in_place: bool
+    is_meniscus: Optional[bool] = None
 
 
 class PointTarget(NamedTuple):
@@ -476,7 +477,12 @@ def validate_location(
     _, well = target_location.labware.get_parent_labware_and_well()
 
     return (
-        WellTarget(well=well, location=target_location, in_place=in_place)
+        WellTarget(
+            well=well,
+            location=target_location,
+            in_place=in_place,
+            is_meniscus=target_location.is_meniscus,
+        )
         if well is not None
         else PointTarget(location=target_location, in_place=in_place)
     )

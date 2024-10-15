@@ -217,6 +217,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
+        is_meniscus: Optional[bool] = None
         well: Optional[labware.Well] = None
         move_to_location: types.Location
         last_location = self._get_last_location_by_api_version()
@@ -237,6 +238,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 z=self._well_bottom_clearances.aspirate
             )
             well = target.well
+            is_meniscus = target.is_meniscus
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
         if isinstance(target, (TrashBin, WasteChute)):
@@ -282,6 +284,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 rate=rate,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
+                is_meniscus=is_meniscus if is_meniscus is not None else None,
             )
 
         return self

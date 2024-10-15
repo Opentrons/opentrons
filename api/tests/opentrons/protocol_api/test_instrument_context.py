@@ -339,6 +339,7 @@ def test_aspirate(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
+            is_meniscus=None,
         ),
         times=1,
     )
@@ -376,6 +377,49 @@ def test_aspirate_well_location(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
+            is_meniscus=None,
+        ),
+        times=1,
+    )
+
+
+def test_aspirate_meniscus_well_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well, is_meniscus=True)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(
+        WellTarget(
+            well=mock_well, location=input_location, in_place=False, is_meniscus=True
+        )
+    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+
+    subject.aspirate(volume=42.0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=42.0,
+            rate=1.23,
+            flow_rate=5.67,
+            is_meniscus=True,
         ),
         times=1,
     )
@@ -412,6 +456,7 @@ def test_aspirate_from_coordinates(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
+            is_meniscus=None,
         ),
         times=1,
     )
@@ -1325,6 +1370,7 @@ def test_aspirate_0_volume_means_aspirate_everything(
             volume=200,
             rate=1.23,
             flow_rate=5.67,
+            is_meniscus=None,
         ),
         times=1,
     )
@@ -1364,6 +1410,7 @@ def test_aspirate_0_volume_means_aspirate_nothing(
             volume=0,
             rate=1.23,
             flow_rate=5.67,
+            is_meniscus=None,
         ),
         times=1,
     )

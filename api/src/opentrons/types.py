@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List, Optional
 
 from opentrons_shared_data.robot.types import RobotType
 
@@ -116,10 +116,12 @@ class Location:
             None,
             "ModuleContext",
         ],
+        is_meniscus: Optional[bool] = None,
     ):
         self._point = point
         self._given_labware = labware
         self._labware = LabwareLike(labware)
+        self._is_meniscus = is_meniscus
 
     # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
     # in the rendered docs, and then update the class docstring to use cross-references.
@@ -131,6 +133,10 @@ class Location:
     @property
     def labware(self) -> LabwareLike:
         return self._labware
+
+    @property
+    def is_meniscus(self) -> Optional[bool]:
+        return self._is_meniscus
 
     def __iter__(self) -> Iterator[Union[Point, LabwareLike]]:
         """Iterable interface to support unpacking. Like a tuple.
