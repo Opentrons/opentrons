@@ -304,18 +304,18 @@ class LogListener:
             data_length = message.payload.data_length.value
             data_bytes = message.payload.sensor_data.value
             data_ints = [
-                int.from_bytes(data_bytes[i * 4 : i * 4 + 4])
+                int.from_bytes(data_bytes[i * 4 : i * 4 + 4], byteorder="little")
                 for i in range(data_length)
             ]
-            data = [
+            data_floats = [
                 sensor_types.SensorDataType.build(d, message.payload.sensor)
                 for d in data_ints
             ]
 
-            for d in data:
+            for d in data_floats:
                 self.response_queue.put_nowait(d)
             SENSOR_LOG.info(
-                f"Revieved from {arbitration_id}: {message.payload.sensor_id}:{message.payload.sensor}: {data}"
+                f"Revieved from {arbitration_id}: {message.payload.sensor_id}:{message.payload.sensor}: {data_floats}"
             )
         if isinstance(message, message_definitions.Acknowledgement):
             if (
