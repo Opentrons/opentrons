@@ -143,7 +143,7 @@ export function getProvider(
         progress(previousUpdate)
         throw err
       } else {
-        log.warning(`Failed to fetch update data: ${err.name}: ${err.message}`)
+        log.warn(`Failed to fetch update data: ${err.name}: ${err.message}`)
       }
       return null
     })

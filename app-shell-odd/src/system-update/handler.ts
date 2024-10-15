@@ -130,7 +130,7 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
               }
             })
             .catch(err => {
-              log.warning(
+              log.warn(
                 `Error finding updates with ${webProvider.name()}: ${
                   err.name
                 }: ${err.message}`
@@ -342,7 +342,7 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
         }
       } else {
         return new Promise(resolve => {
-          log.warning(
+          log.warn(
             `update driver manager received action ${action.type} before initialization`
           )
           resolve()

@@ -229,7 +229,7 @@ const readReleaseNotes = (path: string | null): Promise<string | null> =>
         resolve(null)
       })
     : readFile(path, { encoding: 'utf-8' }).catch(err => {
-        log.warning(
+        log.warn(
           `Could not read release notes from ${path}: ${err.name}: ${err.message}`
         )
         return null
