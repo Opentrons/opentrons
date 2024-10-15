@@ -94,7 +94,7 @@ export function FlexPipetteCard({
     setSelectedPipette(SINGLE_MOUNT_PIPETTES)
   }
 
-  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+  const { showDTWiz, enableDTWiz, disableDTWiz } = useDropTipWizardFlows()
 
   const handleLaunchPipetteWizardFlows = (
     flowType: PipetteWizardFlow
@@ -186,7 +186,7 @@ export function FlexPipetteCard({
             label: i18n.format(t('drop_tips'), 'capitalize'),
             disabled: attachedPipette == null || isRunActive,
             onClick: () => {
-              toggleDTWiz()
+              enableDTWiz()
             },
           },
         ]
@@ -270,7 +270,7 @@ export function FlexPipetteCard({
           robotType={FLEX_ROBOT_TYPE}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
-          closeFlow={toggleDTWiz}
+          closeFlow={disableDTWiz}
           modalStyle="simple"
         />
       ) : null}
