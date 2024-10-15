@@ -153,6 +153,10 @@ class FrontButtonLightBlinker:
         Blinking will continue until `mark_hardware_init_complete()` and
         `mark_persistence_init_complete()` have both been called.
         """
+        if should_use_ot3():
+            # Dont run this task on the Flex
+            return
+
         assert self._hardware_and_task is None, "hardware should only be set once."
 
         async def blink_forever() -> None:
