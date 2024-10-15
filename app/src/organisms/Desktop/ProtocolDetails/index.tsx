@@ -47,6 +47,7 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedModulesBySlot,
   parseInitialPipetteNamesByMount,
+  NON_USER_ADDRESSABLE_LABWARE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -286,8 +287,7 @@ export function ProtocolDetails(
         }).filter(
           labware =>
             labware.result?.definition?.parameters?.format !== 'trash' &&
-            labware?.params?.loadName !==
-              'opentrons_flex_lid_absorbance_plate_reader_module'
+            !NON_USER_ADDRESSABLE_LABWARE.includes(labware?.params?.loadName)
         )
       : []
 

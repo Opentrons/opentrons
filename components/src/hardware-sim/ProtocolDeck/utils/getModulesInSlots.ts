@@ -2,6 +2,7 @@ import {
   SPAN7_8_10_11_SLOT,
   getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
+  NON_USER_ADDRESSABLE_LABWARE,
 } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
@@ -37,8 +38,7 @@ export const getModulesInSlots = (
           .filter(
             (command): command is LoadLabwareRunTimeCommand =>
               command.commandType === 'loadLabware' &&
-              command.params.loadName !==
-                'opentrons_flex_lid_absorbance_plate_reader_module'
+              !NON_USER_ADDRESSABLE_LABWARE.includes(command.params.loadName)
           )
           .find(
             (command: LoadLabwareRunTimeCommand) =>

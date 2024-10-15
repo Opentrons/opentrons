@@ -3,6 +3,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   ABSORBANCE_READER_TYPE,
+  NON_USER_ADDRESSABLE_LABWARE,
 } from '@opentrons/shared-data'
 
 import type {
@@ -48,7 +49,8 @@ export function getPrepCommands(
           return [...acc, loadWithPipetteId]
         } else if (
           command.commandType === 'loadLabware' &&
-          command.result?.labwareId != null
+          command.result?.labwareId != null &&
+          !NON_USER_ADDRESSABLE_LABWARE.includes(command.params.loadName)
         ) {
           // load all labware off-deck so that LPC can move them on individually later
           return [
@@ -100,24 +102,25 @@ export function getPrepCommands(
     []
   )
 
-  const AbsorbanceCommands = protocolData.modules.reduce<
-    AbsorbanceReaderOpenLidCreateCommand[]
-  >((acc, module) => {
-    if (getModuleType(module.model) === ABSORBANCE_READER_TYPE) {
-      return [
-        ...acc,
-        {
-          commandType: 'home',
-          params: {},
-        },
-        {
-          commandType: 'absorbanceReader/openLid',
-          params: { moduleId: module.id },
-        },
-      ]
-    }
-    return acc
-  }, [])
+  const AbsorbanceCommands = protocolData.modules.reduce<LPCPrepCommand[]>(
+    (acc, module) => {
+      if (getModuleType(module.model) === ABSORBANCE_READER_TYPE) {
+        return [
+          ...acc,
+          {
+            commandType: 'home',
+            params: {},
+          },
+          {
+            commandType: 'absorbanceReader/openLid',
+            params: { moduleId: module.id },
+          },
+        ]
+      }
+      return acc
+    },
+    []
+  )
 
   const HSCommands = protocolData.modules.reduce<
     HeaterShakerCloseLatchCreateCommand[]
