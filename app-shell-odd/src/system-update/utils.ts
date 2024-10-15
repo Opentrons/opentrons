@@ -7,8 +7,12 @@ export const directoryWithCleanup = <T>(
   const directory = tempy.directory()
   return new Promise<T>((resolve, reject) =>
     task(directory as string)
-      .then(result => resolve(result))
-      .catch(err => reject(err))
+      .then(result => {
+        resolve(result)
+      })
+      .catch(err => {
+        reject(err)
+      })
       .finally(() => rm(directory as string, { recursive: true, force: true }))
   )
 }

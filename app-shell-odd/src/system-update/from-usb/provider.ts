@@ -81,9 +81,9 @@ export function getProvider(
   return {
     refreshUpdateCache: progressCallback => {
       if (currentCheck != null) {
-        return new Promise((_, reject) =>
+        return new Promise((resolve, reject) => {
           reject(new Error('Check already ongoing'))
-        )
+        })
       }
       const updatePromise = checkUpdates(progressCallback)
       currentCheck = updatePromise
@@ -96,6 +96,7 @@ export function getProvider(
     unlockUpdateCache: () => {},
     teardown: () => {
       canceller.abort()
+      canceller = new AbortController()
       return rm(tempdir, { recursive: true, force: true })
     },
     name: () => `USBUpdateProvider from ${from.massStorageDeviceRoot}`,

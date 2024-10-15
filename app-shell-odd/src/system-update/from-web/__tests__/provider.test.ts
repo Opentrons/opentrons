@@ -6,14 +6,9 @@ import { getProvider } from '../provider'
 import { getOrDownloadManifest as _getOrDownloadManifest } from '../release-manifest'
 import { cleanUpAndGetOrDownloadReleaseFiles as _cleanUpAndGetOrDownloadReleaseFiles } from '../release-files'
 
-import {
-  ReleaseManifest,
-  NoUpdate,
-  FoundUpdate,
-  ReadyUpdate,
-} from '../../types'
 vi.mock('../../../log')
 vi.mock('../release-manifest', async importOriginal => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const original = await importOriginal<typeof import('../release-manifest')>()
   return {
     ...original,
@@ -372,11 +367,12 @@ describe('provider.refreshUpdateCache locking', () => {
           )
           .thenDo(
             (_manifestUrl, _cacheDirectory, abortController) =>
-              new Promise((_resolve, reject) => {
+              new Promise((resolve, reject) => {
                 abortController.signal.addEventListener(
                   'abort',
-                  () =>
-                    reject(new LocalAbortError(abortController.signal.reason)),
+                  () => {
+                    reject(new LocalAbortError(abortController.signal.reason))
+                  },
                   { once: true }
                 )
                 provider.lockUpdateCache()
@@ -563,11 +559,12 @@ describe('provider.refreshUpdateCache locking', () => {
               _progress,
               abortController
             ) =>
-              new Promise((_resolve, reject) => {
+              new Promise((resolve, reject) => {
                 abortController.signal.addEventListener(
                   'abort',
-                  () =>
-                    reject(new LocalAbortError(abortController.signal.reason)),
+                  () => {
+                    reject(new LocalAbortError(abortController.signal.reason))
+                  },
                   { once: true }
                 )
                 provider.lockUpdateCache()
@@ -585,14 +582,14 @@ describe('provider.refreshUpdateCache locking', () => {
             })
           )
       })
-      .then(() =>
+      .then(() => {
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
           files: releaseFiles,
           releaseNotes: 'content',
           downloadProgress: 100,
         })
-      )
+      })
   })
   it('will abort when locked in the last-chance phase and return the previous update', () => {
     const provider = getProvider({

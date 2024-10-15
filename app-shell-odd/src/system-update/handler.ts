@@ -41,17 +41,17 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
     updateCacheDirectory: getSystemUpdateDir(),
     currentVersion: CURRENT_SYSTEM_VERSION,
   })
-  let usbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {}
+  const usbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {}
   let currentBestUsbUpdate:
     | (ReadyUpdate & { providerName: string })
     | null = null
 
-  const updateBestUsbUpdate = () => {
+  const updateBestUsbUpdate = (): void => {
     currentBestUsbUpdate = null
     Object.values(usbProviders).forEach(provider => {
       const providerUpdate = provider.getUpdateDetails()
       if (providerUpdate.files == null) {
-        return
+        // nothing to do, keep null
       } else if (currentBestUsbUpdate == null) {
         currentBestUsbUpdate = {
           ...(providerUpdate as ReadyUpdate),
@@ -68,7 +68,7 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
     })
   }
 
-  const dispatchStaticUpdateData = () => {
+  const dispatchStaticUpdateData = (): void => {
     if (currentBestUsbUpdate != null) {
       dispatchUpdateInfo(
         {
@@ -91,7 +91,7 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
   }
 
   return {
-    handleAction: action => {
+    handleAction: (action: Action): Promise<void> => {
       switch (action.type) {
         case 'shell:CHECK_UPDATE':
           return webProvider
@@ -101,7 +101,7 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
                 if (
                   updateStatus.version != null &&
                   updateStatus.files == null &&
-                  updateStatus.downloadProgress == 0
+                  updateStatus.downloadProgress === 0
                 ) {
                   dispatch({
                     type: 'robotUpdate:UPDATE_VERSION',
@@ -114,7 +114,7 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
                 } else if (
                   updateStatus.version != null &&
                   updateStatus.files == null &&
-                  updateStatus.downloadProgress != 0
+                  updateStatus.downloadProgress !== 0
                 ) {
                   dispatch({
                     // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
@@ -148,7 +148,9 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
             })
         case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
           if (usbProviders[action.payload.rootPath] != null) {
-            return new Promise(resolve => resolve())
+            return new Promise(resolve => {
+              resolve()
+            })
           }
           usbProviders[action.payload.rootPath] = getUsbUpdateProvider({
             currentVersion: CURRENT_SYSTEM_VERSION,
@@ -174,6 +176,7 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
             return provider
               .teardown()
               .then(() => {
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete usbProviders[action.payload.rootPath]
                 updateBestUsbUpdate()
               })
@@ -185,7 +188,9 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
                 )
               })
           }
-          return new Promise(resolve => resolve())
+          return new Promise(resolve => {
+            resolve()
+          })
         case 'robotUpdate:UPLOAD_FILE': {
           const { host, path, systemFile } = action.payload
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -266,7 +271,9 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
           })
         }
       }
-      return new Promise(resolve => resolve())
+      return new Promise(resolve => {
+        resolve()
+      })
     },
     reload: () => {
       webProvider.lockUpdateCache()

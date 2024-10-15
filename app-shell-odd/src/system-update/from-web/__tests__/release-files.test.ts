@@ -312,7 +312,6 @@ describe('downloadReleaseFiles', () => {
     }))
   it('should tolerate failing to fetch release notes', () =>
     directoryWithCleanup(directory => {
-      let tempSystemPath = ''
       when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
@@ -320,7 +319,6 @@ describe('downloadReleaseFiles', () => {
           expect.any(Object)
         )
         .thenDo((_url, dest, _opts) => {
-          tempSystemPath = dest
           return fs
             .writeFile(dest, 'this is the contents of the system.zip')
             .then(() => dest)
@@ -404,7 +402,7 @@ describe('downloadReleaseFiles', () => {
         })
         .thenDo(
           (_url, dest, options) =>
-            new Promise((_resolve, reject) => {
+            new Promise((resolve, reject) => {
               const listener = () => {
                 reject(options.signal.reason)
               }

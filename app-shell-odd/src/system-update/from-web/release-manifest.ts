@@ -27,7 +27,9 @@ export const ensureCacheDir = (directory: string): Promise<string> =>
     .catch(() => removeAndRemake(directory))
     .then(stats =>
       stats.isDirectory()
-        ? new Promise(resolve => resolve(stats))
+        ? new Promise(resolve => {
+            resolve(stats)
+          })
         : removeAndRemake(directory)
     )
     .then(() => FS.readdir(directory, { withFileTypes: true }))
@@ -36,7 +38,9 @@ export const ensureCacheDir = (directory: string): Promise<string> =>
         entry => entry.name === 'manifest.json'
       )
       if (manifestCandidate == null || manifestCandidate.isFile()) {
-        return new Promise(resolve => resolve(directory))
+        return new Promise(resolve => {
+          resolve(directory)
+        })
       }
       return FS.rm(path.join(directory, 'manifest.json'), {
         force: true,

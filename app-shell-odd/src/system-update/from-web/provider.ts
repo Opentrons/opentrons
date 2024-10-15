@@ -1,5 +1,5 @@
 import path from 'path'
-import { rm, readFile } from 'fs/promises'
+import { rm } from 'fs/promises'
 
 import { createLogger } from '../../log'
 import { LocalAbortError } from '../../http'
@@ -32,7 +32,7 @@ export function getProvider(
 ): UpdateProvider<WebUpdateSource> {
   let locked = false
   let canceller = new AbortController()
-  const lockCache = () => {
+  const lockCache = (): void => {
     locked = true
     canceller.abort('cache locked')
     canceller = new AbortController()
@@ -46,8 +46,15 @@ export function getProvider(
   } as const
   let currentUpdate: UnresolvedUpdate = noUpdate
   let currentCheck: Promise<ResolvedUpdate> | null = null
-  const updater = async (progress: ProgressCallback) => {
+  const updater = async (
+    progress: ProgressCallback
+  ): Promise<ResolvedUpdate> => {
     const myCanceller = canceller
+    // this needs to be an `as`-assertion on the value because we can only guarantee that
+    // currentUpdate is resolved by the function of the program: we know that this function,
+    // which is the only thing that can alter currentUpdate, will always end with a resolved update,
+    // and we know that this function will not be running twice at the same time.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const previousUpdate = {
       version: currentUpdate.version,
       files: currentUpdate.files == null ? null : { ...currentUpdate.files },
@@ -166,9 +173,9 @@ export function getProvider(
     getUpdateDetails: () => currentUpdate,
     refreshUpdateCache: (progress: ProgressCallback) => {
       if (currentCheck != null) {
-        return new Promise((_, reject) =>
+        return new Promise((resolve, reject) => {
           reject(new Error('Check already ongoing'))
-        )
+        })
       } else {
         const updaterPromise = updater(progress)
         currentCheck = updaterPromise
@@ -191,5 +198,3 @@ export function getProvider(
     source: () => from,
   }
 }
-
-const NO_NOTES = 'No release notes are available for this release.'

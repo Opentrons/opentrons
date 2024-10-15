@@ -2,7 +2,7 @@
 import fs from 'fs'
 import { remove } from 'fs-extra'
 import pump from 'pump'
-import _fetch, { AbortError } from 'node-fetch'
+import _fetch from 'node-fetch'
 import FormData from 'form-data'
 import { Transform } from 'stream'
 
@@ -96,13 +96,20 @@ export function fetchToFile(
       // pump calls stream.pipe, handles teardown if streams error, and calls
       // its callbacks when the streams are done
       pump(inputStream, progressReader, outputStream, error => {
-        const handleError = (problem: Error) => {
+        const handleError = (problem: Error): void => {
           // if we error out, delete the temp dir to clean up
           log.error(`Aborting fetchToFile: ${problem.name}: ${problem.message}`)
-          remove(destination).then(() => reject(error))
+          remove(destination).then(() => {
+            reject(error)
+          })
         }
-        const listener = () =>
-          handleError(new LocalAbortError(options?.signal?.reason ?? 'aborted'))
+        const listener = (): void => {
+          handleError(
+            new LocalAbortError(
+              (options?.signal?.reason as string | null) ?? 'aborted'
+            )
+          )
+        }
         options?.signal?.addEventListener('abort', listener, { once: true })
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) {

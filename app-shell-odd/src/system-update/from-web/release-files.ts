@@ -52,7 +52,9 @@ export const ensureCleanReleaseCacheForVersion = (
                 force: true,
                 recursive: true,
               })
-            : new Promise<void>(resolve => resolve())
+            : new Promise<void>(resolve => {
+                resolve()
+              })
         )
       )
     )
@@ -67,9 +69,9 @@ export const augmentWithReleaseNotesContent = (
   releaseFiles: ReleaseSetFilepaths
 ): Promise<ReleaseSetData> =>
   releaseFiles.releaseNotes == null
-    ? new Promise(resolve =>
+    ? new Promise(resolve => {
         resolve({ ...releaseFiles, releaseNotesContent: null })
-      )
+      })
     : readReleaseNotes(releaseFiles.releaseNotes)
         .then(releaseNotesContent => ({ ...releaseFiles, releaseNotesContent }))
         .catch(err => {
@@ -92,7 +94,7 @@ export function getReleaseFiles(
       releaseNotes:
         urls?.releaseNotes == null ? null : path.basename(urls.releaseNotes),
     }
-    const foundFiles = files.reduce(
+    const foundFiles = files.reduce<Partial<ReleaseSetFilepaths>>(
       (
         releaseSetFilePaths: Partial<ReleaseSetFilepaths>,
         thisFile: string
@@ -108,7 +110,7 @@ export function getReleaseFiles(
         }
         return releaseSetFilePaths
       },
-      {} as Partial<ReleaseSetFilepaths>
+      {}
     )
     if (foundFiles?.system != null) {
       const files = {
@@ -223,7 +225,9 @@ export const cleanUpAndGetOrDownloadReleaseFiles = (
 
 const readReleaseNotes = (path: string | null): Promise<string | null> =>
   path == null
-    ? new Promise(resolve => resolve(null))
+    ? new Promise(resolve => {
+        resolve(null)
+      })
     : readFile(path, { encoding: 'utf-8' }).catch(err => {
         log.warning(
           `Could not read release notes from ${path}: ${err.name}: ${err.message}`

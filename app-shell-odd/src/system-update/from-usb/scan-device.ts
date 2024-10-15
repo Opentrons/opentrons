@@ -6,9 +6,9 @@ const higherVersion = (a: FileDetails | null, b: FileDetails): FileDetails =>
   a == null ? b : Semver.gt(a.version, b.version) ? a : b
 
 const mostRecentUpdateOf = (candidates: FileDetails[]): FileDetails | null =>
-  candidates.reduce(
+  candidates.reduce<FileDetails | null>(
     (prev, current) => higherVersion(prev, current),
-    null as FileDetails | null
+    null
   )
 
 const getMassStorageUpdateFiles = (
