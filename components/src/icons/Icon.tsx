@@ -77,6 +77,7 @@ export function Icon(props: IconProps): JSX.Element | null {
   return (
     <Svg
       aria-hidden="true"
+      aria-roledescription={name}
       fill={fill}
       viewBox={viewBox}
       className={cx(className, { spin })}
