@@ -55,9 +55,6 @@ class HardwareControlInterface(
     however, they can satisfy protocols.
     """
 
-    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
-        ...
-
 
 class FlexHardwareControlInterface(
     PositionEstimator,
@@ -80,9 +77,6 @@ class FlexHardwareControlInterface(
     The interface for the Flex controller is mostly in-line with the OT-2 interface,
     with some additional functionality and parameterization not supported on the OT-2.
     """
-
-    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
-        ...
 
 
 __all__ = [
