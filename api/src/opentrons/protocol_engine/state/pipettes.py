@@ -96,7 +96,7 @@ class StaticPipetteConfig:
     nozzle_offset_z: float
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
-    default_nozzle_map: NozzleMap
+    default_nozzle_map: NozzleMap  # todo(mm, 2024-10-14): unused, remove?
     lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
@@ -104,6 +104,9 @@ class StaticPipetteConfig:
 class PipetteState:
     """Basic pipette data state and getter methods."""
 
+    # todo(mm, 2024-10-14): It's getting difficult to ensure that all of these
+    # attributes are populated at the appropriate times. Refactor to a
+    # single dict-of-many-things instead of many dicts-of-single-things.
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, Optional[float]]
     current_location: Optional[CurrentPipetteLocation]
@@ -112,7 +115,7 @@ class PipetteState:
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
-    nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
+    nozzle_configuration_by_id: Dict[str, NozzleMap]
     liquid_presence_detection_by_id: Dict[str, bool]
 
 
@@ -167,11 +170,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                self._state.nozzle_configuration_by_id[
-                    pipette_id
-                ] = static_config.default_nozzle_map
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
@@ -632,31 +630,23 @@ class PipetteView(HasState[PipetteState]):
 
     def get_nozzle_layout_type(self, pipette_id: str) -> NozzleConfigurationType:
         """Get the current set nozzle layout configuration."""
-        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
-        if nozzle_map_for_pipette:
-            return nozzle_map_for_pipette.configuration
-        else:
-            return NozzleConfigurationType.FULL
+        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map_for_pipette.configuration
 
     def get_is_partially_configured(self, pipette_id: str) -> bool:
         """Determine if the provided pipette is partially configured."""
         return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
 
-    def get_primary_nozzle(self, pipette_id: str) -> Optional[str]:
+    def get_primary_nozzle(self, pipette_id: str) -> str:
         """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
-        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
-        return nozzle_map.starting_nozzle if nozzle_map else None
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map.starting_nozzle
 
     def _get_critical_point_offset_without_tip(
         self, pipette_id: str, critical_point: Optional[CriticalPoint]
     ) -> Point:
         """Get the offset of the specified critical point from pipette's mount position."""
-        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
-        # Nozzle map is unavailable only when there's no pipette loaded
-        # so this is merely for satisfying the type checker
-        assert (
-            nozzle_map is not None
-        ), "Error getting critical point offset. Nozzle map not found."
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
         match critical_point:
             case CriticalPoint.INSTRUMENT_XY_CENTER:
                 return nozzle_map.instrument_xy_center_offset

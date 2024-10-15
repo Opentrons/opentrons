@@ -1371,24 +1371,24 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
         return nozzle_map
 
     map = _reconfigure_nozzle_layout("A1", "A1", "A1")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("A12", "A12", "A12")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("H1", "H1", "H1")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("H12", "H12", "H12")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
