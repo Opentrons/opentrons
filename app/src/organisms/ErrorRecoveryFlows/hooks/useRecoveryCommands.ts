@@ -274,7 +274,10 @@ export const HOME_GRIPPER_Z_AXIS: CreateCommand = {
 const buildMoveLabwareWithoutPause = (
   failedCommand: FailedCommand | null
 ): CreateCommand | null => {
-  if (failedCommand == null) return null
+  if (failedCommand == null) 
+  {
+   return null
+   }
   const moveLabwareParams = failedCommand.params as MoveLabwareParams
   return {
     commandType: 'moveLabware',
