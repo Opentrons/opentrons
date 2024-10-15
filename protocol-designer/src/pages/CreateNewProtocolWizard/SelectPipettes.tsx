@@ -42,6 +42,7 @@ import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
 import { HandleEnter } from './HandleEnter'
+import { removeOpentronsPhrases } from '../../utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
@@ -334,24 +335,31 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                                 <Checkbox
                                   key={value}
                                   isChecked={selectedValues.includes(value)}
-                                  labelText={name}
+                                  labelText={removeOpentronsPhrases(name)}
                                   onClick={() => {
-                                    const updatedValues = selectedValues.includes(
+                                    const isCurrentlySelected = selectedValues.includes(
                                       value
                                     )
-                                      ? selectedValues.filter(v => v !== value)
-                                      : [...selectedValues, value]
-                                    setValue(
-                                      `pipettesByMount.${defaultMount}.tiprackDefURI`,
-                                      updatedValues.slice(0, 3)
-                                    )
-                                    if (
-                                      selectedValues.length ===
-                                      MAX_TIPRACKS_ALLOWED
-                                    ) {
-                                      makeSnackbar(
-                                        t('up_to_3_tipracks') as string
+
+                                    if (isCurrentlySelected) {
+                                      setValue(
+                                        `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                                        selectedValues.filter(v => v !== value)
                                       )
+                                    } else {
+                                      if (
+                                        selectedValues.length ===
+                                        MAX_TIPRACKS_ALLOWED
+                                      ) {
+                                        makeSnackbar(
+                                          t('up_to_3_tipracks') as string
+                                        )
+                                      } else {
+                                        setValue(
+                                          `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                                          [...selectedValues, value]
+                                        )
+                                      }
                                     }
                                   }}
                                 />

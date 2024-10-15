@@ -31,6 +31,8 @@ export type QuickTransfersOnDeviceSortKey =
   | 'recentCreated'
   | 'oldCreated'
 
+export type Language = 'en' | 'zh'
+
 export interface OnDeviceDisplaySettings {
   sleepMs: number
   brightness: number
@@ -274,4 +276,12 @@ export type ConfigV24 = Omit<ConfigV23, 'version' | 'support'> & {
   }
 }
 
-export type Config = ConfigV24
+export type ConfigV25 = Omit<ConfigV24, 'version'> & {
+  version: 25
+  language: {
+    appLanguage: Language | null
+    systemLanguage: string | null
+  }
+}
+
+export type Config = ConfigV25

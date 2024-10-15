@@ -83,6 +83,9 @@ async def test_success(
                 pipette_id="pipette-id",
                 tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
             ),
+            tips_used=update_types.TipsUsedUpdate(
+                pipette_id="pipette-id", labware_id="labware-id", well_name="A3"
+            ),
         ),
     )
 
@@ -139,6 +142,9 @@ async def test_tip_physically_missing_error(
                     labware_id="labware-id", well_name="well-name"
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
-            )
+            ),
+            tips_used=update_types.TipsUsedUpdate(
+                pipette_id="pipette-id", labware_id="labware-id", well_name="well-name"
+            ),
         ),
     )

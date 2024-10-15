@@ -34,7 +34,7 @@ describe('PipetteInfoItem', () => {
   it('renders pipette with edit and remove buttons', () => {
     render(props)
     screen.getByText('P1000 Single-Channel GEN1')
-    screen.getByText('Left pipette')
+    screen.getByText('Left Pipette')
     screen.getByText('mock display name')
     fireEvent.click(screen.getByText('Edit'))
     expect(props.editClick).toHaveBeenCalled()
@@ -49,7 +49,7 @@ describe('PipetteInfoItem', () => {
     }
     render(props)
     screen.getByText('P1000 Single-Channel GEN1')
-    screen.getByText('Right pipette')
+    screen.getByText('Right Pipette')
     screen.getByText('mock display name')
     fireEvent.click(screen.getByText('Edit'))
     expect(props.editClick).toHaveBeenCalled()

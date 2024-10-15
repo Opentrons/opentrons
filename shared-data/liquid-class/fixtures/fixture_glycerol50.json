@@ -152,7 +152,12 @@
               "10": 7,
               "20": 10
             },
-            "delay": 1
+            "delay": {
+              "enable": true,
+              "params": {
+                "duration": 2.5
+              }
+            }
           },
           "multiDispense": {
             "submerge": {
@@ -211,13 +216,6 @@
               "default": 50,
               "10": 40,
               "20": 30
-            },
-            "mix": {
-              "enable": true,
-              "params": {
-                "repetitions": 3,
-                "volume": 15
-              }
             },
             "conditioningByVolume": {
               "default": 10,

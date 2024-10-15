@@ -4,7 +4,7 @@ import type { ModuleModel } from '@opentrons/shared-data'
 import type { CommandTextData } from '../types'
 
 export function getModuleModel(
-  commandTextData: CommandTextData,
+  commandTextData: Omit<CommandTextData, 'commands'>,
   moduleId: string
 ): ModuleModel | null {
   const loadedModule = getLoadedModule(commandTextData, moduleId)

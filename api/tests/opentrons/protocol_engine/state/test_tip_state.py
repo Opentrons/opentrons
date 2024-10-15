@@ -14,8 +14,9 @@ from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.tips import TipStore, TipView
-from opentrons.protocol_engine.types import FlowRates, DeckPoint
+from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
@@ -70,54 +71,9 @@ def load_labware_command(labware_definition: LabwareDefinition) -> commands.Load
     )
 
 
-@pytest.fixture
-def pick_up_tip_command() -> commands.PickUpTip:
-    """Get a pick-up tip command value object."""
-    return commands.PickUpTip.construct(  # type: ignore[call-arg]
-        params=commands.PickUpTipParams.construct(
-            pipetteId="pipette-id",
-            labwareId="cool-labware",
-            wellName="A1",
-        ),
-        result=commands.PickUpTipResult.construct(
-            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
-        ),
-    )
-
-
-@pytest.fixture
-def drop_tip_command() -> commands.DropTip:
-    """Get a drop tip command value object."""
-    return commands.DropTip.construct(  # type: ignore[call-arg]
-        params=commands.DropTipParams.construct(
-            pipetteId="pipette-id",
-            labwareId="cool-labware",
-            wellName="A1",
-        ),
-        result=commands.DropTipResult.construct(position=DeckPoint(x=0, y=0, z=0)),
-    )
-
-
-@pytest.fixture
-def drop_tip_in_place_command() -> commands.DropTipInPlace:
-    """Get a drop tip in place command object."""
-    return commands.DropTipInPlace.construct(  # type: ignore[call-arg]
-        params=commands.DropTipInPlaceParams.construct(
-            pipetteId="pipette-id",
-        ),
-        result=commands.DropTipInPlaceResult.construct(),
-    )
-
-
-@pytest.fixture
-def unsafe_drop_tip_in_place_command() -> commands.unsafe.UnsafeDropTipInPlace:
-    """Get an unsafe drop-tip-in-place command."""
-    return commands.unsafe.UnsafeDropTipInPlace.construct(  # type: ignore[call-arg]
-        params=commands.unsafe.UnsafeDropTipInPlaceParams.construct(
-            pipetteId="pipette-id"
-        ),
-        result=commands.unsafe.UnsafeDropTipInPlaceResult.construct(),
-    )
+def _dummy_command() -> commands.Command:
+    """Return a placeholder command."""
+    return commands.Comment.construct()  # type: ignore[call-arg]
 
 
 @pytest.mark.parametrize(
@@ -310,7 +266,6 @@ def test_get_next_tip_used_starting_tip(
 )
 def test_get_next_tip_skips_picked_up_tip(
     load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
     subject: TipStore,
     input_tip_amount: int,
     get_next_tip_tips: int,
@@ -322,6 +277,7 @@ def test_get_next_tip_skips_picked_up_tip(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
+
     load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
@@ -372,8 +328,20 @@ def test_get_next_tip_skips_picked_up_tip(
             private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
+
+    pick_up_tip_state_update = update_types.StateUpdate(
+        tips_used=update_types.TipsUsedUpdate(
+            pipette_id="pipette-id",
+            labware_id="cool-labware",
+            well_name="A1",
+        )
+    )
     subject.handle_action(
-        actions.SucceedCommandAction(command=pick_up_tip_command, private_result=None)
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            private_result=None,
+            state_update=pick_up_tip_state_update,
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -436,19 +404,15 @@ def test_get_next_tip_with_starting_tip(
 
     assert result == "B2"
 
-    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
-        params=commands.PickUpTipParams.construct(
-            pipetteId="pipette-id",
-            labwareId="cool-labware",
-            wellName="B2",
-        ),
-        result=commands.PickUpTipResult.construct(
-            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
-        ),
+    pick_up_tip_state_update = update_types.StateUpdate(
+        tips_used=update_types.TipsUsedUpdate("pipette-id", "cool-labware", "B2")
     )
-
     subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip)
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            private_result=None,
+            state_update=pick_up_tip_state_update,
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -512,19 +476,17 @@ def test_get_next_tip_with_starting_tip_8_channel(
 
     assert result == "A2"
 
-    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
-        params=commands.PickUpTipParams.construct(
-            pipetteId="pipette-id",
-            labwareId="cool-labware",
-            wellName="A2",
-        ),
-        result=commands.PickUpTipResult.construct(
-            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
-        ),
+    pick_up_tip_state_update = update_types.StateUpdate(
+        tips_used=update_types.TipsUsedUpdate(
+            pipette_id="pipette-id", labware_id="cool-labware", well_name="A2"
+        )
     )
-
     subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip)
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            private_result=None,
+            state_update=pick_up_tip_state_update,
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -578,10 +540,10 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
             private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
-    load_pipette_command2 = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command_2 = commands.LoadPipette.construct(  # type: ignore[call-arg]
         result=commands.LoadPipetteResult(pipetteId="pipette-id2")
     )
-    load_pipette_private_result2 = commands.LoadPipettePrivateResult(
+    load_pipette_private_result_2 = commands.LoadPipettePrivateResult(
         pipette_id="pipette-id2",
         serial_number="pipette-serial2",
         config=LoadedStaticPipetteData(
@@ -607,7 +569,7 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
     )
     subject.handle_action(
         actions.SucceedCommandAction(
-            private_result=load_pipette_private_result2, command=load_pipette_command2
+            private_result=load_pipette_private_result_2, command=load_pipette_command_2
         )
     )
 
@@ -620,19 +582,17 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
 
     assert result == "A1"
 
-    pick_up_tip2 = commands.PickUpTip.construct(  # type: ignore[call-arg]
-        params=commands.PickUpTipParams.construct(
-            pipetteId="pipette-id2",
-            labwareId="cool-labware",
-            wellName="A1",
-        ),
-        result=commands.PickUpTipResult.construct(
-            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
-        ),
+    pick_up_tip_2_state_update = update_types.StateUpdate(
+        tips_used=update_types.TipsUsedUpdate(
+            pipette_id="pipette-id2", labware_id="cool-labware", well_name="A1"
+        )
     )
-
     subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip2)
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            private_result=None,
+            state_update=pick_up_tip_2_state_update,
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -696,19 +656,17 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
 
     assert result == "H12"
 
-    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
-        params=commands.PickUpTipParams.construct(
-            pipetteId="pipette-id",
-            labwareId="cool-labware",
-            wellName="H12",
-        ),
-        result=commands.PickUpTipResult.construct(
-            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
-        ),
+    pick_up_tip_state_update = update_types.StateUpdate(
+        tips_used=update_types.TipsUsedUpdate(
+            pipette_id="pipette-id", labware_id="cool-labware", well_name="H12"
+        )
     )
-
     subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip)
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            private_result=None,
+            state_update=pick_up_tip_state_update,
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -776,7 +734,6 @@ def test_get_next_tip_with_column_and_starting_tip(
 def test_reset_tips(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should be able to reset tip tracking state."""
@@ -818,18 +775,30 @@ def test_reset_tips(
     )
 
     subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            private_result=None,
+            state_update=update_types.StateUpdate(
+                tips_used=update_types.TipsUsedUpdate(
+                    pipette_id="pipette-id",
+                    labware_id="cool-labware",
+                    well_name="A1",
+                )
+            ),
+        )
     )
+
+    def get_result() -> str | None:
+        return TipView(subject.state).get_next_tip(
+            labware_id="cool-labware",
+            num_tips=1,
+            starting_tip_name=None,
+            nozzle_map=None,
+        )
+
+    assert get_result() != "A1"
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        num_tips=1,
-        starting_tip_name=None,
-        nozzle_map=None,
-    )
-
-    assert result == "A1"
+    assert get_result() == "A1"
 
 
 def test_handle_pipette_config_action(
@@ -906,93 +875,6 @@ def test_has_tip_tip_rack(
     result = TipView(state=subject.state).has_clean_tip("cool-labware", "A1")
 
     assert result is True
-
-
-def test_drop_tip(
-    subject: TipStore,
-    load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
-    drop_tip_command: commands.DropTip,
-    drop_tip_in_place_command: commands.DropTipInPlace,
-    unsafe_drop_tip_in_place_command: commands.unsafe.UnsafeDropTipInPlace,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-) -> None:
-    """It should be clear tip length when a tip is dropped."""
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=load_labware_command)
-    )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
-        result=commands.LoadPipetteResult(pipetteId="pipette-id")
-    )
-    load_pipette_private_result = commands.LoadPipettePrivateResult(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=8,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(x=1, y=2, z=3),
-            front_right_corner_offset=Point(x=4, y=5, z=6),
-            pipette_lld_settings={},
-        ),
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            private_result=load_pipette_private_result, command=load_pipette_command
-        )
-    )
-
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
-    )
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 1.23
-
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=drop_tip_command)
-    )
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 0
-
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
-    )
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 1.23
-
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            private_result=None, command=drop_tip_in_place_command
-        )
-    )
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 0
-
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
-    )
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 1.23
-
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            private_result=None, command=unsafe_drop_tip_in_place_command
-        )
-    )
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 0
 
 
 @pytest.mark.parametrize(
@@ -1096,17 +978,17 @@ def test_active_channels(
     )
 
     # Configure nozzle for partial configuration
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-    configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-        pipette_id="pipette-id",
-        nozzle_map=nozzle_map,
+    state_update = update_types.StateUpdate(
+        pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+            pipette_id="pipette-id",
+            nozzle_map=nozzle_map,
+        )
     )
     subject.handle_action(
         actions.SucceedCommandAction(
-            private_result=configure_nozzle_private_result,
-            command=configure_nozzle_layout_cmd,
+            command=_dummy_command(),
+            private_result=None,
+            state_update=state_update,
         )
     )
     assert (
@@ -1119,7 +1001,6 @@ def test_next_tip_uses_active_channels(
     subject: TipStore,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
     load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
 ) -> None:
     """Test that tip tracking logic uses pipette's active channels."""
     # Load labware
@@ -1162,34 +1043,53 @@ def test_next_tip_uses_active_channels(
     )
 
     # Configure nozzle for partial configuration
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-    configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-        pipette_id="pipette-id",
-        nozzle_map=NozzleMap.build(
-            physical_nozzles=NINETY_SIX_MAP,
-            physical_rows=NINETY_SIX_ROWS,
-            physical_columns=NINETY_SIX_COLS,
-            starting_nozzle="A12",
-            back_left_nozzle="A12",
-            front_right_nozzle="H12",
-            valid_nozzle_maps=ValidNozzleMaps(
-                maps={
-                    "A12_H12": ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
-                }
+    state_update = update_types.StateUpdate(
+        pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+            pipette_id="pipette-id",
+            nozzle_map=NozzleMap.build(
+                physical_nozzles=NINETY_SIX_MAP,
+                physical_rows=NINETY_SIX_ROWS,
+                physical_columns=NINETY_SIX_COLS,
+                starting_nozzle="A12",
+                back_left_nozzle="A12",
+                front_right_nozzle="H12",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "A12_H12": [
+                            "A12",
+                            "B12",
+                            "C12",
+                            "D12",
+                            "E12",
+                            "F12",
+                            "G12",
+                            "H12",
+                        ]
+                    }
+                ),
             ),
-        ),
+        )
     )
     subject.handle_action(
         actions.SucceedCommandAction(
-            private_result=configure_nozzle_private_result,
-            command=configure_nozzle_layout_cmd,
+            command=_dummy_command(),
+            private_result=None,
+            state_update=state_update,
         )
     )
     # Pick up partial tips
     subject.handle_action(
-        actions.SucceedCommandAction(command=pick_up_tip_command, private_result=None)
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            private_result=None,
+            state_update=update_types.StateUpdate(
+                tips_used=update_types.TipsUsedUpdate(
+                    pipette_id="pipette-id",
+                    labware_id="cool-labware",
+                    well_name="A1",
+                )
+            ),
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -1205,7 +1105,6 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
     subject: TipStore,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
     load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
 ) -> None:
     """Test tip tracking logic using multiple pipette configurations."""
     # Load labware
@@ -1254,95 +1153,95 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             starting_tip_name=None,
             nozzle_map=nozzle_map,
         )
-        assert result == well
+        assert result is not None and result == well
 
-        pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
-            params=commands.PickUpTipParams.construct(
-                pipetteId="pipette-id",
-                labwareId="cool-labware",
-                wellName=result,
-            ),
-            result=commands.PickUpTipResult.construct(
-                position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
-            ),
+        pick_up_tip_state_update = update_types.StateUpdate(
+            tips_used=update_types.TipsUsedUpdate(
+                pipette_id="pipette-id",
+                labware_id="cool-labware",
+                well_name=result,
+            )
         )
 
         subject.handle_action(
-            actions.SucceedCommandAction(private_result=None, command=pick_up_tip)
+            actions.SucceedCommandAction(
+                command=_dummy_command(),
+                private_result=None,
+                state_update=pick_up_tip_state_update,
+            )
         )
 
-    # Configure nozzle for partial configurations
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-
     def _reconfigure_nozzle_layout(start: str, back_l: str, front_r: str) -> NozzleMap:
-        configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-            pipette_id="pipette-id",
-            nozzle_map=NozzleMap.build(
-                physical_nozzles=NINETY_SIX_MAP,
-                physical_rows=NINETY_SIX_ROWS,
-                physical_columns=NINETY_SIX_COLS,
-                starting_nozzle=start,
-                back_left_nozzle=back_l,
-                front_right_nozzle=front_r,
-                valid_nozzle_maps=ValidNozzleMaps(
-                    maps={
-                        "A1": ["A1"],
-                        "H1": ["H1"],
-                        "A12": ["A12"],
-                        "H12": ["H12"],
-                        "A1_H3": [
-                            "A1",
-                            "A2",
-                            "A3",
-                            "B1",
-                            "B2",
-                            "B3",
-                            "C1",
-                            "C2",
-                            "C3",
-                            "D1",
-                            "D2",
-                            "D3",
-                            "E1",
-                            "E2",
-                            "E3",
-                            "F1",
-                            "F2",
-                            "F3",
-                            "G1",
-                            "G2",
-                            "G3",
-                            "H1",
-                            "H2",
-                            "H3",
-                        ],
-                        "A1_F2": [
-                            "A1",
-                            "A2",
-                            "B1",
-                            "B2",
-                            "C1",
-                            "C2",
-                            "D1",
-                            "D2",
-                            "E1",
-                            "E2",
-                            "F1",
-                            "F2",
-                        ],
-                    }
-                ),
+        nozzle_map = NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle=start,
+            back_left_nozzle=back_l,
+            front_right_nozzle=front_r,
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "A1": ["A1"],
+                    "H1": ["H1"],
+                    "A12": ["A12"],
+                    "H12": ["H12"],
+                    "A1_H3": [
+                        "A1",
+                        "A2",
+                        "A3",
+                        "B1",
+                        "B2",
+                        "B3",
+                        "C1",
+                        "C2",
+                        "C3",
+                        "D1",
+                        "D2",
+                        "D3",
+                        "E1",
+                        "E2",
+                        "E3",
+                        "F1",
+                        "F2",
+                        "F3",
+                        "G1",
+                        "G2",
+                        "G3",
+                        "H1",
+                        "H2",
+                        "H3",
+                    ],
+                    "A1_F2": [
+                        "A1",
+                        "A2",
+                        "B1",
+                        "B2",
+                        "C1",
+                        "C2",
+                        "D1",
+                        "D2",
+                        "E1",
+                        "E2",
+                        "F1",
+                        "F2",
+                    ],
+                }
             ),
+        )
+        state_update = update_types.StateUpdate(
+            pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+                pipette_id="pipette-id",
+                nozzle_map=nozzle_map,
+            )
         )
         subject.handle_action(
             actions.SucceedCommandAction(
-                private_result=configure_nozzle_private_result,
-                command=configure_nozzle_layout_cmd,
+                command=_dummy_command(),
+                private_result=None,
+                state_update=state_update,
             )
         )
-        return configure_nozzle_private_result.nozzle_map
+        return nozzle_map
 
     map = _reconfigure_nozzle_layout("A1", "A1", "H3")
     _assert_and_pickup("A10", map)
@@ -1364,7 +1263,6 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
     subject: TipStore,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
     load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
 ) -> None:
     """Test tip tracking logic to ensure once a tiprack is consumed it returns None when consuming tips using multiple pipette configurations."""
     # Load labware
@@ -1414,88 +1312,83 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
             nozzle_map=nozzle_map,
         )
         if result is not None:
-            pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
-                params=commands.PickUpTipParams.construct(
-                    pipetteId="pipette-id",
-                    labwareId="cool-labware",
-                    wellName=result,
-                ),
-                result=commands.PickUpTipResult.construct(
-                    position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
-                ),
+            pick_up_tip_state_update = update_types.StateUpdate(
+                tips_used=update_types.TipsUsedUpdate(
+                    pipette_id="pipette-id", labware_id="cool-labware", well_name=result
+                )
             )
 
             subject.handle_action(
-                actions.SucceedCommandAction(private_result=None, command=pick_up_tip)
+                actions.SucceedCommandAction(
+                    command=_dummy_command(),
+                    private_result=None,
+                    state_update=pick_up_tip_state_update,
+                )
             )
 
         return result
 
-    # Configure nozzle for partial configurations
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-
     def _reconfigure_nozzle_layout(start: str, back_l: str, front_r: str) -> NozzleMap:
-        configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-            pipette_id="pipette-id",
-            nozzle_map=NozzleMap.build(
-                physical_nozzles=NINETY_SIX_MAP,
-                physical_rows=NINETY_SIX_ROWS,
-                physical_columns=NINETY_SIX_COLS,
-                starting_nozzle=start,
-                back_left_nozzle=back_l,
-                front_right_nozzle=front_r,
-                valid_nozzle_maps=ValidNozzleMaps(
-                    maps={
-                        "A1": ["A1"],
-                        "H1": ["H1"],
-                        "A12": ["A12"],
-                        "H12": ["H12"],
-                        "Full": sum(
-                            [
-                                NINETY_SIX_ROWS["A"],
-                                NINETY_SIX_ROWS["B"],
-                                NINETY_SIX_ROWS["C"],
-                                NINETY_SIX_ROWS["D"],
-                                NINETY_SIX_ROWS["E"],
-                                NINETY_SIX_ROWS["F"],
-                                NINETY_SIX_ROWS["G"],
-                                NINETY_SIX_ROWS["H"],
-                            ],
-                            [],
-                        ),
-                    }
-                ),
+        nozzle_map = NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle=start,
+            back_left_nozzle=back_l,
+            front_right_nozzle=front_r,
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "A1": ["A1"],
+                    "H1": ["H1"],
+                    "A12": ["A12"],
+                    "H12": ["H12"],
+                    "Full": sum(
+                        [
+                            NINETY_SIX_ROWS["A"],
+                            NINETY_SIX_ROWS["B"],
+                            NINETY_SIX_ROWS["C"],
+                            NINETY_SIX_ROWS["D"],
+                            NINETY_SIX_ROWS["E"],
+                            NINETY_SIX_ROWS["F"],
+                            NINETY_SIX_ROWS["G"],
+                            NINETY_SIX_ROWS["H"],
+                        ],
+                        [],
+                    ),
+                }
             ),
+        )
+        state_update = update_types.StateUpdate(
+            pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+                pipette_id="pipette-id", nozzle_map=nozzle_map
+            )
         )
         subject.handle_action(
             actions.SucceedCommandAction(
-                private_result=configure_nozzle_private_result,
-                command=configure_nozzle_layout_cmd,
+                command=_dummy_command(), private_result=None, state_update=state_update
             )
         )
-        return configure_nozzle_private_result.nozzle_map
+        return nozzle_map
 
     map = _reconfigure_nozzle_layout("A1", "A1", "A1")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("A12", "A12", "A12")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("H1", "H1", "H1")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("H12", "H12", "H12")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
