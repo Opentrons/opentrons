@@ -31,4 +31,4 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     p1000.dispense(100, pcr_plate_1["A1"].top())
     # Dispense into plate 2
     p1000.dispense(100, pcr_plate_2["A1"].top())
-    p1000.drop_tip()
+    p1000.return_tip()

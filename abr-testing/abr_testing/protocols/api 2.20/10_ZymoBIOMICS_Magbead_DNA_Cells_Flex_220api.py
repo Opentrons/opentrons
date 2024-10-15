@@ -139,13 +139,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         temp: TemperatureModuleContext = ctx.load_module(
             "temperature module gen2", "D3"
         )  # type: ignore[assignment]
-        temp_block = temp.load_adapter("opentrons_96_well_aluminum_block")
+        temp_block = temp.load_adapter("opentrons_96_pcr_adapter")
         elutionplate = temp_block.load_labware(
-            "opentrons_96_wellplate_200ul_pcr_full_skirt", "Elution Plate"
+            "armadillo_96_wellplate_200ul_pcr_full_skirt", "Elution Plate"
         )
     else:
         elutionplate = ctx.load_labware(
-            "opentrons_96_wellplate_200ul_pcr_full_skirt", "A3", "Elution Plate"
+            "armadillo_96_wellplate_200ul_pcr_full_skirt", "A3", "Elution Plate"
         )
 
     magblock = ctx.load_module("magneticBlockV1", "C1")
