@@ -31,5 +31,9 @@
   "OT_PD_ENABLE_RETURN_TIP": {
     "title": "Enable return tip",
     "description": "You can choose which tip to pick up and where to drop tip."
+  },
+  "OT_PD_ENABLE_HOT_KEYS_DISPLAY": {
+    "title": "Timeline editing tips",
+    "description": "Show tips for working with steps next to the protocol timeline"
   }
 }

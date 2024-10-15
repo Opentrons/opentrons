@@ -92,4 +92,5 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
     reportActionSelectedEvent: () => {},
     reportActionSelectedResult: () => {},
   },
+  allRunDefs: [],
 }

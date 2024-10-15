@@ -14,6 +14,7 @@ import { COMMAND_WIDTH_PX } from './index'
 
 import type {
   CompletedProtocolAnalysis,
+  LabwareDefinition2,
   ProtocolAnalysisOutput,
   RobotType,
   RunTimeCommand,
@@ -26,17 +27,18 @@ interface CommandItemProps {
   setCurrentCommandIndex: (index: number) => void
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   robotType: RobotType
+  allRunDefs: LabwareDefinition2[]
 }
-export function CommandItem(props: CommandItemProps): JSX.Element {
+export function CommandItem({
+  index,
+  command,
+  currentCommandIndex,
+  setCurrentCommandIndex,
+  analysis,
+  robotType,
+  allRunDefs,
+}: CommandItemProps): JSX.Element {
   const [showDetails, setShowDetails] = useState(false)
-  const {
-    index,
-    command,
-    currentCommandIndex,
-    setCurrentCommandIndex,
-    analysis,
-    robotType,
-  } = props
   const params: RunTimeCommand['params'] = command.params ?? {}
   return (
     <Flex
@@ -78,6 +80,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
         command={command}
         commandTextData={getCommandTextData(analysis)}
         robotType={robotType}
+        allRunDefs={allRunDefs}
       />
       {showDetails
         ? Object.entries(params).map(([key, value]) => (

@@ -5,15 +5,21 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
 } from '@opentrons/shared-data'
+
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
-import { getLabwareDefinitionsFromCommands } from './getLabwareDefinitionsFromCommands'
-import type { RobotType, LabwareLocation } from '@opentrons/shared-data'
+
 import type { TFunction } from 'i18next'
+import type {
+  RobotType,
+  LabwareLocation,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { CommandTextData } from '../types'
 
 export function getLabwareDisplayLocation(
-  commandTextData: CommandTextData,
+  commandTextData: Omit<CommandTextData, 'commands'>,
+  allRunDefs: LabwareDefinition2[],
   location: LabwareLocation,
   t: TFunction,
   robotType: RobotType,
@@ -54,8 +60,7 @@ export function getLabwareDisplayLocation(
     const adapter = commandTextData.labware.find(
       lw => lw.id === location.labwareId
     )
-    const allDefs = getLabwareDefinitionsFromCommands(commandTextData.commands)
-    const adapterDef = allDefs.find(
+    const adapterDef = allRunDefs.find(
       def => getLabwareDefURI(def) === adapter?.definitionUri
     )
     const adapterDisplayName =
