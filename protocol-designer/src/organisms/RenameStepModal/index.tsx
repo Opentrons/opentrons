@@ -33,9 +33,8 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { t } = useTranslation(['form', 'shared', 'protocol_steps'])
   const initialName = i18n.format(t(formData.stepName), 'capitalize')
   const [stepName, setStepName] = useState<string>(initialName)
-  const [stepDetails, setStepDetails] = useState<string | null>(
-    formData.stepDetails
-  )
+  const initialStepDetails = formData.stepDetails || ''
+  const [stepDetails, setStepDetails] = useState<string>(initialStepDetails)
 
   const handleSave = (): void => {
     const { stepId } = formData
