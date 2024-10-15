@@ -24,8 +24,6 @@ import type { Config, Overrides } from './types'
 
 export * from './types'
 
-export const ODD_DIR = '/data/ODD'
-
 // make sure all arguments are included in production
 const argv = process.argv0.endsWith('defaultApp')
   ? process.argv.slice(2)
@@ -48,8 +46,6 @@ const store = (): Store => {
     // perform store migration if loading for the first time
     _store = (new Store({
       defaults: DEFAULTS_V12,
-      // dont overwrite config dir if in dev mode because it causes issues
-      ...(process.env.NODE_ENV === 'production' && { cwd: ODD_DIR }),
     }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }

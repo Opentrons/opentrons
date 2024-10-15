@@ -4,14 +4,14 @@ import fse from 'fs-extra'
 import path from 'path'
 import dateFormat from 'dateformat'
 import winston from 'winston'
+import { app } from 'electron'
 
 import { getConfig } from './config'
 
 import type Transport from 'winston-transport'
 import type { Config } from './config'
 
-const ODD_DIR = '/data/ODD'
-const LOG_DIR = path.join(ODD_DIR, 'logs')
+const LOG_DIR = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
 const COMBINED_LOG = path.join(LOG_DIR, 'combined.log')
 const FILE_OPTIONS = {

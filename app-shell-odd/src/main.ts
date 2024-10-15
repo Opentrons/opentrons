@@ -15,7 +15,6 @@ import {
   getOverrides,
   registerConfig,
   resetStore,
-  ODD_DIR,
 } from './config'
 import systemd from './systemd'
 import { registerDataFiles, watchForMassStorage } from './usb'
@@ -24,6 +23,7 @@ import {
   establishBrokerConnection,
   closeBrokerConnection,
 } from './notifications'
+import { ODD_DATA_DIR } from './constants'
 
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch, Logger } from './types'
@@ -35,6 +35,14 @@ import type { LogEntry } from 'winston'
  * https://github.com/node-fetch/node-fetch/issues/1624
  */
 dns.setDefaultResultOrder('ipv4first')
+console.log(
+  `node env is ${process.env.NODE_ENV}, path is ${app.getPath('userData')}`
+)
+if (process.env.NODE_ENV === 'production') {
+  console.log(`setting app path to ${ODD_DATA_DIR}`)
+  app.setPath('userData', ODD_DATA_DIR)
+}
+console.log(`app path becomes ${app.getPath('userData')}`)
 
 systemd.sendStatus('starting app')
 const config = getConfig()
@@ -83,12 +91,14 @@ function startUp(): void {
   log.info('Starting App')
   console.log('Starting App')
   const storeNeedsReset = fse.existsSync(
-    path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
+    path.join(app.getPath('userData'), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
   if (storeNeedsReset) {
     log.debug('store marked to be reset, resetting store')
     resetStore()
-    fse.removeSync(path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`))
+    fse.removeSync(
+      path.join(app.getPath('userData'), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
+    )
   }
   systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
