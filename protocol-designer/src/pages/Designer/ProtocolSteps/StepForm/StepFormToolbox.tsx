@@ -9,7 +9,6 @@ import {
   COLORS,
   Flex,
   Icon,
-  Modal,
   PrimaryButton,
   SPACING,
   SecondaryButton,

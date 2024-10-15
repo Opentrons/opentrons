@@ -19,9 +19,7 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../assets/localization'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
-import { ThunkDispatch } from '../../types'
-import { renameStep, RenameStepAction } from '../../labware-ingred/actions'
-// import { RenameStepAction } from '../../file-data'
+import { renameStep } from '../../labware-ingred/actions'
 import type { FormData } from '../../form-types'
 
 const MAX_STEP_NAME_LENGTH = 115
@@ -31,7 +29,7 @@ interface RenameStepModalProps {
 }
 export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { onClose, formData } = props
-  const dispatch = useDispatch<ThunkDispatch<any>>()
+  const dispatch = useDispatch()
   const { t } = useTranslation(['form', 'shared'])
   const initialName = i18n.format(t(formData.stepName), 'capitalize')
   const [stepName, setStepName] = useState<string>(initialName)
@@ -39,14 +37,15 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
 
   const handleSave = (): void => {
     const { stepId } = formData
-    const updatePayload: RenameStepAction['payload'] = {
-      stepId,
-      update: {
-        stepName: stepName,
-        stepDetails: stepDetails,
-      },
-    }
-    dispatch(renameStep(updatePayload))
+    dispatch(
+      renameStep({
+        stepId,
+        update: {
+          stepName: stepName,
+          stepDetails: stepDetails,
+        },
+      })
+    )
     onClose()
   }
 
