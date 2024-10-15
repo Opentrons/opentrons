@@ -31,12 +31,13 @@ export function getProvider(
   let canceller = new AbortController()
   let currentCheck: Promise<ResolvedUpdate> | null = null
   const tempdir = tempy.directory()
+  let tornDown = false
 
   const checkUpdates = async (
     progress: ProgressCallback
   ): Promise<ResolvedUpdate> => {
     const myCanceller = canceller
-    if (myCanceller.signal.aborted) {
+    if (myCanceller.signal.aborted || tornDown) {
       progress(noUpdate)
       throw new Error('cache torn down')
     }
@@ -96,6 +97,7 @@ export function getProvider(
     unlockUpdateCache: () => {},
     teardown: () => {
       canceller.abort()
+      tornDown = true
       canceller = new AbortController()
       return rm(tempdir, { recursive: true, force: true })
     },

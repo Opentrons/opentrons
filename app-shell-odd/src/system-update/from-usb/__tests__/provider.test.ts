@@ -30,6 +30,7 @@ describe('system-update/from-usb/provider', () => {
         system: '/storage/valid-release.zip',
         releaseNotes: expect.any(String),
       },
+      releaseNotes: expect.any(String),
       downloadProgress: 100,
     }
     return expect(provider.refreshUpdateCache(progress))
@@ -51,6 +52,7 @@ describe('system-update/from-usb/provider', () => {
     const expectedUpdate = {
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     }
     return expect(provider.refreshUpdateCache(progress))
@@ -72,6 +74,7 @@ describe('system-update/from-usb/provider', () => {
     const expectedUpdate = {
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     }
     return expect(provider.refreshUpdateCache(progress))
@@ -93,6 +96,7 @@ describe('system-update/from-usb/provider', () => {
     const expectedUpdate = {
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     }
     return expect(provider.refreshUpdateCache(progress))
@@ -108,7 +112,7 @@ describe('system-update/from-usb/provider', () => {
       massStorageDeviceFiles: [],
     })
     const progress = vi.fn()
-    provider
+    return provider
       .teardown()
       .then(() =>
         expect(provider.refreshUpdateCache(progress)).rejects.toThrow()
@@ -117,6 +121,7 @@ describe('system-update/from-usb/provider', () => {
         expect(progress).toHaveBeenLastCalledWith({
           version: null,
           files: null,
+          releaseNotes: null,
           downloadProgress: 0,
         })
       )
@@ -136,7 +141,7 @@ describe('system-update/from-usb/provider', () => {
           version: '1.0.0',
         }))
       )
-    provider
+    return provider
       .teardown()
       .then(() =>
         expect(provider.refreshUpdateCache(progress)).rejects.toThrow()
@@ -145,6 +150,7 @@ describe('system-update/from-usb/provider', () => {
         expect(progress).toHaveBeenLastCalledWith({
           version: null,
           files: null,
+          releaseNotes: null,
           downloadProgress: 0,
         })
       )
@@ -162,6 +168,7 @@ describe('system-update/from-usb/provider', () => {
     const expectedUpdate = {
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     }
     const first = provider.refreshUpdateCache(progress)
@@ -184,6 +191,7 @@ describe('system-update/from-usb/provider', () => {
     const expectedUpdate = {
       version: null,
       files: null,
+      releaseNotes: null,
       downloadProgress: 0,
     }
     return expect(provider.refreshUpdateCache(progress))
