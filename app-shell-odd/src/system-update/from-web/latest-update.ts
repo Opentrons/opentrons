@@ -16,7 +16,7 @@ export const latestVersionForChannel = (
 ): string | null =>
   availableVersions
     .filter(version => channelFinder(version, channel))
-    .sort((a, b) => (semver.lt(a, b) ? 1 : -1))
+    .sort((a, b) => (semver.gt(a, b) ? 1 : -1))
     .pop() ?? null
 
 export const shouldUpdate = (
