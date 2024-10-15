@@ -62,7 +62,9 @@ const log = (): Logger => _log ?? (_log = createLogger('config'))
 export function registerConfig(dispatch: Dispatch): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
+      log().info('initializing configuration')
       dispatch(configInitialized(getFullConfig()))
+      log().info('configuration initialized')
     } else if (
       action.type === Cfg.UPDATE_VALUE ||
       action.type === Cfg.RESET_VALUE ||

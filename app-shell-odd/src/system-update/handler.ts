@@ -330,6 +330,7 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
   return {
     handleAction: action => {
       if (action.type === CONFIG_INITIALIZED) {
+        log.info('Initializing update driver')
         return new Promise(resolve => {
           updateDriver = registerUpdateDriver(dispatch)
           resolve()

@@ -5,6 +5,9 @@ import { readJson, outputJson } from 'fs-extra'
 import type { Stats } from 'fs'
 import { fetchJson, LocalAbortError } from '../../http'
 import type { ReleaseManifest, ReleaseSetUrls } from '../types'
+import { createLogger } from '../../log'
+
+const log = createLogger('systemUpdate/from-web/provider')
 
 export function getReleaseSet(
   manifest: ReleaseManifest,
@@ -55,6 +58,7 @@ export const downloadManifest = (
 ): Promise<ReleaseManifest> =>
   fetchJson<ReleaseManifest>(manifestUrl, { signal: cancel.signal }).then(
     manifest => {
+      log.info('Fetched release manifest OK')
       return outputJson(path.join(cacheDir, 'manifest.json'), manifest).then(
         () => manifest
       )
@@ -83,8 +87,12 @@ export async function getOrDownloadManifest(
     )
   } catch (error: any) {
     if (error instanceof LocalAbortError) {
+      log.info('Aborted during manifest fetch')
       throw error
     } else {
+      log.info(
+        `Could not fetch manifest: ${error.name}: ${error.message}, falling back to cached`
+      )
       return await getCachedReleaseManifest(cacheDir)
     }
   }
