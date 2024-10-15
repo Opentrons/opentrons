@@ -30,7 +30,7 @@ interface RenameStepModalProps {
 export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { onClose, formData } = props
   const dispatch = useDispatch()
-  const { t } = useTranslation(['form', 'shared'])
+  const { t } = useTranslation(['form', 'shared', 'protocol_steps',])
   const initialName = i18n.format(t(formData.stepName), 'capitalize')
   const [stepName, setStepName] = useState<string>(initialName)
   const [stepDetails, setStepDetails] = useState<string>(formData.stepDetails)
@@ -86,7 +86,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
             <InputField
               error={
                 stepName.length >= MAX_STEP_NAME_LENGTH
-                  ? t('rename_error')
+                  ? t('protocol_steps:rename_error')
                   : null
               }
               value={stepName}
