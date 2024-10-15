@@ -9,8 +9,8 @@ import { getSlotNameAndLwLocFrom } from '../hooks/useDeckMapUtils'
 import { RECOVERY_MAP } from '../constants'
 
 import type { RecoveryContentProps } from '../types'
-
-// TODO(jh, 10-09-24): Add testing for this component.
+import type * as React from 'react'
+import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps
@@ -88,13 +88,25 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
+  const buildType = (): React.ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['type'] => {
+    switch (selectedRecoveryOption) {
+      case MANUAL_MOVE_AND_SKIP.ROUTE:
+      case MANUAL_REPLACE_AND_RETRY.ROUTE:
+        return 'location-arrow-location'
+      default:
+        return 'location'
+    }
+  }
+
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
         <LeftColumnLabwareInfo
           {...props}
           title={buildTitle()}
-          type="location"
+          type={buildType()}
           bannerText={buildBannerText()}
         />
         <Flex marginTop="1.742rem">

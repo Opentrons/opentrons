@@ -11,8 +11,10 @@ import { useChainRunCommands } from '/app/resources/runs'
 import {
   useRecoveryCommands,
   HOME_PIPETTE_Z_AXES,
+  RELEASE_GRIPPER_JAW,
   buildPickUpTips,
   buildIgnorePolicyRules,
+  HOME_GRIPPER_Z_AXIS,
 } from '../useRecoveryCommands'
 import { RECOVERY_MAP } from '../../constants'
 
@@ -252,14 +254,27 @@ describe('useRecoveryCommands', () => {
   it('should call releaseGripperJaws and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
-    const consoleLogSpy = vi.spyOn(console, 'log')
-
     await act(async () => {
       await result.current.releaseGripperJaws()
     })
 
-    expect(consoleLogSpy).toHaveBeenCalledWith('PLACEHOLDER RELEASE THE JAWS')
-    consoleLogSpy.mockRestore()
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [RELEASE_GRIPPER_JAW],
+      false
+    )
+  })
+
+  it('should call homeGripperZAxis and resolve the promise', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.homeGripperZAxis()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [HOME_GRIPPER_Z_AXIS],
+      false
+    )
   })
 
   it('should call skipFailedCommand and show success toast on success', async () => {

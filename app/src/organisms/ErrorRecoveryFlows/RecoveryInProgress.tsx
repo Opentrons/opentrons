@@ -20,6 +20,8 @@ export function RecoveryInProgress({
   recoveryMap,
   recoveryCommands,
   routeUpdateActions,
+  doorStatusUtils,
+  currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element {
   const {
     ROBOT_CANCELING,
@@ -37,6 +39,8 @@ export function RecoveryInProgress({
     recoveryMap,
     recoveryCommands,
     routeUpdateActions,
+    doorStatusUtils,
+    currentRecoveryOptionUtils,
   })
 
   const buildDescription = (): RobotMovingRoute => {
@@ -76,47 +80,78 @@ export function RecoveryInProgress({
   )
 }
 
-const GRIPPER_RELEASE_COUNTDOWN_S = 5
+export const GRIPPER_RELEASE_COUNTDOWN_S = 3
 
 type UseGripperReleaseProps = Pick<
   RecoveryContentProps,
-  'recoveryMap' | 'recoveryCommands' | 'routeUpdateActions'
+  | 'currentRecoveryOptionUtils'
+  | 'recoveryCommands'
+  | 'routeUpdateActions'
+  | 'doorStatusUtils'
+  | 'recoveryMap'
 >
 
 // Handles the gripper release copy and action, which operates on an interval. At T=0, release the labware then proceed
-// to the next step in the active route.
+// to the next step in the active route if the door is open (which should be a route to handle the door), or to the next
+// CTA route if the door is closed.
 export function useGripperRelease({
-  recoveryMap,
+  currentRecoveryOptionUtils,
   recoveryCommands,
   routeUpdateActions,
+  doorStatusUtils,
+  recoveryMap,
 }: UseGripperReleaseProps): number {
   const { releaseGripperJaws } = recoveryCommands
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     proceedToRouteAndStep,
     proceedNextStep,
     handleMotionRouting,
-    stashedMap,
   } = routeUpdateActions
+  const { isDoorOpen } = doorStatusUtils
   const { MANUAL_MOVE_AND_SKIP, MANUAL_REPLACE_AND_RETRY } = RECOVERY_MAP
   const [countdown, setCountdown] = useState(GRIPPER_RELEASE_COUNTDOWN_S)
 
   const proceedToValidNextStep = (): void => {
-    switch (stashedMap?.route) {
-      case MANUAL_MOVE_AND_SKIP.ROUTE:
-        void proceedToRouteAndStep(
-          MANUAL_MOVE_AND_SKIP.ROUTE,
-          MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE
-        )
-        break
-      case MANUAL_REPLACE_AND_RETRY.ROUTE:
-        void proceedToRouteAndStep(
-          MANUAL_REPLACE_AND_RETRY.ROUTE,
-          MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
-        )
-        break
-      default:
-        console.error('Unhandled post grip-release routing.')
-        void proceedNextStep()
+    if (isDoorOpen) {
+      switch (selectedRecoveryOption) {
+        case MANUAL_MOVE_AND_SKIP.ROUTE:
+          void proceedToRouteAndStep(
+            MANUAL_MOVE_AND_SKIP.ROUTE,
+            MANUAL_MOVE_AND_SKIP.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME
+          )
+          break
+        case MANUAL_REPLACE_AND_RETRY.ROUTE:
+          void proceedToRouteAndStep(
+            MANUAL_REPLACE_AND_RETRY.ROUTE,
+            MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME
+          )
+          break
+        default: {
+          console.error(
+            'Unhandled post grip-release routing when door is open.'
+          )
+          void proceedToRouteAndStep(RECOVERY_MAP.OPTION_SELECTION.ROUTE)
+        }
+      }
+    } else {
+      switch (selectedRecoveryOption) {
+        case MANUAL_MOVE_AND_SKIP.ROUTE:
+          void proceedToRouteAndStep(
+            MANUAL_MOVE_AND_SKIP.ROUTE,
+            MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE
+          )
+          break
+        case MANUAL_REPLACE_AND_RETRY.ROUTE:
+          void proceedToRouteAndStep(
+            MANUAL_REPLACE_AND_RETRY.ROUTE,
+            MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
+          )
+          break
+        default:
+          console.error('Unhandled post grip-release routing.')
+          void proceedNextStep()
+      }
     }
   }
 
