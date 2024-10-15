@@ -5,7 +5,6 @@ from typing_extensions import Final
 from enum import Enum
 from opentrons.config.types import LiquidProbeSettings
 from opentrons.protocol_api.labware import Well
-from opentrons.hardware_control.types import InstrumentProbeType
 
 
 class ConfigType(Enum):

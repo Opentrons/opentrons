@@ -4,7 +4,6 @@ import asyncio
 
 from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import InstrumentProbeType
 
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
