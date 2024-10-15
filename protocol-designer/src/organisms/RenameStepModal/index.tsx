@@ -30,10 +30,12 @@ interface RenameStepModalProps {
 export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { onClose, formData } = props
   const dispatch = useDispatch()
-  const { t } = useTranslation(['form', 'shared', 'protocol_steps',])
+  const { t } = useTranslation(['form', 'shared', 'protocol_steps'])
   const initialName = i18n.format(t(formData.stepName), 'capitalize')
   const [stepName, setStepName] = useState<string>(initialName)
-  const [stepDetails, setStepDetails] = useState<string>(formData.stepDetails)
+  const [stepDetails, setStepDetails] = useState<string | null>(
+    formData.stepDetails
+  )
 
   const handleSave = (): void => {
     const { stepId } = formData
