@@ -53,6 +53,7 @@ export const SelectWellsModal = (
     name,
     value: wellFieldData,
   } = props
+  console.log('hello')
   const { t, i18n } = useTranslation(['liquids', 'protocol_steps', 'shared'])
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const allWellContentsForStep = useSelector(

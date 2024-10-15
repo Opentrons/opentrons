@@ -37,6 +37,7 @@
   },
   "mix": "Mix",
   "mix_step": "<text>Mixing</text><tag/><text>{{times}} times in</text><semiBoldText>{{labware}}</semiBoldText>",
+  "mix_repetitions": "Mix repetitions",
   "module": "Module",
   "move_labware": {
     "gripper": "<text>Move</text><semiBoldText>{{labware}}</semiBoldText><text>to</text><tag/><text>using gripper</text>",
@@ -68,7 +69,7 @@
   "select_dispense_wells": "Select destination wells using a {{displayName}}",
   "select_labware": "Select labware",
   "select_mix_labware": "Select a mix labware",
-  "select_mix_wells": "Select wells using a {{displayName}}",
+  "select_wells": "Select wells using a {{displayName}}",
   "select_nozzles": "Select nozzles",
   "select_pipette": "Select a pipette",
   "select_tip_location": "Select pick up tip location",
