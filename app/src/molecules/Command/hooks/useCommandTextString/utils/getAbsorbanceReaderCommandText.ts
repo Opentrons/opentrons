@@ -33,12 +33,13 @@ export const getAbsorbanceReaderCommandText = ({
   command,
   t,
 }: GetAbsorbanceReaderCommandText): string => {
-  console.log(t(KEYS_BY_COMMAND_TYPE[command.commandType]))
   if (command.commandType === 'absorbanceReader/initialize') {
     const wavelengths = command.params.sampleWavelengths.join(' nm, ') + ` nm`
+    const mode =
+      command.params.measureMode === 'multi' ? t('multiple') : t('single')
     return t('absorbance_reader_initialize', {
-      mode: command.params.measureMode,
-      wavelengths: wavelengths,
+      mode,
+      wavelengths,
     })
   }
   return t(KEYS_BY_COMMAND_TYPE[command.commandType])
