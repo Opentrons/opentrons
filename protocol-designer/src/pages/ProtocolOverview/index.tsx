@@ -349,7 +349,11 @@ export function ProtocolOverview(): JSX.Element {
             />
             <StepsInfo savedStepForms={savedStepForms} />
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} css={COLUMN_STYLE}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            css={COLUMN_STYLE}
+            gridGap={SPACING.spacing12}
+          >
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
@@ -385,7 +389,11 @@ export function ProtocolOverview(): JSX.Element {
                 }}
               />
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing32}
+              alignItems={ALIGN_CENTER}
+            >
               {deckView === leftString ? (
                 <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
               ) : (

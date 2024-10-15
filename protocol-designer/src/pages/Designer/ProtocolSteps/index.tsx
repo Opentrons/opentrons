@@ -7,7 +7,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
   Tag,
@@ -56,44 +57,47 @@ export function ProtocolSteps(): JSX.Element {
     currentStepId != null ? savedStepForms[currentStepId] : null
 
   return (
-    <>
+    <Flex
+      backgroundColor={COLORS.grey10}
+      alignItems={ALIGN_CENTER}
+      width="100%"
+      gridGap={SPACING.spacing16}
+      height="calc(100vh - 4rem)"
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
+      <TimelineToolbox />
       {selectedSubstep ? <SubstepsToolbox stepId={selectedSubstep} /> : null}
-      <StepForm />
       <Flex
-        backgroundColor={COLORS.grey10}
         alignItems={ALIGN_CENTER}
-        width="100%"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        height="calc(100vh - 64px)"
-        justifyContent={JUSTIFY_CENTER}
+        width="100%"
+        paddingBottom={enableHoyKeyDisplay ? '5rem' : '0'}
       >
-        <TimelineToolbox />
-        {isMultiSelectMode ? <BatchEditToolbox /> : null}
-        {formData == null || formType === 'moveLabware' ? (
-          <ToggleGroup
-            selectedValue={deckView}
-            leftText={leftString}
-            rightText={rightString}
-            leftClick={() => {
-              setDeckView(leftString)
-            }}
-            rightClick={() => {
-              setDeckView(rightString)
-            }}
-          />
-        ) : null}
-        <Flex
-          width="751px"
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-        >
-          {deckView === leftString ? (
-            <DeckSetupContainer tab="protocolSteps" />
-          ) : (
-            <OffDeck tab="protocolSteps" />
-          )}
-          <StepSummary currentStep={currentStep} />
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          {formData == null || formType === 'moveLabware' ? (
+            <Flex justifyContent={JUSTIFY_FLEX_END}>
+              <ToggleGroup
+                selectedValue={deckView}
+                leftText={leftString}
+                rightText={rightString}
+                leftClick={() => {
+                  setDeckView(leftString)
+                }}
+                rightClick={() => {
+                  setDeckView(rightString)
+                }}
+              />
+            </Flex>
+          ) : null}
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+            {deckView === leftString ? (
+              <DeckSetupContainer tab="protocolSteps" />
+            ) : (
+              <OffDeck tab="protocolSteps" />
+            )}
+            <StepSummary currentStep={currentStep} />
+          </Flex>
         </Flex>
         {enableHoyKeyDisplay ? (
           <Box position={POSITION_FIXED} left="20.25rem" bottom="0.75rem">
@@ -105,6 +109,8 @@ export function ProtocolSteps(): JSX.Element {
           </Box>
         ) : null}
       </Flex>
-    </>
+      <StepForm />
+      {isMultiSelectMode ? <BatchEditToolbox /> : null}
+    </Flex>
   )
 }

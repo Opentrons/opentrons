@@ -139,6 +139,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   return (
     <>
       <Toolbox
+        position="relative"
         subHeader={
           isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

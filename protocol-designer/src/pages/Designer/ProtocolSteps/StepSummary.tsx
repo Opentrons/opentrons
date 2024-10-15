@@ -2,12 +2,13 @@ import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  COLORS,
-  SPACING,
-  BORDERS,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  FLEX_MAX_CONTENT,
+  SPACING,
   StyledText,
   Tag,
 } from '@opentrons/components'
@@ -323,10 +324,10 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
 
   return stepSummaryContent != null ? (
     <Flex
-      backgroundColor={`${COLORS.grey30}`}
+      backgroundColor={COLORS.grey30}
       padding={SPACING.spacing12}
       borderRadius={BORDERS.borderRadius4}
-      width="max-content"
+      width={FLEX_MAX_CONTENT}
       minWidth="100%"
     >
       {stepSummaryContent}

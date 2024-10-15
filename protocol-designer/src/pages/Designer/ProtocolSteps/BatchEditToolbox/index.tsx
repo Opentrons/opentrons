@@ -1,6 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { Icon, PrimaryButton, StyledText, Toolbox } from '@opentrons/components'
+import {
+  Icon,
+  POSITION_RELATIVE,
+  PrimaryButton,
+  StyledText,
+  Toolbox,
+} from '@opentrons/components'
 import {
   getBatchEditSelectedStepTypes,
   getMultiSelectDisabledFields,
@@ -59,6 +65,7 @@ export const BatchEditToolbox = (): JSX.Element | null => {
     if (stepType === 'moveLiquid' || stepType === 'mix') {
       return (
         <Toolbox
+          position={POSITION_RELATIVE}
           height="calc(100vh - 64px)"
           title={
             <StyledText desktopStyle="bodyLargeSemiBold">
