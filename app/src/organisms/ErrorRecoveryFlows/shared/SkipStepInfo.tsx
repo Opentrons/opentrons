@@ -20,12 +20,17 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
+  const { moveLabwareWithoutPause } = recoveryCommands
   const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
     return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+      if (selectedRecoveryOption === MANUAL_MOVE_AND_SKIP.ROUTE)
+      {
+        void moveLabwareWithoutPause()
+      }
       skipFailedCommand()
     })
   }
