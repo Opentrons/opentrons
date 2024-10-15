@@ -18,6 +18,7 @@ if (!$root) {
 
 const basePath = import.meta.env.BASE_URL
 console.log({ basePath })
+console.log({ publicPath: getPublicPath() })
 
 const Root = (): JSX.Element => (
   <BrowserRouter>
