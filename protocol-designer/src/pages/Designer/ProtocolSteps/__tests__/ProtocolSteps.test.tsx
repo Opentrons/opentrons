@@ -41,7 +41,6 @@ describe('ProtocolSteps', () => {
 
   it('renders each component in ProtocolSteps', () => {
     render()
-    screen.debug()
     screen.getByText('mock TimelineToolbox')
     screen.getByText('mock DeckSetupContainer')
   })
