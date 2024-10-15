@@ -14,6 +14,7 @@ interface StepInfoProps extends StyleProps {
   failedCommand: RecoveryContentProps['failedCommand']
   robotType: RecoveryContentProps['robotType']
   protocolAnalysis: RecoveryContentProps['protocolAnalysis']
+  allRunDefs: RecoveryContentProps['allRunDefs']
   desktopStyle?: React.ComponentProps<typeof StyledText>['desktopStyle']
   oddStyle?: React.ComponentProps<typeof StyledText>['oddStyle']
 }
@@ -25,6 +26,7 @@ export function StepInfo({
   failedCommand,
   robotType,
   protocolAnalysis,
+  allRunDefs,
   ...styleProps
 }: StepInfoProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
@@ -54,6 +56,7 @@ export function StepInfo({
           modernStyledTextDefaults={true}
           desktopStyle={desktopStyleDefaulted}
           oddStyle={oddStyleDefaulted}
+          allRunDefs={allRunDefs}
         />
       ) : null}
     </Flex>

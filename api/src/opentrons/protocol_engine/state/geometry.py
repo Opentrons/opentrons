@@ -12,6 +12,7 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount
+from opentrons.protocols.models import LabwareDefinition
 
 from .. import errors
 from ..errors import (
@@ -20,7 +21,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     InvalidWellDefinitionError,
 )
-from ..resources import fixture_validation
+from ..resources import fixture_validation, labware_validation
 from ..types import (
     OFF_DECK_LOCATION,
     LoadedLabware,
@@ -46,6 +47,7 @@ from ..types import (
     AddressableOffsetVector,
     StagingSlotLocation,
     LabwareOffsetLocation,
+    ModuleModel,
 )
 from .config import Config
 from .labware import LabwareView
@@ -997,17 +999,22 @@ class GeometryView:
         from_location: OnDeckLabwareLocation,
         to_location: OnDeckLabwareLocation,
         additional_offset_vector: LabwareMovementOffsetData,
+        current_labware: LabwareDefinition,
     ) -> LabwareMovementOffsetData:
         """Calculate the final labware offset vector to use in labware movement."""
         pick_up_offset = (
             self.get_total_nominal_gripper_offset_for_move_type(
-                location=from_location, move_type=_GripperMoveType.PICK_UP_LABWARE
+                location=from_location,
+                move_type=_GripperMoveType.PICK_UP_LABWARE,
+                current_labware=current_labware,
             )
             + additional_offset_vector.pickUpOffset
         )
         drop_offset = (
             self.get_total_nominal_gripper_offset_for_move_type(
-                location=to_location, move_type=_GripperMoveType.DROP_LABWARE
+                location=to_location,
+                move_type=_GripperMoveType.DROP_LABWARE,
+                current_labware=current_labware,
             )
             + additional_offset_vector.dropOffset
         )
@@ -1038,7 +1045,10 @@ class GeometryView:
         return location
 
     def get_total_nominal_gripper_offset_for_move_type(
-        self, location: OnDeckLabwareLocation, move_type: _GripperMoveType
+        self,
+        location: OnDeckLabwareLocation,
+        move_type: _GripperMoveType,
+        current_labware: LabwareDefinition,
     ) -> LabwareOffsetVector:
         """Get the total of the offsets to be used to pick up labware in its current location."""
         if move_type == _GripperMoveType.PICK_UP_LABWARE:
@@ -1054,14 +1064,39 @@ class GeometryView:
                     location
                 )
                 ancestor = self._labware.get_parent_location(location.labwareId)
+                extra_offset = LabwareOffsetVector(x=0, y=0, z=0)
+                if (
+                    isinstance(ancestor, ModuleLocation)
+                    and self._modules._state.requested_model_by_id[ancestor.moduleId]
+                    == ModuleModel.THERMOCYCLER_MODULE_V2
+                    and labware_validation.validate_definition_is_lid(current_labware)
+                ):
+                    if "lidOffsets" in current_labware.gripperOffsets.keys():
+                        extra_offset = LabwareOffsetVector(
+                            x=current_labware.gripperOffsets[
+                                "lidOffsets"
+                            ].pickUpOffset.x,
+                            y=current_labware.gripperOffsets[
+                                "lidOffsets"
+                            ].pickUpOffset.y,
+                            z=current_labware.gripperOffsets[
+                                "lidOffsets"
+                            ].pickUpOffset.z,
+                        )
+                    else:
+                        raise errors.LabwareOffsetDoesNotExistError(
+                            f"Labware Definition {current_labware.parameters.loadName} does not contain required field 'lidOffsets' of 'gripperOffsets'."
+                        )
+
                 assert isinstance(
-                    ancestor, (DeckSlotLocation, ModuleLocation)
+                    ancestor, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
                 ), "No gripper offsets for off-deck labware"
                 return (
                     direct_parent_offset.pickUpOffset
                     + self._nominal_gripper_offsets_for_location(
                         location=ancestor
                     ).pickUpOffset
+                    + extra_offset
                 )
         else:
             if isinstance(
@@ -1076,14 +1111,39 @@ class GeometryView:
                     location
                 )
                 ancestor = self._labware.get_parent_location(location.labwareId)
+                extra_offset = LabwareOffsetVector(x=0, y=0, z=0)
+                if (
+                    isinstance(ancestor, ModuleLocation)
+                    and self._modules._state.requested_model_by_id[ancestor.moduleId]
+                    == ModuleModel.THERMOCYCLER_MODULE_V2
+                    and labware_validation.validate_definition_is_lid(current_labware)
+                ):
+                    if "lidOffsets" in current_labware.gripperOffsets.keys():
+                        extra_offset = LabwareOffsetVector(
+                            x=current_labware.gripperOffsets[
+                                "lidOffsets"
+                            ].pickUpOffset.x,
+                            y=current_labware.gripperOffsets[
+                                "lidOffsets"
+                            ].pickUpOffset.y,
+                            z=current_labware.gripperOffsets[
+                                "lidOffsets"
+                            ].pickUpOffset.z,
+                        )
+                    else:
+                        raise errors.LabwareOffsetDoesNotExistError(
+                            f"Labware Definition {current_labware.parameters.loadName} does not contain required field 'lidOffsets' of 'gripperOffsets'."
+                        )
+
                 assert isinstance(
-                    ancestor, (DeckSlotLocation, ModuleLocation)
+                    ancestor, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
                 ), "No gripper offsets for off-deck labware"
                 return (
                     direct_parent_offset.dropOffset
                     + self._nominal_gripper_offsets_for_location(
                         location=ancestor
                     ).dropOffset
+                    + extra_offset
                 )
 
     def check_gripper_labware_tip_collision(
@@ -1147,11 +1207,20 @@ class GeometryView:
         """
         parent_location = self._labware.get_parent_location(labware_id)
         assert isinstance(
-            parent_location, (DeckSlotLocation, ModuleLocation)
+            parent_location,
+            (
+                DeckSlotLocation,
+                ModuleLocation,
+                AddressableAreaLocation,
+            ),
         ), "No gripper offsets for off-deck labware"
 
         if isinstance(parent_location, DeckSlotLocation):
             slot_name = parent_location.slotName
+        elif isinstance(parent_location, AddressableAreaLocation):
+            slot_name = self._addressable_areas.get_addressable_area_base_slot(
+                parent_location.addressableAreaName
+            )
         else:
             module_loc = self._modules.get_location(parent_location.moduleId)
             slot_name = module_loc.slotName

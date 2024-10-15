@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from ..errors import ErrorOccurrence, TipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
-from ..types import DeckPoint, TipGeometry
+from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
@@ -71,6 +71,10 @@ class TipPhysicallyMissingError(ErrorOccurrence):
     of the pipette.
     """
 
+    # The thing above about marking the tips as used makes it so that
+    # when the protocol is resumed and the Python Protocol API calls
+    # `get_next_tip()`, we'll move on to other tips as expected.
+
     isDefined: bool = True
     errorType: Literal["tipPhysicallyMissing"] = "tipPhysicallyMissing"
     errorCode: str = ErrorCodes.TIP_PICKUP_FAILED.value.code
@@ -130,15 +134,10 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 labware_id=labware_id,
                 well_name=well_name,
             )
-            state_update.update_tip_state(
-                pipette_id=pipette_id,
-                tip_geometry=TipGeometry(
-                    volume=tip_geometry.volume,
-                    length=tip_geometry.length,
-                    diameter=tip_geometry.diameter,
-                ),
-            )
         except TipNotAttachedError as e:
+            state_update.mark_tips_as_used(
+                pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+            )
             return DefinedErrorData(
                 public=TipPhysicallyMissingError(
                     id=self._model_utils.generate_id(),
@@ -154,6 +153,13 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 state_update=state_update,
             )
         else:
+            state_update.update_pipette_tip_state(
+                pipette_id=pipette_id,
+                tip_geometry=tip_geometry,
+            )
+            state_update.mark_tips_as_used(
+                pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+            )
             return SuccessData(
                 public=PickUpTipResult(
                     tipVolume=tip_geometry.volume,

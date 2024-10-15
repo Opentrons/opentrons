@@ -18,6 +18,7 @@ type LiquidProbeRunTimeCommands =
 
 export function getLiquidProbeCommandText({
   command,
+  allRunDefs,
   commandTextData,
   t,
   robotType,
@@ -41,6 +42,7 @@ export function getLiquidProbeCommandText({
     labwareLocation != null && commandTextData != null
       ? getLabwareDisplayLocation(
           commandTextData,
+          allRunDefs,
           labwareLocation,
           t as TFunction,
           robotType

@@ -5,6 +5,7 @@ import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
@@ -20,6 +21,9 @@ import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/P
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
+import type { LocalizationProviderProps } from '/app/LocalizationProvider'
+
+vi.mock('/app/LocalizationProvider')
 vi.mock('/app/organisms/Desktop/Breadcrumbs')
 vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
 vi.mock('/app/pages/Desktop/Devices/CalibrationDashboard')
@@ -67,6 +71,11 @@ describe('DesktopApp', () => {
     vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)
     vi.mocked(AlertsModal).mockReturnValue(<></>)
     vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(
+      LocalizationProvider
+    ).mockImplementation((props: LocalizationProviderProps) => (
+      <>{props.children}</>
+    ))
   })
   afterEach(() => {
     vi.resetAllMocks()

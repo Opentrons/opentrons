@@ -29,7 +29,7 @@ import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { RecoveryRoute, RouteStep, RecoveryContentProps } from './types'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
@@ -68,6 +68,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     isOnDevice: boolean
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
+    allRunDefs: LabwareDefinition2[]
   }
 
 export function ErrorRecoveryWizard(

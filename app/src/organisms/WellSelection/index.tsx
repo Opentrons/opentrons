@@ -14,15 +14,21 @@ import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteChannels,
+  NozzleLayoutDetails,
 } from '@opentrons/shared-data'
 import type { GenericRect } from './types'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
   deselectWells: (wells: string[]) => void
+  /* The actual wells that are clicked. */
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
+  /* Highlight only valid wells given the current pipette nozzle configuration. */
+  pipetteNozzleDetails?: NozzleLayoutDetails
+  /* Whether highlighting and selectWells() updates are permitted. */
+  allowSelect?: boolean
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
@@ -32,6 +38,8 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     selectedPrimaryWells,
     selectWells,
     channels,
+    pipetteNozzleDetails,
+    allowSelect = true,
   } = props
   const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
 
@@ -49,8 +57,11 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
             labwareDef: definition,
             wellName,
             channels,
+            pipetteNozzleDetails,
           })
-          if (!wellSet) return acc
+          if (!wellSet) {
+            return acc
+          }
           return { ...acc, [wellSet[0]]: null }
         },
         {}
@@ -68,39 +79,44 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   }
 
   const handleSelectionMove: (rect: GenericRect) => void = rect => {
-    if (channels === 8 || channels === 96) {
-      const selectedWells = _getWellsFromRect(rect)
-      const allWellsForMulti: WellGroup = reduce(
-        selectedWells,
-        (acc: WellGroup, _, wellName: string): WellGroup => {
-          const wellSetForMulti =
-            getWellSetForMultichannel({
-              labwareDef: definition,
-              wellName,
-              channels,
-            }) || []
-          const channelWells = arrayToWellGroup(wellSetForMulti)
-          return {
-            ...acc,
-            ...channelWells,
-          }
-        },
-        {}
-      )
-      setHighlightedWells(allWellsForMulti)
-    } else {
-      setHighlightedWells(_getWellsFromRect(rect))
+    if (allowSelect) {
+      if (channels === 8 || channels === 96) {
+        const selectedWells = _getWellsFromRect(rect)
+        const allWellsForMulti: WellGroup = reduce(
+          selectedWells,
+          (acc: WellGroup, _, wellName: string): WellGroup => {
+            const wellSetForMulti =
+              getWellSetForMultichannel({
+                labwareDef: definition,
+                wellName,
+                channels,
+                pipetteNozzleDetails,
+              }) || []
+            const channelWells = arrayToWellGroup(wellSetForMulti)
+            return {
+              ...acc,
+              ...channelWells,
+            }
+          },
+          {}
+        )
+        setHighlightedWells(allWellsForMulti)
+      } else {
+        setHighlightedWells(_getWellsFromRect(rect))
+      }
     }
   }
 
   const handleSelectionDone: (rect: GenericRect) => void = rect => {
     const wells = _wellsFromSelected(_getWellsFromRect(rect))
 
-    selectWells(wells)
-    setHighlightedWells({})
+    if (allowSelect) {
+      selectWells(wells)
+      setHighlightedWells({})
+    }
   }
 
-  // For rendering, show all wells not just primary wells
+  // For rendering, show all valid wells, not just primary wells
   const allSelectedWells =
     channels === 8 || channels === 96
       ? reduce<WellGroup, WellGroup>(
@@ -110,8 +126,11 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
               labwareDef: definition,
               wellName,
               channels,
+              pipetteNozzleDetails,
             })
-            if (!wellSet) return acc
+            if (!wellSet) {
+              return acc
+            }
             return { ...acc, ...arrayToWellGroup(wellSet) }
           },
           {}
