@@ -7,7 +7,9 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    TYPE_CHECKING,
     AsyncIterator,
+    Type,
     cast,
     Callable,
     Dict,
@@ -179,14 +181,6 @@ def _adjust_high_throughput_z_current(func: Wrapped) -> Wrapped:
 class OT3API(
     ExecutionManagerProvider,
     OT3RobotCalibrationProvider,
-    # This MUST be kept last in the inheritance list so that it is
-    # deprioritized in the method resolution order; otherwise, invocations
-    # of methods that are present in the protocol will call the (empty,
-    # do-nothing) methods in the protocol. This will happily make all the
-    # tests fail.
-    FlexHardwareControlInterface[
-        OT3Transforms, Union[top_types.Mount, OT3Mount], OT3Config
-    ],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -2952,3 +2946,11 @@ class OT3API(
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return await self._backend.get_hepa_uv_state()
+
+
+if TYPE_CHECKING:
+    _: Type[
+        FlexHardwareControlInterface[
+            OT3Transforms, Union[top_types.Mount, OT3Mount], OT3Config
+        ]
+    ] = OT3API

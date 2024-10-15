@@ -6,8 +6,10 @@ import logging
 import pathlib
 from collections import OrderedDict
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Dict,
+    Type,
     Union,
     List,
     Optional,
@@ -85,12 +87,6 @@ class API(
     ExecutionManagerProvider,
     RobotCalibrationProvider,
     PipetteHandlerProvider[top_types.Mount],
-    # This MUST be kept last in the inheritance list so that it is
-    # deprioritized in the method resolution order; otherwise, invocations
-    # of methods that are present in the protocol will call the (empty,
-    # do-nothing) methods in the protocol. This will happily make all the
-    # tests fail.
-    HardwareControlInterface[RobotCalibration, top_types.Mount, RobotConfig],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -1316,3 +1312,9 @@ class API(
 
     def get_estop_state(self) -> EstopState:
         return EstopState.DISENGAGED
+
+
+if TYPE_CHECKING:
+    _: Type[
+        HardwareControlInterface[RobotCalibration, top_types.Mount, RobotConfig]
+    ] = API
