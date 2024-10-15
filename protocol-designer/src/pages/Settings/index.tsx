@@ -24,10 +24,13 @@ import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../tutorial'
+import { ToggleButton } from '../../atoms/ToggleButton'
 import { BUTTON_LINK_STYLE } from '../../atoms'
 import { actions as featureFlagActions } from '../../feature-flags'
 import { getFeatureFlagData } from '../../feature-flags/selectors'
 import type { FlagTypes } from '../../feature-flags'
+
+const HOT_KEY_FLAG = 'OT_PD_ENABLE_HOT_KEYS_DISPLAY'
 
 export function Settings(): JSX.Element {
   const dispatch = useDispatch()
@@ -61,10 +64,6 @@ export function Settings(): JSX.Element {
   }
 
   const toFlagRow = (flagName: FlagTypes): JSX.Element => {
-    const iconName = Boolean(flags[flagName])
-      ? 'ot-toggle-input-on'
-      : 'ot-toggle-input-off'
-
     return (
       <Flex key={flagName} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN}>
@@ -75,29 +74,22 @@ export function Settings(): JSX.Element {
             {getDescription(flagName)}
           </StyledText>
         </Flex>
-        <Btn
-          role="switch"
-          aria-checked={Boolean(flags[flagName])}
-          data-testid={`btn_${flagName}`}
-          size="2rem"
-          css={
-            Boolean(flags[flagName])
-              ? TOGGLE_ENABLED_STYLES
-              : TOGGLE_DISABLED_STYLES
-          }
+        <ToggleButton
+          label={`Settings_${flagName}`}
+          toggledOn={Boolean(flags[flagName])}
           onClick={() => {
             setFeatureFlags({
               [flagName as string]: !flags[flagName],
             })
           }}
-        >
-          <Icon name={iconName} size="1rem" />
-        </Btn>
+        />
       </Flex>
     )
   }
 
-  const prereleaseFlagRows = allFlags.map(toFlagRow)
+  const prereleaseFlagRows = allFlags
+    .filter(flag => flag !== 'OT_PD_ENABLE_HOT_KEYS_DISPLAY')
+    .map(toFlagRow)
 
   return (
     <>
@@ -198,6 +190,33 @@ export function Settings(): JSX.Element {
                       : t('shared:no_hints_to_restore')}
                   </StyledText>
                 </Btn>
+              </Flex>
+              <Flex
+                borderRadius={BORDERS.borderRadius4}
+                backgroundColor={COLORS.grey10}
+                padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                alignItems={ALIGN_CENTER}
+              >
+                <Flex flexDirection={DIRECTION_COLUMN}>
+                  <StyledText desktopStyle="bodyDefaultSemiBold">
+                    {t('OT_PD_ENABLE_HOT_KEYS_DISPLAY.title')}
+                  </StyledText>
+                  <Flex color={COLORS.grey60}>
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('OT_PD_ENABLE_HOT_KEYS_DISPLAY.description')}
+                    </StyledText>
+                  </Flex>
+                </Flex>
+                <ToggleButton
+                  label="Settings_hotKeys"
+                  toggledOn={Boolean(flags[HOT_KEY_FLAG])}
+                  onClick={() => {
+                    setFeatureFlags({
+                      OT_PD_ENABLE_HOT_KEYS_DISPLAY: !flags[HOT_KEY_FLAG],
+                    })
+                  }}
+                />
               </Flex>
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

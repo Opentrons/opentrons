@@ -82,7 +82,7 @@ const buildContent = (props: InterventionInfoProps): JSX.Element => {
 }
 
 const buildLocArrowLoc = (props: InterventionInfoProps): JSX.Element => {
-  const { currentLocationProps, newLocationProps } = props
+  const { currentLocationProps, newLocationProps, type } = props
 
   if (newLocationProps != null) {
     return (
@@ -101,6 +101,9 @@ const buildLocArrowLoc = (props: InterventionInfoProps): JSX.Element => {
       </Flex>
     )
   } else {
+    console.error(
+      `InterventionInfo type is ${type}, but no newLocation was specified.`
+    )
     return buildLoc(props)
   }
 }
@@ -116,7 +119,7 @@ const buildLoc = ({
 }
 
 const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
-  const { currentLocationProps, newLocationProps } = props
+  const { currentLocationProps, newLocationProps, type } = props
 
   if (newLocationProps != null) {
     return (
@@ -135,6 +138,9 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
       </Flex>
     )
   } else {
+    console.error(
+      `InterventionInfo type is ${type}, but no newLocation was specified.`
+    )
     return buildLoc(props)
   }
 }

@@ -273,7 +273,9 @@ class VirtualGantryMover(GantryMover):
             )
         else:
             instrument_height = VIRTUAL_MAX_OT3_HEIGHT
-        tip_length = self._state_view.tips.get_tip_length(pipette_id)
+
+        tip = self._state_view.pipettes.get_attached_tip(pipette_id=pipette_id)
+        tip_length = tip.length if tip is not None else 0
         return instrument_height - tip_length
 
     async def move_to(

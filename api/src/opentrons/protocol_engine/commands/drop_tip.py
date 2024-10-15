@@ -114,7 +114,9 @@ class DropTipImplementation(
 
         await self._tip_handler.drop_tip(pipette_id=pipette_id, home_after=home_after)
 
-        state_update.update_tip_state(pipette_id=params.pipetteId, tip_geometry=None)
+        state_update.update_pipette_tip_state(
+            pipette_id=params.pipetteId, tip_geometry=None
+        )
 
         return SuccessData(
             public=DropTipResult(position=deck_point),

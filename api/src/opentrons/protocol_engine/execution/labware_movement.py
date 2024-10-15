@@ -126,6 +126,7 @@ class LabwareMovementHandler:
             current_location=current_location,
         )
 
+        current_labware = self._state_store.labware.get_definition(labware_id)
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
@@ -134,6 +135,7 @@ class LabwareMovementHandler:
                     from_location=current_location,
                     to_location=new_location,
                     additional_offset_vector=user_offset_data,
+                    current_labware=current_labware,
                 )
             )
             from_labware_center = self._state_store.geometry.get_labware_grip_point(

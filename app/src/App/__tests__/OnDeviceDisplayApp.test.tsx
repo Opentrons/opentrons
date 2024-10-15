@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { OnDeviceLocalizationProvider } from '../../LocalizationProvider'
+import { LocalizationProvider } from '../../LocalizationProvider'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
 import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
@@ -32,7 +32,7 @@ import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 
 import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
-import type { OnDeviceLocalizationProviderProps } from '../../LocalizationProvider'
+import type { LocalizationProviderProps } from '../../LocalizationProvider'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
 
 vi.mock('@opentrons/react-api-client', async () => {
@@ -100,8 +100,8 @@ describe('OnDeviceDisplayApp', () => {
     } as any)
     // TODO(bh, 2024-03-27): implement testing of branded and anonymous i18n, but for now pass through
     vi.mocked(
-      OnDeviceLocalizationProvider
-    ).mockImplementation((props: OnDeviceLocalizationProviderProps) => (
+      LocalizationProvider
+    ).mockImplementation((props: LocalizationProviderProps) => (
       <>{props.children}</>
     ))
   })
@@ -163,14 +163,14 @@ describe('OnDeviceDisplayApp', () => {
   })
   it('renders the localization provider and not the loading screen when app-shell is ready', () => {
     render('/')
-    expect(vi.mocked(OnDeviceLocalizationProvider)).toHaveBeenCalled()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
     expect(screen.queryByLabelText('loading indicator')).toBeNull()
   })
   it('renders the loading screen when app-shell is not ready', () => {
     vi.mocked(getIsShellReady).mockReturnValue(false)
     render('/')
     screen.getByLabelText('loading indicator')
-    expect(vi.mocked(OnDeviceLocalizationProvider)).not.toHaveBeenCalled()
+    expect(vi.mocked(LocalizationProvider)).not.toHaveBeenCalled()
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
     render('/emergency-stop')

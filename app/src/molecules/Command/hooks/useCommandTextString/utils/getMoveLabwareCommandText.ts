@@ -11,6 +11,7 @@ import type { HandlesCommands } from './types'
 
 export function getMoveLabwareCommandText({
   command,
+  allRunDefs,
   t,
   commandTextData,
   robotType,
@@ -27,7 +28,13 @@ export function getMoveLabwareCommandText({
       : null
   const newDisplayLocation =
     commandTextData != null
-      ? getLabwareDisplayLocation(commandTextData, newLocation, t, robotType)
+      ? getLabwareDisplayLocation(
+          commandTextData,
+          allRunDefs,
+          newLocation,
+          t,
+          robotType
+        )
       : null
 
   const location = newDisplayLocation?.includes(
@@ -46,6 +53,7 @@ export function getMoveLabwareCommandText({
           oldLocation != null && commandTextData != null
             ? getLabwareDisplayLocation(
                 commandTextData,
+                allRunDefs,
                 oldLocation,
                 t,
                 robotType
@@ -62,6 +70,7 @@ export function getMoveLabwareCommandText({
           oldLocation != null && commandTextData != null
             ? getLabwareDisplayLocation(
                 commandTextData,
+                allRunDefs,
                 oldLocation,
                 t,
                 robotType

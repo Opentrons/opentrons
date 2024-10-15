@@ -61,6 +61,7 @@
   "release": "Release",
   "release_labware_from_gripper": "Release labware from gripper",
   "remove_any_attached_tips": "Remove any attached tips",
+  "replace_tips_and_select_loc_partial_tip": "Replace tips and select the last location used for partial tip pickup.",
   "replace_tips_and_select_location": "It's best to replace tips and select the last location used for tip pickup.",
   "replace_used_tips_in_rack_location": "Replace used tips in rack location {{location}} in slot {{slot}}",
   "replace_with_new_tip_rack": "Replace with new tip rack in slot {{slot}}",

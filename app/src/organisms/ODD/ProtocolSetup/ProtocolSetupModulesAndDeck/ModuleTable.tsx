@@ -15,6 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  ABSORBANCE_READER_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   getModuleDisplayName,
@@ -203,7 +204,8 @@ function ModuleTableItem({
     )
   } else if (
     isModuleReady &&
-    module.attachedModuleMatch?.moduleOffset?.last_modified != null
+    (module.attachedModuleMatch?.moduleOffset?.last_modified != null ||
+      module.attachedModuleMatch?.moduleType === ABSORBANCE_READER_TYPE)
   ) {
     moduleStatus = (
       <Chip
@@ -265,7 +267,9 @@ function ModuleTableItem({
         alignItems={ALIGN_CENTER}
         backgroundColor={
           isModuleReady &&
-          module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
+          (module.attachedModuleMatch?.moduleOffset?.last_modified != null ||
+            module.attachedModuleMatch?.moduleType ===
+              ABSORBANCE_READER_TYPE) &&
           conflictedFixture == null
             ? COLORS.green35
             : isNonConnectingModule && conflictedFixture == null

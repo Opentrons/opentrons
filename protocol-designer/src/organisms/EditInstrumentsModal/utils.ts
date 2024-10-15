@@ -1,8 +1,13 @@
-import type { PipetteName, PipetteV2Specs } from '@opentrons/shared-data'
+import type {
+  PipetteName,
+  PipetteV2Specs,
+  PipetteMount,
+} from '@opentrons/shared-data'
 import type {
   Gen,
   PipetteType,
 } from '../../pages/CreateNewProtocolWizard/types'
+import type { PipetteOnDeck } from '../../step-forms'
 
 export interface PipetteSections {
   type: PipetteType
@@ -27,4 +32,33 @@ export const getSectionsFromPipetteName = (
     gen: specs.displayCategory === 'FLEX' ? 'flex' : specs.displayCategory,
     volume,
   }
+}
+
+export const getShouldShowPipetteType = (
+  type: PipetteType,
+  has96Channel: boolean,
+  leftPipette?: PipetteOnDeck | null,
+  rightPipette?: PipetteOnDeck | null,
+  currentEditingMount?: PipetteMount | null
+): boolean => {
+  if (type === '96') {
+    // if a protocol has 96-Channel, no 96-Channel button
+    if (has96Channel) {
+      return false
+    }
+
+    // If no mount is being edited (adding a new pipette)
+    if (currentEditingMount == null) {
+      // Only show if both mounts are empty
+      return leftPipette == null && rightPipette == null
+    }
+
+    // Only show if the opposite mount of the one being edited is empty
+    return currentEditingMount === 'left'
+      ? rightPipette == null
+      : leftPipette == null
+  }
+
+  // Always show 1-Channel and Multi-Channel options
+  return true
 }

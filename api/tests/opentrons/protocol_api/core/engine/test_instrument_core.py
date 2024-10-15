@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based instrument API core."""
-from typing import cast, Optional, Union
+from typing import cast, Optional
 
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
@@ -1227,17 +1227,14 @@ def test_configure_nozzle_layout(
     argnames=["pipette_channels", "nozzle_layout", "primary_nozzle", "expected_result"],
     argvalues=[
         (96, NozzleConfigurationType.FULL, "A1", True),
-        (96, NozzleConfigurationType.FULL, None, True),
         (96, NozzleConfigurationType.ROW, "A1", True),
         (96, NozzleConfigurationType.COLUMN, "A1", True),
         (96, NozzleConfigurationType.COLUMN, "A12", True),
         (96, NozzleConfigurationType.SINGLE, "H12", True),
         (96, NozzleConfigurationType.SINGLE, "A1", True),
         (8, NozzleConfigurationType.FULL, "A1", True),
-        (8, NozzleConfigurationType.FULL, None, True),
         (8, NozzleConfigurationType.SINGLE, "H1", True),
         (8, NozzleConfigurationType.SINGLE, "A1", True),
-        (1, NozzleConfigurationType.FULL, None, True),
     ],
 )
 def test_is_tip_tracking_available(
@@ -1246,7 +1243,7 @@ def test_is_tip_tracking_available(
     subject: InstrumentCore,
     pipette_channels: int,
     nozzle_layout: NozzleConfigurationType,
-    primary_nozzle: Union[str, None],
+    primary_nozzle: str,
     expected_result: bool,
 ) -> None:
     """It should return whether tip tracking is available based on nozzle configuration."""

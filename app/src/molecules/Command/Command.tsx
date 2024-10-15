@@ -8,7 +8,11 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import { CommandText } from './CommandText'
 import { CommandIcon } from './CommandIcon'
 import type { CommandTextData } from './types'
@@ -34,6 +38,7 @@ interface SkeletonCommandProps extends FundamentalProps {
 interface NonSkeletonCommandProps extends FundamentalProps {
   state: NonSkeletonCommandState
   command: RunTimeCommand
+  allRunDefs: LabwareDefinition2[]
   commandTextData: CommandTextData
 }
 

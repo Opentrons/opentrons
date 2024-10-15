@@ -29,6 +29,7 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
   const { t, i18n } = useTranslation('create_new_protocol')
   const allLabware = useSelector(getLabwareDefsByURI)
   const is96Channel = pipetteName === 'p1000_96'
+
   return (
     <ListItem type="noActive">
       <Flex
@@ -40,9 +41,9 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {i18n.format(
               t('pip', {
-                mount: is96Channel ? t('left_right') : t(`${mount}`),
+                mount: is96Channel ? t('left_right') : mount,
               }),
-              'capitalize'
+              'titleCase'
             )}
           </StyledText>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

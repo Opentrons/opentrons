@@ -73,7 +73,7 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   tipStatusUtils: {} as any,
   currentRecoveryOptionUtils: {} as any,
   failedLabwareUtils: { pickUpTipLabware: mockPickUpTipLabware } as any,
-  failedPipetteInfo: {} as any,
+  failedPipetteUtils: {} as any,
   deckMapUtils: { setSelectedLocation: () => {} } as any,
   stepCounts: {} as any,
   protocolAnalysis: mockRobotSideAnalysis,
@@ -92,4 +92,5 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
     reportActionSelectedEvent: () => {},
     reportActionSelectedResult: () => {},
   },
+  allRunDefs: [],
 }

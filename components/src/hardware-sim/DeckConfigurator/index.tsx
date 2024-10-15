@@ -14,6 +14,7 @@ import {
   MAGNETIC_BLOCK_V1_FIXTURE,
   ABSORBANCE_READER_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  THERMOCYCLER_MODULE_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -228,18 +229,26 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
         />
       ))}
-      {thermocyclerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
-        <ThermocyclerFixture
-          key={cutoutId}
-          deckDefinition={deckDef}
-          handleClickRemove={
-            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
-          }
-          fixtureLocation={cutoutId}
-          cutoutFixtureId={cutoutFixtureId}
-          selected={cutoutId === selectedCutoutId}
-        />
-      ))}
+      {thermocyclerFixtures.map(({ cutoutId, cutoutFixtureId }) => {
+        return (
+          <ThermocyclerFixture
+            key={cutoutId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            selected={
+              selectedCutoutId != null &&
+              THERMOCYCLER_MODULE_CUTOUTS.includes(selectedCutoutId) &&
+              THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
+            }
+          />
+        )
+      })}
       {absorbanceReaderFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <AbsorbanceReaderFixture
           key={cutoutId}
