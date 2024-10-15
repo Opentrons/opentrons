@@ -12,6 +12,7 @@ import { SubstepsToolbox, TimelineToolbox } from '../Timeline'
 vi.mock('../../Offdeck')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../ui/steps/selectors')
+vi.mock('../../../../ui/labware/selectors')
 vi.mock('../StepForm')
 vi.mock('../../DeckSetup')
 vi.mock('../Timeline')
@@ -40,6 +41,7 @@ describe('ProtocolSteps', () => {
 
   it('renders each component in ProtocolSteps', () => {
     render()
+    screen.debug()
     screen.getByText('mock TimelineToolbox')
     screen.getByText('mock DeckSetupContainer')
   })
