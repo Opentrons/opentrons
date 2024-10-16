@@ -62,11 +62,11 @@ RETRACT_DIST_X = 1
 RETRACT_DIST_Z = 1
 HOME_SPEED = 20
 HOME_ACCELERATION = 100
-MOVE_ACCELERATION_X = 1500
+MOVE_ACCELERATION_X = 750 #1500
 MOVE_ACCELERATION_Z = 50
 MAX_SPEED_DISCONTINUITY_X = 20
 MAX_SPEED_DISCONTINUITY_Z = 20
-MOVE_SPEED_X = 300
+MOVE_SPEED_X = 200 #300
 MOVE_SPEED_UPZ = 200
 MOVE_SPEED_DOWNZ = 200
 LABWARE_CLEARANCE = 9
@@ -282,6 +282,7 @@ class FlexStacker():
                 velocity = self.move_speed_x
                 acceleration = self.move_acceleration_x
         elif axis == AXIS.Z:
+            max_speed_discontinuity = 5
             if velocity == None or acceleration == None:
                 velocity = self.move_speed_up_z
                 acceleration = self.move_acceleration_z
