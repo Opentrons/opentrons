@@ -45,7 +45,7 @@ export default defineConfig({
         postColorModFunction(),
         postCssPresetEnv({ stage: 0 }),
         lostCss(),
-        autoprefixer,
+        autoprefixer({}),
       ],
     },
   },
