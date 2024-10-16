@@ -131,6 +131,7 @@ def _setup(
         _write_line_to_csv(ctx, [liquid_pip_name])
         _write_line_to_csv(ctx, [liquid_rack_name])
         _write_line_to_csv(ctx, [LABWARE])
+        _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
     return (
         liquid_pipette,
         liquid_rack,
@@ -363,3 +364,7 @@ def run(ctx: ProtocolContext) -> None:
         test_wells = test_wells[NUM_TRIALS:]
         test_tips_liquid = test_tips_liquid[NUM_TRIALS:]
         test_tips_probe = test_tips_probe[NUM_TRIALS:]
+    if liq_pipette.has_tip:
+        liq_pipette.return_tip() if RETURN_TIP else liq_pipette.drop_tip()
+    if probe_pipette.has_tip:
+        probe_pipette.return_tip() if RETURN_TIP else probe_pipette.drop_tip()
