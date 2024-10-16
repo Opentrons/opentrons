@@ -4,6 +4,11 @@ from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.liquid_classes import load_definition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
+    PositionReference,
+    Coordinate,
+    Submerge,
+    DelayParams,
+    DelayProperties,
 )
 
 
@@ -18,6 +23,12 @@ def test_load_liquid_class_schema_v1() -> None:
 
 
 def test_load_definition() -> None:
-    assert load_definition("fixture_glycerol50") == json.loads(
-        load_shared_data("liquid-class/fixtures/fixture_glycerol50.json")
+    glycerol_definition = load_definition("fixture_glycerol50")
+    assert type(glycerol_definition) is LiquidClassSchemaV1
+    assert glycerol_definition.byPipette[0].pipetteModel == "p20_single_gen2"
+    assert glycerol_definition.byPipette[0].byTipType[0].aspirate.submerge == Submerge(
+        positionReference=PositionReference.LIQUID_MENISCUS,
+        offset=Coordinate(x=0, y=0, z=-5),
+        speed=100,
+        delay=DelayProperties(enable=True, params=DelayParams(duration=1.5)),
     )
