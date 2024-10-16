@@ -447,9 +447,9 @@
             "items": {
               "type": "object",
               "properties": {
-                "tipType": {
+                "tiprack": {
                   "type": "string",
-                  "description": "The tip type whose properties will be used when handling this specific liquid class with this pipette"
+                  "description": "The tiprack name whose tip will be used when handling this specific liquid class with this pipette"
                 },
                 "aspirate": {
                   "$ref": "#/definitions/aspirateParams"

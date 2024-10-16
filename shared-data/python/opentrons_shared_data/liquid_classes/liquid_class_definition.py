@@ -312,9 +312,9 @@ class MultiDispenseProperties(BaseModel):
 class ByTipTypeSetting(BaseModel):
     """Settings for each kind of tip this pipette can use."""
 
-    tipType: str = Field(
+    tiprack: str = Field(
         ...,
-        description="The tip type whose properties will be used when handling this specific liquid class with this pipette",
+        description="The name of tiprack whose tip will be used when handling this specific liquid class with this pipette",
     )
     aspirate: AspirateProperties = Field(
         ..., description="Aspirate parameters for this tip type."
