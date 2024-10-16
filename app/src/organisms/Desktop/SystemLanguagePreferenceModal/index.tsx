@@ -18,6 +18,7 @@ import {
   getAppLanguage,
   getStoredSystemLanguage,
   updateConfigValue,
+  useFeatureFlag,
 } from '/app/redux/config'
 import { getSystemLanguage } from '/app/redux/shell'
 
@@ -25,6 +26,7 @@ import type { Dispatch } from '/app/redux/types'
 
 export function SystemLanguagePreferenceModal(): JSX.Element | null {
   const { t } = useTranslation(['app_settings', 'branded'])
+  const enableLocalization = useFeatureFlag('enableLocalization')
 
   const dispatch = useDispatch<Dispatch>()
   const navigate = useNavigate()
@@ -76,7 +78,7 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
     dispatch(updateConfigValue('language.systemLanguage', systemLanguage))
   }
 
-  return showBootModal || showUpdateModal ? (
+  return enableLocalization && (showBootModal || showUpdateModal) ? (
     <Modal title={title}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <StyledText desktopStyle="bodyDefaultRegular">{description}</StyledText>
