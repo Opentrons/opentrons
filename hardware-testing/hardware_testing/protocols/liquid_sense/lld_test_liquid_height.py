@@ -13,7 +13,13 @@ from opentrons.types import Point
 ###########################################
 # TODO: use runtime-variables instead of constants
 
-VOLUMES = [7, 10, 15, 25, 40, 60, 100, 200]
+VOLUMES = {
+    "corning_96_wellplate_360ul_flat": [0],
+    "armadillo_96_wellplate_200ul_pcr_full_skirt": [0],
+    "nest_96_wellplate_2ml_deep": [0],
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [0],
+    "nest_12_reservoir_15ml": [0],
+}
 NUM_TRIALS = 12
 DISPENSE_MM_FROM_BOTTOM = 2
 LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
@@ -48,6 +54,14 @@ TEST_WELLS = {
     1: {  # channel count
         "corning_96_wellplate_360ul_flat": _all_96_well_names,
         "armadillo_96_wellplate_200ul_pcr_full_skirt": _all_96_well_names,
+        "nest_96_wellplate_2ml_deep": _all_96_well_names,
+        "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [
+            "A3",
+            "B3",
+            "A4",
+            "B4",
+        ],  # 50mL tubes
+        "nest_12_reservoir_15ml": [f"A{i + 1}" for i in range(12)],
     }
 }
 
@@ -222,28 +236,37 @@ def _test_for_finding_liquid_height(
         # pickup probing tip, then measure Z-error
         probing_pipette.pick_up_tip(probe_tip)
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
-        # pickup liquid tip, then immediately transfer liquid
-        liquid_pipette.pick_up_tip(liq_tip)
-        liquid_pipette.flow_rate.aspirate = max(volume, 10)
-        liquid_pipette.flow_rate.dispense = min(liquid_pipette.flow_rate.aspirate, 50)
-        liquid_pipette.flow_rate.blow_out = 100
-        liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
-        if volume <= 195:
-            liquid_pipette.aspirate(5, src_well.top(2))
-            liquid_pipette.dispense(5, well.top(5))
-        liquid_pipette.dispense(volume, well.bottom(DISPENSE_MM_FROM_BOTTOM))
-        ctx.delay(seconds=1.5)
-        liquid_pipette.move_to(well.top())
-        ctx.delay(seconds=1.5)
-        liquid_pipette.blow_out(well.top())
-        ctx.delay(seconds=1.5)
-        liquid_pipette.prepare_to_aspirate()
-        # get height of liquid
-        height = _get_height_of_liquid_in_well(probing_pipette, well)
+        if volume:
+            # pickup liquid tip, then immediately transfer liquid
+            liquid_pipette.pick_up_tip(liq_tip)
+            liquid_pipette.flow_rate.aspirate = max(volume, 10)
+            liquid_pipette.flow_rate.dispense = min(
+                liquid_pipette.flow_rate.aspirate, 50
+            )
+            liquid_pipette.flow_rate.blow_out = 100
+            liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
+            if volume <= 195:
+                liquid_pipette.aspirate(5, src_well.top(2))
+                liquid_pipette.dispense(5, well.top(5))
+            liquid_pipette.dispense(volume, well.bottom(DISPENSE_MM_FROM_BOTTOM))
+            ctx.delay(seconds=1.5)
+            liquid_pipette.move_to(well.top())
+            ctx.delay(seconds=1.5)
+            liquid_pipette.blow_out(well.top())
+            ctx.delay(seconds=1.5)
+            liquid_pipette.prepare_to_aspirate()
+            # get height of liquid
+            height = _get_height_of_liquid_in_well(probing_pipette, well)
+        else:
+            is_empty = not probing_pipette.detect_liquid_presence(well)
+            height = (
+                0.0 if is_empty else -9999
+            )  # some obviously fake number so we know it failed
         corrected_height = height + tip_z_error
         all_corrected_heights.append(corrected_height)
         # drop all tips
-        liquid_pipette.drop_tip()
+        if volume:
+            liquid_pipette.drop_tip()
         probing_pipette.drop_tip()
         # save data
         trial_data = [trial_counter, volume, height, tip_z_error, corrected_height]
@@ -266,8 +289,9 @@ def run(ctx: ProtocolContext) -> None:
     test_tips_liquid = _get_test_tips(liq_rack, channels=1)
     test_tips_probe = _get_test_tips(probe_rack, channels=1)
     stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
-    assert min(stuff_lengths) >= NUM_TRIALS * len(VOLUMES), f"{stuff_lengths}"
-    for _vol in VOLUMES:
+    volumes = VOLUMES[labware.load_name]
+    assert min(stuff_lengths) >= NUM_TRIALS * len(volumes), f"{stuff_lengths}"
+    for _vol in volumes:
         _test_for_finding_liquid_height(
             ctx,
             _vol,
