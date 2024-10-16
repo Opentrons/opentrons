@@ -168,3 +168,19 @@ class LiquidNotFoundError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.code
     detail: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.detail
+
+
+class TipPhysicallyAttachedError(ErrorOccurrence):
+    """Returned when sensors determine that a tip remains on the pipette after a drop attempt.
+
+    The pipette will act as if the tip was not dropped. So, you won't be able to pick
+    up a new tip without dropping the current one, and movement commands will assume
+    there is a tip hanging off the bottom of the pipette.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["tipPhysicallyAttached"] = "tipPhysicallyAttached"
+
+    errorCode: str = ErrorCodes.TIP_DROP_FAILED.value.code
+    detail: str = ErrorCodes.TIP_DROP_FAILED.value.detail
