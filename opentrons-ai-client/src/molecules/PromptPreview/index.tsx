@@ -9,27 +9,17 @@ import {
 
 const PROMPT_PREVIEW_PLACEHOLDER_MESSAGE =
   'As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol.'
-const SECTION_TITLES = [
-  'Application',
-  'Instruments',
-  'Modules',
-  'Labware and Liquids',
-  'Steps',
-]
+
+interface SectionData {
+  title: string
+  items: string[]
+}
 
 interface AccordionProps {
   id?: string
   isSubmitButtonEnabled?: boolean
   handleSubmit: () => void
-  promptPreviewData: PromptPreviewData
-}
-
-interface PromptPreviewData {
-  application: string[]
-  instruments: string[]
-  modules: string[]
-  labwareAndLiquids: string[]
-  steps: string[]
+  promptPreviewData: SectionData[]
 }
 
 const PromptPreviewContainer = styled(Flex)`
@@ -74,16 +64,7 @@ export function PromptPreview({
   promptPreviewData,
 }: AccordionProps): JSX.Element {
   const areAllSectionsEmpty = (): boolean => {
-    const {
-      application,
-      instruments,
-      modules,
-      labwareAndLiquids,
-      steps,
-    } = promptPreviewData
-    return [application, instruments, modules, labwareAndLiquids, steps].every(
-      arr => arr.length === 0
-    )
+    return promptPreviewData.every(section => section.items.length === 0)
   }
 
   return (
@@ -104,13 +85,13 @@ export function PromptPreview({
 
       {Object.values(promptPreviewData).map(
         (section, index) =>
-          section.length > 0 && (
+          section.items.length > 0 && (
             <PromptPreviewSection key={`section-${index}`}>
               <SectionHeading desktopStyle="bodyLargeSemiBold">
-                {SECTION_TITLES[index]}
+                {section.title}
               </SectionHeading>
               <TagGrid>
-                {section.map((item: string, index: number) => (
+                {section.items.map((item: string, index: number) => (
                   <Tag key={`tag-${index}`} text={item} type={'default'} />
                 ))}
               </TagGrid>
