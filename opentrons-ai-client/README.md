@@ -26,6 +26,23 @@ make teardown-js && make setup-js
 make -C opentrons-ai-client dev
 ```
 
+## Auth0
+
+[Auth0 requires consent in the local application.](https://auth0.com/docs/get-started/applications/confidential-and-public-applications/user-consent-and-third-party-applications#skip-consent-for-first-party-applications)
+
+### Allow consent in the local application
+
+Alter the `authorizationParams` in `src/main.tsx`, provide consent, then remove the change. Once you provide consent in the local application, you will not be prompted for consent again. The consent is stored in Auth0.
+
+```ts
+// src/main.tsx
+authorizationParams={{
+          redirect_uri: window.location.origin,
+          prompt: 'consent',
+          audience: 'sandbox-ai-api',
+        }}
+```
+
 ## Stack and structure
 
 The UI stack is built using:
