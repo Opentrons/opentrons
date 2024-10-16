@@ -30,6 +30,7 @@ def create_queue_worker(
 
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
+        file_provider: Provides access to robot server file writing procedures for protocol output.
         state_store: StateStore to pass down to dependencies.
         action_dispatcher: ActionDispatcher to pass down to dependencies.
         error_recovery_policy: ErrorRecoveryPolicy to pass down to dependencies.

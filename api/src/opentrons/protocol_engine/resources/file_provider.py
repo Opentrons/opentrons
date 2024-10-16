@@ -1,7 +1,6 @@
 """File interaction resource provider."""
-from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, cast, Callable, Awaitable, Dict
+from typing import List, Optional, Callable, Awaitable, Dict
 
 
 MAXIMUM_CSV_FILE_LIMIT = 40
@@ -12,12 +11,13 @@ class GenericCsvTransform:
 
     filename: str
     rows: List[List[str]]
-    delimiter: Optional[str] = ","
+    delimiter: str = ","
 
     @staticmethod
     def build(
-        filename: str, rows: List[List[str]], delimiter: Optional[str] = ","
+        filename: str, rows: List[List[str]], delimiter: str = ","
     ) -> "GenericCsvTransform":
+        """Build a Generic CSV datatype class."""
         if "." in filename and not filename.endswith(".csv"):
             raise ValueError(
                 f"Provided filename {filename} invalid. Only CSV file format is accepted."
@@ -32,11 +32,14 @@ class GenericCsvTransform:
 
 
 class ReadData:
+    """Read Data type containing the wavelength for a Plate Reader read alongside the Measurement Data of that read."""
+
     wavelength: int
     data: Dict[str, float]
 
     @staticmethod
     def build(wavelength: int, data: Dict[str, float]) -> "ReadData":
+        """Build Read Data containing the Wavelength used and the Measurement Data returned."""
         read = ReadData()
         read.wavelength = wavelength
         read.data = data
@@ -52,42 +55,32 @@ class PlateReaderDataTransform:
     finish_time: datetime
     serial_number: str
 
-    def build_generic_csv(
+    def build_generic_csv(  # noqa: C901
         self, filename: str, measurement: ReadData
     ) -> GenericCsvTransform:
         """Builds a CSV compatible object containing Plate Reader Measurements.
+
         This will also automatically reformat the provided filename to include the wavelength of those measurements.
         """
         plate_alpharows = ["A", "B", "C", "D", "E", "F", "G", "H"]
         rows = []
 
-        # line 1
         rows.append(["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
-
-        # lines 2-9
         for i in range(8):
             row = [plate_alpharows[i]]
             for j in range(12):
-                row.append(str(measurement.data[f"{plate_alpharows[i]}{i+1}"]))
+                row.append(str(measurement.data[f"{plate_alpharows[i]}{j+1}"]))
             rows.append(row)
-
-        # lines 10-12 are empty
         for i in range(3):
             rows.append([""])
-        # line 13
         rows.append(["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
-        # lines 14 through 21
         for i in range(8):
             row = [plate_alpharows[i]]
             for j in range(12):
                 row.append("")
             rows.append(row)
-
-        # lines 22-24 are empty
         for i in range(3):
             rows.append([""])
-
-        # line 25
         rows.append(
             [
                 "",
@@ -98,25 +91,20 @@ class PlateReaderDataTransform:
                 "Absorbance %CV",
             ]
         )
-
-        # lines 26-28 are empty
         for i in range(3):
             rows.append([""])
-
-        # line 29
         rows.append(
             [
                 "",
                 "ID",
-                "Well,Absorbance (OD)",
+                "Well",
+                "Absorbance (OD)",
                 "Mean Absorbance (OD)",
                 "Dilution Factor",
                 "Absorbance %CV",
             ]
         )
         rows.append(["1", "Sample 1", "", "", "", "1", "", "", "", "", "", ""])
-
-        # lines 31-33 are empty
         for i in range(3):
             rows.append([""])
 
@@ -150,6 +138,7 @@ class PlateReaderDataTransform:
         serial_number: str,
         reference_wavelength: Optional[int] = None,
     ) -> "PlateReaderDataTransform":
+        """Build a Plate Reader Data object as the result of a Read from a specific Plate Reader."""
         plate_reader_data = PlateReaderDataTransform()
         plate_reader_data.read_results = read_results
         plate_reader_data.reference_wavelength = reference_wavelength
@@ -179,6 +168,7 @@ class FileProvider:
         self._data_files_filecount = data_files_filecount
 
     async def write_csv(self, write_data: GenericCsvTransform) -> None:
+        """Writes the provided CSV object to a file in the Data Files directory."""
         if self._data_files_filecount is not None:
             file_count = await self._data_files_filecount()
             if file_count >= MAXIMUM_CSV_FILE_LIMIT:

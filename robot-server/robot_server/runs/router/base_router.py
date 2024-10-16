@@ -192,7 +192,9 @@ async def create_run(  # noqa: C901
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
-    file_provider_wrapper: Annotated[FileProviderWrapper, Depends(get_file_provider_wrapper)],
+    file_provider_wrapper: Annotated[
+        FileProviderWrapper, Depends(get_file_provider_wrapper)
+    ],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
@@ -212,6 +214,7 @@ async def create_run(  # noqa: C901
         resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
+        file_provider_wrapper: Dependency to provide access to file Reading and Writing to Protocol engine.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None

@@ -1,7 +1,6 @@
 """Support for create_protocol_engine module."""
 from . import ProtocolEngine
 from ..hardware_control import HardwareControlAPI
-from .resources import FileProvider
 
 from opentrons.protocol_runner import protocol_runner, RunOrchestrator
 

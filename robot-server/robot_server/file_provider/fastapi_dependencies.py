@@ -17,7 +17,6 @@ async def get_file_provider_wrapper(
     data_files_store: Annotated[DataFilesStore, fastapi.Depends(get_data_files_store)],
 ) -> FileProviderWrapper:
     """Return the server's singleton `FileProviderWrapper` which provides the engine related callbacks for FileProvider."""
-
     file_provider_wrapper = FileProviderWrapper(
         data_files_directory=data_files_directory, data_files_store=data_files_store
     )

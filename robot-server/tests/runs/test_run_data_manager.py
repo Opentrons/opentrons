@@ -52,6 +52,7 @@ from robot_server.runs.run_store import (
 )
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
+from opentrons.protocol_engine.resources import FileProvider
 
 
 def mock_notify_publishers() -> None:
@@ -210,6 +211,7 @@ async def test_create(
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
             protocol=protocol,
             deck_configuration=sentinel.deck_configuration,
+            file_provider=sentinel.file_provider,
             run_time_param_values=sentinel.run_time_param_values,
             run_time_param_paths=sentinel.run_time_param_paths,
             notify_publishers=mock_notify_publishers,
@@ -251,6 +253,7 @@ async def test_create(
         labware_offsets=sentinel.labware_offsets,
         protocol=protocol,
         deck_configuration=sentinel.deck_configuration,
+        file_provider=sentinel.file_provider,
         run_time_param_values=sentinel.run_time_param_values,
         run_time_param_paths=sentinel.run_time_param_paths,
         notify_publishers=mock_notify_publishers,
@@ -307,6 +310,7 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
+            file_provider=FileProvider(),
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -321,6 +325,7 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
+            file_provider=FileProvider(),
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -792,6 +797,7 @@ async def test_create_archives_existing(
             protocol=None,
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
             deck_configuration=[],
+            file_provider=FileProvider(),
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -812,6 +818,7 @@ async def test_create_archives_existing(
         labware_offsets=[],
         protocol=None,
         deck_configuration=[],
+        file_provider=FileProvider(),
         run_time_param_values=None,
         run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,

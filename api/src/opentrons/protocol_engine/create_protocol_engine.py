@@ -38,6 +38,7 @@ async def create_protocol_engine(
             See documentation on `ErrorRecoveryPolicy`.
         load_fixed_trash: Automatically load fixed trash labware in engine.
         deck_configuration: The initial deck configuration the engine will be instantiated with.
+        file_provider: Provides access to robot server file writing procedures for protocol output.
         notify_publishers: Notifies robot server publishers of internal state change.
     """
     deck_data = DeckDataProvider(config.deck_type)
