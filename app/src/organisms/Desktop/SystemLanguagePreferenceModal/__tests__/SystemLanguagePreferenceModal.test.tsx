@@ -27,7 +27,7 @@ const render = () => {
 
 const mockNavigate = vi.fn()
 
-const MOCK_SYSTEM_LANGUAGE = 'en'
+const MOCK_SYSTEM_LANGUAGE = 'en-US'
 
 describe('SystemLanguagePreferenceModal', () => {
   beforeEach(() => {
@@ -45,8 +45,9 @@ describe('SystemLanguagePreferenceModal', () => {
 
   it('should render null when app language and system language are set', () => {
     render()
+    expect(screen.queryByText('Language preference')).toBeNull()
     expect(
-      screen.queryByRole('button', { name: 'Use system language' })
+      screen.queryByText('Update to your system language preferences')
     ).toBeNull()
   })
 
@@ -55,15 +56,12 @@ describe('SystemLanguagePreferenceModal', () => {
 
     render()
 
-    screen.getByText('System language preferences')
+    screen.getByText('Language preference')
     screen.getByText(
-      'Would you like to use your system language as the default for the Opentrons App?'
+      'The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.'
     )
-    const secondaryButton = screen.getByRole('button', {
-      name: 'Choose different language',
-    })
     const primaryButton = screen.getByRole('button', {
-      name: 'Use system language',
+      name: 'Continue',
     })
 
     fireEvent.click(primaryButton)
@@ -75,8 +73,6 @@ describe('SystemLanguagePreferenceModal', () => {
       'language.systemLanguage',
       MOCK_SYSTEM_LANGUAGE
     )
-    fireEvent.click(secondaryButton)
-    expect(mockNavigate).toBeCalledWith('/app-settings')
   })
 
   it('should render the correct header, description, and buttons when system language changes', () => {

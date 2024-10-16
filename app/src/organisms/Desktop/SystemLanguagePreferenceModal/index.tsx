@@ -1,10 +1,11 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  DropdownMenu,
   Flex,
   JUSTIFY_FLEX_END,
   Modal,
@@ -22,22 +23,33 @@ import {
 } from '/app/redux/config'
 import { getSystemLanguage } from '/app/redux/shell'
 
+import type { DropdownOption } from '@opentrons/components'
 import type { Dispatch } from '/app/redux/types'
 
+// these strings will not be translated so should not be localized
+const languageOptions: DropdownOption[] = [
+  { name: 'English (US)', value: 'en-US' },
+  { name: '中文', value: 'zh-CN' },
+]
+
 export function SystemLanguagePreferenceModal(): JSX.Element | null {
-  const { t } = useTranslation(['app_settings', 'branded'])
+  const { i18n, t } = useTranslation(['app_settings', 'shared', 'branded'])
   const enableLocalization = useFeatureFlag('enableLocalization')
 
+  const [currentOption, setCurrentOption] = useState<DropdownOption>(
+    languageOptions[0]
+  )
+
   const dispatch = useDispatch<Dispatch>()
-  const navigate = useNavigate()
 
   const appLanguage = useSelector(getAppLanguage)
-  const systemLocale = useSelector(getSystemLanguage)
+  const systemLanguage = useSelector(getSystemLanguage)
   const storedSystemLanguage = useSelector(getStoredSystemLanguage)
 
-  // convert full system locale e.g. "en-US" to language subtag e.g. "en"
-  const locale = systemLocale != null ? new Intl.Locale(systemLocale) : null
-  const systemLanguage = locale?.language ?? null
+  // TODO: set current option based on system locale
+  // initial current option: set to detected system language
+  // first, match entire locale -> match language -> fallback to english
+  // change language based on initial system locale
 
   const showBootModal = appLanguage == null && systemLanguage != null
   const showUpdateModal =
@@ -48,50 +60,70 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
 
   const title = showUpdateModal
     ? t('system_language_preferences_update')
-    : t('system_language_preferences')
+    : t('language_preference')
 
   const description = showUpdateModal
     ? t('branded:system_language_preferences_update_description')
-    : t('branded:system_language_preferences_description')
+    : t('branded:language_preference_description')
 
-  const secondaryButtonText = showUpdateModal
-    ? t('dont_change')
-    : t('choose_different_language')
+  const primaryButtonText = showUpdateModal
+    ? t('use_system_language')
+    : i18n.format(t('shared:continue'), 'capitalize')
 
   const handleSecondaryClick = (): void => {
-    if (showBootModal) {
-      /**
-       * if user chooses "Choose different language" on initial boot:
-       * set app language to system language temporarily and navigate to app settings page where language setting lives
-       *  */
-      dispatch(updateConfigValue('language.appLanguage', systemLanguage))
-      dispatch(updateConfigValue('language.systemLanguage', systemLanguage))
-      navigate('/app-settings')
-    } else {
-      // if user chooses "Don't change" on system language update, stored the new system language but don't update the app language
-      dispatch(updateConfigValue('language.systemLanguage', systemLanguage))
-    }
+    // if user chooses "Don't change" on system language update, stored the new system language but don't update the app language
+    dispatch(updateConfigValue('language.systemLanguage', systemLanguage))
   }
 
   const handlePrimaryClick = (): void => {
-    dispatch(updateConfigValue('language.appLanguage', systemLanguage))
+    dispatch(
+      updateConfigValue(
+        'language.appLanguage',
+        // on first boot continue click, set the app language to selected value
+        showBootModal ? currentOption.value : systemLanguage
+      )
+    )
     dispatch(updateConfigValue('language.systemLanguage', systemLanguage))
+  }
+
+  const handleDropdownClick = (value: string): void => {
+    const selectedOption = languageOptions.find(lng => lng.value === value)
+
+    if (selectedOption != null) {
+      setCurrentOption(selectedOption)
+      void i18n.changeLanguage(selectedOption.value)
+    }
   }
 
   return enableLocalization && (showBootModal || showUpdateModal) ? (
     <Modal title={title}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-        <StyledText desktopStyle="bodyDefaultRegular">{description}</StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {description}
+          </StyledText>
+          {showBootModal ? (
+            <DropdownMenu
+              filterOptions={languageOptions}
+              currentOption={currentOption}
+              onClick={handleDropdownClick}
+              title={t('select_language')}
+              width="50%"
+            />
+          ) : null}
+        </Flex>
         <Flex
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing8}
           justifyContent={JUSTIFY_FLEX_END}
         >
-          <SecondaryButton onClick={handleSecondaryClick}>
-            {secondaryButtonText}
-          </SecondaryButton>
+          {showUpdateModal ? (
+            <SecondaryButton onClick={handleSecondaryClick}>
+              {t('dont_change')}
+            </SecondaryButton>
+          ) : null}
           <PrimaryButton onClick={handlePrimaryClick}>
-            {t('use_system_language')}
+            {primaryButtonText}
           </PrimaryButton>
         </Flex>
       </Flex>
