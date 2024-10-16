@@ -23,7 +23,7 @@ VOLUMES_3MM_TOP_BOTTOM = {
     "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [0, 158.1, 56267.2],  # 50mL tubes only
     "nest_12_reservoir_15ml": [0, 1219.0, 13236.1],
 }
-SAME_TIP = True
+SAME_TIP = True  # this is fine when using Ethanol (b/c is evaporates)
 RETURN_TIP = True
 NUM_TRIALS = 3
 DISPENSE_MM_FROM_BOTTOM = 2
@@ -234,10 +234,11 @@ def _test_for_finding_liquid_height(
         # pickup probing tip, then measure Z-error
         if not probing_pipette.has_tip:
             probing_pipette.pick_up_tip(probe_tip)
+        else:
+            # try and get any remaining droplets out of the way
+            probing_pipette.aspirate().dispense().prepare_to_aspirate()
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
         if volume:
-            if not liquid_pipette.has_tip:
-                liquid_pipette.pick_up_tip(liq_tip)
             # set flow-rates
             liquid_pipette.flow_rate.aspirate = max(
                 min(liquid_pipette.max_volume, volume), 10
@@ -250,6 +251,12 @@ def _test_for_finding_liquid_height(
             need_to_transfer = float(volume)
             while need_to_transfer > 0.001:
                 transfer_vol = min(liquid_pipette.max_volume, need_to_transfer)
+                if not liquid_pipette.has_tip:
+                    liquid_pipette.pick_up_tip(liq_tip)
+                else:
+                    # try and get any remaining droplets out of the way
+                    liquid_pipette.move_to(src_well.top(10))
+                    liquid_pipette.aspirate().dispense().prepare_to_aspirate()
                 liquid_pipette.aspirate(
                     transfer_vol, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM)
                 )
