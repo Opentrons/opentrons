@@ -15,6 +15,7 @@ const testAliases: {} | { 'file-saver': string } =
       }
     : {}
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   // this makes imports relative rather than absolute
   base: '',
