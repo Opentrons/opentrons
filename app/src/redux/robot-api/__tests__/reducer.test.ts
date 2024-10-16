@@ -66,6 +66,15 @@ const SPECS: ReducerSpec[] = [
       def: { status: 'pending' },
     },
   },
+  {
+    name: 'handles a dismiss all request action',
+    state: { abc: mockFailedRequestState, def: { status: 'pending' } },
+    action: {
+      type: 'robotApi:DISMISS_ALL_REQUESTS',
+      payload: { requestId: 'abc' },
+    },
+    expected: {},
+  },
 ]
 
 describe('robotApiReducer', () => {
