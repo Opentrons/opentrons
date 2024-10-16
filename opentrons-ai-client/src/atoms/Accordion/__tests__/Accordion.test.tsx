@@ -15,6 +15,7 @@ describe('Accordion', () => {
 
   beforeEach(() => {
     props = {
+      id: 'accordion-test',
       handleClick: mockHandleClick,
       isOpen: false,
       isCompleted: false,
@@ -33,13 +34,13 @@ describe('Accordion', () => {
     props.isOpen = true
     render(props)
     const accordionContent = screen.getByText('Accordion content')
-    expect(accordionContent).toBeInTheDocument()
+    expect(accordionContent).toBeVisible()
   })
 
   it('should not display content if isOpen is false', () => {
     render(props)
     const accordionContent = screen.queryByText('Accordion content')
-    expect(accordionContent).not.toBeInTheDocument()
+    expect(accordionContent).not.toBeVisible()
   })
 
   it("should call handleClick when the accordion's header is clicked", () => {
@@ -54,14 +55,14 @@ describe('Accordion', () => {
   it('should display a check icon if isCompleted is true', () => {
     props.isCompleted = true
     render(props)
-    const checkIcon = screen.getByTestId('accordion-ot-check')
+    const checkIcon = screen.getByTestId('accordion-test-ot-check')
     expect(checkIcon).toBeInTheDocument()
   })
 
   it('should not display a check icon if isCompleted is false', () => {
     props.isCompleted = false
     render(props)
-    const checkIcon = screen.queryByTestId('accordion-ot-check')
+    const checkIcon = screen.queryByTestId('accordion-test-ot-check')
     expect(checkIcon).not.toBeInTheDocument()
   })
 })
