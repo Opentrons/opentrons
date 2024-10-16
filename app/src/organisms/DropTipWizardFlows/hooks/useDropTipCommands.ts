@@ -88,8 +88,11 @@ export function useDropTipCommands({
                 console.error(error.message)
               })
               .finally(() => {
-                closeFlow()
-                deleteMaintenanceRun(activeMaintenanceRunId)
+                deleteMaintenanceRun(activeMaintenanceRunId, {
+                  onSettled: () => {
+                    closeFlow()
+                  },
+                })
               })
           }
         }

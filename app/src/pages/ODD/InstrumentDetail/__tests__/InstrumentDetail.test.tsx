@@ -111,8 +111,9 @@ describe('InstrumentDetail', () => {
     vi.mocked(useParams).mockReturnValue({ mount: 'left' })
     vi.mocked(useIsOEMMode).mockReturnValue(false)
     vi.mocked(useDropTipWizardFlows).mockReturnValue({
-      toggleDTWiz: () => null,
+      enableDTWiz: vi.fn(),
       showDTWiz: false,
+      disableDTWiz: vi.fn(),
     })
     vi.mocked(DropTipWizardFlows).mockReturnValue(<div>MOCK_DROP_TIP_WIZ</div>)
   })
