@@ -17,6 +17,7 @@ import {
   OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
   TIP_NOT_DETECTED_OPTIONS,
+  TIP_DROP_FAILED_OPTIONS,
   GRIPPER_ERROR_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
@@ -80,22 +81,28 @@ describe('SelectRecoveryOption', () => {
     }
 
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE)
+      .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, expect.any(String))
       .thenReturn('Retry step')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+      .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, ERROR_KINDS.TIP_DROP_FAILED)
+      .thenReturn('Retry dropping tip')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE, expect.any(String))
       .thenReturn('Cancel run')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
+      .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with new tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE)
+      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE, expect.any(String))
       .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
+      .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with same tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE)
+      .calledWith(
+        RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
+        expect.any(String)
+      )
       .thenReturn('Skip to next step with same tips')
   })
 
@@ -129,7 +136,6 @@ describe('SelectRecoveryOption', () => {
       ...props,
       errorKind: ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING,
     }
-
     renderSelectRecoveryOption(props)
 
     screen.getByText('Choose a recovery action')
@@ -212,6 +218,28 @@ describe('SelectRecoveryOption', () => {
       RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE
     )
   })
+
+  it('renders appropriate "Tip drop failed" copy and click behavior', () => {
+    props = {
+      ...props,
+      errorKind: ERROR_KINDS.TIP_DROP_FAILED,
+    }
+
+    renderSelectRecoveryOption(props)
+
+    screen.getByText('Choose a recovery action')
+
+    const retryDroppingTip = screen.getAllByRole('label', {
+      name: 'Retry dropping tip',
+    })
+
+    fireEvent.click(retryDroppingTip[0])
+    clickButtonLabeled('Continue')
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.RETRY_STEP.ROUTE
+    )
+  })
 })
 ;([
   ['desktop', renderDesktopRecoveryOptions] as const,
@@ -230,40 +258,53 @@ describe('SelectRecoveryOption', () => {
       )
 
       props = {
+        errorKind: ERROR_KINDS.GENERAL_ERROR,
         validRecoveryOptions: generalRecoveryOptions,
         setSelectedRoute: mockSetSelectedRoute,
         getRecoveryOptionCopy: mockGetRecoveryOptionCopy,
       }
 
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE)
+        .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, expect.any(String))
         .thenReturn('Retry step')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+        .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, ERROR_KINDS.TIP_DROP_FAILED)
+        .thenReturn('Retry dropping tip')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE, expect.any(String))
         .thenReturn('Cancel run')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
+        .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
         .thenReturn('Retry with new tips')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE)
+        .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE, expect.any(String))
         .thenReturn('Manually fill well and skip to next step')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
+        .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
         .thenReturn('Retry with same tips')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE)
+        .calledWith(
+          RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
+          expect.any(String)
+        )
         .thenReturn('Skip to next step with same tips')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE)
+        .calledWith(
+          RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+          expect.any(String)
+        )
         .thenReturn('Skip to next step with new tips')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE)
+        .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE, expect.any(String))
         .thenReturn('Ignore error and skip to next step')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE)
+        .calledWith(RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE, expect.any(String))
         .thenReturn('Manually move labware and skip to next step')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE)
+        .calledWith(
+          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+          expect.any(String)
+        )
         .thenReturn('Manually replace labware on deck and retry step')
     })
 
@@ -354,6 +395,24 @@ describe('SelectRecoveryOption', () => {
       screen.getByRole('label', { name: 'Cancel run' })
     })
 
+    it(`renders valid recovery options for a ${ERROR_KINDS.TIP_DROP_FAILED} errorKind`, () => {
+      props = {
+        ...props,
+        errorKind: ERROR_KINDS.TIP_DROP_FAILED,
+        validRecoveryOptions: TIP_DROP_FAILED_OPTIONS,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', {
+        name: 'Retry dropping tip',
+      })
+      screen.getByRole('label', {
+        name: 'Ignore error and skip to next step',
+      })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
+
     it(`renders valid recovery options for a ${ERROR_KINDS.GRIPPER_ERROR} errorKind`, () => {
       props = {
         ...props,
@@ -416,6 +475,13 @@ describe('getRecoveryOptions', () => {
       ERROR_KINDS.TIP_NOT_DETECTED
     )
     expect(overpressureWhileDispensingOptions).toBe(TIP_NOT_DETECTED_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.TIP_DROP_FAILED}`, () => {
+    const overpressureWhileDispensingOptions = getRecoveryOptions(
+      ERROR_KINDS.TIP_DROP_FAILED
+    )
+    expect(overpressureWhileDispensingOptions).toBe(TIP_DROP_FAILED_OPTIONS)
   })
 
   it(`returns valid options when the errorKind is ${ERROR_KINDS.GRIPPER_ERROR}`, () => {

@@ -35,9 +35,12 @@ export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
       errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_MISSING
     ) {
       return ERROR_KINDS.TIP_NOT_DETECTED
-    }
-    // TODO(jh 09-25-24): Update the error to match what the server actually sends when available.
-    else if (
+    } else if (
+      (commandType === 'dropTip' || commandType === 'dropTipInPlace') &&
+      errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED
+    ) {
+      return ERROR_KINDS.TIP_DROP_FAILED
+    } else if (
       commandType === 'moveLabware' &&
       errorType === DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT
     ) {
