@@ -25,7 +25,7 @@ export default defineConfig({
       input: {
         // Define multiple input HTML files
         main: path.resolve(__dirname, 'index.html'),
-        create: path.resolve(__dirname, 'create.html'),
+        create: path.resolve(__dirname, 'create/index.html'),
       },
     },
   },
