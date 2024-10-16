@@ -96,6 +96,7 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
             contents
           )}`
         )
+        log.info(`Enumerated ${path} with ${contents.length} results`)
         dispatch(robotMassStorageDeviceEnumerated(path, contents))
       })
       .then(() => path)
@@ -111,6 +112,9 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
         )
         const newlyAbsent = prevDirs.filter(
           entry => !sortedEntries.includes(entry)
+        )
+        log.info(
+          `rescan: newly present: ${newlyPresent} newly absent: ${newlyAbsent}`
         )
         return Promise.all([
           ...newlyAbsent.map(entry => {
@@ -130,6 +134,7 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
         ])
       })
       .then(present => {
+        log.info(`now present: ${present}`)
         prevDirs = present.filter((entry): entry is string => entry !== null)
       })
 

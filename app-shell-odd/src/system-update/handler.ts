@@ -150,6 +150,9 @@ export function registerUpdateDriver(upstreamDispatch: Dispatch): UpdateDriver {
               dispatchStaticUpdateData()
             })
         case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
+          log.info(
+            `mass storage device enumerated at ${action.payload.rootPath}`
+          )
           if (usbProviders[action.payload.rootPath] != null) {
             return new Promise(resolve => {
               resolve()
@@ -174,6 +177,7 @@ export function registerUpdateDriver(upstreamDispatch: Dispatch): UpdateDriver {
             })
 
         case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
+          log.info(`mass storage removed at ${action.payload.rootPath}`)
           const provider = usbProviders[action.payload.rootPath]
           if (provider != null) {
             return provider
