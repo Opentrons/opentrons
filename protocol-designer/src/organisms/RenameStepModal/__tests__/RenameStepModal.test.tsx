@@ -59,6 +59,6 @@ describe('EditNickNameModal', () => {
           'mockStepNameisthelongeststepnameihaveeverseen mockstepNameisthelongeststepnameihaveeverseen mockstepNameisthelongest',
       },
     })
-    screen.getByText('Step Names must be 115 characters or fewer.')
+    screen.getByText('Oops! Your step name is too long.')
   })
 })
