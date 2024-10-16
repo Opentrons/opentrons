@@ -32,13 +32,13 @@ SAME_TIP = True  # this is fine when using Ethanol (b/c is evaporates)
 RETURN_TIP = True
 NUM_TRIALS = 3
 DISPENSE_MM_FROM_MENISCUS = -0.5
-LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
+LABWARE = "nest_96_wellplate_2ml_deep"
 
 ASPIRATE_MM_FROM_MENISCUS = -1.5
 RESERVOIR = "opentrons_15_tuberack_nest_15ml_conical"
 
 LIQUID_MOUNT = "right"
-LIQUID_TIP_SIZE = 200
+LIQUID_TIP_SIZE = 1000
 LIQUID_PIPETTE_SIZE = 1000
 
 PROBING_MOUNT = "left"
@@ -262,7 +262,7 @@ def _test_for_finding_liquid_height(
                 _src_meniscus_height = src_well.depth - 1.0
             src_well_z_ul_per_mm = math.pi * math.pow(src_well.diameter * 0.5, 2)
             while need_to_transfer > 0.001:
-                transfer_vol = min(liquid_pipette.max_volume, need_to_transfer)
+                transfer_vol = min(liquid_pipette.max_volume * 0.9, need_to_transfer)
                 if not liquid_pipette.has_tip:
                     liquid_pipette.pick_up_tip(liq_tip)
                     # NOTE: only use new, dry tips to probe
