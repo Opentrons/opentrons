@@ -65,6 +65,11 @@
       "x": 0,
       "y": 0,
       "z": 8.193
+    },
+    "opentrons_flex_deck_riser": {
+      "x": 0,
+      "y": 0,
+      "z": 0
     }
   },
   "gripForce": 15,

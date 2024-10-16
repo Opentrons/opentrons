@@ -110,6 +110,7 @@ import opentronsFlex96Tiprack1000UlV1Uncasted from '../labware/definitions/2/ope
 import opentronsFlex96Tiprack200UlV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_200ul/1.json'
 import opentronsFlex96Tiprack50UlV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_50ul/1.json'
 import opentronsFlex96TiprackAdapterV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_adapter/1.json'
+import opentronsFlexDeckRiserV1Uncasted from '../labware/definitions/2/opentrons_flex_deck_riser/1.json'
 import opentronsFlexLidAbsorbancePlateReaderModuleV1Uncasted from '../labware/definitions/2/opentrons_flex_lid_absorbance_plate_reader_module/1.json'
 import opentronsToughPcrAutoSealingLidV1Uncasted from '../labware/definitions/2/opentrons_tough_pcr_auto_sealing_lid/1.json'
 import opentronsUniversalFlatAdapterV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter/1.json'
@@ -286,6 +287,7 @@ const opentronsFlex96Tiprack1000UlV1 = opentronsFlex96Tiprack1000UlV1Uncasted as
 const opentronsFlex96Tiprack200UlV1 = opentronsFlex96Tiprack200UlV1Uncasted as LabwareDefinition2
 const opentronsFlex96Tiprack50UlV1 = opentronsFlex96Tiprack50UlV1Uncasted as LabwareDefinition2
 const opentronsFlex96TiprackAdapterV1 = opentronsFlex96TiprackAdapterV1Uncasted as LabwareDefinition2
+const opentronsFlexDeckRiserV1 = opentronsFlexDeckRiserV1Uncasted as LabwareDefinition2
 const opentronsFlexLidAbsorbancePlateReaderModuleV1 = opentronsFlexLidAbsorbancePlateReaderModuleV1Uncasted as LabwareDefinition2
 const opentronsToughPcrAutoSealingLidV1 = opentronsToughPcrAutoSealingLidV1Uncasted as LabwareDefinition2
 const opentronsUniversalFlatAdapterV1 = opentronsUniversalFlatAdapterV1Uncasted as LabwareDefinition2
@@ -454,6 +456,7 @@ const latestDefs = {
   opentronsFlex96Tiprack200UlV1,
   opentronsFlex96Tiprack50UlV1,
   opentronsFlex96TiprackAdapterV1,
+  opentronsFlexDeckRiserV1,
   opentronsFlexLidAbsorbancePlateReaderModuleV1,
   opentronsToughPcrAutoSealingLidV1,
   opentronsUniversalFlatAdapterV1,
