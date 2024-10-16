@@ -25,6 +25,7 @@ import {
 } from './notifications'
 import { setUserDataPath } from './early'
 
+import type { OTLogger } from './log'
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch, Logger } from './types'
 import type { LogEntry } from 'winston'
@@ -148,7 +149,7 @@ function startUp(): void {
   })
 }
 
-function createRendererLogger(): Logger {
+function createRendererLogger(): OTLogger {
   log.info('Creating renderer logger')
 
   const logger = createLogger('renderer')
