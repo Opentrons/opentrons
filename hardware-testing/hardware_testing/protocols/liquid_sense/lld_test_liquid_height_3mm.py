@@ -276,7 +276,7 @@ def _test_for_finding_liquid_height(
                     liquid_pipette.aspirate().blow_out().prepare_to_aspirate()
                 # aspirate
                 meniscus_shift_mm = transfer_vol / src_well_z_ul_per_mm
-                _src_meniscus_height -= meniscus_shift_mm
+                _src_meniscus_height -= meniscus_shift_mm * 1.2  # tube has draft
                 asp_mm = max(_src_meniscus_height + ASPIRATE_MM_FROM_MENISCUS, 2)
                 liquid_pipette.aspirate(transfer_vol, src_well.bottom(asp_mm))
                 need_to_transfer -= transfer_vol
@@ -289,10 +289,12 @@ def _test_for_finding_liquid_height(
                 liquid_pipette.move_to(src_well.bottom(_src_meniscus_height + 5))
                 ctx.delay(seconds=1.5)
                 liquid_pipette.touch_tip(src_well, speed=30)
-                if transfer_vol <= 195:
+                did_air_gap = False
+                if transfer_vol <= liquid_pipette.max_volume - 5:
                     liquid_pipette.aspirate(5, src_well.top(2))
+                    did_air_gap = True
                 # dispense
-                if transfer_vol <= 195:
+                if did_air_gap:
                     liquid_pipette.dispense(5, well.top(5))
                 if volume < well.max_volume * 0.5:
                     dispense_loc = well.bottom(3 + DISPENSE_MM_FROM_MENISCUS)
