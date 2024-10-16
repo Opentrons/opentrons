@@ -254,25 +254,40 @@ def _test_for_finding_liquid_height(
             liquid_pipette.flow_rate.blow_out = 100
             # transfer over and over until all volume is moved
             need_to_transfer = float(volume)
-            src_meniscus_height = well.depth - 1.0
-            src_well_z_ul_per_mm = math.pi * math.pow(well.diameter * 0.5, 2)
+            src_meniscus_height = src_well.depth - 1.0
+            src_well_z_ul_per_mm = math.pi * math.pow(src_well.diameter * 0.5, 2)
             while need_to_transfer > 0.001:
                 transfer_vol = min(liquid_pipette.max_volume, need_to_transfer)
                 if not liquid_pipette.has_tip:
                     liquid_pipette.pick_up_tip(liq_tip)
                     # NOTE: only use new, dry tips to probe
-                    src_meniscus_height = liquid_pipette.measure_liquid_height(src_well)
-                    src_meniscus_height -= src_well.bottom().point.z
+                    if not ctx.is_simulating():
+                        src_meniscus_height = liquid_pipette.measure_liquid_height(
+                            src_well
+                        )
+                        src_meniscus_height -= src_well.bottom().point.z
                 else:
                     # try and get any remaining droplets out of the way
                     liquid_pipette.move_to(src_well.top(10))
                     liquid_pipette.aspirate().blow_out().prepare_to_aspirate()
+                # aspirate
                 asp_mm = max(src_meniscus_height + ASPIRATE_MM_FROM_MENISCUS, 2)
                 liquid_pipette.aspirate(transfer_vol, src_well.bottom(asp_mm))
-                src_meniscus_height -= transfer_vol / src_well_z_ul_per_mm
+                meniscus_shift_mm = transfer_vol / src_well_z_ul_per_mm
+                src_meniscus_height -= meniscus_shift_mm
                 need_to_transfer -= transfer_vol
+                ctx.comment(
+                    f"aspirated {round(transfer_vol, 2)} from src, "
+                    f"removed {round(meniscus_shift_mm, 2)} mm, "
+                    f"now is {round(src_meniscus_height, 2)} mm tall"
+                )
+                liquid_pipette.move_to(src_well.bottom(src_meniscus_height + 5))
+                ctx.delay(seconds=1.5)
+                liquid_pipette.touch_tip(src_well, speed=30)
                 if transfer_vol <= 195:
                     liquid_pipette.aspirate(5, src_well.top(2))
+                # dispense
+                if transfer_vol <= 195:
                     liquid_pipette.dispense(5, well.top(5))
                 if volume < well.max_volume * 0.5:
                     dispense_loc = well.bottom(3 + DISPENSE_MM_FROM_MENISCUS)
