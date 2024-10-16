@@ -22,12 +22,11 @@ import {
 import type { StepFormProps } from '../../types'
 
 export function MixTools(props: StepFormProps): JSX.Element {
+  const { propsForFields, formData, toolboxStep } = props
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)
   const { t } = useTranslation(['application', 'form'])
-
-  const { propsForFields, formData, toolboxStep } = props
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
