@@ -21,6 +21,13 @@ export default defineConfig({
   build: {
     // Relative to the root
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        // Define multiple input HTML files
+        main: path.resolve(__dirname, 'index.html'),
+        create: path.resolve(__dirname, 'create.html'),
+      },
+    },
   },
   plugins: [
     react({
