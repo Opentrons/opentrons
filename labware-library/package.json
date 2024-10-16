@@ -24,7 +24,8 @@
     "@types/mixpanel-browser": "^2.35.6",
     "@types/query-string": "6.2.0",
     "@types/webpack-env": "^1.16.0",
-    "@types/yup": "0.29.11"
+    "@types/yup": "0.29.11",
+    "vite-plugin-css-modules": "^0.0.1"
   },
   "dependencies": {
     "@opentrons/components": "link:../components",
