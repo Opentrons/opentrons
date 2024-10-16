@@ -73,7 +73,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.file_provider.fastapi_dependencies import (
-    get_file_provider,
+    get_file_provider_wrapper,
 )
 from robot_server.file_provider.provider import FileProviderWrapper
 from opentrons.protocol_engine.resources.file_provider import FileProvider
@@ -192,7 +192,7 @@ async def create_run(  # noqa: C901
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
-    file_provider_wrapper: Annotated[FileProviderWrapper, Depends(get_file_provider)],
+    file_provider_wrapper: Annotated[FileProviderWrapper, Depends(get_file_provider_wrapper)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:

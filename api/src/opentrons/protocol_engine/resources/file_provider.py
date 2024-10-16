@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, cast, Callable, Awaitable, Dict
 
+
 MAXIMUM_CSV_FILE_LIMIT = 40
 
 
@@ -74,7 +75,7 @@ class PlateReaderDataTransform:
         for i in range(3):
             rows.append([""])
         # line 13
-        rows[12] = ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+        rows.append(["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
         # lines 14 through 21
         for i in range(8):
             row = [plate_alpharows[i]]
@@ -164,7 +165,7 @@ class FileProvider:
     def __init__(
         self,
         data_files_write_csv_callback: Optional[
-            Callable[[GenericCsvTransform], None]
+            Callable[[GenericCsvTransform], Awaitable[None]]
         ] = None,
         data_files_filecount: Optional[Callable[[], Awaitable[int]]] = None,
     ) -> None:
@@ -185,4 +186,4 @@ class FileProvider:
                     f"Not enough space to store file {write_data.filename}."
                 )
             if self._data_files_write_csv_callback is not None:
-                self._data_files_write_csv_callback(write_data)
+                await self._data_files_write_csv_callback(write_data)

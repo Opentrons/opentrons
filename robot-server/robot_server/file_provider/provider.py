@@ -1,4 +1,5 @@
 """Wrapper to provide the callbacks utilized by the Protocol Engine File Provider."""
+import os
 import asyncio
 import csv
 from pathlib import Path
@@ -39,6 +40,7 @@ class FileProviderWrapper:
         """Write the provided data transform to a CSV file."""
         async with self._lock:
             file_id = await get_unique_id()
+            os.makedirs(os.path.dirname(self._data_files_directory / file_id / csv_data.filename), exist_ok=True)
             with open(
                 file=self._data_files_directory / file_id / csv_data.filename,
                 mode="w",
@@ -46,7 +48,7 @@ class FileProviderWrapper:
             ) as csvfile:
                 writer = csv.writer(csvfile, delimiter=csv_data.delimiter)
                 writer.writerows(csv_data.rows)
-
+            
             created_at = await get_current_time()
             # TODO (cb, 10-14-24): Engine created files do not currently get a file_hash, unlike explicitly uploaded files. Do they need one?
             file_info = DataFileInfo(
