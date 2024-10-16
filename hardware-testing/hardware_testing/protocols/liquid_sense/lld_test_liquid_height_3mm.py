@@ -1,4 +1,5 @@
 """Measure Liquid Height 3mm."""
+import math
 from typing import List, Tuple, Optional
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -253,20 +254,22 @@ def _test_for_finding_liquid_height(
             liquid_pipette.flow_rate.blow_out = 100
             # transfer over and over until all volume is moved
             need_to_transfer = float(volume)
+            src_meniscus_height = well.depth - 1.0
+            src_well_z_ul_per_mm = math.pi * math.pow(well.diameter * 0.5, 2)
             while need_to_transfer > 0.001:
                 transfer_vol = min(liquid_pipette.max_volume, need_to_transfer)
                 if not liquid_pipette.has_tip:
                     liquid_pipette.pick_up_tip(liq_tip)
+                    # NOTE: only use new, dry tips to probe
+                    src_meniscus_height = liquid_pipette.measure_liquid_height(src_well)
+                    src_meniscus_height -= src_well.bottom().point.z
                 else:
                     # try and get any remaining droplets out of the way
                     liquid_pipette.move_to(src_well.top(10))
-                    liquid_pipette.aspirate().dispense().prepare_to_aspirate()
-                src_meniscus_height = liquid_pipette.measure_liquid_height(src_well)
-                src_meniscus_height -= src_well.bottom().point.z
-                liquid_pipette.aspirate(
-                    transfer_vol,
-                    src_well.bottom(src_meniscus_height + ASPIRATE_MM_FROM_MENISCUS),
-                )
+                    liquid_pipette.aspirate().blow_out().prepare_to_aspirate()
+                asp_mm = max(src_meniscus_height + ASPIRATE_MM_FROM_MENISCUS, 2)
+                liquid_pipette.aspirate(transfer_vol, src_well.bottom(asp_mm))
+                src_meniscus_height -= transfer_vol / src_well_z_ul_per_mm
                 need_to_transfer -= transfer_vol
                 if transfer_vol <= 195:
                     liquid_pipette.aspirate(5, src_well.top(2))
@@ -291,17 +294,18 @@ def _test_for_finding_liquid_height(
             )  # some obviously fake number so we know it failed
         corrected_height = height + tip_z_error
         all_corrected_heights.append(corrected_height)
-        # drop all tips
+        # drop tips
         if not SAME_TIP:
             if liquid_pipette.has_tip:
                 if RETURN_TIP:
                     liquid_pipette.return_tip()
                 else:
                     liquid_pipette.drop_tip()
-            if RETURN_TIP:
-                probing_pipette.return_tip()
-            else:
-                probing_pipette.drop_tip()
+        # NOTE: always return probing tip, b/c it must be dry
+        if RETURN_TIP:
+            probing_pipette.return_tip()
+        else:
+            probing_pipette.drop_tip()
         # save data
         trial_data = [trial_counter, volume, height, tip_z_error, corrected_height]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
