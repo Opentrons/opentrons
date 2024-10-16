@@ -21,9 +21,9 @@ import {
 } from '../../../../../../molecules'
 import {
   BlowoutLocationField,
-  BlowoutZOffsetField,
+  BlowoutOffsetField,
   ChangeTipField,
-  DisposalVolumeField,
+  DisposalField,
   DropTipField,
   FlowRateField,
   LabwareField,
@@ -31,12 +31,12 @@ import {
   PathField,
   PickUpTipField,
   PipetteField,
-  TipPositionField,
+  PositionField,
   TiprackField,
   TipWellSelectionField,
   VolumeField,
-  WellOrderField,
   WellSelectionField,
+  WellsOrderField,
 } from '../../PipetteFields'
 import {
   getBlowoutLocationOptionsForForm,
@@ -207,7 +207,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
       </Flex>
       <Divider marginY="0" />
       {hideWellOrderField ? null : (
-        <WellOrderField
+        <WellsOrderField
           prefix={tab}
           updateFirstWellOrder={
             propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
@@ -222,7 +222,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         />
       )}
       <Divider marginY="0" />
-      <TipPositionField
+      <PositionField
         prefix={tab}
         propsForFields={propsForFields}
         zField={`${tab}_mmFromBottom`}
@@ -314,7 +314,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
                 {...propsForFields[`${tab}_delay_seconds`]}
                 units={t('application:units.seconds')}
               />
-              <TipPositionField
+              <PositionField
                 prefix={tab}
                 propsForFields={propsForFields}
                 zField={`${tab}_delay_mmFromBottom`}
@@ -359,7 +359,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
                   volume={propsForFields.volume?.value ?? 0}
                   tiprack={propsForFields.tipRack.value}
                 />
-                <BlowoutZOffsetField
+                <BlowoutOffsetField
                   {...propsForFields.blowout_z_offset}
                   sourceLabwareId={propsForFields.aspirate_labware.value}
                   destLabwareId={propsForFields.dispense_labware.value}
@@ -381,7 +381,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           }
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
-            <TipPositionField
+            <PositionField
               prefix={tab}
               propsForFields={propsForFields}
               zField={`${tab}_touchTip_mmFromBottom`}
@@ -417,7 +417,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           ) : null}
         </CheckboxExpandStepFormField>
         {path === 'multiDispense' && tab === 'dispense' && (
-          <DisposalVolumeField
+          <DisposalField
             aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
             aspirate_airGap_volume={formData.aspirate_airGap_volume}
             path={formData.path}

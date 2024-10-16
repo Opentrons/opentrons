@@ -11,12 +11,12 @@ import {
 } from '../../../../../molecules'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { FlowRateField } from './FlowRateField'
-import { BlowoutZOffsetField } from './BlowoutZOffsetField'
+import { BlowoutOffsetField } from './BlowoutOffsetField'
 
 import type { PathOption, StepType } from '../../../../../form-types'
 import type { FieldPropsByName } from '../types'
 
-interface DisposalVolumeFieldProps {
+interface DisposalFieldProps {
   path: PathOption
   pipette: string | null
   propsForFields: FieldPropsByName
@@ -27,9 +27,7 @@ interface DisposalVolumeFieldProps {
   tipRack?: string | null
 }
 
-export const DisposalVolumeField = (
-  props: DisposalVolumeFieldProps
-): JSX.Element => {
+export const DisposalField = (props: DisposalFieldProps): JSX.Element => {
   const {
     path,
     stepType,
@@ -104,7 +102,7 @@ export const DisposalVolumeField = (
             volume={propsForFields.volume?.value ?? 0}
             tiprack={propsForFields.tipRack.value}
           />
-          <BlowoutZOffsetField
+          <BlowoutOffsetField
             {...propsForFields.blowout_z_offset}
             sourceLabwareId={propsForFields.aspirate_labware.value}
             destLabwareId={propsForFields.dispense_labware.value}

@@ -25,7 +25,7 @@ import type {
 } from '../../../../../form-types'
 import type { FieldPropsByName } from '../types'
 import type { PositionSpecs } from '../../../../../components/StepEditForm/fields/TipPositionField/TipPositionModal'
-interface TipPositionFieldProps {
+interface PositionFieldProps {
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   zField: TipZOffsetFields
@@ -34,7 +34,7 @@ interface TipPositionFieldProps {
   labwareId?: string | null
 }
 
-export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
+export function PositionField(props: PositionFieldProps): JSX.Element {
   const { labwareId, propsForFields, zField, xField, yField, prefix } = props
   const {
     name: zName,

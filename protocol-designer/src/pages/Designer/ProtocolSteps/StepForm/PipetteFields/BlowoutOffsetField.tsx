@@ -16,14 +16,14 @@ import { ZTipPositionModal } from '../../../../../components/StepEditForm/fields
 import { getLabwareEntities } from '../../../../../step-forms/selectors'
 import type { FieldProps } from '../types'
 
-interface BlowoutZOffsetFieldProps extends FieldProps {
+interface BlowoutOffsetFieldProps extends FieldProps {
   destLabwareId: unknown
   sourceLabwareId?: unknown
   blowoutLabwareId?: unknown
 }
 
-export function BlowoutZOffsetField(
-  props: BlowoutZOffsetFieldProps
+export function BlowoutOffsetField(
+  props: BlowoutOffsetFieldProps
 ): JSX.Element {
   const {
     disabled,

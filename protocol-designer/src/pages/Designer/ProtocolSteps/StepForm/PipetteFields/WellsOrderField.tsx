@@ -14,7 +14,7 @@ import { WellOrderModal } from '../../../../../components/StepEditForm/fields/We
 import type { WellOrderOption } from '../../../../../form-types'
 import type { FieldProps } from '../types'
 
-export interface WellOrderFieldProps {
+export interface WellsOrderFieldProps {
   prefix: 'aspirate' | 'dispense' | 'mix'
   firstName: string
   secondName: string
@@ -24,7 +24,7 @@ export interface WellOrderFieldProps {
   secondValue?: WellOrderOption | null
 }
 
-export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
+export const WellsOrderField = (props: WellsOrderFieldProps): JSX.Element => {
   const {
     firstValue,
     secondValue,
