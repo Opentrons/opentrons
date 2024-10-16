@@ -32,14 +32,16 @@ SAME_TIP = True  # this is fine when using Ethanol (b/c is evaporates)
 RETURN_TIP = True
 NUM_TRIALS = 3
 DISPENSE_MM_FROM_MENISCUS = -0.5
-LABWARE = "nest_96_wellplate_2ml_deep"
+LABWARE = "nest_12_reservoir_15ml"
 
 ASPIRATE_MM_FROM_MENISCUS = -1.5
-RESERVOIR = "opentrons_15_tuberack_nest_15ml_conical"
+# RESERVOIR = "opentrons_15_tuberack_nest_15ml_conical"
+RESERVOIR = "nest_1_reservoir_195ml"
 
 LIQUID_MOUNT = "right"
 LIQUID_TIP_SIZE = 1000
 LIQUID_PIPETTE_SIZE = 1000
+LIQUID_CHANNELS = 8
 
 PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
@@ -106,7 +108,7 @@ def _setup(
     probing_rack_name = f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL"
     probing_rack = ctx.load_labware(probing_rack_name, SLOT_PROBING_TIPRACK)
 
-    liquid_pip_name = f"flex_1channel_{LIQUID_PIPETTE_SIZE}"
+    liquid_pip_name = f"flex_{LIQUID_CHANNELS}channel_{LIQUID_PIPETTE_SIZE}"
     liquid_pipette = ctx.load_instrument(liquid_pip_name, LIQUID_MOUNT)
     probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
     probing_pipette = ctx.load_instrument(probing_pip_name, PROBING_MOUNT)
@@ -257,12 +259,15 @@ def _test_for_finding_liquid_height(
             )
             liquid_pipette.flow_rate.blow_out = 100
             # transfer over and over until all volume is moved
-            need_to_transfer = float(volume)
+            need_to_transfer_per_ch = volume / liquid_pipette.channels
             if _src_meniscus_height is None:
                 _src_meniscus_height = src_well.depth - 1.0
-            src_well_z_ul_per_mm = math.pi * math.pow(src_well.diameter * 0.5, 2)
-            while need_to_transfer > 0.001:
-                transfer_vol = min(liquid_pipette.max_volume * 0.9, need_to_transfer)
+            if src_well.diameter:
+                src_well_z_ul_per_mm = math.pi * math.pow(src_well.diameter * 0.5, 2)
+            else:
+                src_well_z_ul_per_mm = src_well.width * src_well.length
+            while need_to_transfer_per_ch > 0.001:
+                transfer_vol = min(liquid_pipette.max_volume * 0.9, need_to_transfer_per_ch)
                 if not liquid_pipette.has_tip:
                     liquid_pipette.pick_up_tip(liq_tip)
                     # NOTE: only use new, dry tips to probe
@@ -279,7 +284,7 @@ def _test_for_finding_liquid_height(
                 _src_meniscus_height -= meniscus_shift_mm * 1.2  # tube has draft
                 asp_mm = max(_src_meniscus_height + ASPIRATE_MM_FROM_MENISCUS, 2)
                 liquid_pipette.aspirate(transfer_vol, src_well.bottom(asp_mm))
-                need_to_transfer -= transfer_vol
+                need_to_transfer_per_ch -= transfer_vol
                 ctx.comment(
                     f"Aspirated {round(transfer_vol, 2)} from src, "
                     f"removed {round(meniscus_shift_mm, 2)} mm, "
