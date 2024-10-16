@@ -26,7 +26,7 @@ import type {
 import type { FieldPropsByName } from '../types'
 import type { PositionSpecs } from '../../../../../components/StepEditForm/fields/TipPositionField/TipPositionModal'
 interface PositionFieldProps {
-  prefix: 'aspirate' | 'dispense'
+  prefix: 'aspirate' | 'dispense' | 'mix'
   propsForFields: FieldPropsByName
   zField: TipZOffsetFields
   xField?: TipXOffsetFields

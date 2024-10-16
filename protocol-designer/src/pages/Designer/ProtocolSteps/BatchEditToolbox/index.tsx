@@ -91,7 +91,7 @@ export const BatchEditToolbox = (): JSX.Element | null => {
           {stepType === 'moveLiquid' ? (
             <BatchEditMoveLiquidTools propsForFields={propsForFields} />
           ) : (
-            <BatchEditMixTools />
+            <BatchEditMixTools propsForFields={propsForFields} />
           )}
         </Toolbox>
       )
