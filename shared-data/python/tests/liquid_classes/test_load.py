@@ -1,6 +1,7 @@
 import json
 
 from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.liquid_classes import load_definition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
@@ -14,3 +15,9 @@ def test_load_liquid_class_schema_v1() -> None:
     )
     expected_liquid_class_def = json.loads(fixture_data)
     assert liquid_class_def_from_model == expected_liquid_class_def
+
+
+def test_load_definition() -> None:
+    assert load_definition("fixture_glycerol50") == json.loads(
+        load_shared_data("liquid-class/fixtures/fixture_glycerol50.json")
+    )
