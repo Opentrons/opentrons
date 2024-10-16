@@ -124,7 +124,6 @@
   "tip_pick_up_instructions": "<block>Using the controls below or your keyboard, jog the pipette until the nozzle closest to you is centered above the A1 position and level with the top of the tip.</block><br/><block>When the pipette is properly aligned, pick up the tip.</block>",
   "title": "robot calibration",
   "to_check": "To check the {{mount}} pipette:",
-  "unexpected_error": "An unexpected error has occurred. If the issue persists, contact customer support for assistance.",
   "unknown_custom_tiprack": "unknown custom tip rack",
   "use_calibration_block": "Use Calibration Block",
   "use_trash_bin": "Use trash bin",

@@ -34,7 +34,7 @@ export function useCalibrationError(
   requestIds: string[],
   sessionId: string | undefined
 ): UseCalibrationErrorInfoResult {
-  const { t } = useTranslation('robot_calibration')
+  const { t } = useTranslation(['robot_calibration', 'branded'])
   const dispatch = useDispatch()
 
   // Dismiss all network requests during a unique session to prevent stale error state.
@@ -53,19 +53,25 @@ export function useCalibrationError(
     const erroredReq = erroredReqs[0]
     if (erroredReq != null && erroredReq.status === 'failure') {
       if ('errors' in erroredReq.error) {
-        const title = erroredReq.error.errors[0].title ?? (t('error') as string)
+        const title =
+          erroredReq.error.errors[0].title ??
+          (t('robot_calibration:error') as string)
         const subText =
-          erroredReq.error.errors[0].detail ?? (t('unexpected_error') as string)
+          erroredReq.error.errors[0].detail ??
+          (t('branded:unexpected_error') as string)
 
         return { title, subText }
       } else if ('message' in erroredReq.error) {
-        const title = t('error')
+        const title = t('robot_calibration:error')
         const subText =
-          erroredReq.error.message ?? (t('unexpected_error') as string)
+          erroredReq.error.message ?? (t('branded:unexpected_error') as string)
 
         return { title, subText }
       } else {
-        return { title: t('error'), subText: t('unexpected_error') }
+        return {
+          title: t('robot_calibration:error'),
+          subText: t('branded:unexpected_error'),
+        }
       }
     }
   }

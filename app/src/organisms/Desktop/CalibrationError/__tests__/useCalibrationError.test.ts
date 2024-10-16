@@ -74,7 +74,10 @@ describe('useCalibrationError', () => {
     const { result } = renderHook(() =>
       useCalibrationError(mockRequestIds, mockSessionId)
     )
-    expect(result.current).toEqual({ title: 'error', subText: 'Test Message' })
+    expect(result.current).toEqual({
+      title: 'robot_calibration:error',
+      subText: 'Test Message',
+    })
   })
 
   it('should return default error info when error details are missing', () => {
@@ -89,8 +92,8 @@ describe('useCalibrationError', () => {
       useCalibrationError(mockRequestIds, mockSessionId)
     )
     expect(result.current).toEqual({
-      title: 'error',
-      subText: 'unexpected_error',
+      title: 'robot_calibration:error',
+      subText: 'branded:unexpected_error',
     })
   })
 })
