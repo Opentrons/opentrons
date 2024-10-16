@@ -10,6 +10,10 @@ import { mockPipetteOffsetCalibrationSessionAttributes } from '/app/redux/sessio
 import { CalibratePipetteOffset } from '../index'
 import type { PipetteOffsetCalibrationStep } from '/app/redux/sessions/types'
 import type { DispatchRequestsType } from '/app/redux/robot-api'
+import {
+  useCalibrationError,
+  CalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
@@ -20,6 +24,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 })
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/organisms/Desktop/CalibrationError')
 vi.mock('/app/redux/config')
 
 interface CalibratePipetteOffsetSpec {
@@ -46,6 +51,7 @@ describe('CalibratePipetteOffset', () => {
         dispatchRequests={dispatchRequests}
         showSpinner={showSpinner}
         isJogging={isJogging}
+        requestIds={[]}
       />,
       { i18nInstance: i18n }
     )
@@ -73,6 +79,10 @@ describe('CalibratePipetteOffset', () => {
   beforeEach(() => {
     dispatchRequests = vi.fn()
     when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
+    vi.mocked(useCalibrationError).mockReturnValue(null)
+    vi.mocked(CalibrationError).mockReturnValue(
+      <div>MOCK_CALIBRATION_ERROR</div>
+    )
 
     mockPipOffsetCalSession = {
       id: 'fake_session_id',
@@ -174,5 +184,16 @@ describe('CalibratePipetteOffset', () => {
         data: { vector: [0, -0.1, 0] },
       })
     )
+  })
+
+  it('renders an error modal if there is an error', () => {
+    vi.mocked(useCalibrationError).mockReturnValue({
+      title: 'test',
+      subText: 'test',
+    })
+
+    render()
+
+    screen.getByText('MOCK_CALIBRATION_ERROR')
   })
 })
