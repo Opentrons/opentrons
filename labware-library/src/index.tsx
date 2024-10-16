@@ -30,7 +30,9 @@ const Root = (): JSX.Element => (
 )
 
 if ($root.hasChildNodes()) {
+  console.log('hydrating')
   hydrate(<Root />, $root)
 } else {
+  console.log('rendering')
   render(<Root />, $root)
 }
