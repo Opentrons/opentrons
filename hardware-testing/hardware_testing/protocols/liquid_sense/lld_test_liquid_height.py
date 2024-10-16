@@ -20,6 +20,8 @@ VOLUMES = {
     "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [0],
     "nest_12_reservoir_15ml": [0],
 }
+SAME_TIP = True
+RETURN_TIP = True
 NUM_TRIALS = 12
 DISPENSE_MM_FROM_BOTTOM = 2
 LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
@@ -204,13 +206,6 @@ def _get_tip_z_error(
     return z_error * -1.0
 
 
-def _get_height_of_liquid_in_well(
-    pipette: InstrumentContext,
-    well: Well,
-) -> float:
-    return pipette.measure_liquid_height(well) - well.bottom().point.z
-
-
 def _test_for_finding_liquid_height(
     ctx: ProtocolContext,
     volume: float,
@@ -234,29 +229,42 @@ def _test_for_finding_liquid_height(
     for liq_tip, probe_tip, well in zip(liquid_tips, probing_tips, wells):
         trial_counter += 1
         # pickup probing tip, then measure Z-error
-        probing_pipette.pick_up_tip(probe_tip)
+        if not probing_pipette.has_tip:
+            probing_pipette.pick_up_tip(probe_tip)
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
         if volume:
-            # pickup liquid tip, then immediately transfer liquid
-            liquid_pipette.pick_up_tip(liq_tip)
-            liquid_pipette.flow_rate.aspirate = max(volume, 10)
+            if not liquid_pipette.has_tip:
+                liquid_pipette.pick_up_tip(liq_tip)
+            # set flow-rates
+            liquid_pipette.flow_rate.aspirate = max(
+                min(liquid_pipette.max_volume, volume), 10
+            )
             liquid_pipette.flow_rate.dispense = min(
                 liquid_pipette.flow_rate.aspirate, 50
             )
             liquid_pipette.flow_rate.blow_out = 100
-            liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
-            if volume <= 195:
-                liquid_pipette.aspirate(5, src_well.top(2))
-                liquid_pipette.dispense(5, well.top(5))
-            liquid_pipette.dispense(volume, well.bottom(DISPENSE_MM_FROM_BOTTOM))
-            ctx.delay(seconds=1.5)
-            liquid_pipette.move_to(well.top())
-            ctx.delay(seconds=1.5)
-            liquid_pipette.blow_out(well.top())
-            ctx.delay(seconds=1.5)
-            liquid_pipette.prepare_to_aspirate()
+            # transfer over and over until all volume is moved
+            need_to_transfer = float(volume)
+            while need_to_transfer > 0.001:
+                transfer_vol = min(liquid_pipette.max_volume, need_to_transfer)
+                liquid_pipette.aspirate(
+                    transfer_vol, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM)
+                )
+                need_to_transfer -= transfer_vol
+                if transfer_vol <= 195:
+                    liquid_pipette.aspirate(5, src_well.top(2))
+                    liquid_pipette.dispense(5, well.top(5))
+                liquid_pipette.dispense(
+                    transfer_vol, well.bottom(DISPENSE_MM_FROM_BOTTOM)
+                )
+                ctx.delay(seconds=1.5)
+                liquid_pipette.move_to(well.top())
+                ctx.delay(seconds=1.5)
+                liquid_pipette.blow_out(well.top())
+                ctx.delay(seconds=1.5)
+                liquid_pipette.prepare_to_aspirate()
             # get height of liquid
-            height = _get_height_of_liquid_in_well(probing_pipette, well)
+            height = probing_pipette.measure_liquid_height(well) - well.bottom().point.z
         else:
             is_empty = not probing_pipette.detect_liquid_presence(well)
             height = (
@@ -265,9 +273,16 @@ def _test_for_finding_liquid_height(
         corrected_height = height + tip_z_error
         all_corrected_heights.append(corrected_height)
         # drop all tips
-        if volume:
-            liquid_pipette.drop_tip()
-        probing_pipette.drop_tip()
+        if not SAME_TIP:
+            if liquid_pipette.has_tip:
+                if RETURN_TIP:
+                    liquid_pipette.return_tip()
+                else:
+                    liquid_pipette.drop_tip()
+            if RETURN_TIP:
+                probing_pipette.return_tip()
+            else:
+                probing_pipette.drop_tip()
         # save data
         trial_data = [trial_counter, volume, height, tip_z_error, corrected_height]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
