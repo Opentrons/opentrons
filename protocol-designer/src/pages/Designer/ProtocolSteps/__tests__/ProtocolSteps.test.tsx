@@ -14,6 +14,7 @@ import { SubstepsToolbox, TimelineToolbox } from '../Timeline'
 vi.mock('../../Offdeck')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../ui/steps/selectors')
+vi.mock('../../../../ui/labware/selectors')
 vi.mock('../StepForm')
 vi.mock('../../DeckSetup')
 vi.mock('../Timeline')

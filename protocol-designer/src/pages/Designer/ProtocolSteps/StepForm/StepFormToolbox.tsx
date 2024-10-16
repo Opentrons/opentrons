@@ -9,6 +9,7 @@ import {
   COLORS,
   Flex,
   Icon,
+  POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
   SecondaryButton,
@@ -139,6 +140,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   return (
     <>
       <Toolbox
+        position={POSITION_RELATIVE}
         subHeader={
           isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
