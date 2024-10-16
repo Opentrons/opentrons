@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Flex, Icon, StyledText, COLORS, BORDERS } from '@opentrons/components'
 
 interface AccordionProps {
-  id: string
+  id?: string
   handleClick: () => void
   heading: string
   isOpen?: boolean
