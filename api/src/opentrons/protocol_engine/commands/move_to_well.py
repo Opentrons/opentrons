@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import DeckPoint, WellOrigin
+from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
@@ -56,11 +56,12 @@ class MoveToWellImplementation(
 
         state_update = update_types.StateUpdate()
 
-        if (self._state_view.labware.is_tiprack(labware_id)) and (
-            well_location.origin == WellOrigin.MENISCUS or well_location.volumeOffset
+        if (
+            self._state_view.labware.is_tiprack(labware_id)
+            and well_location.volumeOffset
         ):
             raise LabwareIsTipRackError(
-                "Cannot specify a WellLocation with an origin of MENISCUS or any volumeOffset with movement to a tip rack"
+                "Cannot specify a WellLocation with a volumeOffset with movement to a tip rack"
             )
 
         x, y, z = await self._movement.move_to_well(

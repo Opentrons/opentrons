@@ -4,7 +4,6 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import (
     WellLocation,
-    WellOrigin,
     WellOffset,
     DeckPoint,
     errors,
@@ -71,32 +70,6 @@ async def test_move_to_well_implementation(
             )
         ),
     )
-
-
-async def test_move_to_well_with_tip_rack_and_meniscus(
-    decoy: Decoy,
-    mock_state_view: StateView,
-    movement: MovementHandler,
-) -> None:
-    """It should disallow movement to a tip rack when MENISCUS is specified."""
-    subject = MoveToWellImplementation(state_view=mock_state_view, movement=movement)
-
-    data = MoveToWellParams(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-        wellLocation=WellLocation(
-            origin=WellOrigin.MENISCUS, offset=WellOffset(x=1, y=2, z=3)
-        ),
-        forceDirect=True,
-        minimumZHeight=4.56,
-        speed=7.89,
-    )
-
-    decoy.when(mock_state_view.labware.is_tiprack("123")).then_return(True)
-
-    with pytest.raises(errors.LabwareIsTipRackError):
-        await subject.execute(data)
 
 
 async def test_move_to_well_with_tip_rack_and_volume_offset(
