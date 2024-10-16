@@ -299,7 +299,7 @@ export const generateNewProtocol: (
 })
 
 export interface RenameStepAction {
-  type: 'CHANGE_FORM_INPUT'
+  type: 'CHANGE_STEP_DETAILS'
   payload: {
     stepId?: string
     update: Partial<Record<StepFieldName, unknown | null>>
@@ -309,6 +309,6 @@ export interface RenameStepAction {
 export const renameStep: (
   payload: RenameStepAction['payload']
 ) => RenameStepAction = payload => ({
-  type: 'CHANGE_FORM_INPUT',
+  type: 'CHANGE_STEP_DETAILS',
   payload,
 })

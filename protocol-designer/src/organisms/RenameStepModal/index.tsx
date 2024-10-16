@@ -22,7 +22,7 @@ import { getTopPortalEl } from '../../components/portals/TopPortal'
 import { renameStep } from '../../labware-ingred/actions'
 import type { FormData } from '../../form-types'
 
-const MAX_STEP_NAME_LENGTH = 115
+const MAX_STEP_NAME_LENGTH = 60
 interface RenameStepModalProps {
   formData: FormData
   onClose: () => void
