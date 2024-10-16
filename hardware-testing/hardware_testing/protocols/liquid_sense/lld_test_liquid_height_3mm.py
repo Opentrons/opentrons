@@ -20,17 +20,21 @@ VOLUMES_3MM_TOP_BOTTOM = {
     "corning_96_wellplate_360ul_flat": [0, 97.2, 257.1],
     "armadillo_96_wellplate_200ul_pcr_full_skirt": [0, 14.3, 150.2],
     "nest_96_wellplate_2ml_deep": [0, 118.3, 2060.4],
-    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [0, 158.1, 56267.2],  # 50mL tubes only
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [
+        0,
+        158.1,
+        56267.2,
+    ],  # 50mL tubes only
     "nest_12_reservoir_15ml": [0, 1219.0, 13236.1],
 }
 SAME_TIP = True  # this is fine when using Ethanol (b/c is evaporates)
 RETURN_TIP = True
 NUM_TRIALS = 3
-DISPENSE_MM_FROM_BOTTOM = 2
+DISPENSE_MM_FROM_MENISCUS = -0.5
 LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
 
-ASPIRATE_MM_FROM_BOTTOM = 5
-RESERVOIR = "nest_12_reservoir_15ml"
+ASPIRATE_MM_FROM_MENISCUS = -1.5
+RESERVOIR = "opentrons_15_tuberack_nest_15ml_conical"
 
 LIQUID_MOUNT = "right"
 LIQUID_TIP_SIZE = 200
@@ -257,16 +261,21 @@ def _test_for_finding_liquid_height(
                     # try and get any remaining droplets out of the way
                     liquid_pipette.move_to(src_well.top(10))
                     liquid_pipette.aspirate().dispense().prepare_to_aspirate()
+                src_meniscus_height = liquid_pipette.measure_liquid_height(src_well)
+                src_meniscus_height -= src_well.bottom().point.z
                 liquid_pipette.aspirate(
-                    transfer_vol, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM)
+                    transfer_vol,
+                    src_well.bottom(src_meniscus_height + ASPIRATE_MM_FROM_MENISCUS),
                 )
                 need_to_transfer -= transfer_vol
                 if transfer_vol <= 195:
                     liquid_pipette.aspirate(5, src_well.top(2))
                     liquid_pipette.dispense(5, well.top(5))
-                liquid_pipette.dispense(
-                    transfer_vol, well.bottom(DISPENSE_MM_FROM_BOTTOM)
-                )
+                if volume < well.max_volume * 0.5:
+                    dispense_loc = well.bottom(3 + DISPENSE_MM_FROM_MENISCUS)
+                else:
+                    dispense_loc = well.top(-3 + DISPENSE_MM_FROM_MENISCUS)
+                liquid_pipette.dispense(transfer_vol, dispense_loc)
                 ctx.delay(seconds=1.5)
                 liquid_pipette.move_to(well.top())
                 ctx.delay(seconds=1.5)
