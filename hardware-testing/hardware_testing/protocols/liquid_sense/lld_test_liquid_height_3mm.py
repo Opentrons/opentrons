@@ -1,4 +1,4 @@
-"""Measure Liquid Height."""
+"""Measure Liquid Height 3mm."""
 from typing import List, Tuple, Optional
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -50,7 +50,7 @@ SLOT_DIAL = "B3"
 #  VARIABLES - END
 ###########################################
 
-metadata = {"protocolName": "SIGLER-lld-test-liquid-height"}
+metadata = {"protocolName": "lld-test-liquid-height-3mm"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 _all_96_well_names = [f"{r}{c + 1}" for c in range(12) for r in "ABCDEFGH"]
