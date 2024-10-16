@@ -14,11 +14,11 @@ from opentrons.types import Point
 # TODO: use runtime-variables instead of constants
 
 VOLUMES = {
-    "corning_96_wellplate_360ul_flat": [0],
-    "armadillo_96_wellplate_200ul_pcr_full_skirt": [0],
-    "nest_96_wellplate_2ml_deep": [0],
-    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [0],
-    "nest_12_reservoir_15ml": [0],
+    "corning_96_wellplate_360ul_flat": [0, 97.2, 257.1],
+    "armadillo_96_wellplate_200ul_pcr_full_skirt": [0, 14.3, 150.2],
+    "nest_96_wellplate_2ml_deep": [0, 118.3, 2060.4],
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [0, 158.1, 56267.2],  # 50mL tubes only
+    "nest_12_reservoir_15ml": [0, 1219.0, 13236.1],
 }
 SAME_TIP = True
 RETURN_TIP = True
