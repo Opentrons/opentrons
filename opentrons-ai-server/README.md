@@ -2,24 +2,20 @@
 
 ## Overview
 
-The Opentrons AI server. This is a FastAPI server to handle RAG, integrations, and the OpenAI API calls. The long running POST for chat completion may take from 1-3 minutes to complete. This long running API call is not optimal and forced us away from serverless options like Lambda. The stack is CloudFront + Load Balancer + ECS Fargate FastAPI container.
+The Opentrons AI server is a FastAPI server that handles complex tasks like running generative AI models and integrating with the OpenAI API. One challenge we faced was the long processing time for chat completion, which can take 1-3 minutes. This ruled out serverless options like Lambda, as they typically have strict time limits. Ultimately, we opted for a robust architecture using CloudFront, a load balancer, and an ECS Fargate container running our FastAPI server. This robust architecture ensures reliable performance and scalability, allowing users to seamlessly interact with our AI-powered tools and automate their lab workflows.
 
 ## Deployed Environments
 
-- We have 2 environments currently: `staging` and `prod`
-- staging
-  - <https://staging.opentrons.ai>
-- prod
-  - <https://opentrons.ai>
-  - <https://ai.opentrons.com> - useful if your browser is set to not allow cross site cookies
+Currently we have 2 environments: `staging` and `prod`.
+
+- staging: <https://staging.opentrons.ai>
+- prod: <https://opentrons.ai>
+
+If your browser blocks cross site cookies, use <https://ai.opentrons.com> instead.
 
 ### Environment Variables and Secrets
 
-- Environment variables and secrets are defined and accessed through `opentrons-ai-server/api/settings.py`
-- Locally we use a git ignored `.env` file to store both environment variables and secrets
-- AWS secrets manager stores both secrets and environment variables for the deployed environments
-- the deploy script uses the settings class to have ECS Fargate load the secrets and environment variables
-- You must update the settings class to add new environment variables or secrets. If you don't the deploy script will fail.
+The opentrons-ai-server/api/settings.py file manages environment variables and secrets. Locally, a .env file (which is ignored by git) stores these values. For deployed environments, AWS Secrets Manager handles both secrets and environment variables. Our deploy script uses the settings class to ensure ECS Fargate loads these values correctly. Important: Update the settings class whenever you add new environment variables or secrets; otherwise, the deploy script will fail.
 
 > Note: To update and environment variable or secret you must update the value in AWS secrets manager AND redeploy the service. Environment variables and secrets are not dynamically updated in the deployed environment. They are loaded at service start up.
 
@@ -29,18 +25,18 @@ The Opentrons AI server. This is a FastAPI server to handle RAG, integrations, a
 
 ### Setup
 
-1. clone the repository `gh repo clone Opentrons/opentrons`
+1. clone the repository `gh repo clone Opentrons/opentrons`.
 1. `cd opentrons/opentrons-ai-server`
-1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md)
-1. Use pyenv to install python `pyenv install 3.12.6` or latest 3.12.\*
-1. Have nodejs and yarn installed per [DEV_SETUP.md](../DEV_SETUP.md)
-   1. This allows formatting of of `.md` and `.json` files
-1. select the python version `pyenv local 3.12.6`
-   1. This will create a `.python-version` file in this directory
-1. select the node version with `nvs` or `nvm` currently 18.19\*
-1. Install pipenv and python dependencies using `make setup`
-1. Install docker if you plan to run and build the docker container locally
-1. `make teardown` will remove the virtual environment but requires pipenv to be installed
+1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md).
+1. Use pyenv to install python `pyenv install 3.12.6` or latest 3.12.\*.
+1. Have nodejs and yarn installed per [DEV_SETUP.md](../DEV_SETUP.md).
+   1. This allows formatting of of `.md` and `.json` files.
+1. select the python version `pyenv local 3.12.6`.
+   1. This will create a `.python-version` file in this directory.
+1. select the node version with `nvs` or `nvm` currently 18.19\*.
+1. Install pipenv and python dependencies using `make setup`.
+1. Install docker if you plan to run and build the docker container locally.
+1. `make teardown` will remove the virtual environment but requires pipenv to be installed.
 
 ### Run locally
 

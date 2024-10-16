@@ -8,9 +8,11 @@ The Opentrons AI application helps you to create a protocol with natural languag
 
 ## Developing
 
-1. To get started: clone the `Opentrons/opentrons` repository
-1. Read [contributing guide][contributing-guide-setup]
-1. Follow [DEV_SETUP.md](../DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
+To get started:
+
+1. Clone the `Opentrons/opentrons` repository
+1. Read the [contributing guide.][contributing-guide-setup]
+1. Follow the [DEV_SETUP.md](../DEV_SETUP.md) for your platform.
 
 ```shell
 # change into the cloned directory
@@ -28,7 +30,7 @@ make -C opentrons-ai-client dev
 
 ## Auth0
 
-[Auth0 requires consent in the local application.](https://auth0.com/docs/get-started/applications/confidential-and-public-applications/user-consent-and-third-party-applications#skip-consent-for-first-party-applications)
+[Auth0 requires consent](https://auth0.com/docs/get-started/applications/confidential-and-public-applications/user-consent-and-third-party-applications#skip-consent-for-first-party-applications) in the local application.
 
 ### Allow consent in the local application
 
@@ -76,8 +78,8 @@ Test tasks can also be run with the following arguments:
 
 ## Local development notes
 
-1. [constants.ts](./src/resources/constants.ts) defines the AI API location and the Auth0 configuration.
-1. [main.tsx](./src/main.tsx) has the logic to use the appropriate constants based on the environment.
+- [constants.ts](./src/resources/constants.ts) defines the AI API location and the Auth0 configuration.
+- [main.tsx](./src/main.tsx) has the logic to use the appropriate constants based on the environment.
 
 ## Links
 
