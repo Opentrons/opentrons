@@ -17,7 +17,7 @@ const testAliases: {} | { 'file-saver': string } =
 
 export default defineConfig({
   // revert this before undrafting
-  base: '/ll_update-build-base/',
+  base: '',
   build: {
     // Relative to the root
     outDir: 'dist',
