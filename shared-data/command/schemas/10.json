@@ -4174,6 +4174,11 @@
           "title": "Moduleid",
           "description": "Unique ID of the Absorbance Reader.",
           "type": "string"
+        },
+        "fileName": {
+          "title": "Filename",
+          "description": "Optional file name to use when storing the results of a measurement.",
+          "type": "string"
         }
       },
       "required": ["moduleId"]
