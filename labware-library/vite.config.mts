@@ -6,6 +6,7 @@ import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
+import autoprefixer from 'autoprefixer'
 
 const testAliases: {} | { 'file-saver': string } =
   process.env.CYPRESS === '1'
@@ -44,6 +45,7 @@ export default defineConfig({
         postColorModFunction(),
         postCssPresetEnv({ stage: 0 }),
         lostCss(),
+        autoprefixer,
       ],
     },
   },

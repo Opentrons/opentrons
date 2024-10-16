@@ -7,6 +7,7 @@
 .opentrons_config
 **/tsconfig*.json
 **/vite.config.mts
+**/vite.config.ts
 # prettier
 **/package.json
 **/CHANGELOG.md
