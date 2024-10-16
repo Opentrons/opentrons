@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { join } from 'path'
 import { flatten } from 'lodash'
+import { createLogger } from './log'
 import {
   robotMassStorageDeviceAdded,
   robotMassStorageDeviceEnumerated,
@@ -16,7 +17,12 @@ import type { Dispatch, Action } from './types'
 
 const FLEX_USB_MOUNT_DIR = '/media/'
 const FLEX_USB_DEVICE_DIR = '/dev/'
-const FLEX_USB_MOUNT_FILTER = /sd[a-z]+[0-9]+$/
+// filter matches sda0, sdc9, sdb
+const FLEX_USB_DEVICE_FILTER = /sd[a-z]+[0-9]*$/
+// filter matches sda0, sdc9, sdb, VOLUME-sdc10
+const FLEX_USB_MOUNT_FILTER = /([^/]+-)?(sd[a-z]+[0-9]*)$/
+
+const log = createLogger('mass-storage')
 
 // These are for backoff algorithm
 // apply the delay from 1 sec 64 sec
@@ -69,22 +75,27 @@ const enumerateMassStorage = (path: string): Promise<string[]> => {
         )
       )
     )
-    .catch(error => {
-      console.error(`Error enumerating mass storage: ${error}`)
+    .catch((error: Error) => {
+      log.error(
+        `Error enumerating mass storage: ${error.name}: ${error.message}`
+      )
       return []
     })
     .then(flatten)
-    .then(result => {
-      return result
-    })
+    .then(result => result)
 }
 export function watchForMassStorage(dispatch: Dispatch): () => void {
-  console.log('watching for mass storage')
+  log.info('watching for mass storage')
   let prevDirs: string[] = []
   const handleNewlyPresent = (path: string): Promise<string> => {
     dispatch(robotMassStorageDeviceAdded(path))
     return enumerateMassStorage(path)
       .then(contents => {
+        log.debug(
+          `mass storage device at ${path} enumerated: ${JSON.stringify(
+            contents
+          )}`
+        )
         dispatch(robotMassStorageDeviceEnumerated(path, contents))
       })
       .then(() => path)
@@ -133,6 +144,9 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
             return
           }
           if (!fileName.match(FLEX_USB_MOUNT_FILTER)) {
+            log.debug(
+              `mediaWatcher: filename ${fileName} does not match ${FLEX_USB_MOUNT_FILTER}`
+            )
             return
           }
           const fullPath = join(FLEX_USB_MOUNT_DIR, fileName)
@@ -140,25 +154,36 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
             .stat(fullPath)
             .then(info => {
               if (!info.isDirectory) {
+                log.debug(`mediaWatcher: ${fullPath} is not a directory`)
                 return
               }
               if (prevDirs.includes(fullPath)) {
+                log.debug(`mediaWatcher: ${fullPath} is known`)
                 return
               }
-              console.log(`New mass storage device ${fileName} detected`)
+              log.info(`New mass storage device ${fileName} detected`)
               prevDirs.push(fullPath)
               return handleNewlyPresent(fullPath)
             })
-            .catch(() => {
+            .catch(err => {
               if (prevDirs.includes(fullPath)) {
-                console.log(`Mass storage device at ${fileName} removed`)
+                log.info(
+                  `Mass storage device at ${fileName} removed because its mount point disappeared`,
+                  err
+                )
                 prevDirs = prevDirs.filter(entry => entry !== fullPath)
                 dispatch(robotMassStorageDeviceRemoved(fullPath))
+              } else {
+                log.debug(
+                  `Mass storage device candidate mountpoint at ${fileName} disappeared`,
+                  err
+                )
               }
             })
         }
       )
     } catch {
+      log.error(`Failed to start watcher for ${FLEX_USB_MOUNT_DIR}`)
       return null
     }
   }
@@ -170,21 +195,42 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
     { persistent: true },
     (event, fileName) => {
       if (!!!fileName) return
-      if (!fileName.match(FLEX_USB_MOUNT_FILTER)) return
-      const fullPath = join(FLEX_USB_DEVICE_DIR, fileName)
-      const mountPath = join(FLEX_USB_MOUNT_DIR, fileName)
-      fsPromises.stat(fullPath).catch(() => {
-        if (prevDirs.includes(mountPath)) {
-          console.log(`Mass storage device at ${fileName} removed`)
-          prevDirs = prevDirs.filter(entry => entry !== mountPath)
-          dispatch(
-            robotMassStorageDeviceRemoved(join(FLEX_USB_MOUNT_DIR, fileName))
+      if (!fileName.match(FLEX_USB_DEVICE_FILTER)) return
+      if (event !== 'rename') {
+        log.debug(
+          `devWatcher: ignoring ${event} event for ${fileName} (not rename)`
+        )
+        return
+      }
+      log.debug(`devWatcher: ${event} event for ${fileName}`)
+      fsPromises
+        .readdir(FLEX_USB_DEVICE_DIR)
+        .then(contents => {
+          if (contents.includes(fileName)) {
+            log.debug(
+              `devWatcher: ${fileName} found in /dev, this is an attach`
+            )
+            // this is an attach
+            return
+          }
+          const prevDir = prevDirs.filter(dir => dir.includes(fileName)).at(0)
+          log.debug(
+            `devWatcher: ${fileName} not in /dev, this is a remove, previously mounted at ${prevDir}`
           )
-          // we don't care if this fails because it's racing the system removing
-          // the mount dir in the common case
-          fsPromises.unlink(mountPath).catch(() => {})
-        }
-      })
+          if (prevDir != null) {
+            log.info(`Mass storage device at ${fileName} removed`)
+            prevDirs = prevDirs.filter(entry => entry !== prevDir)
+            dispatch(robotMassStorageDeviceRemoved(prevDir))
+            // we don't care if this fails because it's racing the system removing
+            // the mount dir in the common case
+            fsPromises.unlink(prevDir).catch(() => {})
+          }
+        })
+        .catch(err => {
+          log.info(
+            `Failed to handle mass storage device ${fileName}: ${err.name}: ${err.message}`
+          )
+        })
     }
   )
 

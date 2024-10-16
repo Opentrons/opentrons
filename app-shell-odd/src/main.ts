@@ -137,8 +137,15 @@ function startUp(): void {
     log.info('First dispatch, showing')
     systemd.sendStatus('started')
     systemd.ready()
-    const stopWatching = watchForMassStorage(dispatch)
-    ipcMain.once('quit', stopWatching)
+    try {
+      const stopWatching = watchForMassStorage(dispatch)
+      ipcMain.once('quit', stopWatching)
+    } catch (err) {
+      console.log(
+        `Failed to watch for mass storage: ${err.name}: ${err.message}`,
+        err
+      )
+    }
     // TODO: This is where we render the main window for the first time. See ui.ts
     // in the createUI function for more.
     if (!!!mainWindow) {
