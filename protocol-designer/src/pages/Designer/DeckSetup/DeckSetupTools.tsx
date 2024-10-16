@@ -6,7 +6,6 @@ import {
   DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
-  Link,
   ModuleIcon,
   RadioButton,
   SPACING,
@@ -19,6 +18,8 @@ import {
   getModuleDisplayName,
   getModuleType,
   MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
@@ -43,10 +44,12 @@ import { getEnableAbsorbanceReader } from '../../../feature-flags/selectors'
 import { useBlockingHint } from '../../../organisms/BlockingHintModal/useBlockingHint'
 import { selectors } from '../../../labware-ingred/selectors'
 import { useKitchen } from '../../../organisms/Kitchen/hooks'
+import { getDismissedHints } from '../../../tutorial/selectors'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { FIXTURES, MOAM_MODELS } from './constants'
 import { getSlotInformation } from '../utils'
 import { getModuleModelsBySlot, getDeckErrors } from './utils'
+import { MagnetModuleChangeContent } from './MagnetModuleChangeContent'
 import { LabwareTools } from './LabwareTools'
 
 import type { ModuleModel } from '@opentrons/shared-data'
@@ -68,6 +71,9 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const { makeSnackbar } = useKitchen()
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const robotType = useSelector(getRobotType)
+  const isDismissedModuleHint = useSelector(getDismissedHints).includes(
+    'change_magnet_module_model'
+  )
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -104,6 +110,9 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const hasMagneticModule = Object.values(deckSetup.modules).some(
     module => module.type === MAGNETIC_MODULE_TYPE
   )
+  const moduleOnSlotIsMagneticModuleV1 =
+    Object.values(deckSetup.modules).find(module => module.slot === slot)
+      ?.model === MAGNETIC_MODULE_V1
 
   const changeModuleWarning = useBlockingHint({
     hintKey: 'change_magnet_module_model',
@@ -111,46 +120,19 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
       displayModuleWarning(false)
     },
     handleContinue: () => {
+      setSelectedHardware(
+        moduleOnSlotIsMagneticModuleV1 ? MAGNETIC_MODULE_V2 : MAGNETIC_MODULE_V1
+      )
       dispatch(
         selectModule({
-          moduleModel: Object.values(deckSetup.modules).some(
-            module => module.model === 'magneticModuleV1'
-          )
-            ? 'magneticModuleV2'
-            : 'magneticModuleV1',
+          moduleModel: moduleOnSlotIsMagneticModuleV1
+            ? MAGNETIC_MODULE_V2
+            : MAGNETIC_MODULE_V1,
         })
       )
       displayModuleWarning(false)
-      onCloseClick()
     },
-    content: (
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('gen1_gen2_different_units')}
-        </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('convert_gen1_to_gen2')}
-        </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('convert_gen2_to_gen1')}
-        </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('alter_pause')}
-        </StyledText>
-        <Flex>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('read_more_gen1_gen2')}{' '}
-            <Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href="http://support.opentrons.com/en/articles/1820112-magnetic-module"
-            >
-              {t('here')}
-            </Link>
-          </StyledText>
-        </Flex>
-      </Flex>
-    ),
+    content: <MagnetModuleChangeContent />,
     enabled: changeModuleWarningInfo,
   })
 
@@ -294,7 +276,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
     onCloseClick()
   }
-  console.log('change module warning info', changeModuleWarningInfo)
   return (
     <>
       {changeModuleWarning}
@@ -422,7 +403,8 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                           } else if (
                             hasMagneticModule &&
                             (model === 'magneticModuleV1' ||
-                              model === 'magneticModuleV2')
+                              model === 'magneticModuleV2') &&
+                            !isDismissedModuleHint
                           ) {
                             displayModuleWarning(true)
                           } else {
