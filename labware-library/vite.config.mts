@@ -16,11 +16,18 @@ const testAliases: {} | { 'file-saver': string } =
     : {}
 
 export default defineConfig({
-  // this makes imports relative rather than absolute
-  base: '',
+  // revert this before undrafting
+  base: '/ll_update-build-base/',
   build: {
     // Relative to the root
     outDir: 'dist',
+  //   rollupOptions: {
+  //     input: {
+  //       // Define multiple input HTML files
+  //       main: path.resolve(__dirname, 'index.html'),
+  //       create: path.resolve(__dirname, 'create.html'),
+  //     },
+  //   },
   },
   plugins: [
     react({
