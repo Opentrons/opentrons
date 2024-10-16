@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -46,11 +46,6 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
   const systemLanguage = useSelector(getSystemLanguage)
   const storedSystemLanguage = useSelector(getStoredSystemLanguage)
 
-  // TODO: set current option based on system locale
-  // initial current option: set to detected system language
-  // first, match entire locale -> match language -> fallback to english
-  // change language based on initial system locale
-
   const showBootModal = appLanguage == null && systemLanguage != null
   const showUpdateModal =
     appLanguage != null &&
@@ -76,13 +71,7 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
   }
 
   const handlePrimaryClick = (): void => {
-    dispatch(
-      updateConfigValue(
-        'language.appLanguage',
-        // on first boot continue click, set the app language to selected value
-        showBootModal ? currentOption.value : systemLanguage
-      )
-    )
+    dispatch(updateConfigValue('language.appLanguage', currentOption.value))
     dispatch(updateConfigValue('language.systemLanguage', systemLanguage))
   }
 
@@ -94,6 +83,28 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
       void i18n.changeLanguage(selectedOption.value)
     }
   }
+
+  // set initial language for boot modal; match app language to supported options
+  useEffect(() => {
+    if (systemLanguage != null) {
+      // prefer match entire locale, then match just language e.g. zh-Hant and zh-CN
+      const matchedSystemLanguageOption =
+        languageOptions.find(lng => lng.value === systemLanguage) ??
+        languageOptions.find(
+          lng =>
+            new Intl.Locale(lng.value).language ===
+            new Intl.Locale(systemLanguage).language
+        )
+      if (matchedSystemLanguageOption != null) {
+        // initial current option: set to detected system language
+        setCurrentOption(matchedSystemLanguageOption)
+        if (showBootModal) {
+          // for boot modal temp change app display language based on initial system locale
+          void i18n.changeLanguage(systemLanguage)
+        }
+      }
+    }
+  }, [i18n, systemLanguage, showBootModal])
 
   return enableLocalization && (showBootModal || showUpdateModal) ? (
     <Modal title={title}>

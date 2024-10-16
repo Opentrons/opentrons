@@ -27,13 +27,13 @@ const render = () => {
 
 const mockNavigate = vi.fn()
 
-const MOCK_SYSTEM_LANGUAGE = 'en-US'
+const MOCK_DEFAULT_LANGUAGE = 'en-US'
 
 describe('SystemLanguagePreferenceModal', () => {
   beforeEach(() => {
-    vi.mocked(getAppLanguage).mockReturnValue(MOCK_SYSTEM_LANGUAGE)
-    vi.mocked(getSystemLanguage).mockReturnValue(MOCK_SYSTEM_LANGUAGE)
-    vi.mocked(getStoredSystemLanguage).mockReturnValue(MOCK_SYSTEM_LANGUAGE)
+    vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
+    vi.mocked(getSystemLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
+    vi.mocked(getStoredSystemLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableLocalization')
       .thenReturn(true)
@@ -67,16 +67,60 @@ describe('SystemLanguagePreferenceModal', () => {
     fireEvent.click(primaryButton)
     expect(updateConfigValue).toBeCalledWith(
       'language.appLanguage',
-      MOCK_SYSTEM_LANGUAGE
+      MOCK_DEFAULT_LANGUAGE
     )
     expect(updateConfigValue).toBeCalledWith(
       'language.systemLanguage',
-      MOCK_SYSTEM_LANGUAGE
+      MOCK_DEFAULT_LANGUAGE
     )
   })
 
+  it('should default to English (US) if system language is unsupported', () => {
+    vi.mocked(getAppLanguage).mockReturnValue(null)
+    vi.mocked(getSystemLanguage).mockReturnValue('es-MX')
+
+    render()
+
+    screen.getByText('Language preference')
+    screen.getByText(
+      'The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.'
+    )
+    const primaryButton = screen.getByRole('button', {
+      name: 'Continue',
+    })
+
+    fireEvent.click(primaryButton)
+    expect(updateConfigValue).toBeCalledWith(
+      'language.appLanguage',
+      MOCK_DEFAULT_LANGUAGE
+    )
+    expect(updateConfigValue).toBeCalledWith('language.systemLanguage', 'es-MX')
+  })
+
+  it('should set a supported app language when system language is an unsupported locale of the same language', () => {
+    vi.mocked(getAppLanguage).mockReturnValue(null)
+    vi.mocked(getSystemLanguage).mockReturnValue('en-UK')
+
+    render()
+
+    screen.getByText('Language preference')
+    screen.getByText(
+      'The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.'
+    )
+    const primaryButton = screen.getByRole('button', {
+      name: 'Continue',
+    })
+
+    fireEvent.click(primaryButton)
+    expect(updateConfigValue).toBeCalledWith(
+      'language.appLanguage',
+      MOCK_DEFAULT_LANGUAGE
+    )
+    expect(updateConfigValue).toBeCalledWith('language.systemLanguage', 'en-UK')
+  })
+
   it('should render the correct header, description, and buttons when system language changes', () => {
-    vi.mocked(getSystemLanguage).mockReturnValue('zh')
+    vi.mocked(getSystemLanguage).mockReturnValue('zh-CN')
 
     render()
 
@@ -93,18 +137,47 @@ describe('SystemLanguagePreferenceModal', () => {
     expect(updateConfigValue).toHaveBeenNthCalledWith(
       1,
       'language.appLanguage',
-      'zh'
+      'zh-CN'
     )
     expect(updateConfigValue).toHaveBeenNthCalledWith(
       2,
       'language.systemLanguage',
-      'zh'
+      'zh-CN'
     )
     fireEvent.click(secondaryButton)
     expect(updateConfigValue).toHaveBeenNthCalledWith(
       3,
       'language.systemLanguage',
-      'zh'
+      'zh-CN'
+    )
+  })
+
+  it('should set a supported app language when system language changes to an unsupported locale of the same language', () => {
+    vi.mocked(getSystemLanguage).mockReturnValue('zh-Hant')
+
+    render()
+
+    const secondaryButton = screen.getByRole('button', { name: 'Don’t change' })
+    const primaryButton = screen.getByRole('button', {
+      name: 'Use system language',
+    })
+
+    fireEvent.click(primaryButton)
+    expect(updateConfigValue).toHaveBeenNthCalledWith(
+      1,
+      'language.appLanguage',
+      'zh-CN'
+    )
+    expect(updateConfigValue).toHaveBeenNthCalledWith(
+      2,
+      'language.systemLanguage',
+      'zh-Hant'
+    )
+    fireEvent.click(secondaryButton)
+    expect(updateConfigValue).toHaveBeenNthCalledWith(
+      3,
+      'language.systemLanguage',
+      'zh-Hant'
     )
   })
 })
