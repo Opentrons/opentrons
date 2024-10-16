@@ -10,7 +10,7 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import type { RecoveryRouteStepMetadata, StepOrder } from './types'
+import type { RecoveryRouteStepMetadata, RouteStep, StepOrder } from './types'
 
 // Server-defined error types.
 // (Values for the .error.errorType property of a run command.)
@@ -18,6 +18,7 @@ export const DEFINED_ERROR_TYPES = {
   OVERPRESSURE: 'overpressure',
   LIQUID_NOT_FOUND: 'liquidNotFound',
   TIP_PHYSICALLY_MISSING: 'tipPhysicallyMissing',
+  TIP_PHYSICALLY_ATTACHED: 'tipPhysicallyAttached',
   GRIPPER_MOVEMENT: 'gripperMovement',
 }
 
@@ -29,6 +30,7 @@ export const ERROR_KINDS = {
   OVERPRESSURE_WHILE_ASPIRATING: 'OVERPRESSURE_WHILE_ASPIRATING',
   OVERPRESSURE_WHILE_DISPENSING: 'OVERPRESSURE_WHILE_DISPENSING',
   TIP_NOT_DETECTED: 'TIP_NOT_DETECTED',
+  TIP_DROP_FAILED: 'TIP_DROP_FAILED',
   GRIPPER_ERROR: 'GRIPPER_ERROR',
 } as const
 
@@ -101,6 +103,12 @@ export const RECOVERY_MAP = {
       DOOR_OPEN: 'door-open',
     },
   },
+  ROBOT_DOOR_OPEN_SPECIAL: {
+    ROUTE: 'door-special',
+    STEPS: {
+      DOOR_OPEN: 'door-open',
+    },
+  },
   // Recovery options below
   OPTION_SELECTION: {
     ROUTE: 'option-selection',
@@ -126,6 +134,7 @@ export const RECOVERY_MAP = {
     STEPS: {
       GRIPPER_HOLDING_LABWARE: 'gripper-holding-labware',
       GRIPPER_RELEASE_LABWARE: 'gripper-release-labware',
+      CLOSE_DOOR_GRIPPER_Z_HOME: 'close-robot-door',
       MANUAL_MOVE: 'manual-move',
       SKIP: 'skip',
     },
@@ -135,6 +144,7 @@ export const RECOVERY_MAP = {
     STEPS: {
       GRIPPER_HOLDING_LABWARE: 'gripper-holding-labware',
       GRIPPER_RELEASE_LABWARE: 'gripper-release-labware',
+      CLOSE_DOOR_GRIPPER_Z_HOME: 'close-robot-door',
       MANUAL_REPLACE: 'manual-replace',
       RETRY: 'retry',
     },
@@ -187,6 +197,7 @@ const {
   ROBOT_RETRYING_STEP,
   ROBOT_SKIPPING_STEP,
   ROBOT_DOOR_OPEN,
+  ROBOT_DOOR_OPEN_SPECIAL,
   DROP_TIP_FLOWS,
   REFILL_AND_RESUME,
   IGNORE_AND_SKIP,
@@ -229,6 +240,7 @@ export const STEP_ORDER: StepOrder = {
   [ROBOT_RETRYING_STEP.ROUTE]: [ROBOT_RETRYING_STEP.STEPS.RETRYING],
   [ROBOT_SKIPPING_STEP.ROUTE]: [ROBOT_SKIPPING_STEP.STEPS.SKIPPING],
   [ROBOT_DOOR_OPEN.ROUTE]: [ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN],
+  [ROBOT_DOOR_OPEN_SPECIAL.ROUTE]: [ROBOT_DOOR_OPEN_SPECIAL.STEPS.DOOR_OPEN],
   [DROP_TIP_FLOWS.ROUTE]: [
     DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
     DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
@@ -245,12 +257,14 @@ export const STEP_ORDER: StepOrder = {
   [MANUAL_MOVE_AND_SKIP.ROUTE]: [
     MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_HOLDING_LABWARE,
     MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE,
+    MANUAL_MOVE_AND_SKIP.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME,
     MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE,
     MANUAL_MOVE_AND_SKIP.STEPS.SKIP,
   ],
   [MANUAL_REPLACE_AND_RETRY.ROUTE]: [
     MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
     MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
+    MANUAL_MOVE_AND_SKIP.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME,
     MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE,
     MANUAL_REPLACE_AND_RETRY.STEPS.RETRY,
   ],
@@ -316,6 +330,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
   [ROBOT_DOOR_OPEN.ROUTE]: {
     [ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN]: { allowDoorOpen: false },
   },
+  [ROBOT_DOOR_OPEN_SPECIAL.ROUTE]: {
+    [ROBOT_DOOR_OPEN_SPECIAL.STEPS.DOOR_OPEN]: { allowDoorOpen: true },
+  },
   [OPTION_SELECTION.ROUTE]: {
     [OPTION_SELECTION.STEPS.SELECT]: { allowDoorOpen: false },
   },
@@ -340,6 +357,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE]: {
       allowDoorOpen: true,
     },
+    [MANUAL_MOVE_AND_SKIP.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME]: {
+      allowDoorOpen: true,
+    },
     [MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE]: { allowDoorOpen: true },
     [MANUAL_MOVE_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: true },
   },
@@ -348,6 +368,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: true,
     },
     [MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME]: {
       allowDoorOpen: true,
     },
     [MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE]: { allowDoorOpen: true },
@@ -386,6 +409,18 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     },
   },
 } as const
+
+/**
+ * Special step groupings
+ */
+
+export const GRIPPER_MOVE_STEPS: RouteStep[] = [
+  RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE,
+  RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
+  RECOVERY_MAP.ROBOT_RELEASING_LABWARE.STEPS.RELEASING_LABWARE,
+  RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE,
+  RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE,
+]
 
 export const INVALID = 'INVALID' as const
 

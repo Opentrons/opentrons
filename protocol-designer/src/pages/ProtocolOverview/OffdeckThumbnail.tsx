@@ -26,9 +26,10 @@ import { SlotHover } from './SlotHover'
 interface OffDeckThumbnailProps {
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
+  width?: string
 }
 export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
-  const { hover, setHover } = props
+  const { hover, setHover, width = '32.5rem' } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
@@ -43,7 +44,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
   return (
     <Flex
       height="25.25rem"
-      width="32.5rem"
+      width={width}
       justifyContent={offDeckLabware.length === 0 ? JUSTIFY_CENTER : 'auto'}
       backgroundColor={
         offDeckLabware.length === 0 ? COLORS.grey30 : COLORS.grey10

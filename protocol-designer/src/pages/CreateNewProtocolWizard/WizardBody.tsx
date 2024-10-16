@@ -2,17 +2,17 @@ import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  COLORS,
-  LargeButton,
-  StyledText,
   ALIGN_END,
   BORDERS,
-  TYPOGRAPHY,
   Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LargeButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import temporaryImg from '../../assets/images/placeholder_image_delete.png'
 import { BUTTON_LINK_STYLE } from '../../atoms'

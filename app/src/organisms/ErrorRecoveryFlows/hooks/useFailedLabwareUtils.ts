@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import without from 'lodash/without'
+import { useTranslation } from 'react-i18next'
 
 import {
+  FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -10,7 +12,9 @@ import {
 import { ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
 import { getLoadedLabware } from '/app/molecules/Command/utils/accessors'
+import { getLabwareDisplayLocation } from '/app/molecules/Command'
 
+import type { TFunction } from 'i18next'
 import type { WellGroup } from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
@@ -20,6 +24,8 @@ import type {
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
+  MoveLabwareRunTimeCommand,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps } from './useERUtils'
@@ -28,8 +34,14 @@ interface UseFailedLabwareUtilsProps {
   failedCommandByRunRecord: ERUtilsProps['failedCommandByRunRecord']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   failedPipetteInfo: PipetteData | null
+  allRunDefs: LabwareDefinition2[]
   runCommands?: CommandsData
   runRecord?: Run
+}
+
+interface RelevantFailedLabwareLocations {
+  currentLoc: string
+  newLoc: string | null
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
@@ -41,6 +53,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   relevantWellName: string | null
   /* The user-content nickname of the failed labware, if any */
   failedLabwareNickname: string | null
+  failedLabwareLocations: RelevantFailedLabwareLocations
 }
 
 /** Utils for labware relating to the failedCommand.
@@ -55,6 +68,7 @@ export function useFailedLabwareUtils({
   failedPipetteInfo,
   runCommands,
   runRecord,
+  allRunDefs,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const recentRelevantFailedLabwareCmd = useMemo(
     () =>
@@ -87,12 +101,20 @@ export function useFailedLabwareUtils({
     recentRelevantFailedLabwareCmd
   )
 
+  const failedLabwareLocations = useRelevantFailedLwLocations({
+    failedLabware,
+    failedCommandByRunRecord,
+    protocolAnalysis,
+    allRunDefs,
+  })
+
   return {
     ...tipSelectionUtils,
     failedLabwareName: failedLabwareDetails?.name ?? null,
     failedLabware,
     relevantWellName,
     failedLabwareNickname: failedLabwareDetails?.nickname ?? null,
+    failedLabwareLocations,
   }
 }
 
@@ -101,6 +123,7 @@ type FailedCommandRelevantLabware =
   | Omit<DispenseRunTimeCommand, 'result'>
   | Omit<LiquidProbeRunTimeCommand, 'result'>
   | Omit<PickUpTipRunTimeCommand, 'result'>
+  | Omit<MoveLabwareRunTimeCommand, 'result'>
   | null
 
 interface RelevantFailedLabwareCmd {
@@ -122,6 +145,8 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
     case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
       return getRelevantPickUpTipCommand(failedCommandByRunRecord, runCommands)
+    case ERROR_KINDS.GRIPPER_ERROR:
+      return failedCommandByRunRecord as MoveLabwareRunTimeCommand
     case ERROR_KINDS.GENERAL_ERROR:
       return null
     default:
@@ -177,11 +202,8 @@ interface UseTipSelectionUtilsResult {
   areTipsSelected: boolean
 }
 
-// TODO(jh, 06-18-24): Enforce failure/warning when accessing tipSelectionUtils
-//  if used when the relevant labware
-// is NOT relevant to tip pick up.
-
 // Utils for initializing and interacting with the Tip Selector component.
+// Note: if the relevant failed labware command is not associated with tips, these utils effectively return `null`.
 function useTipSelectionUtils(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
 ): UseTipSelectionUtilsResult {
@@ -293,7 +315,11 @@ export function getRelevantWellName(
   failedPipetteInfo: UseFailedLabwareUtilsProps['failedPipetteInfo'],
   recentRelevantPickUpTipCmd: FailedCommandRelevantLabware
 ): string {
-  if (failedPipetteInfo == null || recentRelevantPickUpTipCmd == null) {
+  if (
+    failedPipetteInfo == null ||
+    recentRelevantPickUpTipCmd == null ||
+    recentRelevantPickUpTipCmd.commandType === 'moveLabware'
+  ) {
     return ''
   }
 
@@ -307,5 +333,56 @@ export function getRelevantWellName(
   // Well names are not used for the 96-channel currently.
   else {
     return wellName
+  }
+}
+
+type GetRelevantLwLocationsParams = Pick<
+  UseFailedLabwareUtilsProps,
+  'protocolAnalysis' | 'failedCommandByRunRecord' | 'allRunDefs'
+> & {
+  failedLabware: UseFailedLabwareUtilsResult['failedLabware']
+}
+
+export function useRelevantFailedLwLocations({
+  failedLabware,
+  failedCommandByRunRecord,
+  protocolAnalysis,
+  allRunDefs,
+}: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
+  const { t } = useTranslation('protocol_command_text')
+  const canGetDisplayLocation =
+    protocolAnalysis != null && failedLabware != null
+
+  const buildLocationCopy = useMemo(() => {
+    return (location: LabwareLocation | undefined): string | null => {
+      return canGetDisplayLocation && location != null
+        ? getLabwareDisplayLocation(
+            protocolAnalysis,
+            allRunDefs,
+            location,
+            t as TFunction,
+            FLEX_ROBOT_TYPE,
+            false // Always return the "full" copy, which is the desktop copy.
+          )
+        : null
+    }
+  }, [canGetDisplayLocation, allRunDefs])
+
+  const currentLocation = useMemo(() => {
+    return buildLocationCopy(failedLabware?.location) ?? ''
+  }, [canGetDisplayLocation])
+
+  const newLocation = useMemo(() => {
+    switch (failedCommandByRunRecord?.commandType) {
+      case 'moveLabware':
+        return buildLocationCopy(failedCommandByRunRecord.params.newLocation)
+      default:
+        return null
+    }
+  }, [canGetDisplayLocation, failedCommandByRunRecord?.key])
+
+  return {
+    currentLoc: currentLocation,
+    newLoc: newLocation,
   }
 }

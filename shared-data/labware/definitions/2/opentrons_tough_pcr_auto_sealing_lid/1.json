@@ -1,5 +1,5 @@
 {
-  "allowedRoles": ["labware"],
+  "allowedRoles": ["labware", "lid"],
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
@@ -7,7 +7,7 @@
   },
   "metadata": {
     "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
-    "displayCategory": "lid",
+    "displayCategory": "other",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -17,12 +17,7 @@
     "zDimension": 12.8
   },
   "wells": {},
-  "groups": [
-    {
-      "metadata": {},
-      "wells": []
-    }
-  ],
+  "groups": [],
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
@@ -89,14 +84,14 @@
     },
     "lidOffsets": {
       "pickUpOffset": {
-        "x": 1.0,
+        "x": 0.5,
         "y": 0,
         "z": -5
       },
       "dropOffset": {
-        "x": 1.0,
+        "x": 0.5,
         "y": 0,
-        "z": 0
+        "z": -1
       }
     }
   }

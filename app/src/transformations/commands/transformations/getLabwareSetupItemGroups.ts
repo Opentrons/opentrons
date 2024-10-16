@@ -1,5 +1,8 @@
 import partition from 'lodash/partition'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  NON_USER_ADDRESSABLE_LABWARE,
+} from '@opentrons/shared-data'
 
 import type {
   LabwareDefinition2,
@@ -43,7 +46,8 @@ export function getLabwareSetupItemGroups(
     commands.reduce<LabwareSetupItem[]>((acc, c) => {
       if (
         c.commandType === 'loadLabware' &&
-        c.result?.definition?.metadata?.displayCategory !== 'trash'
+        c.result?.definition?.metadata?.displayCategory !== 'trash' &&
+        !NON_USER_ADDRESSABLE_LABWARE.includes(c.params?.loadName)
       ) {
         const { location, displayName } = c.params
         const { definition } = c.result ?? {}

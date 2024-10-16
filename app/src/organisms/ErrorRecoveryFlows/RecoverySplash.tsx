@@ -37,7 +37,7 @@ import {
 import { RecoveryInterventionModal, StepInfo } from './shared'
 import { useToaster } from '../ToasterOven'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type {
   ERUtilsResults,
@@ -70,6 +70,7 @@ type RecoverySplashProps = ErrorRecoveryFlowsProps &
     resumePausedRecovery: boolean
     toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
+    allRunDefs: LabwareDefinition2[]
   }
 export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {
@@ -147,6 +148,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const isDisabled = (): boolean => {
     switch (runStatus) {
       case RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR:
+      case RUN_STATUS_AWAITING_RECOVERY_PAUSED:
         return true
       default:
         return false
@@ -198,21 +200,19 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
           gridGap={SPACING.spacing16}
         >
           <LargeButton
+            css={SHARED_BUTTON_STYLE_ODD}
             onClick={onCancelClick}
             buttonText={t('cancel_run')}
-            css={
-              isDisabled() ? BTN_STYLE_DISABLED_ODD : SHARED_BUTTON_STYLE_ODD
-            }
-            iconName={'remove'}
+            iconName="remove"
+            ariaDisabled={isDisabled()}
             buttonType="alertAlt"
           />
           <LargeButton
+            css={SHARED_BUTTON_STYLE_ODD}
             onClick={onLaunchERClick}
             buttonText={t('launch_recovery_mode')}
-            css={
-              isDisabled() ? BTN_STYLE_DISABLED_ODD : SHARED_BUTTON_STYLE_ODD
-            }
-            iconName={'recovery'}
+            iconName="recovery"
+            ariaDisabled={isDisabled()}
             buttonType="alertStroke"
           />
         </Flex>
@@ -296,30 +296,6 @@ const SplashFrame = styled(Flex)`
 const SHARED_BUTTON_STYLE_ODD = css`
   width: 29rem;
   height: 13.5rem;
-`
-const BTN_STYLE_DISABLED_ODD = css`
-  ${SHARED_BUTTON_STYLE_ODD}
-
-  background-color: ${COLORS.grey35};
-  color: ${COLORS.grey50};
-  border: none;
-  box-shadow: none;
-
-  #btn-icon: {
-    color: ${COLORS.grey50};
-  }
-
-  &:active,
-  &:focus,
-  &:hover {
-    background-color: ${COLORS.grey35};
-    color: ${COLORS.grey50};
-  }
-  &:active,
-  &:focus,
-  &:hover #btn-icon {
-    color: ${COLORS.grey50};
-  }
 `
 
 const PRIMARY_BTN_STYLES_DESKTOP = css`

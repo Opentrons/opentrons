@@ -3,9 +3,13 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union, Optional, Any
-from typing_extensions import Literal, TypedDict, NotRequired, TypeGuard
-
+from typing import Dict, List, NewType, Union
+from typing_extensions import Literal, TypedDict, NotRequired
+from .labware_definition import InnerWellGeometry
+from .constants import (
+    Circular,
+    Rectangular,
+)
 
 LabwareUri = NewType("LabwareUri", str)
 
@@ -34,12 +38,8 @@ LabwareRoles = Union[
     Literal["fixture"],
     Literal["adapter"],
     Literal["maintenance"],
+    Literal["lid"],
 ]
-
-Circular = Literal["circular"]
-Rectangular = Literal["rectangular"]
-Spherical = Literal["spherical"]
-WellShape = Union[Circular, Rectangular]
 
 
 class NamedOffset(TypedDict):
@@ -119,42 +119,6 @@ class WellGroup(TypedDict, total=False):
     wells: List[str]
     metadata: WellGroupMetadata
     brand: LabwareBrandData
-
-
-class SphericalSegment(TypedDict):
-    shape: Spherical
-    radiusOfCurvature: float
-    depth: float
-
-
-class RectangularBoundedSection(TypedDict):
-    shape: Rectangular
-    xDimension: float
-    yDimension: float
-    topHeight: float
-
-
-class CircularBoundedSection(TypedDict):
-    shape: Circular
-    diameter: float
-    topHeight: float
-
-
-def is_circular_frusta_list(
-    items: List[Any],
-) -> TypeGuard[List[CircularBoundedSection]]:
-    return all(item.shape == "circular" for item in items)
-
-
-def is_rectangular_frusta_list(
-    items: List[Any],
-) -> TypeGuard[List[RectangularBoundedSection]]:
-    return all(item.shape == "rectangular" for item in items)
-
-
-class InnerWellGeometry(TypedDict):
-    frusta: Union[List[CircularBoundedSection], List[RectangularBoundedSection]]
-    bottomShape: Optional[SphericalSegment]
 
 
 class LabwareDefinition(TypedDict):

@@ -6,7 +6,10 @@ import {
   getMagneticLabwareOptions,
   getMagnetLabwareEngageHeight,
 } from '../../../../../../ui/modules/selectors'
-import { getModuleEntities } from '../../../../../../step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getModuleEntities,
+} from '../../../../../../step-forms/selectors'
 import { MagnetTools } from '../MagnetTools'
 import type { ComponentProps } from 'react'
 import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
@@ -67,7 +70,7 @@ describe('MagnetTools', () => {
       },
     }
     vi.mocked(getMagneticLabwareOptions).mockReturnValue([
-      { name: 'mock name', value: 'mockValue' },
+      { name: 'mock labware in mock module in slot abc', value: 'mockValue' },
     ])
     vi.mocked(getModuleEntities).mockReturnValue({
       magnetId: {
@@ -77,13 +80,29 @@ describe('MagnetTools', () => {
       },
     })
     vi.mocked(getMagnetLabwareEngageHeight).mockReturnValue(null)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      labware: {},
+      modules: {
+        module: {
+          id: 'mockId',
+          slot: '10',
+          type: 'magneticModuleType',
+          moduleState: { engaged: false, type: 'magneticModuleType' },
+          model: 'magneticModuleV1',
+        },
+      },
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
+    })
   })
 
   it('renders the text and a switch button for v2', () => {
     render(props)
     screen.getByText('Module')
-    screen.getByText('mock name')
-    screen.getByText('Magnet action')
+    screen.getByText('10')
+    screen.getByText('mock labware')
+    screen.getByText('mock module')
+    screen.getByText('Magnet state')
     screen.getByLabelText('Engage')
     const toggleButton = screen.getByRole('switch')
     screen.getByText('Engage height')

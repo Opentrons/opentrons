@@ -78,6 +78,17 @@ describe('RetryStepInfo', () => {
     screen.getByText('Then, close the robot door before proceeding.')
   })
 
+  it(`renders correct body text for ${ERROR_KINDS.TIP_DROP_FAILED} error`, () => {
+    props.errorKind = ERROR_KINDS.TIP_DROP_FAILED
+
+    render(props)
+
+    screen.getByText(
+      'First, take any necessary actions to prepare the robot to retry the failed tip drop.'
+    )
+    screen.getByText('Then, close the robot door before proceeding.')
+  })
+
   it(`renders correct body text for ${ERROR_KINDS.GRIPPER_ERROR}`, () => {
     props.errorKind = ERROR_KINDS.GRIPPER_ERROR
 

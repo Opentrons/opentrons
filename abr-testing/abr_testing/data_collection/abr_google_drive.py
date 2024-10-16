@@ -60,7 +60,7 @@ def create_data_dictionary(
             print(f"Run {run_id} is incomplete. Skipping run.")
             continue
         if run_id in runs_to_save:
-            print("started reading run.")
+            print(f"started reading run {run_id}.")
             robot = file_results.get("robot_name")
             protocol_name = file_results["protocol"]["metadata"].get("protocolName", "")
             software_version = file_results.get("API_Version", "")
@@ -114,7 +114,9 @@ def create_data_dictionary(
                 tc_dict = read_robot_logs.thermocycler_commands(file_results)
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
-                pipette_dict = read_robot_logs.instrument_commands(file_results)
+                pipette_dict = read_robot_logs.instrument_commands(
+                    file_results, labware_name="opentrons_tough_pcr_auto_sealing_lid"
+                )
                 plate_reader_dict = read_robot_logs.plate_reader_commands(
                     file_results, hellma_plate_standards
                 )

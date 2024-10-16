@@ -74,7 +74,8 @@ describe('TipsAttachedModal', () => {
     } as any)
     vi.mocked(useDropTipWizardFlows).mockReturnValue({
       showDTWiz: false,
-      toggleDTWiz: mockToggleDTWiz,
+      enableDTWiz: mockToggleDTWiz,
+      disableDTWiz: vi.fn(),
     })
   })
 

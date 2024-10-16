@@ -267,7 +267,6 @@ class LegacyProtocolCore(
         """Load an adapter using its identifying parameters"""
         raise APIVersionError(api_element="Loading adapter")
 
-    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LegacyLabwareCore,

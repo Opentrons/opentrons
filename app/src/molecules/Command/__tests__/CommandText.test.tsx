@@ -41,6 +41,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
@@ -60,6 +61,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
@@ -86,6 +88,7 @@ describe('CommandText', () => {
     if (pushOutDispenseCommand != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={pushOutDispenseCommand}
@@ -100,6 +103,7 @@ describe('CommandText', () => {
   it('renders correct text for dispenseInPlace', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
@@ -129,6 +133,7 @@ describe('CommandText', () => {
     if (blowoutCommand != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={blowoutCommand}
@@ -143,6 +148,7 @@ describe('CommandText', () => {
   it('renders correct text for blowOutInPlace', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
@@ -162,6 +168,7 @@ describe('CommandText', () => {
   it('renders correct text for aspirateInPlace', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
@@ -191,6 +198,7 @@ describe('CommandText', () => {
     if (moveToWellCommand != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={moveToWellCommand}
@@ -205,6 +213,7 @@ describe('CommandText', () => {
   it('renders correct text for labware involving an addressable area slot', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveLabware',
           params: {
@@ -234,6 +243,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for Waste Chutes', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
@@ -254,6 +264,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for Fixed Trash', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
@@ -274,6 +285,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for Trash Bins', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
@@ -294,6 +306,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableAreaForDropTip for Trash Bin', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
@@ -315,6 +328,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for slots', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
@@ -343,6 +357,7 @@ describe('CommandText', () => {
 
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={command}
@@ -361,6 +376,7 @@ describe('CommandText', () => {
 
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={command}
@@ -377,6 +393,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
@@ -389,6 +406,7 @@ describe('CommandText', () => {
   it('renders correct text for dropTip into a labware', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
@@ -412,6 +430,7 @@ describe('CommandText', () => {
   it('renders correct text for dropTipInPlace', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
@@ -435,6 +454,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
@@ -454,6 +474,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
@@ -471,6 +492,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
@@ -487,6 +509,7 @@ describe('CommandText', () => {
     const loadLabwareCommand = loadLabwareCommands[0]
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadLabwareCommand}
@@ -502,6 +525,7 @@ describe('CommandText', () => {
     const loadTipRackCommand = loadLabwareCommands[2]
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadTipRackCommand}
@@ -517,6 +541,7 @@ describe('CommandText', () => {
     const loadOnModuleCommand = loadLabwareCommands[3]
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadOnModuleCommand}
@@ -530,6 +555,7 @@ describe('CommandText', () => {
   it('renders correct text for loadLabware in adapter', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'loadLabware',
           params: {
@@ -579,6 +605,7 @@ describe('CommandText', () => {
     } as LoadLabwareRunTimeCommand
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadOffDeckCommand}
@@ -595,6 +622,7 @@ describe('CommandText', () => {
     if (reloadLabwareCommand != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={reloadLabwareCommand}
@@ -637,6 +665,7 @@ describe('CommandText', () => {
     }
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         commandTextData={getCommandTextData(
           analysisWithLiquids as CompletedProtocolAnalysis
         )}
@@ -651,6 +680,7 @@ describe('CommandText', () => {
     const mockTemp = 20
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'temperatureModule/setTargetTemperature',
           params: { celsius: mockTemp, moduleId: 'abc123' },
@@ -677,6 +707,7 @@ describe('CommandText', () => {
     const mockTemp = 20
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'temperatureModule/waitForTemperature',
           params: { celsius: mockTemp, moduleId: 'abc123' },
@@ -700,6 +731,7 @@ describe('CommandText', () => {
   it('renders correct text for temperatureModule/waitForTemperature with no specified temp', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'temperatureModule/waitForTemperature',
           params: { moduleId: 'abc123' },
@@ -726,6 +758,7 @@ describe('CommandText', () => {
     const mockTemp = 20
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'thermocycler/setTargetBlockTemperature',
           params: { celsius: mockTemp, moduleId: 'abc123' },
@@ -752,6 +785,7 @@ describe('CommandText', () => {
     const mockTemp = 20
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'thermocycler/setTargetLidTemperature',
           params: { celsius: mockTemp, moduleId: 'abc123' },
@@ -776,6 +810,7 @@ describe('CommandText', () => {
     const mockTemp = 20
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'heaterShaker/setTargetTemperature',
           params: { celsius: mockTemp, moduleId: 'abc123' },
@@ -803,6 +838,7 @@ describe('CommandText', () => {
     ]
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'thermocycler/runProfile',
           params: { profile: mockProfileSteps, moduleId: 'abc123' },
@@ -821,11 +857,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )
-    screen.getByText(
-      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
-    )
-    screen.getByText('temperature: 20°C, seconds: 10')
-    screen.getByText('temperature: 40°C, seconds: 30')
+    screen.getByText('Running thermocycler profile with 2 steps:')
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
+    screen.getByText('Temperature: 40°C, hold time: 0h 00m 30s')
   })
   it('renders correct text for thermocycler/runProfile on ODD', () => {
     const mockProfileSteps = [
@@ -834,6 +868,7 @@ describe('CommandText', () => {
     ]
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'thermocycler/runProfile',
           params: { profile: mockProfileSteps, moduleId: 'abc123' },
@@ -853,17 +888,136 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )
-    screen.getByText(
-      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
-    )
-    screen.getByText('temperature: 20°C, seconds: 10')
+    screen.getByText('Running thermocycler profile with 2 steps:')
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
     expect(
-      screen.queryByText('temperature: 40°C, seconds: 30')
+      screen.queryByText('Temperature: 40°C, hold time: 0h 00m 30s')
+    ).not.toBeInTheDocument()
+  })
+  it('renders correct text for thermocycler/runExtendedProfile on Desktop', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      {
+        repetitions: 10,
+        steps: [
+          { holdSeconds: 15, celsius: 10 },
+          { holdSeconds: 12, celsius: 11 },
+        ],
+      },
+      { holdSeconds: 30, celsius: 40 },
+      {
+        repetitions: 9,
+        steps: [
+          { holdSeconds: 13000, celsius: 12 },
+          { holdSeconds: 14, celsius: 13 },
+        ],
+      },
+    ]
+    renderWithProviders(
+      <CommandText
+        allRunDefs={[]}
+        command={{
+          commandType: 'thermocycler/runExtendedProfile',
+          params: { profileElements: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Running thermocycler profile with 4 total steps and cycles:'
+    )
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
+    screen.getByText('10 repetitions of the following steps:')
+    screen.getByText('Temperature: 10°C, hold time: 0h 00m 15s')
+    screen.getByText('Temperature: 11°C, hold time: 0h 00m 12s')
+    screen.getByText('Temperature: 40°C, hold time: 0h 00m 30s')
+    screen.getByText('9 repetitions of the following steps:')
+    screen.getByText('Temperature: 12°C, hold time: 3h 36m 40s')
+    screen.getByText('Temperature: 13°C, hold time: 0h 00m 14s')
+  })
+  it('renders correct text for thermocycler/runExtendedProfile on ODD', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      {
+        repetitions: 10,
+        steps: [
+          { holdSeconds: 15, celsius: 10 },
+          { holdSeconds: 12, celsius: 11 },
+        ],
+      },
+      { holdSeconds: 30, celsius: 40 },
+      {
+        repetitions: 9,
+        steps: [
+          { holdSeconds: 13, celsius: 12 },
+          { holdSeconds: 14, celsius: 13 },
+        ],
+      },
+    ]
+    renderWithProviders(
+      <CommandText
+        allRunDefs={[]}
+        command={{
+          commandType: 'thermocycler/runExtendedProfile',
+          params: { profileElements: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+        isOnDevice={true}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Running thermocycler profile with 4 total steps and cycles:'
+    )
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
+
+    expect(
+      screen.queryByText('10 repetitions of the following steps:')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 10°C, hold time: 0h 00m 15s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 11°C, hold time: 0h 00m 12s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 40°C, hold time: 0h 00m 30s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('9 repetitions of the following steps:')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 12°C, hold time: 0h 00m 13s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 13°C, hold time: 0h 00m 14s')
     ).not.toBeInTheDocument()
   })
   it('renders correct text for heaterShaker/setAndWaitForShakeSpeed', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'heaterShaker/setAndWaitForShakeSpeed',
           params: { rpm: 1000, moduleId: 'abc123' },
@@ -889,6 +1043,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToSlot', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveToSlot',
           params: { slotName: '1', pipetteId: 'asdfgh' },
@@ -912,6 +1067,7 @@ describe('CommandText', () => {
   it('renders correct text for moveRelative', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveRelative',
           params: { pipetteId: 'asdfgh', axis: 'x', distance: 10 },
@@ -935,6 +1091,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToCoordinates', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveToCoordinates',
           params: { pipetteId: 'asdfgh', coordinates: { x: 1, y: 2, z: 3 } },
@@ -986,6 +1143,7 @@ describe('CommandText', () => {
       ([commandType, expectedCopy]) => {
         renderWithProviders(
           <CommandText
+            allRunDefs={[]}
             command={
               {
                 commandType,
@@ -1014,6 +1172,7 @@ describe('CommandText', () => {
   it('renders correct text for waitForDuration', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'waitForDuration',
           params: { seconds: 42, message: 'THIS IS A MESSAGE' },
@@ -1037,6 +1196,7 @@ describe('CommandText', () => {
   it('renders correct text for legacy pause with message', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'pause',
           params: { message: 'THIS IS A MESSAGE' },
@@ -1060,6 +1220,7 @@ describe('CommandText', () => {
   it('renders correct text for legacy pause without message', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'pause',
           params: {},
@@ -1083,6 +1244,7 @@ describe('CommandText', () => {
   it('renders correct text for waitForResume with message', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'waitForResume',
           params: { message: 'THIS IS A MESSAGE' },
@@ -1106,6 +1268,7 @@ describe('CommandText', () => {
   it('renders correct text for waitForResume without message', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'waitForResume',
           params: {},
@@ -1129,6 +1292,7 @@ describe('CommandText', () => {
   it('renders correct text for legacy delay with time', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'delay',
           params: { seconds: 42, message: 'THIS IS A MESSAGE' },
@@ -1152,6 +1316,7 @@ describe('CommandText', () => {
   it('renders correct text for legacy delay wait for resume with message', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'delay',
           params: { waitForResume: true, message: 'THIS IS A MESSAGE' },
@@ -1175,6 +1340,7 @@ describe('CommandText', () => {
   it('renders correct text for legacy delay wait for resume without message', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'delay',
           params: { waitForResume: true },
@@ -1198,6 +1364,7 @@ describe('CommandText', () => {
   it('renders correct text for comment', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'comment',
           params: { message: 'THIS IS A MESSAGE' },
@@ -1221,6 +1388,7 @@ describe('CommandText', () => {
   it('renders correct text for custom command type with legacy command text', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'custom',
           params: { legacyCommandText: 'SOME LEGACY COMMAND' },
@@ -1244,6 +1412,7 @@ describe('CommandText', () => {
   it('renders correct text for custom command type with arbitrary params', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'custom',
           params: {
@@ -1273,6 +1442,7 @@ describe('CommandText', () => {
   it('renders correct text for move labware manually off deck', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveLabware',
           params: {
@@ -1302,6 +1472,7 @@ describe('CommandText', () => {
   it('renders correct text for move labware manually to module', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveLabware',
           params: {
@@ -1331,6 +1502,7 @@ describe('CommandText', () => {
   it('renders correct text for move labware with gripper off deck', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveLabware',
           params: {
@@ -1360,6 +1532,7 @@ describe('CommandText', () => {
   it('renders correct text for move labware with gripper to waste chute', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveLabware',
           params: {
@@ -1391,6 +1564,7 @@ describe('CommandText', () => {
   it('renders correct text for move labware with gripper to module', () => {
     renderWithProviders(
       <CommandText
+        allRunDefs={[]}
         command={{
           commandType: 'moveLabware',
           params: {
@@ -1426,6 +1600,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
@@ -1446,6 +1621,7 @@ describe('CommandText', () => {
     if (command != null) {
       renderWithProviders(
         <CommandText
+          allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getFailedCommandPipetteInfo } from '../getFailedCommandPipetteInfo'
+import { getFailedCommandPipetteInfo } from '../useFailedPipetteUtils'
 
 describe('getFailedCommandPipetteInfo', () => {
   const failedCommand = {

@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
+  POSITION_RELATIVE,
   SPACING,
   StyledText,
   Toolbox,
@@ -61,10 +61,8 @@ export const TimelineToolbox = (): JSX.Element => {
 
   return (
     <Toolbox
+      position={POSITION_RELATIVE}
       width="19.5rem"
-      height={formData != null ? FLEX_MAX_CONTENT : 'calc(100vh - 78px)'}
-      side="left"
-      horizontalSide={formData != null ? 'top' : 'bottom'}
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('protocol_timeline')}

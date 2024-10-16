@@ -234,6 +234,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
 
     return (
       <Flex
+        width="100%"
         alignItems={ALIGN_CENTER}
         lineHeight={1}
         fontSize={TYPOGRAPHY.fontSizeP}

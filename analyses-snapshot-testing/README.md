@@ -14,6 +14,12 @@
   - In CI this is the `SNAPSHOT_REF`. This is the branch or tag of the test code/snapshots that analyses generated will be compared to.
 - The `ANALYSIS_REF` is the branch or tag that you want analyses generated from.
 
+## Build the opentrons-analysis image
+
+> This ALWAYS gets the remote code pushed to Opentrons/opentrons for the specified ANALYSIS_REF
+
+`make build-opentrons-analysis ANALYSIS_REF=chore_release-8.0.0`
+
 ## Running the tests locally
 
 - Compare the current branch snapshots to analyses generated from the edge branch
@@ -38,3 +44,17 @@
 - `make snapshot-test PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
 - `make snapshot-test PROTOCOL_NAMES=none OVERRIDE_PROTOCOL_NAMES=Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP`
 - `make snapshot-test PROTOCOL_NAMES="Flex_S_v2_19_Illumina_DNA_PCR_Free,OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3" OVERRIDE_PROTOCOL_NAMES=none`
+
+## Running a Flex just like `make -C robot-server dev-flex`
+
+> This ALWAYS gets the remote code pushed to Opentrons/opentrons for the specified OPENTRONS_VERSION
+
+```shell
+cd analyses-snapshot-testing \
+&& make build-rs OPENTRONS_VERSION=chore_release-8.0.0 \
+&& make run-rs OPENTRONS_VERSION=chore_release-8.0.0`
+```
+
+### Default OPENTRONS_VERSION=edge in the Makefile so you can omit it if you want latest edge
+
+`cd analyses-snapshot-testing && make build-rs && make run-rs`

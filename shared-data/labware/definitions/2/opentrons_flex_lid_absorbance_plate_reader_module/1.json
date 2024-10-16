@@ -32,9 +32,9 @@
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
-  "allowedRoles": ["fixture"],
-  "gripForce": 20.0,
-  "gripHeightFromLabwareBottom": 53.0,
+  "allowedRoles": ["fixture", "lid"],
+  "gripForce": 21.0,
+  "gripHeightFromLabwareBottom": 48.0,
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
@@ -43,12 +43,12 @@
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
-        "x": 14,
+        "x": 9,
         "y": 0,
         "z": 0
       },
       "dropOffset": {
-        "x": 14,
+        "x": 9,
         "y": 0,
         "z": 0
       }

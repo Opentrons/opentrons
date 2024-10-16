@@ -9,6 +9,7 @@ import {
   COLORS,
   Flex,
   Icon,
+  POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
   SecondaryButton,
@@ -90,7 +91,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     getTimelineWarningsForSelectedStep
   )
   const timeline = useSelector(getRobotStateTimeline)
-  const [toolboxStep, setToolboxStep] = useState<number>(0)
+  const [toolboxStep, setToolboxStep] = useState<number>(
+    // progress to step 2 if thermocycler form is populated
+    formData.thermocyclerFormType === 'thermocyclerProfile' ||
+      formData.thermocyclerFormType === 'thermocyclerState'
+      ? 1
+      : 0
+  )
   const icon = stepIconsByType[formData.stepType]
 
   const ToolsComponent: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
@@ -133,6 +140,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   return (
     <>
       <Toolbox
+        position={POSITION_RELATIVE}
         subHeader={
           isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

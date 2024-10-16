@@ -6,6 +6,7 @@ from decoy import Decoy, matchers
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocol_engine.error_recovery_policy import never_recover
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, API
@@ -58,6 +59,7 @@ async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> Non
     result = await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         protocol=None,
         deck_configuration=[],
         notify_publishers=mock_notify_publishers,
@@ -85,6 +87,7 @@ async def test_create_engine_uses_robot_type(
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -106,6 +109,7 @@ async def test_create_engine_with_labware_offsets(
     result = await subject.create(
         run_id="run-id",
         labware_offsets=[labware_offset],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -129,6 +133,7 @@ async def test_archives_state_if_engine_already_exists(
     await subject.create(
         run_id="run-id-1",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -138,6 +143,7 @@ async def test_archives_state_if_engine_already_exists(
         await subject.create(
             run_id="run-id-2",
             labware_offsets=[],
+            initial_error_recovery_policy=never_recover,
             deck_configuration=[],
             protocol=None,
             notify_publishers=mock_notify_publishers,
@@ -151,6 +157,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -172,6 +179,7 @@ async def test_clear_engine_not_stopped_or_idle(
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -187,6 +195,7 @@ async def test_clear_idle_engine(subject: RunOrchestratorStore) -> None:
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -238,6 +247,7 @@ async def test_get_default_orchestrator_current_unstarted(
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -252,6 +262,7 @@ async def test_get_default_orchestrator_conflict(subject: RunOrchestratorStore) 
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,
@@ -269,6 +280,7 @@ async def test_get_default_orchestrator_run_stopped(
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
         notify_publishers=mock_notify_publishers,

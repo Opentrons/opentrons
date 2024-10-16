@@ -21,7 +21,7 @@ describe('useProtocolDropTipModal', () => {
   beforeEach(() => {
     props = {
       areTipsAttached: true,
-      toggleDTWiz: vi.fn(),
+      enableDTWiz: vi.fn(),
       isRunCurrent: true,
       onSkipAndHome: vi.fn(),
       currentRunId: 'MOCK_ID',
@@ -89,7 +89,7 @@ describe('useProtocolDropTipModal', () => {
       result.current.modalProps?.onBeginRemoval()
     })
 
-    expect(props.toggleDTWiz).toHaveBeenCalled()
+    expect(props.enableDTWiz).toHaveBeenCalled()
   })
 
   it('should set isDisabled to true when isHomingPipettes is true', () => {

@@ -30,7 +30,7 @@ interface AbsorbanceReaderFixtureProps {
   selected?: boolean
 }
 
-const ABSORBANCE_READER_FIXTURE_DISPLAY_NAME = 'Absorbance Reader'
+const ABSORBANCE_READER_FIXTURE_DISPLAY_NAME = 'Absorbance'
 
 export function AbsorbanceReaderFixture(
   props: AbsorbanceReaderFixtureProps

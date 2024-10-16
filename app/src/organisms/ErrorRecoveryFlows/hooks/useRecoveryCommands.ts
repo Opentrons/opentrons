@@ -19,6 +19,7 @@ import type {
   DispenseInPlaceRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
+  MoveLabwareParams,
 } from '@opentrons/shared-data'
 import type {
   CommandData,
@@ -58,7 +59,11 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   pickUpTips: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
-  releaseGripperJaws: () => Promise<void>
+  releaseGripperJaws: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
+  homeGripperZAxis: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
+  moveLabwareWithoutPause: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -215,10 +220,24 @@ export function useRecoveryCommands({
     failedCommandByRunRecord?.commandType,
   ])
 
-  const releaseGripperJaws = useCallback((): Promise<void> => {
-    console.log('PLACEHOLDER RELEASE THE JAWS')
-    return Promise.resolve()
-  }, [])
+  const releaseGripperJaws = useCallback((): Promise<CommandData[]> => {
+    return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
+  }, [chainRunRecoveryCommands])
+
+  const homeGripperZAxis = useCallback((): Promise<CommandData[]> => {
+    return chainRunRecoveryCommands([HOME_GRIPPER_Z_AXIS])
+  }, [chainRunRecoveryCommands])
+
+  const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
+    const moveLabwareCmd = buildMoveLabwareWithoutPause(
+      failedCommandByRunRecord
+    )
+    if (moveLabwareCmd == null) {
+      return Promise.reject(new Error('Invalid use of MoveLabware command'))
+    } else {
+      return chainRunRecoveryCommands([moveLabwareCmd])
+    }
+  }, [chainRunRecoveryCommands, failedCommandByRunRecord])
 
   return {
     resumeRun,
@@ -227,6 +246,8 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     releaseGripperJaws,
+    homeGripperZAxis,
+    moveLabwareWithoutPause,
     skipFailedCommand,
     ignoreErrorKindThisRun,
   }
@@ -236,6 +257,36 @@ export const HOME_PIPETTE_Z_AXES: CreateCommand = {
   commandType: 'home',
   params: { axes: ['leftZ', 'rightZ'] },
   intent: 'fixit',
+}
+
+export const RELEASE_GRIPPER_JAW: CreateCommand = {
+  commandType: 'unsafe/ungripLabware',
+  params: {},
+  intent: 'fixit',
+}
+
+export const HOME_GRIPPER_Z_AXIS: CreateCommand = {
+  commandType: 'home',
+  params: { axes: ['extensionZ'] },
+  intent: 'fixit',
+}
+
+const buildMoveLabwareWithoutPause = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const moveLabwareParams = failedCommand.params as MoveLabwareParams
+  return {
+    commandType: 'moveLabware',
+    params: {
+      labwareId: moveLabwareParams.labwareId,
+      newLocation: moveLabwareParams.newLocation,
+      strategy: 'manualMoveWithoutPause',
+    },
+    intent: 'fixit',
+  }
 }
 
 export const buildPickUpTips = (

@@ -22,7 +22,9 @@ describe('TipSelection', () => {
     props = {
       ...mockRecoveryContentProps,
       allowTipSelection: true,
-      failedPipetteInfo: { data: { channels: 8 } } as any,
+      failedPipetteUtils: {
+        failedPipetteInfo: { data: { channels: 8 } } as any,
+      } as any,
     }
 
     vi.mocked(WellSelection).mockReturnValue(<div>MOCK WELL SELECTION</div>)
@@ -36,7 +38,10 @@ describe('TipSelection', () => {
       expect.objectContaining({
         definition: props.failedLabwareUtils.tipSelectorDef,
         selectedPrimaryWells: props.failedLabwareUtils.selectedTipLocations,
-        channels: props.failedPipetteInfo?.data.channels ?? 1,
+        channels:
+          props.failedPipetteUtils.failedPipetteInfo?.data.channels ?? 1,
+        allowSelect: props.allowTipSelection,
+        pipetteNozzleDetails: undefined,
       }),
       {}
     )

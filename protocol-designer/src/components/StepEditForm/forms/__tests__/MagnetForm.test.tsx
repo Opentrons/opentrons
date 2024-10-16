@@ -78,7 +78,7 @@ describe('MagnetForm', () => {
     screen.getByText('magnet')
     screen.getByText('module')
     screen.getByText('mock name')
-    screen.getByText('Magnet action')
+    screen.getByText('Magnet state')
     const engage = screen.getByText('Engage')
     screen.getByText('Disengage')
     fireEvent.click(engage)

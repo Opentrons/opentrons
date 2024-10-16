@@ -30,7 +30,7 @@ type UseProtocolDropTipModalProps = Pick<
   'pipetteInfo'
 > & {
   areTipsAttached: TipAttachmentStatusResult['areTipsAttached']
-  toggleDTWiz: () => void
+  enableDTWiz: () => void
   currentRunId: string
   onSkipAndHome: () => void
   /* True if the most recent run is the current run */
@@ -47,7 +47,7 @@ export type UseProtocolDropTipModalResult =
 // Wraps functionality required for rendering the related modal.
 export function useProtocolDropTipModal({
   areTipsAttached,
-  toggleDTWiz,
+  enableDTWiz,
   isRunCurrent,
   onSkipAndHome,
   pipetteInfo,
@@ -75,7 +75,7 @@ export function useProtocolDropTipModal({
   }
 
   const onBeginRemoval = (): void => {
-    toggleDTWiz()
+    enableDTWiz()
     setShowModal(false)
   }
 

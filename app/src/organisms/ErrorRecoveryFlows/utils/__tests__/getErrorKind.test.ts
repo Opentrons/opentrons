@@ -50,6 +50,17 @@ describe('getErrorKind', () => {
     expect(result).toEqual(ERROR_KINDS.TIP_NOT_DETECTED)
   })
 
+  it(`returns ${ERROR_KINDS.TIP_DROP_FAILED} for ${DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED} errorType`, () => {
+    const result = getErrorKind({
+      commandType: 'dropTip',
+      error: {
+        isDefined: true,
+        errorType: DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED,
+      } as RunCommandError,
+    } as RunTimeCommand)
+    expect(result).toEqual(ERROR_KINDS.TIP_DROP_FAILED)
+  })
+
   it(`returns ${ERROR_KINDS.GRIPPER_ERROR} for ${DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT} errorType`, () => {
     const result = getErrorKind({
       commandType: 'moveLabware',

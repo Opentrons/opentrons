@@ -171,180 +171,182 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   )
 
   return (
-    <>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       {tab === 'protocolSteps' ? (
         <Flex justifyContent={JUSTIFY_CENTER} width="100%">
           <TimelineAlerts />
         </Flex>
       ) : null}
-      <Flex
-        backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadius12}
-        width="100%"
-        height={zoomIn.slot != null ? '75vh' : '70vh'}
-        flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing40}
-      >
+      <Flex>
         <Flex
+          backgroundColor={COLORS.white}
+          borderRadius={BORDERS.borderRadius12}
           width="100%"
-          height="100%"
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_CENTER}
+          height={zoomIn.slot != null ? '75vh' : '65vh'}
+          flexDirection={DIRECTION_COLUMN}
+          padding={SPACING.spacing40}
         >
-          <RobotCoordinateSpaceWithRef
-            height={zoomIn.slot != null ? '100%' : '80%'}
+          <Flex
             width="100%"
-            deckDef={deckDef}
-            viewBox={viewBox}
-            outline="auto"
+            height="100%"
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
           >
-            {() => (
-              <>
-                {robotType === OT2_ROBOT_TYPE ? (
-                  <DeckFromLayers
-                    robotType={robotType}
-                    layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-                  />
-                ) : (
-                  <>
-                    {filteredAddressableAreas.map(addressableArea => {
-                      const cutoutId = getCutoutIdForAddressableArea(
-                        addressableArea.id,
-                        deckDef.cutoutFixtures
-                      )
-                      return cutoutId != null ? (
-                        <SingleSlotFixture
-                          key={addressableArea.id}
-                          cutoutId={cutoutId}
-                          deckDefinition={deckDef}
-                          showExpansion={cutoutId === 'cutoutA1'}
-                          fixtureBaseColor={lightFill}
-                        />
-                      ) : null
-                    })}
-                    {stagingAreaFixtures.map(fixture => {
-                      if (
-                        zoomIn.cutout == null ||
-                        zoomIn.cutout !== fixture.location
-                      ) {
-                        return (
-                          <StagingAreaFixture
-                            key={fixture.id}
-                            cutoutId={fixture.location as StagingAreaLocation}
+            <RobotCoordinateSpaceWithRef
+              height={zoomIn.slot != null ? '100%' : '80%'}
+              width="100%"
+              deckDef={deckDef}
+              viewBox={viewBox}
+              outline="auto"
+            >
+              {() => (
+                <>
+                  {robotType === OT2_ROBOT_TYPE ? (
+                    <DeckFromLayers
+                      robotType={robotType}
+                      layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+                    />
+                  ) : (
+                    <>
+                      {filteredAddressableAreas.map(addressableArea => {
+                        const cutoutId = getCutoutIdForAddressableArea(
+                          addressableArea.id,
+                          deckDef.cutoutFixtures
+                        )
+                        return cutoutId != null ? (
+                          <SingleSlotFixture
+                            key={addressableArea.id}
+                            cutoutId={cutoutId}
                             deckDefinition={deckDef}
+                            showExpansion={cutoutId === 'cutoutA1'}
                             fixtureBaseColor={lightFill}
                           />
-                        )
-                      }
-                    })}
-                    {trash != null
-                      ? trashBinFixtures.map(({ cutoutId }) =>
-                          cutoutId != null &&
-                          (zoomIn.cutout == null ||
-                            zoomIn.cutout !== cutoutId) ? (
-                            <Fragment key={cutoutId}>
-                              <SingleSlotFixture
-                                cutoutId={cutoutId}
-                                deckDefinition={deckDef}
-                                slotClipColor={COLORS.transparent}
-                                fixtureBaseColor={lightFill}
-                              />
-                              <FlexTrash
-                                robotType={robotType}
-                                trashIconColor={lightFill}
-                                trashCutoutId={cutoutId as TrashCutoutId}
-                                backgroundColor={COLORS.grey50}
-                              />
-                            </Fragment>
-                          ) : null
-                        )
-                      : null}
-                    {wasteChuteFixtures.map(fixture => {
-                      if (
-                        zoomIn.cutout == null ||
-                        zoomIn.cutout !== fixture.location
-                      ) {
-                        return (
-                          <WasteChuteFixture
-                            key={fixture.id}
-                            cutoutId={
-                              fixture.location as typeof WASTE_CHUTE_CUTOUT
-                            }
-                            deckDefinition={deckDef}
-                            fixtureBaseColor={lightFill}
-                          />
-                        )
-                      }
-                    })}
-                    {wasteChuteStagingAreaFixtures.map(fixture => {
-                      if (
-                        zoomIn.cutout == null ||
-                        zoomIn.cutout !== fixture.location
-                      ) {
-                        return (
-                          <WasteChuteStagingAreaFixture
-                            key={fixture.id}
-                            cutoutId={
-                              fixture.location as typeof WASTE_CHUTE_CUTOUT
-                            }
-                            deckDefinition={deckDef}
-                            fixtureBaseColor={lightFill}
-                          />
-                        )
-                      }
-                    })}
-                  </>
-                )}
-                <DeckSetupDetails
-                  selectedZoomInSlot={zoomIn.slot ?? undefined}
-                  hoveredLabware={hoveredLabware}
-                  hoveredModule={hoveredModule}
-                  hoveredFixture={hoveredFixture}
-                  hover={hoverSlot}
-                  tab={tab}
-                  setHover={setHoverSlot}
-                  addEquipment={addEquipment}
-                  activeDeckSetup={activeDeckSetup}
-                  stagingAreaCutoutIds={stagingAreaFixtures.map(
-                    areas => areas.location as CutoutId
+                        ) : null
+                      })}
+                      {stagingAreaFixtures.map(fixture => {
+                        if (
+                          zoomIn.cutout == null ||
+                          zoomIn.cutout !== fixture.location
+                        ) {
+                          return (
+                            <StagingAreaFixture
+                              key={fixture.id}
+                              cutoutId={fixture.location as StagingAreaLocation}
+                              deckDefinition={deckDef}
+                              fixtureBaseColor={lightFill}
+                            />
+                          )
+                        }
+                      })}
+                      {trash != null
+                        ? trashBinFixtures.map(({ cutoutId }) =>
+                            cutoutId != null &&
+                            (zoomIn.cutout == null ||
+                              zoomIn.cutout !== cutoutId) ? (
+                              <Fragment key={cutoutId}>
+                                <SingleSlotFixture
+                                  cutoutId={cutoutId}
+                                  deckDefinition={deckDef}
+                                  slotClipColor={COLORS.transparent}
+                                  fixtureBaseColor={lightFill}
+                                />
+                                <FlexTrash
+                                  robotType={robotType}
+                                  trashIconColor={lightFill}
+                                  trashCutoutId={cutoutId as TrashCutoutId}
+                                  backgroundColor={COLORS.grey50}
+                                />
+                              </Fragment>
+                            ) : null
+                          )
+                        : null}
+                      {wasteChuteFixtures.map(fixture => {
+                        if (
+                          zoomIn.cutout == null ||
+                          zoomIn.cutout !== fixture.location
+                        ) {
+                          return (
+                            <WasteChuteFixture
+                              key={fixture.id}
+                              cutoutId={
+                                fixture.location as typeof WASTE_CHUTE_CUTOUT
+                              }
+                              deckDefinition={deckDef}
+                              fixtureBaseColor={lightFill}
+                            />
+                          )
+                        }
+                      })}
+                      {wasteChuteStagingAreaFixtures.map(fixture => {
+                        if (
+                          zoomIn.cutout == null ||
+                          zoomIn.cutout !== fixture.location
+                        ) {
+                          return (
+                            <WasteChuteStagingAreaFixture
+                              key={fixture.id}
+                              cutoutId={
+                                fixture.location as typeof WASTE_CHUTE_CUTOUT
+                              }
+                              deckDefinition={deckDef}
+                              fixtureBaseColor={lightFill}
+                            />
+                          )
+                        }
+                      })}
+                    </>
                   )}
-                  {...{
-                    deckDef,
-                    showGen1MultichannelCollisionWarnings,
-                  }}
-                />
-                <SlotLabels
-                  robotType={robotType}
-                  show4thColumn={stagingAreaFixtures.length > 0}
-                />
-                {hoverSlot != null ? (
-                  <SlotDetailsContainer
-                    robotType={robotType}
-                    slot={hoverSlot}
+                  <DeckSetupDetails
+                    selectedZoomInSlot={zoomIn.slot ?? undefined}
+                    hoveredLabware={hoveredLabware}
+                    hoveredModule={hoveredModule}
+                    hoveredFixture={hoveredFixture}
+                    hover={hoverSlot}
+                    tab={tab}
+                    setHover={setHoverSlot}
+                    addEquipment={addEquipment}
+                    activeDeckSetup={activeDeckSetup}
+                    stagingAreaCutoutIds={stagingAreaFixtures.map(
+                      areas => areas.location as CutoutId
+                    )}
+                    {...{
+                      deckDef,
+                      showGen1MultichannelCollisionWarnings,
+                    }}
                   />
-                ) : null}
-              </>
-            )}
-          </RobotCoordinateSpaceWithRef>
+                  <SlotLabels
+                    robotType={robotType}
+                    show4thColumn={stagingAreaFixtures.length > 0}
+                  />
+                  {hoverSlot != null ? (
+                    <SlotDetailsContainer
+                      robotType={robotType}
+                      slot={hoverSlot}
+                    />
+                  ) : null}
+                </>
+              )}
+            </RobotCoordinateSpaceWithRef>
+          </Flex>
         </Flex>
+        {zoomIn.slot != null && zoomIn.cutout != null ? (
+          <DeckSetupTools
+            onDeckProps={{
+              setHoveredFixture,
+              setHoveredModule,
+            }}
+            onCloseClick={() => {
+              dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
+              animateZoom({
+                targetViewBox: initialViewBox,
+                viewBox,
+                setViewBox,
+              })
+            }}
+            setHoveredLabware={setHoveredLabware}
+          />
+        ) : null}
       </Flex>
-      {zoomIn.slot != null && zoomIn.cutout != null ? (
-        <DeckSetupTools
-          onDeckProps={{
-            setHoveredFixture,
-            setHoveredModule,
-          }}
-          onCloseClick={() => {
-            dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
-            animateZoom({
-              targetViewBox: initialViewBox,
-              viewBox,
-              setViewBox,
-            })
-          }}
-          setHoveredLabware={setHoveredLabware}
-        />
-      ) : null}
-    </>
+    </Flex>
   )
 }
