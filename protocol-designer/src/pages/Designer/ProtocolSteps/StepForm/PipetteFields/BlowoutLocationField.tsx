@@ -9,9 +9,9 @@ type BlowoutLocationDropdownProps = FieldProps & {
   options: Options
 }
 
-export const BlowoutLocationField = (
+export function BlowoutLocationField(
   props: BlowoutLocationDropdownProps
-): JSX.Element => {
+): JSX.Element {
   const { options: propOptions, ...restProps } = props
   const { t } = useTranslation('protocol_steps')
   const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)

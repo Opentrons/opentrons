@@ -24,7 +24,7 @@ export interface WellsOrderFieldProps {
   secondValue?: WellOrderOption | null
 }
 
-export const WellsOrderField = (props: WellsOrderFieldProps): JSX.Element => {
+export function WellsOrderField(props: WellsOrderFieldProps): JSX.Element {
   const {
     firstValue,
     secondValue,

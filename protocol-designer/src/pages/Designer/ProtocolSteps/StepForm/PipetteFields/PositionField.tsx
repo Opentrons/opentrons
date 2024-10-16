@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -47,7 +47,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
 
   const { t, i18n } = useTranslation(['application', 'protocol_steps'])
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [isModalOpen, setModalOpen] = React.useState<boolean>(false)
+  const [isModalOpen, setModalOpen] = useState<boolean>(false)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const labwareDef =
     labwareId != null && labwareEntities[labwareId] != null

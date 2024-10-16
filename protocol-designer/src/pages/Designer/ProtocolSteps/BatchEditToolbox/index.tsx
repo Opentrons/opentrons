@@ -26,8 +26,8 @@ import { makeBatchEditFieldProps } from './utils'
 import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
 import { BatchEditMixTools } from './BatchEditMixTools'
 
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { ThunkDispatch } from 'redux-thunk'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { BaseState } from '../../../../types'
 
 export const BatchEditToolbox = (): JSX.Element | null => {

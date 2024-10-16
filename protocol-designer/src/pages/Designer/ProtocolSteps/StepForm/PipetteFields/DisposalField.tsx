@@ -27,7 +27,7 @@ interface DisposalFieldProps {
   tipRack?: string | null
 }
 
-export const DisposalField = (props: DisposalFieldProps): JSX.Element => {
+export function DisposalField(props: DisposalFieldProps): JSX.Element {
   const {
     path,
     stepType,

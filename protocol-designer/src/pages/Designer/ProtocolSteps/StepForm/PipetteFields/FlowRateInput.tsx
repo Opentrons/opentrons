@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import round from 'lodash/round'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../../../components/portals/MainPageModalPortal'
+import type { ChangeEvent } from 'react'
 import type { FieldProps } from '../types'
 
 const DECIMALS_ALLOWED = 1
@@ -32,7 +33,7 @@ interface InitialState {
   modalFlowRate?: string | null
 }
 
-export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
+export function FlowRateInput(props: FlowRateInputProps): JSX.Element {
   const {
     defaultFlowRate,
     disabled,
@@ -60,19 +61,19 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     showModal: false,
   }
 
-  const [isPristine, setIsPristine] = React.useState<
-    InitialState['isPristine']
-  >(initialState.isPristine)
+  const [isPristine, setIsPristine] = useState<InitialState['isPristine']>(
+    initialState.isPristine
+  )
 
-  const [modalFlowRate, setModalFlowRate] = React.useState<
+  const [modalFlowRate, setModalFlowRate] = useState<
     InitialState['modalFlowRate']
   >(initialState.modalFlowRate)
 
-  const [modalUseDefault, setModalUseDefault] = React.useState<
+  const [modalUseDefault, setModalUseDefault] = useState<
     InitialState['modalUseDefault']
   >(initialState.modalUseDefault)
 
-  const [showModal, setShowModal] = React.useState<InitialState['showModal']>(
+  const [showModal, setShowModal] = useState<InitialState['showModal']>(
     initialState.showModal
   )
 
@@ -99,11 +100,11 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     }
   }
 
-  const handleChangeRadio = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+  const handleChangeRadio = (e: ChangeEvent<HTMLSelectElement>): void => {
     setModalUseDefault(e.target.value !== 'custom')
   }
 
-  const handleChangeNumber = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleChangeNumber = (e: ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value
     if (value === '' || value === '.' || !Number.isNaN(Number(value))) {
       setModalFlowRate(value)
