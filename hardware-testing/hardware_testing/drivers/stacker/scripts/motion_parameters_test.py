@@ -13,14 +13,14 @@ import argparse
 TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
     "Plate_stacker": {
         "X": {
-            "SPEED": {"MIN": 100, "MAX": 300, "INC": 20},
-            "ACCEL": {"MIN": 100, "MAX": 2000, "INC": 100},
-            "CURRENT": {"MIN": 0.8, "MAX": 1.5, "INC": 0.05}
+            "SPEED": {"MIN": 200, "MAX": 200, "INC": 50},
+            "ACCEL": {"MIN": 2000, "MAX": 2000, "INC": 50},
+            "CURRENT": {"MIN": 1.1, "MAX": 1.5, "INC": 0.1}
         },
         "Z": {
-            "SPEED": {"MIN": 5, "MAX": 450, "INC": 5},
-            "ACCEL": {"MIN": 5, "MAX": 200, "INC": 5},
-            "CURRENT": {"MIN": 1, "MAX": 1.4, "INC": 0.05}
+            "SPEED": {"MIN": 50, "MAX": 300, "INC": 50},
+            "ACCEL": {"MIN": 100, "MAX": 2000, "INC": 100},
+            "CURRENT": {"MIN": 1.0, "MAX": 1.5, "INC": 0.1}
         },
         "L": {
             "SPEED": {"MIN": 80, "MAX": 120, "INC": 5},
@@ -34,7 +34,7 @@ TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description="Motion Parameter Test Script")
     arg_parser.add_argument("-c", "--cycles", default = 100, help = "number of cycles to execute")
-    arg_parser.add_argument("-a", "--acceleration", default = 10, help = "Set the Acceleration")
+    arg_parser.add_argument("-a", "--axis", default = AXIS.X, help = "Choose a Axis")
     # arg_parser.add_argument("-")
     return arg_parser
 
@@ -93,31 +93,40 @@ if __name__ == '__main__':
     s = stacker.FlexStacker(None).create('COM6')
     gauge = dial_indicator.Mitutoyo_Digimatic_Indicator('COM7')
     gauge.connect()
-    test_axis = AXIS.X
+    home_reading = gauge.read_stable()
+    print(f'home reading: {home_reading}')
+    test_axis = AXIS.Z
     # Home the Axis being tested
     s.set_run_current(1.5, test_axis)
-    s.set_ihold_current(1.0, test_axis)
-    s.home(test_axis, DIR.POSITIVE_HOME)
+    s.set_ihold_current(0.6, test_axis)
     list_1 = make_test_list(test_axis)
     # Loop through motor current
     # Loop through accelerations
     # Loop through velocity
     if test_axis == AXIS.X:
-        TOTAL_TRAVEL_X = 202
+        TOTAL_TRAVEL = 202
+        s.home(test_axis, DIR.POSITIVE_HOME)
+        axis_str = 'X'
+        sw_axis = 'XE'
+    elif test_axis == AXIS.Z:
+        TOTAL_TRAVEL = 110.75
+        s.home(test_axis, DIR.NEGATIVE_HOME)
+        axis_str = 'Z'
+        sw_axis = 'ZE'
     else:
-        TOTAL_TRAVEL_Z = 113.75
-    with open(f'motion_parameters.csv', 'w', newline='') as file:
+        raise("NO AXIS CHOSEN!!!")
+    with open(f'motion_parameters_{test_axis}.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         fields = ["Cycle", "Position 1", "Position 2", "Position 3",
                     "SW_State_1", "SW_STATE_2", "SW_STATE_3", "MOTOR_CURRENT", "VELOCITY", "ACCELERATION"]
         writer.writerow(fields)
         for c in range(1, 2):
             print(f'Cycle Count: {c}')
-            for settings in list_1['X']:
+            for settings in list_1[axis_str]:
                 print(settings)
                 sw_states = s.get_sensor_states()
-                if sw_states['XE'] == '1':
-                    sw_state_1 = sw_states['XE']
+                if sw_states[sw_axis] == '1':
+                    sw_state_1 = sw_states[sw_axis]
                     print(f'Limite Switch Statues: {sw_state_1}')
                     home_reading = gauge.read_stable()
                     print(f'home reading: {home_reading}')
@@ -126,20 +135,20 @@ if __name__ == '__main__':
                     s.home(test_axis, DIR.POSITIVE_HOME, s.home_speed, s.home_acceleration)
                     home_reading = gauge.read_stable()
                     print(f'home reading: {home_reading}')
-                    sw_state_1 = s.get_sensor_states()['XE']
+                    sw_state_1 = s.get_sensor_states()[sw_axis]
                     print(f'SW state 1: {sw_state_1}')
                 s.set_run_current(settings['CURRENT'], test_axis)
                 s.move(test_axis,
-                                TOTAL_TRAVEL_X-1, # 202 - 4 = 201
+                                TOTAL_TRAVEL-1, # 202 - 4 = 201
                                 DIR.NEGATIVE,
                                 settings['SPEED'],
                                 settings['ACCEL'])
                 s.move(test_axis,
-                                TOTAL_TRAVEL_X-2, # 202 -4 = 200
+                                TOTAL_TRAVEL-2, # 202 -4 = 200
                                 DIR.POSITIVE,
                                 settings['SPEED'],
                                 settings['ACCEL'])
-                sw_state_2 = s.get_sensor_states()['XE']
+                sw_state_2 = s.get_sensor_states()[sw_axis]
                 print(f'SW State 2: {sw_state_2}')
                 position_2 = gauge.read_stable()
                 print(f'position_2: {position_2}')
@@ -149,13 +158,13 @@ if __name__ == '__main__':
                                 DIR.POSITIVE,
                                 settings['SPEED'],
                                 settings['ACCEL'])
-                sw_state_3 = s.get_sensor_states()['XE']
+                sw_state_3 = s.get_sensor_states()[sw_axis]
                 print(f'SW State 3: {sw_state_3}')
                 position_3 = gauge.read_stable()
                 print(f'position_3: {position_3}')
                 data = [c, home_reading, position_2, position_3, sw_state_1, sw_state_2, sw_state_3,
                         settings['CURRENT'], settings['SPEED'], settings['ACCEL'],
-                        ]
+                        s.max_speed_discontinuity]
                 writer.writerow(data)
                 file.flush()
         # Move to full distance - 1mm, measure the limit switch,
