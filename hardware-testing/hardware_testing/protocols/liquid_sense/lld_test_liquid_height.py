@@ -13,7 +13,10 @@ from opentrons.types import Point
 ###########################################
 # TODO: use runtime-variables instead of constants
 
-VOLUMES = {
+# NOTE: The volumes below were calculated using Solidworks
+#       models, they are the nominal volume inside the well
+#       at both 3mm from bottom and 3mm from top.
+VOLUMES_3MM_TOP_BOTTOM = {
     "corning_96_wellplate_360ul_flat": [0, 97.2, 257.1],
     "armadillo_96_wellplate_200ul_pcr_full_skirt": [0, 14.3, 150.2],
     "nest_96_wellplate_2ml_deep": [0, 118.3, 2060.4],
@@ -22,7 +25,7 @@ VOLUMES = {
 }
 SAME_TIP = True
 RETURN_TIP = True
-NUM_TRIALS = 12
+NUM_TRIALS = 3
 DISPENSE_MM_FROM_BOTTOM = 2
 LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
 
@@ -304,7 +307,7 @@ def run(ctx: ProtocolContext) -> None:
     test_tips_liquid = _get_test_tips(liq_rack, channels=1)
     test_tips_probe = _get_test_tips(probe_rack, channels=1)
     stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
-    volumes = VOLUMES[labware.load_name]
+    volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
     assert min(stuff_lengths) >= NUM_TRIALS * len(volumes), f"{stuff_lengths}"
     for _vol in volumes:
         _test_for_finding_liquid_height(
