@@ -1,6 +1,6 @@
 // labware library entry
 import { hydrate, render } from 'react-dom'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
@@ -21,12 +21,12 @@ console.log({ basePath })
 console.log({ publicPath: getPublicPath() })
 
 const Root = (): JSX.Element => (
-  <HashRouter>
+  <BrowserRouter>
     <Routes>
       <Route path={`${getPublicPath()}create`} element={<LabwareCreator />} />
       <Route path={`${getPublicPath()}*`} element={<App />} />
     </Routes>
-  </HashRouter>
+  </BrowserRouter>
 )
 
 if ($root.hasChildNodes()) {
