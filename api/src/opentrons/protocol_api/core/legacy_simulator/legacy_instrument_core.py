@@ -133,6 +133,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
+        is_meniscus: Optional[bool] = None,
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(

@@ -527,14 +527,20 @@ class GeometryView:
         labware_id: str,
         well_name: str,
         absolute_point: Point,
+        is_meniscus: Optional[bool] = None,
     ) -> LiquidHandlingWellLocation:
         """Given absolute position, get relative location of a well in a labware."""
-        well_absolute_point = self.get_well_position(labware_id, well_name)
-        delta = absolute_point - well_absolute_point
-
-        return LiquidHandlingWellLocation(
-            offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
-        )
+        if is_meniscus:
+            return LiquidHandlingWellLocation(
+                origin=WellOrigin.MENISCUS,
+                offset=WellOffset(x=0, y=0, z=absolute_point.z),
+            )
+        else:
+            well_absolute_point = self.get_well_position(labware_id, well_name)
+            delta = absolute_point - well_absolute_point
+            return LiquidHandlingWellLocation(
+                offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
+            )
 
     def get_relative_pick_up_tip_well_location(
         self,

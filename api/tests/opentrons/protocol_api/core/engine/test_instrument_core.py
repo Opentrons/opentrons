@@ -499,7 +499,10 @@ def test_aspirate_from_well(
 
     decoy.when(
         mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
-            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+            labware_id="123abc",
+            well_name="my cool well",
+            absolute_point=Point(1, 2, 3),
+            is_meniscus=None,
         )
     ).then_return(
         LiquidHandlingWellLocation(
@@ -727,7 +730,10 @@ def test_dispense_to_well(
 
     decoy.when(
         mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
-            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+            labware_id="123abc",
+            well_name="my cool well",
+            absolute_point=Point(1, 2, 3),
+            is_meniscus=None,
         )
     ).then_return(
         LiquidHandlingWellLocation(

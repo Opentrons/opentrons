@@ -151,9 +151,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
+                is_meniscus=is_meniscus,
             )
-            if is_meniscus:
-                well_location.volumeOffset = "operationVolume"
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
@@ -183,6 +182,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
+        is_meniscus: Optional[bool] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -242,6 +242,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
+                is_meniscus=is_meniscus,
             )
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,

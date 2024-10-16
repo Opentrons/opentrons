@@ -387,6 +387,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
         well: Optional[labware.Well] = None
+        is_meniscus: Optional[bool] = None
         last_location = self._get_last_location_by_api_version()
 
         try:
@@ -405,6 +406,7 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
             if target.location:
                 move_to_location = target.location
+                is_meniscus = target.is_meniscus
             elif well.parent._core.is_fixed_trash():
                 move_to_location = target.well.top()
             else:
@@ -449,6 +451,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     flow_rate=flow_rate,
                     in_place=False,
                     push_out=push_out,
+                    is_meniscus=is_meniscus if is_meniscus is not None else None,
                 )
             return self
 
