@@ -154,14 +154,18 @@ class FrontButtonLightBlinker:
         `mark_persistence_init_complete()` have both been called.
         """
         if should_use_ot3():
-            # Dont run this task on the Flex
+            # Dont run this task on the Flex because,
+            # 1. There is no front button blinker on the Flex
+            # 2. The Flex raises an error when attempting to turn on the lights
+            #    while there is a system firmware update in progress. This causes
+            #    the hardware controller to fail initialization, leaving the
+            #    robot server in a bad state.
             return
 
         assert self._hardware_and_task is None, "hardware should only be set once."
 
         async def blink_forever() -> None:
             while True:
-                # This should no-op on a Flex.
                 await hardware.set_lights(button=True)
                 await asyncio.sleep(0.5)
                 await hardware.set_lights(button=False)
