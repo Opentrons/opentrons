@@ -1267,16 +1267,8 @@ export const ICON_DATA_BY_NAME = {
     fill: '',
     paths: [
       {
-        d: 'M10 2V18',
-        stroke: 'currentColor',
-        strokeWidth: '1.5',
-        strokeDasharray: '4 4',
-      },
-      {
-        d: 'M2 10L18 10',
-        stroke: 'currentColor',
-        strokeWidth: '1.5',
-        strokeDasharray: '4 4',
+        d:
+          'M9 4h1v2H9zM9 7h1v2H9zM4 9h2v1H4zM7 9h5v1H7zM13 9h2v1h-2zM9 10h1v2H9zM9 13h1v2H9z',
       },
     ],
     viewBox: '0 0 20 20',
