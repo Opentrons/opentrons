@@ -23,7 +23,7 @@ import {
   establishBrokerConnection,
   closeBrokerConnection,
 } from './notifications'
-import { ODD_DATA_DIR } from './constants'
+import { setUserDataPath } from './early'
 
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch, Logger } from './types'
@@ -35,14 +35,7 @@ import type { LogEntry } from 'winston'
  * https://github.com/node-fetch/node-fetch/issues/1624
  */
 dns.setDefaultResultOrder('ipv4first')
-console.log(
-  `node env is ${process.env.NODE_ENV}, path is ${app.getPath('userData')}`
-)
-if (process.env.NODE_ENV === 'production') {
-  console.log(`setting app path to ${ODD_DATA_DIR}`)
-  app.setPath('userData', ODD_DATA_DIR)
-}
-console.log(`app path becomes ${app.getPath('userData')}`)
+setUserDataPath()
 
 systemd.sendStatus('starting app')
 const config = getConfig()

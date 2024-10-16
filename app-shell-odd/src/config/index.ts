@@ -5,7 +5,6 @@ import get from 'lodash/get'
 import forEach from 'lodash/forEach'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
-
 import { UI_INITIALIZED } from '../constants'
 import * as Cfg from '../constants'
 import { configInitialized, configValueUpdated } from '../actions'
@@ -13,6 +12,7 @@ import systemd from '../systemd'
 import { createLogger } from '../log'
 import { DEFAULTS_V12, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
+import { setUserDataPath } from '../early'
 
 import type {
   ConfigV12,
@@ -46,6 +46,7 @@ const store = (): Store => {
     // perform store migration if loading for the first time
     _store = (new Store({
       defaults: DEFAULTS_V12,
+      cwd: setUserDataPath(),
     }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }
@@ -64,6 +65,11 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
     if (action.type === UI_INITIALIZED) {
       log().info('initializing configuration')
       dispatch(configInitialized(getFullConfig()))
+      log().info(
+        `flow route: ${
+          getConfig('onDeviceDisplaySettings').unfinishedUnboxingFlowRoute
+        }`
+      )
       log().info('configuration initialized')
     } else if (
       action.type === Cfg.UPDATE_VALUE ||
