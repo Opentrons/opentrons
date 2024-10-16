@@ -6,6 +6,7 @@ import {
   DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
+  Link,
   ModuleIcon,
   RadioButton,
   SPACING,
@@ -17,6 +18,7 @@ import {
   FLEX_ROBOT_TYPE,
   getModuleDisplayName,
   getModuleType,
+  MAGNETIC_MODULE_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
@@ -38,6 +40,7 @@ import {
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
 import { getEnableAbsorbanceReader } from '../../../feature-flags/selectors'
+import { useBlockingHint } from '../../../organisms/BlockingHintModal/useBlockingHint'
 import { selectors } from '../../../labware-ingred/selectors'
 import { useKitchen } from '../../../organisms/Kitchen/hooks'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
@@ -76,6 +79,9 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     selectedNestedLabwareDefUri,
   } = selectedSlotInfo
   const { slot, cutout } = selectedSlot
+  const [changeModuleWarningInfo, displayModuleWarning] = useState<boolean>(
+    false
+  )
   const [selectedHardware, setSelectedHardware] = useState<
     ModuleModel | Fixture | null
   >(null)
@@ -95,6 +101,58 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const [tab, setTab] = useState<'hardware' | 'labware'>(
     moduleModels?.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
   )
+  const hasMagneticModule = Object.values(deckSetup.modules).some(
+    module => module.type === MAGNETIC_MODULE_TYPE
+  )
+
+  const changeModuleWarning = useBlockingHint({
+    hintKey: 'change_magnet_module_model',
+    handleCancel: () => {
+      displayModuleWarning(false)
+    },
+    handleContinue: () => {
+      dispatch(
+        selectModule({
+          moduleModel: Object.values(deckSetup.modules).some(
+            module => module.model === 'magneticModuleV1'
+          )
+            ? 'magneticModuleV2'
+            : 'magneticModuleV1',
+        })
+      )
+      displayModuleWarning(false)
+      onCloseClick()
+    },
+    content: (
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('gen1_gen2_different_units')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('convert_gen1_to_gen2')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('convert_gen2_to_gen1')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('alter_pause')}
+        </StyledText>
+        <Flex>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('read_more_gen1_gen2')}{' '}
+            <Link
+              target="_blank"
+              rel="noopener noreferrer"
+              href="http://support.opentrons.com/en/articles/1820112-magnetic-module"
+            >
+              {t('here')}
+            </Link>
+          </StyledText>
+        </Flex>
+      </Flex>
+    ),
+    enabled: changeModuleWarningInfo,
+  })
 
   if (slot == null || (onDeckProps == null && slot !== 'offDeck')) {
     return null
@@ -236,194 +294,211 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
     onCloseClick()
   }
-
+  console.log('change module warning info', changeModuleWarningInfo)
   return (
-    <Toolbox
-      height="calc(100vh - 64px)"
-      width="23.375rem"
-      title={
-        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel
-            deckLabel={
-              slot === 'offDeck'
-                ? i18n.format(t('off_deck_title'), 'upperCase')
-                : slot
-            }
-          />
-          <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('customize_slot')}
+    <>
+      {changeModuleWarning}
+      <Toolbox
+        height="calc(100vh - 64px)"
+        width="23.375rem"
+        title={
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+            <DeckInfoLabel
+              deckLabel={
+                slot === 'offDeck'
+                  ? i18n.format(t('off_deck_title'), 'upperCase')
+                  : slot
+              }
+            />
+            <StyledText desktopStyle="bodyLargeSemiBold">
+              {t('customize_slot')}
+            </StyledText>
+          </Flex>
+        }
+        closeButton={
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('clear')}
           </StyledText>
-        </Flex>
-      }
-      closeButton={
-        <StyledText desktopStyle="bodyDefaultRegular">{t('clear')}</StyledText>
-      }
-      onCloseClick={() => {
-        handleClear()
-        handleResetToolbox()
-      }}
-      onConfirmClick={() => {
-        handleConfirm()
-      }}
-      confirmButtonText={t('done')}
-    >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        {slot !== 'offDeck' ? <Tabs tabs={[hardwareTab, labwareTab]} /> : null}
-        {tab === 'hardware' ? (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyDefaultSemiBold">
-                {t('add_module')}
-              </StyledText>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {moduleModels?.map(model => {
-                  const modelSomewhereOnDeck = Object.values(
-                    deckSetupModules
-                  ).filter(
-                    module => module.model === model && module.slot !== slot
-                  )
-                  const typeSomewhereOnDeck = Object.values(
-                    deckSetupModules
-                  ).filter(
-                    module =>
-                      module.type === getModuleType(model) &&
-                      module.slot !== slot
-                  )
-                  const moamModels = MOAM_MODELS
-
-                  const collisionError = getDeckErrors({
-                    modules: deckSetupModules,
-                    selectedSlot: slot,
-                    selectedModel: model,
-                    labware: deckSetupLabware,
-                    robotType,
-                  })
-
-                  return (
-                    <RadioButton
-                      setNoHover={() => {
-                        if (onDeckProps?.setHoveredModule != null) {
-                          onDeckProps.setHoveredModule(null)
-                        }
-                      }}
-                      setHovered={() => {
-                        if (onDeckProps?.setHoveredModule != null) {
-                          onDeckProps.setHoveredFixture(null)
-                          onDeckProps.setHoveredModule(model)
-                        }
-                      }}
-                      largeDesktopBorderRadius
-                      buttonLabel={
-                        <Flex
-                          gridGap={SPACING.spacing4}
-                          alignItems={ALIGN_CENTER}
-                        >
-                          <ModuleIcon
-                            size="1rem"
-                            moduleType={getModuleType(model)}
-                          />
-                          <StyledText desktopStyle="bodyDefaultRegular">
-                            {getModuleDisplayName(model)}
-                          </StyledText>
-                        </Flex>
-                      }
-                      key={`${model}_${slot}`}
-                      buttonValue={model}
-                      onChange={() => {
-                        if (
-                          modelSomewhereOnDeck.length === 1 &&
-                          !moamModels.includes(model) &&
-                          robotType === FLEX_ROBOT_TYPE
-                        ) {
-                          makeSnackbar(
-                            t('one_item', {
-                              hardware: getModuleDisplayName(model),
-                            }) as string
-                          )
-                        } else if (
-                          typeSomewhereOnDeck.length > 0 &&
-                          robotType === OT2_ROBOT_TYPE
-                        ) {
-                          makeSnackbar(
-                            t('one_item', {
-                              hardware: t(
-                                `shared:${getModuleType(model).toLowerCase()}`
-                              ),
-                            }) as string
-                          )
-                        } else if (collisionError != null) {
-                          makeSnackbar(t(`${collisionError}`) as string)
-                        } else {
-                          setSelectedHardware(model)
-                          dispatch(selectFixture({ fixture: null }))
-                          dispatch(selectModule({ moduleModel: model }))
-                          dispatch(selectLabware({ labwareDefUri: null }))
-                          dispatch(
-                            selectNestedLabware({ nestedLabwareDefUri: null })
-                          )
-                        }
-                      }}
-                      isSelected={model === selectedHardware}
-                    />
-                  )
-                })}
-              </Flex>
-            </Flex>
-            {robotType === OT2_ROBOT_TYPE || fixtures.length === 0 ? null : (
+        }
+        onCloseClick={() => {
+          handleClear()
+          handleResetToolbox()
+        }}
+        onConfirmClick={() => {
+          handleConfirm()
+        }}
+        confirmButtonText={t('done')}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          {slot !== 'offDeck' ? (
+            <Tabs tabs={[hardwareTab, labwareTab]} />
+          ) : null}
+          {tab === 'hardware' ? (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 <StyledText desktopStyle="bodyDefaultSemiBold">
-                  {t('add_fixture')}
+                  {t('add_module')}
                 </StyledText>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                 >
-                  {fixtures.map(fixture => (
-                    <RadioButton
-                      setNoHover={() => {
-                        if (onDeckProps?.setHoveredFixture != null) {
-                          onDeckProps.setHoveredFixture(null)
+                  {moduleModels?.map(model => {
+                    const modelSomewhereOnDeck = Object.values(
+                      deckSetupModules
+                    ).filter(
+                      module => module.model === model && module.slot !== slot
+                    )
+                    const typeSomewhereOnDeck = Object.values(
+                      deckSetupModules
+                    ).filter(
+                      module =>
+                        module.type === getModuleType(model) &&
+                        module.slot !== slot
+                    )
+                    const moamModels = MOAM_MODELS
+
+                    const collisionError = getDeckErrors({
+                      modules: deckSetupModules,
+                      selectedSlot: slot,
+                      selectedModel: model,
+                      labware: deckSetupLabware,
+                      robotType,
+                    })
+
+                    return (
+                      <RadioButton
+                        setNoHover={() => {
+                          if (onDeckProps?.setHoveredModule != null) {
+                            onDeckProps.setHoveredModule(null)
+                          }
+                        }}
+                        setHovered={() => {
+                          if (onDeckProps?.setHoveredModule != null) {
+                            onDeckProps.setHoveredModule(model)
+                          }
+                        }}
+                        largeDesktopBorderRadius
+                        buttonLabel={
+                          <Flex
+                            gridGap={SPACING.spacing4}
+                            alignItems={ALIGN_CENTER}
+                          >
+                            <ModuleIcon
+                              size="1rem"
+                              moduleType={getModuleType(model)}
+                            />
+                            <StyledText desktopStyle="bodyDefaultRegular">
+                              {getModuleDisplayName(model)}
+                            </StyledText>
+                          </Flex>
                         }
-                      }}
-                      setHovered={() => {
-                        if (onDeckProps?.setHoveredFixture != null) {
-                          onDeckProps.setHoveredModule(null)
-                          onDeckProps.setHoveredFixture(fixture)
-                        }
-                      }}
-                      largeDesktopBorderRadius
-                      buttonLabel={t(`shared:${fixture}`)}
-                      key={`${fixture}_${slot}`}
-                      buttonValue={fixture}
-                      onChange={() => {
-                        //    delete this when multiple trash bins are supported
-                        if (fixture === 'trashBin' && hasTrash) {
-                          makeSnackbar(
-                            t('one_item', {
-                              hardware: t('shared:trashBin'),
-                            }) as string
-                          )
-                        } else {
-                          setSelectedHardware(fixture)
-                          dispatch(selectModule({ moduleModel: null }))
-                          dispatch(selectFixture({ fixture }))
-                          dispatch(selectLabware({ labwareDefUri: null }))
-                          dispatch(
-                            selectNestedLabware({ nestedLabwareDefUri: null })
-                          )
-                        }
-                      }}
-                      isSelected={fixture === selectedHardware}
-                    />
-                  ))}
+                        key={`${model}_${slot}`}
+                        buttonValue={model}
+                        onChange={() => {
+                          if (
+                            modelSomewhereOnDeck.length === 1 &&
+                            !moamModels.includes(model) &&
+                            robotType === FLEX_ROBOT_TYPE
+                          ) {
+                            makeSnackbar(
+                              t('one_item', {
+                                hardware: getModuleDisplayName(model),
+                              }) as string
+                            )
+                          } else if (
+                            typeSomewhereOnDeck.length > 0 &&
+                            robotType === OT2_ROBOT_TYPE
+                          ) {
+                            makeSnackbar(
+                              t('one_item', {
+                                hardware: t(
+                                  `shared:${getModuleType(model).toLowerCase()}`
+                                ),
+                              }) as string
+                            )
+                          } else if (collisionError != null) {
+                            makeSnackbar(t(`${collisionError}`) as string)
+                          } else if (
+                            hasMagneticModule &&
+                            (model === 'magneticModuleV1' ||
+                              model === 'magneticModuleV2')
+                          ) {
+                            displayModuleWarning(true)
+                          } else {
+                            setSelectedHardware(model)
+                            dispatch(selectFixture({ fixture: null }))
+                            dispatch(selectModule({ moduleModel: model }))
+                            dispatch(selectLabware({ labwareDefUri: null }))
+                            dispatch(
+                              selectNestedLabware({ nestedLabwareDefUri: null })
+                            )
+                          }
+                        }}
+                        isSelected={model === selectedHardware}
+                      />
+                    )
+                  })}
                 </Flex>
               </Flex>
-            )}
-          </Flex>
-        ) : (
-          <LabwareTools setHoveredLabware={setHoveredLabware} slot={slot} />
-        )}
-      </Flex>
-    </Toolbox>
+              {robotType === OT2_ROBOT_TYPE || fixtures.length === 0 ? null : (
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing8}
+                >
+                  <StyledText desktopStyle="bodyDefaultSemiBold">
+                    {t('add_fixture')}
+                  </StyledText>
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing4}
+                  >
+                    {fixtures.map(fixture => (
+                      <RadioButton
+                        setNoHover={() => {
+                          if (onDeckProps?.setHoveredFixture != null) {
+                            onDeckProps.setHoveredFixture(null)
+                          }
+                        }}
+                        setHovered={() => {
+                          if (onDeckProps?.setHoveredFixture != null) {
+                            onDeckProps.setHoveredFixture(fixture)
+                          }
+                        }}
+                        largeDesktopBorderRadius
+                        buttonLabel={t(`shared:${fixture}`)}
+                        key={`${fixture}_${slot}`}
+                        buttonValue={fixture}
+                        onChange={() => {
+                          //    delete this when multiple trash bins are supported
+                          if (fixture === 'trashBin' && hasTrash) {
+                            makeSnackbar(
+                              t('one_item', {
+                                hardware: t('shared:trashBin'),
+                              }) as string
+                            )
+                          } else {
+                            setSelectedHardware(fixture)
+                            dispatch(selectModule({ moduleModel: null }))
+                            dispatch(selectFixture({ fixture }))
+                            dispatch(selectLabware({ labwareDefUri: null }))
+                            dispatch(
+                              selectNestedLabware({ nestedLabwareDefUri: null })
+                            )
+                          }
+                        }}
+                        isSelected={fixture === selectedHardware}
+                      />
+                    ))}
+                  </Flex>
+                </Flex>
+              )}
+            </Flex>
+          ) : (
+            <LabwareTools setHoveredLabware={setHoveredLabware} slot={slot} />
+          )}
+        </Flex>
+      </Toolbox>
+    </>
   )
 }
