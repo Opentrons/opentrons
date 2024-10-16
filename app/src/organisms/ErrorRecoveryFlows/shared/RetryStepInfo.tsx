@@ -29,6 +29,8 @@ export function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
         return 'take_necessary_actions_failed_pickup'
       case ERROR_KINDS.GRIPPER_ERROR:
         return 'robot_retry_failed_lw_movement'
+      case ERROR_KINDS.TIP_DROP_FAILED:
+        return 'take_necessary_actions_failed_tip_drop'
       default:
         return 'take_necessary_actions'
     }
