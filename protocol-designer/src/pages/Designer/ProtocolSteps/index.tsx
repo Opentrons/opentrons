@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
@@ -23,6 +24,7 @@ import {
   getIsMultiSelectMode,
   getSelectedSubstep,
   getSelectedStepId,
+  getHoveredStepId,
 } from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
@@ -51,15 +53,20 @@ export function ProtocolSteps(): JSX.Element {
     }
   }, [formData, formType, deckView])
 
-  const currentStepId = useSelector(getSelectedStepId)
+  const currentHoveredStepId = useSelector(getHoveredStepId)
+  const currentSelectedStepId = useSelector(getSelectedStepId)
+  const currentstepIdForStepSummary =
+    currentHoveredStepId ?? currentSelectedStepId
   const savedStepForms = useSelector(getSavedStepForms)
   const currentStep =
-    currentStepId != null ? savedStepForms[currentStepId] : null
+    currentstepIdForStepSummary != null
+      ? savedStepForms[currentstepIdForStepSummary]
+      : null
 
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      alignItems={ALIGN_CENTER}
+      // alignItems={ALIGN_CENTER}
       width="100%"
       gridGap={SPACING.spacing16}
       height="calc(100vh - 4rem)"
@@ -73,6 +80,8 @@ export function ProtocolSteps(): JSX.Element {
         gridGap={SPACING.spacing16}
         width="100%"
         paddingBottom={enableHoyKeyDisplay ? '5rem' : '0'}
+        paddingTop={SPACING.spacing16}
+        justifyContent={JUSTIFY_FLEX_START}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           {formData == null || formType === 'moveLabware' ? (
@@ -96,7 +105,9 @@ export function ProtocolSteps(): JSX.Element {
             ) : (
               <OffDeck tab="protocolSteps" />
             )}
-            <StepSummary currentStep={currentStep} />
+            {formData == null ? (
+              <StepSummary currentStep={currentStep} />
+            ) : null}
           </Flex>
         </Flex>
         {enableHoyKeyDisplay ? (
