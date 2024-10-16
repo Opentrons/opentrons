@@ -88,7 +88,7 @@ export function getReleaseFiles(
   directory: string
 ): Promise<ReleaseSetData> {
   return readdir(directory).then((files: string[]) => {
-    log.debug('Files in system update download directory', { files })
+    log.info(`Files in system update download directory ${directory}: ${files}`)
     const expected = {
       system: path.basename(urls.system),
       releaseNotes:
@@ -120,6 +120,9 @@ export function getReleaseFiles(
             ? outPath(directory, foundFiles.releaseNotes)
             : null,
       }
+      log.info(
+        `Found system file ${foundFiles.system} in cache directory ${directory}`
+      )
       return augmentWithReleaseNotesContent(files)
     }
 
@@ -144,7 +147,6 @@ export function downloadReleaseFiles(
   const tempDir: string = tempy.directory()
   const tempSystemPath = outPath(tempDir, urls.system)
   const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')
-
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously
   const notesReq =
@@ -158,6 +160,12 @@ export function downloadReleaseFiles(
           return null
         })
       : Promise.resolve(null)
+  if (urls.releaseNotes != null) {
+    log.info(`Downloading ${urls.releaseNotes} to ${tempNotesPath}`)
+  } else {
+    log.info('No release notes available, not downloading')
+  }
+  log.info(`Downloading ${urls.system} to ${tempSystemPath}`)
   const systemReq = fetchToFile(urls.system, tempSystemPath, {
     onProgress,
     signal: canceller.signal,
@@ -170,14 +178,15 @@ export function downloadReleaseFiles(
         ? outPath(directory, releaseNotesTemp)
         : null
 
-      log.debug('renaming directory', { from: tempDir, to: directory })
+      log.info(`Download complete, ${tempDir}=>${directory}`)
 
-      return move(tempDir, directory, { overwrite: true }).then(() =>
-        augmentWithReleaseNotesContent({
+      return move(tempDir, directory, { overwrite: true }).then(() => {
+        log.info(`Move complete`)
+        return augmentWithReleaseNotesContent({
           system: systemPath,
           releaseNotes: notesPath,
         })
-      )
+      })
     })
     .catch(error => {
       log.error(
@@ -199,7 +208,7 @@ export async function getOrDownloadReleaseFiles(
     return await getReleaseFiles(urls, releaseCacheDirectory)
   } catch (error: any) {
     log.info(
-      `Could not find cached release files for  ${releaseCacheDirectory}: ${error.name}: ${error.message}`
+      `Could not find cached release files for  ${releaseCacheDirectory}: ${error.name}: ${error.message}, attempting to download`
     )
     return await downloadReleaseFiles(
       urls,

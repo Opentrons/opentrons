@@ -55,15 +55,17 @@ export const downloadManifest = (
   manifestUrl: string,
   cacheDir: string,
   cancel: AbortController
-): Promise<ReleaseManifest> =>
-  fetchJson<ReleaseManifest>(manifestUrl, { signal: cancel.signal }).then(
-    manifest => {
-      log.info('Fetched release manifest OK')
-      return outputJson(path.join(cacheDir, 'manifest.json'), manifest).then(
-        () => manifest
-      )
-    }
-  )
+): Promise<ReleaseManifest> => {
+  log.info(`Attempting to fetch release manifest from ${manifestUrl}`)
+  return fetchJson<ReleaseManifest>(manifestUrl, {
+    signal: cancel.signal,
+  }).then(manifest => {
+    log.info('Fetched release manifest OK')
+    return outputJson(path.join(cacheDir, 'manifest.json'), manifest).then(
+      () => manifest
+    )
+  })
+}
 
 export const ensureCacheDirAndDownloadManifest = (
   manifestUrl: string,

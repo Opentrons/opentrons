@@ -27,8 +27,11 @@ export interface UpdateDriver {
   teardown: () => Promise<void>
 }
 
-export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
+export function registerUpdateDriver(upstreamDispatch: Dispatch): UpdateDriver {
   log.info(`Running robot system updates storing to ${getSystemUpdateDir()}`)
+  const dispatch: Dispatch = action => {
+    upstreamDispatch(action)
+  }
   let webUpdate: UnresolvedUpdate = {
     version: null,
     files: null,
@@ -314,7 +317,7 @@ export function registerUpdateDriver(dispatch: Dispatch): UpdateDriver {
           log.error(`Failed to tear down some providers: ${errs}`)
         })
         .then(results => {
-          log.info('all providers town down')
+          log.info('all providers torn down')
         })
     },
   }

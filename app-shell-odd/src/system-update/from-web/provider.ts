@@ -104,6 +104,7 @@ export function getProvider(
       log.debug(`no release urls found, returning`)
       return returnNoUpdate()
     }
+    log.info(`Finding version ${latestVersion}`)
     const downloadingUpdate = {
       version: latestVersion,
       files: null,
@@ -124,14 +125,18 @@ export function getProvider(
       versionCacheDir,
       versionToUpdate,
       (downloadProgress: DownloadProgress): void => {
+        const downloadProgressPercent =
+          downloadProgress.size == null || downloadProgress.size === 0.0
+            ? 0
+            : (downloadProgress.downloaded / downloadProgress.size) * 100
+        log.debug(
+          `Downloading update ${versionToUpdate}: ${downloadProgress.downloaded}/${downloadProgress.size}B (${downloadProgressPercent}%)`
+        )
         const update = {
           version: versionToUpdate,
           files: null,
           releaseNotes: null,
-          downloadProgress:
-            downloadProgress.size == null || downloadProgress.size === 0.0
-              ? 0
-              : (downloadProgress.downloaded / downloadProgress.size) * 100,
+          downloadProgress: downloadProgressPercent,
         }
         currentUpdate = update
         progress(update)
@@ -147,7 +152,11 @@ export function getProvider(
       }
       return null
     })
+
     if (localFiles == null) {
+      log.info(
+        `Download of ${versionToUpdate} failed, no release data is available`
+      )
       return returnNoUpdate()
     }
     if (myCanceller.signal.aborted) {
