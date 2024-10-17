@@ -54,7 +54,7 @@
   "overpressure_is_usually_caused": "Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly",
   "pick_up_tips": "Pick up tips",
   "pipette_overpressure": "Pipette overpressure",
-  "preserve_aspirated_liquid": "First, do you need to preserve aspirated liquid?",
+  "do_you_need_to_blowout": "First, do you need to blowout aspirated liquid?",
   "proceed_to_cancel": "Proceed to cancel",
   "proceed_to_tip_selection": "Proceed to tip selection",
   "recovery_action_failed": "{{action}} failed",
