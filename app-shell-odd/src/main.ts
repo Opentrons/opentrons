@@ -110,7 +110,9 @@ function startUp(): void {
     log.debug(
       `bouncing action ${action.type} to ${actionHandlers.length} handlers`
     )
-    actionHandlers.forEach(handler => handler(action))
+    actionHandlers.forEach(handler => {
+      handler(action)
+    })
   }
 
   mainWindow = createUi(dispatch)

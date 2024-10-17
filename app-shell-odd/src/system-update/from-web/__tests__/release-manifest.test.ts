@@ -5,7 +5,6 @@ import { readdir, writeFile, mkdir, readFile } from 'fs/promises'
 import { fetchJson as _fetchJson } from '../../../http'
 import { ensureCacheDir, getOrDownloadManifest } from '../release-manifest'
 import { directoryWithCleanup } from '../../utils'
-import { createLogger } from '../../../log'
 
 vi.mock('../../../http')
 // note: this doesn't look like it's needed but it is because http uses log

@@ -2,7 +2,7 @@
 
 import Semver from 'semver'
 
-import { CONFIG_INITIALIZED } from '../constants'
+import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../constants'
 import { createLogger } from '../log'
 import { postFile } from '../http'
 import { getConfig } from '../config'
@@ -14,7 +14,6 @@ import { getProvider as getUsbUpdateProvider } from './from-usb'
 import type { Action, Dispatch } from '../types'
 import type { UpdateProvider, UnresolvedUpdate, ReadyUpdate } from './types'
 import type { USBUpdateSource } from './from-usb'
-import { VALUE_UPDATED } from '../constants'
 
 export const CURRENT_SYSTEM_VERSION = _PKG_VERSION_
 
