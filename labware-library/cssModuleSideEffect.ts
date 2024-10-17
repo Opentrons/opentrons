@@ -1,7 +1,8 @@
 import type { Plugin } from 'vite'
 
 /**
- * Creates a Vite plugin that marks CSS modules as having side effects
+ * Plugin to make sure CSS modules do not get tree shaked out of the dist.
+ * see https://github.com/vitejs/vite/pull/16051
  *
  * @returns {Plugin} The Vite plugin object.
  */
