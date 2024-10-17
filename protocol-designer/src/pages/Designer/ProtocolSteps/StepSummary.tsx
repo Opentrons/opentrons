@@ -1,6 +1,8 @@
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import { first, flatten, last } from 'lodash'
+import first from 'lodash/first'
+import flatten from 'lodash/flatten'
+import last from 'lodash/last'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -381,15 +383,17 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       gridGap={SPACING.spacing4}
       width="100%"
     >
-      <Flex
-        backgroundColor={COLORS.grey30}
-        padding={SPACING.spacing12}
-        borderRadius={BORDERS.borderRadius4}
-        width={FLEX_MAX_CONTENT}
-        minWidth="100%"
-      >
-        {stepSummaryContent}
-      </Flex>
+      {stepSummaryContent != null ? (
+        <Flex
+          backgroundColor={COLORS.grey30}
+          padding={SPACING.spacing12}
+          borderRadius={BORDERS.borderRadius4}
+          width={FLEX_MAX_CONTENT}
+          minWidth="100%"
+        >
+          {stepSummaryContent}
+        </Flex>
+      ) : null}
       {stepDetails != null && stepDetails !== '' ? (
         <StyledText
           backgroundColor={COLORS.grey30}
