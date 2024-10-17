@@ -102,16 +102,18 @@ function startUp(): void {
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (mainWindow) {
-      log.silly('Sending action via IPC to renderer', { action })
-      mainWindow.webContents.send('dispatch', action)
-    }
-    log.debug(
-      `bouncing action ${action.type} to ${actionHandlers.length} handlers`
-    )
-    actionHandlers.forEach(handler => {
-      handler(action)
+    process.nextTick(() => {
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (mainWindow) {
+        log.silly('Sending action via IPC to renderer', { action })
+        mainWindow.webContents.send('dispatch', action)
+      }
+      log.debug(
+        `bouncing action ${action.type} to ${actionHandlers.length} handlers`
+      )
+      actionHandlers.forEach(handler => {
+        handler(action)
+      })
     })
   }
 
