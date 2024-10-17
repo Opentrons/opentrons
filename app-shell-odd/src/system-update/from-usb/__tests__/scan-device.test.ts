@@ -3,7 +3,7 @@ import { when } from 'vitest-when'
 
 import { getVersionFromZipIfValid as _getVersionFromZipIfValid } from '../scan-zip'
 import { getLatestMassStorageUpdateFile } from '../scan-device'
-
+vi.mock('../../../log')
 vi.mock('../scan-zip')
 const getVersionFromZipIfValid = vi.mocked(_getVersionFromZipIfValid)
 

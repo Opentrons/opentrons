@@ -1,4 +1,4 @@
-import { it, describe, expect } from 'vitest'
+import { it, describe, expect, vi } from 'vitest'
 import path from 'path'
 import { exec as _exec } from 'child_process'
 import { promisify } from 'util'
@@ -7,6 +7,7 @@ import { REASONABLE_VERSION_FILE_SIZE_B } from '../../constants'
 import { directoryWithCleanup } from '../../utils'
 import { getVersionFromZipIfValid } from '../scan-zip'
 
+vi.mock('../../../log')
 const exec = promisify(_exec)
 
 const zipCommand = (
