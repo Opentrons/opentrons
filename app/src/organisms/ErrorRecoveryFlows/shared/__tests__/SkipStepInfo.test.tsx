@@ -58,6 +58,18 @@ describe('SkipStepInfo', () => {
     })
   })
 
+  it(`renders correct title and body text for ${RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE
+    render(props)
+
+    screen.getByText('Skip to next step')
+    screen.getByText(
+      "First, inspect the robot to ensure it's prepared to continue the run from the next step."
+    )
+    screen.getByText('Then, close the robot door before proceeding.')
+  })
+
   it(`renders correct title and body text for ${RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE}`, () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE
@@ -95,8 +107,7 @@ describe('SkipStepInfo', () => {
   })
 
   it('renders error message for unexpected recovery option', () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE
+    props.currentRecoveryOptionUtils.selectedRecoveryOption = 'UNEXPECTED_ROUTE' as any
     render(props)
 
     expect(screen.getAllByText('UNEXPECTED STEP')[0]).toBeInTheDocument()
