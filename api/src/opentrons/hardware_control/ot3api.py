@@ -2319,6 +2319,10 @@ class OT3API(
         if home_after:
             await self._home([Axis.by_mount(mount)])
 
+        # call this in case we're simulating:
+        if isinstance(self._backend, OT3Simulator):
+            self._backend._update_tip_state(realmount, False)
+
     async def drop_tip(
         self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
@@ -2335,10 +2339,6 @@ class OT3API(
 
         self.set_current_tiprack_diameter(mount, 0.0)
         await self.remove_tip(mount)
-
-        # call this in case we're simulating:
-        if isinstance(self._backend, OT3Simulator):
-            self._backend._update_tip_state(realmount, False)
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
