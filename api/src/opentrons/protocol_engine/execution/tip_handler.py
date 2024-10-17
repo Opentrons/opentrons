@@ -68,13 +68,19 @@ class TipHandler(TypingProtocol):
 
         Returns:
             Tip geometry of the picked up tip.
+
+        Raises:
+            TipNotAttachedError
         """
         ...
 
     async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
-        """Drop the attached tip into the named location.
+        """Drop the attached tip into the current location.
 
         Pipette should be in place over the destination prior to calling this method.
+
+        Raises:
+            TipAttachedError
         """
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
@@ -89,7 +95,12 @@ class TipHandler(TypingProtocol):
         expected: TipPresenceStatus,
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
-        """Verify the expected tip presence status."""
+        """Use sensors to verify that a tip is or is not physically attached.
+
+        Raises:
+            TipNotAttachedError or TipAttachedError, as appropriate, if the physical
+            status doesn't match what was expected.
+        """
 
 
 async def _available_for_nozzle_layout(  # noqa: C901
@@ -195,7 +206,7 @@ class HardwareTipHandler(TipHandler):
         front_right_nozzle: Optional[str] = None,
         back_left_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
-        """Returns configuration for nozzle layout to pass to configure_nozzle_layout."""
+        """See documentation on abstract base class."""
         if self._state_view.pipettes.get_attached_tip(pipette_id):
             raise CommandPreconditionViolated(
                 message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
@@ -211,7 +222,7 @@ class HardwareTipHandler(TipHandler):
         labware_id: str,
         well_name: str,
     ) -> TipGeometry:
-        """Pick up a tip at the current location using the Hardware API."""
+        """See documentation on abstract base class."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
         nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
@@ -249,7 +260,7 @@ class HardwareTipHandler(TipHandler):
         )
 
     async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
-        """Drop a tip at the current location using the Hardware API."""
+        """See documentation on abstract base class."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
         # Let the hardware controller handle defaulting home_after since its behavior
@@ -263,7 +274,7 @@ class HardwareTipHandler(TipHandler):
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
-        """Tell the Hardware API that a tip is attached."""
+        """See documentation on abstract base class."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
         await self._hardware_api.add_tip(mount=hw_mount, tip_length=tip.length)
@@ -279,7 +290,7 @@ class HardwareTipHandler(TipHandler):
         )
 
     async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
-        """Get the tip presence status of the pipette."""
+        """See documentation on abstract base class."""
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
 
@@ -297,11 +308,7 @@ class HardwareTipHandler(TipHandler):
         expected: TipPresenceStatus,
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
-        """Verify the expecterd tip presence status of the pipette.
-
-        This function will raise an exception if the specified tip presence status
-        isn't matched.
-        """
+        """See documentation on abstract base class."""
         nozzle_configuration = (
             self._state_view.pipettes.state.nozzle_configuration_by_id[pipette_id]
         )
@@ -385,7 +392,7 @@ class VirtualTipHandler(TipHandler):
         front_right_nozzle: Optional[str] = None,
         back_left_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
-        """Returns configuration for nozzle layout to pass to configure_nozzle_layout."""
+        """See documentation on abstract base class."""
         if self._state_view.pipettes.get_attached_tip(pipette_id):
             raise CommandPreconditionViolated(
                 message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."

@@ -9,6 +9,7 @@ import {
   COLORS,
   Flex,
   Icon,
+  POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
   SecondaryButton,
@@ -19,6 +20,7 @@ import {
 import { stepIconsByType } from '../../../../form-types'
 import { FormAlerts } from '../../../../organisms'
 import { useKitchen } from '../../../../organisms/Kitchen/hooks'
+import { RenameStepModal } from '../../../../organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
@@ -90,7 +92,14 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     getTimelineWarningsForSelectedStep
   )
   const timeline = useSelector(getRobotStateTimeline)
-  const [toolboxStep, setToolboxStep] = useState<number>(0)
+  const [toolboxStep, setToolboxStep] = useState<number>(
+    // progress to step 2 if thermocycler form is populated
+    formData.thermocyclerFormType === 'thermocyclerProfile' ||
+      formData.thermocyclerFormType === 'thermocyclerState'
+      ? 1
+      : 0
+  )
+  const [isRename, setIsRename] = useState<boolean>(false)
   const icon = stepIconsByType[formData.stepType]
 
   const ToolsComponent: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
@@ -130,9 +139,19 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       }) as string
     )
   }
+
   return (
     <>
+      {isRename ? (
+        <RenameStepModal
+          formData={formData}
+          onClose={() => {
+            setIsRename(false)
+          }}
+        />
+      ) : null}
       <Toolbox
+        position={POSITION_RELATIVE}
         subHeader={
           isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
@@ -143,7 +162,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         secondaryHeaderButton={
           <Btn
             onClick={() => {
-              console.log('TODO: wire this up')
+              setIsRename(true)
             }}
             css={BUTTON_LINK_STYLE}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
@@ -192,7 +211,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <Icon size="1rem" name={icon} />
             <StyledText desktopStyle="bodyLargeSemiBold">
-              {i18n.format(t(`stepType.${formData.stepType}`), 'capitalize')}
+              {i18n.format(t(formData.stepName), 'capitalize')}
             </StyledText>
           </Flex>
         }

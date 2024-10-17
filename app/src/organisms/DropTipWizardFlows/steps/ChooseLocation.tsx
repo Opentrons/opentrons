@@ -76,6 +76,8 @@ export function ChooseLocation({
         return t('trash_bin_in_slot', { slot: slotName })
       case 'waste-chute':
         return t('waste_chute_in_slot', { slot: slotName })
+      case 'fixed-trash':
+        return t('fixed_trash_in_12')
       case 'deck':
         return t('choose_deck_location')
       default:
@@ -115,6 +117,7 @@ export function ChooseLocation({
       case 'labware':
       case 'trash-bin':
       case 'waste-chute':
+      case 'fixed-trash':
         executeCommands()
         break
       default:

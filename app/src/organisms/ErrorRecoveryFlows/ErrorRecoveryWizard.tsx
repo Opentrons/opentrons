@@ -24,16 +24,18 @@ import {
   useErrorDetailsModal,
   ErrorDetailsModal,
   RecoveryInterventionModal,
+  RecoveryDoorOpenSpecial,
 } from './shared'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
+import { useHomeGripperZAxis } from './hooks'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { RecoveryRoute, RouteStep, RecoveryContentProps } from './types'
-import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 
 export interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -68,6 +70,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     isOnDevice: boolean
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
+    allRunDefs: LabwareDefinition2[]
   }
 
 export function ErrorRecoveryWizard(
@@ -86,6 +89,8 @@ export function ErrorRecoveryWizard(
     recoveryCommands,
     routeUpdateActions,
   })
+
+  useHomeGripperZAxis(props)
 
   return <ErrorRecoveryComponent errorKind={errorKind} {...props} />
 }
@@ -135,7 +140,6 @@ export function ErrorRecoveryComponent(
     </StyledText>
   )
 
-  // TODO(jh, 07-29-24): Make RecoveryDoorOpen render logic equivalent to RecoveryTakeover. Do not nest it in RecoveryWizard.
   const buildInterventionContent = (): JSX.Element => {
     if (isProhibitedDoorOpen) {
       return <RecoveryDoorOpen {...props} />
@@ -184,7 +188,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RecoveryInProgress {...props} />
   }
 
-  const buildResumeRun = (): JSX.Element => {
+  const buildRetryStep = (): JSX.Element => {
     return <RetryStep {...props} />
   }
 
@@ -232,13 +236,17 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RecoveryDoorOpen {...props} />
   }
 
+  const buildRecoveryDoorOpenSpecial = (): JSX.Element => {
+    return <RecoveryDoorOpenSpecial {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
     case RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE:
       return buildRecoveryError()
     case RECOVERY_MAP.RETRY_STEP.ROUTE:
-      return buildResumeRun()
+      return buildRetryStep()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
       return buildCancelRun()
     case RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE:
@@ -259,6 +267,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildManualMoveLwAndSkip()
     case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
       return buildManualReplaceLwAndRetry()
+    case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
+      return buildRecoveryDoorOpenSpecial()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:

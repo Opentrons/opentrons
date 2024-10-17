@@ -15,6 +15,7 @@ export type ModuleRunTimeCommand =
   | TCDeactivateBlockRunTimeCommand
   | TCDeactivateLidRunTimeCommand
   | TCRunProfileRunTimeCommand
+  | TCRunExtendedProfileRunTimeCommand
   | TCAwaitProfileCompleteRunTimeCommand
   | HeaterShakerSetTargetTemperatureRunTimeCommand
   | HeaterShakerWaitForTemperatureRunTimeCommand
@@ -23,6 +24,10 @@ export type ModuleRunTimeCommand =
   | HeaterShakerCloseLatchRunTimeCommand
   | HeaterShakerDeactivateHeaterRunTimeCommand
   | HeaterShakerDeactivateShakerRunTimeCommand
+  | AbsorbanceReaderOpenLidRunTimeCommand
+  | AbsorbanceReaderCloseLidRunTimeCommand
+  | AbsorbanceReaderInitializeRunTimeCommand
+  | AbsorbanceReaderReadRunTimeCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
@@ -39,6 +44,7 @@ export type ModuleCreateCommand =
   | TCDeactivateBlockCreateCommand
   | TCDeactivateLidCreateCommand
   | TCRunProfileCreateCommand
+  | TCRunExtendedProfileCreateCommand
   | TCAwaitProfileCompleteCreateCommand
   | HeaterShakerWaitForTemperatureCreateCommand
   | HeaterShakerSetAndWaitForShakeSpeedCreateCommand
@@ -47,6 +53,10 @@ export type ModuleCreateCommand =
   | HeaterShakerDeactivateHeaterCreateCommand
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerSetTargetTemperatureCreateCommand
+  | AbsorbanceReaderOpenLidCreateCommand
+  | AbsorbanceReaderCloseLidCreateCommand
+  | AbsorbanceReaderInitializeCreateCommand
+  | AbsorbanceReaderReadCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -189,6 +199,16 @@ export interface TCRunProfileRunTimeCommand
     TCRunProfileCreateCommand {
   result?: any
 }
+export interface TCRunExtendedProfileCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/runExtendedProfile'
+  params: TCExtendedProfileParams
+}
+export interface TCRunExtendedProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCRunExtendedProfileCreateCommand {
+  result?: any
+}
 export interface TCAwaitProfileCompleteCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/awaitProfileComplete'
@@ -269,12 +289,56 @@ export interface HeaterShakerDeactivateShakerRunTimeCommand
     HeaterShakerDeactivateShakerCreateCommand {
   result?: any
 }
-
+export interface AbsorbanceReaderOpenLidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderOpenLidCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderCloseLidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderCloseLidCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderInitializeRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderInitializeCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderReadRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderReadCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderOpenLidCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/openLid'
+  params: ModuleOnlyParams
+}
+export interface AbsorbanceReaderCloseLidCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/closeLid'
+  params: ModuleOnlyParams
+}
+export interface AbsorbanceReaderInitializeCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/initialize'
+  params: AbsorbanceReaderInitializeParams
+}
+export interface AbsorbanceReaderReadCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/read'
+  params: ModuleOnlyParams
+}
 export interface EngageMagnetParams {
   moduleId: string
   height: number
 }
-
+export interface AbsorbanceReaderInitializeParams {
+  moduleId: string
+  measureMode: 'single' | 'multi'
+  sampleWavelengths: number[]
+  referenceWavelength?: number
+}
 export interface TemperatureParams {
   moduleId: string
   celsius: number
@@ -304,4 +368,15 @@ export interface ThermocyclerSetTargetBlockTemperatureParams {
   celsius: number
   volume?: number
   holdTimeSeconds?: number
+}
+
+export interface TCProfileCycle {
+  steps: AtomicProfileStep[]
+  repetitions: number
+}
+
+export interface TCExtendedProfileParams {
+  moduleId: string
+  profileElements: Array<TCProfileCycle | AtomicProfileStep>
+  blockMaxVolumeUl?: number
 }

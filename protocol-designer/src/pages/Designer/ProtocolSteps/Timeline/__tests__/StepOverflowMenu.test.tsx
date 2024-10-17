@@ -3,19 +3,28 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
-import { duplicateStep } from '../../../../../ui/steps/actions/thunks'
+import {
+  getMultiSelectItemIds,
+  actions as stepsActions,
+} from '../../../../../ui/steps'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
+  getSavedStepForms,
   getUnsavedForm,
 } from '../../../../../step-forms/selectors'
+import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '../../../../../ui/steps/actions/actions'
 import type * as React from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 
 const mockConfirm = vi.fn()
 const mockCancel = vi.fn()
 
+vi.mock('../../../../../ui/steps')
 vi.mock('../../../../../step-forms/selectors')
 vi.mock('../../../../../ui/steps/actions/actions')
 vi.mock('../../../../../ui/steps/actions/thunks')
@@ -37,19 +46,27 @@ const render = (props: React.ComponentProps<typeof StepOverflowMenu>) => {
   })[0]
 }
 
+const moveLiquidStepId = 'mockId'
 describe('StepOverflowMenu', () => {
   let props: React.ComponentProps<typeof StepOverflowMenu>
 
   beforeEach(() => {
     props = {
-      stepId: 'mockId',
+      stepId: moveLiquidStepId,
       top: 0,
       menuRootRef: { current: null },
       setStepOverflowMenu: vi.fn(),
     }
+    vi.mocked(getMultiSelectItemIds).mockReturnValue(null)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
     vi.mocked(getCurrentFormHasUnsavedChanges).mockReturnValue(false)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
+    vi.mocked(getSavedStepForms).mockReturnValue({
+      [moveLiquidStepId]: {
+        stepType: 'moveLiquid',
+        id: moveLiquidStepId,
+      },
+    })
   })
 
   it('renders each button and clicking them calls the action', () => {
@@ -59,10 +76,19 @@ describe('StepOverflowMenu', () => {
     fireEvent.click(screen.getByText('delete step'))
     expect(mockConfirm).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Duplicate step'))
-    expect(vi.mocked(duplicateStep)).toHaveBeenCalled()
+    expect(vi.mocked(stepsActions.duplicateStep)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Edit step'))
     expect(mockConfirm).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('View commands'))
-    //  TODO: wire up view commands
+    fireEvent.click(screen.getByText('View details'))
+    expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()
+    expect(vi.mocked(toggleViewSubstep)).toHaveBeenCalled()
+  })
+
+  it('renders the multi select overflow menu', () => {
+    vi.mocked(getMultiSelectItemIds).mockReturnValue(['1', '2'])
+    render(props)
+    screen.getByText('Duplicate steps')
+    screen.getByText('Delete steps')
+    screen.getByText('Delete multiple steps')
   })
 })

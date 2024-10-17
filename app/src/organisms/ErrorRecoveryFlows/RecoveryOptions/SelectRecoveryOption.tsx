@@ -89,6 +89,7 @@ export function SelectRecoveryOptionHome({
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
             getRecoveryOptionCopy={getRecoveryOptionCopy}
+            errorKind={errorKind}
           />
         </Flex>
         <Flex css={DESKTOP_ONLY}>
@@ -97,6 +98,7 @@ export function SelectRecoveryOptionHome({
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
             getRecoveryOptionCopy={getRecoveryOptionCopy}
+            errorKind={errorKind}
           />
         </Flex>
       </Flex>
@@ -109,10 +111,12 @@ interface RecoveryOptionsProps {
   validRecoveryOptions: RecoveryRoute[]
   setSelectedRoute: (route: RecoveryRoute) => void
   getRecoveryOptionCopy: RecoveryContentProps['getRecoveryOptionCopy']
+  errorKind: ErrorKind
   selectedRoute?: RecoveryRoute
 }
 // For ODD use only.
 export function ODDRecoveryOptions({
+  errorKind,
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
@@ -125,7 +129,7 @@ export function ODDRecoveryOptions({
       width="100%"
     >
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
-        const optionName = getRecoveryOptionCopy(recoveryOption)
+        const optionName = getRecoveryOptionCopy(recoveryOption, errorKind)
         return (
           <RadioButton
             key={`recovery_option_${optionName}`}
@@ -144,6 +148,7 @@ export function ODDRecoveryOptions({
 }
 
 export function DesktopRecoveryOptions({
+  errorKind,
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
@@ -166,7 +171,7 @@ export function DesktopRecoveryOptions({
                 role="label"
                 htmlFor={option}
               >
-                {getRecoveryOptionCopy(option)}
+                {getRecoveryOptionCopy(option, errorKind)}
               </StyledText>
             ),
           } as const)
@@ -195,6 +200,8 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return OVERPRESSURE_WHILE_DISPENSING_OPTIONS
     case ERROR_KINDS.TIP_NOT_DETECTED:
       return TIP_NOT_DETECTED_OPTIONS
+    case ERROR_KINDS.TIP_DROP_FAILED:
+      return TIP_DROP_FAILED_OPTIONS
     case ERROR_KINDS.GRIPPER_ERROR:
       return GRIPPER_ERROR_OPTIONS
     case ERROR_KINDS.GENERAL_ERROR:
@@ -226,6 +233,12 @@ export const OVERPRESSURE_WHILE_DISPENSING_OPTIONS: RecoveryRoute[] = [
 ]
 
 export const TIP_NOT_DETECTED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.RETRY_STEP.ROUTE,
+  RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const TIP_DROP_FAILED_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_STEP.ROUTE,
   RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,

@@ -8,7 +8,11 @@ The Opentrons AI application helps you to create a protocol with natural languag
 
 ## Developing
 
-To get started: clone the `Opentrons/opentrons` repository, set up your computer for development as specified in the [contributing guide][contributing-guide-setup], and then:
+To get started:
+
+1. Clone the `Opentrons/opentrons` repository
+1. Read the [contributing guide.][contributing-guide-setup]
+1. Follow the [DEV_SETUP.md](../DEV_SETUP.md) for your platform.
 
 ```shell
 # change into the cloned directory
@@ -22,6 +26,23 @@ make teardown-js && make setup-js
 
 # launch the dev server
 make -C opentrons-ai-client dev
+```
+
+## Auth0
+
+[Auth0 requires consent](https://auth0.com/docs/get-started/applications/confidential-and-public-applications/user-consent-and-third-party-applications#skip-consent-for-first-party-applications) in the local application.
+
+### Allow consent in the local application
+
+Alter the `authorizationParams` in `src/main.tsx`, provide consent, then remove the change. Once you provide consent in the local application, you will not be prompted for consent again. The consent is stored in Auth0.
+
+```ts
+// src/main.tsx
+authorizationParams={{
+          redirect_uri: window.location.origin,
+          prompt: 'consent',
+          audience: 'sandbox-ai-api',
+        }}
 ```
 
 ## Stack and structure
@@ -55,14 +76,16 @@ Test tasks can also be run with the following arguments:
 | watch    | `false`  | Run tests in watch mode | `make test-unit watch=true`       |
 | cover    | `!watch` | Calculate code coverage | `make test watch=true cover=true` |
 
-## Building
+## Local development notes
 
-TBD
+- [constants.ts](./src/resources/constants.ts) defines the AI API location and the Auth0 configuration.
+- [main.tsx](./src/main.tsx) has the logic to use the appropriate constants based on the environment.
+
+## Links
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
 [contributing-guide-setup]: ../CONTRIBUTING.md#development-setup
-[contributing-guide-running-the-api]: ../CONTRIBUTING.md#opentrons-api
 [react]: https://react.dev/
 [babel]: https://babeljs.io/
 [vite]: https://vitejs.dev/

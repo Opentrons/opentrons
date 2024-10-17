@@ -24,6 +24,7 @@ import type {
   ConfigV22,
   ConfigV23,
   ConfigV24,
+  ConfigV25,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -300,5 +301,14 @@ export const MOCK_CONFIG_V24: ConfigV24 = {
   version: 24,
   userInfo: {
     userId: 'MOCK_UUIDv4',
+  },
+}
+
+export const MOCK_CONFIG_V25: ConfigV25 = {
+  ...MOCK_CONFIG_V24,
+  version: 25,
+  language: {
+    appLanguage: null,
+    systemLanguage: null,
   },
 }

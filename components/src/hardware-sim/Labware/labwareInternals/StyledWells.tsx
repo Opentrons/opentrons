@@ -27,7 +27,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   highlightedWell: {
     stroke: COLORS.blue50,
     fill: COLORS.transparent,
-    strokeWidth: 0.5,
+    strokeWidth: 1,
   },
   disabledWell: {
     stroke: '#C6C6C6', // LEGACY --light-grey-hover

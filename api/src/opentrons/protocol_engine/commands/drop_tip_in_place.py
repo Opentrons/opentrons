@@ -1,13 +1,21 @@
 """Drop tip in place command request, result, and implementation models."""
 from __future__ import annotations
-from opentrons.protocol_engine.state import update_types
 from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
+from .pipetting_common import PipetteIdMixin, TipPhysicallyAttachedError
+from ..errors.exceptions import TipAttachedError
 from ..errors.error_occurrence import ErrorOccurrence
+from ..resources.model_utils import ModelUtils
+from ..state import update_types
 
 if TYPE_CHECKING:
     from ..execution import TipHandler
@@ -35,33 +43,54 @@ class DropTipInPlaceResult(BaseModel):
     pass
 
 
+_ExecuteReturn = (
+    SuccessData[DropTipInPlaceResult, None]
+    | DefinedErrorData[TipPhysicallyAttachedError]
+)
+
+
 class DropTipInPlaceImplementation(
-    AbstractCommandImpl[DropTipInPlaceParams, SuccessData[DropTipInPlaceResult, None]]
+    AbstractCommandImpl[DropTipInPlaceParams, _ExecuteReturn]
 ):
     """Drop tip in place command implementation."""
 
     def __init__(
         self,
         tip_handler: TipHandler,
+        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._tip_handler = tip_handler
+        self._model_utils = model_utils
 
-    async def execute(
-        self, params: DropTipInPlaceParams
-    ) -> SuccessData[DropTipInPlaceResult, None]:
+    async def execute(self, params: DropTipInPlaceParams) -> _ExecuteReturn:
         """Drop a tip using the requested pipette."""
-        await self._tip_handler.drop_tip(
-            pipette_id=params.pipetteId, home_after=params.homeAfter
-        )
-
         state_update = update_types.StateUpdate()
 
-        state_update.update_tip_state(pipette_id=params.pipetteId, tip_geometry=None)
-
-        return SuccessData(
-            public=DropTipInPlaceResult(), private=None, state_update=state_update
-        )
+        try:
+            await self._tip_handler.drop_tip(
+                pipette_id=params.pipetteId, home_after=params.homeAfter
+            )
+        except TipAttachedError as exception:
+            error = TipPhysicallyAttachedError(
+                id=self._model_utils.generate_id(),
+                createdAt=self._model_utils.get_timestamp(),
+                wrappedErrors=[
+                    ErrorOccurrence.from_failed(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        error=exception,
+                    )
+                ],
+            )
+            return DefinedErrorData(public=error, state_update=state_update)
+        else:
+            state_update.update_pipette_tip_state(
+                pipette_id=params.pipetteId, tip_geometry=None
+            )
+            return SuccessData(
+                public=DropTipInPlaceResult(), private=None, state_update=state_update
+            )
 
 
 class DropTipInPlace(

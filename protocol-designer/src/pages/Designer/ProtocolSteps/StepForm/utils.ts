@@ -11,6 +11,7 @@ import {
   getDisabledFields,
   getDefaultsForStepType,
 } from '../../../../steplist/formLevel'
+import { i18n } from '../../../../assets/localization'
 import { PROFILE_CYCLE } from '../../../../form-types'
 import type { PipetteEntity } from '@opentrons/step-generation'
 import type { Options } from '@opentrons/components'
@@ -34,11 +35,11 @@ export function getBlowoutLocationOptionsForForm(args: {
   const { stepType, path } = args
   // TODO: Ian 2019-02-21 use i18n for names
   const destOption = {
-    name: 'Destination Well',
+    name: i18n.t('shared:destination_well'),
     value: DEST_WELL_BLOWOUT_DESTINATION,
   }
   const sourceOption = {
-    name: 'Source Well',
+    name: i18n.t('shared:source_well'),
     value: SOURCE_WELL_BLOWOUT_DESTINATION,
   }
 

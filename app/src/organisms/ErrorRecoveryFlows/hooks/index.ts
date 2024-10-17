@@ -1,11 +1,11 @@
 export { useCurrentlyRecoveringFrom } from './useCurrentlyRecoveringFrom'
-export { useErrorMessage } from './useErrorMessage'
 export { useErrorName } from './useErrorName'
 export { useRecoveryCommands } from './useRecoveryCommands'
 export { useRouteUpdateActions } from './useRouteUpdateActions'
 export { useERUtils } from './useERUtils'
 export { useRecoveryTakeover } from './useRecoveryTakeover'
 export { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
+export { useHomeGripperZAxis } from './useHomeGripperZAxis'
 
 export type { ERUtilsProps } from './useERUtils'
 export type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'

@@ -29,6 +29,8 @@ import {
 import { uuid } from '../../../../../../utils'
 import { getTimeFromString, getStepIndex } from './utils'
 
+import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
+
 export interface ThermocyclerStepType {
   durationMinutes: string
   durationSeconds: string
@@ -39,12 +41,12 @@ export interface ThermocyclerStepType {
 }
 
 interface ThermocyclerStepProps {
-  steps: ThermocyclerStepType[]
-  setSteps: React.Dispatch<React.SetStateAction<any[]>>
-  setShowCreateNewStep: (_: boolean) => void
+  steps: ThermocyclerStepTypeGeneral[]
+  setSteps: React.Dispatch<React.SetStateAction<ThermocyclerStepTypeGeneral[]>>
+  setShowCreateNewStep: React.Dispatch<React.SetStateAction<boolean>>
+  setIsInEdit: React.Dispatch<React.SetStateAction<boolean>>
   step?: ThermocyclerStepType
   backgroundColor?: string
-  showHeader?: boolean
   readOnly?: boolean
 }
 export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
@@ -54,21 +56,22 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
     steps,
     setSteps,
     backgroundColor = COLORS.grey30,
-    showHeader = true,
     readOnly = true,
+    setIsInEdit,
   } = props
   const { i18n, t } = useTranslation(['application', 'form'])
   const [hover, setHover] = useState<boolean>(false)
   const [showEdit, setShowEditCurrentStep] = useState<boolean>(!readOnly)
   const [stepState, setStepState] = useState({
     name: { value: step?.title, error: null },
-    temp: { value: step?.temperature, error: null },
+    temp: { value: step?.temperature, error: null, wasAccessed: false },
     time: {
       value:
         step?.durationMinutes != null && step?.durationSeconds != null
           ? `${step.durationMinutes}:${step.durationSeconds}`
           : undefined,
       error: null,
+      wasAccessed: false,
     },
   })
   const id = step?.id ?? null
@@ -86,6 +89,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
     } else {
       setShowCreateNewStep(false)
     }
+    setIsInEdit(false)
   }
   const handleValueUpdate = (
     field: 'name' | 'temp' | 'time',
@@ -101,14 +105,13 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
     })
   }
   const handleSaveStep = (): void => {
-    const stepId = uuid()
     const { minutes, seconds } = getTimeFromString(stepState.time.value ?? '')
-    const stepBaseData = {
+    const stepBaseData: ThermocyclerStepType = {
       durationMinutes: minutes,
       durationSeconds: seconds,
-      id: stepId,
-      temperature: stepState.temp.value,
-      title: stepState.name.value,
+      id: id ?? '',
+      temperature: stepState.temp.value ?? '',
+      title: stepState.name.value ?? '',
       type: 'profileStep',
     }
 
@@ -117,14 +120,15 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       // editing a step already in steps
       setSteps([
         ...steps.slice(0, existingStepIndex),
-        { ...stepBaseData, id },
+        { ...stepBaseData, id: id ?? uuid() },
         ...steps.slice(existingStepIndex + 1),
       ])
     } else {
-      setSteps([...steps, { ...stepBaseData, id: stepId }])
+      setSteps([...steps, { ...stepBaseData, id: uuid() }])
     }
     setShowCreateNewStep(false)
     setShowEditCurrentStep(false)
+    setIsInEdit(false)
   }
 
   const header = showEdit ? (
@@ -207,6 +211,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
             onClick={() => {
               setShowEditCurrentStep(true)
+              setIsInEdit(true)
             }}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
@@ -269,7 +274,13 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
               temperatureRangeFieldValue(4, 96)
             )
           }}
-          error={stepState.temp.error}
+          onBlur={() => {
+            setStepState({
+              ...stepState,
+              temp: { ...stepState.temp, wasAccessed: true },
+            })
+          }}
+          error={stepState.temp.wasAccessed ? stepState.temp.error : null}
         />
       </Flex>
       <Flex
@@ -291,7 +302,13 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
               isTimeFormatMinutesSeconds
             )
           }}
-          error={stepState.time.error}
+          onBlur={() => {
+            setStepState({
+              ...stepState,
+              time: { ...stepState.time, wasAccessed: true },
+            })
+          }}
+          error={stepState.time.wasAccessed ? stepState.time.error : null}
         />
       </Flex>
     </Flex>
@@ -303,7 +320,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius4}
     >
-      {showHeader ? header : null}
+      {header}
       {showEdit ? editContent : null}
     </Flex>
   )

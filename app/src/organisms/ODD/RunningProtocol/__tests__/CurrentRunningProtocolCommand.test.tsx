@@ -55,6 +55,7 @@ describe('CurrentRunningProtocolCommand', () => {
       updateLastAnimatedCommand: mockUpdateLastAnimatedCommand,
       robotType: FLEX_ROBOT_TYPE,
       runId: 'MOCK_RUN_ID',
+      allRunDefs: [],
     }
 
     vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({} as any)

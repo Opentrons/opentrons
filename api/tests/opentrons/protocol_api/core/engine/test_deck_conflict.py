@@ -19,7 +19,7 @@ from opentrons.protocol_api.disposal_locations import (
     _TRASH_BIN_CUTOUT_FIXTURE,
 )
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.engine import deck_conflict
+from opentrons.protocol_api.core.engine import deck_conflict, pipette_movement_conflict
 from opentrons.protocol_engine import (
     Config,
     DeckSlotLocation,
@@ -441,7 +441,7 @@ module = LoadedModule(
                 Point(x=50, y=50, z=40),
             ),
             pytest.raises(
-                deck_conflict.PartialTipMovementNotAllowedError,
+                pipette_movement_conflict.PartialTipMovementNotAllowedError,
                 match="collision with items in deck slot D1",
             ),
             0,
@@ -454,7 +454,7 @@ module = LoadedModule(
                 Point(x=101, y=50, z=40),
             ),
             pytest.raises(
-                deck_conflict.PartialTipMovementNotAllowedError,
+                pipette_movement_conflict.PartialTipMovementNotAllowedError,
                 match="collision with items in deck slot D2",
             ),
             0,
@@ -467,7 +467,7 @@ module = LoadedModule(
                 Point(x=250, y=150, z=40),
             ),
             pytest.raises(
-                deck_conflict.PartialTipMovementNotAllowedError,
+                pipette_movement_conflict.PartialTipMovementNotAllowedError,
                 match="will result in collision with items in staging slot C4.",
             ),
             170,
@@ -623,7 +623,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         ).then_return(Dimensions(90, 90, 0))
 
     with expected_raise:
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_state_view,
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
@@ -726,10 +726,10 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
         True
     )
     with pytest.raises(
-        deck_conflict.PartialTipMovementNotAllowedError,
+        pipette_movement_conflict.PartialTipMovementNotAllowedError,
         match="Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
     ):
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_state_view,
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
@@ -829,7 +829,7 @@ pipette_movement_specs: List[PipetteMovementSpec] = [
         is_on_flex_adapter=False,
         is_partial_config=False,
         expected_raise=pytest.raises(
-            deck_conflict.UnsuitableTiprackForPipetteMotion,
+            pipette_movement_conflict.UnsuitableTiprackForPipetteMotion,
             match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
         ),
     ),
@@ -846,7 +846,7 @@ pipette_movement_specs: List[PipetteMovementSpec] = [
         is_on_flex_adapter=False,
         is_partial_config=False,
         expected_raise=pytest.raises(
-            deck_conflict.UnsuitableTiprackForPipetteMotion,
+            pipette_movement_conflict.UnsuitableTiprackForPipetteMotion,
             match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
         ),
     ),
@@ -856,7 +856,7 @@ pipette_movement_specs: List[PipetteMovementSpec] = [
         is_on_flex_adapter=True,
         is_partial_config=True,
         expected_raise=pytest.raises(
-            deck_conflict.PartialTipMovementNotAllowedError,
+            pipette_movement_conflict.PartialTipMovementNotAllowedError,
             match="A cool tiprack cannot be on an adapter taller than the tip rack",
         ),
     ),
@@ -918,7 +918,7 @@ def test_valid_96_pipette_movement_for_tiprack_and_adapter(
     ).then_return(is_on_flex_adapter)
 
     with expected_raise:
-        deck_conflict.check_safe_for_tip_pickup_and_return(
+        pipette_movement_conflict.check_safe_for_tip_pickup_and_return(
             engine_state=mock_state_view,
             pipette_id="pipette-id",
             labware_id="labware-id",

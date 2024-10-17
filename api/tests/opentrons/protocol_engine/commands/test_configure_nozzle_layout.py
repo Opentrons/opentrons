@@ -19,7 +19,6 @@ from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.configure_nozzle_layout import (
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
-    ConfigureNozzleLayoutPrivateResult,
     ConfigureNozzleLayoutImplementation,
 )
 
@@ -146,10 +145,7 @@ async def test_configure_nozzle_layout_implementation(
 
     assert result == SuccessData(
         public=ConfigureNozzleLayoutResult(),
-        private=ConfigureNozzleLayoutPrivateResult(
-            pipette_id="pipette-id",
-            nozzle_map=expected_nozzlemap,
-        ),
+        private=None,
         state_update=StateUpdate(
             pipette_nozzle_map=PipetteNozzleMapUpdate(
                 pipette_id="pipette-id",

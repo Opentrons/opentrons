@@ -35,7 +35,7 @@ import type {
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData
   host: HostConfig | null
-  toggleDTWiz: () => void
+  enableDTWiz: () => void
 }
 
 export const handleInstrumentDetailOverflowMenu = (
@@ -46,13 +46,13 @@ export const handleInstrumentDetailOverflowMenu = (
   NiceModal.show(InstrumentDetailsOverflowMenu, {
     instrument,
     host,
-    toggleDTWiz,
+    enableDTWiz: toggleDTWiz,
   })
 }
 
 const InstrumentDetailsOverflowMenu = NiceModal.create(
   (props: InstrumentDetailsOverflowMenuProps): JSX.Element => {
-    const { instrument, host, toggleDTWiz } = props
+    const { instrument, host, enableDTWiz } = props
     const { t } = useTranslation('robot_controls')
     const modal = useModal()
     const [wizardProps, setWizardProps] = React.useState<
@@ -98,7 +98,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
     }
 
     const handleDropTip = (): void => {
-      toggleDTWiz()
+      enableDTWiz()
       modal.remove()
     }
 

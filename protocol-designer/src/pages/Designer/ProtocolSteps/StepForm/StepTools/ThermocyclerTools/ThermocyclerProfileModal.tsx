@@ -13,11 +13,17 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { ThermocyclerCycle } from './ThermocyclerCycle'
 import { ThermocyclerStep } from './ThermocyclerStep'
 
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
+import type { ThermocyclerCycleType } from './ThermocyclerCycle'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
+
+export type ThermocyclerStepTypeGeneral =
+  | ThermocyclerCycleType
+  | ThermocyclerStepType
 
 interface ThermocyclerModalProps {
   formData: FormData
@@ -33,10 +39,11 @@ export function ThermocyclerProfileModal(
 
   const [showCreateNewStep, setShowCreateNewStep] = useState<boolean>(false)
   const [showCreateNewCycle, setShowCreateNewCycle] = useState<boolean>(false)
-  const [steps, setSteps] = useState<ThermocyclerStepType[]>(
+  const [isInEdit, setIsInEdit] = useState<boolean>(false)
+  const [steps, setSteps] = useState<ThermocyclerStepTypeGeneral[]>(
     formData.orderedProfileItems.map(
       (id: string) => formData.profileItemsById[id]
-    ) as ThermocyclerStepType[]
+    ) as ThermocyclerStepTypeGeneral[]
   )
   const canAddStepOrProfile = !(showCreateNewCycle || showCreateNewStep)
 
@@ -71,7 +78,10 @@ export function ThermocyclerProfileModal(
               {i18n.format(t('cancel'), 'capitalize')}
             </StyledText>
           </SecondaryButton>
-          <PrimaryButton onClick={handleSaveModal} disabled={showCreateNewStep}>
+          <PrimaryButton
+            onClick={handleSaveModal}
+            disabled={isInEdit || showCreateNewCycle || showCreateNewStep}
+          >
             <StyledText desktopStyle="bodyDefaultRegular">
               {i18n.format(t('save'), 'capitalize')}
             </StyledText>
@@ -111,24 +121,43 @@ export function ThermocyclerProfileModal(
                 <ThermocyclerStep
                   key={step.id}
                   step={step}
-                  setShowCreateNewStep={setShowCreateNewStep}
                   steps={steps}
                   setSteps={setSteps}
+                  setShowCreateNewStep={setShowCreateNewStep}
+                  setIsInEdit={setIsInEdit}
+                  readOnly
                 />
               ) : (
                 // TODO (nd: 10/1/2024): add add profile cycle component
-                <>TODO: wire up cycle</>
+                <ThermocyclerCycle
+                  key={step.id}
+                  step={step}
+                  steps={steps}
+                  setSteps={setSteps}
+                  setShowCreateNewCycle={setShowCreateNewCycle}
+                  setIsInEdit={setIsInEdit}
+                  readOnly
+                />
               )
             })}
             {showCreateNewStep ? (
               <ThermocyclerStep
-                setShowCreateNewStep={setShowCreateNewStep}
                 steps={steps}
                 setSteps={setSteps}
+                setShowCreateNewStep={setShowCreateNewStep}
+                setIsInEdit={setIsInEdit}
                 readOnly={false}
               />
             ) : null}
-            {showCreateNewCycle ? <>TODO: wire up cycle</> : null}
+            {showCreateNewCycle ? (
+              <ThermocyclerCycle
+                steps={steps}
+                setSteps={setSteps}
+                setShowCreateNewCycle={setShowCreateNewCycle}
+                setIsInEdit={setIsInEdit}
+                readOnly={false}
+              />
+            ) : null}
           </Flex>
         ) : (
           <InfoScreen

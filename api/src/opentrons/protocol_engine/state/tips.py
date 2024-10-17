@@ -3,27 +3,15 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, List, Union
 
+from opentrons.protocol_engine.state import update_types
+
 from ._abstract_store import HasState, HandlesActions
-from ..actions import (
-    Action,
-    SucceedCommandAction,
-    FailCommandAction,
-    ResetTipsAction,
-)
+from ..actions import Action, SucceedCommandAction, ResetTipsAction, get_state_update
 from ..commands import (
     Command,
     LoadLabwareResult,
-    PickUpTip,
-    PickUpTipResult,
-    DropTipResult,
-    DropTipInPlaceResult,
-    unsafe,
 )
-from ..commands.configuring_common import (
-    PipetteConfigUpdateResultMixin,
-    PipetteNozzleLayoutResultMixin,
-)
-from ..error_recovery_policy import ErrorRecoveryType
+from ..commands.configuring_common import PipetteConfigUpdateResultMixin
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
@@ -38,16 +26,26 @@ class TipRackWellState(Enum):
 TipRackStateByWellName = Dict[str, TipRackWellState]
 
 
+# todo(mm, 2024-10-10): This info is duplicated between here and PipetteState because
+# TipStore is using it to compute which tips a PickUpTip removes from the tip rack,
+# given the pipette's current nozzle map. We could avoid this duplication by moving the
+# computation to TipView, calling it from PickUpTipImplementation, and passing the
+# precomputed list of wells to TipStore.
+@dataclass
+class _PipetteInfo:
+    channels: int
+    active_channels: int
+    nozzle_map: NozzleMap
+
+
 @dataclass
 class TipState:
     """State of all tips."""
 
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
     column_by_labware_id: Dict[str, List[List[str]]]
-    channels_by_pipette_id: Dict[str, int]
-    length_by_pipette_id: Dict[str, float]
-    active_channels_by_pipette_id: Dict[str, int]
-    nozzle_map_by_pipette_id: Dict[str, NozzleMap]
+
+    pipette_info_by_pipette_id: Dict[str, _PipetteInfo]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -60,38 +58,26 @@ class TipStore(HasState[TipState], HandlesActions):
         self._state = TipState(
             tips_by_labware_id={},
             column_by_labware_id={},
-            channels_by_pipette_id={},
-            length_by_pipette_id={},
-            active_channels_by_pipette_id={},
-            nozzle_map_by_pipette_id={},
+            pipette_info_by_pipette_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
+        state_update = get_state_update(action)
+        if state_update is not None:
+            self._handle_state_update(state_update)
+
         if isinstance(action, SucceedCommandAction):
             if isinstance(action.private_result, PipetteConfigUpdateResultMixin):
                 pipette_id = action.private_result.pipette_id
                 config = action.private_result.config
-                self._state.channels_by_pipette_id[pipette_id] = config.channels
-                self._state.active_channels_by_pipette_id[pipette_id] = config.channels
-                self._state.nozzle_map_by_pipette_id[pipette_id] = config.nozzle_map
+                self._state.pipette_info_by_pipette_id[pipette_id] = _PipetteInfo(
+                    channels=config.channels,
+                    active_channels=config.channels,
+                    nozzle_map=config.nozzle_map,
+                )
+
             self._handle_succeeded_command(action.command)
-
-            if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
-                pipette_id = action.private_result.pipette_id
-                nozzle_map = action.private_result.nozzle_map
-                if nozzle_map:
-                    self._state.active_channels_by_pipette_id[
-                        pipette_id
-                    ] = nozzle_map.tip_count
-                    self._state.nozzle_map_by_pipette_id[pipette_id] = nozzle_map
-                else:
-                    self._state.active_channels_by_pipette_id[
-                        pipette_id
-                    ] = self._state.channels_by_pipette_id[pipette_id]
-
-        elif isinstance(action, FailCommandAction):
-            self._handle_failed_command(action)
 
         elif isinstance(action, ResetTipsAction):
             labware_id = action.labware_id
@@ -117,51 +103,29 @@ class TipStore(HasState[TipState], HandlesActions):
                 column for column in definition.ordering
             ]
 
-        elif isinstance(command.result, PickUpTipResult):
-            labware_id = command.params.labwareId
-            well_name = command.params.wellName
-            pipette_id = command.params.pipetteId
-            length = command.result.tipLength
+    def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.tips_used != update_types.NO_CHANGE:
             self._set_used_tips(
-                pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
+                pipette_id=state_update.tips_used.pipette_id,
+                labware_id=state_update.tips_used.labware_id,
+                well_name=state_update.tips_used.well_name,
             )
-            self._state.length_by_pipette_id[pipette_id] = length
 
-        elif isinstance(
-            command.result,
-            (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
-        ):
-            pipette_id = command.params.pipetteId
-            self._state.length_by_pipette_id.pop(pipette_id, None)
-
-    def _handle_failed_command(
-        self,
-        action: FailCommandAction,
-    ) -> None:
-        # If a pickUpTip command fails recoverably, mark the tips as used. This way,
-        # when the protocol is resumed and the Python Protocol API calls
-        # `get_next_tip()`, we'll move on to other tips as expected.
-        #
-        # We don't attempt this for nonrecoverable errors because maybe the failure
-        # was due to a bad labware ID or well name.
-        if (
-            isinstance(action.running_command, PickUpTip)
-            and action.type != ErrorRecoveryType.FAIL_RUN
-        ):
-            self._set_used_tips(
-                pipette_id=action.running_command.params.pipetteId,
-                labware_id=action.running_command.params.labwareId,
-                well_name=action.running_command.params.wellName,
+        if state_update.pipette_nozzle_map != update_types.NO_CHANGE:
+            pipette_info = self._state.pipette_info_by_pipette_id[
+                state_update.pipette_nozzle_map.pipette_id
+            ]
+            pipette_info.active_channels = (
+                state_update.pipette_nozzle_map.nozzle_map.tip_count
             )
-            # Note: We're logically removing the tip from the tip rack,
-            # but we're not logically updating the pipette to have that tip on it.
+            pipette_info.nozzle_map = state_update.pipette_nozzle_map.nozzle_map
 
     def _set_used_tips(  # noqa: C901
         self, pipette_id: str, well_name: str, labware_id: str
     ) -> None:
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
-        nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
+        nozzle_map = self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
 
         # TODO (cb, 02-28-2024): Transition from using partial nozzle map to full instrument map for the set used logic
         num_nozzle_cols = len(nozzle_map.columns)
@@ -229,7 +193,7 @@ class TipView(HasState[TipState]):
             critical_row: int,
             entry_well: str,
         ) -> Optional[List[str]]:
-            tip_cluster = []
+            tip_cluster: list[str] = []
             for i in range(active_columns):
                 if entry_well == "A1" or entry_well == "H1":
                     if critical_column - i >= 0:
@@ -280,12 +244,12 @@ class TipView(HasState[TipState]):
 
                 # In the case of a 96ch we can attempt to index in by singular rows and columns assuming that indexed direction is safe
                 # The tip cluster list is ordered: Each row from a column in order by columns
-                tip_cluster_final_column = []
+                tip_cluster_final_column: list[str] = []
                 for i in range(active_rows):
                     tip_cluster_final_column.append(
                         tip_cluster[((active_columns * active_rows) - 1) - i]
                     )
-                tip_cluster_final_row = []
+                tip_cluster_final_row: list[str] = []
                 for i in range(active_columns):
                     tip_cluster_final_row.append(
                         tip_cluster[(active_rows - 1) + (i * active_rows)]
@@ -476,15 +440,22 @@ class TipView(HasState[TipState]):
 
     def get_pipette_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""
-        return self._state.channels_by_pipette_id[pipette_id]
+        return self._state.pipette_info_by_pipette_id[pipette_id].channels
 
     def get_pipette_active_channels(self, pipette_id: str) -> int:
         """Get the number of channels being used in the given pipette's configuration."""
-        return self._state.active_channels_by_pipette_id[pipette_id]
+        return self._state.pipette_info_by_pipette_id[pipette_id].active_channels
 
     def get_pipette_nozzle_map(self, pipette_id: str) -> NozzleMap:
         """Get the current nozzle map the given pipette's configuration."""
-        return self._state.nozzle_map_by_pipette_id[pipette_id]
+        return self._state.pipette_info_by_pipette_id[pipette_id].nozzle_map
+
+    def get_pipette_nozzle_maps(self) -> Dict[str, NozzleMap]:
+        """Get current nozzle maps keyed by pipette id."""
+        return {
+            pipette_id: pipette_info.nozzle_map
+            for pipette_id, pipette_info in self._state.pipette_info_by_pipette_id.items()
+        }
 
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
         """Get whether a well in a labware has a clean tip.
@@ -501,10 +472,6 @@ class TipView(HasState[TipState]):
         well_state = tip_rack.get(well_name) if tip_rack else None
 
         return well_state == TipRackWellState.CLEAN
-
-    def get_tip_length(self, pipette_id: str) -> float:
-        """Return the given pipette's tip length."""
-        return self._state.length_by_pipette_id.get(pipette_id, 0)
 
 
 def _drop_wells_before_starting_tip(

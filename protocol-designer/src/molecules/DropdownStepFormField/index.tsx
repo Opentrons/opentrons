@@ -6,6 +6,8 @@ import type { FieldProps } from '../../pages/Designer/ProtocolSteps/StepForm/typ
 export interface DropdownStepFormFieldProps extends FieldProps {
   options: Options
   title: string
+  addPadding?: boolean
+  width?: string
 }
 
 export function DropdownStepFormField(
@@ -18,15 +20,17 @@ export function DropdownStepFormField(
     title,
     errorToShow,
     tooltipContent,
+    addPadding = true,
+    width = '17.5rem',
   } = props
   const { t } = useTranslation('tooltip')
   const availableOptionId = options.find(opt => opt.value === value)
 
   return (
-    <Flex padding={SPACING.spacing16}>
+    <Flex padding={addPadding ? SPACING.spacing16 : 0}>
       <DropdownMenu
         tooltipText={tooltipContent != null ? t(`${tooltipContent}`) : null}
-        width="17.5rem"
+        width={width}
         error={errorToShow}
         dropdownType="neutral"
         filterOptions={options}

@@ -93,7 +93,7 @@ export function RobotSettingsCalibration({
     dispatch(Sessions.fetchAllSessions(robotName))
   }, [dispatch, robotName])
 
-  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
+  const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current =
@@ -263,6 +263,7 @@ export function RobotSettingsCalibration({
             dispatchRequests={dispatchRequests}
             showSpinner={isPending}
             isJogging={isJogging}
+            requestIds={requestIds}
           />
           {createStatus === RobotApi.PENDING ? (
             <SpinnerModalPage

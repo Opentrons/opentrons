@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -30,6 +30,7 @@ import {
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { FailedCommand } from './types'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
@@ -125,6 +126,15 @@ export function ErrorRecoveryFlows(
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const robotName = useHost()?.robotName ?? 'robot'
 
+  const isValidRobotSideAnalysis = protocolAnalysis != null
+  const allRunDefs = useMemo(
+    () =>
+      protocolAnalysis != null
+        ? getLabwareDefinitionsFromCommands(protocolAnalysis.commands)
+        : [],
+    [isValidRobotSideAnalysis]
+  )
+
   const {
     showTakeover,
     isActiveUser,
@@ -140,6 +150,7 @@ export function ErrorRecoveryFlows(
     robotType,
     showTakeover,
     failedCommand: failedCommandBySource,
+    allRunDefs,
   })
 
   const renderWizard =
@@ -164,6 +175,7 @@ export function ErrorRecoveryFlows(
           robotType={robotType}
           isOnDevice={isOnDevice}
           failedCommand={failedCommandBySource}
+          allRunDefs={allRunDefs}
         />
       ) : null}
       {showSplash ? (
@@ -176,6 +188,7 @@ export function ErrorRecoveryFlows(
           toggleERWizAsActiveUser={toggleERWizAsActiveUser}
           failedCommand={failedCommandBySource}
           resumePausedRecovery={!renderWizard && !showTakeover}
+          allRunDefs={allRunDefs}
         />
       ) : null}
     </>

@@ -55,7 +55,8 @@ describe('PipetteCard', () => {
     ])
     vi.mocked(useDropTipWizardFlows).mockReturnValue({
       showDTWiz: false,
-      toggleDTWiz: vi.fn(),
+      enableDTWiz: vi.fn(),
+      disableDTWiz: vi.fn(),
     })
     when(usePipetteSettingsQuery)
       .calledWith({ refetchInterval: 5000, enabled: true })

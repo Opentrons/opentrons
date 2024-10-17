@@ -130,11 +130,11 @@ function _getSelectedWellsForStep(
         wells.push(commandWellName)
       } else if (channels === 8 || channels === 96) {
         const wellSet =
-          getWellSetForMultichannel(
-            invariantContext.labwareEntities[labwareId].def,
-            commandWellName,
-            channels
-          ) || []
+          getWellSetForMultichannel({
+            labwareDef: invariantContext.labwareEntities[labwareId].def,
+            wellName: commandWellName,
+            channels,
+          }) || []
         wells.push(...wellSet)
       } else {
         console.error(
@@ -241,11 +241,11 @@ function _getSelectedWellsForSubstep(
           activeTips.labwareId === labwareId &&
           channels !== 1
         ) {
-          const multiTipWellSet = getWellSetForMultichannel(
-            invariantContext.labwareEntities[labwareId].def,
-            activeTips.wellName,
-            channels
-          )
+          const multiTipWellSet = getWellSetForMultichannel({
+            labwareDef: invariantContext.labwareEntities[labwareId].def,
+            wellName: activeTips.wellName,
+            channels,
+          })
           if (multiTipWellSet) tipWellSet = multiTipWellSet
         }
       } else {
