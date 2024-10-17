@@ -16,10 +16,6 @@ if (!$root) {
   throw new Error('fatal: :root not found')
 }
 
-const basePath = import.meta.env.BASE_URL
-console.log({ basePath })
-console.log({ publicPath: getPublicPath() })
-
 const Root = (): JSX.Element => (
   <HashRouter>
     <Routes>
@@ -30,9 +26,7 @@ const Root = (): JSX.Element => (
 )
 
 if ($root.hasChildNodes()) {
-  console.log('hydrating')
   hydrate(<Root />, $root)
 } else {
-  console.log('rendering')
   render(<Root />, $root)
 }

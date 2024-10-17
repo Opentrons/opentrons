@@ -11,8 +11,6 @@ export interface GalleryProps {
   className?: string
 }
 
-console.log('styles:')
-console.log(styles)
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition, className } = props
   const {

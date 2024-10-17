@@ -121,7 +121,7 @@ jobs:
         run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
-    # needs: ['js-unit-test'] uncomment this before undrafting
+    needs: ['js-unit-test']
     timeout-minutes: 30
     runs-on: 'ubuntu-20.04'
     if: github.event_name != 'pull_request'
@@ -171,7 +171,7 @@ jobs:
   deploy-ll:
     name: 'deploy LL artifact to S3'
     runs-on: 'ubuntu-20.04'
-    needs: ['build-ll'] #uncomment this before undrafting
+    needs: ['js-unit-test', 'e2e-test', 'build-ll']
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'

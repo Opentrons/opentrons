@@ -16,14 +16,14 @@ const testAliases: {} | { 'file-saver': string } =
     : {}
 
 export default defineConfig({
-  // revert this before undrafting
+  // this makes imports relative rather than absolute
   base: '',
   build: {
     // Relative to the root
     outDir: 'dist',
     rollupOptions: {
       input: {
-        // Define multiple input HTML files
+        // entry points for both Labware Library and Labware Creator
         main: path.resolve(__dirname, 'index.html'),
         create: path.resolve(__dirname, 'create/index.html'),
       },
