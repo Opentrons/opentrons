@@ -500,23 +500,22 @@ class LabwareView(HasState[LabwareState]):
         self, labware_id: str, well_name: Optional[str] = None
     ) -> InnerWellGeometry:
         """Get a well's inner geometry by labware and well name."""
-        # TODO(pbm, 10-11-24): wordsmith this error
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
-            raise errors.InvalidWellDefinitionError(
-                message=f"No innerLabwareGeometry found for labware_id: {labware_id}."
+            raise errors.IncompleteLabwareDefinitionError(
+                message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
         well_id = well_def.geometryDefinitionId
         if well_id is None:
-            raise errors.InvalidWellDefinitionError(
-                message=f"No geometryDefinitionId found for well: {well_name} in labware_id: {labware_id}"
+            raise errors.IncompleteWellDefinitionError(
+                message=f"No geometryDefinitionId found in well definition for well: {well_name} in labware_id: {labware_id}"
             )
         else:
             well_geometry = labware_def.innerLabwareGeometry.get(well_id)
             if well_geometry is None:
-                raise errors.InvalidWellDefinitionError(
-                    message=f"No innerLabwareGeometry found for well_id: {well_id} in labware_id: {labware_id}"
+                raise errors.IncompleteLabwareDefinitionError(
+                    message=f"No innerLabwareGeometry found in labware definition for well_id: {well_id} in labware_id: {labware_id}"
                 )
             return well_geometry
 

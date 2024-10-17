@@ -1071,8 +1071,8 @@ class TipNotEmptyError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
-class InvalidWellDefinitionError(ProtocolEngineError):
-    """Raised when an InnerWellGeometry definition is invalid."""
+class IncompleteLabwareDefinitionError(ProtocolEngineError):
+    """Raised when a labware definition lacks innerLabwareGeometry in general or for a specific well_id."""
 
     def __init__(
         self,
@@ -1080,7 +1080,20 @@ class InvalidWellDefinitionError(ProtocolEngineError):
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an InvalidWellDefinitionError."""
+        """Build an IncompleteLabwareDefinitionError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class IncompleteWellDefinitionError(ProtocolEngineError):
+    """Raised when a well definition lacks a geometryDefinitionId."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an IncompleteWellDefinitionError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
