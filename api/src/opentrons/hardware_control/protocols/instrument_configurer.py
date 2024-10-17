@@ -142,6 +142,9 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         """
         ...
 
+    # todo(mm, 2024-10-17): Can this be made non-async?
+    # todo(mm, 2024-10-17): What is the difference between this and cache_tip()?
+    # Can one of them be removed?
     async def add_tip(self, mount: MountArgType, tip_length: float) -> None:
         """Inform the hardware that a tip is now attached to a pipette.
 
@@ -150,6 +153,7 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         """
         ...
 
+    # todo(mm, 2024-10-17): Can this be made non-async?
     async def remove_tip(self, mount: MountArgType) -> None:
         """Inform the hardware that a tip is no longer attached to a pipette.
 
