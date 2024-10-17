@@ -1757,7 +1757,7 @@
       "createdAt": "TIMESTAMP",
       "error": {
         "createdAt": "TIMESTAMP",
-        "detail": "Cannot aspirate 21.0 µL when only 20 is available.",
+        "detail": "Cannot aspirate 21.0 µL when only 20 is available in the tip.",
         "errorCode": "4000",
         "errorInfo": {
           "attempted_aspirate_volume": 21.0,
@@ -1800,7 +1800,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "Cannot aspirate 21.0 µL when only 20 is available.",
+      "detail": "Cannot aspirate 21.0 µL when only 20 is available in the tip.",
       "errorCode": "4000",
       "errorInfo": {
         "attempted_aspirate_volume": 21.0,
