@@ -226,7 +226,7 @@ class Well:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
             negative offsets are lower.
-        :return: A :py:class:`~opentrons.types.Location` that holds the ``z`` offset in its point.z field.
+        :return: A :py:class:`~opentrons.types.Location` that indicates location is meniscus and that holds the ``z`` offset in its point.z field.
 
         :meta private:
         """

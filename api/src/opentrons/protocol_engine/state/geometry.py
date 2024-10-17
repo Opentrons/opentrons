@@ -529,7 +529,10 @@ class GeometryView:
         absolute_point: Point,
         is_meniscus: Optional[bool] = None,
     ) -> LiquidHandlingWellLocation:
-        """Given absolute position, get relative location of a well in a labware."""
+        """Given absolute position, get relative location of a well in a labware.
+
+        If is_meniscus is True, absolute_point will hold the z-offset in its z field.
+        """
         if is_meniscus:
             return LiquidHandlingWellLocation(
                 origin=WellOrigin.MENISCUS,

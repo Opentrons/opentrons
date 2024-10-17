@@ -479,11 +479,7 @@ def validate_location(
     _, well = target_location.labware.get_parent_labware_and_well()
 
     return (
-        WellTarget(
-            well=well,
-            location=target_location,
-            in_place=in_place,
-        )
+        WellTarget(well=well, location=target_location, in_place=in_place)
         if well is not None
         else PointTarget(location=target_location, in_place=in_place)
     )
