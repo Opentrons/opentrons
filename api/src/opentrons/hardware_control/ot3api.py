@@ -2323,14 +2323,19 @@ class OT3API(
         self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
         """Drop tip at the current location."""
-        realmount = OT3Mount.from_mount(mount)
-        instrument = self._pipette_handler.get_pipette(realmount)
-
         await self.tip_drop_moves(mount=mount, home_after=home_after)
 
+        # todo(mm, 2024-10-17): Ideally, callers would be able to replicate the behavior
+        # of this method via self.drop_tip_moves() plus other public methods. This
+        # currently prevents that: there is no public equivalent for
+        # instrument.set_current_volume().
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
         instrument.set_current_volume(0)
-        instrument.current_tiprack_diameter = 0.0
-        instrument.remove_tip()
+
+        self.set_current_tiprack_diameter(mount, 0.0)
+        await self.remove_tip(mount)
+
         # call this in case we're simulating:
         if isinstance(self._backend, OT3Simulator):
             self._backend._update_tip_state(realmount, False)
