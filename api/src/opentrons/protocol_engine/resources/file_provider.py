@@ -1,6 +1,7 @@
 """File interaction resource provider."""
 from datetime import datetime
 from typing import List, Optional, Callable, Awaitable, Dict
+from ..errors import StorageLimitReachedError
 
 
 MAXIMUM_CSV_FILE_LIMIT = 40
@@ -154,7 +155,7 @@ class FileProvider:
     def __init__(
         self,
         data_files_write_csv_callback: Optional[
-            Callable[[GenericCsvTransform], Awaitable[None]]
+            Callable[[GenericCsvTransform], Awaitable[str]]
         ] = None,
         data_files_filecount: Optional[Callable[[], Awaitable[int]]] = None,
     ) -> None:
@@ -167,13 +168,15 @@ class FileProvider:
         self._data_files_write_csv_callback = data_files_write_csv_callback
         self._data_files_filecount = data_files_filecount
 
-    async def write_csv(self, write_data: GenericCsvTransform) -> None:
-        """Writes the provided CSV object to a file in the Data Files directory."""
+    async def write_csv(self, write_data: GenericCsvTransform) -> str:
+        """Writes the provided CSV object to a file in the Data Files directory. Returns the File ID of the file created."""
         if self._data_files_filecount is not None:
             file_count = await self._data_files_filecount()
             if file_count >= MAXIMUM_CSV_FILE_LIMIT:
-                raise ValueError(
+                raise StorageLimitReachedError(
                     f"Not enough space to store file {write_data.filename}."
                 )
             if self._data_files_write_csv_callback is not None:
                 await self._data_files_write_csv_callback(write_data)
+        # If we are in an analysis or simulation state, return an empty file ID
+        return ""

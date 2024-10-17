@@ -31,3 +31,4 @@ class StateSummary(BaseModel):
     completedAt: Optional[datetime]
     liquids: List[Liquid] = Field(default_factory=list)
     wells: List[LiquidHeightSummary] = Field(default_factory=list)
+    files: List[str]

@@ -66,6 +66,7 @@ def _build_run(
             completedAt=state_summary.completedAt,
             startedAt=state_summary.startedAt,
             liquids=state_summary.liquids,
+            outputFileIds=state_summary.files,
             runTimeParameters=run_time_parameters,
         )
 
@@ -80,6 +81,7 @@ def _build_run(
             modules=[],
             liquids=[],
             wells=[],
+            files=[],
             hasEverEnteredErrorRecovery=False,
         )
         errors.append(state_summary.dataError)
@@ -123,6 +125,7 @@ def _build_run(
         startedAt=state.startedAt,
         liquids=state.liquids,
         runTimeParameters=run_time_parameters,
+        outputFileIds=state.files,
         hasEverEnteredErrorRecovery=state.hasEverEnteredErrorRecovery,
     )
 

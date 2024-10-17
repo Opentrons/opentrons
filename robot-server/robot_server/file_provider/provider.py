@@ -37,8 +37,8 @@ class FileProviderWrapper:
     async def write_csv_callback(
         self,
         csv_data: GenericCsvTransform,
-    ) -> None:
-        """Write the provided data transform to a CSV file."""
+    ) -> str:
+        """Write the provided data transform to a CSV file. Returns the File ID of the created file."""
         async with self._lock:
             file_id = await get_unique_id()
             os.makedirs(
@@ -64,6 +64,7 @@ class FileProviderWrapper:
                 created_at=created_at,
             )
             await self._data_files_store.insert(file_info)
+            return file_id
 
     async def csv_filecount_callback(self) -> int:
         """Return the current count of files stored within the data files directory."""
