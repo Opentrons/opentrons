@@ -21,6 +21,13 @@ export default defineConfig({
   build: {
     // Relative to the root
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        // entry points for both Labware Library and Labware Creator
+        main: path.resolve(__dirname, 'index.html'),
+        create: path.resolve(__dirname, 'create/index.html'),
+      },
+    },
   },
   plugins: [
     react({
