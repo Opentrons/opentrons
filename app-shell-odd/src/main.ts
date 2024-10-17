@@ -107,6 +107,10 @@ function startUp(): void {
       log.silly('Sending action via IPC to renderer', { action })
       mainWindow.webContents.send('dispatch', action)
     }
+    log.debug(
+      `bouncing action ${action.type} to ${actionHandlers.length} handlers`
+    )
+    actionHandlers.forEach(handler => handler(action))
   }
 
   mainWindow = createUi(dispatch)
