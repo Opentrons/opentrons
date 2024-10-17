@@ -29,6 +29,8 @@ class Liquid:
     display_color: Optional[str]
 
 
+# TODO (spp, 2024-10-17): create PAPI-equivalent types for all the properties
+#  and have validation on value updates with user-facing error messages
 @dataclass
 class TransferProperties:
     _aspirate: AspirateProperties
@@ -64,7 +66,7 @@ class LiquidClass:
 
         return LiquidClass(
             name=liquid_class_definition.liquidName,
-            _by_pipette_setting=liquid_class_definition.byPipette,  # make sure this is a copy and not a reference
+            _by_pipette_setting=liquid_class_definition.byPipette,
         )
 
     def get_for(self, pipette: str, tiprack: str) -> TransferProperties:
@@ -76,7 +78,7 @@ class LiquidClass:
             )
         )
         if len(settings_for_pipette) == 0:
-            raise KeyError(
+            raise ValueError(
                 f"No properties found for {pipette} in {self.name} liquid class"
             )
         settings_for_tip: Sequence[ByTipTypeSetting] = list(
@@ -86,7 +88,7 @@ class LiquidClass:
             )
         )
         if len(settings_for_tip) == 0:
-            raise KeyError(
+            raise ValueError(
                 f"No properties found for {tiprack} in {self.name} liquid class"
             )
         return TransferProperties(
