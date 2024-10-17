@@ -4,6 +4,7 @@ import {
   GripperReleaseLabware,
   TwoColLwInfoAndDeck,
   RetryStepInfo,
+  RecoveryDoorOpenSpecial,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
@@ -22,6 +23,8 @@ export function ManualReplaceLwAndRetry(
         return <GripperIsHoldingLabware {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE:
         return <GripperReleaseLabware {...props} />
+      case MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME:
+        return <RecoveryDoorOpenSpecial {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:
         return <TwoColLwInfoAndDeck {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.RETRY:

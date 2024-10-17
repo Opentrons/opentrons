@@ -22,7 +22,7 @@ import { InlineNotification } from '/app/atoms/InlineNotification'
 import { StepInfo } from './StepInfo'
 import { getErrorKind } from '../utils'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
@@ -52,6 +52,7 @@ type ErrorDetailsModalProps = Omit<
     robotType: RobotType
     desktopType: DesktopSizeType
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
+    allRunDefs: LabwareDefinition2[]
   }
 
 export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {

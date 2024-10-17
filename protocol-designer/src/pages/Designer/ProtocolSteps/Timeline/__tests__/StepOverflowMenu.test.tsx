@@ -3,7 +3,10 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
-import { duplicateStep } from '../../../../../ui/steps/actions/thunks'
+import {
+  getMultiSelectItemIds,
+  actions as stepsActions,
+} from '../../../../../ui/steps'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 import {
   getCurrentFormHasUnsavedChanges,
@@ -21,6 +24,7 @@ import type * as OpentronsComponents from '@opentrons/components'
 const mockConfirm = vi.fn()
 const mockCancel = vi.fn()
 
+vi.mock('../../../../../ui/steps')
 vi.mock('../../../../../step-forms/selectors')
 vi.mock('../../../../../ui/steps/actions/actions')
 vi.mock('../../../../../ui/steps/actions/thunks')
@@ -53,6 +57,7 @@ describe('StepOverflowMenu', () => {
       menuRootRef: { current: null },
       setStepOverflowMenu: vi.fn(),
     }
+    vi.mocked(getMultiSelectItemIds).mockReturnValue(null)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
     vi.mocked(getCurrentFormHasUnsavedChanges).mockReturnValue(false)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
@@ -71,11 +76,19 @@ describe('StepOverflowMenu', () => {
     fireEvent.click(screen.getByText('delete step'))
     expect(mockConfirm).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Duplicate step'))
-    expect(vi.mocked(duplicateStep)).toHaveBeenCalled()
+    expect(vi.mocked(stepsActions.duplicateStep)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Edit step'))
     expect(mockConfirm).toHaveBeenCalled()
     fireEvent.click(screen.getByText('View details'))
     expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()
     expect(vi.mocked(toggleViewSubstep)).toHaveBeenCalled()
+  })
+
+  it('renders the multi select overflow menu', () => {
+    vi.mocked(getMultiSelectItemIds).mockReturnValue(['1', '2'])
+    render(props)
+    screen.getByText('Duplicate steps')
+    screen.getByText('Delete steps')
+    screen.getByText('Delete multiple steps')
   })
 })

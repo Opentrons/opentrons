@@ -53,6 +53,8 @@
   "download_calibration_data_unavailable": "No calibration data available.",
   "download_calibration_title": "Download Calibration Data",
   "download_details": "Download details JSON Calibration Check summary",
+  "error": "Error",
+  "exit": "Exit",
   "finish": "Finish",
   "get_started": "Get started",
   "good_calibration": "Good calibration",

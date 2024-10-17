@@ -28,41 +28,43 @@
 
   "step_fields": {
     "defaults": {
-      "aspirate_wells": "Selected source wells",
-      "aspirate_labware": "Select a source labware to use",
       "aspirate_airGap_checkbox": "Aspirate air before moving to next well",
       "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step, including any Air Gap",
       "aspirate_delay_mmFromBottom": "Distance from the bottom of the well",
       "aspirate_flowRate": "The speed at which the pipette aspirates",
+      "aspirate_labware": "Select a source labware to use",
       "aspirate_mix_checkbox": "Pipette up and down before aspirating",
       "aspirate_mmFromBottom": "Adjust tip position for aspirate",
       "aspirate_touchTip_checkbox": "Touch tip to each side of well after aspirating",
       "aspirate_touchTip_mmFromBottom": "Distance from the bottom of the well",
+      "aspirate_wells": "Selected source wells",
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
+      "blowout_flowRate": "Blowout speed",
       "blowout_location": "Where to dispose of remaining volume in tip",
+      "blowout_z_offset": "The height at which blowout occurs from the top of the well",
       "changeTip": "Choose when the robot picks up fresh tips",
-      "dispense_wells": "Selected destination wells",
-      "dispense_labware": "Select a destination labware to use",
       "dispense_airGap_checkbox": "Aspirate air before moving to Trash to dispose of tip. Tip will be disposed of at the end of steps using this setting.",
       "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
       "dispense_delay_mmFromBottom": "Distance from the bottom of the well",
       "dispense_flowRate": "The speed at which the pipette dispenses",
+      "dispense_labware": "Select a destination labware to use",
       "dispense_mix_checkbox": "Pipette up and down after dispensing",
       "dispense_mmFromBottom": "Adjust tip position for dispense",
       "dispense_touchTip_checkbox": "Touch tip to each side of well after dispensing and other dispense advanced setting commands",
       "dispense_touchTip_mmFromBottom": "Distance from the bottom of the well",
+      "dispense_wells": "Selected destination wells",
       "disposalVolume_checkbox": "Aspirate extra volume that is disposed of after a multi-dispense is complete. We recommend a disposal volume of at least the pipette's minimum.",
       "dropTip_location": "Choose where you would like to drop tip",
       "heaterShakerSetTimer": "Once this counter has elapsed, the module will deactivate the heater and shaker",
+      "labware": "Select a labware to use",
       "mix_mmFromBottom": "Adjust tip position",
       "mix_touchTip_checkbox": "Touch tip to each side of the well after mixing",
       "mix_touchTip_mmFromBottom": "Distance from the bottom of the well",
       "pipette": "Select the pipette you want to use",
       "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
-      "volume": "Volume to dispense in each well",
-      "blowout_z_offset": "The height at which blowout occurs from the top of the well",
-      "blowout_flowRate": "Blowout speed",
-      "setTemperature": "Select the temperature to set your module to"
+      "setTemperature": "Select the temperature to set your module to",
+      "wells": "Select wells",
+      "volume": "Volume to dispense in each well"
     },
     "indeterminate": {
       "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
@@ -79,6 +81,7 @@
     },
     "mix": {
       "disabled": {
+        "wells": "Select a labware before selecting wells",
         "mix_mmFromBottom": "Tip position adjustment is not supported",
         "blowout_z_offset": "Blowout location and destination labware must first be selected"
       }

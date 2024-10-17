@@ -6,6 +6,7 @@ export { useRouteUpdateActions } from './useRouteUpdateActions'
 export { useERUtils } from './useERUtils'
 export { useRecoveryTakeover } from './useRecoveryTakeover'
 export { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
+export { useHomeGripperZAxis } from './useHomeGripperZAxis'
 
 export type { ERUtilsProps } from './useERUtils'
 export type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'

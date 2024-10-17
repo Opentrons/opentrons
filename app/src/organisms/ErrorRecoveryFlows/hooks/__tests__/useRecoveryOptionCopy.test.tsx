@@ -4,20 +4,26 @@ import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { useRecoveryOptionCopy } from '../useRecoveryOptionCopy'
-import { RECOVERY_MAP } from '../../constants'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 
-import type { RecoveryRoute } from '../../types'
+import type { ErrorKind, RecoveryRoute } from '../../types'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 function MockRenderCmpt({
   route,
+  errorKind,
 }: {
   route: RecoveryRoute | null
+  errorKind?: ErrorKind
 }): JSX.Element {
   const getRecoveryOptionCopy = useRecoveryOptionCopy()
 
-  return <div>{getRecoveryOptionCopy(route)}</div>
+  return (
+    <div>
+      {getRecoveryOptionCopy(route, errorKind ?? ERROR_KINDS.GENERAL_ERROR)}
+    </div>
+  )
 }
 
 const render = (props: React.ComponentProps<typeof MockRenderCmpt>) => {
@@ -31,6 +37,15 @@ describe('useRecoveryOptionCopy', () => {
     render({ route: RECOVERY_MAP.RETRY_STEP.ROUTE })
 
     screen.getByText('Retry step')
+  })
+
+  it(`renders the correct copy for ${RECOVERY_MAP.RETRY_STEP.ROUTE} when the error kind is ${ERROR_KINDS.TIP_DROP_FAILED}`, () => {
+    render({
+      route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+      errorKind: ERROR_KINDS.TIP_DROP_FAILED,
+    })
+
+    screen.getByText('Retry dropping tip')
   })
 
   it(`renders the correct copy for ${RECOVERY_MAP.CANCEL_RUN.ROUTE}`, () => {

@@ -54,6 +54,7 @@ export function ErrorRecoveryFlowError({
   currentRecoveryOptionUtils,
   routeUpdateActions,
   recoveryCommands,
+  errorKind,
 }: RecoveryContentProps): JSX.Element {
   const { OPTION_SELECTION } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
@@ -61,7 +62,10 @@ export function ErrorRecoveryFlowError({
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { homePipetteZAxes } = recoveryCommands
 
-  const userRecoveryOptionCopy = getRecoveryOptionCopy(selectedRecoveryOption)
+  const userRecoveryOptionCopy = getRecoveryOptionCopy(
+    selectedRecoveryOption,
+    errorKind
+  )
 
   const onPrimaryClick = (): void => {
     void handleMotionRouting(true)
@@ -87,6 +91,7 @@ export function RecoveryDropTipFlowErrors({
   currentRecoveryOptionUtils,
   routeUpdateActions,
   getRecoveryOptionCopy,
+  errorKind,
 }: RecoveryContentProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const { step } = recoveryMap
@@ -98,7 +103,10 @@ export function RecoveryDropTipFlowErrors({
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
 
-  const userRecoveryOptionCopy = getRecoveryOptionCopy(selectedRecoveryOption)
+  const userRecoveryOptionCopy = getRecoveryOptionCopy(
+    selectedRecoveryOption,
+    errorKind
+  )
 
   const buildTitle = (): string => {
     switch (step) {

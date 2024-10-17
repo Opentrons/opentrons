@@ -46,7 +46,7 @@ export const AbsorbanceReaderData = (
         data-testid="abs_module_data"
       >
         {t('abs_reader_lid_status', {
-          status: moduleData.lidStatus === 'on' ? 'open' : 'closed',
+          status: moduleData.lidStatus === 'on' ? 'closed' : 'open',
         })}
       </StyledText>
     </>

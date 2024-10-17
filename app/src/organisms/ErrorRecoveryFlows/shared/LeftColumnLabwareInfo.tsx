@@ -1,7 +1,6 @@
-import type * as React from 'react'
-
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
+import type * as React from 'react'
 import type { RecoveryContentProps } from '../types'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
@@ -20,22 +19,15 @@ export function LeftColumnLabwareInfo({
 }: LeftColumnLabwareInfoProps): JSX.Element | null {
   const {
     failedLabwareName,
-    failedLabware,
     failedLabwareNickname,
+    failedLabwareLocations,
   } = failedLabwareUtils
+  const { newLoc, currentLoc } = failedLabwareLocations
 
-  const buildLabwareLocationSlotName = (): string => {
-    const location = failedLabware?.location
-    if (
-      location != null &&
-      typeof location === 'object' &&
-      'slotName' in location
-    ) {
-      return location.slotName
-    } else {
-      return ''
-    }
-  }
+  const buildNewLocation = (): React.ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['newLocationProps'] =>
+    newLoc != null ? { deckLabel: newLoc.toUpperCase() } : undefined
 
   return (
     <InterventionContent
@@ -44,7 +36,8 @@ export function LeftColumnLabwareInfo({
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: { deckLabel: buildLabwareLocationSlotName() },
+        currentLocationProps: { deckLabel: currentLoc.toUpperCase() },
+        newLocationProps: buildNewLocation(),
       }}
       notificationProps={
         bannerText ? { type: 'alert', heading: bannerText } : undefined

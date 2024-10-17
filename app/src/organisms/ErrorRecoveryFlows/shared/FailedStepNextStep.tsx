@@ -8,6 +8,7 @@ export function FailedStepNextStep({
   commandsAfterFailedCommand,
   protocolAnalysis,
   robotType,
+  allRunDefs,
 }: Pick<
   RecoveryContentProps,
   | 'stepCounts'
@@ -15,6 +16,7 @@ export function FailedStepNextStep({
   | 'commandsAfterFailedCommand'
   | 'protocolAnalysis'
   | 'robotType'
+  | 'allRunDefs'
 >): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const failedCommandByAnalysis = failedCommand?.byAnalysis ?? null
@@ -44,6 +46,7 @@ export function FailedStepNextStep({
   return (
     <CategorizedStepContent
       commandTextData={protocolAnalysis}
+      allRunDefs={allRunDefs}
       robotType={robotType}
       topCategoryHeadline={t('failed_step')}
       topCategory="failed"

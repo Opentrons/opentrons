@@ -2,7 +2,11 @@ import { useTranslation } from 'react-i18next'
 import * as utils from './utils'
 
 import type { TFunction } from 'i18next'
-import type { RunTimeCommand, RobotType } from '@opentrons/shared-data'
+import type {
+  RunTimeCommand,
+  RobotType,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { CommandTextData } from '../../types'
 import type { GetDirectTranslationCommandText } from './utils/getDirectTranslationCommandText'
 import type {
@@ -12,14 +16,10 @@ import type {
 
 export interface UseCommandTextStringParams {
   command: RunTimeCommand | null
+  allRunDefs: LabwareDefinition2[]
   commandTextData: CommandTextData | null
   robotType: RobotType
 }
-
-export type CommandTextKind =
-  | 'generic'
-  | 'thermocycler/runProfile'
-  | 'thermocycler/runExtendedProfile'
 
 export type GetCommandText = UseCommandTextStringParams & { t: TFunction }
 export interface GetGenericCommandTextResult {
@@ -127,7 +127,17 @@ export function useCommandTextString(
           command,
         }),
       }
-
+    case 'absorbanceReader/openLid':
+    case 'absorbanceReader/closeLid':
+    case 'absorbanceReader/initialize':
+    case 'absorbanceReader/read':
+      return {
+        kind: 'generic',
+        commandText: utils.getAbsorbanceReaderCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
     case 'thermocycler/runProfile':
       return utils.getTCRunProfileCommandText({ ...fullParams, command })
 

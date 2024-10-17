@@ -72,7 +72,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showSlideout, setShowSlideout] = useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = useState(false)
 
-  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+  const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
 
   const settings =
     usePipetteSettingsQuery({
@@ -110,7 +110,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           robotType={OT2_ROBOT_TYPE}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
-          closeFlow={toggleDTWiz}
+          closeFlow={disableDTWiz}
           modalStyle="simple"
         />
       ) : null}
@@ -207,7 +207,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteSpecs={pipetteModelSpecs}
               mount={mount}
               handleChangePipette={handleChangePipette}
-              handleDropTip={toggleDTWiz}
+              handleDropTip={enableDTWiz}
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
               pipetteSettings={settings}

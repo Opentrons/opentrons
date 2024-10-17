@@ -978,17 +978,17 @@ def test_active_channels(
     )
 
     # Configure nozzle for partial configuration
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-    configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-        pipette_id="pipette-id",
-        nozzle_map=nozzle_map,
+    state_update = update_types.StateUpdate(
+        pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+            pipette_id="pipette-id",
+            nozzle_map=nozzle_map,
+        )
     )
     subject.handle_action(
         actions.SucceedCommandAction(
-            private_result=configure_nozzle_private_result,
-            command=configure_nozzle_layout_cmd,
+            command=_dummy_command(),
+            private_result=None,
+            state_update=state_update,
         )
     )
     assert (
@@ -1043,29 +1043,38 @@ def test_next_tip_uses_active_channels(
     )
 
     # Configure nozzle for partial configuration
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-    configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-        pipette_id="pipette-id",
-        nozzle_map=NozzleMap.build(
-            physical_nozzles=NINETY_SIX_MAP,
-            physical_rows=NINETY_SIX_ROWS,
-            physical_columns=NINETY_SIX_COLS,
-            starting_nozzle="A12",
-            back_left_nozzle="A12",
-            front_right_nozzle="H12",
-            valid_nozzle_maps=ValidNozzleMaps(
-                maps={
-                    "A12_H12": ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
-                }
+    state_update = update_types.StateUpdate(
+        pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+            pipette_id="pipette-id",
+            nozzle_map=NozzleMap.build(
+                physical_nozzles=NINETY_SIX_MAP,
+                physical_rows=NINETY_SIX_ROWS,
+                physical_columns=NINETY_SIX_COLS,
+                starting_nozzle="A12",
+                back_left_nozzle="A12",
+                front_right_nozzle="H12",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "A12_H12": [
+                            "A12",
+                            "B12",
+                            "C12",
+                            "D12",
+                            "E12",
+                            "F12",
+                            "G12",
+                            "H12",
+                        ]
+                    }
+                ),
             ),
-        ),
+        )
     )
     subject.handle_action(
         actions.SucceedCommandAction(
-            private_result=configure_nozzle_private_result,
-            command=configure_nozzle_layout_cmd,
+            command=_dummy_command(),
+            private_result=None,
+            state_update=state_update,
         )
     )
     # Pick up partial tips
@@ -1162,78 +1171,77 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             )
         )
 
-    # Configure nozzle for partial configurations
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-
     def _reconfigure_nozzle_layout(start: str, back_l: str, front_r: str) -> NozzleMap:
-        configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-            pipette_id="pipette-id",
-            nozzle_map=NozzleMap.build(
-                physical_nozzles=NINETY_SIX_MAP,
-                physical_rows=NINETY_SIX_ROWS,
-                physical_columns=NINETY_SIX_COLS,
-                starting_nozzle=start,
-                back_left_nozzle=back_l,
-                front_right_nozzle=front_r,
-                valid_nozzle_maps=ValidNozzleMaps(
-                    maps={
-                        "A1": ["A1"],
-                        "H1": ["H1"],
-                        "A12": ["A12"],
-                        "H12": ["H12"],
-                        "A1_H3": [
-                            "A1",
-                            "A2",
-                            "A3",
-                            "B1",
-                            "B2",
-                            "B3",
-                            "C1",
-                            "C2",
-                            "C3",
-                            "D1",
-                            "D2",
-                            "D3",
-                            "E1",
-                            "E2",
-                            "E3",
-                            "F1",
-                            "F2",
-                            "F3",
-                            "G1",
-                            "G2",
-                            "G3",
-                            "H1",
-                            "H2",
-                            "H3",
-                        ],
-                        "A1_F2": [
-                            "A1",
-                            "A2",
-                            "B1",
-                            "B2",
-                            "C1",
-                            "C2",
-                            "D1",
-                            "D2",
-                            "E1",
-                            "E2",
-                            "F1",
-                            "F2",
-                        ],
-                    }
-                ),
+        nozzle_map = NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle=start,
+            back_left_nozzle=back_l,
+            front_right_nozzle=front_r,
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "A1": ["A1"],
+                    "H1": ["H1"],
+                    "A12": ["A12"],
+                    "H12": ["H12"],
+                    "A1_H3": [
+                        "A1",
+                        "A2",
+                        "A3",
+                        "B1",
+                        "B2",
+                        "B3",
+                        "C1",
+                        "C2",
+                        "C3",
+                        "D1",
+                        "D2",
+                        "D3",
+                        "E1",
+                        "E2",
+                        "E3",
+                        "F1",
+                        "F2",
+                        "F3",
+                        "G1",
+                        "G2",
+                        "G3",
+                        "H1",
+                        "H2",
+                        "H3",
+                    ],
+                    "A1_F2": [
+                        "A1",
+                        "A2",
+                        "B1",
+                        "B2",
+                        "C1",
+                        "C2",
+                        "D1",
+                        "D2",
+                        "E1",
+                        "E2",
+                        "F1",
+                        "F2",
+                    ],
+                }
             ),
+        )
+        state_update = update_types.StateUpdate(
+            pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+                pipette_id="pipette-id",
+                nozzle_map=nozzle_map,
+            )
         )
         subject.handle_action(
             actions.SucceedCommandAction(
-                private_result=configure_nozzle_private_result,
-                command=configure_nozzle_layout_cmd,
+                command=_dummy_command(),
+                private_result=None,
+                state_update=state_update,
             )
         )
-        return configure_nozzle_private_result.nozzle_map
+        return nozzle_map
 
     map = _reconfigure_nozzle_layout("A1", "A1", "H3")
     _assert_and_pickup("A10", map)
@@ -1320,71 +1328,67 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
 
         return result
 
-    # Configure nozzle for partial configurations
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
-        result=commands.ConfigureNozzleLayoutResult()
-    )
-
     def _reconfigure_nozzle_layout(start: str, back_l: str, front_r: str) -> NozzleMap:
-        configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
-            pipette_id="pipette-id",
-            nozzle_map=NozzleMap.build(
-                physical_nozzles=NINETY_SIX_MAP,
-                physical_rows=NINETY_SIX_ROWS,
-                physical_columns=NINETY_SIX_COLS,
-                starting_nozzle=start,
-                back_left_nozzle=back_l,
-                front_right_nozzle=front_r,
-                valid_nozzle_maps=ValidNozzleMaps(
-                    maps={
-                        "A1": ["A1"],
-                        "H1": ["H1"],
-                        "A12": ["A12"],
-                        "H12": ["H12"],
-                        "Full": sum(
-                            [
-                                NINETY_SIX_ROWS["A"],
-                                NINETY_SIX_ROWS["B"],
-                                NINETY_SIX_ROWS["C"],
-                                NINETY_SIX_ROWS["D"],
-                                NINETY_SIX_ROWS["E"],
-                                NINETY_SIX_ROWS["F"],
-                                NINETY_SIX_ROWS["G"],
-                                NINETY_SIX_ROWS["H"],
-                            ],
-                            [],
-                        ),
-                    }
-                ),
+        nozzle_map = NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle=start,
+            back_left_nozzle=back_l,
+            front_right_nozzle=front_r,
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "A1": ["A1"],
+                    "H1": ["H1"],
+                    "A12": ["A12"],
+                    "H12": ["H12"],
+                    "Full": sum(
+                        [
+                            NINETY_SIX_ROWS["A"],
+                            NINETY_SIX_ROWS["B"],
+                            NINETY_SIX_ROWS["C"],
+                            NINETY_SIX_ROWS["D"],
+                            NINETY_SIX_ROWS["E"],
+                            NINETY_SIX_ROWS["F"],
+                            NINETY_SIX_ROWS["G"],
+                            NINETY_SIX_ROWS["H"],
+                        ],
+                        [],
+                    ),
+                }
             ),
+        )
+        state_update = update_types.StateUpdate(
+            pipette_nozzle_map=update_types.PipetteNozzleMapUpdate(
+                pipette_id="pipette-id", nozzle_map=nozzle_map
+            )
         )
         subject.handle_action(
             actions.SucceedCommandAction(
-                private_result=configure_nozzle_private_result,
-                command=configure_nozzle_layout_cmd,
+                command=_dummy_command(), private_result=None, state_update=state_update
             )
         )
-        return configure_nozzle_private_result.nozzle_map
+        return nozzle_map
 
     map = _reconfigure_nozzle_layout("A1", "A1", "A1")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("A12", "A12", "A12")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("H1", "H1", "H1")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
     map = _reconfigure_nozzle_layout("H12", "H12", "H12")
-    for x in range(96):
+    for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
