@@ -6,7 +6,6 @@ const PROMPT_PREVIEW_PLACEHOLDER_MESSAGE =
   'As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol.'
 
 interface PromptPreviewProps {
-  id?: string
   isSubmitButtonEnabled?: boolean
   handleSubmit: () => void
   promptPreviewData: PromptPreviewSectionProps[]
@@ -33,7 +32,6 @@ const PromptPreviewPlaceholderMessage = styled(StyledText)`
 `
 
 export function PromptPreview({
-  id,
   isSubmitButtonEnabled = false,
   handleSubmit,
   promptPreviewData,
@@ -43,7 +41,7 @@ export function PromptPreview({
   }
 
   return (
-    <PromptPreviewContainer id={id}>
+    <PromptPreviewContainer>
       <PromptPreviewHeading>
         <StyledText desktopStyle="headingLargeBold">Prompt</StyledText>
         <LargeButton
@@ -52,6 +50,7 @@ export function PromptPreview({
           onClick={handleSubmit}
         />
       </PromptPreviewHeading>
+      
       {areAllSectionsEmpty() && (
         <PromptPreviewPlaceholderMessage desktopStyle="headingSmallRegular">
           {PROMPT_PREVIEW_PLACEHOLDER_MESSAGE}
