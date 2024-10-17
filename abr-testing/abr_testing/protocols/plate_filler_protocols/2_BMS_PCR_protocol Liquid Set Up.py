@@ -18,8 +18,12 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     # Initiate Labware
     tiprack_1000 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
     master_reservoir = protocol.load_labware("axygen_1_reservoir_90ml", "C2")
-    pcr_plate_1 = protocol.load_labware("nest_12_reservoir_15ml", "C3", "PCR Plate 1")
-    pcr_plate_2 = protocol.load_labware("nest_12_reservoir_15ml", "B3", "PCR Plate 2")
+    pcr_plate_1 = protocol.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "C3", "PCR Plate 1"
+    )
+    pcr_plate_2 = protocol.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "B3", "PCR Plate 2"
+    )
     # Load Pipette
     p1000 = protocol.load_instrument(
         instrument_name="flex_8channel_1000", mount="left", tip_racks=[tiprack_1000]
