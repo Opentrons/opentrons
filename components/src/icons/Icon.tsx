@@ -7,6 +7,12 @@ import { ICON_DATA_BY_NAME } from './icon-data'
 
 import type { SvgProps } from '../primitives'
 
+export interface IconData {
+  fill?: string
+  paths: Array<React.SVGProps<SVGPathElement>>
+  viewBox: string
+}
+
 export type IconName = keyof typeof ICON_DATA_BY_NAME
 
 export interface IconProps extends SvgProps {
@@ -60,19 +66,28 @@ export function Icon(props: IconProps): JSX.Element | null {
     return null
   }
 
-  const { viewBox, path } = ICON_DATA_BY_NAME[name]
+  const { fill = 'currentColor', viewBox, paths } = ICON_DATA_BY_NAME[
+    name
+  ] as IconData
+
+  if (paths.length < 1) {
+    return null
+  }
 
   return (
     <Svg
       aria-hidden="true"
-      fill="currentColor"
+      aria-roledescription={name}
+      fill={fill}
       viewBox={viewBox}
       className={cx(className, { spin })}
       css={spinStyle}
       {...svgProps}
       id={id}
     >
-      <path aria-roledescription={name} fillRule="evenodd" d={path} />
+      {paths.map((pathData, index) => (
+        <path key={index} {...pathData} />
+      ))}
       {props.children}
     </Svg>
   )
