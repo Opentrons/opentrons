@@ -475,6 +475,12 @@
       }
     }
   },
-  "required": ["liquidClassName", "displayName","schemaVersion", "namespace", "byPipette"],
+  "required": [
+    "liquidClassName",
+    "displayName",
+    "schemaVersion",
+    "namespace",
+    "byPipette"
+  ],
   "additionalProperties": false
 }
