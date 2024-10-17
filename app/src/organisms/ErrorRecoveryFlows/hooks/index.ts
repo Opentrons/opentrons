@@ -1,5 +1,4 @@
 export { useCurrentlyRecoveringFrom } from './useCurrentlyRecoveringFrom'
-export { useErrorMessage } from './useErrorMessage'
 export { useErrorName } from './useErrorName'
 export { useRecoveryCommands } from './useRecoveryCommands'
 export { useRouteUpdateActions } from './useRouteUpdateActions'
