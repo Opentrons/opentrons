@@ -1,4 +1,6 @@
 """Utilities for calculating motion correctly."""
+from logging import getLogger
+
 from functools import lru_cache
 from typing import Callable, Dict, Union, Optional, cast
 from collections import OrderedDict
@@ -11,6 +13,7 @@ from opentrons.util import linal
 
 from .types import Axis, OT3Mount
 
+log = getLogger(__name__)
 
 # TODO: The offset_for_mount function should be defined with an overload
 # set, as with other functions in this module. Unfortunately, mypy < 0.920
@@ -128,6 +131,8 @@ def target_axis_map_from_absolute(
     primary_z = Axis.by_mount(primary_mount)
     target_position = OrderedDict()
 
+    log.info(f"The primary critical point {primary_cp} and primary_mount {primary_mount} and type {type(primary_cp)}")
+    log.info(f"The offset {offset} and type is {type(offset)}")
     if Axis.X in keys_for_target_position:
         target_position[Axis.X] = axis_map[Axis.X] - offset.x - primary_cp.x
     if Axis.Y in keys_for_target_position:
