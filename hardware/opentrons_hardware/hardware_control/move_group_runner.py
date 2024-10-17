@@ -237,13 +237,23 @@ class MoveGroupRunner:
             log.warning("Clear move group failed")
 
     def all_nodes(self) -> Set[NodeId]:
-        """Get all of the nodes in the move group runner's move gruops."""
+        """Get all of the nodes in the move group runner's move groups."""
         node_set: Set[NodeId] = set()
         for group in self._move_groups:
             for sequence in group:
                 for node in sequence.keys():
                     node_set.add(node)
         return node_set
+    
+    def all_moving_nodes(self) -> Set[NodeId]:
+        """Get all of the moving nodes in the move group runner's move groups."""
+        node_set: Set[NodeId] = set()
+        for group in self._move_groups:
+            for sequence in group:
+                for node, node_step in sequence.items():
+                    if node_step.is_moving_step():
+                        node_set.add(node)
+            return node_set
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to set up the message groups."""

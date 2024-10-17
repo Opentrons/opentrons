@@ -154,15 +154,6 @@ def test_moving_pipettes_in_move_group(
         NodeId.gripper_g,
         NodeId.gripper_z,
     ]
-    move_group = [
-        create_step(
-            distance={node: f64(100) for node in moving},
-            velocity={node: f64(100) for node in moving},
-            acceleration={node: f64(0) for node in moving},
-            duration=f64(1),
-            present_nodes=present_nodes,
-        )
-    ]
 
-    moving_pipettes = ot3utils.moving_pipettes_in_move_group(move_group)
+    moving_pipettes = ot3utils.moving_pipettes_in_move_group(present_nodes, moving)
     assert set(moving_pipettes) == set(expected)

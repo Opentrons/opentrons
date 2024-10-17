@@ -201,11 +201,12 @@ def mock_send_stop_threshold() -> Iterator[mock.AsyncMock]:
 
 @pytest.fixture
 def mock_move_group_run() -> Iterator[mock.AsyncMock]:
+
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner.run",
         autospec=True,
     ) as mock_mgr_run:
-        mock_mgr_run.return_value = {}
+        mock_mgr_run.side_effect = {}
         yield mock_mgr_run
 
 
@@ -342,7 +343,7 @@ home_test_params = [
 ]
 
 
-def move_group_run_side_effect(
+def move_group_run_side_effect_home(
     controller: OT3Controller, axes_to_home: List[Axis]
 ) -> Iterator[Dict[NodeId, MotorPositionStatus]]:
     """Return homed position for axis that is present and was commanded to home."""
@@ -370,7 +371,7 @@ async def test_home_execute(
     mock_present_devices: None,
     mock_check_overpressure: None,
 ) -> None:
-    config = {"run.side_effect": move_group_run_side_effect(controller, axes)}
+    config = {"run.side_effect": move_group_run_side_effect_home(controller, axes)}
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
@@ -489,7 +490,7 @@ async def test_home_only_present_devices(
 
     controller._position = starting_position
 
-    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
+    mock_move_group_run.side_effect = move_group_run_side_effect_home(controller, axes)
 
     # nothing has been homed
     assert not controller._motor_status
@@ -1281,3 +1282,123 @@ def test_grip_error_detection(
             hard_max,
             hard_min,
         )
+
+
+def move_group_run_side_effect(
+    controller: OT3Controller, target_pos: Dict[Axis, float]
+) -> Iterator[Dict[NodeId, MotorPositionStatus]]:
+    """Return homed position for axis that is present and was commanded to home."""
+    motor_nodes = controller._motor_nodes()
+    target_nodes = {axis_to_node(ax): ax for ax in target_pos.keys() if ax != Axis.Q}
+    res = {}
+    for node in motor_nodes:
+        pos = 0
+        if target_nodes.get(node):
+            pos = target_pos[target_nodes[node]]
+        res[node] = MotorPositionStatus(pos, pos, True, True, MoveCompleteAck(1))
+    yield res
+
+
+@pytest.mark.parametrize(
+    argnames=["origin_pos", "target_pos", "expected_pos", "gear_position"],
+    argvalues=[
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+                Axis.Q: 0,
+            },
+            {Axis.Q: 10},
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            10
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {Axis.Q: 10},
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+            },
+            {
+                Axis.X: 10,
+                Axis.Y: 10,
+                Axis.Z_L: 10,
+            },
+            {
+                Axis.X: 10,
+                Axis.Y: 10,
+                Axis.Z_L: 10,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None
+        ],
+    ],
+)
+async def test_controller_move(
+    controller: OT3Controller,
+    mock_present_devices: mock.AsyncMock,
+    origin_pos: Dict[Axis, float],
+    target_pos: Dict[Axis, float],
+    expected_pos: Dict[Axis, float],
+    gear_position: Optional[int]
+) -> None:
+    from copy import deepcopy
+
+    controller.update_constraints_for_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+
+    run_target_pos = deepcopy(target_pos)
+    config = {"run.side_effect": move_group_run_side_effect(controller, run_target_pos)}
+    with mock.patch(  # type: ignore [call-overload]
+        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
+        spec=MoveGroupRunner,
+        **config
+    ):
+        await controller.move(origin_pos, target_pos, 100)
+        position = await controller.update_position()
+        gear_position = controller.gear_motor_position
+
+        assert position == expected_pos
+        assert gear_position == gear_position

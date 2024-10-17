@@ -595,30 +595,99 @@ class OT3Controller(FlexBackend):
         return axis_convert(self._encoder_position, 0.0)
 
     def _handle_motor_status_response(
-        self,
-        response: NodeMap[MotorPositionStatus],
+        self, response: NodeMap[MotorPositionStatus], handle_gear_move: bool = False
     ) -> None:
         for axis, pos in response.items():
-            self._position.update({axis: pos.motor_position})
-            self._encoder_position.update({axis: pos.encoder_position})
-            # TODO (FPS 6-01-2023): Remove this once the Feature Flag to ignore stall detection is removed.
-            # This check will latch the motor status for an axis at "true" if it was ever set to true.
-            # To account for the case where a motor axis has its power reset, we also depend on the
-            # "encoder_ok" flag staying set (it will only be False if the motor axis has not been
-            # homed since a power cycle)
-            motor_ok_latch = (
-                (not self._feature_flags.stall_detection_enabled)
-                and ((axis in self._motor_status) and self._motor_status[axis].motor_ok)
-                and self._motor_status[axis].encoder_ok
-            )
-            self._motor_status.update(
-                {
-                    axis: MotorStatus(
-                        motor_ok=(pos.motor_ok or motor_ok_latch),
-                        encoder_ok=pos.encoder_ok,
+            if handle_gear_move and axis == NodeId.pipette_left:
+                self._gear_motor_position = {axis: pos.motor_position}
+            else:
+                self._position.update({axis: pos.motor_position})
+                self._encoder_position.update({axis: pos.encoder_position})
+                # TODO (FPS 6-01-2023): Remove this once the Feature Flag to ignore stall detection is removed.
+                # This check will latch the motor status for an axis at "true" if it was ever set to true.
+                # To account for the case where a motor axis has its power reset, we also depend on the
+                # "encoder_ok" flag staying set (it will only be False if the motor axis has not been
+                # homed since a power cycle)
+                motor_ok_latch = (
+                    (not self._feature_flags.stall_detection_enabled)
+                    and (
+                        (axis in self._motor_status)
+                        and self._motor_status[axis].motor_ok
                     )
-                }
+                    and self._motor_status[axis].encoder_ok
+                )
+                self._motor_status.update(
+                    {
+                        axis: MotorStatus(
+                            motor_ok=(pos.motor_ok or motor_ok_latch),
+                            encoder_ok=pos.encoder_ok,
+                        )
+                    }
+                )
+
+    def _build_move_node_axis_runner(
+        self,
+        origin: Dict[Axis, float],
+        target: Dict[Axis, float],
+        speed: float,
+        stop_condition: HWStopCondition,
+        nodes_in_moves_only: bool,
+    ) -> Tuple[Optional[MoveGroupRunner], bool]:
+        if not target:
+            return None, False
+        move_target = MoveTarget.build(position=target, max_speed=speed)
+        log.info(f"The origin: {origin} and {target} position at speed: {speed}")
+        try:
+            _, movelist = self._move_manager.plan_motion(
+                origin=origin, target_list=[move_target]
             )
+        except ZeroLengthMoveError as zme:
+            log.debug(f"Not moving because move was zero length {str(zme)}")
+            return
+        moves = movelist[0]
+        log.info(f"move: machine {target} from {origin} requires {moves}")
+
+        ordered_nodes = self._motor_nodes()
+        if nodes_in_moves_only:
+            moving_axes = {
+                axis_to_node(ax) for move in moves for ax in move.unit_vector.keys()
+            }
+            ordered_nodes = ordered_nodes.intersection(moving_axes)
+
+        move_group, _ = create_move_group(
+            origin, moves, ordered_nodes, MoveStopCondition[stop_condition.name]
+        )
+        return (
+            MoveGroupRunner(
+                move_groups=[move_group],
+                ignore_stalls=True
+                if not self._feature_flags.stall_detection_enabled
+                else False,
+            ),
+            False,
+        )
+
+    def _build_move_gear_axis_runner(
+        self, possible_q_axis_origin, possible_q_axis_target, speed, nodes_in_moves_only
+    ) -> Optional[MoveGroupRunner]:
+        if possible_q_axis_origin is None or possible_q_axis_target is None:
+            return None, True
+        tip_motor_move_group = self._build_tip_action_group(
+            possible_q_axis_origin, [(possible_q_axis_target, speed)]
+        )
+        if nodes_in_moves_only:
+            ordered_nodes = self._motor_nodes()
+
+            ordered_nodes.intersection({axis_to_node(Axis.Q)})
+        return (
+            MoveGroupRunner(
+                move_groups=[tip_motor_move_group],
+                ignore_stalls=True
+                if not self._feature_flags.stall_detection_enabled
+                else False,
+            ),
+            True,
+        )
 
     @requires_update
     @requires_estop
@@ -648,49 +717,45 @@ class OT3Controller(FlexBackend):
         """
         possible_q_axis_origin = origin.pop(Axis.Q, None)
         possible_q_axis_target = target.pop(Axis.Q, None)
-        tip_motor_move_group = []
 
-        if possible_q_axis_origin and possible_q_axis_target:
-            tip_motor_move_group = self._build_tip_action_group(
-                possible_q_axis_origin, [(possible_q_axis_target, speed)]
-            )
-
-        move_target = MoveTarget.build(position=target, max_speed=speed)
-        log.info(f"The origin: {origin} and {target} position at speed: {speed}")
-        try:
-            _, movelist = self._move_manager.plan_motion(
-                origin=origin, target_list=[move_target]
-            )
-        except ZeroLengthMoveError as zme:
-            log.debug(f"Not moving because move was zero length {str(zme)}")
-            return
-        moves = movelist[0]
-        log.info(f"move: machine {target} from {origin} requires {moves}")
-
-        ordered_nodes = self._motor_nodes()
-        if nodes_in_moves_only:
-            moving_axes = {
-                axis_to_node(ax) for move in moves for ax in move.unit_vector.keys()
-            }
-            ordered_nodes = ordered_nodes.intersection(moving_axes)
-
-        group = create_move_group(
-            origin, moves, ordered_nodes, MoveStopCondition[stop_condition.name]
+        maybe_runners = (
+            self._build_move_node_axis_runner(
+                origin, target, speed, stop_condition, nodes_in_moves_only
+            ),
+            self._build_move_gear_axis_runner(
+                possible_q_axis_origin,
+                possible_q_axis_target,
+                speed,
+                nodes_in_moves_only,
+            ),
         )
-        move_group, _ = group
-        log.info(f"The move group is {move_group} and the tip motor move group is {tip_motor_move_group}")
-        runner = MoveGroupRunner(
-            move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+        log.info(f"The move groups are {maybe_runners}.")
+
+        gather_moving_nodes = set()
+        all_moving_nodes = set()
+        for runner, _ in maybe_runners:
+            if runner:
+                gather_moving_nodes.add(runner.all_nodes())
+                all_moving_nodes.add(runner.all_moving_nodes())
+
+        pipettes_moving = moving_pipettes_in_move_group(
+            gather_moving_nodes, all_moving_nodes
         )
 
-        pipettes_moving = moving_pipettes_in_move_group(move_group)
-
-        async with self._monitor_overpressure(pipettes_moving):
+        async def _runner_coroutine(runner: MoveGroupRunner, is_gear_move: bool):
             positions = await runner.run(can_messenger=self._messenger)
-        self._handle_motor_status_response(positions)
+            return positions, is_gear_move
+
+        coros = [
+            _runner_coroutine(runner, is_gear_move)
+            for runner, is_gear_move in maybe_runners
+            if runner
+        ]
+        async with self._monitor_overpressure(pipettes_moving):
+            all_positions = await asyncio.gather(*coros)
+
+        for positions, handle_gear_move in all_positions:
+            self._handle_motor_status_response(positions, handle_gear_move)
 
     def _get_axis_home_distance(self, axis: Axis) -> float:
         if self.check_motor_status([axis]):
@@ -805,6 +870,7 @@ class OT3Controller(FlexBackend):
                     Axis.to_kind(Axis.Q)
                 ],
             )
+
         for position in positions:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)

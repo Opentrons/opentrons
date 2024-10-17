@@ -498,10 +498,10 @@ def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
     return move_group
 
 
-def moving_pipettes_in_move_group(group: MoveGroup) -> List[NodeId]:
+def moving_pipettes_in_move_group(
+    all_nodes: Set[NodeId], moving_nodes: Set[NodeId]
+) -> List[NodeId]:
     """Utility function to get which pipette nodes are moving either in z or their plunger."""
-    all_nodes = [node for step in group for node, _ in step.items()]
-    moving_nodes = moving_axes_in_move_group(group)
     pipettes_moving: List[NodeId] = [
         k for k in moving_nodes if k in [NodeId.pipette_left, NodeId.pipette_right]
     ]
@@ -510,16 +510,6 @@ def moving_pipettes_in_move_group(group: MoveGroup) -> List[NodeId]:
     if NodeId.head_r in moving_nodes and NodeId.pipette_right in all_nodes:
         pipettes_moving.append(NodeId.pipette_right)
     return pipettes_moving
-
-
-def moving_axes_in_move_group(group: MoveGroup) -> Set[NodeId]:
-    """Utility function to get only the moving nodes in a move group."""
-    ret: Set[NodeId] = set()
-    for step in group:
-        for node, node_step in step.items():
-            if node_step.is_moving_step():
-                ret.add(node)
-    return ret
 
 
 AxisMapPayload = TypeVar("AxisMapPayload")
