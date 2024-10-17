@@ -7,7 +7,7 @@ import winston from 'winston'
 
 import { getConfig } from './config'
 
-import type Transport from 'winston-transport'
+import Transport from 'winston-transport'
 import type { Config } from './config'
 
 const ODD_DIR = '/data/ODD'
@@ -25,20 +25,30 @@ const FILE_OPTIONS = {
   tailable: true,
 }
 
-let config: Config['log']
-let transports: Transport[]
-let log: winston.Logger
+// Use our own logger type because winston (a) doesn't allow these by default
+// but (b) does it by binding something other than a function to these props.
+export type OTLogger = Omit<
+  winston.Logger,
+  'emerg' | 'alert' | 'crit' | 'warning' | 'notice'
+>
 
-export function createLogger(filename: string): winston.Logger {
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (!config) config = getConfig('log')
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (!transports) initializeTransports()
-
-  return createWinstonLogger(filename)
+export function createLogger(label: string): OTLogger {
+  const rootLogger = ensureRootLogger()
+  return rootLogger.child({ label })
 }
 
-function initializeTransports(): void {
+let _rootLog: OTLogger | null = null
+
+function ensureRootLogger(): OTLogger {
+  if (_rootLog == null) {
+    return buildRootLogger()
+  } else {
+    return _rootLog
+  }
+}
+
+function buildRootLogger(): OTLogger {
+  const config = getConfig('log')
   let error = null
 
   // sync is ok here because this only happens once
@@ -48,17 +58,34 @@ function initializeTransports(): void {
     error = e
   }
 
-  transports = createTransports()
-  log = createWinstonLogger('log')
+  const transports = createTransports(config)
 
+  const formats = [
+    winston.format.timestamp(),
+    winston.format.metadata({
+      key: 'meta',
+      fillExcept: ['level', 'message', 'timestamp', 'label'],
+    }),
+  ]
+
+  _rootLog = winston.createLogger({
+    transports,
+    format: winston.format.combine(...formats),
+  })
+  const loggingLog = _rootLog.child({ label: 'logging' })
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (error) log.error('Could not create log directory', { error })
-  log.info(`Level "error" and higher logging to ${ERROR_LOG}`)
-  log.info(`Level "${config.level.file}" and higher logging to ${COMBINED_LOG}`)
-  log.info(`Level "${config.level.console}" and higher logging to console`)
+  if (error) loggingLog.error('Could not create log directory', { error })
+  loggingLog.info(`Level "error" and higher logging to ${ERROR_LOG}`)
+  loggingLog.info(
+    `Level "${config.level.file}" and higher logging to ${COMBINED_LOG}`
+  )
+  loggingLog.info(
+    `Level "${config.level.console}" and higher logging to console`
+  )
+  return _rootLog
 }
 
-function createTransports(): Transport[] {
+function createTransports(config: Config['log']): Transport[] {
   const timeFromStamp = (ts: string): string =>
     dateFormat(new Date(ts), 'HH:MM:ss.l')
 
@@ -104,23 +131,4 @@ function createTransports(): Transport[] {
       ),
     }),
   ]
-}
-
-function createWinstonLogger(label: string): winston.Logger {
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
-  log && log.debug(`Creating logger for ${label}`)
-
-  const formats = [
-    winston.format.label({ label }),
-    winston.format.timestamp(),
-    winston.format.metadata({
-      key: 'meta',
-      fillExcept: ['level', 'message', 'timestamp', 'label'],
-    }),
-  ]
-
-  return winston.createLogger({
-    transports,
-    format: winston.format.combine(...formats),
-  })
 }
