@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import head from 'lodash/head'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -62,9 +62,15 @@ export function IgnoreErrorStepHome({
     goBackPrevStep,
   } = routeUpdateActions
 
-  const [selectedOption, setSelectedOption] = React.useState<IgnoreOption>(
+  const [selectedOption, setSelectedOption] = useState<IgnoreOption>(
     head(IGNORE_OPTIONS_IN_ORDER) as IgnoreOption
   )
+
+  // Reset client choice to ignore all errors whenever navigating back to this view. This prevents unexpected
+  // behavior after pressing "go back" and ending up on this screen.
+  useEffect(() => {
+    void ignoreErrorKindThisRun(false)
+  }, [])
 
   // In order to keep routing linear, all extended "skip" flows should be kept as separate recovery options with
   // go back functionality that routes to this view. Those "skip" views encapsulate the generic "skip" view.
@@ -84,7 +90,7 @@ export function IgnoreErrorStepHome({
 
   // See ignoreOnce comment.
   const ignoreAlways = (): void => {
-    void ignoreErrorKindThisRun().then(() => {
+    void ignoreErrorKindThisRun(true).then(() => {
       switch (errorKind) {
         case ERROR_KINDS.NO_LIQUID_DETECTED:
           void proceedToRouteAndStep(
