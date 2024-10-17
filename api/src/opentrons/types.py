@@ -80,7 +80,7 @@ LocationLabware = Union[
 
 class Location:
     """Location(point: Point, labware: Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"])
-    
+
     A location to target as a motion.
 
     The location contains a :py:class:`.Point` (in

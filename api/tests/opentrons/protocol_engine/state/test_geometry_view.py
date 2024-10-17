@@ -1808,6 +1808,31 @@ def test_get_relative_well_location(
     )
 
 
+def test_get_relative_liquid_handling_well_location(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should get the relative location of a well given an absolute position."""
+    result = subject.get_relative_liquid_handling_well_location(
+        labware_id="labware-id",
+        well_name="B2",
+        absolute_point=Point(x=0, y=0, z=-2),
+        is_meniscus=True,
+    )
+
+    assert result == LiquidHandlingWellLocation(
+        origin=WellOrigin.MENISCUS,
+        offset=WellOffset.construct(
+            x=0.0,
+            y=0.0,
+            z=cast(float, pytest.approx(-2)),
+        ),
+    )
+
+
 def test_get_nominal_effective_tip_length(
     decoy: Decoy,
     mock_labware_view: LabwareView,
