@@ -34,7 +34,7 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import { swatchColors } from '../../components/swatchColors'
 import { checkColor } from './utils'
 
-import type { ColorResult } from 'react-color'
+import type { ColorResult, RGBColor } from 'react-color'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../types'
 import type { LiquidGroup } from '../../labware-ingred/types'
@@ -151,15 +151,11 @@ export function DefineLiquidsModal(
     })
   }
 
-  const rgbaToHex = (r: number, g: number, b: number, a?: number): string => {
-    const toHex = (value: number): string => {
-      const hex = Math.round(value * 255).toString(16)
-      return hex.length === 1 ? '0' + hex : hex
-    }
-
-    return a != null
-      ? `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(a)}`
-      : `#${toHex(r)}${toHex(g)}${toHex(b)}`
+  const rgbaToHex = (rgba: RGBColor): string => {
+    const { r, g, b, a } = rgba
+    const toHex = (n: number): string => n.toString(16).padStart(2, '0')
+    const alpha = a != null ? Math.round(a * 255) : 255
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(alpha)}`
   }
 
   return (
@@ -197,8 +193,7 @@ export function DefineLiquidsModal(
                     presetColors={DEFAULT_LIQUID_COLORS}
                     color={color}
                     onChange={(color: ColorResult) => {
-                      const { r, g, b, a } = color.rgb
-                      const hex = rgbaToHex(r, g, b, a)
+                      const hex = rgbaToHex(color.rgb)
                       setValue('displayColor', hex)
                       field.onChange(hex)
                     }}
