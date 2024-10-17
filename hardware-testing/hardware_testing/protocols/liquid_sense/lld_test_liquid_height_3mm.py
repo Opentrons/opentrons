@@ -17,6 +17,9 @@ from opentrons.types import Point
 # NOTE: The volumes below were calculated using Solidworks
 #       models, they are the nominal volume inside the well
 #       at both 3mm from bottom and 3mm from top.
+# FIXME: replace this with actual Opentrons API software
+#        volume estimations. No need for us to include Solidworks
+#        in this testing loop.
 VOLUMES_3MM_TOP_BOTTOM = {
     "corning_96_wellplate_360ul_flat": [257.1, 97.2, 0.0],
     "armadillo_96_wellplate_200ul_pcr_full_skirt": [150.2, 14.3, 0.0],
@@ -28,13 +31,13 @@ VOLUMES_3MM_TOP_BOTTOM = {
     ],  # 50mL tubes only
     "nest_12_reservoir_15ml": [13236.1, 1219.0,0.0],
 }
-SAME_TIP = True  # this is fine when using Ethanol (b/c is evaporates)
+SAME_TIP = True  # this is fine when using Ethanol (b/c it evaporates)
 RETURN_TIP = True
 NUM_TRIALS = 3
 DISPENSE_MM_FROM_MENISCUS = -0.5
 LABWARE = "nest_12_reservoir_15ml"
 
-ASPIRATE_MM_FROM_MENISCUS = -1.5
+ASPIRATE_MM_FROM_MENISCUS = -2.0
 # RESERVOIR = "opentrons_15_tuberack_nest_15ml_conical"
 RESERVOIR = "nest_1_reservoir_195ml"
 
@@ -250,16 +253,16 @@ def _test_for_finding_liquid_height(
             probing_pipette.aspirate().dispense().prepare_to_aspirate()
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
         if volume:
+            # transfer over and over until all volume is moved
+            need_to_transfer_per_ch = volume / liquid_pipette.channels
             # set flow-rates
-            liquid_pipette.flow_rate.aspirate = max(
-                min(liquid_pipette.max_volume, volume), 10
-            )
+            liquid_pipette.flow_rate.aspirate = min(max(
+                min(liquid_pipette.max_volume, need_to_transfer_per_ch), 10
+            ), 200)
             liquid_pipette.flow_rate.dispense = min(
                 liquid_pipette.flow_rate.aspirate, 50
             )
             liquid_pipette.flow_rate.blow_out = 100
-            # transfer over and over until all volume is moved
-            need_to_transfer_per_ch = volume / liquid_pipette.channels
             if _src_meniscus_height is None:
                 _src_meniscus_height = src_well.depth - 1.0
             if src_well.diameter:
@@ -281,7 +284,8 @@ def _test_for_finding_liquid_height(
                     liquid_pipette.aspirate().blow_out().prepare_to_aspirate()
                 # aspirate
                 meniscus_shift_mm = transfer_vol / src_well_z_ul_per_mm
-                _src_meniscus_height -= meniscus_shift_mm * 1.2  # tube has draft
+                draft_multiplier = 1.2 if src_well.diameter else 1.5
+                _src_meniscus_height -= draft_multiplier
                 asp_mm = max(_src_meniscus_height + ASPIRATE_MM_FROM_MENISCUS, 2)
                 liquid_pipette.aspirate(transfer_vol, src_well.bottom(asp_mm))
                 need_to_transfer_per_ch -= transfer_vol
@@ -354,6 +358,8 @@ def run(ctx: ProtocolContext) -> None:
     test_tips_liquid = _get_test_tips(liq_rack, channels=1)
     test_tips_probe = _get_test_tips(probe_rack, channels=1)
     stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
+    # FIXME: calculate nominal volumes at +3mm from bottom and -3mm from top
+    #        using Opentrons API (not Solidworks)
     volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
     assert min(stuff_lengths) >= NUM_TRIALS * len(volumes), f"{stuff_lengths}"
     for _vol in volumes:
