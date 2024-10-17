@@ -1,7 +1,6 @@
 """Pipetting execution handler."""
 import pytest
-from decoy import Decoy
-from mock import AsyncMock, patch
+from decoy import Decoy, matchers
 
 from typing import Dict, ContextManager, Optional, OrderedDict
 from contextlib import nullcontext as does_not_raise
@@ -91,7 +90,6 @@ async def test_create_tip_handler(
     )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize("tip_state", [TipStateType.PRESENT, TipStateType.ABSENT])
 async def test_flex_pick_up_tip_state(
     decoy: Decoy,
@@ -99,21 +97,22 @@ async def test_flex_pick_up_tip_state(
     mock_labware_data_provider: LabwareDataProvider,
     tip_rack_definition: LabwareDefinition,
     tip_state: TipStateType,
+    mock_hardware_api: HardwareAPI,
 ) -> None:
     """Test the protocol engine's pick_up_tip logic."""
-    from opentrons.hardware_control.ot3api import OT3API
-
-    ot3_hardware_api = decoy.mock(cls=OT3API)
-    decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
-
     subject = HardwareTipHandler(
         state_view=mock_state_view,
-        hardware_api=ot3_hardware_api,
+        hardware_api=mock_hardware_api,
         labware_data_provider=mock_labware_data_provider,
     )
-    decoy.when(subject._state_view.config.robot_type).then_return("OT-3 Standard")
     decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
         MountType.LEFT
+    )
+    decoy.when(mock_state_view.pipettes.get_serial_number("pipette-id")).then_return(
+        "pipette-serial"
+    )
+    decoy.when(mock_state_view.labware.get_definition("labware-id")).then_return(
+        tip_rack_definition
     )
     decoy.when(mock_state_view.pipettes.state.nozzle_configuration_by_id).then_return(
         {"pipette-id": MOCK_MAP}
@@ -134,30 +133,34 @@ async def test_flex_pick_up_tip_state(
         )
     ).then_return(42)
 
-    with patch.object(
-        ot3_hardware_api, "cache_tip", AsyncMock(spec=ot3_hardware_api.cache_tip)
-    ) as mock_add_tip:
-        if tip_state == TipStateType.PRESENT:
+    if tip_state == TipStateType.PRESENT:
+        await subject.pick_up_tip(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="B2",
+        )
+        decoy.verify(mock_hardware_api.cache_tip(Mount.LEFT, 42), times=1)
+    else:
+        decoy.when(
+            await subject.verify_tip_presence(
+                pipette_id="pipette-id", expected=TipPresenceStatus.PRESENT
+            )
+        ).then_raise(TipNotAttachedError())
+        # if a TipNotAttchedError is caught, we should not add any tip information
+        with pytest.raises(TipNotAttachedError):
             await subject.pick_up_tip(
                 pipette_id="pipette-id",
                 labware_id="labware-id",
                 well_name="B2",
             )
-            mock_add_tip.assert_called_once()
-        else:
-            decoy.when(
-                await subject.verify_tip_presence(
-                    pipette_id="pipette-id", expected=TipPresenceStatus.PRESENT
-                )
-            ).then_raise(TipNotAttachedError())
-            # if a TipNotAttchedError is caught, we should not add any tip information
-            with pytest.raises(TipNotAttachedError):
-                await subject.pick_up_tip(
-                    pipette_id="pipette-id",
-                    labware_id="labware-id",
-                    well_name="B2",
-                )
-            mock_add_tip.assert_not_called()
+        decoy.verify(
+            mock_hardware_api.cache_tip(
+                mount=matchers.Anything(),
+                tip_length=matchers.Anything(),
+            ),
+            ignore_extra_args=True,
+            times=0,
+        )
 
 
 async def test_pick_up_tip(
