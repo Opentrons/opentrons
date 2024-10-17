@@ -1,30 +1,20 @@
 import styled from 'styled-components'
-import {
-  Flex,
-  StyledText,
-  LargeButton,
-  COLORS,
-  Tag,
-} from '@opentrons/components'
+import { Flex, StyledText, LargeButton, COLORS } from '@opentrons/components'
+import { PromptPreviewSection, type PromptPreviewSectionProps } from '../PromptPreviewSection'
 
 const PROMPT_PREVIEW_PLACEHOLDER_MESSAGE =
   'As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol.'
 
-interface SectionData {
-  title: string
-  items: string[]
-}
-
-interface AccordionProps {
+interface PromptPreviewProps {
   id?: string
   isSubmitButtonEnabled?: boolean
   handleSubmit: () => void
-  promptPreviewData: SectionData[]
+  promptPreviewData: PromptPreviewSectionProps[]
 }
 
 const PromptPreviewContainer = styled(Flex)`
   flex-direction: column;
-  width: 516px;
+  width: 100%;
   height: auto;
   padding-top: 8px;
   background-color: transparent;
@@ -42,27 +32,12 @@ const PromptPreviewPlaceholderMessage = styled(StyledText)`
   color: ${COLORS.grey60};
 `
 
-const PromptPreviewSection = styled(Flex)`
-  flex-direction: column;
-  margin-top: 32px;
-`
-
-const SectionHeading = styled(StyledText)`
-  margin-bottom: 8px;
-`
-
-const TagGrid = styled(Flex)`
-  grid-gap: 4px;
-  flex-wrap: wrap;
-  color: ${COLORS.grey60};
-`
-
 export function PromptPreview({
   id,
   isSubmitButtonEnabled = false,
   handleSubmit,
   promptPreviewData,
-}: AccordionProps): JSX.Element {
+}: PromptPreviewProps): JSX.Element {
   const areAllSectionsEmpty = (): boolean => {
     return promptPreviewData.every(section => section.items.length === 0)
   }
@@ -86,16 +61,7 @@ export function PromptPreview({
       {Object.values(promptPreviewData).map(
         (section, index) =>
           section.items.length > 0 && (
-            <PromptPreviewSection key={`section-${index}`}>
-              <SectionHeading desktopStyle="bodyLargeSemiBold">
-                {section.title}
-              </SectionHeading>
-              <TagGrid>
-                {section.items.map((item: string, index: number) => (
-                  <Tag key={`tag-${index}`} text={item} type={'default'} />
-                ))}
-              </TagGrid>
-            </PromptPreviewSection>
+            <PromptPreviewSection key={`section-${index}`} title={section.title} items={section.items} />
           )
       )}
     </PromptPreviewContainer>
