@@ -193,6 +193,9 @@ export function registerUpdateDriver(upstreamDispatch: Dispatch): UpdateDriver {
                   }: ${err.message}`
                 )
               })
+              .then(() => {
+                dispatchStaticUpdateData()
+              })
           }
           return new Promise(resolve => {
             resolve()

@@ -54,11 +54,15 @@ const isWeirdDirectoryAndShouldSkip = (dirName: string): boolean =>
     .map(keyword => dirName.includes(keyword))
     .reduce((prev, current) => prev || current, false)
 
-const enumerateMassStorage = (path: string): Promise<string[]> => {
+const doEnumerateMassStorage = (
+  path: string,
+  depth: number
+): Promise<string[]> => {
+  log.info(`Enumerating mass storage path ${path}`)
   return callWithRetry(() =>
     fsPromises.readdir(path).then(entries => {
-      if (entries.length === 0) {
-        throw new Error('No entries found, retrying...')
+      if (entries.length === 0 && depth === 0) {
+        throw new Error('No entries found for top level, retrying...')
       }
       return entries
     })
@@ -68,7 +72,7 @@ const enumerateMassStorage = (path: string): Promise<string[]> => {
       Promise.all(
         entries.map(entry =>
           entry.isDirectory() && !isWeirdDirectoryAndShouldSkip(entry.name)
-            ? enumerateMassStorage(join(path, entry.name))
+            ? doEnumerateMassStorage(join(path, entry.name), depth + 1)
             : new Promise<string[]>(resolve => {
                 resolve([join(path, entry.name)])
               })
@@ -77,13 +81,22 @@ const enumerateMassStorage = (path: string): Promise<string[]> => {
     )
     .catch((error: Error) => {
       log.error(
-        `Error enumerating mass storage: ${error.name}: ${error.message}`
+        `Error enumerating mass storage path ${path}: ${error.name}: ${error.message}`
       )
       return []
     })
     .then(flatten)
     .then(result => result)
 }
+
+const enumerateMassStorage = (path: string): Promise<string[]> => {
+  log.info(`Beginning scan of mass storage device at ${path}`)
+  return doEnumerateMassStorage(path, 0).then(results => {
+    log.info(`Found ${results.length} files in ${path}`)
+    return results
+  })
+}
+
 export function watchForMassStorage(dispatch: Dispatch): () => void {
   log.info('watching for mass storage')
   let prevDirs: string[] = []
