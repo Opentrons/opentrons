@@ -19,6 +19,8 @@ export function useRecoveryOptionCopy(): (
       case RECOVERY_MAP.RETRY_STEP.ROUTE:
         if (errorKind === ERROR_KINDS.TIP_DROP_FAILED) {
           return t('retry_dropping_tip')
+        } else if (errorKind === ERROR_KINDS.TIP_NOT_DETECTED) {
+          return t('retry_picking_up_tip')
         } else {
           return t('retry_step')
         }

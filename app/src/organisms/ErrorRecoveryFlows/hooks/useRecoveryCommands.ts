@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
@@ -50,8 +50,10 @@ export interface UseRecoveryCommandsResult {
   cancelRun: () => void
   /* A terminal recovery command, that causes ER to exit as the run status becomes "running" */
   skipFailedCommand: () => void
-  /* A non-terminal recovery command. Ignore this errorKind for the rest of this run. */
-  ignoreErrorKindThisRun: () => Promise<void>
+  /* A non-terminal recovery command. Ignore this errorKind for the rest of this run.
+   * The server is not informed of recovery policy changes until a terminal recovery command occurs that does not result
+   * in termination of the run. */
+  ignoreErrorKindThisRun: (ignoreErrors: boolean) => Promise<void>
   /* A non-terminal recovery command */
   retryFailedCommand: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
@@ -77,6 +79,8 @@ export function useRecoveryCommands({
   analytics,
   selectedRecoveryOption,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
+  const [ignoreErrors, setIgnoreErrors] = useState(false)
+
   const { proceedToRouteAndStep } = routeUpdateActions
   const { chainRunCommands } = useChainRunCommands(
     runId,
@@ -86,7 +90,9 @@ export function useRecoveryCommands({
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
-  const { updateErrorRecoveryPolicy } = useUpdateErrorRecoveryPolicy(runId)
+  const {
+    mutateAsync: updateErrorRecoveryPolicy,
+  } = useUpdateErrorRecoveryPolicy(runId)
   const { makeSuccessToast } = recoveryToastUtils
 
   const chainRunRecoveryCommands = useCallback(
@@ -182,12 +188,59 @@ export function useRecoveryCommands({
     }
   }, [chainRunRecoveryCommands, failedCommandByRunRecord, failedLabwareUtils])
 
+  const ignoreErrorKindThisRun = (ignoreErrors: boolean): Promise<void> => {
+    setIgnoreErrors(ignoreErrors)
+    return Promise.resolve()
+  }
+
+  // Only send the finalized error policy to the server during a terminal recovery command that does not terminate the run.
+  // If the request to update the policy fails, route to the error modal.
+  const handleIgnoringErrorKind = useCallback((): Promise<void> => {
+    if (ignoreErrors) {
+      if (failedCommandByRunRecord?.error != null) {
+        const ignorePolicyRules = buildIgnorePolicyRules(
+          failedCommandByRunRecord.commandType,
+          failedCommandByRunRecord.error.errorType
+        )
+
+        return updateErrorRecoveryPolicy(ignorePolicyRules)
+          .then(() => Promise.resolve())
+          .catch(() =>
+            Promise.reject(new Error('Failed to update recovery policy.'))
+          )
+      } else {
+        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+        return Promise.reject(
+          new Error('Could not execute command. No failed command.')
+        )
+      }
+    } else {
+      return Promise.resolve()
+    }
+  }, [
+    failedCommandByRunRecord?.error?.errorType,
+    failedCommandByRunRecord?.commandType,
+    ignoreErrors,
+  ])
+
   const resumeRun = useCallback((): void => {
-    void resumeRunFromRecovery(runId).then(() => {
-      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
-      makeSuccessToast()
-    })
-  }, [runId, resumeRunFromRecovery, makeSuccessToast])
+    void handleIgnoringErrorKind()
+      .then(() => resumeRunFromRecovery(runId))
+      .then(() => {
+        analytics.reportActionSelectedResult(
+          selectedRecoveryOption,
+          'succeeded'
+        )
+        makeSuccessToast()
+      })
+  }, [
+    runId,
+    ignoreErrors,
+    resumeRunFromRecovery,
+    handleIgnoringErrorKind,
+    selectedRecoveryOption,
+    makeSuccessToast,
+  ])
 
   const cancelRun = useCallback((): void => {
     analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
@@ -195,29 +248,21 @@ export function useRecoveryCommands({
   }, [runId])
 
   const skipFailedCommand = useCallback((): void => {
-    void resumeRunFromRecovery(runId).then(() => {
-      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
-      makeSuccessToast()
-    })
-  }, [runId, resumeRunFromRecovery, makeSuccessToast])
-
-  const ignoreErrorKindThisRun = useCallback((): Promise<void> => {
-    if (failedCommandByRunRecord?.error != null) {
-      const ignorePolicyRules = buildIgnorePolicyRules(
-        failedCommandByRunRecord.commandType,
-        failedCommandByRunRecord.error.errorType
-      )
-
-      updateErrorRecoveryPolicy(ignorePolicyRules)
-      return Promise.resolve()
-    } else {
-      return Promise.reject(
-        new Error('Could not execute command. No failed command.')
-      )
-    }
+    void handleIgnoringErrorKind().then(() =>
+      resumeRunFromRecovery(runId).then(() => {
+        analytics.reportActionSelectedResult(
+          selectedRecoveryOption,
+          'succeeded'
+        )
+        makeSuccessToast()
+      })
+    )
   }, [
-    failedCommandByRunRecord?.error?.errorType,
-    failedCommandByRunRecord?.commandType,
+    runId,
+    resumeRunFromRecovery,
+    handleIgnoringErrorKind,
+    selectedRecoveryOption,
+    makeSuccessToast,
   ])
 
   const releaseGripperJaws = useCallback((): Promise<CommandData[]> => {
