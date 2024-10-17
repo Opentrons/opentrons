@@ -45,7 +45,6 @@ async def test_blow_out_in_place_implementation(
     pipetting: PipettingHandler,
 ) -> None:
     """Test BlowOut command execution."""
-
     data = BlowOutInPlaceParams(
         pipetteId="pipette-id",
         flowRate=1.234,
