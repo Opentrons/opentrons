@@ -735,8 +735,10 @@ class OT3Controller(FlexBackend):
         all_moving_nodes = set()
         for runner, _ in maybe_runners:
             if runner:
-                gather_moving_nodes.add(runner.all_nodes())
-                all_moving_nodes.add(runner.all_moving_nodes())
+                for n in runner.all_nodes():
+                    gather_moving_nodes.add(n)
+                for n in runner.all_moving_nodes():
+                    all_moving_nodes.add(n)
 
         pipettes_moving = moving_pipettes_in_move_group(
             gather_moving_nodes, all_moving_nodes
