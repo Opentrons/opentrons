@@ -84,7 +84,7 @@ build-opentrons-analysis:
 	@echo "The image will be named opentrons-analysis:$(ANALYSIS_REF)"
 	@echo "If you want to build a different version, run 'make build-opentrons-analysis ANALYSIS_REF=<version>'"
 	@echo "Cache is always busted to ensure latest version of the code is used"
-	docker build --build-arg OPENTRONS_VERSION=$(ANALYSIS_REF) --build-arg CACHEBUST=$(CACHEBUST) -t opentrons-analysis:$(ANALYSIS_REF) citools/.
+	docker build --build-arg ANALYSIS_REF=$(ANALYSIS_REF) --build-arg CACHEBUST=$(CACHEBUST) -t opentrons-analysis:$(ANALYSIS_REF) citools/.
 
 .PHONY: generate-protocols
 generate-protocols:
