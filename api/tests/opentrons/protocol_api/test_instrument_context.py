@@ -402,11 +402,7 @@ def test_aspirate_meniscus_well_location(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(
-        WellTarget(
-            well=mock_well, location=input_location, in_place=False, is_meniscus=True
-        )
-    )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
@@ -970,6 +966,7 @@ def test_dispense_with_location(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
+            is_meniscus=None,
         ),
         times=1,
     )
@@ -1008,6 +1005,7 @@ def test_dispense_with_well_location(
             rate=1.23,
             flow_rate=3.0,
             push_out=7,
+            is_meniscus=None,
         ),
         times=1,
     )
@@ -1048,6 +1046,7 @@ def test_dispense_with_well(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
+            is_meniscus=None,
         ),
         times=1,
     )
@@ -1302,6 +1301,7 @@ def test_dispense_0_volume_means_dispense_everything(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
+            is_meniscus=None,
         ),
         times=1,
     )
@@ -1331,6 +1331,7 @@ def test_dispense_0_volume_means_dispense_nothing(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
+            is_meniscus=None,
         ),
         times=1,
     )

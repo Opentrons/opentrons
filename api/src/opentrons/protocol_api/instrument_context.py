@@ -217,9 +217,9 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
-        is_meniscus: Optional[bool] = None
-        well: Optional[labware.Well] = None
         move_to_location: types.Location
+        well: Optional[labware.Well] = None
+        is_meniscus: Optional[bool] = None
         last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
@@ -233,18 +233,13 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
-        if isinstance(target, validation.WellTarget):
-            move_to_location = target.location or target.well.bottom(
-                z=self._well_bottom_clearances.aspirate
-            )
-            well = target.well
-            is_meniscus = target.is_meniscus
-        if isinstance(target, validation.PointTarget):
-            move_to_location = target.location
         if isinstance(target, (TrashBin, WasteChute)):
             raise ValueError(
                 "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
             )
+        move_to_location, well, is_meniscus = self._handle_aspirate_target(
+            target=target
+        )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -284,7 +279,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 rate=rate,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
-                is_meniscus=is_meniscus if is_meniscus is not None else None,
+                is_meniscus=is_meniscus,
             )
 
         return self
@@ -406,7 +401,7 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
             if target.location:
                 move_to_location = target.location
-                is_meniscus = target.is_meniscus
+                is_meniscus = target.location.is_meniscus
             elif well.parent._core.is_fixed_trash():
                 move_to_location = target.well.top()
             else:
@@ -451,7 +446,6 @@ class InstrumentContext(publisher.CommandPublisher):
                     flow_rate=flow_rate,
                     in_place=False,
                     push_out=push_out,
-                    is_meniscus=is_meniscus if is_meniscus is not None else None,
                 )
             return self
 
@@ -473,6 +467,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 flow_rate=flow_rate,
                 in_place=target.in_place,
                 push_out=push_out,
+                is_meniscus=is_meniscus,
             )
 
         return self
@@ -2196,6 +2191,26 @@ class InstrumentContext(publisher.CommandPublisher):
                         "Partial column configuration is only supported on 8-Channel pipettes."
                     )
             # SINGLE, QUADRANT and ALL are supported by all pipettes
+
+    def _handle_aspirate_target(
+        self, target: validation.ValidTarget
+    ) -> tuple[types.Location, Optional[labware.Well], Optional[bool]]:
+        move_to_location: types.Location
+        well: Optional[labware.Well] = None
+        is_meniscus: Optional[bool] = None
+        if isinstance(target, validation.WellTarget):
+            well = target.well
+            if target.location:
+                move_to_location = target.location
+                is_meniscus = target.location.is_meniscus
+
+            else:
+                move_to_location = target.well.bottom(
+                    z=self._well_bottom_clearances.aspirate
+                )
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+        return (move_to_location, well, is_meniscus)
 
 
 class AutoProbeDisable:

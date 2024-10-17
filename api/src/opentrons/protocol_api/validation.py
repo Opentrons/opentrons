@@ -418,7 +418,6 @@ class WellTarget(NamedTuple):
     well: Well
     location: Optional[Location]
     in_place: bool
-    is_meniscus: Optional[bool] = None
 
 
 class PointTarget(NamedTuple):
@@ -436,10 +435,13 @@ class LocationTypeError(TypeError):
     """Error representing that the location supplied is of different expected type."""
 
 
+ValidTarget = Union[WellTarget, PointTarget, TrashBin, WasteChute]
+
+
 def validate_location(
     location: Union[Location, Well, TrashBin, WasteChute, None],
     last_location: Optional[Location],
-) -> Union[WellTarget, PointTarget, TrashBin, WasteChute]:
+) -> ValidTarget:
     """Validate a given location for a liquid handling command.
 
     Args:
@@ -481,7 +483,6 @@ def validate_location(
             well=well,
             location=target_location,
             in_place=in_place,
-            is_meniscus=target_location.is_meniscus,
         )
         if well is not None
         else PointTarget(location=target_location, in_place=in_place)

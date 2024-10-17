@@ -154,6 +154,7 @@ class Location:
             isinstance(other, Location)
             and other._point == self._point
             and other._labware == self._labware
+            and other._is_meniscus == self._is_meniscus
         )
 
     def move(self, point: Point) -> "Location":
@@ -179,7 +180,7 @@ class Location:
         return Location(point=self.point + point, labware=self._given_labware)
 
     def __repr__(self) -> str:
-        return f"Location(point={repr(self._point)}, labware={self._labware})"
+        return f"Location(point={repr(self._point)}, labware={self._labware}, is_meniscus={self._is_meniscus if self._is_meniscus is not None else False})"
 
 
 # TODO(mc, 2020-10-22): use MountType implementation for Mount
