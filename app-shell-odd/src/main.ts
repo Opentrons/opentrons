@@ -144,11 +144,15 @@ function startUp(): void {
     try {
       const stopWatching = watchForMassStorage(dispatch)
       ipcMain.once('quit', stopWatching)
-    } catch (err) {
-      console.log(
-        `Failed to watch for mass storage: ${err.name}: ${err.message}`,
-        err
-      )
+    } catch (err: any) {
+      if (err instanceof Error) {
+        console.log(
+          `Failed to watch for mass storage: ${err.name}: ${err.message}`,
+          err
+        )
+      } else {
+        console.log(`Failed to watch for mass storage: ${err}`)
+      }
     }
     // TODO: This is where we render the main window for the first time. See ui.ts
     // in the createUI function for more.

@@ -67,9 +67,15 @@ export const getVersionFromOpenedZipIfValid = (
             resolve(version)
             return true
           }
-        } catch (error) {
-          log.error(`Failed to read ${entry.name}: ${err.name}: ${err.message}`)
-          reject(error)
+        } catch (err: any) {
+          if (err instanceof Error) {
+            log.error(
+              `Failed to read ${entry.name}: ${err.name}: ${err.message}`
+            )
+          } else {
+            log.error(`Failed to ready ${entry.name}: ${err}`)
+          }
+          reject(err)
           return prev
         }
       } else {
