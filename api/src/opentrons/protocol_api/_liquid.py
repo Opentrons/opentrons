@@ -65,7 +65,7 @@ class LiquidClass:
     def create(cls, liquid_class_definition: LiquidClassSchemaV1) -> "LiquidClass":
         """Liquid class factory method."""
 
-        return LiquidClass(
+        return cls(
             _name=liquid_class_definition.liquidClassName,
             _display_name=liquid_class_definition.displayName,
             _by_pipette_setting=liquid_class_definition.byPipette,

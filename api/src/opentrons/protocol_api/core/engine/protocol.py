@@ -2,6 +2,8 @@
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
+from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
+
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
@@ -764,8 +766,8 @@ class ProtocolCore(
                 # Calling this often will degrade protocol execution performance.
                 liquid_class_def = liquid_classes.load_definition(name)
                 self._defined_liquid_class_defs_by_name[name] = liquid_class_def
-            except KeyError:
-                raise ValueError("Liquid class definition not found")
+            except LiquidClassDefinitionDoesNotExist:
+                raise ValueError(f"Liquid class definition not found for '{name}'.")
 
         return LiquidClass.create(liquid_class_def)
 

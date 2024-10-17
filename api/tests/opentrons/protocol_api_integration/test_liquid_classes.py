@@ -37,7 +37,10 @@ def test_liquid_class_creation_and_property_fetching(
         == 100
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="No properties found for p300_multi in fixture_glycerol50 liquid class",
+    ):
         glycerol_50.get_for(pipette_right.name, tiprack.load_name)
 
     with pytest.raises(AttributeError):
@@ -45,6 +48,9 @@ def test_liquid_class_creation_and_property_fetching(
 
     with pytest.raises(AttributeError):
         glycerol_50.display_name = "bar"  # type: ignore
+
+    with pytest.raises(ValueError, match="Liquid class definition not found"):
+        protocol_context.define_liquid_class("non-existent-liquid")
 
 
 def test_liquid_class_feature_flag() -> None:

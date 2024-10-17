@@ -6,7 +6,7 @@ from .liquid_class_definition import LiquidClassSchemaV1
 
 
 class LiquidClassDefinitionDoesNotExist(Exception):
-    """Specified liquid class' definition does not exist."""
+    """Specified liquid class definition does not exist."""
 
 
 # TODO (spp, 2024-10-16): update the path once definitions are added
