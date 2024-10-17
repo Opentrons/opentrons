@@ -329,9 +329,9 @@ class HardwareGantryMover(GantryMover):
                     mount,
                     pos_hw,
                     partial(self._critical_point_for, cp_override=critical_point),
-                    self._hardware_api.config.left_mount_offset,
-                    self._hardware_api.config.right_mount_offset,
-                    self._hardware_api.config.gripper_mount_offset,
+                    Point(*self._hardware_api.config.left_mount_offset),
+                    Point(*self._hardware_api.config.right_mount_offset),
+                    Point(*self._hardware_api.config.gripper_mount_offset),
                 )
             await self._hardware_api.move_axes(
                 position=absolute_pos,
