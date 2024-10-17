@@ -2289,17 +2289,10 @@ class OT3API(
         )
         instrument.working_volume = tip_volume
 
-    async def drop_tip(
+    async def tip_drop_moves(
         self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
-        """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
-        instrument = self._pipette_handler.get_pipette(realmount)
-
-        def _remove_tips() -> None:
-            instrument.set_current_volume(0)
-            instrument.current_tiprack_diameter = 0.0
-            instrument.remove_tip()
 
         await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
 
@@ -2326,8 +2319,19 @@ class OT3API(
         if home_after:
             await self._home([Axis.by_mount(mount)])
 
-        _remove_tips()
-        # call this in case we're simulating
+    async def drop_tip(
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+    ) -> None:
+        """Drop tip at the current location."""
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        await self.tip_drop_moves(mount=mount, home_after=home_after)
+
+        instrument.set_current_volume(0)
+        instrument.current_tiprack_diameter = 0.0
+        instrument.remove_tip()
+        # call this in case we're simulating:
         if isinstance(self._backend, OT3Simulator):
             self._backend._update_tip_state(realmount, False)
 

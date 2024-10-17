@@ -1241,9 +1241,9 @@ class API(
         if prep_after:
             await self.prepare_for_aspirate(mount)
 
-    async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
-        """Drop tip at the current location."""
-
+    async def tip_drop_moves(
+        self, mount: top_types.Mount, home_after: bool = True
+    ) -> None:
         spec, _ = self.plan_check_drop_tip(mount, home_after)
 
         for move in spec.drop_moves:
@@ -1272,6 +1272,10 @@ class API(
             await self.move_rel(mount, shake[0], speed=shake[1])
 
         self._backend.set_active_current(spec.ending_current)
+
+    async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
+        """Drop tip at the current location."""
+        await self.tip_drop_moves(mount, home_after)
 
         instrument = self.get_pipette(mount)
         instrument.set_current_volume(0)
