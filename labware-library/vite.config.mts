@@ -31,7 +31,7 @@ export default defineConfig({
         configFile: true,
       },
     }),
-    cssModuleSideEffect(),
+    cssModuleSideEffect(), // Note for treeshake
   ],
   optimizeDeps: {
     esbuildOptions: {
