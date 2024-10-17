@@ -1,5 +1,5 @@
 import {
-  navigateToPage,
+  navigateToUrl,
   fileHelper,
   wellBottomImageLocator,
 } from '../../support/e2e'
@@ -7,7 +7,7 @@ const fileHolder = fileHelper('testpro_10_reservoir_250ul')
 
 context('Reservoirs', () => {
   before(() => {
-    navigateToPage('create')
+    navigateToUrl('/#/create')
   })
 
   describe('Reservoir', () => {

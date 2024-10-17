@@ -1,5 +1,5 @@
 import {
-  navigateToPage,
+  navigateToUrl,
   fileHelper,
   wellBottomImageLocator,
 } from '../../support/e2e'
@@ -7,8 +7,7 @@ const fileHolder = fileHelper('testpro_24_aluminumblock_10ul')
 
 context('Tubes and Block', () => {
   beforeEach(() => {
-    navigateToPage('create')
-
+    navigateToUrl('/#/create')
     cy.get('label')
       .contains('What type of labware are you creating?')
       .children()
@@ -447,9 +446,7 @@ context('Tubes and Block', () => {
       })
 
       it('tests the whole form and file export', () => {
-        cy.visit('/')
-        cy.get('a[href="/create"]').first().click()
-        cy.viewport('macbook-15')
+        navigateToUrl('/#/create')
         cy.get('label')
           .contains('What type of labware are you creating?')
           .children()

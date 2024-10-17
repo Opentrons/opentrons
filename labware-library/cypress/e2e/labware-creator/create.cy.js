@@ -2,11 +2,11 @@
 // an element is in view before clicking or checking with
 // { force: true }
 
-import { navigateToPage } from '../../support/e2e'
+import { navigateToUrl } from '../../support/e2e'
 
 context('The Labware Creator Landing Page', () => {
   beforeEach(() => {
-    navigateToPage('create')
+    navigateToUrl('/#/create')
   })
 
   describe('The initial text', () => {

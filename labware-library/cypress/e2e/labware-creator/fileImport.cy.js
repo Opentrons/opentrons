@@ -1,5 +1,5 @@
 import {
-  navigateToPage,
+  navigateToUrl,
   fileHelper,
   wellBottomImageLocator,
 } from '../../support/e2e'
@@ -9,7 +9,7 @@ const importedLabwareFile = 'TestLabwareDefinition.json'
 
 describe('File Import', () => {
   before(() => {
-    navigateToPage('create')
+    navigateToUrl('/#/create')
   })
 
   it('tests the file import flow', () => {

@@ -3,7 +3,7 @@
 // a user to do this.
 
 import {
-  navigateToPage,
+  navigateToUrl,
   fileHelper,
   wellBottomImageLocator,
 } from '../../support/e2e'
@@ -11,7 +11,7 @@ const fileHolder = fileHelper('testpro_80_wellplate_100ul')
 
 context('Well Plates', () => {
   before(() => {
-    navigateToPage('create')
+    navigateToUrl('/#/create')
   })
 
   describe('Create a well plate', () => {

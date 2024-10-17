@@ -1,5 +1,5 @@
 import {
-  navigateToPage,
+  navigateToUrl,
   fileHelper,
   wellBottomImageLocator,
 } from '../../support/e2e'
@@ -7,7 +7,7 @@ const fileHolder = fileHelper('somerackbrand_24_tuberack_1500ul')
 
 context('Tubes and Rack', () => {
   before(() => {
-    navigateToPage('create')
+    navigateToUrl('/#/create')
   })
 
   describe('Custom 6 x 4 tube rack', () => {

@@ -6,9 +6,8 @@
 import { join } from 'path'
 import './commands'
 
-export const navigateToPage = (page: string): void => {
-  cy.visit('/')
-  cy.get(`a[href="/${page}"]`).first().click()
+export const navigateToUrl = (url: string): void => {
+  cy.visit(url)
   cy.viewport('macbook-15')
 }
 

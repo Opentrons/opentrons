@@ -1,9 +1,9 @@
-import { navigateToPage, wellBottomImageLocator } from '../../support/e2e'
+import { navigateToUrl, wellBottomImageLocator } from '../../support/e2e'
 
 context('Tubes and Rack', () => {
   describe('Six tubes', () => {
     before(() => {
-      navigateToPage('create')
+      navigateToUrl('/#/create')
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -134,10 +134,7 @@ context('Tubes and Rack', () => {
 
   describe('Fifteen tubes', () => {
     before(() => {
-      cy.visit('/')
-      cy.get('a[href="/create"]').first().click()
-      cy.viewport('macbook-15')
-
+      navigateToUrl('#/create')
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -266,10 +263,7 @@ context('Tubes and Rack', () => {
 
   describe('Twentyfour tubes', () => {
     before(() => {
-      cy.visit('/')
-      cy.get('a[href="/create"]').first().click()
-      cy.viewport('macbook-15')
-
+      navigateToUrl('/#/create')
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
