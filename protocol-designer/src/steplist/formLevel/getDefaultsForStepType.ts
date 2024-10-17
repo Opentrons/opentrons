@@ -41,8 +41,6 @@ export function getDefaultsForStepType(
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
-        stepDetails: null,
-        stepName: null,
         times: null,
         tipRack: null,
         volume: undefined,
@@ -103,8 +101,6 @@ export function getDefaultsForStepType(
         pickUpTip_wellNames: undefined,
         pipette: null,
         preWetTip: false,
-        stepDetails: null,
-        stepName: null,
         tipRack: null,
         volume: null,
       }
@@ -112,15 +108,11 @@ export function getDefaultsForStepType(
     case 'comment':
       return {
         message: null,
-        stepDetails: null,
-        stepName: null,
       }
     case 'moveLabware':
       return {
         labware: null,
         newLocation: null,
-        stepDetails: null,
-        stepName: null,
         useGripper: false,
       }
 
@@ -134,8 +126,6 @@ export function getDefaultsForStepType(
         pauseSecond: null,
         pauseTemperature: null,
         pauseTime: null,
-        stepDetails: null,
-        stepName: null,
       }
 
     case 'manualIntervention':
@@ -143,8 +133,6 @@ export function getDefaultsForStepType(
         labwareLocationUpdate: {},
         moduleLocationUpdate: {},
         pipetteLocationUpdate: {},
-        stepDetails: null,
-        stepName: null,
       }
 
     case 'magnet':
@@ -152,8 +140,6 @@ export function getDefaultsForStepType(
         engageHeight: null,
         magnetAction: null,
         moduleId: null,
-        stepDetails: null,
-        stepName: null,
       }
 
     case 'temperature':
@@ -161,8 +147,6 @@ export function getDefaultsForStepType(
         moduleId: null,
         setTemperature: null,
         targetTemperature: null,
-        stepDetails: null,
-        stepName: null,
       }
     case 'heaterShaker':
       return {
@@ -175,8 +159,6 @@ export function getDefaultsForStepType(
         setShake: null,
         targetHeaterShakerTemperature: null,
         targetSpeed: null,
-        stepDetails: null,
-        stepName: null,
       }
     case 'thermocycler':
       return {
@@ -195,8 +177,6 @@ export function getDefaultsForStepType(
         profileItemsById: {},
         profileTargetLidTemp: null,
         profileVolume: null,
-        stepDetails: null,
-        stepName: null,
         thermocyclerFormType: null,
       }
 
