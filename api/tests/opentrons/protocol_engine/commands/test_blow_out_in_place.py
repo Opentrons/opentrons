@@ -13,7 +13,6 @@ from opentrons.protocol_engine.commands.blow_out_in_place import (
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.execution import (
-    MovementHandler,
     PipettingHandler,
 )
 from opentrons.hardware_control import HardwareControlAPI

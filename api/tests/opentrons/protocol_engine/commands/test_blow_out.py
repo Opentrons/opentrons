@@ -31,6 +31,7 @@ def subject(
     model_utils: ModelUtils,
     pipetting: PipettingHandler,
 ) -> BlowOutImplementation:
+    """Get the impelementation subject."""
     return BlowOutImplementation(
         state_view=state_view,
         movement=movement,
@@ -47,7 +48,6 @@ async def test_blow_out_implementation(
     subject: BlowOutImplementation,
 ) -> None:
     """Test BlowOut command execution."""
-
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
     data = BlowOutParams(
