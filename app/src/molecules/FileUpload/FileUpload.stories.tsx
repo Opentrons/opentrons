@@ -4,7 +4,10 @@ import { FileUpload } from '.'
 
 import type { StoryFn, Meta } from '@storybook/react'
 
-const file = new File([testFile], 'a-file-to-test.png')
+const file = new File(
+  [testFile],
+  'a-test-file-with-a-really-long-file-name-to-test-file-name-truncation.png'
+)
 const handleClick = (): void => {
   console.log('clicked the file')
 }

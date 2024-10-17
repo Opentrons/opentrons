@@ -26,7 +26,8 @@ const FILE_UPLOAD_STYLE = css`
 const FILE_UPLOAD_FOCUS_VISIBLE = css`
   &:focus-visible {
     border-radius: ${BORDERS.borderRadius4};
-    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.blue50};
+    outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+    outline-offset: 2px;
   }
 `
 
@@ -46,6 +47,7 @@ export function FileUpload({
       <Btn
         onClick={handleClick}
         aria-label="remove_file"
+        maxWidth="19rem"
         css={FILE_UPLOAD_FOCUS_VISIBLE}
       >
         <Flex
