@@ -280,8 +280,9 @@ class HardwareGantryMover(GantryMover):
     ) -> Point:
         """Move the given hardware mount to a waypoint."""
         assert len(waypoints) > 0, "Must have at least one waypoint"
-
+        log.info(f"Moving mount {mount}")
         for waypoint in waypoints:
+            log.info(f"The current waypoint moving is {waypoint}")
             await self._hardware_api.move_to(
                 mount=mount,
                 abs_position=waypoint.position,

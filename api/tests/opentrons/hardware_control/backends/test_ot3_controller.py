@@ -1325,7 +1325,7 @@ def move_group_run_side_effect(
                 Axis.Z_G: 0,
                 Axis.G: 0,
             },
-            10
+            10,
         ],
         [
             {
@@ -1349,7 +1349,7 @@ def move_group_run_side_effect(
                 Axis.Z_G: 0,
                 Axis.G: 0,
             },
-            None
+            None,
         ],
         [
             {
@@ -1373,7 +1373,7 @@ def move_group_run_side_effect(
                 Axis.Z_G: 0,
                 Axis.G: 0,
             },
-            None
+            None,
         ],
     ],
 )
@@ -1383,7 +1383,7 @@ async def test_controller_move(
     origin_pos: Dict[Axis, float],
     target_pos: Dict[Axis, float],
     expected_pos: Dict[Axis, float],
-    gear_position: Optional[int]
+    gear_position: Optional[int],
 ) -> None:
     from copy import deepcopy
 
