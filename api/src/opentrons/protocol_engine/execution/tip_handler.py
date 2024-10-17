@@ -238,6 +238,7 @@ class HardwareTipHandler(TipHandler):
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
         )
+        # Allow TipNotAttachedError to propagate.
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
 
         self._hardware_api.cache_tip(hw_mount, actual_tip_length)
@@ -248,6 +249,9 @@ class HardwareTipHandler(TipHandler):
             tiprack_diameter=nominal_tip_geometry.diameter,
         )
 
+        # todo(mm, 2024-10-15): The hardware API's original pick_up_tip() implementation
+        # seems to set the *current* volume to 0, not the working volume.
+        # Investigate that discrepancy.
         self._hardware_api.set_working_volume(
             mount=hw_mount,
             tip_volume=nominal_tip_geometry.volume,
@@ -270,8 +274,13 @@ class HardwareTipHandler(TipHandler):
         else:
             kwargs = {}
 
-        await self._hardware_api.drop_tip(mount=hw_mount, **kwargs)
+        await self._hardware_api.tip_drop_moves(mount=hw_mount, **kwargs)
+
+        # Allow TipNotAttachedError to propagate.
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
+
+        await self._hardware_api.remove_tip(hw_mount)
+        self._hardware_api.set_current_tiprack_diameter(hw_mount, 0)
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """See documentation on abstract base class."""
