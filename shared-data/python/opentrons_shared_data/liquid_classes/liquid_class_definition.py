@@ -339,9 +339,10 @@ class ByPipetteSetting(BaseModel):
 class LiquidClassSchemaV1(BaseModel):
     """Defines a single liquid class's properties for liquid handling functions."""
 
-    liquidName: str = Field(
+    liquidClassName: str = Field(
         ..., description="The name of the liquid (e.g., water, ethanol, serum)."
     )
+    displayName: str = Field(..., description="User-readable name of the liquid class.")
     schemaVersion: Literal[1] = Field(
         ..., description="Which schema version a liquid class is using"
     )

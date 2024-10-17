@@ -1762,7 +1762,9 @@ def test_define_liquid_class(
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
     """It should create a LiquidClass and cache the definition."""
-    expected_liquid_class = LiquidClass(name="water1", _by_pipette_setting=[])
+    expected_liquid_class = LiquidClass(
+        _name="water1", _display_name="water 1", _by_pipette_setting=[]
+    )
     decoy.when(liquid_classes.load_definition("water")).then_return(
         minimal_liquid_class_def1
     )

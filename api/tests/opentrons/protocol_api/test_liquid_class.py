@@ -12,7 +12,7 @@ def test_create_liquid_class(
 ) -> None:
     """It should create a LiquidClass from provided definition."""
     assert LiquidClass.create(minimal_liquid_class_def1) == LiquidClass(
-        name="water1", _by_pipette_setting=[]
+        _name="water1", _display_name="water 1", _by_pipette_setting=[]
     )
 
 

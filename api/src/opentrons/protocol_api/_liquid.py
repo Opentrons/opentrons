@@ -57,7 +57,8 @@ class TransferProperties:
 class LiquidClass:
     """A data class that contains properties of a specific class of liquids."""
 
-    name: str
+    _name: str
+    _display_name: str
     _by_pipette_setting: Sequence[ByPipetteSetting]
 
     @classmethod
@@ -65,9 +66,18 @@ class LiquidClass:
         """Liquid class factory method."""
 
         return LiquidClass(
-            name=liquid_class_definition.liquidName,
+            _name=liquid_class_definition.liquidClassName,
+            _display_name=liquid_class_definition.displayName,
             _by_pipette_setting=liquid_class_definition.byPipette,
         )
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def display_name(self) -> str:
+        return self._display_name
 
     def get_for(self, pipette: str, tiprack: str) -> TransferProperties:
         """Get liquid class transfer properties for the specified pipette and tip."""
@@ -79,7 +89,7 @@ class LiquidClass:
         )
         if len(settings_for_pipette) == 0:
             raise ValueError(
-                f"No properties found for {pipette} in {self.name} liquid class"
+                f"No properties found for {pipette} in {self._name} liquid class"
             )
         settings_for_tip: Sequence[ByTipTypeSetting] = list(
             filter(
@@ -89,7 +99,7 @@ class LiquidClass:
         )
         if len(settings_for_tip) == 0:
             raise ValueError(
-                f"No properties found for {tiprack} in {self.name} liquid class"
+                f"No properties found for {tiprack} in {self._name} liquid class"
             )
         return TransferProperties(
             _aspirate=settings_for_tip[0].aspirate,

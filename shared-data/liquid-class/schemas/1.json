@@ -418,9 +418,13 @@
     }
   },
   "properties": {
-    "liquidName": {
+    "liquidClassName": {
+      "$ref": "#/definitions/safeString",
+      "description": "The name of the liquid class specified when loading into protocol (e.g., water, ethanol, serum). Should be the same as file name."
+    },
+    "displayName": {
       "type": "string",
-      "description": "The name of the liquid (e.g., water, ethanol, serum)."
+      "description": "User-readable name of the liquid class."
     },
     "schemaVersion": {
       "description": "Which schema version a liquid class is using",
@@ -471,6 +475,6 @@
       }
     }
   },
-  "required": ["liquidName", "schemaVersion", "namespace", "byPipette"],
+  "required": ["liquidClassName", "displayName","schemaVersion", "namespace", "byPipette"],
   "additionalProperties": false
 }

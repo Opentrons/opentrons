@@ -786,14 +786,19 @@ def minimal_module_def() -> ModuleDefinitionV3:
 @pytest.fixture
 def minimal_liquid_class_def1() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
-        liquidName="water1", schemaVersion=1, namespace="test-fixture-1", byPipette=[]
+        liquidClassName="water1",
+        displayName="water 1",
+        schemaVersion=1,
+        namespace="test-fixture-1",
+        byPipette=[],
     )
 
 
 @pytest.fixture
 def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
-        liquidName="water2",
+        liquidClassName="water2",
+        displayName="water 2",
         schemaVersion=1,
         namespace="test-fixture-2",
         byPipette=[

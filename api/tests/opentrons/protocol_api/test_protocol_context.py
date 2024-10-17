@@ -1219,7 +1219,9 @@ def test_define_liquid_class(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
     """It should create the liquid class definition."""
-    expected_liquid_class = LiquidClass(name="volatile_100", _by_pipette_setting=[])
+    expected_liquid_class = LiquidClass(
+        _name="volatile_100", _display_name="volatile 100%", _by_pipette_setting=[]
+    )
     decoy.when(mock_core.define_liquid_class("volatile_90")).then_return(
         expected_liquid_class
     )
