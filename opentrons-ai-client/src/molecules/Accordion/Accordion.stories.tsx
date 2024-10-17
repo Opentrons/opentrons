@@ -5,6 +5,18 @@ import { Accordion } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
+const contentExample: React.ReactNode = (
+  <div>
+    <p>What&apos;s your scientific application?</p>
+    <p>Describe what you are trying to do</p>
+    <p>
+      Example: “The protocol performs automated liquid handling for Pierce BCA
+      Protein Assay Kit to determine protein concentrations in various sample
+      types, such as cell lysates and eluates of purification process.&quot;
+    </p>
+  </div>
+)
+
 const meta: Meta<typeof Accordion> = {
   title: 'AI/molecules/Accordion',
   component: Accordion,
@@ -21,13 +33,42 @@ const meta: Meta<typeof Accordion> = {
 export default meta
 type Story = StoryObj<typeof Accordion>
 
-export const AccordionExample: Story = {
+export const AccordionCollapsed: Story = {
   args: {
     id: 'accordion',
-    handleClick: () => {},
-    isOpen: false,
-    isCompleted: false,
-    heading: 'Accordion Title',
-    children: <div>Accordion Content</div>,
+    handleClick: () => {
+      alert('Accordion clicked')
+    },
+    heading: 'Application',
+    children: contentExample,
+  },
+}
+
+export const AccordionCompleted: Story = {
+  args: {
+    id: 'accordion',
+    isCompleted: true,
+    heading: 'Application',
+  },
+}
+
+export const AccordionExpanded: Story = {
+  args: {
+    id: 'accordion2',
+    isOpen: true,
+    heading: 'Application',
+    children: contentExample,
+  },
+}
+
+export const AccordionDisabled: Story = {
+  args: {
+    id: 'accordion3',
+    handleClick: () => {
+      alert('Accordion clicked')
+    },
+    disabled: true,
+    heading: 'Application',
+    children: contentExample,
   },
 }

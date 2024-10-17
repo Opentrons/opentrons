@@ -15,6 +15,7 @@ import {
   TEXT_ALIGN_LEFT,
   DISPLAY_FLEX,
   OVERFLOW_HIDDEN,
+  CURSOR_DEFAULT,
 } from '@opentrons/components'
 
 interface AccordionProps {
@@ -23,6 +24,7 @@ interface AccordionProps {
   heading: string
   isOpen?: boolean
   isCompleted?: boolean
+  disabled?: boolean
   children: React.ReactNode
 }
 
@@ -31,24 +33,29 @@ const BUTTON = 'button'
 const CONTENT = 'content'
 const OT_CHECK = 'ot-check'
 
-const AccordionContainer = styled(Flex)`
+const AccordionContainer = styled(Flex)<{
+  isOpen: boolean
+  disabled: boolean
+}>`
   flex-direction: ${DIRECTION_COLUMN};
   width: 100%;
   height: ${SIZE_AUTO};
   padding: ${SPACING.spacing24} ${SPACING.spacing32};
   border-radius: ${BORDERS.borderRadius16};
   background-color: ${COLORS.white};
+  cursor: ${props =>
+    props.isOpen || props.disabled ? `${CURSOR_DEFAULT}` : `${CURSOR_POINTER}`};
 `
 
-const AccordionButton = styled.button<{ isOpen: boolean }>`
+const AccordionButton = styled.button<{ isOpen: boolean; disabled: boolean }>`
   display: ${DISPLAY_FLEX};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   align-items: ${ALIGN_CENTER};
   width: 100%;
   background: none;
   border: none;
-  padding: 0;
-  cursor: ${CURSOR_POINTER};
+  cursor: ${props =>
+    props.isOpen || props.disabled ? `${CURSOR_DEFAULT}` : `${CURSOR_POINTER}`};
   text-align: ${TEXT_ALIGN_LEFT};
 
   &:focus-visible {
@@ -79,6 +86,7 @@ export function Accordion({
   handleClick,
   isOpen = false,
   isCompleted = false,
+  disabled = false,
   heading = '',
   children,
 }: AccordionProps): JSX.Element {
@@ -91,14 +99,40 @@ export function Accordion({
     }
   }, [isOpen])
 
+  const handleContainerClick = (e: React.MouseEvent): void => {
+    // Prevent the click event from propagating to the button
+    if (
+      (e.target as HTMLElement).tagName !== 'BUTTON' &&
+      !disabled &&
+      !isOpen
+    ) {
+      handleClick()
+    }
+  }
+
+  const handleButtonClick = (e: React.MouseEvent): void => {
+    // Stop the event from propagating to the container
+    if (!isOpen && !disabled) {
+      e.stopPropagation()
+      handleClick()
+    }
+  }
+
   return (
-    <AccordionContainer id={id}>
+    <AccordionContainer
+      id={id}
+      onClick={handleContainerClick}
+      isOpen={isOpen}
+      disabled={disabled}
+    >
       <AccordionButton
         id={`${id}-${BUTTON}`}
         aria-expanded={isOpen}
         aria-controls={`${id}-${CONTENT}`}
         isOpen={isOpen}
-        onClick={handleClick}
+        onClick={handleButtonClick}
+        aria-disabled={!isCompleted}
+        disabled={disabled}
       >
         <HeadingText desktopStyle="headingSmallBold">{heading}</HeadingText>
         {isCompleted && (
