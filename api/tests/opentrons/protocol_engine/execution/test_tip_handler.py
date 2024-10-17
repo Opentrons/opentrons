@@ -228,6 +228,8 @@ async def test_pick_up_tip(
     )
 
 
+# todo(mm, 2024-10-17): Test that when verify_tip_presence raises,
+# the hardware API state is NOT updated.
 async def test_drop_tip(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -251,8 +253,13 @@ async def test_drop_tip(
     await subject.drop_tip(pipette_id="pipette-id", home_after=True)
 
     decoy.verify(
-        await mock_hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
-        times=1,
+        await mock_hardware_api.tip_drop_moves(mount=Mount.RIGHT, home_after=True)
+    )
+    decoy.verify(await mock_hardware_api.remove_tip(mount=Mount.RIGHT))
+    decoy.verify(
+        mock_hardware_api.set_current_tiprack_diameter(
+            mount=Mount.RIGHT, tiprack_diameter=0
+        )
     )
 
 
