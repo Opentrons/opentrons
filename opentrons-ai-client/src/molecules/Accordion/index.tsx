@@ -1,6 +1,21 @@
 import { useRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { Flex, Icon, StyledText, COLORS, BORDERS } from '@opentrons/components'
+import {
+  Flex,
+  Icon,
+  StyledText,
+  COLORS,
+  BORDERS,
+  DIRECTION_COLUMN,
+  SIZE_AUTO,
+  SPACING,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
+  CURSOR_POINTER,
+  TEXT_ALIGN_LEFT,
+  DISPLAY_FLEX,
+  OVERFLOW_HIDDEN,
+} from '@opentrons/components'
 
 interface AccordionProps {
   id?: string
@@ -17,24 +32,24 @@ const CONTENT = 'content'
 const OT_CHECK = 'ot-check'
 
 const AccordionContainer = styled(Flex)`
-  flex-direction: column;
+  flex-direction: ${DIRECTION_COLUMN};
   width: 100%;
-  height: auto;
-  padding: 24px 32px;
+  height: ${SIZE_AUTO};
+  padding: ${SPACING.spacing24} ${SPACING.spacing32};
   border-radius: ${BORDERS.borderRadius16};
   background-color: ${COLORS.white};
 `
 
 const AccordionButton = styled.button<{ isOpen: boolean }>`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: ${DISPLAY_FLEX};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  align-items: ${ALIGN_CENTER};
   width: 100%;
   background: none;
   border: none;
   padding: 0;
-  cursor: pointer;
-  text-align: left;
+  cursor: ${CURSOR_POINTER};
+  text-align: ${TEXT_ALIGN_LEFT};
 
   &:focus-visible {
     outline: 2px solid ${COLORS.blue50};
@@ -43,7 +58,7 @@ const AccordionButton = styled.button<{ isOpen: boolean }>`
 
 const HeadingText = styled(StyledText)`
   flex: 1;
-  margin-right: 8px;
+  margin-right: ${SPACING.spacing8};
 `
 
 const AccordionContent = styled.div<{
@@ -52,9 +67,9 @@ const AccordionContent = styled.div<{
   contentHeight: number
 }>`
   transition: height 0.3s ease, margin-top 0.3s ease, visibility 0.3s ease;
-  overflow: hidden;
+  overflow: ${OVERFLOW_HIDDEN};
   height: ${props => (props.isOpen ? `${props.contentHeight}px` : '0')};
-  margin-top: ${props => (props.isOpen ? '16px' : '0')};
+  margin-top: ${props => (props.isOpen ? `${SPACING.spacing16}` : '0')};
   pointer-events: ${props => (props.isOpen ? 'auto' : 'none')};
   visibility: ${props => (props.isOpen ? 'unset' : 'hidden')};
 `
