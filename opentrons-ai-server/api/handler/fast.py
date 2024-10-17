@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
+from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
 from api.handler.custom_logging import setup_logging
 from api.integration.auth import VerifyToken
@@ -187,7 +188,10 @@ async def create_chat_completion(
             )
 
         if body.fake:
-            return ChatResponse(reply="Fake response", fake=body.fake)
+            if body.fake_key is not None:
+                fake: FakeResponse = get_fake_response(body.fake_key)
+                return ChatResponse(reply=fake.chat_response.reply, fake=fake.chat_response.fake)
+            return ChatResponse(reply="Default fake response.  ", fake=body.fake)
         response: Union[str, None] = openai.predict(prompt=body.message, chat_completion_message_params=body.history)
 
         if response is None or response == "":

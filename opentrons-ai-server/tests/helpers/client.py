@@ -1,8 +1,8 @@
 import time
 from functools import wraps
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
-from api.models.chat_request import ChatRequest
+from api.models.chat_request import ChatRequest, FakeKeys
 from httpx import Client as HttpxClient
 from httpx import Response, Timeout
 from rich.console import Console, Group
@@ -62,9 +62,9 @@ class Client:
         return self.httpx.get("/health", headers=self.type_headers)
 
     @timeit
-    def get_chat_completion(self, message: str, fake: bool = True, bad_auth: bool = False) -> Response:
+    def get_chat_completion(self, message: str, fake: bool = True, fake_key: Optional[FakeKeys] = None, bad_auth: bool = False) -> Response:
         """Call the /chat/completion endpoint and return the response."""
-        request = ChatRequest(message=message, fake=fake)
+        request = ChatRequest(message=message, fake=fake, fake_key=fake_key, history=None)
         headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
         return self.httpx.post("/chat/completion", headers=headers, json=request.model_dump())
 
