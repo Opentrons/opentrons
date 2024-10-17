@@ -1,6 +1,7 @@
 """Gantry movement wrapper for hardware and simulation based movement."""
 from logging import getLogger
 
+from functools import partial
 from typing import Optional, List, Dict
 from typing_extensions import Protocol as TypingProtocol
 
@@ -39,6 +40,12 @@ _MOTOR_AXIS_TO_HARDWARE_MOUNT: Dict[MotorAxis, Mount] = {
     MotorAxis.LEFT_Z: Mount.LEFT,
     MotorAxis.RIGHT_Z: Mount.RIGHT,
     MotorAxis.EXTENSION_Z: Mount.EXTENSION,
+}
+
+_HARDWARE_MOUNT_MOTOR_AXIS_TO: Dict[MotorAxis, Mount] = {
+    Mount.LEFT: MotorAxis.LEFT_Z,
+    Mount.RIGHT: MotorAxis.RIGHT_Z,
+    Mount.EXTENSION: MotorAxis.EXTENSION_Z,
 }
 
 _HARDWARE_AXIS_TO_MOTOR_AXIS: Dict[HardwareAxis, MotorAxis] = {
@@ -103,6 +110,7 @@ class GantryMover(TypingProtocol):
         axis_map: Dict[MotorAxis, float],
         critical_point: Optional[Dict[MotorAxis, float]] = None,
         speed: Optional[float] = None,
+        relative_move: bool = False,
     ) -> Dict[MotorAxis, float]:
         """Move a set of axes a given distance."""
         ...
@@ -170,30 +178,17 @@ class HardwareGantryMover(GantryMover):
         """Transform an engine motor axis map to a hardware axis map."""
         return {_MOTOR_AXIS_TO_HARDWARE_AXIS[ax]: dist for ax, dist in axis_map.items()}
 
-    def _offset_axis_map_for_mount(self, mount: Mount) -> Dict[HardwareAxis, float]:
-        """Determine the offset for the given hardware mount"""
-        if (
-            self._state_view.config.robot_type == "OT-2 Standard"
-            and mount == Mount.RIGHT
-        ):
-            return {HardwareAxis.X: 0.0, HardwareAxis.Y: 0.0, HardwareAxis.A: 0.0}
-        elif (
-            self._state_view.config.robot_type == "OT-3 Standard"
-            and mount == Mount.EXTENSION
-        ):
-            offset = self._hardware_api.config.gripper_mount_offset  # type: ignore [union-attr]
-            return {
-                HardwareAxis.X: offset[0],
-                HardwareAxis.Y: offset[1],
-                HardwareAxis.Z_G: offset[2],
-            }
+    def _critical_point_for(
+        self, mount: Mount, cp_override: Dict[MotorAxis, float] = None
+    ) -> Point:
+        if cp_override:
+            return Point(
+                x=cp_override[MotorAxis.X],
+                y=cp_override[MotorAxis.Y],
+                z=cp_override[_HARDWARE_MOUNT_MOTOR_AXIS_TO[mount]],
+            )
         else:
-            offset = self._hardware_api.config.left_mount_offset
-            return {
-                HardwareAxis.X: offset[0],
-                HardwareAxis.Y: offset[1],
-                HardwareAxis.Z: offset[2],
-            }
+            return self._hardware_api.critical_point_for(mount)
 
     def pick_mount_from_axis_map(self, axis_map: Dict[MotorAxis, float]) -> Mount:
         """Find a mount axis in the axis_map if it exists otherwise default to left mount."""
@@ -301,7 +296,7 @@ class HardwareGantryMover(GantryMover):
         axis_map: Dict[MotorAxis, float],
         critical_point: Optional[Dict[MotorAxis, float]] = None,
         speed: Optional[float] = None,
-        relative_move: bool = False
+        relative_move: bool = False,
     ) -> Dict[MotorAxis, float]:
         """Move a set of axes a given distance.
 
@@ -317,17 +312,25 @@ class HardwareGantryMover(GantryMover):
                 current_position = await self._hardware_api.current_position(
                     mount, refresh=True
                 )
+                converted_current_position_deck = self._hardware_api._deck_from_machine(
+                    current_position
+                )
                 log.info(f"The current position of the robot is: {current_position}.")
-                absolute_pos = target_axis_map_from_relative(pos_hw, current_position)
+                absolute_pos = target_axis_map_from_relative(
+                    pos_hw, converted_current_position_deck
+                )
                 log.info(
                     f"The absolute position is: {absolute_pos} and hw pos map is {absolute_pos}."
                 )
             else:
                 log.info(f"Absolute move {axis_map} and {mount}")
-                mount_offset = self._offset_axis_map_for_mount(mount)
-                abs_cp_hw = self._convert_axis_map_for_hw(critical_point)
                 absolute_pos = target_axis_map_from_absolute(
-                    pos_hw, abs_cp_hw, mount_offset
+                    mount,
+                    pos_hw,
+                    partial(self._critical_point_for, cp_override=critical_point),
+                    self._hardware_api.config.left_mount_offset,
+                    self._hardware_api.config.right_mount_offset,
+                    self._hardware_api.config.gripper_mount_offset,
                 )
             await self._hardware_api.move_axes(
                 position=absolute_pos,
@@ -340,9 +343,12 @@ class HardwareGantryMover(GantryMover):
         current_position = await self._hardware_api.current_position(
             mount, refresh=True
         )
+        converted_current_position_deck = self._hardware_api._deck_from_machine(
+            current_position
+        )
         return {
             self._hardware_axis_to_motor_axis(ax): pos
-            for ax, pos in current_position.items()
+            for ax, pos in converted_current_position_deck.items()
         }
 
     async def move_relative(
@@ -521,26 +527,37 @@ class VirtualGantryMover(GantryMover):
         axis_map: Dict[MotorAxis, float],
         critical_point: Optional[Dict[MotorAxis, float]] = None,
         speed: Optional[float] = None,
+        relative_move: bool = False,
     ) -> Dict[MotorAxis, float]:
         """Move the give axes map. No-op in virtual implementation."""
         mount = self.pick_mount_from_axis_map(axis_map)
         current_position = await self.get_position_from_mount(mount)
-        axis_map[MotorAxis.X] = axis_map.get(MotorAxis.X, 0.0) + current_position[0]
-        axis_map[MotorAxis.Y] = axis_map.get(MotorAxis.Y, 0.0) + current_position[1]
-        if mount == Mount.RIGHT:
-            axis_map[MotorAxis.RIGHT_Z] = (
-                axis_map.get(MotorAxis.RIGHT_Z, 0.0) + current_position[2]
+        updated_position = {}
+        if relative_move:
+            updated_position[MotorAxis.X] = (
+                axis_map.get(MotorAxis.X, 0.0) + current_position[0]
             )
-        elif mount == Mount.EXTENSION:
-            axis_map[MotorAxis.EXTENSION_Z] = (
-                axis_map.get(MotorAxis.EXTENSION_Z, 0.0) + current_position[2]
+            updated_position[MotorAxis.Y] = (
+                axis_map.get(MotorAxis.Y, 0.0) + current_position[1]
             )
+            if mount == Mount.RIGHT:
+                updated_position[MotorAxis.RIGHT_Z] = (
+                    axis_map.get(MotorAxis.RIGHT_Z, 0.0) + current_position[2]
+                )
+            elif mount == Mount.EXTENSION:
+                updated_position[MotorAxis.EXTENSION_Z] = (
+                    axis_map.get(MotorAxis.EXTENSION_Z, 0.0) + current_position[2]
+                )
+            else:
+                updated_position[MotorAxis.LEFT_Z] = (
+                    axis_map.get(MotorAxis.LEFT_Z, 0.0) + current_position[2]
+                )
         else:
-            axis_map[MotorAxis.LEFT_Z] = (
-                axis_map.get(MotorAxis.LEFT_Z, 0.0) + current_position[2]
-            )
-        critical_point = critical_point or {}
-        return {ax: pos - critical_point.get(ax, 0.0) for ax, pos in axis_map.items()}
+            critical_point = critical_point or {}
+            updated_position = {
+                ax: pos - critical_point.get(ax, 0.0) for ax, pos in axis_map.items()
+            }
+        return updated_position
 
     async def move_mount_to(
         self, mount: Mount, waypoints: List[Waypoint], speed: Optional[float]

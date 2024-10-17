@@ -111,21 +111,32 @@ def target_position_from_relative(
 
 
 def target_axis_map_from_absolute(
+    primary_mount: Union[OT3Mount, Mount],
     axis_map: Dict[Axis, float],
-    critical_point: Dict[Axis, float],
-    mount_offset: Dict[Axis, float],
+    get_critical_point: Callable[[Union[Mount, OT3Mount]], Point],
+    left_mount_offset: Point,
+    right_mount_offset: Point,
+    gripper_mount_offset: Optional[Point] = None,
 ) -> "OrderedDict[Axis, float]":
     """Create an absolute target position for all specified machine axes."""
-    axis_with_cp = {ax: axis_map[ax] - val for ax, val in critical_point.items()}
-    axis_map.update(axis_with_cp)
-    axis_with_offset = {
-        ax: axis_map[ax] - val
-        for ax, val in mount_offset.items()
-        if ax in axis_map.keys()
-    }
-    axis_map.update(axis_with_offset)
-    target_position = OrderedDict(
-        ((ax, axis_map[ax]) for ax in EMPTY_ORDERED_DICT.keys() if ax in axis_map.keys())
+    keys_for_target_position = list(axis_map.keys())
+
+    offset = offset_for_mount(
+        primary_mount, left_mount_offset, right_mount_offset, gripper_mount_offset
+    )
+    primary_cp = get_critical_point(primary_mount)
+    primary_z = Axis.by_mount(primary_mount)
+    target_position = OrderedDict()
+
+    if Axis.X in keys_for_target_position:
+        target_position[Axis.X] = axis_map[Axis.X] - offset.x - primary_cp.x
+    if Axis.Y in keys_for_target_position:
+        target_position[Axis.Y] = axis_map[Axis.Y] - offset.y - primary_cp.y
+    if primary_z in keys_for_target_position:
+        target_position[primary_z] = axis_map[primary_z] - offset.z - primary_cp.z
+
+    target_position.update(
+        {ax: val for ax, val in axis_map.items() if ax not in Axis.gantry_axes()}
     )
     return target_position
 

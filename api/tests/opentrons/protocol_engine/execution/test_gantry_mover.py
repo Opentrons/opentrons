@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 from decoy import Decoy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Optional
 
 from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import API as HardwareAPI
@@ -461,6 +461,109 @@ async def test_home_z(
     )
 
 
+@pytest.mark.parametrize(
+    argnames=[
+        "axis_map",
+        "critical_point",
+        "relative_move",
+        "expected_mount",
+        "call_to_hw",
+        "final_position",
+    ],
+    argvalues=[
+        [
+            {MotorAxis.X: 10, MotorAxis.Y: 15, MotorAxis.RIGHT_Z: 20},
+            {MotorAxis.X: 2, MotorAxis.Y: 1, MotorAxis.RIGHT_Z: 1},
+            False,
+            Mount.RIGHT,
+            {HardwareAxis.X: -2, HardwareAxis.Y: 4, HardwareAxis.A: 9},
+            {HardwareAxis.X: -2, HardwareAxis.Y: 4, HardwareAxis.A: 9},
+        ],
+        [
+            {MotorAxis.RIGHT_Z: 20},
+            None,
+            True,
+            Mount.RIGHT,
+            {HardwareAxis.A: 30},
+            {
+                HardwareAxis.X: 10,
+                HardwareAxis.Y: 15,
+                HardwareAxis.Z: 10,
+                HardwareAxis.A: 30,
+            },
+        ],
+        [
+            {MotorAxis.CLAMP_JAW_96_CHANNEL: 10},
+            None,
+            False,
+            Mount.LEFT,
+            {HardwareAxis.Q: 10},
+            {HardwareAxis.Q: 10},
+        ],
+    ],
+)
+async def test_move_axes(
+    decoy: Decoy,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwareGantryMover,
+    axis_map: Dict[MotorAxis, float],
+    critical_point: Optional[Dict[MotorAxis, float]],
+    expected_mount: Mount,
+    relative_move: bool,
+    call_to_hw: Dict[HardwareAxis, float],
+    final_position: Dict[HardwareAxis, float],
+) -> None:
+    curr_pos = {
+        HardwareAxis.X: 10,
+        HardwareAxis.Y: 15,
+        HardwareAxis.Z: 10,
+        HardwareAxis.A: 10,
+    }
+    call_count = 0
+
+    def _current_position(mount, refresh) -> Dict[HardwareAxis, float]:
+        nonlocal call_count
+        nonlocal curr_pos
+        nonlocal final_position
+        if call_count == 0 and relative_move:
+            call_count += 1
+            return curr_pos
+        else:
+            return final_position
+
+    decoy.when(
+        await mock_hardware_api.current_position(expected_mount, refresh=True)
+    ).then_do(_current_position)
+
+    decoy.when(mock_hardware_api.config.left_mount_offset).then_return(Point(1, 1, 1))
+    decoy.when(mock_hardware_api.config.right_mount_offset).then_return(
+        Point(10, 10, 10)
+    )
+    decoy.when(mock_hardware_api.config.gripper_mount_offset).then_return(
+        Point(0.5, 0.5, 0.5)
+    )
+
+    decoy.when(mock_hardware_api._deck_from_machine(curr_pos)).then_return(curr_pos)
+
+    decoy.when(mock_hardware_api._deck_from_machine(final_position)).then_return(
+        final_position
+    )
+    if not critical_point:
+        decoy.when(mock_hardware_api._critical_point_for(expected_mount)).then_return(
+            Point(1, 1, 1)
+        )
+
+    pos = await hardware_subject.move_axes(axis_map, critical_point, 100, relative_move)
+    decoy.verify(
+        await mock_hardware_api.move_axes(position=call_to_hw, speed=100),
+        times=1,
+    )
+    assert pos == {
+        hardware_subject._hardware_axis_to_motor_axis(ax): pos
+        for ax, pos in final_position.items()
+    }
+
+
 async def test_virtual_get_position(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -553,3 +656,38 @@ async def test_virtual_move_to(
     )
 
     assert result == Point(4, 5, 6)
+
+
+@pytest.mark.parametrize(
+    argnames=["axis_map", "critical_point", "relative_move", "expected_position"],
+    argvalues=[
+        [
+            {MotorAxis.X: 10, MotorAxis.Y: 15, MotorAxis.RIGHT_Z: 20},
+            {MotorAxis.X: 2, MotorAxis.Y: 1, MotorAxis.RIGHT_Z: 1},
+            False,
+            {MotorAxis.X: 8, MotorAxis.Y: 14, MotorAxis.RIGHT_Z: 19},
+        ],
+        [
+            {MotorAxis.RIGHT_Z: 20},
+            None,
+            True,
+            {MotorAxis.X: 0.0, MotorAxis.Y: 0.0, MotorAxis.RIGHT_Z: 20},
+        ],
+        [
+            {MotorAxis.CLAMP_JAW_96_CHANNEL: 10},
+            None,
+            False,
+            {MotorAxis.CLAMP_JAW_96_CHANNEL: 10},
+        ],
+    ],
+)
+async def test_virtual_move_axes(
+    decoy: Decoy,
+    virtual_subject: VirtualGantryMover,
+    axis_map: Dict[MotorAxis, float],
+    critical_point: Optional[Dict[MotorAxis, float]],
+    relative_move: bool,
+    expected_position: Dict[HardwareAxis, float],
+) -> None:
+    pos = await virtual_subject.move_axes(axis_map, critical_point, 100, relative_move)
+    assert pos == expected_position
