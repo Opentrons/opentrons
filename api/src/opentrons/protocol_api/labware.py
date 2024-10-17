@@ -230,7 +230,9 @@ class Well:
 
         :meta private:
         """
-        return Location(point=Point(x=0, y=0, z=z), labware=self, is_meniscus=True)
+        return Location(
+            point=Point(x=0, y=0, z=z), labware=self, _ot_internal_is_meniscus=True
+        )
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

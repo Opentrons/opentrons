@@ -79,7 +79,9 @@ LocationLabware = Union[
 
 
 class Location:
-    """A location to target as a motion.
+    """Location(point: Point, labware: Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"])
+    
+    A location to target as a motion.
 
     The location contains a :py:class:`.Point` (in
     :ref:`protocol-api-deck-coords`) and possibly an associated
@@ -116,12 +118,13 @@ class Location:
             None,
             "ModuleContext",
         ],
-        is_meniscus: Optional[bool] = None,
+        *,
+        _ot_internal_is_meniscus: Optional[bool] = None,
     ):
         self._point = point
         self._given_labware = labware
         self._labware = LabwareLike(labware)
-        self._is_meniscus = is_meniscus
+        self._is_meniscus = _ot_internal_is_meniscus
 
     # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
     # in the rendered docs, and then update the class docstring to use cross-references.

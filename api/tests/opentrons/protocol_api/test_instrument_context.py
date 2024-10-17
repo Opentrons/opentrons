@@ -391,7 +391,9 @@ def test_aspirate_meniscus_well_location(
 ) -> None:
     """It should aspirate to a well."""
     mock_well = decoy.mock(cls=Well)
-    input_location = Location(point=Point(2, 2, 2), labware=mock_well, is_meniscus=True)
+    input_location = Location(
+        point=Point(2, 2, 2), labware=mock_well, _ot_internal_is_meniscus=True
+    )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
