@@ -929,6 +929,8 @@ class PipetteHandlerProvider(Generic[MountType]):
     ) -> Tuple[DropTipSpec, Callable[[], None]]:
         ...
 
+    # todo(mm, 2024-10-17): The returned _remove_tips() callable is not used by anything
+    # anymore. Delete it.
     def plan_check_drop_tip(  # type: ignore[no-untyped-def]
         self,
         mount,

@@ -1244,7 +1244,7 @@ class API(
     async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
         """Drop tip at the current location."""
 
-        spec, _remove = self.plan_check_drop_tip(mount, home_after)
+        spec, _ = self.plan_check_drop_tip(mount, home_after)
 
         for move in spec.drop_moves:
             self._backend.set_active_current(move.current)
@@ -1272,7 +1272,11 @@ class API(
             await self.move_rel(mount, shake[0], speed=shake[1])
 
         self._backend.set_active_current(spec.ending_current)
-        _remove()
+
+        instrument = self.get_pipette(mount)
+        instrument.set_current_volume(0)
+        instrument.current_tiprack_diameter = 0.0
+        instrument.remove_tip()
 
     async def create_simulating_module(
         self,
