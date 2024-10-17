@@ -7,9 +7,11 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.robot.types import RobotTypeEnum, RobotType
 
 from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.types import Mount, DeckSlotName, StagingSlotName
+from opentrons.config import feature_flags as ff
 from opentrons.protocol_api import OFF_DECK
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
@@ -1215,8 +1217,13 @@ def test_define_liquid_arg_defaulting(
             )
 
 
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_define_liquid_class(
-    decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+    robot_type: RobotType,
+    mock_feature_flags: None,
 ) -> None:
     """It should create the liquid class definition."""
     expected_liquid_class = LiquidClass(
@@ -1225,6 +1232,10 @@ def test_define_liquid_class(
     decoy.when(mock_core.define_liquid_class("volatile_90")).then_return(
         expected_liquid_class
     )
+    decoy.when(mock_core.robot_type).then_return(robot_type)
+    decoy.when(
+        ff.allow_liquid_classes(RobotTypeEnum.robot_literal_to_enum(robot_type))
+    ).then_return(True)
     assert subject.define_liquid_class("volatile_90") == expected_liquid_class
 
 

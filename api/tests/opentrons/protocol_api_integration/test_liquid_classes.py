@@ -1,11 +1,18 @@
 """Tests for the APIs around liquid classes."""
 import pytest
+from decoy import Decoy
+from opentrons_shared_data.robot.types import RobotTypeEnum
+
 from opentrons import simulate
+from opentrons.config import feature_flags as ff
 
 
 @pytest.mark.ot2_only
-def test_liquid_class_creation_and_property_fetching() -> None:
+def test_liquid_class_creation_and_property_fetching(
+    decoy: Decoy, mock_feature_flags: None
+) -> None:
     """It should create the liquid class and provide access to its properties."""
+    decoy.when(ff.allow_liquid_classes(RobotTypeEnum.OT2)).then_return(True)
     protocol_context = simulate.get_protocol_api(version="2.20", robot_type="OT-2")
     pipette_left = protocol_context.load_instrument("p20_single_gen2", mount="left")
     pipette_right = protocol_context.load_instrument("p300_multi", mount="right")
@@ -15,6 +22,8 @@ def test_liquid_class_creation_and_property_fetching() -> None:
 
     assert glycerol_50.name == "fixture_glycerol50"
     assert glycerol_50.display_name == "Glycerol 50%"
+
+    # TODO (spp, 2024-10-17): update this to use pipette's load name instead of pipette.name
     assert (
         glycerol_50.get_for(
             pipette_left.name, tiprack.load_name
@@ -36,3 +45,10 @@ def test_liquid_class_creation_and_property_fetching() -> None:
 
     with pytest.raises(AttributeError):
         glycerol_50.display_name = "bar"  # type: ignore
+
+
+def test_liquid_class_feature_flag() -> None:
+    """It should raise a not implemented error without the allowLiquidClass flag set."""
+    protocol_context = simulate.get_protocol_api(version="2.20", robot_type="OT-2")
+    with pytest.raises(NotImplementedError):
+        protocol_context.define_liquid_class("fixture_glycerol50")

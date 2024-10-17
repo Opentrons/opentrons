@@ -222,6 +222,17 @@ settings = [
         robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="allowLiquidClasses",
+        title="Allow the use of liquid classes",
+        description=(
+            "Do not enable."
+            " This is an Opentrons internal setting to allow using in-development"
+            " liquid classes."
+        ),
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
 ]
 
 
