@@ -1,5 +1,13 @@
 import styled from 'styled-components'
-import { Flex, StyledText, COLORS, Tag } from '@opentrons/components'
+import {
+  Flex,
+  StyledText,
+  COLORS,
+  Tag,
+  DIRECTION_COLUMN,
+  WRAP,
+  SPACING,
+} from '@opentrons/components'
 
 export interface PromptPreviewSectionProps {
   title: string
@@ -7,17 +15,17 @@ export interface PromptPreviewSectionProps {
 }
 
 const PromptPreviewSectionContainer = styled(Flex)`
-  flex-direction: column;
-  margin-top: 32px;
+  flex-direction: ${DIRECTION_COLUMN};
+  margin-top: ${SPACING.spacing32};
 `
 
 const SectionHeading = styled(StyledText)`
-  margin-bottom: 8px;
+  margin-bottom: ${SPACING.spacing8};
 `
 
 const TagGrid = styled(Flex)`
-  grid-gap: 4px;
-  flex-wrap: wrap;
+  grid-gap: ${SPACING.spacing4};
+  flex-wrap: ${WRAP};
   color: ${COLORS.grey60};
 `
 
@@ -29,9 +37,11 @@ export function PromptPreviewSection({
     <PromptPreviewSectionContainer>
       <SectionHeading desktopStyle="bodyLargeSemiBold">{title}</SectionHeading>
       <TagGrid>
-        {items.map((item: string, index: number) => (
-          <Tag key={`tag-${index}`} text={item} type={'default'} />
-        ))}
+        {items.map((item: string, index: number) =>
+          item.trim() === '' ? null : (
+            <Tag key={`item-tag-${index}`} text={item} type={'default'} />
+          )
+        )}
       </TagGrid>
     </PromptPreviewSectionContainer>
   )

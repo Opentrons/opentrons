@@ -10,7 +10,11 @@ const meta: Meta<typeof PromptPreview> = {
   decorators: [
     Story => (
       <I18nextProvider i18n={i18n}>
-        <Flex backgroundColor={COLORS.grey10} padding={SPACING.spacing40}>
+        <Flex
+          backgroundColor={COLORS.grey10}
+          padding={SPACING.spacing40}
+          width={'596px'}
+        >
           <Story />
         </Flex>
       </I18nextProvider>
@@ -23,6 +27,9 @@ type Story = StoryObj<typeof PromptPreview>
 export const PromptPreviewExample: Story = {
   args: {
     isSubmitButtonEnabled: false,
+    handleSubmit: () => {
+      alert('Submit button clicked')
+    },
     promptPreviewData: [
       {
         title: 'Application',
@@ -61,5 +68,14 @@ export const PromptPreviewExample: Story = {
         items: ['Fill the first column of a Elisa...'],
       },
     ],
+  },
+}
+
+export const PromptPreviewPlaceholderMessage: Story = {
+  args: {
+    isSubmitButtonEnabled: false,
+    handleSubmit: () => {
+      alert('Submit button clicked')
+    },
   },
 }
