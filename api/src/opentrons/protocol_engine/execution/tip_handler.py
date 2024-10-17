@@ -249,9 +249,6 @@ class HardwareTipHandler(TipHandler):
             tiprack_diameter=nominal_tip_geometry.diameter,
         )
 
-        # todo(mm, 2024-10-15): The hardware API's original pick_up_tip() implementation
-        # seems to set the *current* volume to 0, not the working volume.
-        # Investigate that discrepancy.
         self._hardware_api.set_working_volume(
             mount=hw_mount,
             tip_volume=nominal_tip_geometry.volume,
