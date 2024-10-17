@@ -1,9 +1,8 @@
 """Capacitve Sensor Driver Class."""
 import time
 import asyncio
-import csv
 
-from typing import Optional, AsyncIterator, Any, Sequence
+from typing import Optional, AsyncIterator, Any, Sequence, List, Union
 from contextlib import asynccontextmanager, suppress
 from logging import getLogger
 
@@ -19,7 +18,6 @@ from opentrons_hardware.firmware_bindings.messages import (
 from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
-    NodeId,
 )
 from opentrons_hardware.sensors.types import (
     SensorDataType,
@@ -32,7 +30,12 @@ from opentrons_hardware.sensors.utils import (
     SensorThresholdInformation,
 )
 
-from opentrons_hardware.sensors.sensor_types import BaseSensorType, ThresholdSensorType
+from opentrons_hardware.sensors.sensor_types import (
+    BaseSensorType,
+    ThresholdSensorType,
+    PressureSensor,
+    CapacitiveSensor,
+)
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     BindSensorOutputRequestPayload,
 )
@@ -46,8 +49,10 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from .sensor_abc import AbstractSensorDriver
 from .scheduler import SensorScheduler
+from . import SENSOR_LOG_NAME
 
 LOG = getLogger(__name__)
+SENSOR_LOG = getLogger(SENSOR_LOG_NAME)
 
 
 class SensorDriver(AbstractSensorDriver):
@@ -226,43 +231,50 @@ class LogListener:
 
     def __init__(
         self,
-        mount: NodeId,
-        data_file: Any,
-        file_heading: Sequence[str],
-        sensor_metadata: Sequence[Any],
+        messenger: CanMessenger,
+        sensor: Union[PressureSensor, CapacitiveSensor],
     ) -> None:
         """Build the capturer."""
-        self.csv_writer = Any
-        self.data_file = data_file
-        self.file_heading = file_heading
-        self.sensor_metadata = sensor_metadata
-        self.response_queue: asyncio.Queue[float] = asyncio.Queue()
-        self.mount = mount
+        self.response_queue: asyncio.Queue[SensorDataType] = asyncio.Queue()
+        self.tool = sensor.sensor.node_id
         self.start_time = 0.0
         self.event: Any = None
+        self.messenger = messenger
+        self.sensor = sensor
+        self.type = sensor.sensor.sensor_type
+        self.id = sensor.sensor.sensor_id
+
+    def get_data(self) -> Optional[List[SensorDataType]]:
+        """Return the sensor data captured by this listener."""
+        if self.response_queue.empty():
+            return None
+        data: List[SensorDataType] = []
+        while not self.response_queue.empty():
+            data.append(self.response_queue.get_nowait())
+        return data
 
     async def __aenter__(self) -> None:
-        """Create a csv heading for logging pressure readings."""
-        self.data_file = open(self.data_file, "w")
-        self.csv_writer = csv.writer(self.data_file)
-        self.csv_writer.writerows([self.file_heading, self.sensor_metadata])
-
+        """Start logging sensor readings."""
+        self.messenger.add_listener(self, None)
         self.start_time = time.time()
+        SENSOR_LOG.info(f"Data capture for {self.tool.name} started {self.start_time}")
 
     async def __aexit__(self, *args: Any) -> None:
-        """Close csv file."""
-        self.data_file.close()
+        """Finish the capture."""
+        self.messenger.remove_listener(self)
+        SENSOR_LOG.info(f"Data capture for {self.tool.name} ended {time.time()}")
 
-    async def wait_for_complete(
-        self, wait_time: float = 10, message_index: int = 0
-    ) -> None:
-        """Wait for the data to stop, only use this with a send_accumulated_data_request."""
+    def set_stop_ack(self, message_index: int = 0) -> None:
+        """Tell the Listener which message index to wait for."""
         self.event = asyncio.Event()
         self.expected_ack = message_index
+
+    async def wait_for_complete(self, wait_time: float = 10) -> None:
+        """Wait for the data to stop."""
         with suppress(asyncio.TimeoutError):
             await asyncio.wait_for(self.event.wait(), wait_time)
         if not self.event.is_set():
-            LOG.error("Did not receive the full data set from the sensor")
+            SENSOR_LOG.error("Did not receive the full data set from the sensor")
         self.event = None
 
     def __call__(
@@ -271,30 +283,44 @@ class LogListener:
         arbitration_id: ArbitrationId,
     ) -> None:
         """Callback entry point for capturing messages."""
+        if arbitration_id.parts.originating_node_id != self.tool:
+            # check that this is from the node we care about
+            return
         if isinstance(message, message_definitions.ReadFromSensorResponse):
+            if (
+                message.payload.sensor_id.value is not self.id
+                or message.payload.sensor is not self.type
+            ):
+                # ignore sensor responses from other sensors
+                return
             data = sensor_types.SensorDataType.build(
                 message.payload.sensor_data, message.payload.sensor
-            ).to_float()
+            )
             self.response_queue.put_nowait(data)
-            current_time = round((time.time() - self.start_time), 3)
-            self.csv_writer.writerow([current_time, data])  # type: ignore
+            SENSOR_LOG.info(
+                f"Revieved from {arbitration_id}: {message.payload.sensor_id}:{message.payload.sensor}: {data}"
+            )
         if isinstance(message, message_definitions.BatchReadFromSensorResponse):
             data_length = message.payload.data_length.value
             data_bytes = message.payload.sensor_data.value
             data_ints = [
-                int.from_bytes(data_bytes[i * 4 : i * 4 + 4])
+                int.from_bytes(data_bytes[i * 4 : i * 4 + 4], byteorder="little")
                 for i in range(data_length)
             ]
-            for d in data_ints:
-                data = sensor_types.SensorDataType.build(
-                    d, message.payload.sensor
-                ).to_float()
-                self.response_queue.put_nowait(data)
-                current_time = round((time.time() - self.start_time), 3)
-                self.csv_writer.writerow([current_time, data])
+            data_floats = [
+                sensor_types.SensorDataType.build(d, message.payload.sensor)
+                for d in data_ints
+            ]
+
+            for d in data_floats:
+                self.response_queue.put_nowait(d)
+            SENSOR_LOG.info(
+                f"Revieved from {arbitration_id}: {message.payload.sensor_id}:{message.payload.sensor}: {data_floats}"
+            )
         if isinstance(message, message_definitions.Acknowledgement):
             if (
                 self.event is not None
                 and message.payload.message_index.value == self.expected_ack
             ):
+                SENSOR_LOG.info("Finished receiving sensor data")
                 self.event.set()
