@@ -17,26 +17,41 @@ describe('getErrorKind', () => {
     expect(result).toEqual(ERROR_KINDS.NO_LIQUID_DETECTED)
   })
 
-  it(`returns ${ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING} for ${DEFINED_ERROR_TYPES.OVERPRESSURE} errorType`, () => {
-    const result = getErrorKind({
-      commandType: 'aspirate',
-      error: {
-        isDefined: true,
-        errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
-      } as RunCommandError,
-    } as RunTimeCommand)
-    expect(result).toEqual(ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING)
-  })
+  const IS_IN_PLACE = [false, true]
 
-  it(`returns ${ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING} for ${DEFINED_ERROR_TYPES.OVERPRESSURE} errorType`, () => {
-    const result = getErrorKind({
-      commandType: 'dispense',
-      error: {
-        isDefined: true,
-        errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
-      } as RunCommandError,
-    } as RunTimeCommand)
-    expect(result).toEqual(ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING)
+  IS_IN_PLACE.forEach(isInPlace => {
+    it(`returns ${ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING} for ${DEFINED_ERROR_TYPES.OVERPRESSURE} errorType when using the inPlace command type is ${isInPlace}`, () => {
+      const result = getErrorKind({
+        commandType: isInPlace ? 'aspirateInPlace' : 'aspirate',
+        error: {
+          isDefined: true,
+          errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
+        } as RunCommandError,
+      } as RunTimeCommand)
+      expect(result).toEqual(ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING)
+    })
+
+    it(`returns ${ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING} for ${DEFINED_ERROR_TYPES.OVERPRESSURE} errorType when using the inPlace command type is ${isInPlace}`, () => {
+      const result = getErrorKind({
+        commandType: isInPlace ? 'dispenseInPlace' : 'dispense',
+        error: {
+          isDefined: true,
+          errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
+        } as RunCommandError,
+      } as RunTimeCommand)
+      expect(result).toEqual(ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING)
+    })
+
+    it(`returns ${ERROR_KINDS.TIP_DROP_FAILED} for ${DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED} errorType when using the inPlace command type is ${isInPlace}`, () => {
+      const result = getErrorKind({
+        commandType: isInPlace ? 'dropTipInPlace' : 'dropTip',
+        error: {
+          isDefined: true,
+          errorType: DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED,
+        } as RunCommandError,
+      } as RunTimeCommand)
+      expect(result).toEqual(ERROR_KINDS.TIP_DROP_FAILED)
+    })
   })
 
   it(`returns ${ERROR_KINDS.TIP_NOT_DETECTED} for ${DEFINED_ERROR_TYPES.TIP_PHYSICALLY_MISSING} errorType`, () => {
@@ -48,17 +63,6 @@ describe('getErrorKind', () => {
       } as RunCommandError,
     } as RunTimeCommand)
     expect(result).toEqual(ERROR_KINDS.TIP_NOT_DETECTED)
-  })
-
-  it(`returns ${ERROR_KINDS.TIP_DROP_FAILED} for ${DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED} errorType`, () => {
-    const result = getErrorKind({
-      commandType: 'dropTip',
-      error: {
-        isDefined: true,
-        errorType: DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED,
-      } as RunCommandError,
-    } as RunTimeCommand)
-    expect(result).toEqual(ERROR_KINDS.TIP_DROP_FAILED)
   })
 
   it(`returns ${ERROR_KINDS.GRIPPER_ERROR} for ${DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT} errorType`, () => {
