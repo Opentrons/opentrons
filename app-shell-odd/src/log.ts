@@ -6,23 +6,13 @@ import winston from 'winston'
 
 import { getConfig } from './config'
 
-import Transport from 'winston-transport'
+import type Transport from 'winston-transport'
 import type { Config } from './config'
 
 const ODD_DIR = '/data/ODD'
 const LOG_DIR = path.join(ODD_DIR, 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
 const COMBINED_LOG = path.join(LOG_DIR, 'combined.log')
-const FILE_OPTIONS = {
-  // JSON logs
-  format: winston.format.json(),
-  // 1 MB max log file size (to ensure emailablity)
-  maxsize: 1024 * 1024,
-  // keep 10 backups at most
-  maxFiles: 10,
-  // roll filenames in accending order (larger the number, older the log)
-  tailable: true,
-}
 
 // Use our own logger type because winston (a) doesn't allow these by default
 // but (b) does it by binding something other than a function to these props.
