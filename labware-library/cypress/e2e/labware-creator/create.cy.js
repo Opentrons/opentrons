@@ -4,7 +4,7 @@
 
 context('The Labware Creator Landing Page', () => {
   beforeEach(() => {
-    cy.visit('/create')
+    cy.visit('/#/create')
     cy.viewport('macbook-15')
   })
 

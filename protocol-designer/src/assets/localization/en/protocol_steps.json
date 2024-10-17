@@ -1,19 +1,29 @@
 {
   "add_details": "Add step details",
+  "advanced_settings": "Advanced pipetting settings",
+  "air_gap_volume": "Air gap volume",
+  "aspirate": "Aspirate",
   "aspirated": "Aspirated",
   "batch_edit_steps": "Batch edit steps",
   "batch_edit": "Batch edit",
   "batch_edits_saved": "Batch edits saved",
+  "blowout_location": "Blowout location",
+  "blowout_position": "Blowout position from bottom",
   "change_tips": "Change tips",
   "default_tip_option": "Default - get next tip",
+  "delay_duration": "Delay duration",
+  "delay_position": "Delay position from bottom",
   "delete_steps": "Delete steps",
   "delete": "Delete step",
+  "dispense": "Dispense",
   "dispensed": "Dispensed",
+  "disposal_volume": "Disposal volume",
   "duplicate_steps": "Duplicate steps",
   "duplicate": "Duplicate step",
   "edit_step": "Edit step",
   "engage_height": "Engage height",
   "final_deck_state": "Final deck state",
+  "flow_type_title": "{{type}} flow rate",
   "from": "from",
   "heater_shaker": {
     "active": {
@@ -35,6 +45,9 @@
     "disengage": "<semiBoldText>{{module}}</semiBoldText><text>disengaged</text>",
     "engage": "<semiBoldText>{{module}}</semiBoldText><text>engaged to</text><tag/>"
   },
+  "max_disposal_volume": "Max {{vol}} {{unit}}",
+  "mix_times": "Mix repititions",
+  "mix_volume": "Mix volume",
   "mix": "Mix",
   "mix_step": "<text>Mixing</text><tag/><text>{{times}} times in</text><semiBoldText>{{labware}}</semiBoldText>",
   "mix_repetitions": "Mix repetitions",
@@ -48,6 +61,7 @@
     "distribute": "<text>Distributing</text><tag/><text>from</text><semiBoldText>{{source}}</semiBoldText><text>to</text><semiBoldText>{{destination}}</semiBoldText>",
     "transfer": "<text>Transferring</text><tag/><text>from</text><semiBoldText>{{source}}</semiBoldText><text>to</text><semiBoldText>{{destination}}</semiBoldText>"
   },
+  "multi_dispense_options": "Distribute options",
   "multiAspirate": "Consolidate path",
   "multiDispense": "Distribute path",
   "new_location": "New location",
@@ -59,6 +73,7 @@
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",
   "rename": "Rename",
+  "rename_error": "Oops! Your step name is too long.",
   "save_errors": "{{stepType}} has been saved with {{numErrors}} error(s)",
   "save_no_errors": "{{stepType}} has been saved",
   "save_warnings": "{{stepType}} has been saved with {{numWarnings}} warning(s)",
@@ -104,6 +119,11 @@
     }
   },
   "time": "Time",
+  "tip_position": "{{prefix}} tip position",
+  "touch_tip_position": "Touch tip position from top",
+  "valid_range": "Valid range between {{min}} - {{max}} {{unit}}",
   "view_details": "View details",
-  "well_name": "Well {{wellName}}"
+  "well_name": "Well {{wellName}}",
+  "well_order_title": "{{prefix}} well order",
+  "well_position": "Well position (x,y,z): "
 }

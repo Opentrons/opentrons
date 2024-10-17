@@ -89,7 +89,6 @@ export function SkipToNextStep(
   const { ROBOT_SKIPPING_STEP, IGNORE_AND_SKIP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
-  // TODO(jh, 06-18-24): EXEC-569
   const secondaryBtnOnClick = (): void => {
     if (selectedRecoveryOption === IGNORE_AND_SKIP.ROUTE) {
       void proceedToRouteAndStep(IGNORE_AND_SKIP.ROUTE)
