@@ -58,3 +58,12 @@ cd analyses-snapshot-testing \
 ### Default OPENTRONS_VERSION=edge in the Makefile so you can omit it if you want latest edge
 
 `cd analyses-snapshot-testing && make build-rs && make run-rs`
+
+## Running the Analyses Battery against your local code
+
+1. `make build-local`
+1. `make local-snapshot-test`
+
+You have the option to specify one or many protocols to run the analyses on. This is also described above [Running the tests against specific protocols](#running-the-tests-against-specific-protocols)
+
+- `make local-snapshot-test PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
