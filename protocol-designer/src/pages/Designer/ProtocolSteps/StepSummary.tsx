@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-
+import { first, flatten, last } from 'lodash'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -14,7 +14,10 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { getModuleEntities } from '../../../step-forms/selectors'
+import {
+  getLabwareEntities,
+  getModuleEntities,
+} from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 
 import type { FormData } from '../../../form-types'
@@ -43,16 +46,35 @@ function StyledTrans(props: StyledTransProps): JSX.Element {
   )
 }
 
+const getWellsForStepSummary = (
+  targetWells: string[],
+  labwareWells: string[]
+): string => {
+  if (targetWells.length === 1) {
+    return targetWells[0]
+  }
+  const firstElementIndexOffset = labwareWells.indexOf(targetWells[0])
+  const isInOrder = targetWells.every(
+    (targetWell, i) =>
+      labwareWells.indexOf(targetWell) === firstElementIndexOffset + i
+  )
+  return isInOrder
+    ? `${first(targetWells)}-${last(targetWells)}`
+    : `${targetWells.length} wells`
+}
+
 interface StepSummaryProps {
   currentStep: FormData | null
+  stepDetails?: string
 }
 
 export function StepSummary(props: StepSummaryProps): JSX.Element | null {
-  const { currentStep } = props
+  const { currentStep, stepDetails } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
 
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
 
+  const labwareEntities = useSelector(getLabwareEntities)
   const modules = useSelector(getModuleEntities)
   if (currentStep?.stepType == null) {
     return null
@@ -62,13 +84,28 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   let stepSummaryContent: JSX.Element | null = null
   switch (stepType) {
     case 'mix':
-      const { labware: mixLabwareId, volume: mixVolume, times } = currentStep
+      const {
+        labware: mixLabwareId,
+        volume: mixVolume,
+        times,
+        wells: mix_wells,
+        labware: mixLabware,
+      } = currentStep
       const mixLabwareDisplayName = labwareNicknamesById[mixLabwareId]
+      const mixWellsDisplay = getWellsForStepSummary(
+        mix_wells as string[],
+        flatten(labwareEntities[mixLabware].def.ordering)
+      )
+
       stepSummaryContent = (
         <StyledTrans
           i18nKey="protocol_steps:mix_step"
           tagText={`${mixVolume} ${t('application:units.microliter')}`}
-          values={{ labware: mixLabwareDisplayName, times }}
+          values={{
+            labware: mixLabwareDisplayName,
+            times,
+            wells: mixWellsDisplay,
+          }}
         />
       )
       break
@@ -254,13 +291,29 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       } else {
         moveLiquidType = 'transfer'
       }
-      const { aspirate_labware, dispense_labware, volume } = currentStep
+      const {
+        aspirate_labware,
+        aspirate_wells,
+        dispense_wells,
+        dispense_labware,
+        volume,
+      } = currentStep
       const sourceLabwareName = labwareNicknamesById[aspirate_labware]
       const destinationLabwareName = labwareNicknamesById[dispense_labware]
+      const aspirateWellsDisplay = getWellsForStepSummary(
+        aspirate_wells as string[],
+        flatten(labwareEntities[aspirate_labware].def.ordering)
+      )
+      const dispenseWellsDisplay = getWellsForStepSummary(
+        dispense_wells as string[],
+        flatten(labwareEntities[dispense_labware].def.ordering)
+      )
       stepSummaryContent = (
         <StyledTrans
           i18nKey={`protocol_steps:move_liquid.${moveLiquidType}`}
           values={{
+            sourceWells: aspirateWellsDisplay,
+            destinationWells: dispenseWellsDisplay,
             source: sourceLabwareName,
             destination: destinationLabwareName,
           }}
@@ -322,15 +375,31 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       stepSummaryContent = null
   }
 
-  return stepSummaryContent != null ? (
+  return stepSummaryContent != null || stepDetails != null ? (
     <Flex
-      backgroundColor={COLORS.grey30}
-      padding={SPACING.spacing12}
-      borderRadius={BORDERS.borderRadius4}
-      width={FLEX_MAX_CONTENT}
-      minWidth="100%"
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="100%"
     >
-      {stepSummaryContent}
+      <Flex
+        backgroundColor={COLORS.grey30}
+        padding={SPACING.spacing12}
+        borderRadius={BORDERS.borderRadius4}
+        width={FLEX_MAX_CONTENT}
+        minWidth="100%"
+      >
+        {stepSummaryContent}
+      </Flex>
+      {stepDetails != null && stepDetails !== '' ? (
+        <StyledText
+          backgroundColor={COLORS.grey30}
+          padding={SPACING.spacing12}
+          borderRadius={BORDERS.borderRadius4}
+          desktopStyle="bodyDefaultRegular"
+        >
+          {stepDetails}
+        </StyledText>
+      ) : null}
     </Flex>
   ) : null
 }

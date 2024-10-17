@@ -36,7 +36,7 @@
     "engage": "<semiBoldText>{{module}}</semiBoldText><text>engaged to</text><tag/>"
   },
   "mix": "Mix",
-  "mix_step": "<text>Mixing</text><tag/><text>{{times}} times in</text><semiBoldText>{{labware}}</semiBoldText>",
+  "mix_step": "<text>Mixing</text><tag/><text>{{times}} times in</text><semiBoldText>{{wells}} of {{labware}}</semiBoldText>",
   "mix_repetitions": "Mix repetitions",
   "module": "Module",
   "move_labware": {
@@ -44,9 +44,9 @@
     "no_gripper": "<text>Move</text><semiBoldText>{{labware}}</semiBoldText><text>to</text><tag/>"
   },
   "move_liquid": {
-    "consolidate": "<text>Consolidating</text><tag/><text>from</text><semiBoldText>{{source}}</semiBoldText><text>to</text><semiBoldText>{{destination}}</semiBoldText>",
-    "distribute": "<text>Distributing</text><tag/><text>from</text><semiBoldText>{{source}}</semiBoldText><text>to</text><semiBoldText>{{destination}}</semiBoldText>",
-    "transfer": "<text>Transferring</text><tag/><text>from</text><semiBoldText>{{source}}</semiBoldText><text>to</text><semiBoldText>{{destination}}</semiBoldText>"
+    "consolidate": "<text>Consolidating</text><tag/><text>from</text><semiBoldText>{{sourceWells}} of {{source}}</semiBoldText><text>to</text><semiBoldText>{{destinationWells}} of {{destination}}</semiBoldText>",
+    "distribute": "<text>Distributing</text><tag/><text>from</text><semiBoldText>{{sourceWells}} of {{source}}</semiBoldText><text>to</text><semiBoldText>{{destinationWells}} of {{destination}}</semiBoldText>",
+    "transfer": "<text>Transferring</text><tag/><text>from</text><semiBoldText>{{sourceWells}} of {{source}}</semiBoldText><text>to</text><semiBoldText>{{destinationWells}} of {{destination}}</semiBoldText>"
   },
   "multiAspirate": "Consolidate path",
   "multiDispense": "Distribute path",
