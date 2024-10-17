@@ -67,7 +67,7 @@ class MoveAxesToImplementation(
         current_position = await self._gantry_mover.move_axes(
             axis_map=params.axis_map,
             speed=params.speed,
-            critical_point={MotorAxis.X: 0.0, MotorAxis.Y: 0.0, MotorAxis.LEFT_Z: 0.0},
+            critical_point=params.critical_point,
         )
         return SuccessData(
             public=MoveAxesToResult(position=current_position),

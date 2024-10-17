@@ -65,7 +65,7 @@ class MoveAxesRelativeImplementation(
         ensure_ot3_hardware(self._hardware_api)
 
         current_position = await self._gantry_mover.move_axes(
-            axis_map=params.axis_map, speed=params.speed
+            axis_map=params.axis_map, speed=params.speed, relative_move=True
         )
         return SuccessData(
             public=MoveAxesRelativeResult(position=current_position),

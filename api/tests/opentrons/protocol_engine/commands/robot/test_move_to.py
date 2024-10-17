@@ -2,7 +2,6 @@
 from decoy import Decoy
 
 from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import Point, MountType
 
@@ -16,7 +15,6 @@ from opentrons.protocol_engine.commands.robot.move_to import (
 
 async def test_move_to_implementation(
     decoy: Decoy,
-    state_view: StateView,
     movement: MovementHandler,
 ) -> None:
     """Test the `robot.moveTo` implementation.
@@ -25,7 +23,6 @@ async def test_move_to_implementation(
     correct coordinates.
     """
     subject = MoveToImplementation(
-        state_view=state_view,
         movement=movement,
     )
 

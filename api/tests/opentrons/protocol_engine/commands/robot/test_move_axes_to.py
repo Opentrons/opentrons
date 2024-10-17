@@ -3,8 +3,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from opentrons.protocol_engine.execution import MovementHandler, GantryMover
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.execution import GantryMover
 from opentrons.protocol_engine.types import MotorAxis
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 from opentrons.types import Point, MountType
@@ -17,12 +16,10 @@ from opentrons.protocol_engine.commands.robot.move_axes_to import (
 )
 
 
-async def test_move_to_implementation(
+async def test_move_axes_to_implementation(
     decoy: Decoy,
-    state_view: StateView,
     gantry_mover: GantryMover,
-    movement: MovementHandler,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: HardwareControlAPI,
 ) -> None:
     """Test the `robot.moveAxesTo` implementation.
 
@@ -30,10 +27,8 @@ async def test_move_to_implementation(
     correct coordinates.
     """
     subject = MoveAxesToImplementation(
-        state_view=state_view,
         gantry_mover=gantry_mover,
-        movement=movement,
-        hardware_api=hardware_api,
+        hardware_api=ot3_hardware_api,
     )
 
     params = MoveAxesToParams(
@@ -42,21 +37,15 @@ async def test_move_to_implementation(
         speed=567.8,
     )
 
-    # OT 2 shape
-    decoy.when(hardware_api.get_robot_type()).then_return(OT2RobotType)
-
-    result = await subject.execute(params=params)
-
-    assert result == SuccessData(
-        public=MoveAxesToResult(
-            position={MotorAxis.X: 10, MotorAxis.Y: 10, MotorAxis.EXTENSION_Z: 20}
-        ),
-        private=None,
-    )
-
     # Flex shape
-    decoy.when(hardware_api.get_robot_type()).then_return(FlexRobotType)
-
+    decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
+    decoy.when(
+        await gantry_mover.move_axes(
+            axis_map=params.axis_map,
+            speed=params.speed,
+            critical_point=params.critical_point,
+        )
+    ).then_return({MotorAxis.X: 10, MotorAxis.Y: 10, MotorAxis.EXTENSION_Z: 20})
     result = await subject.execute(params=params)
 
     assert result == SuccessData(
