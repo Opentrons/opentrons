@@ -726,6 +726,16 @@ def _migrate34to35(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate35to36(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 36 of the feature flags file.
+
+    - Adds the allowLiquidClasses config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["allowLiquidClasses"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -762,6 +772,7 @@ _MIGRATIONS = [
     _migrate32to33,
     _migrate33to34,
     _migrate34to35,
+    _migrate35to36,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
