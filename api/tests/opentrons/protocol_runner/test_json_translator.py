@@ -40,6 +40,8 @@ from opentrons.protocol_engine import (
     DeckPoint,
     DeckSlotLocation,
     WellLocation,
+    LiquidHandlingWellLocation,
+    PickUpTipWellLocation,
     DropTipWellLocation,
     WellOrigin,
     DropTipWellOrigin,
@@ -106,7 +108,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
@@ -167,7 +169,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
@@ -241,7 +243,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=WellLocation(),
+                wellLocation=PickUpTipWellLocation(),
             )
         ),
     ),

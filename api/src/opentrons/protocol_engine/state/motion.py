@@ -1,6 +1,6 @@
 """Motion state store and getters."""
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from opentrons.types import MountType, Point
 from opentrons.hardware_control.types import CriticalPoint
@@ -15,6 +15,7 @@ from .. import errors
 from ..types import (
     MotorAxis,
     WellLocation,
+    LiquidHandlingWellLocation,
     CurrentWell,
     CurrentPipetteLocation,
     AddressableOffsetVector,
@@ -89,13 +90,14 @@ class MotionView:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: Optional[WellLocation],
+        well_location: Optional[Union[WellLocation, LiquidHandlingWellLocation]],
         origin: Point,
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float,
         current_well: Optional[CurrentWell] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
+        operation_volume: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
@@ -107,9 +109,11 @@ class MotionView:
             destination_cp = CriticalPoint.XY_CENTER
 
         destination = self._geometry.get_well_position(
-            labware_id,
-            well_name,
-            well_location,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            operation_volume=operation_volume,
+            pipette_id=pipette_id,
         )
 
         move_type = _move_types.get_move_type_to_well(
