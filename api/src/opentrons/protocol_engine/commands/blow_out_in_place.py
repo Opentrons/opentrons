@@ -73,11 +73,11 @@ class BlowOutInPlaceImplementation(
     async def execute(self, params: BlowOutInPlaceParams) -> _ExecuteReturn:
         """Blow-out without moving the pipette."""
         try:
+            current_position = await self._gantry_mover.get_position(params.pipetteId)
             await self._pipetting.blow_out_in_place(
                 pipette_id=params.pipetteId, flow_rate=params.flowRate
             )
         except PipetteOverpressureError as e:
-            current_position = await self._gantry_mover.get_position(params.pipetteId)
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),
