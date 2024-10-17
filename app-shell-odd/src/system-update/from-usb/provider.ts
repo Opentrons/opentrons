@@ -3,6 +3,7 @@ import path from 'path'
 import { rm, writeFile } from 'fs/promises'
 import type { UpdateProvider, ResolvedUpdate, ProgressCallback } from '../types'
 import { getLatestMassStorageUpdateFile } from './scan-device'
+import { createLogger } from '../../log'
 
 export interface USBUpdateSource {
   currentVersion: string
@@ -17,6 +18,7 @@ This update is from a USB mass storage device connected to your Flex, and releas
 
 Don't remove the USB mass storage device while the update is in progress.
 `
+const log = createLogger('system-updates/from-usb')
 
 export function getProvider(
   from: USBUpdateSource
@@ -49,10 +51,12 @@ export function getProvider(
       throw new Error('cache torn down')
     }
     if (updateFile == null) {
+      log.info(`No update file in presented files`)
       progress(noUpdate)
       currentUpdate = noUpdate
       return noUpdate
     }
+    log.info(`Update file found for version ${updateFile.version}`)
     if (updateFile.version === from.currentVersion) {
       progress(noUpdate)
       currentUpdate = noUpdate

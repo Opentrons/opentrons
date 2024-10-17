@@ -165,9 +165,8 @@ export function registerUpdateDriver(upstreamDispatch: Dispatch): UpdateDriver {
           })
           return usbProviders[action.payload.rootPath]
             .refreshUpdateCache(() => {})
-            .then(results => {
+            .then(() => {
               updateBestUsbUpdate()
-
               dispatchStaticUpdateData()
             })
             .catch(err => {

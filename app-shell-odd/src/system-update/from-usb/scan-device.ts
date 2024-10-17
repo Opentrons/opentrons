@@ -2,6 +2,9 @@ import Semver from 'semver'
 import { getVersionFromZipIfValid } from './scan-zip'
 import type { FileDetails } from './scan-zip'
 
+import { createLogger } from '../../log'
+const log = createLogger('system-udpate/from-usb/scan-device')
+
 const higherVersion = (a: FileDetails | null, b: FileDetails): FileDetails =>
   a == null ? b : Semver.gt(a.version, b.version) ? a : b
 
@@ -22,7 +25,11 @@ const getMassStorageUpdateFiles = (
             resolve(null)
           })
     )
-  ).then(values => values.filter(entry => entry != null) as FileDetails[])
+  ).then(values => {
+    const filtered = values.filter(entry => entry != null) as FileDetails[]
+    log.debug(`scan device found ${filtered}`)
+    return filtered
+  })
 
 export const getLatestMassStorageUpdateFile = (
   filePaths: string[]

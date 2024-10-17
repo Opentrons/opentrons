@@ -41,7 +41,7 @@ export const getVersionFromOpenedZipIfValid = (
 ): Promise<string> =>
   new Promise((resolve, reject) => {
     const found = Object.values(zip.entries()).reduce((prev, entry) => {
-      log.info(
+      log.debug(
         `Checking if ${entry.name} is ${VERSION_FILENAME}, is a file (${entry.isFile}), and ${entry.size}<${REASONABLE_VERSION_FILE_SIZE_B}`
       )
       if (
@@ -49,9 +49,9 @@ export const getVersionFromOpenedZipIfValid = (
         entry.name === VERSION_FILENAME &&
         entry.size < REASONABLE_VERSION_FILE_SIZE_B
       ) {
-        log.info(`${entry.name} is a version file candidate`)
+        log.debug(`${entry.name} is a version file candidate`)
         const contents = zip.entryDataSync(entry.name).toString('ascii')
-        log.info(`version contents: ${contents}`)
+        log.debug(`version contents: ${contents}`)
         try {
           const parsedContents = JSON.parse(contents)
           if (parsedContents?.robot_type !== 'OT-3 Standard') {
