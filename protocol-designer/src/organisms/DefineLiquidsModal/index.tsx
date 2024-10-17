@@ -151,6 +151,15 @@ export function DefineLiquidsModal(
     })
   }
 
+  const rgbaToHex = (r: number, g: number, b: number, a: number): string => {
+    const toHex = (value: number): string => {
+      const hex = Math.round(value * 255).toString(16)
+      return hex.length === 1 ? '0' + hex : hex
+    }
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(a)}`
+  }
+
   return (
     <Modal
       width="673px"
@@ -186,9 +195,10 @@ export function DefineLiquidsModal(
                     presetColors={DEFAULT_LIQUID_COLORS}
                     color={color}
                     onChange={(color: ColorResult) => {
-                      setValue('displayColor', color.hex)
-
-                      field.onChange(color.hex)
+                      const { r, g, b, a } = color.rgb
+                      const hex = rgbaToHex(r, g, b, a)
+                      setValue('displayColor', hex)
+                      field.onChange(hex)
                     }}
                   />
                 )}
