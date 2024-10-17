@@ -20,6 +20,7 @@ from typing import (
     Union,
     cast,
 )
+
 from typing_extensions import TypedDict
 
 import pytest
@@ -37,6 +38,9 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons_shared_data.protocol.types import JsonProtocol
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    LiquidClassSchemaV1,
+)
 from opentrons_shared_data.deck.types import (
     RobotModel,
     DeckDefinitionV3,
@@ -763,3 +767,17 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
         "twoDimensionalRendering": {},
     }
+
+
+@pytest.fixture
+def minimal_liquid_class_def1() -> LiquidClassSchemaV1:
+    return LiquidClassSchemaV1(
+        liquidName="water1", schemaVersion=1, namespace="test-fixture-1", byPipette=[]
+    )
+
+
+@pytest.fixture
+def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
+    return LiquidClassSchemaV1(
+        liquidName="water2", schemaVersion=1, namespace="test-fixture-2", byPipette=[]
+    )

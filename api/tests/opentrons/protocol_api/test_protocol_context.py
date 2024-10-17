@@ -8,6 +8,7 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 
+from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.types import Mount, DeckSlotName, StagingSlotName
 from opentrons.protocol_api import OFF_DECK
 from opentrons.legacy_broker import LegacyBroker
@@ -1212,6 +1213,17 @@ def test_define_liquid_arg_defaulting(
                 name="water"
                 # description and display_color omitted.
             )
+
+
+def test_define_liquid_class(
+    decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
+) -> None:
+    """It should create the liquid class definition."""
+    expected_liquid_class = LiquidClass(name="volatile_100", _by_pipette_setting=[])
+    decoy.when(mock_core.define_liquid_class("volatile_90")).then_return(
+        expected_liquid_class
+    )
+    assert subject.define_liquid_class("volatile_90") == expected_liquid_class
 
 
 def test_bundled_data(

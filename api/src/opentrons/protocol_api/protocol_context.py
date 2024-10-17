@@ -61,7 +61,7 @@ from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
-from ._liquid import Liquid
+from ._liquid import Liquid, LiquidClass
 from .disposal_locations import TrashBin, WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
@@ -1283,6 +1283,14 @@ class ProtocolContext(CommandPublisher):
             description=description,
             display_color=display_color,
         )
+
+    # TODO: add feature flag
+    def define_liquid_class(
+        self,
+        name: str,
+    ) -> LiquidClass:
+        """Define a liquid class for use in the protocol."""
+        return self._core.define_liquid_class(name=name)
 
     @property
     @requires_version(2, 5)
