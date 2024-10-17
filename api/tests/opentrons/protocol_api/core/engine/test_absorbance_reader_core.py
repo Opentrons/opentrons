@@ -115,7 +115,7 @@ def test_read(
 ) -> None:
     """It should call absorbance reader to read with the engine client."""
     subject._initialized_value = [123]
-    subject.read()
+    subject.read(filename=None)
 
     decoy.verify(
         mock_engine_client.execute_command(

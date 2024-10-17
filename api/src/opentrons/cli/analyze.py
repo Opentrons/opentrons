@@ -332,6 +332,7 @@ async def _do_analyze(
                 liquids=[],
                 wells=[],
                 hasEverEnteredErrorRecovery=False,
+                files=[],
             ),
             parameters=[],
         )

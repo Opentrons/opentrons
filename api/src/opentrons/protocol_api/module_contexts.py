@@ -1035,6 +1035,9 @@ class AbsorbanceReaderContext(ModuleContext):
         )
 
     @requires_version(2, 21)
-    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
-        """Initiate read on the Absorbance Reader. Returns a dictionary of wavelengths to dictionary of values ordered by well name."""
-        return self._core.read()
+    def read(self, filename: Optional[str]) -> Optional[Dict[int, Dict[str, float]]]:
+        """Initiate read on the Absorbance Reader. Returns a dictionary of wavelengths to dictionary of values ordered by well name.
+
+        :param filename: Optional, if a filename is provided a CSV file will be saved as a result of the read action containing measurement data.
+        """
+        return self._core.read(filename=filename)

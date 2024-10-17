@@ -274,6 +274,7 @@ class AbstractCommandImpl(
         state_view: StateView,
         hardware_api: HardwareControlAPI,
         equipment: execution.EquipmentHandler,
+        file_provider: execution.FileProvider,
         movement: execution.MovementHandler,
         gantry_mover: execution.GantryMover,
         labware_movement: execution.LabwareMovementHandler,

@@ -586,11 +586,13 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         )
         self._initialized_value = wavelengths
 
-    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
-        """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return None."""
+    def read(self, filename: Optional[str]) -> Optional[Dict[int, Dict[str, float]]]:
+        """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return a measurement of zero for all wells."""
         if self._initialized_value:
             self._engine_client.execute_command(
-                cmd.absorbance_reader.ReadAbsorbanceParams(moduleId=self.module_id)
+                cmd.absorbance_reader.ReadAbsorbanceParams(
+                    moduleId=self.module_id, fileName=filename
+                )
             )
         if not self._engine_client.state.config.use_virtual_modules:
             read_result = (

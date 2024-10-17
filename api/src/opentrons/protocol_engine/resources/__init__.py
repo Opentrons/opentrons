@@ -9,6 +9,7 @@ from .model_utils import ModelUtils
 from .deck_data_provider import DeckDataProvider, DeckFixedLabware
 from .labware_data_provider import LabwareDataProvider
 from .module_data_provider import ModuleDataProvider
+from .file_provider import FileProvider
 from .ot3_validation import ensure_ot3_hardware
 
 
@@ -18,6 +19,7 @@ __all__ = [
     "DeckDataProvider",
     "DeckFixedLabware",
     "ModuleDataProvider",
+    "FileProvider",
     "ensure_ot3_hardware",
     "pipette_data_provider",
     "labware_validation",
