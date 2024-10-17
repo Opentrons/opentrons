@@ -952,7 +952,7 @@ class InvalidAspirateVolumeError(ProtocolEngineError):
         """Build a InvalidPipettingVolumeError."""
         message = (
             f"Cannot aspirate {attempted_aspirate_volume} µL when only"
-            f" {available_volume} is available."
+            f" {available_volume} is available in the tip."
         )
         details = {
             "attempted_aspirate_volume": attempted_aspirate_volume,
