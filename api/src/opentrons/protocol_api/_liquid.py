@@ -81,22 +81,20 @@ class LiquidClass:
 
     def get_for(self, pipette: str, tiprack: str) -> TransferProperties:
         """Get liquid class transfer properties for the specified pipette and tip."""
-        settings_for_pipette: Sequence[ByPipetteSetting] = list(
-            filter(
-                lambda pip_setting: pip_setting.pipetteModel == pipette,
-                self._by_pipette_setting,
-            )
-        )
+        settings_for_pipette: Sequence[ByPipetteSetting] = [
+            pip_setting
+            for pip_setting in self._by_pipette_setting
+            if pip_setting.pipetteModel == pipette
+        ]
         if len(settings_for_pipette) == 0:
             raise ValueError(
                 f"No properties found for {pipette} in {self._name} liquid class"
             )
-        settings_for_tip: Sequence[ByTipTypeSetting] = list(
-            filter(
-                lambda tip_setting: tip_setting.tiprack == tiprack,
-                settings_for_pipette[0].byTipType,
-            )
-        )
+        settings_for_tip: Sequence[ByTipTypeSetting] = [
+            tip_setting
+            for tip_setting in settings_for_pipette[0].byTipType
+            if tip_setting.tiprack == tiprack
+        ]
         if len(settings_for_tip) == 0:
             raise ValueError(
                 f"No properties found for {tiprack} in {self._name} liquid class"
