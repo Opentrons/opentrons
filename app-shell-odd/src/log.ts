@@ -1,6 +1,5 @@
 // create logger function
 import { inspect } from 'util'
-import fse from 'fs-extra'
 import path from 'path'
 import dateFormat from 'dateformat'
 import winston from 'winston'
@@ -49,14 +48,6 @@ function ensureRootLogger(): OTLogger {
 
 function buildRootLogger(): OTLogger {
   const config = getConfig('log')
-  let error = null
-
-  // sync is ok here because this only happens once
-  try {
-    fse.ensureDirSync(LOG_DIR)
-  } catch (e: unknown) {
-    error = e
-  }
 
   const transports = createTransports(config)
 
@@ -73,8 +64,6 @@ function buildRootLogger(): OTLogger {
     format: winston.format.combine(...formats),
   })
   const loggingLog = _rootLog.child({ label: 'logging' })
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (error) loggingLog.error('Could not create log directory', { error })
   loggingLog.info(`Level "error" and higher logging to ${ERROR_LOG}`)
   loggingLog.info(
     `Level "${config.level.file}" and higher logging to ${COMBINED_LOG}`
@@ -90,28 +79,6 @@ function createTransports(config: Config['log']): Transport[] {
     dateFormat(new Date(ts), 'HH:MM:ss.l')
 
   return [
-    // error file log
-    new winston.transports.File(
-      Object.assign(
-        {
-          level: 'error',
-          filename: ERROR_LOG,
-        },
-        FILE_OPTIONS
-      )
-    ),
-
-    // regular combined file log
-    new winston.transports.File(
-      Object.assign(
-        {
-          level: config.level.file,
-          filename: COMBINED_LOG,
-        },
-        FILE_OPTIONS
-      )
-    ),
-
     // console log
     new winston.transports.Console({
       level: config.level.console,
