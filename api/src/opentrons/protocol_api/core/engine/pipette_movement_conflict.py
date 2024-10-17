@@ -19,6 +19,8 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     OnLabwareLocation,
     WellLocation,
+    LiquidHandlingWellLocation,
+    PickUpTipWellLocation,
     DropTipWellLocation,
 )
 from opentrons.protocol_engine.types import (
@@ -66,7 +68,12 @@ def check_safe_for_pipette_movement(
     pipette_id: str,
     labware_id: str,
     well_name: str,
-    well_location: Union[WellLocation, DropTipWellLocation],
+    well_location: Union[
+        WellLocation,
+        LiquidHandlingWellLocation,
+        PickUpTipWellLocation,
+        DropTipWellLocation,
+    ],
 ) -> None:
     """Check if the labware is safe to move to with a pipette in partial tip configuration.
 

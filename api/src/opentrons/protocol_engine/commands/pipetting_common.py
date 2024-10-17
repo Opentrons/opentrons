@@ -5,7 +5,7 @@ from typing import Literal, Optional, Tuple, TypedDict
 
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
-from ..types import WellLocation, DeckPoint
+from ..types import WellLocation, LiquidHandlingWellLocation, DeckPoint
 
 
 class PipetteIdMixin(BaseModel):
@@ -64,6 +64,23 @@ class WellLocationMixin(BaseModel):
     )
     wellLocation: WellLocation = Field(
         default_factory=WellLocation,
+        description="Relative well location at which to perform the operation",
+    )
+
+
+class LiquidHandlingWellLocationMixin(BaseModel):
+    """Mixin for command requests that take a location that's somewhere in a well."""
+
+    labwareId: str = Field(
+        ...,
+        description="Identifier of labware to use.",
+    )
+    wellName: str = Field(
+        ...,
+        description="Name of well to use in labware.",
+    )
+    wellLocation: LiquidHandlingWellLocation = Field(
+        default_factory=LiquidHandlingWellLocation,
         description="Relative well location at which to perform the operation",
     )
 

@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     MovementAxis,
     WellLocation,
+    LiquidHandlingWellLocation,
     LabwareLocation,
     DeckSlotLocation,
     LabwareMovementStrategy,
@@ -211,7 +212,7 @@ def create_aspirate_command(
     flow_rate: float,
     labware_id: str = "labware-id",
     well_name: str = "A1",
-    well_location: Optional[WellLocation] = None,
+    well_location: Optional[LiquidHandlingWellLocation] = None,
     destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
 ) -> cmd.Aspirate:
     """Get a completed Aspirate command."""
@@ -219,7 +220,7 @@ def create_aspirate_command(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
-        wellLocation=well_location or WellLocation(),
+        wellLocation=well_location or LiquidHandlingWellLocation(),
         volume=volume,
         flowRate=flow_rate,
     )
@@ -264,7 +265,7 @@ def create_dispense_command(
     flow_rate: float,
     labware_id: str = "labware-id",
     well_name: str = "A1",
-    well_location: Optional[WellLocation] = None,
+    well_location: Optional[LiquidHandlingWellLocation] = None,
     destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
 ) -> cmd.Dispense:
     """Get a completed Dispense command."""
@@ -272,7 +273,7 @@ def create_dispense_command(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
-        wellLocation=well_location or WellLocation(),
+        wellLocation=well_location or LiquidHandlingWellLocation(),
         volume=volume,
         flowRate=flow_rate,
     )

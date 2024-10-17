@@ -435,10 +435,13 @@ class LocationTypeError(TypeError):
     """Error representing that the location supplied is of different expected type."""
 
 
+ValidTarget = Union[WellTarget, PointTarget, TrashBin, WasteChute]
+
+
 def validate_location(
     location: Union[Location, Well, TrashBin, WasteChute, None],
     last_location: Optional[Location],
-) -> Union[WellTarget, PointTarget, TrashBin, WasteChute]:
+) -> ValidTarget:
     """Validate a given location for a liquid handling command.
 
     Args:
