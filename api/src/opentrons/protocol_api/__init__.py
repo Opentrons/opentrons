@@ -29,7 +29,7 @@ from .module_contexts import (
     AbsorbanceReaderContext,
 )
 from .disposal_locations import TrashBin, WasteChute
-from ._liquid import Liquid
+from ._liquid import Liquid, LiquidClass
 from ._types import OFF_DECK
 from ._nozzle_layout import (
     COLUMN,
@@ -67,6 +67,7 @@ __all__ = [
     "WasteChute",
     "Well",
     "Liquid",
+    "LiquidClass",
     "Parameters",
     "COLUMN",
     "PARTIAL_COLUMN",

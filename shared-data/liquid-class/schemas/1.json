@@ -418,9 +418,13 @@
     }
   },
   "properties": {
-    "liquidName": {
+    "liquidClassName": {
+      "$ref": "#/definitions/safeString",
+      "description": "The name of the liquid class specified when loading into protocol (e.g., water, ethanol, serum). Should be the same as file name."
+    },
+    "displayName": {
       "type": "string",
-      "description": "The name of the liquid (e.g., water, ethanol, serum)."
+      "description": "User-readable name of the liquid class."
     },
     "schemaVersion": {
       "description": "Which schema version a liquid class is using",
@@ -447,9 +451,9 @@
             "items": {
               "type": "object",
               "properties": {
-                "tipType": {
+                "tiprack": {
                   "type": "string",
-                  "description": "The tip type whose properties will be used when handling this specific liquid class with this pipette"
+                  "description": "The tiprack name whose tip will be used when handling this specific liquid class with this pipette"
                 },
                 "aspirate": {
                   "$ref": "#/definitions/aspirateParams"
@@ -461,7 +465,7 @@
                   "$ref": "#/definitions/multiDispenseParams"
                 }
               },
-              "required": ["tipType", "aspirate", "singleDispense"],
+              "required": ["tiprack", "aspirate", "singleDispense"],
               "additionalProperties": false
             }
           }
@@ -471,6 +475,12 @@
       }
     }
   },
-  "required": ["liquidName", "schemaVersion", "namespace", "byPipette"],
+  "required": [
+    "liquidClassName",
+    "displayName",
+    "schemaVersion",
+    "namespace",
+    "byPipette"
+  ],
   "additionalProperties": false
 }
