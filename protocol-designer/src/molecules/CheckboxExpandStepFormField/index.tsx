@@ -16,7 +16,7 @@ interface CheckboxExpandStepFormFieldProps {
   checkboxUpdateValue: (value: unknown) => void
   checkboxValue: unknown
   isChecked: boolean
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 export function CheckboxExpandStepFormField(
   props: CheckboxExpandStepFormFieldProps

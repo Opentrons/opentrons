@@ -47,7 +47,7 @@ const TipsAttachedModal = NiceModal.create(
     const modal = useModal()
 
     const { mount, specs } = aPipetteWithTip
-    const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+    const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
     const { homePipettes, isHoming } = useHomePipettes({
       ...homePipetteProps,
       pipetteInfo: buildPipetteDetails(aPipetteWithTip),
@@ -68,7 +68,7 @@ const TipsAttachedModal = NiceModal.create(
     }
 
     const cleanUpAndClose = (isTakeover?: boolean): void => {
-      toggleDTWiz()
+      disableDTWiz()
 
       if (!isTakeover) {
         modal.remove()
@@ -106,7 +106,7 @@ const TipsAttachedModal = NiceModal.create(
               <SmallButton
                 flex="1"
                 buttonText={t('begin_removal')}
-                onClick={toggleDTWiz}
+                onClick={enableDTWiz}
                 disabled={isHoming}
               />
             </Flex>

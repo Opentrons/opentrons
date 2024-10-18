@@ -22,15 +22,20 @@ import type {
  */
 export function useDropTipWizardFlows(): {
   showDTWiz: boolean
-  toggleDTWiz: () => void
+  enableDTWiz: () => void
+  disableDTWiz: () => void
 } {
   const [showDTWiz, setShowDTWiz] = useState(false)
 
-  const toggleDTWiz = (): void => {
-    setShowDTWiz(!showDTWiz)
+  return {
+    showDTWiz,
+    enableDTWiz: () => {
+      setShowDTWiz(true)
+    },
+    disableDTWiz: () => {
+      setShowDTWiz(false)
+    },
   }
-
-  return { showDTWiz, toggleDTWiz }
 }
 
 export interface DropTipWizardFlowsProps {

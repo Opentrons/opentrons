@@ -2289,17 +2289,10 @@ class OT3API(
         )
         instrument.working_volume = tip_volume
 
-    async def drop_tip(
+    async def tip_drop_moves(
         self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
-        """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
-        instrument = self._pipette_handler.get_pipette(realmount)
-
-        def _remove_tips() -> None:
-            instrument.set_current_volume(0)
-            instrument.current_tiprack_diameter = 0.0
-            instrument.remove_tip()
 
         await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
 
@@ -2326,10 +2319,26 @@ class OT3API(
         if home_after:
             await self._home([Axis.by_mount(mount)])
 
-        _remove_tips()
-        # call this in case we're simulating
+        # call this in case we're simulating:
         if isinstance(self._backend, OT3Simulator):
             self._backend._update_tip_state(realmount, False)
+
+    async def drop_tip(
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+    ) -> None:
+        """Drop tip at the current location."""
+        await self.tip_drop_moves(mount=mount, home_after=home_after)
+
+        # todo(mm, 2024-10-17): Ideally, callers would be able to replicate the behavior
+        # of this method via self.drop_tip_moves() plus other public methods. This
+        # currently prevents that: there is no public equivalent for
+        # instrument.set_current_volume().
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+        instrument.set_current_volume(0)
+
+        self.set_current_tiprack_diameter(mount, 0.0)
+        self.remove_tip(mount)
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
@@ -2598,13 +2607,13 @@ class OT3API(
                 starting_nozzle,
             )
 
-    async def add_tip(
+    def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
     ) -> None:
-        await self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
+        self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
 
-    async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
-        await self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
+    def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+        self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
 
     def add_gripper_probe(self, probe: GripperProbe) -> None:
         self._gripper_handler.add_probe(probe)

@@ -25,7 +25,6 @@ clean:
 dist: export NODE_ENV := production
 dist:
 	vite build
-	node ./renderStatic.js
 
 # development assets server
 .PHONY: dev

@@ -812,7 +812,7 @@ async def test_liquid_probe(
     pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
 
     assert pipette
-    await ot3_hardware.add_tip(mount, 100)
+    ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -905,7 +905,7 @@ async def test_liquid_probe_plunger_moves(
     pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
 
     assert pipette
-    await ot3_hardware.add_tip(mount, 100)
+    ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -1012,7 +1012,7 @@ async def test_liquid_probe_mount_moves(
     pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
 
     assert pipette
-    await ot3_hardware.add_tip(mount, 100)
+    ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -1073,7 +1073,7 @@ async def test_multi_liquid_probe(
     await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
     pipette = ot3_hardware.hardware_pipettes[OT3Mount.LEFT.to_mount()]
     assert pipette
-    await ot3_hardware.add_tip(OT3Mount.LEFT, 100)
+    ot3_hardware.add_tip(OT3Mount.LEFT, 100)
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -1142,7 +1142,7 @@ async def test_liquid_not_found(
     await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
     pipette = ot3_hardware.hardware_pipettes[OT3Mount.LEFT.to_mount()]
     assert pipette
-    await ot3_hardware.add_tip(OT3Mount.LEFT, 100)
+    ot3_hardware.add_tip(OT3Mount.LEFT, 100)
     await ot3_hardware.home()
     await ot3_hardware.move_to(OT3Mount.LEFT, Point(10, 10, 10))
 
@@ -1633,7 +1633,7 @@ async def test_prepare_for_aspirate(
     await ot3_hardware.cache_pipette(mount, instr_data, None)
     assert ot3_hardware.hardware_pipettes[mount.to_mount()]
 
-    await ot3_hardware.add_tip(mount, 100)
+    ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
     mock_move_to_plunger_bottom.assert_called_once_with(OT3Mount.LEFT, 1.0)
 
@@ -1668,7 +1668,7 @@ async def test_plunger_ready_to_aspirate_after_dispense(
     await ot3_hardware.cache_pipette(mount, instr_data, None)
     assert ot3_hardware.hardware_pipettes[mount.to_mount()]
 
-    await ot3_hardware.add_tip(mount, 100)
+    ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
     assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate
 
@@ -1729,7 +1729,7 @@ async def test_move_to_plunger_bottom(
 
     # tip attached, moving DOWN towards "bottom" position
     await ot3_hardware.home()
-    await ot3_hardware.add_tip(mount, 100)
+    ot3_hardware.add_tip(mount, 100)
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
     # make sure we've done the backlash compensation

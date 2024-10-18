@@ -252,7 +252,7 @@ export function useDropTipFlowUtils({
   const buildCopyOverrides = (): FixitCommandTypeUtils['copyOverrides'] => {
     return {
       tipDropCompleteBtnCopy: buildTipDropCompleteBtn(),
-      beforeBeginningTopText: t('preserve_aspirated_liquid'),
+      beforeBeginningTopText: t('do_you_need_to_blowout'),
     }
   }
 

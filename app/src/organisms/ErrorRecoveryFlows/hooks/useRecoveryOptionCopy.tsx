@@ -1,21 +1,29 @@
 import { useTranslation } from 'react-i18next'
 
-import type { RecoveryRoute } from '../types'
-import { RECOVERY_MAP } from '../constants'
+import type { ErrorKind, RecoveryRoute } from '../types'
+import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
 
 // Return user-friendly recovery option copy from a given route. Only routes that are
 // recovery options are handled.
 export function useRecoveryOptionCopy(): (
-  recoveryOption: RecoveryRoute | null
+  recoveryOption: RecoveryRoute | null,
+  errorKind: ErrorKind
 ) => string {
   const { t } = useTranslation('error_recovery')
 
   const getRecoveryOptionCopy = (
-    recoveryOption: RecoveryRoute | null
+    recoveryOption: RecoveryRoute | null,
+    errorKind: ErrorKind
   ): string => {
     switch (recoveryOption) {
       case RECOVERY_MAP.RETRY_STEP.ROUTE:
-        return t('retry_step')
+        if (errorKind === ERROR_KINDS.TIP_DROP_FAILED) {
+          return t('retry_dropping_tip')
+        } else if (errorKind === ERROR_KINDS.TIP_NOT_DETECTED) {
+          return t('retry_picking_up_tip')
+        } else {
+          return t('retry_step')
+        }
       case RECOVERY_MAP.CANCEL_RUN.ROUTE:
         return t('cancel_run')
       case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:

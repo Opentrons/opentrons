@@ -4,6 +4,7 @@
   "about_pipette_name": "About {{name}} Pipette",
   "about_pipette": "About pipette",
   "abs_reader_status": "Absorbance Plate Reader Status",
+  "abs_reader_lid_status": "Lid status: {{status}}",
   "add_fixture_description": "Add this hardware to your deck configuration. It will be referenced during protocol analysis.",
   "add_to_slot": "Add to slot {{slotName}}",
   "add": "Add",

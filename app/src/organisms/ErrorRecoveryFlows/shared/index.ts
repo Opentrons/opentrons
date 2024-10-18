@@ -19,5 +19,6 @@ export { GripperReleaseLabware } from './GripperReleaseLabware'
 export { RetryStepInfo } from './RetryStepInfo'
 export { SkipStepInfo } from './SkipStepInfo'
 export { GripperIsHoldingLabware } from './GripperIsHoldingLabware'
+export { RecoveryDoorOpenSpecial } from './RecoveryDoorOpenSpecial'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'

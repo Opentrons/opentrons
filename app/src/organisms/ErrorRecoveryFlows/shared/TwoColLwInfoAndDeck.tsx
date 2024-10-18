@@ -9,18 +9,19 @@ import { getSlotNameAndLwLocFrom } from '../hooks/useDeckMapUtils'
 import { RECOVERY_MAP } from '../constants'
 
 import type { RecoveryContentProps } from '../types'
+import type * as React from 'react'
+import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const {
     routeUpdateActions,
-    failedPipetteInfo,
+    failedPipetteUtils,
     failedLabwareUtils,
     deckMapUtils,
     currentRecoveryOptionUtils,
   } = props
-  console.log('=>(TwoColLwInfoAndDeck.tsx:23) deckMapUtils', deckMapUtils)
   const {
     RETRY_NEW_TIPS,
     SKIP_STEP_WITH_NEW_TIPS,
@@ -30,6 +31,7 @@ export function TwoColLwInfoAndDeck(
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { relevantWellName, failedLabware } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
+  const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
@@ -46,7 +48,11 @@ export function TwoColLwInfoAndDeck(
         return t('manually_replace_lw_on_deck')
       case RETRY_NEW_TIPS.ROUTE:
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE: {
-        if (failedPipetteInfo?.data.channels === 96) {
+        // Only special case the "full" 96-channel nozzle config.
+        if (
+          failedPipetteInfo?.data.channels === 96 &&
+          !isPartialTipConfigValid
+        ) {
           return t('replace_with_new_tip_rack', { slot })
         } else {
           return t('replace_used_tips_in_rack_location', {
@@ -69,13 +75,28 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_REPLACE_AND_RETRY.ROUTE:
         return t('ensure_lw_is_accurately_placed')
       case RETRY_NEW_TIPS.ROUTE:
-      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
-        return t('replace_tips_and_select_location')
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE: {
+        return isPartialTipConfigValid
+          ? t('replace_tips_and_select_loc_partial_tip')
+          : t('replace_tips_and_select_location')
+      }
       default:
         console.error(
           'Unexpected recovery option. Handle retry step copy explicitly.'
         )
         return 'UNEXPECTED RECOVERY OPTION'
+    }
+  }
+
+  const buildType = (): React.ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['type'] => {
+    switch (selectedRecoveryOption) {
+      case MANUAL_MOVE_AND_SKIP.ROUTE:
+      case MANUAL_REPLACE_AND_RETRY.ROUTE:
+        return 'location-arrow-location'
+      default:
+        return 'location'
     }
   }
 
@@ -85,10 +106,10 @@ export function TwoColLwInfoAndDeck(
         <LeftColumnLabwareInfo
           {...props}
           title={buildTitle()}
-          type="location"
+          type={buildType()}
           bannerText={buildBannerText()}
         />
-        <Flex marginTop="1.742rem">
+        <Flex marginTop="0.7rem">
           <DeckMapContent {...deckMapUtils} />
         </Flex>
       </TwoColumn>

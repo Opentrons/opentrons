@@ -5,7 +5,7 @@ const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
 
 describe('Create a Tip Rack', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('/#/create')
     cy.viewport('macbook-15')
   })
   it('Should create a tip rack', () => {

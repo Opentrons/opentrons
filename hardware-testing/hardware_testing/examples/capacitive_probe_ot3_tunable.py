@@ -85,7 +85,7 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
         raise RuntimeError("No pipette attached")
 
     # add length to the pipette, to account for the attached probe
-    await api.add_tip(mount, PROBE_LENGTH)
+    api.add_tip(mount, PROBE_LENGTH)
 
     await helpers_ot3.home_ot3(api)
     for c in range(cycles):
@@ -96,7 +96,7 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
     z_ax = types.Axis.by_mount(mount)
     top_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
     await api.move_to(mount, ASSUMED_XY_LOCATION._replace(z=top_z))
-    await api.remove_tip(mount)
+    api.remove_tip(mount)
     await api.disengage_axes([types.Axis.X, types.Axis.Y])
 
 

@@ -79,7 +79,7 @@ export interface HeaterShakerData {
   status: HeaterShakerStatus
 }
 export interface AbsorbanceReaderData {
-  lidStatus: 'open' | 'closed' | 'unknown'
+  lidStatus: 'on' | 'off' | 'unknown'
   platePresence: 'present' | 'absent' | 'unknown'
   sampleWavelength: number | null
   status: AbsorbanceReaderStatus

@@ -5,7 +5,12 @@ from decoy import Decoy, matchers
 
 from opentrons.types import MountType, Point
 
-from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
+from opentrons.protocol_engine import (
+    WellLocation,
+    PickUpTipWellLocation,
+    WellOffset,
+    DeckPoint,
+)
 from opentrons.protocol_engine.errors import TipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
@@ -40,6 +45,12 @@ async def test_success(
     decoy.when(state_view.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
 
     decoy.when(
+        state_view.geometry.convert_pick_up_tip_well_location(
+            well_location=PickUpTipWellLocation(offset=WellOffset(x=1, y=2, z=3))
+        )
+    ).then_return(WellLocation(offset=WellOffset(x=1, y=2, z=3)))
+
+    decoy.when(
         await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
@@ -61,7 +72,7 @@ async def test_success(
             pipetteId="pipette-id",
             labwareId="labware-id",
             wellName="A3",
-            wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            wellLocation=PickUpTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
     )
 
@@ -82,6 +93,9 @@ async def test_success(
             pipette_tip_state=update_types.PipetteTipStateUpdate(
                 pipette_id="pipette-id",
                 tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
+            ),
+            tips_used=update_types.TipsUsedUpdate(
+                pipette_id="pipette-id", labware_id="labware-id", well_name="A3"
             ),
         ),
     )
@@ -107,6 +121,12 @@ async def test_tip_physically_missing_error(
     well_name = "well-name"
     error_id = "error-id"
     error_created_at = datetime(1234, 5, 6)
+
+    decoy.when(
+        state_view.geometry.convert_pick_up_tip_well_location(
+            well_location=PickUpTipWellLocation(offset=WellOffset())
+        )
+    ).then_return(WellLocation(offset=WellOffset()))
 
     decoy.when(
         await movement.move_to_well(
@@ -139,6 +159,9 @@ async def test_tip_physically_missing_error(
                     labware_id="labware-id", well_name="well-name"
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
-            )
+            ),
+            tips_used=update_types.TipsUsedUpdate(
+                pipette_id="pipette-id", labware_id="labware-id", well_name="well-name"
+            ),
         ),
     )

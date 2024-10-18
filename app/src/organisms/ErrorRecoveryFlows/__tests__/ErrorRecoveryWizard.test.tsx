@@ -29,7 +29,11 @@ import {
 import { RecoveryInProgress } from '../RecoveryInProgress'
 import { RecoveryError } from '../RecoveryError'
 import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
-import { useErrorDetailsModal, ErrorDetailsModal } from '../shared'
+import {
+  useErrorDetailsModal,
+  ErrorDetailsModal,
+  RecoveryDoorOpenSpecial,
+} from '../shared'
 
 import type { Mock } from 'vitest'
 
@@ -37,12 +41,14 @@ vi.mock('../RecoveryOptions')
 vi.mock('../RecoveryInProgress')
 vi.mock('../RecoveryError')
 vi.mock('../RecoveryDoorOpen')
+vi.mock('../hooks')
 vi.mock('../shared', async importOriginal => {
   const actual = await importOriginal<typeof ErrorDetailsModal>()
   return {
     ...actual,
     useErrorDetailsModal: vi.fn(),
     ErrorDetailsModal: vi.fn(),
+    RecoveryDoorOpenSpecial: vi.fn(),
   }
 })
 describe('useERWizard', () => {
@@ -181,6 +187,7 @@ describe('ErrorRecoveryContent', () => {
     DROP_TIP_FLOWS,
     ERROR_WHILE_RECOVERING,
     ROBOT_DOOR_OPEN,
+    ROBOT_DOOR_OPEN_SPECIAL,
     ROBOT_RELEASING_LABWARE,
     MANUAL_REPLACE_AND_RETRY,
     MANUAL_MOVE_AND_SKIP,
@@ -218,6 +225,9 @@ describe('ErrorRecoveryContent', () => {
       <div>MOCK_IGNORE_ERROR_SKIP_STEP</div>
     )
     vi.mocked(RecoveryDoorOpen).mockReturnValue(<div>MOCK_DOOR_OPEN</div>)
+    vi.mocked(RecoveryDoorOpenSpecial).mockReturnValue(
+      <div>MOCK_DOOR_OPEN_SPECIAL</div>
+    )
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
@@ -484,6 +494,19 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_DOOR_OPEN')
+  })
+
+  it(`returns RecoveryDoorOpenSpecial when the route is ${ROBOT_DOOR_OPEN_SPECIAL.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: ROBOT_DOOR_OPEN_SPECIAL.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_DOOR_OPEN_SPECIAL')
   })
 })
 

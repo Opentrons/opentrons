@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
+  POSITION_RELATIVE,
   SPACING,
   StyledText,
   Toolbox,
@@ -29,8 +29,6 @@ export const TimelineToolbox = (): JSX.Element => {
   const { t } = useTranslation('protocol_steps')
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const formData = useSelector(getUnsavedForm)
-  //  TODO: potentially add batch edit capabilities back in
-  // const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
@@ -61,10 +59,8 @@ export const TimelineToolbox = (): JSX.Element => {
 
   return (
     <Toolbox
+      position={POSITION_RELATIVE}
       width="19.5rem"
-      height={formData != null ? FLEX_MAX_CONTENT : 'calc(100vh - 78px)'}
-      side="left"
-      horizontalSide={formData != null ? 'top' : 'bottom'}
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('protocol_timeline')}
@@ -72,8 +68,6 @@ export const TimelineToolbox = (): JSX.Element => {
       }
       confirmButton={formData != null ? undefined : <AddStepButton />}
     >
-      {/* todo(ja): this is for batch edit which we will need to add back in */}
-      {/* <MultiSelectToolbar isMultiSelectMode={Boolean(isMultiSelectMode)} /> */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}

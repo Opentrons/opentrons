@@ -37,7 +37,7 @@ import {
 import { RecoveryInterventionModal, StepInfo } from './shared'
 import { useToaster } from '../ToasterOven'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type {
   ERUtilsResults,
@@ -70,6 +70,7 @@ type RecoverySplashProps = ErrorRecoveryFlowsProps &
     resumePausedRecovery: boolean
     toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
+    allRunDefs: LabwareDefinition2[]
   }
 export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {
@@ -147,6 +148,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const isDisabled = (): boolean => {
     switch (runStatus) {
       case RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR:
+      case RUN_STATUS_AWAITING_RECOVERY_PAUSED:
         return true
       default:
         return false

@@ -11,6 +11,7 @@ from .command import DefinedErrorData
 from .pipetting_common import (
     OverpressureError,
     LiquidNotFoundError,
+    TipPhysicallyAttachedError,
 )
 
 from . import absorbance_reader
@@ -288,7 +289,6 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
     ConfigureNozzleLayoutCommandType,
-    ConfigureNozzleLayoutPrivateResult,
 )
 
 from .verify_tip_presence import (
@@ -709,12 +709,12 @@ CommandPrivateResult = Union[
     None,
     LoadPipettePrivateResult,
     ConfigureForVolumePrivateResult,
-    ConfigureNozzleLayoutPrivateResult,
 ]
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError],
+    DefinedErrorData[TipPhysicallyAttachedError],
     DefinedErrorData[OverpressureError],
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],

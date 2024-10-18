@@ -62,9 +62,9 @@ describe('FlexPipetteCard', () => {
       data: undefined,
     } as any)
     vi.mocked(useDropTipWizardFlows).mockReturnValue({
-      toggleDTWiz: mockDTWizToggle,
+      enableDTWiz: mockDTWizToggle,
       showDTWiz: false,
-    })
+    } as any)
   })
   afterEach(() => {
     vi.resetAllMocks()

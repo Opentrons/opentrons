@@ -13,7 +13,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Group,
     Metadata1,
     WellDefinition,
-    RectangularBoundedSection,
+    CuboidalFrustum,
     InnerWellGeometry,
     SphericalSegment,
 )
@@ -40,6 +40,8 @@ from opentrons.protocol_engine import (
     DeckPoint,
     DeckSlotLocation,
     WellLocation,
+    LiquidHandlingWellLocation,
+    PickUpTipWellLocation,
     DropTipWellLocation,
     WellOrigin,
     DropTipWellOrigin,
@@ -106,7 +108,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
@@ -167,7 +169,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
@@ -241,7 +243,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=WellLocation(),
+                wellLocation=PickUpTipWellLocation(),
             )
         ),
     ),
@@ -685,32 +687,39 @@ def _load_labware_definition_data() -> LabwareDefinition:
                 y=75.43,
                 z=75,
                 totalLiquidVolume=1100000,
-                shape="rectangular",
+                shape="circular",
             )
         },
         dimensions=Dimensions(yDimension=85.5, zDimension=100, xDimension=127.75),
         cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
         innerLabwareGeometry={
             "welldefinition1111": InnerWellGeometry(
-                frusta=[
-                    RectangularBoundedSection(
-                        shape="rectangular",
-                        xDimension=7.6,
-                        yDimension=8.5,
+                sections=[
+                    CuboidalFrustum(
+                        shape="cuboidal",
+                        topXDimension=7.6,
+                        topYDimension=8.5,
+                        bottomXDimension=5.6,
+                        bottomYDimension=6.5,
                         topHeight=45,
+                        bottomHeight=20,
                     ),
-                    RectangularBoundedSection(
-                        shape="rectangular",
-                        xDimension=5.6,
-                        yDimension=6.5,
+                    CuboidalFrustum(
+                        shape="cuboidal",
+                        topXDimension=5.6,
+                        topYDimension=6.5,
+                        bottomXDimension=4.5,
+                        bottomYDimension=4.0,
                         topHeight=20,
+                        bottomHeight=10,
+                    ),
+                    SphericalSegment(
+                        shape="spherical",
+                        radiusOfCurvature=6,
+                        topHeight=10,
+                        bottomHeight=0.0,
                     ),
                 ],
-                bottomShape=SphericalSegment(
-                    shape="spherical",
-                    radiusOfCurvature=6,
-                    depth=10,
-                ),
             )
         },
         brand=BrandData(brand="foo"),

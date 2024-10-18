@@ -9,6 +9,10 @@ import { i18n } from '/app/i18n'
 import * as Sessions from '/app/redux/sessions'
 import { mockDeckCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
 import { CalibrateDeck } from '../index'
+import {
+  useCalibrationError,
+  CalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
 
 import type { DeckCalibrationStep } from '/app/redux/sessions/types'
 import type { DispatchRequestsType } from '/app/redux/robot-api'
@@ -16,6 +20,7 @@ import type { DispatchRequestsType } from '/app/redux/robot-api'
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux/config')
+vi.mock('/app/organisms/Desktop/CalibrationError')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
   return {
@@ -50,6 +55,7 @@ describe('CalibrateDeck', () => {
         dispatchRequests={dispatchRequests}
         showSpinner={showSpinner}
         isJogging={isJogging}
+        requestIds={[]}
       />,
       { i18nInstance: i18n }
     )
@@ -85,6 +91,10 @@ describe('CalibrateDeck', () => {
   beforeEach(() => {
     dispatchRequests = vi.fn()
     vi.mocked(getDeckDefinitions).mockReturnValue({})
+    vi.mocked(useCalibrationError).mockReturnValue(null)
+    vi.mocked(CalibrationError).mockReturnValue(
+      <div>MOCK_CALIBRATION_ERROR</div>
+    )
   })
 
   SPECS.forEach(spec => {
@@ -181,5 +191,16 @@ describe('CalibrateDeck', () => {
         data: { vector: [0, -0.1, 0] },
       })
     )
+  })
+
+  it('renders an error modal if there is an error', () => {
+    vi.mocked(useCalibrationError).mockReturnValue({
+      title: 'test',
+      subText: 'test',
+    })
+
+    render()
+
+    screen.getByText('MOCK_CALIBRATION_ERROR')
   })
 })

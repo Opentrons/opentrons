@@ -71,7 +71,10 @@ from .exceptions import (
     CommandNotAllowedError,
     InvalidLiquidHeightFound,
     LiquidHeightUnknownError,
-    InvalidWellDefinitionError,
+    IncompleteLabwareDefinitionError,
+    IncompleteWellDefinitionError,
+    OperationLocationNotInWellError,
+    InvalidDispenseVolumeError,
     StorageLimitReachedError,
 )
 
@@ -152,6 +155,9 @@ __all__ = [
     "CommandNotAllowedError",
     "InvalidLiquidHeightFound",
     "LiquidHeightUnknownError",
-    "InvalidWellDefinitionError",
+    "IncompleteLabwareDefinitionError",
+    "IncompleteWellDefinitionError",
+    "OperationLocationNotInWellError",
+    "InvalidDispenseVolumeError",
     "StorageLimitReachedError",
 ]

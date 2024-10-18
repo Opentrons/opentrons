@@ -10,19 +10,23 @@ import {
   IgnoreErrorStepHome,
   IgnoreOptions,
 } from '../IgnoreErrorSkipStep'
-import { RECOVERY_MAP } from '../../constants'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { clickButtonLabeled } from '../../__tests__/util'
+import { SkipStepInfo } from '/app/organisms/ErrorRecoveryFlows/shared'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../shared', async () => {
-  const actual = await vi.importActual('../shared')
+vi.mock('/app/organisms/ErrorRecoveryFlows/shared', async () => {
+  const actual = await vi.importActual(
+    '/app/organisms/ErrorRecoveryFlows/shared'
+  )
   return {
     ...actual,
     RecoverySingleColumnContentWrapper: vi.fn(({ children }) => (
       <div>{children}</div>
     )),
+    SkipStepInfo: vi.fn(),
   }
 })
 vi.mock('../SelectRecoveryOption')
@@ -47,11 +51,13 @@ describe('IgnoreErrorSkipStep', () => {
   beforeEach(() => {
     props = {
       ...mockRecoveryContentProps,
+      recoveryCommands: { ignoreErrorKindThisRun: vi.fn() } as any,
     }
 
     vi.mocked(SelectRecoveryOption).mockReturnValue(
       <div>MOCK_SELECT_RECOVERY_OPTION</div>
     )
+    vi.mocked(SkipStepInfo).mockReturnValue(<div>MOCK_SKIP_STEP_INFO</div>)
   })
 
   it(`renders IgnoreErrorStepHome when step is ${RECOVERY_MAP.IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND}`, () => {
@@ -64,6 +70,18 @@ describe('IgnoreErrorSkipStep', () => {
     }
     render(props)
     screen.getByText('Ignore similar errors later in the run?')
+  })
+
+  it(`renders SkipStepInfo when step is ${RECOVERY_MAP.IGNORE_AND_SKIP.STEPS.SKIP_STEP}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        step: RECOVERY_MAP.IGNORE_AND_SKIP.STEPS.SKIP_STEP,
+      },
+    }
+    render(props)
+    screen.getByText('MOCK_SKIP_STEP_INFO')
   })
 
   it('renders SelectRecoveryOption as a fallback', () => {
@@ -84,26 +102,30 @@ describe('IgnoreErrorStepHome', () => {
   let mockIgnoreErrorKindThisRun: Mock
   let mockProceedToRouteAndStep: Mock
   let mockGoBackPrevStep: Mock
+  let mockProceedNextStep: Mock
 
   beforeEach(() => {
     mockIgnoreErrorKindThisRun = vi.fn(() => Promise.resolve())
     mockProceedToRouteAndStep = vi.fn()
     mockGoBackPrevStep = vi.fn()
+    mockProceedNextStep = vi.fn()
 
     props = {
       ...mockRecoveryContentProps,
       isOnDevice: true,
+      errorKind: ERROR_KINDS.NO_LIQUID_DETECTED,
       recoveryCommands: {
         ignoreErrorKindThisRun: mockIgnoreErrorKindThisRun,
       } as any,
       routeUpdateActions: {
         proceedToRouteAndStep: mockProceedToRouteAndStep,
         goBackPrevStep: mockGoBackPrevStep,
+        proceedNextStep: mockProceedNextStep,
       } as any,
     }
   })
 
-  it('calls ignoreOnce when "ignore_only_this_error" is selected and primary button is clicked', async () => {
+  it(`ignoreOnce correctly routes "ignore_only_this_error" is clicked and the errorKind is ${ERROR_KINDS.NO_LIQUID_DETECTED}`, async () => {
     renderIgnoreErrorStepHome(props)
     fireEvent.click(screen.queryAllByText('Ignore only this error')[0])
     clickButtonLabeled('Continue')
@@ -115,7 +137,19 @@ describe('IgnoreErrorStepHome', () => {
     })
   })
 
-  it('calls ignoreAlways when "ignore_all_errors_of_this_type" is selected and primary button is clicked', async () => {
+  it(`ignoreOnce correctly routes "ignore_only_this_error" is clicked and the errorKind not explicitly handled`, async () => {
+    renderIgnoreErrorStepHome({
+      ...props,
+      errorKind: ERROR_KINDS.GENERAL_ERROR,
+    })
+    fireEvent.click(screen.queryAllByText('Ignore only this error')[0])
+    clickButtonLabeled('Continue')
+    await waitFor(() => {
+      expect(mockProceedNextStep).toHaveBeenCalled()
+    })
+  })
+
+  it(`ignoreAlways correctly routes when "ignore_all_errors_of_this_type" is clicked and the errorKind is ${ERROR_KINDS.NO_LIQUID_DETECTED}`, async () => {
     renderIgnoreErrorStepHome(props)
     fireEvent.click(screen.queryAllByText('Ignore all errors of this type')[0])
     clickButtonLabeled('Continue')
@@ -127,6 +161,18 @@ describe('IgnoreErrorStepHome', () => {
         RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
         RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP
       )
+    })
+  })
+
+  it(`ignoreAlways correctly routes "ignore_all_errors_of_this_type" is clicked and the errorKind not explicitly handled`, async () => {
+    renderIgnoreErrorStepHome({
+      ...props,
+      errorKind: ERROR_KINDS.GENERAL_ERROR,
+    })
+    fireEvent.click(screen.queryAllByText('Ignore all errors of this type')[0])
+    clickButtonLabeled('Continue')
+    await waitFor(() => {
+      expect(mockProceedNextStep).toHaveBeenCalled()
     })
   })
 

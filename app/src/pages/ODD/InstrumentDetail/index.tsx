@@ -48,7 +48,7 @@ export const InstrumentDetail = (): JSX.Element => {
   const gripperDisplayName = useGripperDisplayName(
     instrument?.instrumentModel as GripperModel
   )
-  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+  const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
   const pipetteModelSpecs =
     instrument != null
       ? getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ??
@@ -69,7 +69,7 @@ export const InstrumentDetail = (): JSX.Element => {
               robotType={FLEX_ROBOT_TYPE}
               mount={instrument.mount}
               instrumentModelSpecs={pipetteModelSpecs}
-              closeFlow={toggleDTWiz}
+              closeFlow={disableDTWiz}
               modalStyle="simple"
             />,
             getTopPortalEl()
@@ -93,7 +93,7 @@ export const InstrumentDetail = (): JSX.Element => {
                   handleInstrumentDetailOverflowMenu(
                     instrument,
                     host,
-                    toggleDTWiz
+                    enableDTWiz
                   )
                 }}
               >

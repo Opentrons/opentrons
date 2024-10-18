@@ -248,3 +248,34 @@ export function getMatchingTipLiquidSpecs(
 
   return matchingTipLiquidSpecs
 }
+
+/**
+ * Removes specific phrases from the input string.
+ *
+ * This function removes the following phrases from the input string:
+ * - 'Opentrons Flex 96'
+ * - 'Opentrons OT-2 96'
+ * - '(Retired)'
+ * - '96' (only if it is not the first two characters)
+ *
+ * @param {string} input - The input string from which phrases will be removed.
+ * @returns {string} - The modified string with specified phrases removed.
+ */
+export const removeOpentronsPhrases = (input: string): string => {
+  const phrasesToRemove = [
+    'Opentrons Flex 96',
+    'Opentrons OT-2 96',
+    '\\(Retired\\)',
+    '96',
+    'Eppendorf',
+  ]
+
+  const updatedText = phrasesToRemove
+    .reduce((text, phrase) => {
+      return text.replace(new RegExp(phrase, 'gi'), '')
+    }, input)
+    .trim()
+    .replace(/\s+/g, ' ')
+
+  return updatedText.trim()
+}
