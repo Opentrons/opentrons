@@ -276,14 +276,14 @@ class HardwareTipHandler(TipHandler):
         # Allow TipNotAttachedError to propagate.
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
 
-        await self._hardware_api.remove_tip(hw_mount)
+        self._hardware_api.remove_tip(hw_mount)
         self._hardware_api.set_current_tiprack_diameter(hw_mount, 0)
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """See documentation on abstract base class."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        await self._hardware_api.add_tip(mount=hw_mount, tip_length=tip.length)
+        self._hardware_api.add_tip(mount=hw_mount, tip_length=tip.length)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,

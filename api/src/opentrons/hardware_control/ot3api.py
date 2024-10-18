@@ -2338,7 +2338,7 @@ class OT3API(
         instrument.set_current_volume(0)
 
         self.set_current_tiprack_diameter(mount, 0.0)
-        await self.remove_tip(mount)
+        self.remove_tip(mount)
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""

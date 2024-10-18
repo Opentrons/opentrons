@@ -1285,7 +1285,7 @@ class API(
         instrument.set_current_volume(0)
 
         self.set_current_tiprack_diameter(mount, 0.0)
-        await self.remove_tip(mount)
+        self.remove_tip(mount)
 
     async def create_simulating_module(
         self,
