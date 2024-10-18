@@ -152,6 +152,9 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         """
         ...
 
+    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
+        ...
+
     def remove_tip(self, mount: MountArgType) -> None:
         """Inform the hardware that a tip is no longer attached to a pipette.
 
