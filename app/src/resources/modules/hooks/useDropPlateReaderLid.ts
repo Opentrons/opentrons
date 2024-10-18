@@ -33,15 +33,14 @@ export function useDropPlateReaderLid(
 
 const LOAD_PLATE_READER: CreateCommand = {
   commandType: 'loadModule' as const,
-  params: {"model": "absorbanceReaderV1", "location": {"slotName": "C3"}},
+  params: { model: 'absorbanceReaderV1', location: { slotName: 'C3' } },
 }
 
 const DROP_PLATE_READER_LID: CreateCommand = {
   commandType: 'moveLabware' as const,
-  params: 
-      {
-      "labwareId": "absorbanceReaderV1LidC3",
-      "newLocation": {"slotName": "C3"},
-      "strategy": "usingGripper",
+  params: {
+    labwareId: 'absorbanceReaderV1LidC3',
+    newLocation: { slotName: 'C3' },
+    strategy: 'usingGripper',
   },
 }

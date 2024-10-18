@@ -601,17 +601,16 @@ async def get_current_state(
 
     # TODO: add the actual plate reader data
     plate_reader_states = {
-            "test": PlateReaderState(
-                lidHeldByGripper=False,
-                plateReaderLidLocation="D3",
-            )
+        "test": PlateReaderState(
+            lidHeldByGripper=False,
+            plateReaderLidLocation="D3",
+        )
     }
 
     return await PydanticResponse.create(
         content=Body.construct(
             data=RunCurrentState.construct(
-                activeNozzleLayouts=nozzle_layouts,
-                plateReaderState=plate_reader_states
+                activeNozzleLayouts=nozzle_layouts, plateReaderState=plate_reader_states
             ),
             links=links,
         ),

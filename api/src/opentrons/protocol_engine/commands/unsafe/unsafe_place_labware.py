@@ -115,7 +115,6 @@ class UnsafePlaceLabwareImplementation(
         drop_offset = Point()  # TODO: FIx this
         to_labware_center = self._state_store.geometry.get_labware_grip_point(
             labware_id=labware_id, location=new_location
-
         )
 
         log.warning(9)
