@@ -26,6 +26,11 @@ export function LevelingVideo(props: {
   mount: Mount
 }): JSX.Element {
   const { pipetteName, mount } = props
+  const video = new URL(
+    `../../../../app/assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
+    import.meta.url
+  ).href
+
   return (
     <video
       css={css`
@@ -39,7 +44,7 @@ export function LevelingVideo(props: {
       controls={true}
     >
       <source
-        src={`../app/assets/videos/pip-leveling/${pipetteName}-${mount}.webm`}
+        src={video}
       />
     </video>
   )
