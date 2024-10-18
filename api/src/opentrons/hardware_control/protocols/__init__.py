@@ -58,6 +58,8 @@ class HardwareControlInterface(
     def get_robot_type(self) -> Type[OT2RobotType]:
         return OT2RobotType
 
+    # todo(mm, 2024-10-17): This probably belongs in InstrumentConfigurer, alongside
+    # add_tip() and remove_tip().
     def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
         ...
 
@@ -87,6 +89,8 @@ class FlexHardwareControlInterface(
     def get_robot_type(self) -> Type[FlexRobotType]:
         return FlexRobotType
 
+    # todo(mm, 2024-10-17): This probably belongs in InstrumentConfigurer, alongside
+    # add_tip() and remove_tip().
     def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
         ...
 
