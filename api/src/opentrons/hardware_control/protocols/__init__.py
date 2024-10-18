@@ -86,7 +86,7 @@ class FlexHardwareControlInterface(
 
 
 __all__ = [
-    "HardwareControlAPI",
+    "HardwareControlInterface",
     "FlexHardwareControlInterface",
     "Simulatable",
     "Stoppable",
