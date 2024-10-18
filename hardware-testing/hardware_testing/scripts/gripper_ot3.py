@@ -287,7 +287,7 @@ async def _probe_labware_corners(
 ) -> List[float]:
     nominal_corners = _calculate_probe_positions(slot, labware_key, deck_item)
     await api.home([types.Axis.by_mount(PROBE_MOUNT)])
-    await api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
+    api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
     found_heights: List[float] = list()
     for corner in nominal_corners:
         current_pos = await api.gantry_position(PROBE_MOUNT)
@@ -300,7 +300,7 @@ async def _probe_labware_corners(
         )
         found_heights.append(found_z)
     await api.home([types.Axis.by_mount(PROBE_MOUNT)])
-    await api.remove_tip(PROBE_MOUNT)
+    api.remove_tip(PROBE_MOUNT)
     print(f'\tLabware Corners ("{deck_item}" at slot {slot})')
     print(f"\t\tTop-Left = {found_heights[0]}")
     print(f"\t\tTop-Right = {found_heights[1]}")
