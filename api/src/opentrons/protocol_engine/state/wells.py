@@ -40,7 +40,7 @@ class WellStore(HasState[WellState], HandlesActions):
 
     def _handle_succeeded_command(self, command: Command) -> None:
         if isinstance(command.result, LiquidProbeResult):
-            self._set_liquid_height(
+            self._set_liquid_height_from_probe(
                 labware_id=command.params.labwareId,
                 well_name=command.params.wellName,
                 height=command.result.z_position,
@@ -49,17 +49,17 @@ class WellStore(HasState[WellState], HandlesActions):
 
     def _handle_failed_command(self, action: FailCommandAction) -> None:
         if isinstance(action.error, LiquidNotFoundError):
-            self._set_liquid_height(
+            self._set_liquid_height_from_probe(
                 labware_id=action.error.private.labware_id,
                 well_name=action.error.private.well_name,
                 height=None,
                 time=action.failed_at,
             )
 
-    def _set_liquid_height(
+    def _set_liquid_height_from_probe(
         self, labware_id: str, well_name: str, height: float, time: datetime
     ) -> None:
-        """Set the liquid height of the well."""
+        """Set the liquid height of the well from a LiquidProbe command."""
         lhi = LiquidHeightInfo(height=height, last_measured=time)
         if labware_id not in self._state.measured_liquid_heights:
             self._state.measured_liquid_heights[labware_id] = {}
@@ -128,10 +128,10 @@ class WellView(HasState[WellState]):
         except KeyError:
             return False
 
-    def set_liquid_height(
+    def set_liquid_height_from_load(
         self, labware_id: str, well_name: str, height: float, time: datetime
     ) -> None:
-        """Set the liquid height of the well."""
+        """Set the liquid height of the well from a LoadLiquid command."""
         lhi = LiquidHeightInfo(height=height, last_measured=time)
         if labware_id not in self._state.measured_liquid_heights:
             self._state.measured_liquid_heights[labware_id] = {}

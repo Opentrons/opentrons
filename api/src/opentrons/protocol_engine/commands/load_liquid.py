@@ -54,14 +54,14 @@ class LoadLiquidImplementation(
         self._state_view.labware.validate_liquid_allowed_in_labware(
             labware_id=params.labwareId, wells=params.volumeByWell
         )
-        # do this in WellStore?!
+        # do this in WellStore? Don't have access to GeometryView
         labware_id = params.labwareId
         well_name = next(iter(params.volumeByWell))
         volume = next(iter(params.volumeByWell.values()))
         height = self._state_view.geometry.get_well_height_at_volume(
             labware_id=labware_id, well_name=well_name, volume=volume
         )
-        self._state_view.wells.set_liquid_height(
+        self._state_view.wells.set_liquid_height_from_load(
             labware_id=labware_id,
             well_name=well_name,
             height=height,
