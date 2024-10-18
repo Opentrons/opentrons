@@ -148,6 +148,6 @@ class FileProvider:
                     f"Not enough space to store file {write_data.filename}."
                 )
             if self._data_files_write_csv_callback is not None:
-                await self._data_files_write_csv_callback(write_data)
+                return await self._data_files_write_csv_callback(write_data)
         # If we are in an analysis or simulation state, return an empty file ID
         return ""
