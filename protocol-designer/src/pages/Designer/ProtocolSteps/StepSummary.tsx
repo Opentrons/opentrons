@@ -342,9 +342,13 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             <StyledTrans
               i18nKey="protocol_steps:heater_shaker.active.temperature"
               values={{ module: moduleDisplayName }}
-              tagText={`${targetHeaterShakerTemperature ?? '-'}${t(
-                'application:units.degrees'
-              )}`}
+              tagText={
+                targetHeaterShakerTemperature != null
+                  ? `${targetHeaterShakerTemperature}${t(
+                      'application:units.degrees'
+                    )}`
+                  : t('protocol_steps:heater_shaker.active.ambient')
+              }
             />
             {targetSpeed != null ? (
               <StyledTrans

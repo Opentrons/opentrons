@@ -17,6 +17,7 @@
   "from": "from",
   "heater_shaker": {
     "active": {
+      "ambient": "ambient",
       "latch": "<text>Latch</text><tag/>",
       "shake": "<text>Shaking at</text><tag/>",
       "temperature": "<semiBoldText>{{module}}</semiBoldText><text>set to</text><tag/>",
