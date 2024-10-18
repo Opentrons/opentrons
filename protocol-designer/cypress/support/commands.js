@@ -40,6 +40,22 @@ Cypress.Commands.add('closeAnnouncementModal', () => {
     .click({ force: true })
 })
 
+Cypress.Commands.add('enableRedesign', () => {
+  cy.window().then(win => {
+    win.enablePrereleaseMode()
+  })
+  // You select using the mouse thing on the upper right corner of
+  // The inspector window
+  // Use the element name and what's inside it
+  cy.get('button')
+    .contains('Got It!')
+    .should('be.visible')
+    .click({ force: true })
+  cy.openSettingsPage()
+  //
+  cy.contains('Enable redesign').next().click()
+  cy.contains('button', 'Continue').click()
+})
 //
 // File Page Actions
 //
