@@ -27,7 +27,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         instrument_name="flex_8channel_1000", mount="left", tip_racks=[tiprack_1000]
     )  # Pipette
 
-    vol = 1000
+    vol = 500
 
     column_list = [
         "A1",
