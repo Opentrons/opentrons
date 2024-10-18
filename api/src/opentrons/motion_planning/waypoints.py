@@ -181,3 +181,35 @@ def get_gripper_labware_movement_waypoints(
             )
         )
     return waypoints_with_jaw_status
+
+
+def get_gripper_labware_placement_waypoints(
+    to_labware_center: Point,
+    gripper_home_z: float,
+    drop_offset: Optional[Point],
+) -> List[GripperMovementWaypointsWithJawStatus]:
+    """Get waypoints for placing labware using a gripper."""
+    drop_offset = drop_offset or Point()
+
+    drop_location = to_labware_center + Point(
+        drop_offset.x, drop_offset.y, drop_offset.z
+    )
+
+    post_drop_home_pos = Point(drop_location.x, drop_location.y, gripper_home_z)
+
+    return [
+        GripperMovementWaypointsWithJawStatus(
+            position=Point(drop_location.x, drop_location.y, gripper_home_z),
+            jaw_open=False,
+            dropping=False,
+        ),
+        GripperMovementWaypointsWithJawStatus(
+            position=drop_location, jaw_open=False, dropping=False
+        ),
+        # Gripper ungrips here
+        GripperMovementWaypointsWithJawStatus(
+            position=post_drop_home_pos,
+            jaw_open=True,
+            dropping=True,
+        ),
+    ]

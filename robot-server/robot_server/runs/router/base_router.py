@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
+from robot_server.service.legacy.models.modules import HeaterShakerModuleLiveData
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths
 from opentrons.protocol_engine import (
     errors as pe_errors,
@@ -48,6 +49,7 @@ from robot_server.protocols.protocol_store import (
 from robot_server.protocols.router import ProtocolNotFound
 
 from ..run_models import (
+    PlateReaderState,
     RunNotFoundError,
     ActiveNozzleLayout,
     RunCurrentState,
@@ -597,9 +599,20 @@ async def get_current_state(
         else None
     )
 
+    # TODO: add the actual plate reader data
+    plate_reader_states = {
+            "test": PlateReaderState(
+                lidHeldByGripper=False,
+                plateReaderLidLocation="D3",
+            )
+    }
+
     return await PydanticResponse.create(
         content=Body.construct(
-            data=RunCurrentState.construct(activeNozzleLayouts=nozzle_layouts),
+            data=RunCurrentState.construct(
+                activeNozzleLayouts=nozzle_layouts,
+                plateReaderState=plate_reader_states
+            ),
             links=links,
         ),
         status_code=status.HTTP_200_OK,

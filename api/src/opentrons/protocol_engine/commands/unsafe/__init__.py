@@ -40,6 +40,15 @@ from .unsafe_ungrip_labware import (
 )
 
 
+from .unsafe_place_labware import (
+    UnsafePlaceLabwareCommandType,
+    UnsafePlaceLabwareParams,
+    UnsafePlaceLabwareResult,
+    UnsafePlaceLabware,
+    UnsafePlaceLabwareCreate,
+)
+
+
 __all__ = [
     # Unsafe blow-out-in-place command models
     "UnsafeBlowOutInPlaceCommandType",
@@ -71,4 +80,10 @@ __all__ = [
     "UnsafeUngripLabwareResult",
     "UnsafeUngripLabware",
     "UnsafeUngripLabwareCreate",
+    # Unsafe place labware
+    "UnsafePlaceLabwareCommandType",
+    "UnsafePlaceLabwareParams",
+    "UnsafePlaceLabwareResult",
+    "UnsafePlaceLabware",
+    "UnsafePlaceLabwareCreate",
 ]

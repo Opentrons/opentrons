@@ -307,10 +307,22 @@ class ActiveNozzleLayout(BaseModel):
     )
 
 
+class PlateReaderState(BaseModel):
+    """Details about the plate reader."""
+
+    plateReaderLidLocation: str = Field(
+        ..., description="The location the Plate Reade lid should be in."
+    )
+    lidHeldByGripper: bool = Field(
+        ..., description="Whether the gripper is holding the Plate Reader lid."
+    )
+
+
 class RunCurrentState(BaseModel):
     """Current details about a run."""
 
     activeNozzleLayouts: Dict[str, ActiveNozzleLayout] = Field(..., description="")
+    plateReaderState: Dict[str, PlateReaderState] = Field(..., description="")
 
 
 class CommandLinkNoMeta(BaseModel):
