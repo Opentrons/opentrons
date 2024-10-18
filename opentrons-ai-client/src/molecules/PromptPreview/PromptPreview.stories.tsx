@@ -35,7 +35,7 @@ export const PromptPreviewExample: Story = {
         title: 'Application',
         items: [
           'Cherrypicking',
-          'I have a Chlorine Reagent Set (Total), Ultra Low Range...',
+          'I have a Chlorine Reagent Set (Total), Ultra Low Range',
         ],
       },
       {
@@ -59,13 +59,16 @@ export const PromptPreviewExample: Story = {
           'Opentrons 96 Well Plate',
           'Thermocycler GEN2',
           'Opentrons 96 Deep Well Plate',
-          'Liquid 1: These are my samples, the...',
-          'Liquid 2: This is the reagent in my ...',
+          'Liquid 1: In commodo lectus nec erat commodo blandit. Etiam leo dui, porttitor vel imperdiet sed, tristique nec nisl. Maecenas pulvinar sapien quis sodales imperdiet.',
+          'Liquid 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         ],
       },
       {
         title: 'Steps',
-        items: ['Fill the first column of a Elisa...'],
+        items: [
+          'Fill the first column of a Elisa plate with 100 uL of Liquid 1',
+          'Fill the second column of a Elisa plate with 100 uL of Liquid 2',
+        ],
       },
     ],
   },

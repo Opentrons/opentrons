@@ -2,7 +2,6 @@ import styled from 'styled-components'
 import {
   Flex,
   StyledText,
-  COLORS,
   Tag,
   DIRECTION_COLUMN,
   WRAP,
@@ -23,10 +22,27 @@ const SectionHeading = styled(StyledText)`
   margin-bottom: ${SPACING.spacing8};
 `
 
-const TagGrid = styled(Flex)`
+const TagsContainer = styled(Flex)`
   grid-gap: ${SPACING.spacing4};
   flex-wrap: ${WRAP};
-  color: ${COLORS.grey60};
+  justify-content: flex-start;
+  width: 100%;
+`
+
+const TagItemWrapper = styled(Flex)`
+  width: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 35%;
+
+  & > div {
+    overflow: hidden;
+
+    > p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 `
 
 export function PromptPreviewSection({
@@ -36,13 +52,16 @@ export function PromptPreviewSection({
   return (
     <PromptPreviewSectionContainer>
       <SectionHeading desktopStyle="bodyLargeSemiBold">{title}</SectionHeading>
-      <TagGrid>
-        {items.map((item: string, index: number) =>
-          item.trim() === '' ? null : (
-            <Tag key={`item-tag-${index}`} text={item} type={'default'} />
-          )
+      <TagsContainer>
+        {items.map(
+          (item: string, index: number) =>
+            item.trim() !== '' && (
+              <TagItemWrapper key={`item-tag-${index}`}>
+                <Tag text={item} type={'default'} />
+              </TagItemWrapper>
+            )
         )}
-      </TagGrid>
+      </TagsContainer>
     </PromptPreviewSectionContainer>
   )
 }
