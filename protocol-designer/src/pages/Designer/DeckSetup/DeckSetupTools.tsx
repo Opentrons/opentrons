@@ -161,6 +161,8 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   }
 
   const handleClear = (): void => {
+    onDeckProps?.setHoveredModule(null)
+    onDeckProps?.setHoveredFixture(null)
     if (slot !== 'offDeck') {
       //  clear module from slot
       if (createdModuleForSlot != null) {
@@ -312,6 +314,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                       }}
                       setHovered={() => {
                         if (onDeckProps?.setHoveredModule != null) {
+                          onDeckProps.setHoveredFixture(null)
                           onDeckProps.setHoveredModule(model)
                         }
                       }}
@@ -390,6 +393,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                       }}
                       setHovered={() => {
                         if (onDeckProps?.setHoveredFixture != null) {
+                          onDeckProps.setHoveredModule(null)
                           onDeckProps.setHoveredFixture(fixture)
                         }
                       }}
