@@ -43,9 +43,7 @@ export function LevelingVideo(props: {
       loop={true}
       controls={true}
     >
-      <source
-        src={video}
-      />
+      <source src={video} />
     </video>
   )
 }
