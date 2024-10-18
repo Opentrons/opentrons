@@ -3,7 +3,6 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type, Dict, TYPE_CHECKING
 from typing_extensions import Literal
-from datetime import datetime
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
