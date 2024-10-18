@@ -97,7 +97,11 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
-    name: 'opentrons app backend unit tests on ${{matrix.os}}'
+        shell: ['app-shell', 'app-shell-odd', 'discovery-client']
+        exclude:
+          - os: 'windows-2022'
+            shell: 'app-shell-odd'
+    name: 'opentrons ${{matrix.shell}} unit tests on ${{matrix.os}}'
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
@@ -144,7 +148,7 @@ jobs:
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true"
+        run: make test-js-internal tests="${{}matrix.shell}/src" cov_opts="--coverage=true"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:

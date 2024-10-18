@@ -16,11 +16,13 @@ export type ConfigState = Config | null
 export interface ConfigInitializedAction {
   type: typeof INITIALIZED
   payload: { config: Config }
+  meta: { shell: true }
 }
 
 export interface ConfigValueUpdatedAction {
   type: typeof VALUE_UPDATED
   payload: { path: string; value: any }
+  meta: { shell: true }
 }
 
 export interface UpdateConfigValueAction {

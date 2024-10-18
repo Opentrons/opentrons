@@ -9,6 +9,7 @@ import type { Request, Response } from 'node-fetch'
 
 vi.mock('../config')
 vi.mock('node-fetch')
+vi.mock('../log')
 
 describe('app-shell main http module', () => {
   beforeEach(() => {
