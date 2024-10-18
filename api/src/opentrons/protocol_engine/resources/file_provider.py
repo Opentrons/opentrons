@@ -8,23 +8,34 @@ from ..errors import StorageLimitReachedError
 MAXIMUM_CSV_FILE_LIMIT = 40
 
 
-def _csv_filename_validation(filename: str) -> str:
-
-    if "." in filename and not filename.endswith(".csv"):
-        raise ValueError(
-            f"Provided filename {filename} invalid. Only CSV file format is accepted."
-        )
-    elif "." not in filename:
-        filename = f"{filename}.csv"
-    return filename
-
-
-class GenericCsvTransform(BaseModel):
+class GenericCsvTransform:
     """Generic CSV File Type data for rows of data to be seperated by a delimeter."""
 
     filename: str
     rows: List[List[str]]
     delimiter: str = ","
+
+    def __init__(self, filename: str, rows: List[List[str]], delimeter: str) -> None:
+        self.filename = filename
+        rows = rows
+        delimeter = delimeter
+
+    @classmethod
+    def build(
+        cls, filename: str, rows: List[List[str]], delimiter: str = ","
+    ) -> "GenericCsvTransform":
+        """Build a Generic CSV datatype class."""
+        if "." in filename and not filename.endswith(".csv"):
+            raise ValueError(
+                f"Provided filename {filename} invalid. Only CSV file format is accepted."
+            )
+        elif "." not in filename:
+            filename = f"{filename}.csv"
+        return cls(
+            filename,
+            rows,
+            delimiter,
+        )
 
 
 class ReadData(BaseModel):
@@ -107,17 +118,15 @@ class PlateReaderData(BaseModel):
         rows.append(["Measurement finished at", str(self.finish_time)])
 
         # Ensure the filename adheres to ruleset contains the wavelength for a given measurement
-        filename = _csv_filename_validation(filename)
         if filename.endswith(".csv"):
             filename = filename[:-4]
         filename = filename + "_" + str(measurement.wavelength) + ".csv"
 
-        csv_data = GenericCsvTransform.construct(
+        return GenericCsvTransform.build(
             filename=filename,
             rows=rows,
             delimiter=",",
         )
-        return csv_data
 
 
 class FileProvider:

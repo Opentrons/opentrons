@@ -1035,9 +1035,17 @@ class AbsorbanceReaderContext(ModuleContext):
         )
 
     @requires_version(2, 21)
-    def read(self, filename: Optional[str]) -> Dict[int, Dict[str, float]]:
-        """Initiate read on the Absorbance Reader. Returns a dictionary of wavelengths to dictionary of values ordered by well name.
+    def read(self, export_filename: Optional[str]) -> Dict[int, Dict[str, float]]:
+        """Initiate read on the Absorbance Reader.
 
-        :param filename: Optional, if a filename is provided a CSV file will be saved as a result of the read action containing measurement data.
+        Returns a dictionary of wavelengths to dictionary of values ordered by well name.
+
+        :param export_filename: Optional, if a filename is provided a CSV file will be saved
+             as a result of the read action containing measurement data. The filename will
+             be modified to include the wavelength used during measurement. If multiple
+             measurements are taken, then a file will be generated for each wavelength provided.
+
+        Example: If `export_filename="my_data"` and wavelengths 450 and 531 are used during
+        measurement, the output files will be "my_data_450.csv" and "my_data_531.csv".
         """
-        return self._core.read(filename=filename)
+        return self._core.read(filename=export_filename)

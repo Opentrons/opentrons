@@ -11,6 +11,11 @@ from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import AbsorbanceReaderCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_engine.state.module_substates import AbsorbanceReaderSubState
+from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
+    AbsorbanceReaderId,
+    AbsorbanceReaderMeasureMode,
+)
 
 SyncAbsorbanceReaderHardware = SynchronousAdapter[AbsorbanceReader]
 
@@ -115,6 +120,22 @@ def test_read(
 ) -> None:
     """It should call absorbance reader to read with the engine client."""
     subject._initialized_value = [123]
+    substate = AbsorbanceReaderSubState(
+        module_id=AbsorbanceReaderId(subject.module_id),
+        configured=True,
+        measured=False,
+        is_lid_on=True,
+        data=None,
+        configured_wavelengths=subject._initialized_value,
+        measure_mode=AbsorbanceReaderMeasureMode("single"),
+        reference_wavelength=None,
+        lid_id="pr_lid_labware",
+    )
+    decoy.when(
+        mock_engine_client.state.modules.get_absorbance_reader_substate(
+            subject.module_id
+        )
+    ).then_return(substate)
     subject.read(filename=None)
 
     decoy.verify(

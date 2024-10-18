@@ -10,6 +10,7 @@ from robot_server.data_files.dependencies import (
     get_data_files_store,
 )
 from robot_server.data_files.data_files_store import DataFilesStore
+from opentrons.protocol_engine.resources.file_provider import FileProvider
 
 
 async def get_file_provider_wrapper(
@@ -22,3 +23,17 @@ async def get_file_provider_wrapper(
     )
 
     return file_provider_wrapper
+
+
+async def get_file_provider(
+    file_provider_wrapper: Annotated[
+        FileProviderWrapper, fastapi.Depends(get_file_provider_wrapper)
+    ],
+) -> FileProvider:
+    """Return theengine `FileProvider` which accepts callbacks from FileProviderWrapper."""
+    file_provider = FileProvider(
+        data_files_write_csv_callback=file_provider_wrapper.write_csv_callback,
+        data_files_filecount=file_provider_wrapper.csv_filecount_callback,
+    )
+
+    return file_provider

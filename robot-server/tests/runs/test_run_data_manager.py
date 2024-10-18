@@ -53,6 +53,7 @@ from robot_server.runs.run_store import (
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
 from opentrons.protocol_engine.resources import FileProvider
+from robot_server.file_provider.provider import FileProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -140,6 +141,20 @@ def mock_nozzle_maps(decoy: Decoy) -> Dict[str, NozzleMap]:
     """Get a mock NozzleMap."""
     mock_nozzle_map = decoy.mock(cls=NozzleMap)
     return {"mock-pipette-id": mock_nozzle_map}
+
+
+@pytest.fixture()
+def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderWrapper:
+    """Return a mock FileProviderWrapper."""
+    return decoy.mock(cls=FileProviderWrapper)
+
+
+@pytest.fixture()
+def mock_file_provider(
+    decoy: Decoy, mock_file_provider_wrapper: FileProviderWrapper
+) -> FileProvider:
+    """Return a mock FileProvider."""
+    return decoy.mock(cls=FileProvider)
 
 
 @pytest.fixture
@@ -274,6 +289,7 @@ async def test_create(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         runTimeParameters=[bool_parameter, file_parameter],
+        outputFileIds=engine_state_summary.files,
     )
     decoy.verify(
         mock_run_store.insert_csv_rtp(
@@ -287,6 +303,7 @@ async def test_create_engine_error(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
+    mock_file_provider: FileProvider,
     subject: RunDataManager,
 ) -> None:
     """It should not create a resource if engine creation fails."""
@@ -310,7 +327,7 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
-            file_provider=FileProvider(),
+            file_provider=mock_file_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -325,7 +342,7 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
-            file_provider=FileProvider(),
+            file_provider=mock_file_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -379,6 +396,7 @@ async def test_get_current_run(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         runTimeParameters=run_time_parameters,
+        outputFileIds=engine_state_summary.files,
     )
     assert subject.current_run_id == run_id
 
@@ -421,6 +439,7 @@ async def test_get_historical_run(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         runTimeParameters=run_time_parameters,
+        outputFileIds=engine_state_summary.files,
     )
 
 
@@ -464,6 +483,7 @@ async def test_get_historical_run_no_data(
         modules=[],
         liquids=[],
         runTimeParameters=run_time_parameters,
+        outputFileIds=[],
     )
 
 
@@ -565,6 +585,7 @@ async def test_get_all_runs(
             modules=historical_run_data.modules,
             liquids=historical_run_data.liquids,
             runTimeParameters=historical_run_time_parameters,
+            outputFileIds=historical_run_data.files,
         ),
         Run(
             current=True,
@@ -581,6 +602,7 @@ async def test_get_all_runs(
             modules=current_run_data.modules,
             liquids=current_run_data.liquids,
             runTimeParameters=current_run_time_parameters,
+            outputFileIds=current_run_data.files,
         ),
     ]
 
@@ -679,6 +701,7 @@ async def test_update_current(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         runTimeParameters=run_time_parameters,
+        outputFileIds=engine_state_summary.files,
     )
 
 
@@ -735,6 +758,7 @@ async def test_update_current_noop(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         runTimeParameters=run_time_parameters,
+        outputFileIds=engine_state_summary.files,
     )
 
 
@@ -764,6 +788,7 @@ async def test_create_archives_existing(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
+    mock_file_provider: FileProvider,
     subject: RunDataManager,
 ) -> None:
     """It should persist the previously current run when a new run is created."""
@@ -797,7 +822,7 @@ async def test_create_archives_existing(
             protocol=None,
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
             deck_configuration=[],
-            file_provider=FileProvider(),
+            file_provider=mock_file_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -818,7 +843,7 @@ async def test_create_archives_existing(
         labware_offsets=[],
         protocol=None,
         deck_configuration=[],
-        file_provider=FileProvider(),
+        file_provider=mock_file_provider,
         run_time_param_values=None,
         run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,

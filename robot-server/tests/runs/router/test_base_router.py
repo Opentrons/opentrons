@@ -69,7 +69,9 @@ from robot_server.runs.router.base_router import (
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from opentrons.protocol_engine.resources import FileProvider
+from opentrons.protocol_engine.resources.file_provider import (
+    FileProvider,
+)
 from robot_server.file_provider.provider import FileProviderWrapper
 
 
@@ -130,6 +132,7 @@ async def test_create_run(
     mock_file_provider_wrapper: FileProviderWrapper,
     mock_protocol_store: ProtocolStore,
     mock_data_files_store: DataFilesStore,
+    mock_file_provider: FileProvider,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -148,6 +151,7 @@ async def test_create_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
     decoy.when(
@@ -160,7 +164,7 @@ async def test_create_run(
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
-            file_provider=FileProvider(),
+            file_provider=mock_file_provider,
             protocol=None,
             run_time_param_values=None,
             run_time_param_paths=None,
@@ -180,7 +184,7 @@ async def test_create_run(
         run_auto_deleter=mock_run_auto_deleter,
         quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
-        file_provider_wrapper=mock_file_provider_wrapper,
+        file_provider=mock_file_provider,
         notify_publishers=mock_notify_publishers,
         protocol_store=mock_protocol_store,
         check_estop=True,
@@ -199,7 +203,7 @@ async def test_create_protocol_run(
     mock_run_auto_deleter: RunAutoDeleter,
     mock_deck_configuration_store: DeckConfigurationStore,
     mock_data_files_store: DataFilesStore,
-    mock_file_provider_wrapper: FileProviderWrapper,
+    mock_file_provider: FileProvider,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -235,6 +239,7 @@ async def test_create_protocol_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
     decoy.when(mock_data_files_store.get("file-id")).then_return(
@@ -258,7 +263,7 @@ async def test_create_protocol_run(
             created_at=run_created_at,
             labware_offsets=[],
             deck_configuration=[],
-            file_provider=FileProvider(),
+            file_provider=mock_file_provider,
             protocol=protocol_resource,
             run_time_param_values={"foo": "bar"},
             run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
@@ -283,7 +288,7 @@ async def test_create_protocol_run(
         run_auto_deleter=mock_run_auto_deleter,
         quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
-        file_provider_wrapper=mock_file_provider_wrapper,
+        file_provider=mock_file_provider,
         notify_publishers=mock_notify_publishers,
         check_estop=True,
     )
@@ -302,7 +307,7 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_run_auto_deleter: RunAutoDeleter,
     mock_data_files_store: DataFilesStore,
     mock_data_files_directory: Path,
-    mock_file_provider_wrapper: FileProviderWrapper,
+    mock_file_provider: FileProvider,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -319,7 +324,7 @@ async def test_create_protocol_run_bad_protocol_id(
             run_data_manager=mock_run_data_manager,
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
-            file_provider_wrapper=mock_file_provider_wrapper,
+            file_provider=mock_file_provider,
             run_id="run-id",
             created_at=datetime.now(),
             run_auto_deleter=mock_run_auto_deleter,
@@ -340,7 +345,7 @@ async def test_create_run_conflict(
     mock_protocol_store: ProtocolStore,
     mock_data_files_store: DataFilesStore,
     mock_data_files_directory: Path,
-    mock_file_provider_wrapper: FileProviderWrapper,
+    mock_file_provider: FileProvider,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -354,7 +359,7 @@ async def test_create_run_conflict(
             created_at=created_at,
             labware_offsets=[],
             deck_configuration=[],
-            file_provider=FileProvider(),
+            file_provider=mock_file_provider,
             protocol=None,
             run_time_param_values=None,
             run_time_param_paths=None,
@@ -374,7 +379,7 @@ async def test_create_run_conflict(
             deck_configuration_store=mock_deck_configuration_store,
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
-            file_provider_wrapper=mock_file_provider_wrapper,
+            file_provider=mock_file_provider,
             notify_publishers=mock_notify_publishers,
             check_estop=True,
         )
@@ -401,6 +406,7 @@ async def test_get_run_data_from_url(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -448,6 +454,7 @@ async def test_get_run() -> None:
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -494,6 +501,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -510,6 +518,7 @@ async def test_get_runs_not_empty(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -589,6 +598,7 @@ async def test_update_run_to_not_current(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -624,6 +634,7 @@ async def test_update_current_none_noop(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
 
