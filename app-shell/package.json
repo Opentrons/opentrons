@@ -24,9 +24,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": [
-      "**"
-    ]
+    "nohoist": ["**"]
   },
   "devDependencies": {
     "electron-notarize": "^1.2.1",
@@ -68,7 +66,7 @@
     "tempy": "1.0.1",
     "usb": "^2.11.0",
     "uuid": "3.2.1",
-    "winston": "3.1.0",
+    "winston": "3.15.0",
     "yargs-parser": "13.1.2"
   }
 }
