@@ -1,6 +1,7 @@
 export * from './Alerts'
 export * from './AnnouncementModal'
 export * from './AssignLiquidsModal'
+export * from './BlockingHintModal'
 export * from './DefineLiquidsModal'
 export * from './EditInstrumentsModal'
 export * from './EditNickNameModal'
