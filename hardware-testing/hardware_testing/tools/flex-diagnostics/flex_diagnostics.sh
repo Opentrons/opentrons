@@ -96,8 +96,8 @@ gather() {
             ps aux > $diag_dir/system/psaux.txt
             top -c -b -n 10 > $diag_dir/system/top.txt
             free -wl -c 10 -s 10 > $diag_dir/system/free.txt
-            date > $diag_dir/system/datetime.txt
-            timedatectl >> $diag_dir/system/datetime.txt
+            #date > $diag_dir/system/datetime.txt
+            #timedatectl >> $diag_dir/system/datetime.txt
             uptime > $diag_dir/system/uptime.txt
 
             echo "Gathering network info"
