@@ -3,6 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type, Dict, TYPE_CHECKING
 from typing_extensions import Literal
+from datetime import datetime
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
@@ -52,6 +53,19 @@ class LoadLiquidImplementation(
 
         self._state_view.labware.validate_liquid_allowed_in_labware(
             labware_id=params.labwareId, wells=params.volumeByWell
+        )
+        # do this in WellStore?!
+        labware_id = params.labwareId
+        well_name = next(iter(params.volumeByWell))
+        volume = next(iter(params.volumeByWell.values()))
+        height = self._state_view.geometry.get_well_height_at_volume(
+            labware_id=labware_id, well_name=well_name, volume=volume
+        )
+        self._state_view.wells.set_liquid_height(
+            labware_id=labware_id,
+            well_name=well_name,
+            height=height,
+            time=datetime.now(),
         )
 
         return SuccessData(public=LoadLiquidResult(), private=None)

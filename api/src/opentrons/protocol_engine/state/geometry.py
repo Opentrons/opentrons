@@ -1445,6 +1445,15 @@ class GeometryView:
             target_volume=final_volume, well_geometry=well_geometry
         )
 
+    def get_well_height_at_volume(
+        self, labware_id: str, well_name: str, volume: float
+    ) -> float:
+        """Convert well volume to height."""
+        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
+        return find_height_at_well_volume(
+            target_volume=volume, well_geometry=well_geometry
+        )
+
     def validate_dispense_volume_into_well(
         self,
         labware_id: str,

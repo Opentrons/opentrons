@@ -127,3 +127,12 @@ class WellView(HasState[WellState]):
             )
         except KeyError:
             return False
+
+    def set_liquid_height(
+        self, labware_id: str, well_name: str, height: float, time: datetime
+    ) -> None:
+        """Set the liquid height of the well."""
+        lhi = LiquidHeightInfo(height=height, last_measured=time)
+        if labware_id not in self._state.measured_liquid_heights:
+            self._state.measured_liquid_heights[labware_id] = {}
+        self._state.measured_liquid_heights[labware_id][well_name] = lhi
