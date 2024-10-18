@@ -24,6 +24,7 @@ from robot_server.runs.run_orchestrator_store import (
     NoRunOrchestrator,
     handle_estop_event,
 )
+from opentrons.protocol_engine.resources import FileProvider
 
 
 def mock_notify_publishers() -> None:
@@ -61,6 +62,7 @@ async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> Non
         labware_offsets=[],
         initial_error_recovery_policy=never_recover,
         protocol=None,
+        file_provider=FileProvider(),
         deck_configuration=[],
         notify_publishers=mock_notify_publishers,
     )
@@ -90,6 +92,7 @@ async def test_create_engine_uses_robot_type(
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -112,6 +115,7 @@ async def test_create_engine_with_labware_offsets(
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -136,6 +140,7 @@ async def test_archives_state_if_engine_already_exists(
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -146,6 +151,7 @@ async def test_archives_state_if_engine_already_exists(
             initial_error_recovery_policy=never_recover,
             deck_configuration=[],
             protocol=None,
+            file_provider=FileProvider(),
             notify_publishers=mock_notify_publishers,
         )
 
@@ -160,6 +166,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -182,6 +189,7 @@ async def test_clear_engine_not_stopped_or_idle(
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -198,6 +206,7 @@ async def test_clear_idle_engine(subject: RunOrchestratorStore) -> None:
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -250,6 +259,7 @@ async def test_get_default_orchestrator_current_unstarted(
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -265,6 +275,7 @@ async def test_get_default_orchestrator_conflict(subject: RunOrchestratorStore) 
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
     subject.play()
@@ -283,6 +294,7 @@ async def test_get_default_orchestrator_run_stopped(
         initial_error_recovery_policy=never_recover,
         deck_configuration=[],
         protocol=None,
+        file_provider=FileProvider(),
         notify_publishers=mock_notify_publishers,
     )
     await subject.finish(error=None)

@@ -47,6 +47,7 @@ stages:
               location: !anydict
           labwareOffsets: []
           runTimeParameters: []
+          outputFileIds: []
           liquids:
             - id: waterId
               displayName: Water

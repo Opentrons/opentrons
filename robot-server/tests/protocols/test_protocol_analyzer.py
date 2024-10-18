@@ -190,6 +190,7 @@ async def test_analyze(
                 labwareOffsets=[],
                 liquids=[],
                 wells=[],
+                files=[],
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[bool_parameter],

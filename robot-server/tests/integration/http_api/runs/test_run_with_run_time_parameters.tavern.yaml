@@ -115,6 +115,7 @@ stages:
               file:
                 id: '{data_file_id}'
                 name: sample_plates.csv
+          outputFileIds: []
           liquids: []
           protocolId: '{protocol_id}'
 

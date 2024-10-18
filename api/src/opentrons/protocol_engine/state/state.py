@@ -29,6 +29,7 @@ from .tips import TipState, TipView, TipStore
 from .wells import WellState, WellView, WellStore
 from .geometry import GeometryView
 from .motion import MotionView
+from .files import FileView, FileState, FileStore
 from .config import Config
 from .state_summary import StateSummary
 from ..types import DeckConfigurationType
@@ -50,6 +51,7 @@ class State:
     liquids: LiquidState
     tips: TipState
     wells: WellState
+    files: FileState
 
 
 class StateView(HasState[State]):
@@ -66,6 +68,7 @@ class StateView(HasState[State]):
     _wells: WellView
     _geometry: GeometryView
     _motion: MotionView
+    _files: FileView
     _config: Config
 
     @property
@@ -119,6 +122,11 @@ class StateView(HasState[State]):
         return self._motion
 
     @property
+    def files(self) -> FileView:
+        """Get state view selectors for engine create file state."""
+        return self._files
+
+    @property
     def config(self) -> Config:
         """Get ProtocolEngine configuration."""
         return self._config
@@ -139,6 +147,7 @@ class StateView(HasState[State]):
             liquids=self._liquid.get_all(),
             wells=self._wells.get_all(),
             hasEverEnteredErrorRecovery=self._commands.get_has_entered_recovery_mode(),
+            files=self._state.files.file_ids,
         )
 
 
@@ -206,6 +215,7 @@ class StateStore(StateView, ActionHandler):
         self._liquid_store = LiquidStore()
         self._tip_store = TipStore()
         self._well_store = WellStore()
+        self._file_store = FileStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -216,6 +226,7 @@ class StateStore(StateView, ActionHandler):
             self._liquid_store,
             self._tip_store,
             self._well_store,
+            self._file_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -333,6 +344,7 @@ class StateStore(StateView, ActionHandler):
             liquids=self._liquid_store.state,
             tips=self._tip_store.state,
             wells=self._well_store.state,
+            files=self._file_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -349,6 +361,7 @@ class StateStore(StateView, ActionHandler):
         self._liquid = LiquidView(state.liquids)
         self._tips = TipView(state.tips)
         self._wells = WellView(state.wells)
+        self._files = FileView(state.files)
 
         # Derived states
         self._geometry = GeometryView(

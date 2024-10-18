@@ -14,7 +14,7 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons.protocol_engine.commands.command import SuccessData
 
 from ..state.state import StateStore
-from ..resources import ModelUtils
+from ..resources import ModelUtils, FileProvider
 from ..commands import CommandStatus
 from ..actions import (
     ActionDispatcher,
@@ -72,6 +72,7 @@ class CommandExecutor:
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
+        file_provider: FileProvider,
         state_store: StateStore,
         action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
@@ -88,6 +89,7 @@ class CommandExecutor:
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
         self._hardware_api = hardware_api
+        self._file_provider = file_provider
         self._state_store = state_store
         self._action_dispatcher = action_dispatcher
         self._equipment = equipment
@@ -116,6 +118,7 @@ class CommandExecutor:
         command_impl = queued_command._ImplementationCls(
             state_view=self._state_store,
             hardware_api=self._hardware_api,
+            file_provider=self._file_provider,
             equipment=self._equipment,
             movement=self._movement,
             gantry_mover=self._gantry_mover,

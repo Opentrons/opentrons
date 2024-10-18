@@ -52,6 +52,7 @@ stages:
               description: Liquid H2O
               displayColor: '#7332a8'
           runTimeParameters: []
+          outputFileIds: []
           protocolId: '{protocol_id}'
 
   - name: Execute a setup command

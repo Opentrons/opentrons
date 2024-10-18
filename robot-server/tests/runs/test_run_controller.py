@@ -72,6 +72,7 @@ def engine_state_summary() -> StateSummary:
         modules=[],
         liquids=[],
         wells=[],
+        files=[],
         hasEverEnteredErrorRecovery=False,
     )
 

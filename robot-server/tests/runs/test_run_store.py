@@ -132,6 +132,7 @@ def state_summary() -> StateSummary:
         status=EngineStatus.IDLE,
         liquids=liquids,
         wells=[],
+        files=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -216,6 +217,7 @@ def invalid_state_summary() -> StateSummary:
         status=EngineStatus.IDLE,
         liquids=liquids,
         wells=[],
+        files=[],
     )
 
 

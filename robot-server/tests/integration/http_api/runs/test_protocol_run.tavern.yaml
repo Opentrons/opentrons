@@ -44,6 +44,7 @@ stages:
               location: !anydict
           labwareOffsets: []
           runTimeParameters: []
+          outputFileIds: []
           protocolId: '{protocol_id}'
           liquids: []
       save:
@@ -240,6 +241,7 @@ stages:
           startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           liquids: []
           runTimeParameters: []
+          outputFileIds: []
           completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           errors: []
           hasEverEnteredErrorRecovery: False
