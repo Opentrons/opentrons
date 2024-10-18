@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -13,6 +11,7 @@ import {
   getModuleDisplayLocation,
 } from '/app/local-resources/modules'
 
+import type { TFunction } from 'i18next'
 import type {
   RobotType,
   LabwareLocation,
@@ -22,24 +21,28 @@ import type { LoadedModules } from '/app/local-resources/modules'
 import type { LoadedLabwares } from '/app/local-resources/labware'
 
 export interface UseLabwareDisplayLocationProps {
+  location: LabwareLocation | null
   loadedModules: LoadedModules
   loadedLabwares: LoadedLabwares
   allRunDefs: LabwareDefinition2[]
-  location: LabwareLocation
   robotType: RobotType
+  t: TFunction
   isOnDevice?: boolean
 }
 
-export function useLabwareDisplayLocation({
+export function getLabwareDisplayLocation({
   loadedLabwares,
   loadedModules,
   allRunDefs,
   location,
   robotType,
-  isOnDevice,
+  t,
+  isOnDevice = false,
 }: UseLabwareDisplayLocationProps): string {
-  const { t } = useTranslation('protocol_command_text')
-
+  if (location == null) {
+    console.warn('Cannot get labware display location. No location provided.')
+    return ''
+  }
   if (location === 'offDeck') {
     return t('off_deck')
   } else if ('slotName' in location) {

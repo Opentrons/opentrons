@@ -3,7 +3,8 @@ import type {
   MoveToAddressableAreaParams,
 } from '@opentrons/shared-data'
 import type { TFunction } from 'i18next'
-import type { CommandTextData } from '../types'
+
+import type { CommandTextData } from '/app/local-resources/commands'
 
 export function getAddressableAreaDisplayName(
   commandTextData: CommandTextData,

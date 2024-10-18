@@ -38,7 +38,7 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type {

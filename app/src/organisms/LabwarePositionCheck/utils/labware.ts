@@ -5,7 +5,7 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from '/app/transformations/commands'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,

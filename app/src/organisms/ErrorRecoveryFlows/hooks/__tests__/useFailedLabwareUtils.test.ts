@@ -206,7 +206,7 @@ describe('useRelevantFailedLwLocations', () => {
 
     expect(result.current).toEqual({
       currentLoc: '',
-      newLoc: '',
+      newLoc: null,
     })
   })
 })
