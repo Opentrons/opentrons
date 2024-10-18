@@ -164,6 +164,11 @@ class LiquidHandler(
         """
         ...
 
+    async def tip_drop_moves(
+        self, mount: MountArgType, home_after: bool = True
+    ) -> None:
+        ...
+
     async def drop_tip(
         self,
         mount: MountArgType,

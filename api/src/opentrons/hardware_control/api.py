@@ -1241,10 +1241,10 @@ class API(
         if prep_after:
             await self.prepare_for_aspirate(mount)
 
-    async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
-        """Drop tip at the current location."""
-
-        spec, _remove = self.plan_check_drop_tip(mount, home_after)
+    async def tip_drop_moves(
+        self, mount: top_types.Mount, home_after: bool = True
+    ) -> None:
+        spec, _ = self.plan_check_drop_tip(mount, home_after)
 
         for move in spec.drop_moves:
             self._backend.set_active_current(move.current)
@@ -1272,7 +1272,20 @@ class API(
             await self.move_rel(mount, shake[0], speed=shake[1])
 
         self._backend.set_active_current(spec.ending_current)
-        _remove()
+
+    async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
+        """Drop tip at the current location."""
+        await self.tip_drop_moves(mount, home_after)
+
+        # todo(mm, 2024-10-17): Ideally, callers would be able to replicate the behavior
+        # of this method via self.drop_tip_moves() plus other public methods. This
+        # currently prevents that: there is no public equivalent for
+        # instrument.set_current_volume().
+        instrument = self.get_pipette(mount)
+        instrument.set_current_volume(0)
+
+        self.set_current_tiprack_diameter(mount, 0.0)
+        await self.remove_tip(mount)
 
     async def create_simulating_module(
         self,
