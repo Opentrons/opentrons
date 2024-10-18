@@ -4,13 +4,19 @@ import { Landing } from './pages/Landing'
 import type { RouteProps } from './resources/types'
 
 const opentronsAIRoutes: RouteProps[] = [
-  // new routes can be added here
-  // {
-  //   Component: Landing,
-  //   name: 'Test',
-  //   navLinkTo: '/test',
-  //   path: '/test',
-  // },
+  // replace Landing with the correct component
+  {
+    Component: Landing,
+    name: 'Create A New Protocol',
+    navLinkTo: '/new-protocol',
+    path: '/new-protocol',
+  },
+  {
+    Component: Landing,
+    name: 'Update An Existing Protocol',
+    navLinkTo: '/update-protocol',
+    path: '/update-protocol',
+  },
 ]
 
 export function OpentronsAIRoutes(): JSX.Element {

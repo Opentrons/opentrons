@@ -13,13 +13,26 @@ import {
 } from '@opentrons/components'
 import welcomeImage from '../../assets/images/welcome_dashboard.png'
 import { useTranslation } from 'react-i18next'
+import { useIsMobile } from '../../resources/hooks/useIsMobile'
+import { useNavigate } from 'react-router-dom'
 
 export interface InputType {
   userPrompt: string
 }
 
 export function Landing(): JSX.Element | null {
+  const navigate = useNavigate()
   const { t } = useTranslation('protocol_generator')
+  const isMobile = useIsMobile()
+
+  function handleCreateNewProtocol(): void {
+    // add analytics in these handlers
+    navigate('/new-protocol')
+  }
+
+  function handleUpdateProtocol(): void {
+    navigate('/update-protocol')
+  }
 
   return (
     <Flex
@@ -43,21 +56,29 @@ export function Landing(): JSX.Element | null {
           src={welcomeImage}
           height="132px"
           width="548px"
-          aria-label={t('landing_page_image_alt')}
+          alt={t('landing_page_image_alt')}
         />
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText desktopStyle="headingLargeBold">
             {t('landing_page_heading')}
           </StyledText>
           <StyledText desktopStyle="headingSmallRegular">
-            {t('landing_page_body')}
+            {!isMobile ? t('landing_page_body') : t('landing_page_body_mobile')}
           </StyledText>
         </Flex>
-        <LargeButton buttonText={t('landing_page_button_new_protocol')} />
-        <LargeButton
-          buttonText={t('landing_page_button_update_protocol')}
-          buttonType="stroke"
-        />
+        {!isMobile && (
+          <>
+            <LargeButton
+              buttonText={t('landing_page_button_new_protocol')}
+              onClick={handleCreateNewProtocol}
+            />
+            <LargeButton
+              buttonText={t('landing_page_button_update_protocol')}
+              buttonType="stroke"
+              onClick={handleUpdateProtocol}
+            />
+          </>
+        )}
       </Flex>
     </Flex>
   )
