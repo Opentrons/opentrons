@@ -13,14 +13,20 @@ import { useAtom } from 'jotai'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loading } from './molecules/Loading'
-import { tokenAtom } from './resources/atoms'
+import { mixpanelAtom, tokenAtom } from './resources/atoms'
 import { useGetAccessToken } from './resources/hooks'
+import { initializeMixpanel } from './analytics/mixpanel'
+import { useTrackEvent } from './resources/hooks/useTrackEvent'
 
 export function OpentronsAI(): JSX.Element | null {
   const { t } = useTranslation('protocol_generator')
   const { isAuthenticated, logout, isLoading, loginWithRedirect } = useAuth0()
   const [, setToken] = useAtom(tokenAtom)
+  const [mixpanel] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
+  const trackEvent = useTrackEvent()
+
+  initializeMixpanel(mixpanel)
 
   const fetchAccessToken = async (): Promise<void> => {
     try {
@@ -39,6 +45,12 @@ export function OpentronsAI(): JSX.Element | null {
       void fetchAccessToken()
     }
   }, [isAuthenticated, isLoading, loginWithRedirect])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      trackEvent({ name: 'user-login', properties: {} })
+    }
+  }, [isAuthenticated])
 
   if (isLoading) {
     return <Loading />

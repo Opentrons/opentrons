@@ -30,3 +30,15 @@ export interface RouteProps {
   path: string
   navLinkTo: string
 }
+
+export interface Mixpanel {
+  analytics: {
+    hasOptedIn: boolean
+  }
+}
+
+export interface AnalyticsEvent {
+  name: string
+  properties: Record<string, unknown>
+  superProperties?: Record<string, unknown>
+}
