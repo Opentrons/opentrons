@@ -19,14 +19,14 @@ async def _main(is_simulating: bool) -> None:
     await api.home_plunger(mount)
 
     # move the plunger based on volume (aspirate/dispense)
-    await api.add_tip(mount, tip_length=10)
+    api.add_tip(mount, tip_length=10)
     await api.prepare_for_aspirate(mount)
     max_vol = pipette.working_volume
     for vol in [max_vol, max_vol / 2, max_vol / 10]:
         await api.aspirate(mount, volume=vol)
         await api.dispense(mount, volume=vol)
         await api.prepare_for_aspirate(mount)
-    await api.remove_tip(mount)
+    api.remove_tip(mount)
 
     # move the plunger based on position (millimeters)
     plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
