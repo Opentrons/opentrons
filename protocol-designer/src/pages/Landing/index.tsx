@@ -77,16 +77,14 @@ export function Landing(): JSX.Element {
           </StyledText>
         </Flex>
       </Flex>
-      <LargeButton
-        onClick={() => {
-          dispatch(toggleNewProtocolModal(true))
-        }}
-        buttonText={
-          <StyledNavLink to={'/createNew'}>
-            <ButtonText>{t('create_a_protocol')}</ButtonText>
-          </StyledNavLink>
-        }
-      />
+      <StyledNavLink to={'/createNew'}>
+        <LargeButton
+          onClick={() => {
+            dispatch(toggleNewProtocolModal(true))
+          }}
+          buttonText={<ButtonText>{t('create_a_protocol')}</ButtonText>}
+        />
+      </StyledNavLink>
       <StyledLabel>
         <Flex css={BUTTON_LINK_STYLE}>
           <StyledText desktopStyle="bodyLargeRegular">
