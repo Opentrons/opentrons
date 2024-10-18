@@ -17,7 +17,7 @@ def subject(
 
 def test_error_recovery_setting_store(subject: ErrorRecoverySettingStore) -> None:
     """Test `ErrorRecoverySettingStore`."""
-    assert subject.get_is_enabled() is None
+    assert subject.get_is_enabled() is True
 
     subject.set_is_enabled(is_enabled=False)
     assert subject.get_is_enabled() is False
@@ -26,4 +26,4 @@ def test_error_recovery_setting_store(subject: ErrorRecoverySettingStore) -> Non
     assert subject.get_is_enabled() is True
 
     subject.set_is_enabled(is_enabled=None)
-    assert subject.get_is_enabled() is None
+    assert subject.get_is_enabled() is True

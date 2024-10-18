@@ -23,6 +23,7 @@ import {
 
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
+import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import {
   DEV_INTERNAL_FLAGS,
   getApplyHistoricOffsets,
@@ -31,6 +32,7 @@ import {
   toggleDevInternalFlag,
   toggleDevtools,
   toggleHistoricOffsets,
+  updateConfigValue,
   useFeatureFlag,
 } from '/app/redux/config'
 import { InlineNotification } from '/app/atoms/InlineNotification'
@@ -84,6 +86,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation />
@@ -175,6 +179,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="reticle"
           rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
           onClick={() => dispatch(toggleHistoricOffsets())}
+        />
+        <RobotSettingButton
+          settingName={t('app_settings:error_recovery_mode')}
+          dataTestId="RobotSettingButton_error_recovery_mode"
+          settingInfo={t('app_settings:error_recovery_mode_description')}
+          iconName="recovery"
+          rightElement={<OnOffToggle isOn={isEREnabled} />}
+          onClick={toggleERSettings}
         />
         <RobotSettingButton
           settingName={t('device_reset')}
@@ -273,6 +285,7 @@ function FeatureFlags(): JSX.Element {
 
 function LanguageToggle(): JSX.Element | null {
   const enableLocalization = useFeatureFlag('enableLocalization')
+  const dispatch = useDispatch<Dispatch>()
 
   const { i18n } = useContext(I18nContext)
 
@@ -280,9 +293,9 @@ function LanguageToggle(): JSX.Element | null {
     <RobotSettingButton
       settingName={`Change Language: ${i18n.language}`}
       onClick={() => {
-        void (i18n.language === 'en'
-          ? i18n.changeLanguage('zh')
-          : i18n.changeLanguage('en'))
+        i18n.language === 'en'
+          ? dispatch(updateConfigValue('language.appLanguage', 'zh'))
+          : dispatch(updateConfigValue('language.appLanguage', 'en'))
       }}
       rightElement={<></>}
     />

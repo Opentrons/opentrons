@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List, Optional
 
 from opentrons_shared_data.robot.types import RobotType
 
@@ -79,7 +79,9 @@ LocationLabware = Union[
 
 
 class Location:
-    """A location to target as a motion.
+    """Location(point: Point, labware: Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"])
+
+    A location to target as a motion.
 
     The location contains a :py:class:`.Point` (in
     :ref:`protocol-api-deck-coords`) and possibly an associated
@@ -116,10 +118,13 @@ class Location:
             None,
             "ModuleContext",
         ],
+        *,
+        _ot_internal_is_meniscus: Optional[bool] = None,
     ):
         self._point = point
         self._given_labware = labware
         self._labware = LabwareLike(labware)
+        self._is_meniscus = _ot_internal_is_meniscus
 
     # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
     # in the rendered docs, and then update the class docstring to use cross-references.
@@ -131,6 +136,10 @@ class Location:
     @property
     def labware(self) -> LabwareLike:
         return self._labware
+
+    @property
+    def is_meniscus(self) -> Optional[bool]:
+        return self._is_meniscus
 
     def __iter__(self) -> Iterator[Union[Point, LabwareLike]]:
         """Iterable interface to support unpacking. Like a tuple.
@@ -148,6 +157,7 @@ class Location:
             isinstance(other, Location)
             and other._point == self._point
             and other._labware == self._labware
+            and other._is_meniscus == self._is_meniscus
         )
 
     def move(self, point: Point) -> "Location":
@@ -173,7 +183,7 @@ class Location:
         return Location(point=self.point + point, labware=self._given_labware)
 
     def __repr__(self) -> str:
-        return f"Location(point={repr(self._point)}, labware={self._labware})"
+        return f"Location(point={repr(self._point)}, labware={self._labware}, is_meniscus={self._is_meniscus if self._is_meniscus is not None else False})"
 
 
 # TODO(mc, 2020-10-22): use MountType implementation for Mount

@@ -698,8 +698,8 @@ async def test_create_policies(
         run_data_manager=mock_run_data_manager,
     )
     decoy.verify(
-        mock_run_data_manager.set_policies(
-            run_id="rud-id", policies=policies.policyRules
+        mock_run_data_manager.set_error_recovery_rules(
+            run_id="rud-id", rules=policies.policyRules
         )
     )
 
@@ -710,8 +710,8 @@ async def test_create_policies_raises_not_active_run(
     """It should raise that the run is not current."""
     policies = decoy.mock(cls=ErrorRecoveryPolicy)
     decoy.when(
-        mock_run_data_manager.set_policies(
-            run_id="rud-id", policies=policies.policyRules
+        mock_run_data_manager.set_error_recovery_rules(
+            run_id="rud-id", rules=policies.policyRules
         )
     ).then_raise(RunNotCurrentError())
     with pytest.raises(ApiError) as exc_info:

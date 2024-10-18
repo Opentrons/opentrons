@@ -1,5 +1,7 @@
 """Tests for the engine based Protocol API module core implementations."""
+from typing import cast
 import pytest
+from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
 from opentrons.drivers.types import ThermocyclerLidStatus
@@ -13,6 +15,8 @@ from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
+from ... import versions_below, versions_at_or_above
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -34,11 +38,41 @@ def subject(
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncThermocyclerHardware,
 ) -> ThermocyclerModuleCore:
-    """Get a HeaterShakerModuleCore test subject."""
+    """Get a ThermocyclerModuleCore test subject."""
     return ThermocyclerModuleCore(
         module_id="1234",
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
+        sync_module_hardware=mock_sync_module_hardware,
+    )
+
+
+@pytest.fixture(params=versions_below(APIVersion(2, 21), flex_only=False))
+def subject_below_221(
+    request: SubRequest,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: SyncThermocyclerHardware,
+) -> ThermocyclerModuleCore:
+    """Get a ThermocyclerCore below API version 2.21."""
+    return ThermocyclerModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=cast(APIVersion, request.param),
+        sync_module_hardware=mock_sync_module_hardware,
+    )
+
+
+@pytest.fixture(params=versions_at_or_above(APIVersion(2, 21)))
+def subject_at_or_above_221(
+    request: SubRequest,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: SyncThermocyclerHardware,
+) -> ThermocyclerModuleCore:
+    """Get a ThermocyclerCore below API version 2.21."""
+    return ThermocyclerModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=cast(APIVersion, request.param),
         sync_module_hardware=mock_sync_module_hardware,
     )
 
@@ -159,11 +193,13 @@ def test_wait_for_lid_temperature(
     )
 
 
-def test_execute_profile(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: ThermocyclerModuleCore
+def test_execute_profile_below_221(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject_below_221: ThermocyclerModuleCore,
 ) -> None:
     """It should run a thermocycler profile with the engine client."""
-    subject.execute_profile(
+    subject_below_221.execute_profile(
         steps=[{"temperature": 45.6, "hold_time_seconds": 12.3}],
         repetitions=2,
         block_max_volume=78.9,
@@ -182,6 +218,43 @@ def test_execute_profile(
                     ),
                 ],
                 blockMaxVolumeUl=78.9,
+            )
+        )
+    )
+
+
+def test_execute_profile_above_221(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject_at_or_above_221: ThermocyclerModuleCore,
+) -> None:
+    """It should run a thermocycler profile with the engine client."""
+    subject_at_or_above_221.execute_profile(
+        steps=[
+            {"temperature": 45.6, "hold_time_seconds": 12.3},
+            {"temperature": 78.9, "hold_time_seconds": 45.6},
+        ],
+        repetitions=2,
+        block_max_volume=25,
+    )
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.thermocycler.RunExtendedProfileParams(
+                moduleId="1234",
+                profileElements=[
+                    cmd.thermocycler.ProfileCycle(
+                        repetitions=2,
+                        steps=[
+                            cmd.thermocycler.ProfileStep(
+                                celsius=45.6, holdSeconds=12.3
+                            ),
+                            cmd.thermocycler.ProfileStep(
+                                celsius=78.9, holdSeconds=45.6
+                            ),
+                        ],
+                    )
+                ],
+                blockMaxVolumeUl=25,
             )
         )
     )

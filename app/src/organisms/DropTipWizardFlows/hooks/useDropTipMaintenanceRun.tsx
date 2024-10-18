@@ -17,7 +17,7 @@ export type UseDropTipMaintenanceRunParams = Omit<
   UseDTWithTypeParams,
   'instrumentModelSpecs' | 'mount'
 > & {
-  setErrorDetails?: (errorDetails: SetRobotErrorDetailsParams) => void
+  setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   instrumentModelSpecs?: PipetteModelSpecs
   mount?: PipetteData['mount']
 }
@@ -95,9 +95,7 @@ function useCreateDropTipMaintenanceRun({
         .catch((error: Error) => error)
     },
     onError: (error: Error) => {
-      if (setErrorDetails != null) {
-        setErrorDetails({ message: error.message })
-      }
+      setErrorDetails({ message: error.message })
     },
   })
 
@@ -108,11 +106,9 @@ function useCreateDropTipMaintenanceRun({
       instrumentModelName != null
     ) {
       createTargetedMaintenanceRun({}).catch((e: Error) => {
-        if (setErrorDetails != null) {
-          setErrorDetails({
-            message: `Error creating maintenance run: ${e.message}`,
-          })
-        }
+        setErrorDetails({
+          message: `Error creating maintenance run: ${e.message}`,
+        })
       })
     } else {
       console.warn(

@@ -22,6 +22,7 @@ from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
 )
 
+from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
@@ -33,6 +34,9 @@ from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
 from .run_models import Run, BadRun, RunDataError
 
 from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
+
+
+_INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
 
 def _build_run(
@@ -145,11 +149,13 @@ class RunDataManager:
         self,
         run_orchestrator_store: RunOrchestratorStore,
         run_store: RunStore,
+        error_recovery_setting_store: ErrorRecoverySettingStore,
         task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
     ) -> None:
         self._run_orchestrator_store = run_orchestrator_store
         self._run_store = run_store
+        self._error_recovery_setting_store = error_recovery_setting_store
         self._task_runner = task_runner
         self._runs_publisher = runs_publisher
 
@@ -190,6 +196,7 @@ class RunDataManager:
         """
         prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
+            # Allow clear() to propagate RunConflictError.
             prev_run_result = await self._run_orchestrator_store.clear()
             self._run_store.update_run_state(
                 run_id=prev_run_id,
@@ -197,9 +204,18 @@ class RunDataManager:
                 commands=prev_run_result.commands,
                 run_time_parameters=prev_run_result.parameters,
             )
+
+        error_recovery_is_enabled = self._error_recovery_setting_store.get_is_enabled()
+        initial_error_recovery_policy = (
+            error_recovery_mapping.create_error_recovery_policy_from_rules(
+                _INITIAL_ERROR_RECOVERY_RULES, error_recovery_is_enabled
+            )
+        )
+
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
+            initial_error_recovery_policy=initial_error_recovery_policy,
             deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
@@ -215,6 +231,7 @@ class RunDataManager:
         self._run_store.insert_csv_rtp(
             run_id=run_id, run_time_parameters=run_time_parameters
         )
+
         self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
             get_recovery_target_command=self.get_recovery_target_command,
@@ -498,16 +515,23 @@ class RunDataManager:
             run_id, include_fixit_commands
         )
 
-    def set_policies(self, run_id: str, policies: List[ErrorRecoveryRule]) -> None:
-        """Create run policy rules for error recovery."""
+    def set_error_recovery_rules(
+        self, run_id: str, rules: List[ErrorRecoveryRule]
+    ) -> None:
+        """Set the run's error recovery policy.
+
+        The input rules get combined with the global error recovery enabled/disabled
+        setting, which this method retrieves automatically.
+        """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
                 f"Cannot update {run_id} because it is not the current run."
             )
-        policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
-            policies
+        is_enabled = self._error_recovery_setting_store.get_is_enabled()
+        mapped_policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
+            rules, is_enabled
         )
-        self._run_orchestrator_store.set_error_recovery_policy(policy=policy)
+        self._run_orchestrator_store.set_error_recovery_policy(policy=mapped_policy)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._run_orchestrator_store.current_run_id:

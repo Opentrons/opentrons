@@ -28,6 +28,7 @@ export interface ToolboxProps {
   childrenPadding?: string
   subHeader?: JSX.Element | null
   secondaryHeaderButton?: JSX.Element
+  position?: string
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -41,12 +42,13 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     height = '100%',
     disableCloseButton = false,
     width = '19.5rem',
-    confirmButton,
     side = 'right',
     horizontalSide = 'bottom',
+    confirmButton,
     childrenPadding = SPACING.spacing16,
     subHeader,
     secondaryHeaderButton,
+    position = POSITION_FIXED,
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
@@ -67,23 +69,26 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     handleScroll()
   }, [slideOutRef])
 
-  const positionStyles = {
-    ...(side === 'right' && { right: '0' }),
-    ...(side === 'left' && { left: '0' }),
-    ...(horizontalSide === 'bottom' && { bottom: '0' }),
-    ...(horizontalSide === 'top' && { top: '5rem' }),
-  }
-
+  const positionStyles =
+    position === POSITION_FIXED
+      ? {
+          ...(side === 'right' && { right: '0' }),
+          ...(side === 'left' && { left: '0' }),
+          ...(horizontalSide === 'bottom' && { bottom: '0' }),
+          ...(horizontalSide === 'top' && { top: '5rem' }),
+        }
+      : {}
   return (
-    <Box
+    <Flex
       zIndex={10}
       cursor="auto"
-      position={POSITION_FIXED}
-      {...positionStyles}
       backgroundColor={COLORS.white}
       boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
       height={height}
+      {...positionStyles}
       borderRadius={BORDERS.borderRadius8}
+      minWidth="19.5rem"
+      flex="0"
     >
       <Flex
         width={width}
@@ -119,7 +124,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-        <Box borderBottom={`1px solid ${COLORS.grey30}`} />
         <Box
           padding={childrenPadding}
           flex="1 1 auto"
@@ -152,6 +156,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           </Box>
         ) : null}
       </Flex>
-    </Box>
+    </Flex>
   )
 }

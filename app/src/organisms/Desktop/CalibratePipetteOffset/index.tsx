@@ -22,6 +22,10 @@ import {
 } from '/app/organisms/Desktop/CalibrationPanels'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '/app/App/portal'
+import {
+  CalibrationError,
+  useCalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
 
 import type { Mount } from '@opentrons/components'
 import type {
@@ -54,11 +58,15 @@ const STEPS_IN_ORDER: CalibrationSessionStep[] = [
   Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
 ]
 
-export function CalibratePipetteOffset(
-  props: CalibratePipetteOffsetParentProps
-): JSX.Element | null {
+export function CalibratePipetteOffset({
+  session,
+  robotName,
+  dispatchRequests,
+  showSpinner,
+  isJogging,
+  requestIds,
+}: CalibratePipetteOffsetParentProps): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details ?? {}
 
@@ -72,6 +80,8 @@ export function CalibratePipetteOffset(
   } = useConditionalConfirm(() => {
     cleanUpAndExit()
   }, true)
+
+  const errorInfo = useCalibrationError(requestIds, session?.id)
 
   const tipRack: CalibrationLabware | null =
     labware != null ? labware.find(l => l.isTiprack) ?? null : null
@@ -146,6 +156,8 @@ export function CalibratePipetteOffset(
             sessionType: t('pipette_offset_calibration'),
           })}
         />
+      ) : errorInfo != null ? (
+        <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
       ) : (
         <Panel
           sendCommands={sendCommands}

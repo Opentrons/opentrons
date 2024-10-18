@@ -59,6 +59,7 @@ vi.mock('../RobotSettingsGripperCalibration')
 vi.mock('../RobotSettingsPipetteOffsetCalibration')
 vi.mock('../RobotSettingsTipLengthCalibration')
 vi.mock('../RobotSettingsModuleCalibration')
+vi.mock('/app/organisms/Desktop/CalibrationError')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,

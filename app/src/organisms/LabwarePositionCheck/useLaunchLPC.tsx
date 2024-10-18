@@ -61,12 +61,12 @@ export function useLaunchLPC(
         Promise.all(
           getLabwareDefinitionsFromCommands(
             mostRecentAnalysis?.commands ?? []
-          ).map(def =>
+          ).map(def => {
             createLabwareDefinition({
               maintenanceRunId: maintenanceRun?.data?.id,
               labwareDef: def,
             })
-          )
+          })
         ).then(() => {
           setMaintenanceRunId(maintenanceRun.data.id)
         })

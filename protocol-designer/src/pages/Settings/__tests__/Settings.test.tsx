@@ -46,6 +46,10 @@ describe('Settings', () => {
     screen.getByText('User settings')
     screen.getByText('Hints')
     screen.getByText('Reset all hints and tips notifications')
+    screen.getByText('Timeline editing tips')
+    screen.getByText(
+      'Show tips for working with steps next to the protocol timeline'
+    )
     screen.getByText('Reset hints')
     screen.getByText('Privacy')
     screen.getByText('Share sessions with Opentrons')
@@ -87,7 +91,7 @@ describe('Settings', () => {
     screen.getByText(
       'Turn off all restrictions on module placement and related pipette crash guidance.'
     )
-    fireEvent.click(screen.getByTestId('btn_PRERELEASE_MODE'))
+    fireEvent.click(screen.getByLabelText('Settings_PRERELEASE_MODE'))
     expect(vi.mocked(setFeatureFlags)).toHaveBeenCalled()
   })
 })

@@ -1,0 +1,31 @@
+# Use Python 3.10 as the base image
+FROM python:3.10-slim-bullseye
+
+# Update packages and install dependencies
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y git libsystemd-dev build-essential pkg-config network-manager
+
+# Define build arguments
+ARG OPENTRONS_VERSION=edge
+
+# Set the working directory
+WORKDIR /opentrons
+
+# Clone the Opentrons repository
+ARG CACHEBUST=1
+RUN git clone --branch $OPENTRONS_VERSION --depth 1 https://github.com/Opentrons/opentrons .
+
+# Install dependencies
+RUN make setup-py -j
+
+WORKDIR /opentrons/robot-server
+
+# Set the port via environment variable
+ENV PORT=31950
+
+# Expose the port
+EXPOSE ${PORT}
+
+# Default command
+CMD ["sh", "-c", "python -m pipenv run uvicorn robot_server.app:app --host 0.0.0.0 --port ${PORT} --ws wsproto --lifespan on"]

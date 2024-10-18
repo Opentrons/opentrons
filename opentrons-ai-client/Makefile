@@ -78,3 +78,7 @@ staging-deploy:
 .PHONY: prod-deploy
 prod-deploy:
 	aws s3 sync ./dist s3://prod-opentrons-ai-front-end/ --delete
+
+.PHONY: format-md-json
+format-md-json:
+	yarn prettier --ignore-path .eslintignore --write **/*.md **/*.json

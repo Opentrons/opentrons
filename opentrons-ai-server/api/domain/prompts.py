@@ -1,15 +1,16 @@
 import json
-import logging
 import uuid
 from typing import Any, Dict, Iterable
 
 import requests
+import structlog
+from ddtrace import tracer
 from openai.types.chat import ChatCompletionToolParam
 
 from api.settings import Settings
 
 settings: Settings = Settings()
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(settings.logger_name)
 
 
 def generate_unique_name() -> str:
@@ -17,13 +18,14 @@ def generate_unique_name() -> str:
     return unique_name
 
 
+@tracer.wrap()
 def send_post_request(payload: str) -> str:
     url = "https://Opentrons-simulator.hf.space/protocol"
     protocol_name: str = generate_unique_name()
     data = {"name": protocol_name, "content": payload}
     hf_token: str = settings.huggingface_api_key.get_secret_value()
     headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(hf_token)}
-
+    logger.info("Sending POST request to the simulate API", extra={"url": url, "protocolName": data["name"]})
     response = requests.post(url, json=data, headers=headers)
 
     if response.status_code != 200:

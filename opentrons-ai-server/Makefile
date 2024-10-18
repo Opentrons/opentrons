@@ -95,8 +95,8 @@ live-client:
 live-hf:
 	python -m pipenv run python -m tests.helpers.huggingface_client
 
-.PHONY: test-live
-test-live:
+.PHONY: live-test
+live-test:
 	python -m pipenv run python -m pytest tests -m live --env $(ENV)
 
 IMAGE_NAME=ai-server-local
@@ -115,7 +115,7 @@ run:
 	docker logs -f $(CONTAINER_NAME)
 
 .PHONY: clean
-clean:
+clean: gen-requirements
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 

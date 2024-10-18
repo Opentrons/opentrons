@@ -69,7 +69,6 @@ export function SubstepsToolbox(
           {t('shared:done')}
         </PrimaryButton>
       }
-      height="calc(100vh - 64px)"
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">
           {i18n.format(

@@ -1,9 +1,14 @@
+import os
 from pathlib import Path
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ENV_PATH: Path = Path(Path(__file__).parent.parent, ".env")
+
+
+def is_running_in_docker() -> bool:
+    return os.path.exists("/.dockerenv")
 
 
 class Settings(BaseSettings):
@@ -26,7 +31,7 @@ class Settings(BaseSettings):
     auth0_algorithms: str = "RS256"
     dd_version: str = "hardcoded_default_from_settings"
     allowed_origins: str = "*"
-    dd_logs_injection: str = "true"
+    dd_trace_enabled: str = "false"
     cpu: str = "1028"
     memory: str = "2048"
 
@@ -34,6 +39,16 @@ class Settings(BaseSettings):
     # These come from environment variables in the local and deployed execution environments
     openai_api_key: SecretStr = SecretStr("default_openai_api_key")
     huggingface_api_key: SecretStr = SecretStr("default_huggingface_api_key")
+
+    @property
+    def json_logging(self) -> bool:
+        if self.environment == "local" and not is_running_in_docker():
+            return False
+        return True
+
+    @property
+    def logger_name(self) -> str:
+        return "app.logger"
 
 
 def get_settings_from_json(json_str: str) -> Settings:

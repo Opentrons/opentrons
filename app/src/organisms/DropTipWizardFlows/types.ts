@@ -65,6 +65,7 @@ export type DropTipWizardContainerProps = DropTipWizardProps & {
  */
 export type ValidDropTipBlowoutLocation =
   | 'trash-bin'
+  | 'fixed-trash'
   | 'waste-chute'
   | 'labware'
   | 'deck'

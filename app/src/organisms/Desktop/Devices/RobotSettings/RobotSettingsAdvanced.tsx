@@ -18,6 +18,7 @@ import {
   DeviceReset,
   DisplayRobotName,
   EnableStatusLight,
+  EnableErrorRecoveryMode,
   FactoryMode,
   GantryHoming,
   LegacySettings,
@@ -209,6 +210,12 @@ export function RobotSettingsAdvanced({
               robotName={robotName}
               isEstopNotDisengaged={isEstopNotDisengaged}
             />
+          </>
+        ) : null}
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <EnableErrorRecoveryMode isRobotBusy={isRobotBusy} />
           </>
         ) : null}
         <Divider marginY={SPACING.spacing16} />

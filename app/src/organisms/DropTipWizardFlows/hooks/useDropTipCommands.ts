@@ -9,8 +9,6 @@ import type {
   CreateCommand,
   AddressableAreaName,
   PipetteModelSpecs,
-  DropTipInPlaceCreateCommand,
-  UnsafeDropTipInPlaceCreateCommand,
 } from '@opentrons/shared-data'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type { CommandData, PipetteData } from '@opentrons/api-client'
@@ -90,8 +88,11 @@ export function useDropTipCommands({
                 console.error(error.message)
               })
               .finally(() => {
-                closeFlow()
-                deleteMaintenanceRun(activeMaintenanceRunId)
+                deleteMaintenanceRun(activeMaintenanceRunId, {
+                  onSettled: () => {
+                    closeFlow()
+                  },
+                })
               })
           }
         }
@@ -325,19 +326,21 @@ const UPDATE_PLUNGER_ESTIMATORS: CreateCommand = {
 const buildDropTipInPlaceCommand = (
   isFlex: boolean,
   pipetteId: string | null
-): Array<DropTipInPlaceCreateCommand | UnsafeDropTipInPlaceCreateCommand> =>
+): CreateCommand[] =>
   isFlex
     ? [
         {
           commandType: 'unsafe/dropTipInPlace',
           params: { pipetteId: pipetteId ?? MANAGED_PIPETTE_ID },
         },
+        Z_HOME,
       ]
     : [
         {
           commandType: 'dropTipInPlace',
           params: { pipetteId: pipetteId ?? MANAGED_PIPETTE_ID },
         },
+        Z_HOME,
       ]
 
 const buildBlowoutCommands = (
@@ -366,6 +369,7 @@ const buildBlowoutCommands = (
             pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
           },
         },
+        Z_HOME,
       ]
     : [
         {
@@ -376,6 +380,7 @@ const buildBlowoutCommands = (
             flowRate: specs.defaultBlowOutFlowRate.value,
           },
         },
+        Z_HOME,
       ]
 
 const buildMoveToAACommand = (

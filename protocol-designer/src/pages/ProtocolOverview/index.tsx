@@ -11,13 +11,10 @@ import {
   Btn,
   DIRECTION_COLUMN,
   Flex,
-  InfoScreen,
   JUSTIFY_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
-  ListItem,
-  ListItemDescriptor,
   Modal,
   NO_WRAP,
   PrimaryButton,
@@ -26,12 +23,9 @@ import {
   StyledText,
   ToggleGroup,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
-import {
-  getPipetteSpecsV2,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   getAdditionalEquipmentEntities,
@@ -57,13 +51,15 @@ import {
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 import { getWarningContent } from './UnusedModalContent'
+import { ProtocolMetadata } from './ProtocolMetadata'
+import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
+import { StepsInfo } from './StepsInfo'
 
-import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 
-const REQUIRED_APP_VERSION = '8.0.0'
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
 
@@ -181,8 +177,6 @@ export function ProtocolOverview(): JSX.Element {
   }
 
   const pipettesOnDeck = Object.values(pipettes)
-  const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
-  const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
   const {
     protocolName,
     description,
@@ -333,152 +327,31 @@ export function ProtocolOverview(): JSX.Element {
             />
           </Flex>
         </Flex>
-        <Flex gridGap={SPACING.spacing80}>
+        <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
           <Flex
             flex="1.27"
             flexDirection={DIRECTION_COLUMN}
+            css={COLUMN_STYLE}
             gridGap={SPACING.spacing40}
           >
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('protocol_metadata')}
-                </StyledText>
-                <Flex padding={SPACING.spacing4}>
-                  <Btn
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    onClick={() => {
-                      setShowEditMetadataModal(true)
-                    }}
-                    css={BUTTON_LINK_STYLE}
-                    data-testid="ProtocolOverview_MetadataEditButton"
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('edit')}
-                    </StyledText>
-                  </Btn>
-                </Flex>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {metaDataInfo.map(info => {
-                  const [title, value] = Object.entries(info)[0]
-
-                  return (
-                    <ListItem type="noActive" key={`ProtocolOverview_${title}`}>
-                      <ListItemDescriptor
-                        type="default"
-                        description={t(`${title}`)}
-                        content={value ?? t('na')}
-                      />
-                    </ListItem>
-                  )
-                })}
-                <ListItem type="noActive" key="ProtocolOverview_robotVersion">
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('required_app_version')}
-                    content={t('app_version', {
-                      version: REQUIRED_APP_VERSION,
-                    })}
-                  />
-                </ListItem>
-              </Flex>
-            </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('instruments')}
-                </StyledText>
-                <Flex padding={SPACING.spacing4}>
-                  <Btn
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    onClick={() => {
-                      setShowEditInstrumentsModal(true)
-                    }}
-                    css={BUTTON_LINK_STYLE}
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('edit')}
-                    </StyledText>
-                  </Btn>
-                </Flex>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('robotType')}
-                    content={
-                      robotType === FLEX_ROBOT_TYPE
-                        ? t('shared:opentrons_flex')
-                        : t('shared:ot2')
-                    }
-                  />
-                </ListItem>
-                <ListItem type="noActive" key={`ProtocolOverview_left`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('left_pip')}
-                    content={
-                      leftPip != null
-                        ? getPipetteSpecsV2(leftPip.name as PipetteName)
-                            ?.displayName ?? t('na')
-                        : t('na')
-                    }
-                  />
-                </ListItem>
-                <ListItem type="noActive" key={`ProtocolOverview_right`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('right_pip')}
-                    content={
-                      rightPip != null
-                        ? getPipetteSpecsV2(rightPip.name as PipetteName)
-                            ?.displayName ?? t('na')
-                        : t('na')
-                    }
-                  />
-                </ListItem>
-                {robotType === FLEX_ROBOT_TYPE ? (
-                  <ListItem type="noActive" key={`ProtocolOverview_gripper`}>
-                    <ListItemDescriptor
-                      type="default"
-                      description={t('extension')}
-                      content={isGripperAttached ? t('gripper') : t('na')}
-                    />
-                  </ListItem>
-                ) : null}
-              </Flex>
-            </Flex>
+            <ProtocolMetadata
+              metaDataInfo={metaDataInfo}
+              setShowEditMetadataModal={setShowEditMetadataModal}
+            />
+            <InstrumentsInfo
+              robotType={robotType}
+              pipettesOnDeck={pipettesOnDeck}
+              additionalEquipment={additionalEquipment}
+              setShowEditInstrumentsModal={setShowEditInstrumentsModal}
+            />
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <Flex>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('step')}
-                </StyledText>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.keys(savedStepForms).length <= 1 ? (
-                  <InfoScreen content={t('no_steps')} />
-                ) : (
-                  <ListItem type="noActive" key="ProtocolOverview_Step">
-                    <ListItemDescriptor
-                      type="default"
-                      description={'Steps:'}
-                      content={(
-                        Object.keys(savedStepForms).length - 1
-                      ).toString()}
-                    />
-                  </ListItem>
-                )}
-              </Flex>
-            </Flex>
+            <StepsInfo savedStepForms={savedStepForms} />
           </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            flex="1"
+            css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
           >
             <Flex
@@ -516,11 +389,19 @@ export function ProtocolOverview(): JSX.Element {
                 }}
               />
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing32}
+              alignItems={ALIGN_CENTER}
+            >
               {deckView === leftString ? (
                 <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
               ) : (
-                <OffDeckThumbnail hover={hover} setHover={setHover} />
+                <OffDeckThumbnail
+                  hover={hover}
+                  setHover={setHover}
+                  width="100%"
+                />
               )}
               <SlotDetailsContainer
                 robotType={robotType}
@@ -542,4 +423,12 @@ const PROTOCOL_NAME_TEXT_STYLE = css`
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: 3;
+`
+
+const MIN_OVERVIEW_WIDTH = '64rem'
+const COLUMN_GRID_GAP = '5rem'
+const COLUMN_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  min-width: calc((${MIN_OVERVIEW_WIDTH} - ${COLUMN_GRID_GAP}) * 0.5);
+  flex: 1;
 `
