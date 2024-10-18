@@ -18,6 +18,4 @@ storybook-static
 **/.mypy_cache/**
 **/.pytest_cache/**
 
-# todo(mc, 2022-01-28): make these ignore rules more specific so we
-# format data files like markdown and JSON inside python projects
 python/**
