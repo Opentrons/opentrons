@@ -258,7 +258,7 @@ async def test_drop_tip(
     decoy.verify(
         await mock_hardware_api.tip_drop_moves(mount=Mount.RIGHT, home_after=True)
     )
-    decoy.verify(await mock_hardware_api.remove_tip(mount=Mount.RIGHT))
+    decoy.verify(mock_hardware_api.remove_tip(mount=Mount.RIGHT))
     decoy.verify(
         mock_hardware_api.set_current_tiprack_diameter(
             mount=Mount.RIGHT, tiprack_diameter=0
@@ -292,7 +292,7 @@ async def test_add_tip(
     await subject.add_tip(pipette_id="pipette-id", tip=tip)
 
     decoy.verify(
-        await mock_hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
+        mock_hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
         mock_hardware_api.set_current_tiprack_diameter(
             mount=Mount.LEFT,
             tiprack_diameter=5,
