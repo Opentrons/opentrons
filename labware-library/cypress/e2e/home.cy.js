@@ -1,7 +1,8 @@
+import { navigateToUrl } from '../support/e2e'
+
 describe('The Desktop Home Page', () => {
   beforeEach(() => {
-    cy.visit('/')
-    cy.viewport('macbook-15')
+    navigateToUrl('/')
   })
 
   it('successfully loads', () => {

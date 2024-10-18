@@ -83,3 +83,7 @@ Certain environment variables, when set, will affect the artifact output.
 | OT_LL_MIXPANEL_DEV_ID | some string ID                       | Mixpanel token for dev environment.                       |
 | OT_LL_VERSION         | semver string eg "1.2.3"             | reported to analytics. Read from package.json by default. |
 | OT_LL_BUILD_DATE      | result of `new Date().toUTCString()` | reported to analytics. Uses current date-time by default. |
+
+## Cypress
+
+`npx cypress open` will open the Cypress test runner. From there, you can run the tests in the `labware-library` directory.
