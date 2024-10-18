@@ -2686,7 +2686,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -2719,7 +2720,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -2752,7 +2754,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -2785,7 +2788,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -2818,7 +2822,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -2851,7 +2856,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
