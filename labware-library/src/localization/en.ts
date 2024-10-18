@@ -10,6 +10,7 @@ export const CATEGORY_LABELS_BY_CATEGORY = {
   trash: 'Trash',
   other: 'Other',
   adapter: 'Adapter',
+  lid: 'Lid',
 }
 
 export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
@@ -20,6 +21,7 @@ export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
   wellPlate: 'Well Plates',
   reservoir: 'Reservoirs',
   aluminumBlock: 'Aluminum Blocks',
+  lid: 'Lid',
   trash: 'Trashes',
   other: 'Other',
 }
