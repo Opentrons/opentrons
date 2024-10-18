@@ -9,10 +9,11 @@ import subprocess
 from datetime import datetime
 import os
 from abr_testing.data_collection.error_levels import ERROR_LEVELS_PATH
-from typing import List, Dict, Any, Tuple, Set, Optional
+from typing import List, Dict, Any, Tuple, Set
 import time as t
 import json
 import requests
+import sys
 from abr_testing.tools import plate_reader
 
 
@@ -106,44 +107,7 @@ def count_command_in_run_data(
     return total_command, avg_time
 
 
-def identify_labware_ids(
-    file_results: Dict[str, Any], labware_name: Optional[str]
-) -> List[str]:
-    """Determine what type of labware is being picked up."""
-    if labware_name:
-        labwares = file_results.get("labware", "")
-        list_of_labware_ids = []
-        if len(labwares) > 1:
-            for labware in labwares:
-                load_name = labware["loadName"]
-                if load_name == labware_name:
-                    labware_id = labware["id"]
-                    list_of_labware_ids.append(labware_id)
-    return list_of_labware_ids
-
-
-def match_pipette_to_action(
-    command_dict: Dict[str, Any],
-    commandTypes: List[str],
-    right_pipette: Optional[str],
-    left_pipette: Optional[str],
-) -> Tuple[int, int]:
-    """Match pipette id to id in command."""
-    right_pipette_add = 0
-    left_pipette_add = 0
-    for command in commandTypes:
-        command_type = command_dict["commandType"]
-        command_pipette = command_dict.get("pipetteId", "")
-        if command_type == command and command_pipette == right_pipette:
-            right_pipette_add = 1
-        elif command_type == command and command_pipette == left_pipette:
-            left_pipette_add = 1
-    return left_pipette_add, right_pipette_add
-
-
-def instrument_commands(
-    file_results: Dict[str, Any], labware_name: Optional[str]
-) -> Dict[str, float]:
+def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     """Count number of pipette and gripper commands per run."""
     pipettes = file_results.get("pipettes", "")
     commandData = file_results.get("commands", "")
@@ -156,9 +120,7 @@ def instrument_commands(
     right_pipette_id = ""
     left_pipette_id = ""
     gripper_pickups = 0.0
-    gripper_labware_of_interest = 0.0
     avg_liquid_probe_time_sec = 0.0
-    list_of_labware_ids = identify_labware_ids(file_results, labware_name)
     # Match pipette mount to id
     for pipette in pipettes:
         if pipette["mount"] == "right":
@@ -166,34 +128,30 @@ def instrument_commands(
         elif pipette["mount"] == "left":
             left_pipette_id = pipette["id"]
     for command in commandData:
-        # Count pick ups
-        single_left_pickup, single_right_pickup = match_pipette_to_action(
-            command, ["pickUpTip"], right_pipette_id, left_pipette_id
-        )
-        right_tip_pick_up += single_right_pickup
-        left_tip_pick_up += single_left_pickup
-        # Count aspirates
-        single_left_aspirate, single_right_aspirate = match_pipette_to_action(
-            command, ["aspirate"], right_pipette_id, left_pipette_id
-        )
-        right_aspirate += single_right_aspirate
-        left_aspirate += single_left_aspirate
-        # count dispenses/blowouts
-        single_left_dispense, single_right_dispense = match_pipette_to_action(
-            command, ["blowOut", "dispense"], right_pipette_id, left_pipette_id
-        )
-        right_dispense += single_right_dispense
-        left_dispense += single_left_dispense
-        # count gripper actions
         commandType = command["commandType"]
-        if (
+        # Count tip pick ups
+        if commandType == "pickUpTip":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                right_tip_pick_up += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                left_tip_pick_up += 1
+        # Count aspirates
+        elif commandType == "aspirate":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                right_aspirate += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                left_aspirate += 1
+        # count dispenses/blowouts
+        elif commandType == "dispense" or commandType == "blowout":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                right_dispense += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                left_dispense += 1
+        elif (
             commandType == "moveLabware"
             and command["params"]["strategy"] == "usingGripper"
         ):
             gripper_pickups += 1
-            labware_moving = command["params"]["labwareId"]
-            if labware_moving in list_of_labware_ids:
-                gripper_labware_of_interest += 1
     liquid_probes, avg_liquid_probe_time_sec = count_command_in_run_data(
         commandData, "liquidProbe", True
     )
@@ -205,7 +163,6 @@ def instrument_commands(
         "Right Pipette Total Aspirates": right_aspirate,
         "Right Pipette Total Dispenses": right_dispense,
         "Gripper Pick Ups": gripper_pickups,
-        f"Gripper Pick Ups of {labware_name}": gripper_labware_of_interest,
         "Total Liquid Probes": liquid_probes,
         "Average Liquid Probe Time (sec)": avg_liquid_probe_time_sec,
     }
@@ -221,12 +178,11 @@ def plate_reader_commands(
     initialize_count: int = 0
     read = "no"
     final_result = {}
-    read_num = 0
-    # Count Number of Reads per measure mode
+    # Count Number of Reads
     read_count, avg_read_time = count_command_in_run_data(
         commandData, "absorbanceReader/read", True
     )
-    # Count Number of Initializations per measure mode
+    # Count Number of Initializations
     initialize_count, avg_initialize_time = count_command_in_run_data(
         commandData, "absorbanceReader/initialize", True
     )
@@ -242,37 +198,28 @@ def plate_reader_commands(
             read = "yes"
         elif read == "yes" and commandType == "comment":
             result = command["params"].get("message", "")
-            formatted_result = result.split("result: ")[1]
-            result_dict = eval(formatted_result)
-            result_dict_keys = list(result_dict.keys())
-            if len(result_dict_keys) > 1:
-                read_type = "multi"
-            else:
-                read_type = "single"
-            for wavelength in result_dict_keys:
-                one_wavelength_dict = result_dict.get(wavelength)
-                result_ndarray = plate_reader.convert_read_dictionary_to_array(
-                    one_wavelength_dict
-                )
-                for item in hellma_plate_standards:
-                    wavelength_of_interest = item["wavelength"]
-                    if str(wavelength) == str(wavelength_of_interest):
-                        error_cells = plate_reader.check_byonoy_data_accuracy(
-                            result_ndarray, item, False
+            wavelength = result.split("result: {")[1].split(":")[0]
+            wavelength_str = wavelength + ": "
+            rest_of_string = result.split(wavelength_str)[1][:-1]
+            result_dict = eval(rest_of_string)
+            result_ndarray = plate_reader.convert_read_dictionary_to_array(result_dict)
+            for item in hellma_plate_standards:
+                wavelength_of_interest = item["wavelength"]
+                if str(wavelength) == str(wavelength_of_interest):
+                    error_cells = plate_reader.check_byonoy_data_accuracy(
+                        result_ndarray, item, False
+                    )
+                    if len(error_cells[0]) > 0:
+                        percent = (96 - len(error_cells)) / 96 * 100
+                        for cell in error_cells:
+                            print("FAIL: Cell " + str(cell) + " out of accuracy spec.")
+                    else:
+                        percent = 100
+                        print(
+                            f"PASS: {wavelength_of_interest} meet accuracy specification"
                         )
-                        if len(error_cells[0]) > 0:
-                            percent = (96 - len(error_cells)) / 96 * 100
-                            for cell in error_cells:
-                                print(
-                                    "FAIL: Cell " + str(cell) + " out of accuracy spec."
-                                )
-                        else:
-                            percent = 100
-                            print(
-                                f"PASS: {wavelength_of_interest} meet accuracy specification"
-                            )
-                        final_result[read_type, wavelength, read_num] = percent
-                        read_num += 1
+                    final_result[wavelength] = percent
+                    input("###########################")
             read = "no"
     plate_dict = {
         "Plate Reader # of Reads": read_count,
@@ -425,10 +372,7 @@ def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             or commandType == "thermocycler/closeLid"
         ):
             lid_engagements += 1
-        if (
-            commandType == "thermocycler/setTargetBlockTemperature"
-            and command["status"] != "queued"
-        ):
+        if commandType == "thermocycler/setTargetBlockTemperature":
             block_temp = command["params"]["celsius"]
             block_temp_changes += 1
             block_on_time = datetime.strptime(
@@ -558,10 +502,7 @@ def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
         error_code = error_details.get("errorCode", "")
         error_instrument = error_details.get("detail", "")
     # Determine error level
-    if end_run_errors > 0:
-        error_level = error_levels.get(error_code, "4")
-    else:
-        error_level = ""
+    error_level = error_levels.get(error_code, "4")
     # Create dictionary with all error descriptions
     error_dict = {
         "Total Recoverable Error(s)": total_recoverable_errors,
@@ -694,7 +635,7 @@ def get_calibration_offsets(
         print(f"Connected to {ip}")
     except Exception:
         print(f"ERROR: Failed to read IP address: {ip}")
-        raise
+        sys.exit()
     health_data = response.json()
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
