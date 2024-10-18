@@ -98,4 +98,4 @@ PROTOCOL_DIR := abr_testing/protocols
 SIMULATION_TOOL := protocol_simulation/abr_sim_check.py
 EXTENSION := .py
 simulate:
-	$(python) protocol_simulation/abr_sim_check.py
+	$(python) $(SIMULATION_TOOL)

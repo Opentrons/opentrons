@@ -81,7 +81,7 @@ def main(configurations: configparser.ConfigParser) -> None:
         ip_file = configurations["TEMP-SENSOR"]["Robo_List"]
     print("Starting temp sensors...")
     if ip_file:
-        # run_temp_sensor(ip_file)
+        run_temp_sensor(ip_file)
         print("Temp Sensors Started")
     else:
         print("Missing ip_file location, please fix configs")
@@ -95,9 +95,9 @@ def main(configurations: configparser.ConfigParser) -> None:
     print(sheet_name)
     if storage_directory and drive_folder and sheet_name and email:
         print("Retrieving robot run logs...")
-        # get_abr_logs(storage_directory, drive_folder, email)
+        get_abr_logs(storage_directory, drive_folder, email)
         print("Recording robot run logs...")
-        # record_abr_logs(storage_directory, drive_folder, sheet_name, email)
+        record_abr_logs(storage_directory, drive_folder, sheet_name, email)
         print("Run logs updated")
     else:
         print("Storage, Email, or Drive Folder is missing, please fix configs")

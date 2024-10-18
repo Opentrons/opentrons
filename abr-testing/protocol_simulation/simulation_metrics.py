@@ -12,7 +12,11 @@ from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
 from abr_testing.tools import plate_reader
 
+
+
+
 def look_for_air_gaps(protocol_file_path: str) -> int:
+    """Search Protocol for Air Gaps"""
     instances = 0
     try:
         with open(protocol_file_path, "r") as open_file:
@@ -26,44 +30,18 @@ def look_for_air_gaps(protocol_file_path: str) -> int:
     except Exception as error:
         print("Error reading protocol:", error.with_traceback())
     return instances
-        
-
-
-def set_api_level(protocol_file_path) -> None:
-    with open(protocol_file_path, "r") as file:
-        file_contents = file.readlines()  # Read all lines
-
-    # Look for current'apiLevel:'
-    for i, line in enumerate(file_contents):
-        print(line)
-        if 'apiLevel' in line:
-            print(f"The current API level of this protocol is: {line}")
-            change = input("Would you like to simulate with a different API level? (Y/N) ").strip().upper()
-
-            if change == "Y":
-                api_level = input("Protocol API Level to Simulate with: ")
-                # Update new API level
-                file_contents[i] = f'apiLevel: {api_level}\n'
-                print(f"Updated line: {file_contents[i]}")
-            break
-
-    with open(protocol_file_path, "w") as file:
-        file.writelines(file_contents)
-    print("File updated successfully.")
-
-        
-
-
 
 
 # Mock sys.exit to avoid program termination
 original_exit = sys.exit  # Save the original sys.exit function
 
-def mock_exit(code=None) -> None:
+def mock_exit(code: Any = None) -> None:
+    """Prevents program from exiting after analyze"""
     print(f"sys.exit() called with code: {code}")
     raise SystemExit(code)  # Raise the exception but catch it to prevent termination
 
 def get_labware_name(id: str, object_dict: dict, json_data: dict) -> str:
+    """Recursively find the labware_name"""
     slot = ""
     for obj in object_dict:
         if obj['id'] == id:
@@ -91,6 +69,7 @@ def parse_results_volume(json_data_file: str) -> Tuple[
     List[str], List[str], List[str], List[str],
     List[str], List[str], List[str]
     ]:
+    """Pars run log and extract neccessay information"""
     json_data = []
     with open(json_data_file, "r") as json_file:
         json_data = json.load(json_file)
@@ -238,47 +217,53 @@ def parse_results_volume(json_data_file: str) -> Tuple[
         values_row)
     
 
-def main(storage_directory, google_sheet_name, protocol_file_path) -> None:
+def main(protocol_file_path: Path, save: bool, storage_directory: str = os.curdir, google_sheet_name: str = "") -> None:
+    """Main module control"""
     sys.exit = mock_exit  # Replace sys.exit with the mock function
-
-
     # Read file path from arguments
     protocol_file_path = Path(protocol_file_path)
     global protocol_name
     protocol_name = protocol_file_path.stem
     print("Simulating", protocol_name)
-
-
     global file_date
     file_date = datetime.now()
     global file_date_formatted
     file_date_formatted = file_date.strftime("%Y-%m-%d_%H-%M-%S")
-    # Prepare output file
-    json_file_path = f"{storage_directory}\\{protocol_name}_{file_date_formatted}.json"
-    json_file_output = open(json_file_path, "wb+")
-    # log_output_file = f"{protocol_name}_log"
     error_output = f"{storage_directory}\\test_debug"
     # Run protocol simulation
     try:
-
         with Context(analyze) as ctx:
-            # err = open(error_output, "w")
-            # err.close()
-            ctx.invoke(
-                analyze,
-                files=[protocol_file_path],
-                json_output=json_file_output,
-                human_json_output=None,
-                log_output=error_output,
-                log_level="ERROR",
-                check=False
-            )
+            if save:
+                # Prepare output file
+                json_file_path = f"{storage_directory}\\{protocol_name}_{file_date_formatted}.json"
+                json_file_output = open(json_file_path, "wb+")
+                # log_output_file = f"{protocol_name}_log"
+                ctx.invoke(
+                    analyze,
+                    files=[protocol_file_path],
+                    json_output=json_file_output,
+                    human_json_output=None,
+                    log_output=error_output,
+                    log_level="ERROR",
+                    check=False
+                )
+                json_file_output.close()
+            else:
+                ctx.invoke(
+                    analyze,
+                    files=[protocol_file_path],
+                    json_output=None,
+                    human_json_output=None,
+                    log_output=error_output,
+                    log_level="ERROR",
+                    check=True
+                )
+                
     except SystemExit as e:
         print(f"SystemExit caught with code: {e}")
     finally:
         # Reset sys.exit to the original behavior
         sys.exit = original_exit
-        json_file_output.close()
         with open(error_output, "r") as open_file:
             try:
                 errors = open_file.readlines()
@@ -289,34 +274,32 @@ def main(storage_directory, google_sheet_name, protocol_file_path) -> None:
             except:
                 print("error simulating ...")
                 sys.exit()
+    if save:
+        try:
+            credentials_path = os.path.join(storage_directory, "credentials.json")
+            print(credentials_path)
 
-    
-    try:
-        credentials_path = os.path.join(storage_directory, "credentials.json")
-        print(credentials_path)
-
-    except FileNotFoundError:
-        print(f"Add credentials.json file to: {storage_directory}.")
-        sys.exit()
-    
-    global hellma_plate_standards
-    try:
-        hellma_plate_standards = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+        except FileNotFoundError:
+            print(f"Add credentials.json file to: {storage_directory}.")
+            sys.exit()
         
-    except:
-        print(f"Add helma plate standard files to {storage_directory}.")
-        sys.exit()
-    google_sheet = google_sheets_tool.google_sheet(
-        credentials_path, google_sheet_name, 0
-    )
-    google_sheet.write_to_row([])
-    for row in parse_results_volume(json_file_path):
-        print("Writing results to", google_sheet_name)
-        print(str(row))
-        google_sheet.write_to_row(row)
+        global hellma_plate_standards
+        try:
+            hellma_plate_standards = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+            
+        except:
+            print(f"Add helma plate standard files to {storage_directory}.")
+            sys.exit()
+        google_sheet = google_sheets_tool.google_sheet(
+            credentials_path, google_sheet_name, 0
+        )
+        google_sheet.write_to_row([])
+        for row in parse_results_volume(json_file_path):
+            print("Writing results to", google_sheet_name)
+            print(str(row))
+            google_sheet.write_to_row(row)
 
 if __name__ == "__main__":
-
     CLEAN_PROTOCOL = True
     parser = argparse.ArgumentParser(description="Read run logs on google drive.")
     parser.add_argument(
@@ -370,10 +353,10 @@ if __name__ == "__main__":
     if CLEAN_PROTOCOL:
         # set_api_level(Path(protocol_file_path))
         main(
-            storage_directory,
-            sheet_name,
             protocol_file_path,
-                )
+            True,
+            storage_directory,
+            sheet_name,)
     else: sys.exit(0)
 
 
