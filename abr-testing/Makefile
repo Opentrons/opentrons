@@ -88,3 +88,14 @@ push-no-restart-ot3: sdist Pipfile.lock
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
+
+.PHONY: abr-setup
+abr-setup:
+	$(python) abr_testing/tools/abr_setup.py
+
+.PHONY: simulate
+PROTOCOL_DIR := abr_testing/protocols
+SIMULATION_TOOL := protocol_simulation/abr_sim_check.py
+EXTENSION := .py
+simulate:
+	$(python) protocol_simulation/abr_sim_check.py

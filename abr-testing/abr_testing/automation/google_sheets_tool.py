@@ -167,6 +167,7 @@ class google_sheet:
             self.spread_sheet.batch_update(body=body)
         except gspread.exceptions.APIError as e:
             print(f"ERROR MESSAGE: {e}")
+            raise
 
     def update_cell(
         self, sheet_title: str, row: int, column: int, single_data: Any
