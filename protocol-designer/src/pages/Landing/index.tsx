@@ -80,7 +80,6 @@ export function Landing(): JSX.Element {
       <StyledNavLink to={'/createNew'}>
         <LargeButton
           onClick={() => {
-            console.log('clicked')
             dispatch(toggleNewProtocolModal(true))
           }}
           buttonText={<ButtonText>{t('create_a_protocol')}</ButtonText>}
