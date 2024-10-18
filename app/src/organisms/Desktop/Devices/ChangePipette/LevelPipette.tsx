@@ -39,7 +39,12 @@ export function LevelingVideo(props: {
       controls={true}
     >
       <source
-        src={`../app/assets/videos/pip-leveling/${pipetteName}-${mount}.webm`}
+        src={
+          new URL(
+            `/app/assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
+            import.meta.url
+          ).href
+        }
       />
     </video>
   )
