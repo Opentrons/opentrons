@@ -468,4 +468,13 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  opentrons_tough_pcr_auto_sealing_lid: [
+    new URL(
+      '../../images/opentrons_tough_pcr_auto_sealing_lid.jpg',
+      import.meta.url
+    ).href,
+  ],
+  opentrons_flex_deck_riser: [
+    new URL('../../images/opentrons_flex_deck_riser.jpg', import.meta.url).href,
+  ],
 }
