@@ -14,7 +14,7 @@ class GenericCsvTransform:
     filename: str
     rows: List[List[str]]
     delimiter: str = ","
-    
+
     @staticmethod
     def build(
         filename: str, rows: List[List[str]], delimiter: str = ","
