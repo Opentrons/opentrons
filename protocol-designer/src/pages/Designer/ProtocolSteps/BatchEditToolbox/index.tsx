@@ -16,16 +16,18 @@ import {
 import { useKitchen } from '../../../../organisms/Kitchen/hooks'
 import { deselectAllSteps } from '../../../../ui/steps/actions/actions'
 import {
-  //   changeBatchEditField,
+  changeBatchEditField,
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
 } from '../../../../step-forms/actions'
+import { maskField } from '../../../../steplist/fieldLevel'
+import { getBatchEditFormHasUnsavedChanges } from '../../../../step-forms/selectors'
+import { makeBatchEditFieldProps } from './utils'
 import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
 import { BatchEditMixTools } from './BatchEditMixTools'
-// import { maskField } from '../../../../steplist/fieldLevel'
 
-// import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { ThunkDispatch } from 'redux-thunk'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { BaseState } from '../../../../types'
 
 export const BatchEditToolbox = (): JSX.Element | null => {
@@ -36,15 +38,16 @@ export const BatchEditToolbox = (): JSX.Element | null => {
   const stepTypes = useSelector(getBatchEditSelectedStepTypes)
   const disabledFields = useSelector(getMultiSelectDisabledFields)
   const selectedStepIds = useSelector(getMultiSelectItemIds)
+  const batchEditFormHasChanges = useSelector(getBatchEditFormHasUnsavedChanges)
 
-  //   const handleChangeFormInput = (name: StepFieldName, value: unknown): void => {
-  //     const maskedValue = maskField(name, value)
-  //     dispatch(changeBatchEditField({ [name]: maskedValue }))
-  //   }
+  const handleChangeFormInput = (name: StepFieldName, value: unknown): void => {
+    const maskedValue = maskField(name, value)
+    dispatch(changeBatchEditField({ [name]: maskedValue }))
+  }
 
   const handleSave = (): void => {
     dispatch(saveStepFormsMulti(selectedStepIds))
-    makeSnackbar(t('batch_edits_saved') as string)
+    makeSnackbar(t('protocol_steps:batch_edits_saved') as string)
     dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
   }
 
@@ -56,12 +59,12 @@ export const BatchEditToolbox = (): JSX.Element | null => {
   const stepType = stepTypes.length === 1 ? stepTypes[0] : null
 
   if (stepType !== null && fieldValues !== null && disabledFields !== null) {
-    // const propsForFields = makeBatchEditFieldProps(
-    //   fieldValues,
-    //   disabledFields,
-    //   handleChangeFormInput,
-    //   t
-    // )
+    const propsForFields = makeBatchEditFieldProps(
+      fieldValues,
+      disabledFields,
+      handleChangeFormInput,
+      t
+    )
     if (stepType === 'moveLiquid' || stepType === 'mix') {
       return (
         <Toolbox
@@ -76,15 +79,19 @@ export const BatchEditToolbox = (): JSX.Element | null => {
           onCloseClick={handleCancel}
           closeButton={<Icon size="2rem" name="close" />}
           confirmButton={
-            <PrimaryButton onClick={handleSave} width="100%">
+            <PrimaryButton
+              onClick={handleSave}
+              disabled={!batchEditFormHasChanges}
+              width="100%"
+            >
               {t('shared:save')}
             </PrimaryButton>
           }
         >
           {stepType === 'moveLiquid' ? (
-            <BatchEditMoveLiquidTools />
+            <BatchEditMoveLiquidTools propsForFields={propsForFields} />
           ) : (
-            <BatchEditMixTools />
+            <BatchEditMixTools propsForFields={propsForFields} />
           )}
         </Toolbox>
       )

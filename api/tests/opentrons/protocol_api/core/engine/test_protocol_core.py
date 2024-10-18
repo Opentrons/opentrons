@@ -3,6 +3,10 @@ import inspect
 from typing import Optional, Type, cast, Tuple
 
 import pytest
+from opentrons_shared_data import liquid_classes
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    LiquidClassSchemaV1,
+)
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
@@ -69,7 +73,7 @@ from opentrons.protocol_api.core.engine import (
     ModuleCore,
     load_labware_params,
 )
-from opentrons.protocol_api._liquid import Liquid
+from opentrons.protocol_api._liquid import Liquid, LiquidClass
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
@@ -109,6 +113,15 @@ def patch_mock_load_labware_params(
     """Mock out load_labware_params.py functions."""
     for name, func in inspect.getmembers(load_labware_params, inspect.isfunction):
         monkeypatch.setattr(load_labware_params, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_load_liquid_class_def(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out liquid_classes.load_definition() function."""
+    mock_load = decoy.mock(func=liquid_classes.load_definition)
+    monkeypatch.setattr(liquid_classes, "load_definition", mock_load)
 
 
 @pytest.fixture(autouse=True)
@@ -1740,6 +1753,27 @@ def test_add_liquid(
     )
 
     assert result == expected_result
+
+
+def test_define_liquid_class(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    minimal_liquid_class_def1: LiquidClassSchemaV1,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+) -> None:
+    """It should create a LiquidClass and cache the definition."""
+    expected_liquid_class = LiquidClass(
+        _name="water1", _display_name="water 1", _by_pipette_setting=[]
+    )
+    decoy.when(liquid_classes.load_definition("water")).then_return(
+        minimal_liquid_class_def1
+    )
+    assert subject.define_liquid_class("water") == expected_liquid_class
+
+    decoy.when(liquid_classes.load_definition("water")).then_return(
+        minimal_liquid_class_def2
+    )
+    assert subject.define_liquid_class("water") == expected_liquid_class
 
 
 def test_get_labware_location_deck_slot(

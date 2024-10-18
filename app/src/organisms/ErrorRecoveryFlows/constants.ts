@@ -120,7 +120,7 @@ export const RECOVERY_MAP = {
   },
   IGNORE_AND_SKIP: {
     ROUTE: 'ignore-and-skip-step',
-    STEPS: { SELECT_IGNORE_KIND: 'select-ignore' },
+    STEPS: { SELECT_IGNORE_KIND: 'select-ignore', SKIP_STEP: 'skip-step' },
   },
   MANUAL_FILL_AND_SKIP: {
     ROUTE: 'manual-fill-well-and-skip',
@@ -248,7 +248,10 @@ export const STEP_ORDER: StepOrder = {
     DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],
   [REFILL_AND_RESUME.ROUTE]: [],
-  [IGNORE_AND_SKIP.ROUTE]: [IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND],
+  [IGNORE_AND_SKIP.ROUTE]: [
+    IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND,
+    IGNORE_AND_SKIP.STEPS.SKIP_STEP,
+  ],
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
   [MANUAL_FILL_AND_SKIP.ROUTE]: [
     MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL,
@@ -343,6 +346,7 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND]: {
       allowDoorOpen: false,
     },
+    [IGNORE_AND_SKIP.STEPS.SKIP_STEP]: { allowDoorOpen: false },
   },
   [MANUAL_FILL_AND_SKIP.ROUTE]: {
     [MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL]: {

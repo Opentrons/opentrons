@@ -29,8 +29,6 @@ export const TimelineToolbox = (): JSX.Element => {
   const { t } = useTranslation('protocol_steps')
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const formData = useSelector(getUnsavedForm)
-  //  TODO: potentially add batch edit capabilities back in
-  // const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
@@ -70,8 +68,6 @@ export const TimelineToolbox = (): JSX.Element => {
       }
       confirmButton={formData != null ? undefined : <AddStepButton />}
     >
-      {/* todo(ja): this is for batch edit which we will need to add back in */}
-      {/* <MultiSelectToolbar isMultiSelectMode={Boolean(isMultiSelectMode)} /> */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}

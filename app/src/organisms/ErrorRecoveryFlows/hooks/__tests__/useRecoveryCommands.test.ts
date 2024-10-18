@@ -44,7 +44,7 @@ describe('useRecoveryCommands', () => {
   const mockChainRunCommands = vi.fn().mockResolvedValue([])
   const mockReportActionSelectedResult = vi.fn()
   const mockReportRecoveredRunResult = vi.fn()
-  const mockUpdateErrorRecoveryPolicy = vi.fn()
+  const mockUpdateErrorRecoveryPolicy = vi.fn(() => Promise.resolve())
 
   const props = {
     runId: mockRunId,
@@ -70,7 +70,7 @@ describe('useRecoveryCommands', () => {
       chainRunCommands: mockChainRunCommands,
     } as any)
     vi.mocked(useUpdateErrorRecoveryPolicy).mockReturnValue({
-      updateErrorRecoveryPolicy: mockUpdateErrorRecoveryPolicy,
+      mutateAsync: mockUpdateErrorRecoveryPolicy,
     } as any)
   })
 
@@ -302,11 +302,17 @@ describe('useRecoveryCommands', () => {
       failedCommandByRunRecord: mockFailedCommandWithError,
     }
 
-    const { result } = renderHook(() => useRecoveryCommands(testProps))
+    const { result, rerender } = renderHook(() =>
+      useRecoveryCommands(testProps)
+    )
 
     await act(async () => {
-      await result.current.ignoreErrorKindThisRun()
+      await result.current.ignoreErrorKindThisRun(true)
     })
+
+    rerender()
+
+    result.current.skipFailedCommand()
 
     const expectedPolicyRules = buildIgnorePolicyRules(
       'aspirateInPlace',
@@ -318,16 +324,33 @@ describe('useRecoveryCommands', () => {
     )
   })
 
-  it('should reject with an error when failedCommand or error is null', async () => {
+  it('should call proceedToRouteAndStep with ERROR_WHILE_RECOVERING route when updateErrorRecoveryPolicy rejects', async () => {
+    const mockFailedCommandWithError = {
+      ...mockFailedCommand,
+      commandType: 'aspirateInPlace',
+      error: {
+        errorType: 'mockErrorType',
+      },
+    }
+
     const testProps = {
       ...props,
-      failedCommand: null,
+      failedCommandByRunRecord: mockFailedCommandWithError,
     }
+
+    mockUpdateErrorRecoveryPolicy.mockRejectedValueOnce(
+      new Error('Update policy failed')
+    )
 
     const { result } = renderHook(() => useRecoveryCommands(testProps))
 
-    await expect(result.current.ignoreErrorKindThisRun()).rejects.toThrow(
-      'Could not execute command. No failed command.'
+    await act(async () => {
+      await result.current.ignoreErrorKindThisRun(true)
+    })
+
+    expect(mockUpdateErrorRecoveryPolicy).toHaveBeenCalled()
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
     )
   })
 })
