@@ -2,14 +2,16 @@
 // that cannot be imported. The creator probably shouldn't allow
 // a user to do this.
 
-// Scrolling seems wonky, so I disabled checking to see if
-// an element is in view before clicking or checking with
-// { force: true }
+import {
+  navigateToUrl,
+  fileHelper,
+  wellBottomImageLocator,
+} from '../../support/e2e'
+const fileHolder = fileHelper('testpro_80_wellplate_100ul')
 
 context('Well Plates', () => {
   before(() => {
-    cy.visit('/#/create')
-    cy.viewport('macbook-15')
+    navigateToUrl('/#/create')
   })
 
   describe('Create a well plate', () => {
@@ -145,21 +147,21 @@ context('Well Plates', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()
@@ -208,7 +210,9 @@ context('Well Plates', () => {
       cy.get("input[placeholder='TestPro 80 Well Plate 100 µL']").should(
         'exist'
       )
-      cy.get("input[placeholder='testpro_80_wellplate_100ul']").should('exist')
+      cy.get(`input[placeholder='${fileHolder.downloadFileStem}']`).should(
+        'exist'
+      )
 
       // All fields present
       cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -216,7 +220,15 @@ context('Well Plates', () => {
         'Please resolve all invalid fields in order to export the labware definition'
       ).should('not.exist')
 
-      // TODO IMMEDIATELY match against fixture ??? Is this not happening?
+      cy.fixture(fileHolder.expectedExportFixture).then(
+        expectedExportLabwareDef => {
+          cy.readFile(fileHolder.downloadPath).then(actualExportLabwareDef => {
+            expect(actualExportLabwareDef).to.deep.equal(
+              expectedExportLabwareDef
+            )
+          })
+        }
+      )
     })
   })
 })

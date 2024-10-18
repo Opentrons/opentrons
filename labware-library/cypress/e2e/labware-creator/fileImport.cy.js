@@ -1,11 +1,15 @@
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+import {
+  navigateToUrl,
+  fileHelper,
+  wellBottomImageLocator,
+} from '../../support/e2e'
+const fileHolder = fileHelper('testpro_15_wellplate_5ul')
 
 const importedLabwareFile = 'TestLabwareDefinition.json'
 
 describe('File Import', () => {
   before(() => {
-    cy.visit('/#/create')
-    cy.viewport('macbook-15')
+    navigateToUrl('/#/create')
   })
 
   it('tests the file import flow', () => {
@@ -49,9 +53,9 @@ describe('File Import', () => {
 
     // verify well bottom and depth
     cy.get("input[name='wellBottomShape'][value='flat']").should('exist')
-    cy.get("img[src*='_flat.']").should('exist')
-    cy.get("img[src*='_round.']").should('not.exist')
-    cy.get("img[src*='_v.']").should('not.exist')
+    cy.get(wellBottomImageLocator.flat).should('exist')
+    cy.get(wellBottomImageLocator.round).should('not.exist')
+    cy.get(wellBottomImageLocator.v).should('not.exist')
     cy.get("input[name='wellDepth'][value='5']").should('exist')
 
     // verify grid spacing
@@ -69,7 +73,9 @@ describe('File Import', () => {
 
     // File info
     cy.get("input[placeholder='TestPro 15 Well Plate 5 µL']").should('exist')
-    cy.get("input[placeholder='testpro_15_wellplate_5ul']").should('exist')
+    cy.get(`input[placeholder='${fileHolder.downloadFileStem}']`).should(
+      'exist'
+    )
 
     // All fields present
     cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -77,20 +83,12 @@ describe('File Import', () => {
       'Please resolve all invalid fields in order to export the labware definition'
     ).should('not.exist')
 
-    cy.fixture(importedLabwareFile).then(expected => {
-      cy.window()
-        .its('__lastSavedFileBlob__')
-        .should('be.a', 'blob') // wait until we get the blob
-        .should(async blob => {
-          const labwareDefText = await blob.text()
-          const savedDef = JSON.parse(labwareDefText)
-
-          expectDeepEqual(assert, savedDef, expected)
+    cy.fixture(fileHolder.expectedExportFixture).then(
+      expectedExportLabwareDef => {
+        cy.readFile(fileHolder.downloadPath).then(actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
         })
-    })
-
-    cy.window()
-      .its('__lastSavedFileName__')
-      .should('equal', 'testpro_15_wellplate_5ul.json')
+      }
+    )
   })
 })
