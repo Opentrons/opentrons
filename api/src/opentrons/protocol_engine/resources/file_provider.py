@@ -14,15 +14,10 @@ class GenericCsvTransform:
     filename: str
     rows: List[List[str]]
     delimiter: str = ","
-
-    def __init__(self, filename: str, rows: List[List[str]], delimeter: str) -> None:
-        self.filename = filename
-        rows = rows
-        delimeter = delimeter
-
-    @classmethod
+    
+    @staticmethod
     def build(
-        cls, filename: str, rows: List[List[str]], delimiter: str = ","
+        filename: str, rows: List[List[str]], delimiter: str = ","
     ) -> "GenericCsvTransform":
         """Build a Generic CSV datatype class."""
         if "." in filename and not filename.endswith(".csv"):
@@ -31,11 +26,11 @@ class GenericCsvTransform:
             )
         elif "." not in filename:
             filename = f"{filename}.csv"
-        return cls(
-            filename,
-            rows,
-            delimiter,
-        )
+        csv = GenericCsvTransform()
+        csv.filename = filename
+        csv.rows = rows
+        csv.delimiter = delimiter
+        return csv
 
 
 class ReadData(BaseModel):
