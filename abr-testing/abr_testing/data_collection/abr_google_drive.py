@@ -60,7 +60,7 @@ def create_data_dictionary(
             print(f"Run {run_id} is incomplete. Skipping run.")
             continue
         if run_id in runs_to_save:
-            print("started reading run.")
+            print(f"started reading run {run_id}.")
             robot = file_results.get("robot_name")
             protocol_name = file_results["protocol"]["metadata"].get("protocolName", "")
             software_version = file_results.get("API_Version", "")
@@ -114,7 +114,9 @@ def create_data_dictionary(
                 tc_dict = read_robot_logs.thermocycler_commands(file_results)
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
-                pipette_dict = read_robot_logs.instrument_commands(file_results)
+                pipette_dict = read_robot_logs.instrument_commands(
+                    file_results, labware_name="opentrons_tough_pcr_auto_sealing_lid"
+                )
                 plate_reader_dict = read_robot_logs.plate_reader_commands(
                     file_results, hellma_plate_standards
                 )
@@ -156,6 +158,60 @@ def create_data_dictionary(
     return transposed_runs_and_robots, headers, transposed_runs_and_lpc, headers_lpc
 
 
+def run(
+    storage_directory: str, folder_name: str, google_sheet_name: str, email: str
+) -> None:
+    """Main control function."""
+    try:
+        credentials_path = os.path.join(storage_directory, "credentials.json")
+    except FileNotFoundError:
+        print(f"Add credentials.json file to: {storage_directory}.")
+        sys.exit()
+    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
+    # Get run ids on google sheet
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
+    # Get run ids on google sheet
+    run_ids_on_gs = set(google_sheet.get_column(2))
+    # Get robots on google sheet
+    # Uploads files that are not in google drive directory
+    google_drive.upload_missing_files(storage_directory)
+
+    # Run ids in google_drive_folder
+    run_ids_on_gd = read_robot_logs.get_run_ids_from_google_drive(google_drive)
+    missing_runs_from_gs = read_robot_logs.get_unseen_run_ids(
+        run_ids_on_gd, run_ids_on_gs
+    )
+    # Read Hellma Files
+    file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+    # Add missing runs to google sheet
+    (
+        transposed_runs_and_robots,
+        headers,
+        transposed_runs_and_lpc,
+        headers_lpc,
+    ) = create_data_dictionary(
+        missing_runs_from_gs,
+        storage_directory,
+        "",
+        "",
+        "",
+        hellma_plate_standards=file_values,
+    )
+    start_row = google_sheet.get_index_row() + 1
+    google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
+
+    # Add LPC to google sheet
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    start_row_lpc = google_sheet_lpc.get_index_row() + 1
+    google_sheet_lpc.batch_update_cells(
+        transposed_runs_and_lpc, "A", start_row_lpc, "0"
+    )
+    # Calculate Robot Lifetimes
+    sync_abr_sheet.determine_lifetime(google_sheet)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Read run logs on google drive.")
     parser.add_argument(
@@ -188,54 +244,4 @@ if __name__ == "__main__":
     google_sheet_name = args.google_sheet_name[0]
     email = args.email[0]
 
-    try:
-        credentials_path = os.path.join(storage_directory, "credentials.json")
-    except FileNotFoundError:
-        print(f"Add credentials.json file to: {storage_directory}.")
-        sys.exit()
-    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
-    # Get run ids on google sheet
-    google_sheet = google_sheets_tool.google_sheet(
-        credentials_path, google_sheet_name, 0
-    )
-    # Get run ids on google sheet
-    run_ids_on_gs = set(google_sheet.get_column(2))
-    # Get robots on google sheet
-    robots = list(set(google_sheet.get_column(1)))
-    # Uploads files that are not in google drive directory
-    google_drive.upload_missing_files(storage_directory)
-
-    # Run ids in google_drive_folder
-    run_ids_on_gd = read_robot_logs.get_run_ids_from_google_drive(google_drive)
-    missing_runs_from_gs = read_robot_logs.get_unseen_run_ids(
-        run_ids_on_gd, run_ids_on_gs
-    )
-    # Read Hellma Files
-    file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
-    # Add missing runs to google sheet
-    (
-        transposed_runs_and_robots,
-        headers,
-        transposed_runs_and_lpc,
-        headers_lpc,
-    ) = create_data_dictionary(
-        missing_runs_from_gs,
-        storage_directory,
-        "",
-        "",
-        "",
-        hellma_plate_standards=file_values,
-    )
-    start_row = google_sheet.get_index_row() + 1
-    print(start_row)
-    google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
-
-    # Add LPC to google sheet
-    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
-    start_row_lpc = google_sheet_lpc.get_index_row() + 1
-    google_sheet_lpc.batch_update_cells(
-        transposed_runs_and_lpc, "A", start_row_lpc, "0"
-    )
-    robots = list(set(google_sheet.get_column(1)))
-    # Calculate Robot Lifetimes
-    sync_abr_sheet.determine_lifetime(google_sheet)
+    run(storage_directory, folder_name, google_sheet_name, email)
