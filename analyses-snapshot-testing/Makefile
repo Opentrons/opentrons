@@ -126,9 +126,7 @@ local-build:
 	@echo "Building docker image for your local opentrons code"
 	@echo "The image will be named opentrons-analysis:local"
 	@echo "For a fresh build, run 'make local-build NO_CACHE=1'"
-	sed -i.bak '/^.git/s/^/#/' ../.dockerignore || true
 	docker build $(BUILD_FLAGS) -t opentrons-analysis:local -f citools/Dockerfile.local .. || true
-	mv ../.dockerignore.bak ../.dockerignore || true
 	@echo "Build complete"
 
 .PHONY: local-snapshot-test

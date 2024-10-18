@@ -10,10 +10,9 @@ RUN apt-get update && \
 WORKDIR /opentrons
 
 # Copy everything from the build context into the /opentrons directory
+# root directory .dockerignore file is respected
 COPY . /opentrons
 
-# List the contents of the /opentrons directory to verify the .git folder is copied
-RUN ls -al /opentrons/.git
 
 # Install required packages from the copied code
 RUN python -m pip install -U ./shared-data/python
