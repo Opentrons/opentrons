@@ -16,12 +16,12 @@ export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
     // todo(mm, 2024-07-02): Also handle aspirateInPlace and dispenseInPlace.
     // https://opentrons.atlassian.net/browse/EXEC-593
     if (
-      commandType === 'aspirate' &&
+      (commandType === 'aspirate' || commandType === 'aspirateInPlace') &&
       errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
     ) {
       return ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING
     } else if (
-      commandType === 'dispense' &&
+      (commandType === 'dispense' || commandType === 'dispenseInPlace') &&
       errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
     ) {
       return ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING

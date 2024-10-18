@@ -159,7 +159,7 @@ export const getUserId: (state: State) => string = createSelector(
 
 export const getAppLanguage: (state: State) => Language | null = createSelector(
   getConfig,
-  config => config?.language.appLanguage ?? 'en'
+  config => config?.language.appLanguage ?? null
 )
 
 export const getStoredSystemLanguage: (

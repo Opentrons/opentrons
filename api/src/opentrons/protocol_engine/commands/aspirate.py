@@ -9,7 +9,7 @@ from .pipetting_common import (
     PipetteIdMixin,
     AspirateVolumeMixin,
     FlowRateMixin,
-    WellLocationMixin,
+    LiquidHandlingWellLocationMixin,
     BaseLiquidHandlingResult,
     DestinationPositionResult,
 )
@@ -38,7 +38,7 @@ AspirateCommandType = Literal["aspirate"]
 
 
 class AspirateParams(
-    PipetteIdMixin, AspirateVolumeMixin, FlowRateMixin, WellLocationMixin
+    PipetteIdMixin, AspirateVolumeMixin, FlowRateMixin, LiquidHandlingWellLocationMixin
 ):
     """Parameters required to aspirate from a specific well."""
 
@@ -112,12 +112,17 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                 well_name=well_name,
             )
 
+        well_location = params.wellLocation
+        if well_location.origin == WellOrigin.MENISCUS:
+            well_location.volumeOffset = "operationVolume"
+
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=params.wellLocation,
+            well_location=well_location,
             current_well=current_well,
+            operation_volume=-params.volume,
         )
         deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
         state_update.set_pipette_location(

@@ -5,7 +5,12 @@ from decoy import Decoy, matchers
 from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.types import Point
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine import (
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckPoint,
+)
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands import (

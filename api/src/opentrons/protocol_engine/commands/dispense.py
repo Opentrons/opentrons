@@ -13,7 +13,7 @@ from .pipetting_common import (
     PipetteIdMixin,
     DispenseVolumeMixin,
     FlowRateMixin,
-    WellLocationMixin,
+    LiquidHandlingWellLocationMixin,
     BaseLiquidHandlingResult,
     DestinationPositionResult,
     OverpressureError,
@@ -30,13 +30,14 @@ from ..errors.error_occurrence import ErrorOccurrence
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
     from ..resources import ModelUtils
+    from ..state.state import StateView
 
 
 DispenseCommandType = Literal["dispense"]
 
 
 class DispenseParams(
-    PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin, WellLocationMixin
+    PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin, LiquidHandlingWellLocationMixin
 ):
     """Payload required to dispense to a specific well."""
 
@@ -63,11 +64,13 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
 
     def __init__(
         self,
+        state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
+        self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
         self._model_utils = model_utils
@@ -75,25 +78,31 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
     async def execute(self, params: DispenseParams) -> _ExecuteReturn:
         """Move to and dispense to the requested well."""
         state_update = StateUpdate()
+        well_location = params.wellLocation
+        labware_id = params.labwareId
+        well_name = params.wellName
+        volume = params.volume
+
+        # TODO(pbm, 10-15-24): call self._state_view.geometry.validate_dispense_volume_into_well()
 
         position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
-            labware_id=params.labwareId,
-            well_name=params.wellName,
-            well_location=params.wellLocation,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
         )
         deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
         state_update.set_pipette_location(
             pipette_id=params.pipetteId,
-            new_labware_id=params.labwareId,
-            new_well_name=params.wellName,
+            new_labware_id=labware_id,
+            new_well_name=well_name,
             new_deck_point=deck_point,
         )
 
         try:
             volume = await self._pipetting.dispense_in_place(
                 pipette_id=params.pipetteId,
-                volume=params.volume,
+                volume=volume,
                 flow_rate=params.flowRate,
                 push_out=params.pushOut,
             )
