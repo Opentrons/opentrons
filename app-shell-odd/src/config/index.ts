@@ -5,7 +5,6 @@ import get from 'lodash/get'
 import forEach from 'lodash/forEach'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
-
 import { UI_INITIALIZED } from '../constants'
 import * as Cfg from '../constants'
 import { configInitialized, configValueUpdated } from '../actions'
@@ -13,6 +12,7 @@ import systemd from '../systemd'
 import { createLogger } from '../log'
 import { DEFAULTS_V12, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
+import { setUserDataPath } from '../early'
 
 import type {
   ConfigV12,
@@ -23,8 +23,6 @@ import type { Action, Dispatch, Logger } from '../types'
 import type { Config, Overrides } from './types'
 
 export * from './types'
-
-export const ODD_DIR = '/data/ODD'
 
 // make sure all arguments are included in production
 const argv = process.argv0.endsWith('defaultApp')
@@ -48,8 +46,7 @@ const store = (): Store => {
     // perform store migration if loading for the first time
     _store = (new Store({
       defaults: DEFAULTS_V12,
-      // dont overwrite config dir if in dev mode because it causes issues
-      ...(process.env.NODE_ENV === 'production' && { cwd: ODD_DIR }),
+      cwd: setUserDataPath(),
     }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }
@@ -66,7 +63,14 @@ const log = (): Logger => _log ?? (_log = createLogger('config'))
 export function registerConfig(dispatch: Dispatch): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
+      log().info('initializing configuration')
       dispatch(configInitialized(getFullConfig()))
+      log().info(
+        `flow route: ${
+          getConfig('onDeviceDisplaySettings').unfinishedUnboxingFlowRoute
+        }`
+      )
+      log().info('configuration initialized')
     } else if (
       action.type === Cfg.UPDATE_VALUE ||
       action.type === Cfg.RESET_VALUE ||
@@ -120,8 +124,8 @@ export function getOverrides(path?: string): unknown {
   return path != null ? get(overrides(), path) : overrides()
 }
 
-export function getConfig<P extends keyof Config>(path: P): Config[P]
 export function getConfig(): Config
+export function getConfig<P extends keyof Config>(path: P): Config[P]
 export function getConfig(path?: any): any {
   const result = store().get(path)
   const over = getOverrides(path as string | undefined)

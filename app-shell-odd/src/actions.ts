@@ -119,6 +119,7 @@ import type {
 export const configInitialized = (config: Config): ConfigInitializedAction => ({
   type: CONFIG_INITIALIZED,
   payload: { config },
+  meta: { shell: true },
 })
 
 // config value has been updated
@@ -128,6 +129,7 @@ export const configValueUpdated = (
 ): ConfigValueUpdatedAction => ({
   type: VALUE_UPDATED,
   payload: { path, value },
+  meta: { shell: true },
 })
 
 export const customLabwareList = (

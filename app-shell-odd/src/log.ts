@@ -5,13 +5,13 @@ import path from 'path'
 import dateFormat from 'dateformat'
 import winston from 'winston'
 
+import { setUserDataPath } from './early'
 import { getConfig } from './config'
 
 import type Transport from 'winston-transport'
 import type { Config } from './config'
 
-const ODD_DIR = '/data/ODD'
-const LOG_DIR = path.join(ODD_DIR, 'logs')
+const LOG_DIR = path.join(setUserDataPath(), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
 const COMBINED_LOG = path.join(LOG_DIR, 'combined.log')
 const FILE_OPTIONS = {
@@ -25,11 +25,18 @@ const FILE_OPTIONS = {
   tailable: true,
 }
 
+// Use our own logger type because winston (a) doesn't allow these by default
+// but (b) does it by binding something other than a function to these props.
+export type OTLogger = Omit<
+  winston.Logger,
+  'emerg' | 'alert' | 'crit' | 'warning' | 'notice'
+>
+
 let config: Config['log']
 let transports: Transport[]
-let log: winston.Logger
+let log: OTLogger
 
-export function createLogger(filename: string): winston.Logger {
+export function createLogger(filename: string): OTLogger {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!config) config = getConfig('log')
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -40,7 +47,6 @@ export function createLogger(filename: string): winston.Logger {
 
 function initializeTransports(): void {
   let error = null
-
   // sync is ok here because this only happens once
   try {
     fse.ensureDirSync(LOG_DIR)
