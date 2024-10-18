@@ -82,8 +82,6 @@ class TOF_Sensor_Driver():
     def get_histogram_zone(self, zone_list):
         zones = ",".join(map(str, zone_list))
         self.packet = "{},{}{}".format(self.GCODE["HIST_ZONE"], zones, self.ACK)
-        # print(self.packet)
-        # print(zone_list)
         self.send_packet(self.packet)
         time.sleep(2.0)
         data_list = []
@@ -148,17 +146,16 @@ class TOF_Sensor_Driver():
         return df
 
     def plot_log(self, labware = False, labware_num = 0):
-        # filename = f"{self.log_folder}/{self.log_file}"
-        filename = f"{self.log_folder}/TOF_ZONE[1,2,3]_10-17-24_17-02.csv"
+        filename = f"{self.log_folder}/{self.log_file}"
+        # filename = f"{self.log_folder}/TOF_ZONE[1,2,3]_10-17-24_17-02.csv"
         self.create_folder(self.plot_folder)
         df = self.import_log(filename)
         cols = sorted(df)
         print(df)
-        zone_list = []
+        # Plot each Zone Sample
         for col in cols:
             zone = col.split("-")[0].replace("Z","")
             sample = col.split("-")[1].replace("S","")
-            zone_list.append(zone)
             if labware:
                 filename = f"tof_histogram_zone{zone}_sample{sample}_lab{labware_num}"
                 title = f"TOF Histogram - Zone {zone} (Sample {sample}) [Labware = {labware_num}]"
@@ -177,15 +174,18 @@ class TOF_Sensor_Driver():
             self.plot_param["annotation"] = None
             self.make_plot(self.plot_param)
 
+        # Plot each Zone Average
         df_avg = df.groupby(by=lambda x: x.split("-")[0], axis=1).mean()
         print(df_avg)
         cols = sorted(df_avg)
-        for col in cols:
+        zone_list = [int(x.replace("Z","")) for x in cols]
+        for i, col in enumerate(cols):
             zone = col.replace("Z","")
             if labware:
                 filename = f"tof_histogram_zone{zone}_average_lab{labware_num}"
                 title = f"TOF Histogram - Zone {zone} (Average) [Labware = {labware_num}]"
-                self.df_list.append(df_avg)
+                if i==0:
+                    self.df_list.append(df_avg)
             else:
                 filename = f"tof_histogram_zone{zone}_average"
                 title = f"TOF Histogram - Zone {zone} (Average)"
@@ -201,8 +201,13 @@ class TOF_Sensor_Driver():
             self.plot_param["annotation"] = None
             self.make_plot(self.plot_param)
 
-        filename = f"tof_histogram_zone-all_average"
-        title = f"TOF Histogram - Zone All (Average)"
+        # Plot all Zones Average
+        if labware:
+            filename = f"tof_histogram_zone-all_average_lab{labware_num}"
+            title = f"TOF Histogram - Zone All (Average) [Labware = {labware_num}]"
+        else:
+            filename = f"tof_histogram_zone-all_average"
+            title = f"TOF Histogram - Zone All (Average)"
         fig = px.line(df_avg)
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = filename
@@ -215,39 +220,40 @@ class TOF_Sensor_Driver():
         self.plot_param["annotation"] = None
         self.make_plot(self.plot_param)
 
-        # if labware_num == args.labware_max:
-        #     df_all = pd.DataFrame()
-        #     for i, df in enumerate(self.df_list):
-        #         df_all[f"Labware{i}"] = df["Average"]
-        #     print(df_all)
-        #     legend = []
-        #     y_axis = sorted(df_all)
-        #     fig = px.line(df_all, y=y_axis)
-        #     for i in range(len(y_axis)):
-        #         legend.append(f"Labware = {i}")
-        #     self.set_legend(fig, legend)
-        #     ## Normal Plot
-        #     self.plot_param["figure"] = fig
-        #     self.plot_param["filename"] = f"tof_histogram_zone{zone}_average_all"
-        #     self.plot_param["title"] = f"TOF Histogram - Zone {zone} (Average All)"
-        #     self.plot_param["x_title"] = "Bin Number"
-        #     self.plot_param["y_title"] = "Number of Photons"
-        #     self.plot_param["x_range"] = [0, 127]
-        #     self.plot_param["y_range"] = None
-        #     self.plot_param["legend"] = "Number of Labware"
-        #     self.plot_param["annotation"] = None
-        #     self.make_plot(self.plot_param)
-        #     ## Zoomed Plot
-        #     self.plot_param["figure"] = fig
-        #     self.plot_param["filename"] = f"tof_histogram_zone{zone}_average_all_zoomed"
-        #     self.plot_param["title"] = f"TOF Histogram - Zone {zone} (Average All) [Zoomed]"
-        #     self.plot_param["x_title"] = "Bin Number"
-        #     self.plot_param["y_title"] = "Number of Photons"
-        #     self.plot_param["x_range"] = [0, 50]
-        #     self.plot_param["y_range"] = None
-        #     self.plot_param["legend"] = "Number of Labware"
-        #     self.plot_param["annotation"] = None
-        #     self.make_plot(self.plot_param)
+        if labware_num == args.labware_max:
+            for zone in zone_list:
+                df_all = pd.DataFrame()
+                for i, df in enumerate(self.df_list):
+                    df_all[f"Labware{i}"] = df[f"Z{zone}"]
+                print(df_all)
+                legend = []
+                y_axis = sorted(df_all)
+                fig = px.line(df_all, y=y_axis)
+                for i in range(len(y_axis)):
+                    legend.append(f"Labware = {i}")
+                self.set_legend(fig, legend)
+                ## Normal Plot
+                self.plot_param["figure"] = fig
+                self.plot_param["filename"] = f"tof_histogram_zone{zone}_average_lab-all"
+                self.plot_param["title"] = f"TOF Histogram - Zone {zone} (All Labware)"
+                self.plot_param["x_title"] = "Bin Number"
+                self.plot_param["y_title"] = "Number of Photons"
+                self.plot_param["x_range"] = [0, 127]
+                self.plot_param["y_range"] = None
+                self.plot_param["legend"] = "Number of Labware"
+                self.plot_param["annotation"] = None
+                self.make_plot(self.plot_param)
+                ## Zoomed Plot
+                self.plot_param["figure"] = fig
+                self.plot_param["filename"] = f"tof_histogram_zone{zone}_average_lab-all_zoomed"
+                self.plot_param["title"] = f"TOF Histogram - Zone {zone} (All Labware) [Zoomed]"
+                self.plot_param["x_title"] = "Bin Number"
+                self.plot_param["y_title"] = "Number of Photons"
+                self.plot_param["x_range"] = [20, 80]
+                self.plot_param["y_range"] = None
+                self.plot_param["legend"] = "Number of Labware"
+                self.plot_param["annotation"] = None
+                self.make_plot(self.plot_param)
 
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
@@ -323,9 +329,9 @@ if __name__ == '__main__':
         sensor = TOF_Sensor_Driver(port=args.port_name, baudrate=115200)
     else:
         sensor = TOF_Sensor_Driver(port="/dev/ttyACM0", baudrate=115200)
-    # sensor.connect()
+    sensor.connect()
     if args.test:
-        # sensor.log_histogram(args.log)
+        sensor.log_histogram(args.log)
         sensor.plot_log()
     elif args.labware:
         print(f"Testing TOF Sensor from 0 to {args.labware_max} labware.\n")
