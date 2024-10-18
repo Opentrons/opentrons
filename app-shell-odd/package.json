@@ -24,9 +24,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": [
-      "**"
-    ]
+    "nohoist": ["**"]
   },
   "devDependencies": {
     "@opentrons/app": "link:../app"
@@ -58,7 +56,7 @@
     "semver": "5.7.2",
     "tempy": "1.0.1",
     "uuid": "3.2.1",
-    "winston": "3.1.0",
+    "winston": "3.15.0",
     "yargs-parser": "13.1.2"
   }
 }
