@@ -1,53 +1,40 @@
 """File interaction resource provider."""
 from datetime import datetime
 from typing import List, Optional, Callable, Awaitable, Dict
+from pydantic import BaseModel
 from ..errors import StorageLimitReachedError
 
 
 MAXIMUM_CSV_FILE_LIMIT = 40
 
 
-class GenericCsvTransform:
+def _csv_filename_validation(filename: str) -> str:
+
+    if "." in filename and not filename.endswith(".csv"):
+        raise ValueError(
+            f"Provided filename {filename} invalid. Only CSV file format is accepted."
+        )
+    elif "." not in filename:
+        filename = f"{filename}.csv"
+    return filename
+
+
+class GenericCsvTransform(BaseModel):
     """Generic CSV File Type data for rows of data to be seperated by a delimeter."""
 
     filename: str
     rows: List[List[str]]
     delimiter: str = ","
 
-    @staticmethod
-    def build(
-        filename: str, rows: List[List[str]], delimiter: str = ","
-    ) -> "GenericCsvTransform":
-        """Build a Generic CSV datatype class."""
-        if "." in filename and not filename.endswith(".csv"):
-            raise ValueError(
-                f"Provided filename {filename} invalid. Only CSV file format is accepted."
-            )
-        elif "." not in filename:
-            filename = f"{filename}.csv"
-        csv = GenericCsvTransform()
-        csv.filename = filename
-        csv.rows = rows
-        csv.delimiter = delimiter
-        return csv
 
-
-class ReadData:
+class ReadData(BaseModel):
     """Read Data type containing the wavelength for a Plate Reader read alongside the Measurement Data of that read."""
 
     wavelength: int
     data: Dict[str, float]
 
-    @staticmethod
-    def build(wavelength: int, data: Dict[str, float]) -> "ReadData":
-        """Build Read Data containing the Wavelength used and the Measurement Data returned."""
-        read = ReadData()
-        read.wavelength = wavelength
-        read.data = data
-        return read
 
-
-class PlateReaderDataTransform:
+class PlateReaderData(BaseModel):
     """Data from a Opentrons Plate Reader Read. Can be converted to CSV template format."""
 
     read_results: List[ReadData]
@@ -119,34 +106,18 @@ class PlateReaderDataTransform:
         rows.append(["Measurement started at", str(self.start_time)])
         rows.append(["Measurement finished at", str(self.finish_time)])
 
-        # Ensure the filename contains the wavelength for a given measurement
+        # Ensure the filename adheres to ruleset contains the wavelength for a given measurement
+        filename = _csv_filename_validation(filename)
         if filename.endswith(".csv"):
             filename = filename[:-4]
         filename = filename + "_" + str(measurement.wavelength) + ".csv"
 
-        csv_data = GenericCsvTransform.build(
+        csv_data = GenericCsvTransform.construct(
             filename=filename,
             rows=rows,
             delimiter=",",
         )
         return csv_data
-
-    @staticmethod
-    def build(
-        read_results: List[ReadData],
-        start_time: datetime,
-        finish_time: datetime,
-        serial_number: str,
-        reference_wavelength: Optional[int] = None,
-    ) -> "PlateReaderDataTransform":
-        """Build a Plate Reader Data object as the result of a Read from a specific Plate Reader."""
-        plate_reader_data = PlateReaderDataTransform()
-        plate_reader_data.read_results = read_results
-        plate_reader_data.reference_wavelength = reference_wavelength
-        plate_reader_data.start_time = start_time
-        plate_reader_data.finish_time = finish_time
-        plate_reader_data.serial_number = serial_number
-        return plate_reader_data
 
 
 class FileProvider:
