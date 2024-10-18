@@ -20,6 +20,7 @@
   "pcr_flex": "PCR (Flex)",
   "pcr": "PCR",
   "pipettes": "Pipettes: Specify your pipettes, including the volume, number of channels, and whether they’re mounted on the left or right.",
+  "privacy_policy": "By continuing, you agree to the Opentrons \nPrivacy Policy\n and \nEnd user license agreement\n Copyright © 2024 Opentrons",
   "reagent_transfer_flex": "Reagent Transfer (Flex)",
   "reagent_transfer": "Reagent Transfer",
   "reload_page": "To start over and create a new protocol, simply reload the page.",
