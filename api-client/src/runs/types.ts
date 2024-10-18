@@ -59,6 +59,7 @@ export interface LegacyGoodRunData {
 export interface KnownGoodRunData extends LegacyGoodRunData {
   ok: true
   runTimeParameters: RunTimeParameter[]
+  outputFileIds: string[]
 }
 
 export interface KnownInvalidRunData extends LegacyGoodRunData {
