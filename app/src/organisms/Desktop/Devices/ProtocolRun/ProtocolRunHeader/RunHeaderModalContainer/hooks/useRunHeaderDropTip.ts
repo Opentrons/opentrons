@@ -49,7 +49,7 @@ export function useRunHeaderDropTip({
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
 
   const { closeCurrentRun } = useCloseCurrentRun()
-  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+  const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
 
   const {
     areTipsAttached,
@@ -66,7 +66,7 @@ export function useRunHeaderDropTip({
 
   const dropTipModalUtils = useProtocolDropTipModal({
     areTipsAttached,
-    toggleDTWiz,
+    enableDTWiz,
     isRunCurrent,
     currentRunId: runId,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
@@ -78,12 +78,12 @@ export function useRunHeaderDropTip({
   // The onCloseFlow for Drop Tip Wizard
   const onCloseFlow = (isTakeover?: boolean): void => {
     if (isTakeover) {
-      toggleDTWiz()
+      disableDTWiz()
     } else {
       void setTipStatusResolved(() => {
-        toggleDTWiz()
+        disableDTWiz()
         closeCurrentRun()
-      }, toggleDTWiz)
+      }, disableDTWiz)
     }
   }
 

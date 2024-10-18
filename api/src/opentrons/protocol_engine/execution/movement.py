@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from opentrons.types import Point, MountType
 from opentrons.hardware_control import HardwareControlAPI
@@ -10,6 +10,7 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from ..types import (
     WellLocation,
+    LiquidHandlingWellLocation,
     DeckPoint,
     MovementAxis,
     MotorAxis,
@@ -66,11 +67,12 @@ class MovementHandler:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: Optional[WellLocation] = None,
+        well_location: Optional[Union[WellLocation, LiquidHandlingWellLocation]] = None,
         current_well: Optional[CurrentWell] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
+        operation_volume: Optional[float] = None,
     ) -> Point:
         """Move to a specific well."""
         self._state_store.labware.raise_if_labware_inaccessible_by_pipette(
@@ -129,6 +131,7 @@ class MovementHandler:
             current_well=current_well,
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
+            operation_volume=operation_volume,
         )
 
         speed = self._state_store.pipettes.get_movement_speed(

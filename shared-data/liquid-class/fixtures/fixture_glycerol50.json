@@ -1,5 +1,6 @@
 {
-  "liquidName": "Glycerol 50%",
+  "liquidClassName": "fixture_glycerol50",
+  "displayName": "Glycerol 50%",
   "schemaVersion": 1,
   "namespace": "opentrons",
   "byPipette": [
@@ -7,7 +8,7 @@
       "pipetteModel": "p20_single_gen2",
       "byTipType": [
         {
-          "tipType": "p20_tip",
+          "tiprack": "opentrons_96_tiprack_20ul",
           "aspirate": {
             "submerge": {
               "positionReference": "liquid-meniscus",

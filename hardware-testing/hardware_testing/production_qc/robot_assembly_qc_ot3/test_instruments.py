@@ -101,7 +101,7 @@ async def _probe_mount_and_record_result(
             ui.get_user_ready(f"attach {probe.name} calibration probe")
         api.add_gripper_probe(probe)
     else:
-        await api.add_tip(mount, 0.1)
+        api.add_tip(mount, 0.1)
 
     # probe downwards
     pos = await api.gantry_position(mount)
@@ -131,7 +131,7 @@ async def _probe_mount_and_record_result(
         api.remove_gripper_probe()
         await api.ungrip()
     else:
-        await api.remove_tip(mount)
+        api.remove_tip(mount)
 
 
 async def _test_pipette(

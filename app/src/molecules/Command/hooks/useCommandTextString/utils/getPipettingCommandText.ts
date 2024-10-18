@@ -15,6 +15,7 @@ import type { GetCommandText } from '..'
 
 export const getPipettingCommandText = ({
   command,
+  allRunDefs,
   commandTextData,
   robotType,
   t,
@@ -43,6 +44,7 @@ export const getPipettingCommandText = ({
     labwareLocation != null && commandTextData != null
       ? getLabwareDisplayLocation(
           commandTextData,
+          allRunDefs,
           labwareLocation,
           t as TFunction,
           robotType

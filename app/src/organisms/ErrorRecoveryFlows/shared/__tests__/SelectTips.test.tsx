@@ -53,6 +53,7 @@ describe('SelectTips', () => {
       failedLabwareUtils: {
         selectedTipLocations: { A1: null },
         areTipsSelected: true,
+        failedLabwareLocations: { newLoc: null, currentLoc: 'A1' },
       } as any,
     }
 
@@ -160,6 +161,7 @@ describe('SelectTips', () => {
       failedLabwareUtils: {
         selectedTipLocations: null,
         areTipsSelected: false,
+        failedLabwareLocations: { newLoc: null, currentLoc: '' },
       } as any,
     }
 

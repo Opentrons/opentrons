@@ -42,8 +42,6 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const deckSetup = useSelector(getInitialDeckSetup)
   const modulesOnDeck = getModulesOnDeckByType(deckSetup, MAGNETIC_MODULE_TYPE)
 
-  console.log(modulesOnDeck)
-
   const moduleModel = moduleEntities[formData.moduleId].model
 
   const slotInfo = moduleLabwareOptions[0].name.split('in')

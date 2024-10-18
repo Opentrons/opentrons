@@ -15,6 +15,7 @@ vi.mock('../../shared', () => ({
   GripperReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
   TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
   RetryStepInfo: vi.fn(() => <div>MOCK_RETRY_STEP_INFO</div>),
+  RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
 }))
 
 vi.mock('../SelectRecoveryOption', () => ({
@@ -52,6 +53,13 @@ describe('ManualReplaceLwAndRetry', () => {
       RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE
     render(props)
     screen.getByText('MOCK_GRIPPER_RELEASE_LABWARE')
+  })
+
+  it(`renders RecoveryDoorOpenSpecial for ${RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME} step`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME
+    render(props)
+    screen.getByText('MOCK_DOOR_OPEN_SPECIAL')
   })
 
   it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE} step`, () => {

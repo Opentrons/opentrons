@@ -5,6 +5,7 @@ export interface CalibrateDeckParentProps {
   robotName: string
   session: DeckCalibrationSession | null
   dispatchRequests: DispatchRequestsType
+  requestIds: string[]
   showSpinner: boolean
   isJogging: boolean
   exitBeforeDeckConfigCompletion?: MutableRefObject<boolean>

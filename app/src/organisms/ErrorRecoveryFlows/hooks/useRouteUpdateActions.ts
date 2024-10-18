@@ -4,7 +4,12 @@ import last from 'lodash/last'
 
 import head from 'lodash/head'
 
-import { INVALID, RECOVERY_MAP, STEP_ORDER } from '../constants'
+import {
+  INVALID,
+  RECOVERY_MAP,
+  STEP_ORDER,
+  GRIPPER_MOVE_STEPS,
+} from '../constants'
 import type {
   IRecoveryMap,
   RecoveryRoute,
@@ -13,11 +18,6 @@ import type {
 } from '../types'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 import type { UseShowDoorInfoResult } from './useShowDoorInfo'
-
-const GRIPPER_MOVE_STEPS: RouteStep[] = [
-  RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE,
-  RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
-]
 
 export interface GetRouteUpdateActionsParams {
   hasLaunchedRecovery: boolean

@@ -1,14 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import {
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  InputField,
-  SPACING,
-  Tooltip,
-  useHoverTooltip,
-} from '@opentrons/components'
+import { Flex, InputField, SPACING } from '@opentrons/components'
 import type { FieldProps } from '../../components/StepEditForm/types'
 
 interface InputStepFormFieldProps extends FieldProps {
@@ -38,29 +29,14 @@ export function InputStepFormField(
     ...otherProps
   } = props
   const { t } = useTranslation('tooltip')
-  const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={padding}>
-      <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
-        {showTooltip ? (
-          <>
-            <Flex {...targetProps}>
-              <Icon
-                name="information"
-                size={SPACING.spacing12}
-                color={COLORS.grey60}
-                data-testid="information_icon"
-              />
-            </Flex>
-            <Tooltip tooltipProps={tooltipProps}>
-              {t(`${tooltipContent}`)}
-            </Tooltip>
-          </>
-        ) : null}
-      </Flex>
+    <Flex padding={padding} width="100%">
       <InputField
         {...otherProps}
+        tooltipText={
+          showTooltip ? t(`${tooltipContent}`) ?? undefined : undefined
+        }
         title={title}
         caption={caption}
         name={name}

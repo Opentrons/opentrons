@@ -26,7 +26,10 @@ export function getLoadedPipette(
     : commandTextData.pipettes[mount]
 }
 export function getLoadedModule(
-  commandTextData: CompletedProtocolAnalysis | RunData | CommandTextData,
+  commandTextData:
+    | CompletedProtocolAnalysis
+    | RunData
+    | Omit<CommandTextData, 'commands'>,
   moduleId: string
 ): LoadedModule | undefined {
   // NOTE: old analysis contains a object dictionary of module entities by id, this case is supported for backwards compatibility purposes
