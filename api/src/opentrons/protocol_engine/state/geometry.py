@@ -1386,9 +1386,9 @@ class GeometryView:
             volume = operation_volume or 0.0
 
         if volume:
-            well_geometry = self._labware.get_well_geometry(labware_id, well_name)
             return self.get_well_height_after_volume(
-                well_geometry=well_geometry,
+                labware_id=labware_id,
+                well_name=well_name,
                 initial_height=initial_handling_height,
                 volume=volume,
             )
@@ -1431,12 +1431,13 @@ class GeometryView:
         return float(handling_height)
 
     def get_well_height_after_volume(
-        self, well_geometry: InnerWellGeometry, initial_height: float, volume: float
+        self, labware_id: str, well_name: str, initial_height: float, volume: float
     ) -> float:
         """Return the height of liquid in a labware well after a given volume has been handled.
 
         This is given an initial handling height, with reference to the well bottom.
         """
+        well_geometry = self._labware.get_well_geometry(labware_id=labware_id, well_name=well_name)
         initial_volume = find_volume_at_well_height(
             target_height=initial_height, well_geometry=well_geometry
         )
