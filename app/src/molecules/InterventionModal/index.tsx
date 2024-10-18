@@ -53,6 +53,7 @@ const BASE_STYLE = {
   right: 0,
   bottom: 0,
   left: 0,
+  padding: '1rem',
   width: '100%',
   height: '100%',
   'data-testid': '__otInterventionModalHeaderBase',
