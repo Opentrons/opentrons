@@ -1,6 +1,8 @@
-import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
+import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+
+// Note: This is an O(n) operation.
 export function getLabwareDefinitionsFromCommands(
   commands: RunTimeCommand[]
 ): LabwareDefinition2[] {

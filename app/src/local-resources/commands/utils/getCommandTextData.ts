@@ -4,7 +4,7 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandTextData } from '../types'
+import type { CommandTextData } from '/app/local-resources/commands/types'
 
 export function getCommandTextData(
   protocolData:
