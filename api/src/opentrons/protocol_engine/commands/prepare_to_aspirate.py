@@ -63,8 +63,8 @@ class PrepareToAspirateImplementation(
 
     async def execute(self, params: PrepareToAspirateParams) -> _ExecuteReturn:
         """Prepare the pipette to aspirate."""
+        current_position = await self._gantry_mover.get_position(params.pipetteId)
         try:
-            current_position = await self._gantry_mover.get_position(params.pipetteId)
             await self._pipetting_handler.prepare_for_aspirate(
                 pipette_id=params.pipetteId,
             )
