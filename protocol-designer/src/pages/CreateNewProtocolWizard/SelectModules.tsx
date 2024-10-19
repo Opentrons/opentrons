@@ -38,7 +38,13 @@ import {
   FLEX_SUPPORTED_MODULE_MODELS,
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
-import { getNumOptions, getNumSlotsAvailable } from './utils'
+import {
+  getNumOptions,
+  getNumSlotsAvailable,
+  getModuleDistribution,
+  getAvailableSlots,
+  getCanAddModule,
+} from './utils'
 import { HandleEnter } from './HandleEnter'
 
 import type { DropdownBorder } from '@opentrons/components'
@@ -64,6 +70,11 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
       ? FLEX_SUPPORTED_MODULE_MODELS
       : OT2_SUPPORTED_MODULE_MODELS
 
+  const distribution = getModuleDistribution(modules)
+  console.log('distribution', distribution)
+  const availableSlots = getAvailableSlots(distribution)
+  console.log('availableSlots', availableSlots)
+
   const numSlotsAvailable = getNumSlotsAvailable(modules, additionalEquipment)
   const hasNoAvailableSlots = numSlotsAvailable === 0
   const numMagneticBlocks =
@@ -87,21 +98,40 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
     ? [TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE, MAGNETIC_BLOCK_TYPE]
     : [TEMPERATURE_MODULE_TYPE]
 
+  // const handleAddModule = (moduleModel: ModuleModel): void => {
+  //   // Need to fix since this condition isn't quite right
+  //   if (hasNoAvailableSlots) {
+  //     makeSnackbar(t('slots_limit_reached') as string)
+  //   } else {
+  //     setValue('modules', {
+  //       ...modules,
+  //       [uuid()]: {
+  //         model: moduleModel,
+  //         type: getModuleType(moduleModel),
+  //         slot:
+  //           robotType === FLEX_ROBOT_TYPE
+  //             ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
+  //             : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
+  //       },
+  //     })
+  //   }
+  // }
+
   const handleAddModule = (moduleModel: ModuleModel): void => {
-    if (hasNoAvailableSlots) {
-      makeSnackbar(t('slots_limit_reached') as string)
-    } else {
+    const moduleType = getModuleType(moduleModel)
+    const distribution = getModuleDistribution(modules)
+
+    if (getCanAddModule(moduleType, distribution)) {
       setValue('modules', {
         ...modules,
         [uuid()]: {
           model: moduleModel,
-          type: getModuleType(moduleModel),
-          slot:
-            robotType === FLEX_ROBOT_TYPE
-              ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-              : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
+          type: moduleType,
+          slot: null,
         },
       })
+    } else {
+      makeSnackbar(t('cannot_add_module') as string)
     }
   }
 
@@ -256,13 +286,14 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                           )
                         },
                         dropdownType: 'neutral' as DropdownBorder,
-                        filterOptions: getNumOptions(
-                          module.model === 'magneticBlockV1'
-                            ? numSlotsAvailable +
-                                MAGNETIC_BLOCKS_ADJUSTMENT +
-                                module.count
-                            : numSlotsAvailable + module.count
-                        ),
+                        // filterOptions: getNumOptions(
+                        //   module.model === 'magneticBlockV1'
+                        //     ? numSlotsAvailable +
+                        //         MAGNETIC_BLOCKS_ADJUSTMENT +
+                        //         module.count
+                        //     : numSlotsAvailable + module.count
+                        // ),
+                        filterOptions: getNumOptions(module.type, distribution),
                       }
                       return (
                         <ListItem type="noActive" key={`${module.model}`}>
