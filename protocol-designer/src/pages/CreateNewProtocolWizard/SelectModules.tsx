@@ -53,7 +53,7 @@ import type { FormModule, FormModules } from '../../step-forms'
 import type { WizardTileProps } from './types'
 
 const MAX_MAGNETIC_BLOCKS = 4
-const MAGNETIC_BLOCKS_ADJUSTMENT = 3
+// const MAGNETIC_BLOCKS_ADJUSTMENT = 3
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -127,7 +127,10 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
         [uuid()]: {
           model: moduleModel,
           type: moduleType,
-          slot: null,
+          slot:
+            robotType === FLEX_ROBOT_TYPE
+              ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
+              : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
         },
       })
     } else {
