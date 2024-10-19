@@ -18,6 +18,7 @@
   "error_dropping_tips": "Error dropping tips",
   "exit": "Exit",
   "exit_and_home_pipette": "Exit and home pipette",
+  "fixed_trash_in_12": "Fixed trash in 12",
   "getting_ready": "Getting ready…",
   "go_back": "Go back",
   "jog_too_far": "Jog too far?",
@@ -46,5 +47,5 @@
   "waste_chute_in_slot": "Waste chute in {{slot}}",
   "where_to_blowout": "Where do you want to blow out the aspirated liquid?",
   "where_to_drop_tips": "Where do you want to drop the attached tips?",
-  "yes_blow_out_liquid": "Yes, blow out liquid in labware"
+  "yes_blow_out_liquid": "Yes, choose blowout location"
 }

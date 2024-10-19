@@ -171,7 +171,7 @@ describe('TipNotDetectedBanner', () => {
         heading:
           'Tip presence errors are usually caused by improperly placed labware or inaccurate labware offsets',
         message:
-          ' If the issue persists, cancel the run and initiate Labware Position Check',
+          ' If the issue persists, cancel the run and perform Labware Position Check',
       }),
       {}
     )

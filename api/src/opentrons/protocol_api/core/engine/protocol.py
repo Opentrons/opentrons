@@ -2,11 +2,17 @@
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
+from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
+
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data import liquid_classes
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    LiquidClassSchemaV1,
+)
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
@@ -51,7 +57,7 @@ from opentrons.protocol_engine.errors import (
 
 from ... import validation
 from ..._types import OffDeckType
-from ..._liquid import Liquid
+from ..._liquid import Liquid, LiquidClass
 from ...disposal_locations import TrashBin, WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -103,6 +109,7 @@ class ProtocolCore(
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
+        self._defined_liquid_class_defs_by_name: Dict[str, LiquidClassSchemaV1] = {}
         self._load_fixed_trash()
 
     @property
@@ -311,7 +318,6 @@ class ProtocolCore(
 
         return labware_core
 
-    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareCore,
@@ -747,6 +753,23 @@ class ProtocolCore(
                 liquid.displayColor.__root__ if liquid.displayColor else None
             ),
         )
+
+    def define_liquid_class(self, name: str) -> LiquidClass:
+        """Define a liquid class for use in transfer functions."""
+        try:
+            # Check if we have already loaded this liquid class' definition
+            liquid_class_def = self._defined_liquid_class_defs_by_name[name]
+        except KeyError:
+            try:
+                # Fetching the liquid class data from file and parsing it
+                # is an expensive operation and should be avoided.
+                # Calling this often will degrade protocol execution performance.
+                liquid_class_def = liquid_classes.load_definition(name)
+                self._defined_liquid_class_defs_by_name[name] = liquid_class_def
+            except LiquidClassDefinitionDoesNotExist:
+                raise ValueError(f"Liquid class definition not found for '{name}'.")
+
+        return LiquidClass.create(liquid_class_def)
 
     def get_labware_location(
         self, labware_core: LabwareCore

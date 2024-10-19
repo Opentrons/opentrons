@@ -23,7 +23,7 @@ import {
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { CommandText, CommandIcon } from '/app/molecules/Command'
-import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
+import { getCommandTextData } from '/app/local-resources/commands'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
@@ -31,6 +31,7 @@ import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import type { ViewportListRef } from 'react-viewport-list'
 import type {
   CompletedProtocolAnalysis,
+  LabwareDefinition2,
   RobotType,
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
@@ -60,17 +61,6 @@ const COMMAND_ROW_STYLE = css`
   overflow: hidden;
 `
 
-// Note (kj:05/15/2023)
-// This blur part will be fixed before the launch
-// const BOTTOM_ROW_STYLE = css`
-//   position: ${POSITION_ABSOLUTE};
-//   bottom: 0;
-//   width: 100%;
-//   height: 5rem;
-//   z-index: 6;
-//   backdrop-filter: blur(1.5px);
-// `
-
 interface VisibleIndexRange {
   lowestVisibleIndex: number
   highestVisibleIndex: number
@@ -87,6 +77,7 @@ interface RunningProtocolCommandListProps {
   robotAnalyticsData: RobotAnalyticsData | null
   protocolName?: string
   currentRunCommandIndex?: number
+  allRunDefs: LabwareDefinition2[]
 }
 
 export function RunningProtocolCommandList({
@@ -100,6 +91,7 @@ export function RunningProtocolCommandList({
   robotAnalyticsData,
   protocolName,
   currentRunCommandIndex,
+  allRunDefs,
 }: RunningProtocolCommandListProps): JSX.Element {
   const { t } = useTranslation('run_details')
   const viewPortRef = useRef<HTMLDivElement | null>(null)
@@ -249,6 +241,7 @@ export function RunningProtocolCommandList({
                       robotType={robotType}
                       css={COMMAND_ROW_STYLE}
                       isOnDevice={true}
+                      allRunDefs={allRunDefs}
                     />
                   </Flex>
                 </Flex>

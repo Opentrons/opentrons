@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
@@ -57,6 +57,7 @@ import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { OnDeviceRouteParams } from '/app/App/types'
 
@@ -152,6 +153,15 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipeType, setSwipeType])
 
+  const isValidRobotSideAnalysis = robotSideAnalysis != null
+  const allRunDefs = useMemo(
+    () =>
+      robotSideAnalysis != null
+        ? getLabwareDefinitionsFromCommands(robotSideAnalysis.commands)
+        : [],
+    [isValidRobotSideAnalysis]
+  )
+
   return (
     <>
       {isERActive ? (
@@ -228,6 +238,7 @@ export function RunningProtocol(): JSX.Element {
                 updateLastAnimatedCommand={(newCommandKey: string) =>
                   (lastAnimatedCommand.current = newCommandKey)
                 }
+                allRunDefs={allRunDefs}
               />
             ) : (
               <>
@@ -242,6 +253,7 @@ export function RunningProtocol(): JSX.Element {
                   robotAnalyticsData={robotAnalyticsData}
                   currentRunCommandIndex={currentRunCommandIndex}
                   robotSideAnalysis={robotSideAnalysis}
+                  allRunDefs={allRunDefs}
                 />
                 <Flex
                   css={css`

@@ -46,7 +46,7 @@ export function useDashboardCalibrateTipLength(
 
   const sessionType = Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
 
-  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
+  const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
@@ -171,6 +171,7 @@ export function useDashboardCalibrateTipLength(
         robotName={robotName}
         showSpinner={showSpinner}
         dispatchRequests={dispatchRequests}
+        requestIds={requestIds}
         isJogging={isJogging}
         offsetInvalidationHandler={invalidateHandlerRef.current}
         allowChangeTipRack={sessionParams.current?.tipRackDefinition == null}

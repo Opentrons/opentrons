@@ -103,12 +103,11 @@ def test_well_center(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> N
 
 def test_well_meniscus(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
     """It should get a Location representing the meniscus of the well."""
-    decoy.when(mock_well_core.get_meniscus(z_offset=4.2)).then_return(Point(1, 2, 3))
-
     result = subject.meniscus(4.2)
 
     assert isinstance(result, Location)
-    assert result.point == Point(1, 2, 3)
+    assert result.point == Point(0, 0, 4.2)
+    assert result.is_meniscus is True
     assert result.labware.as_well() is subject
 
 

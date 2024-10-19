@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import ViewportList from 'react-viewport-list'
@@ -27,7 +27,9 @@ import {
   wellFillFromWellContents,
 } from './utils'
 import { CommandItem } from './CommandItem'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
+import type { ComponentProps } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
 import type {
   CompletedProtocolAnalysis,
@@ -66,12 +68,10 @@ export function ProtocolTimelineScrubber(
   props: ProtocolTimelineScrubberProps
 ): JSX.Element {
   const { commands, analysis, robotType = FLEX_ROBOT_TYPE } = props
-  const wrapperRef = React.useRef<HTMLDivElement>(null)
-  const commandListRef = React.useRef<ViewportListRef>(null)
-  const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
-    0
-  )
-  const [isPlaying, setIsPlaying] = React.useState<boolean>(true)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const commandListRef = useRef<ViewportListRef>(null)
+  const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
+  const [isPlaying, setIsPlaying] = useState<boolean>(true)
 
   const currentCommandsSlice = commands.slice(0, currentCommandIndex + 1)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
@@ -81,7 +81,7 @@ export function ProtocolTimelineScrubber(
     setIsPlaying(!isPlaying)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isPlaying) {
       const intervalId = setInterval(() => {
         setCurrentCommandIndex(prev => {
@@ -123,6 +123,15 @@ export function ProtocolTimelineScrubber(
     liquid => liquid.displayColor ?? COLORS.blue50
   )
 
+  const isValidRobotSideAnalysis = analysis != null
+  const allRunDefs = useMemo(
+    () =>
+      analysis != null
+        ? getLabwareDefinitionsFromCommands(analysis.commands)
+        : [],
+    [isValidRobotSideAnalysis]
+  )
+
   return (
     <Flex
       height="95vh"
@@ -142,7 +151,7 @@ export function ProtocolTimelineScrubber(
 
               const getModuleInnerProps = (
                 moduleState: ModuleTemporalProperties['moduleState']
-              ): React.ComponentProps<typeof Module>['innerProps'] => {
+              ): ComponentProps<typeof Module>['innerProps'] => {
                 if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
                   let lidMotorState = 'unknown'
                   if (moduleState.lidOpen === true) {
@@ -282,6 +291,7 @@ export function ProtocolTimelineScrubber(
               setCurrentCommandIndex={setCurrentCommandIndex}
               analysis={analysis}
               robotType={robotType}
+              allRunDefs={allRunDefs}
             />
           )}
         </ViewportList>

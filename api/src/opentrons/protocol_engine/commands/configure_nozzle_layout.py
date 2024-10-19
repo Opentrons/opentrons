@@ -10,9 +10,6 @@ from .pipetting_common import (
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
-from .configuring_common import (
-    PipetteNozzleLayoutResultMixin,
-)
 from ..types import (
     AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
@@ -40,12 +37,6 @@ class ConfigureNozzleLayoutParams(PipetteIdMixin):
     ]
 
 
-class ConfigureNozzleLayoutPrivateResult(PipetteNozzleLayoutResultMixin):
-    """Result sent to the store but not serialized."""
-
-    pass
-
-
 class ConfigureNozzleLayoutResult(BaseModel):
     """Result data from execution of an configureNozzleLayout command."""
 
@@ -55,7 +46,7 @@ class ConfigureNozzleLayoutResult(BaseModel):
 class ConfigureNozzleLayoutImplementation(
     AbstractCommandImpl[
         ConfigureNozzleLayoutParams,
-        SuccessData[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult],
+        SuccessData[ConfigureNozzleLayoutResult, None],
     ]
 ):
     """Configure nozzle layout command implementation."""
@@ -68,7 +59,7 @@ class ConfigureNozzleLayoutImplementation(
 
     async def execute(
         self, params: ConfigureNozzleLayoutParams
-    ) -> SuccessData[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult]:
+    ) -> SuccessData[ConfigureNozzleLayoutResult, None]:
         """Check that requested pipette can support the requested nozzle layout."""
         primary_nozzle = params.configurationParams.dict().get("primaryNozzle")
         front_right_nozzle = params.configurationParams.dict().get("frontRightNozzle")
@@ -93,10 +84,7 @@ class ConfigureNozzleLayoutImplementation(
 
         return SuccessData(
             public=ConfigureNozzleLayoutResult(),
-            private=ConfigureNozzleLayoutPrivateResult(
-                pipette_id=params.pipetteId,
-                nozzle_map=nozzle_map,
-            ),
+            private=None,
             state_update=update_state,
         )
 

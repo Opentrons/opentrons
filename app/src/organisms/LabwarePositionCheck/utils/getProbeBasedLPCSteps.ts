@@ -2,7 +2,7 @@ import { isEqual } from 'lodash'
 import { SECTIONS } from '../constants'
 import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type {
   CompletedProtocolAnalysis,
@@ -58,7 +58,10 @@ function getAllCheckSectionSteps(
       const labwareDef = labwareDefinitions.find(
         def => getLabwareDefURI(def) === labwareLocationCombo.definitionUri
       )
-      if ((labwareDef?.allowedRoles ?? []).includes('adapter')) {
+      if (
+        (labwareDef?.allowedRoles ?? []).includes('adapter') ||
+        (labwareDef?.allowedRoles ?? []).includes('lid')
+      ) {
         return acc
       }
       // remove duplicate definitionUri in same location

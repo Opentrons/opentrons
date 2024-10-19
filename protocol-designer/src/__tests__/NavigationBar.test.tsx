@@ -31,7 +31,7 @@ describe('NavigationBar', () => {
     render()
     screen.getByText('Opentrons')
     screen.getByText('Protocol Designer')
-    screen.getByText('Version # fake_PD_version')
+    screen.getByText('Version fake_PD_version')
     screen.getByText('Create new')
     screen.getByText('Import')
     screen.getByText('mock SettingsIcon')

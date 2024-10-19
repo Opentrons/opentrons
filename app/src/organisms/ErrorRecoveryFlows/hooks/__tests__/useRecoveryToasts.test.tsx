@@ -14,16 +14,17 @@ import {
 } from '../useRecoveryToasts'
 import { RECOVERY_MAP } from '../../constants'
 import { useToaster } from '../../../ToasterOven'
-import { useCommandTextString } from '/app/molecules/Command'
+import { useCommandTextString } from '/app/local-resources/commands'
 
 import type { Mock } from 'vitest'
 import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')
-vi.mock('/app/molecules/Command')
+vi.mock('/app/local-resources/commands')
 
 const TEST_COMMAND = 'test command'
-const TC_COMMAND = 'tc command cycle some more text'
+const TC_COMMAND =
+  'tc starting profile of 1231231 element steps composed of some extra text bla bla'
 
 let mockMakeToast: Mock
 
@@ -33,6 +34,7 @@ const DEFAULT_PROPS: BuildToast = {
   selectedRecoveryOption: RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE,
   commandTextData: { commands: [] } as any,
   robotType: FLEX_ROBOT_TYPE,
+  allRunDefs: [],
 }
 
 // Utility function for rendering with I18nextProvider
@@ -45,6 +47,7 @@ describe('useRecoveryToasts', () => {
     mockMakeToast = vi.fn()
     vi.mocked(useToaster).mockReturnValue({ makeToast: mockMakeToast } as any)
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
     })
   })
@@ -69,6 +72,7 @@ describe('useRecoveryToasts', () => {
 
   it('should make toast with correct parameters for desktop', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
     })
 
@@ -80,8 +84,8 @@ describe('useRecoveryToasts', () => {
     )
 
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
-      stepTexts: undefined,
     })
 
     result.current.makeSuccessToast()
@@ -120,8 +124,8 @@ describe('useRecoveryToasts', () => {
 
   it('should use recoveryToastText when desktopFullCommandText is null', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: '',
-      stepTexts: undefined,
     })
 
     const { result } = renderHook(() =>
@@ -196,8 +200,8 @@ describe('getStepNumber', () => {
 describe('useRecoveryFullCommandText', () => {
   it('should return the correct command text', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
-      stepTexts: undefined,
     })
 
     const { result } = renderHook(() =>
@@ -205,6 +209,7 @@ describe('useRecoveryFullCommandText', () => {
         robotType: FLEX_ROBOT_TYPE,
         stepNumber: 0,
         commandTextData: { commands: [TEST_COMMAND] } as any,
+        allRunDefs: [],
       })
     )
 
@@ -213,8 +218,8 @@ describe('useRecoveryFullCommandText', () => {
 
   it('should return null when relevantCmd is null', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: '',
-      stepTexts: undefined,
     })
 
     const { result } = renderHook(() =>
@@ -222,6 +227,7 @@ describe('useRecoveryFullCommandText', () => {
         robotType: FLEX_ROBOT_TYPE,
         stepNumber: 1,
         commandTextData: { commands: [] } as any,
+        allRunDefs: [],
       })
     )
 
@@ -234,6 +240,7 @@ describe('useRecoveryFullCommandText', () => {
         robotType: FLEX_ROBOT_TYPE,
         stepNumber: '?',
         commandTextData: { commands: [] } as any,
+        allRunDefs: [],
       })
     )
 
@@ -242,6 +249,7 @@ describe('useRecoveryFullCommandText', () => {
 
   it('should truncate TC command', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'thermocycler/runProfile',
       commandText: TC_COMMAND,
       stepTexts: ['step'],
     })
@@ -253,9 +261,29 @@ describe('useRecoveryFullCommandText', () => {
         commandTextData: {
           commands: [TC_COMMAND],
         } as any,
+        allRunDefs: [],
       })
     )
+    expect(result.current).toBe('tc starting profile of 1231231 element steps')
+  })
 
-    expect(result.current).toBe('tc command cycle')
+  it('should truncate new TC command', () => {
+    vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'thermocycler/runExtendedProfile',
+      commandText: TC_COMMAND,
+      profileElementTexts: [{ kind: 'step', stepText: 'blah blah blah' }],
+    })
+
+    const { result } = renderHook(() =>
+      useRecoveryFullCommandText({
+        robotType: FLEX_ROBOT_TYPE,
+        stepNumber: 0,
+        commandTextData: {
+          commands: [TC_COMMAND],
+        } as any,
+        allRunDefs: [],
+      })
+    )
+    expect(result.current).toBe('tc starting profile of 1231231 element steps')
   })
 })

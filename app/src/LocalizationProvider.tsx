@@ -1,23 +1,27 @@
-import type * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 
-import { resources } from './assets/localization'
-import { useIsOEMMode } from './resources/robot-settings/hooks'
-import { i18n, i18nCb, i18nConfig } from './i18n'
+import { resources } from '/app/assets/localization'
+import { i18n, i18nCb, i18nConfig } from '/app/i18n'
+import { getAppLanguage } from '/app/redux/config'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 
-export interface OnDeviceLocalizationProviderProps {
+import type * as React from 'react'
+
+export interface LocalizationProviderProps {
   children?: React.ReactNode
 }
 
 export const BRANDED_RESOURCE = 'branded'
 export const ANONYMOUS_RESOURCE = 'anonymous'
 
-// TODO(bh, 2024-03-26): anonymization limited to ODD for now, may change in future OEM phases
-export function OnDeviceLocalizationProvider(
-  props: OnDeviceLocalizationProviderProps
+export function LocalizationProvider(
+  props: LocalizationProviderProps
 ): JSX.Element | null {
   const isOEMMode = useIsOEMMode()
+
+  const language = useSelector(getAppLanguage)
 
   // iterate through language resources, nested files, substitute anonymous file for branded file for OEM mode
   const anonResources = reduce(
@@ -44,6 +48,7 @@ export function OnDeviceLocalizationProvider(
   const anonI18n = i18n.createInstance(
     {
       ...i18nConfig,
+      lng: language ?? 'en',
       resources: anonResources,
     },
     i18nCb

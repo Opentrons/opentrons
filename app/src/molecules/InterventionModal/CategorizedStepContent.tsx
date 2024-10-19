@@ -1,7 +1,5 @@
 import { css } from 'styled-components'
-import { Command, CommandIndex } from '../Command'
-import type { NonSkeletonCommandState, CommandTextData } from '../Command'
-import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
+
 import {
   StyledText,
   Flex,
@@ -11,6 +9,16 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
+import { Command, CommandIndex } from '../Command'
+
+import type { CommandTextData } from '/app/local-resources/commands'
+import type { NonSkeletonCommandState } from '../Command'
+import type {
+  LabwareDefinition2,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+
 export interface CommandWithIndex {
   index: number | undefined
   command: RunTimeCommand
@@ -19,6 +27,7 @@ export interface CommandWithIndex {
 export interface CategorizedStepContentProps {
   robotType: RobotType
   commandTextData: CommandTextData | null
+  allRunDefs: LabwareDefinition2[]
   topCategoryHeadline: string
   topCategory: NonSkeletonCommandState
   topCategoryCommand: CommandWithIndex | null
@@ -35,6 +44,7 @@ const EMPTY_COMMAND = {
   command: null,
   state: 'loading',
   commandTextData: null,
+  allRunDefs: [],
 } as const
 
 type MappedState =
@@ -42,17 +52,19 @@ type MappedState =
       command: RunTimeCommand
       state: NonSkeletonCommandState
       commandTextData: CommandTextData
+      allRunDefs: LabwareDefinition2[]
     }
   | typeof EMPTY_COMMAND
 
 const commandAndState = (
   command: CommandWithIndex | null,
   state: NonSkeletonCommandState,
-  commandTextData: CommandTextData | null
+  commandTextData: CommandTextData | null,
+  allRunDefs: LabwareDefinition2[]
 ): MappedState =>
   command == null || commandTextData == null
     ? EMPTY_COMMAND
-    : { state, command: command.command, commandTextData }
+    : { state, command: command.command, commandTextData, allRunDefs }
 
 export function CategorizedStepContent(
   props: CategorizedStepContentProps
@@ -97,7 +109,8 @@ export function CategorizedStepContent(
             {...commandAndState(
               props.topCategoryCommand,
               props.topCategory,
-              props.commandTextData
+              props.commandTextData,
+              props.allRunDefs
             )}
             robotType={props.robotType}
             aligned="left"
@@ -137,7 +150,8 @@ export function CategorizedStepContent(
                 {...commandAndState(
                   command,
                   props.bottomCategory,
-                  props.commandTextData
+                  props.commandTextData,
+                  props.allRunDefs
                 )}
                 robotType={props.robotType}
                 aligned="left"

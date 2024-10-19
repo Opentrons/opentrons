@@ -17,7 +17,7 @@ from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ...disposal_locations import TrashBin, WasteChute
-from ..._liquid import Liquid
+from ..._liquid import Liquid, LiquidClass
 from ..._types import OffDeckType
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -267,7 +267,6 @@ class LegacyProtocolCore(
         """Load an adapter using its identifying parameters"""
         raise APIVersionError(api_element="Loading adapter")
 
-    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LegacyLabwareCore,
@@ -531,6 +530,10 @@ class LegacyProtocolCore(
     ) -> Liquid:
         """Define a liquid to load into a well."""
         assert False, "define_liquid only supported on engine core"
+
+    def define_liquid_class(self, name: str) -> LiquidClass:
+        """Define a liquid class."""
+        assert False, "define_liquid_class is only supported on engine core"
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore

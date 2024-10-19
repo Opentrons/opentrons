@@ -557,6 +557,79 @@ def test_door_during_error_recovery() -> None:
     assert subject.state.failed_command_errors == [expected_error_occurance]
 
 
+@pytest.mark.parametrize("close_door_before_queueing", [False, True])
+def test_door_ungrip_labware(close_door_before_queueing: bool) -> None:
+    """Ungrip commands should be able to run even when the door is open."""
+    subject = CommandStore(
+        is_door_open=False,
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    # Fail a command to put the subject in recovery mode.
+    queue_failing = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="failing-command-id",
+    )
+    subject.handle_action(queue_failing)
+    run_failing = actions.RunCommandAction(
+        command_id="failing-command-id",
+        started_at=datetime(year=2022, month=2, day=2),
+    )
+    subject.handle_action(run_failing)
+    expected_error = errors.ProtocolEngineError(message="oh no")
+    fail_failing = actions.FailCommandAction(
+        command_id="failing-command-id",
+        running_command=subject_view.get("failing-command-id"),
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=expected_error,
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+    )
+    subject.handle_action(fail_failing)
+
+    # Open the door:
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+    assert (
+        subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+    )
+    assert subject_view.get_next_to_execute() is None
+
+    if close_door_before_queueing:
+        subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+
+    assert subject_view.get_status() in (
+        EngineStatus.AWAITING_RECOVERY_PAUSED,  # If we closed the door.
+        EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,  # If we didn't.
+    )
+
+    # Make sure the special ungrip command can be queued and that it will be returned
+    # as next to execute:
+    queue_fixit = actions.QueueCommandAction(
+        request=commands.unsafe.UnsafeUngripLabwareCreate(
+            params=commands.unsafe.UnsafeUngripLabwareParams(),
+            intent=CommandIntent.FIXIT,
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="fixit-command-id",
+    )
+    subject_view.validate_action_allowed(queue_fixit)
+    subject.handle_action(queue_fixit)
+    assert subject_view.get_next_to_execute() == "fixit-command-id"
+
+
 @pytest.mark.parametrize(
     ("door_initially_open", "expected_engine_status_after_play"),
     [

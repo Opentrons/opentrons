@@ -3,11 +3,11 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { RECOVERY_MAP_METADATA } from '../constants'
+import { GRIPPER_MOVE_STEPS, RECOVERY_MAP_METADATA } from '../constants'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { ErrorRecoveryFlowsProps } from '../index'
-import type { IRecoveryMap } from '../types'
+import type { IRecoveryMap, RouteStep } from '../types'
 
 const DOOR_OPEN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
@@ -24,13 +24,17 @@ export interface UseShowDoorInfoResult {
 // Whether the door is open and not permitted to be open or the user has not yet resumed the run after a door open event.
 export function useShowDoorInfo(
   runStatus: ErrorRecoveryFlowsProps['runStatus'],
-  recoveryMap: IRecoveryMap
+  recoveryMap: IRecoveryMap,
+  currentStep: RouteStep
 ): UseShowDoorInfoResult {
   // TODO(jh, 07-16-24): "recovery paused" is only used for door status and therefore
   // a valid way to ensure all apps show the door open prompt, however this could be problematic in the future.
   // Consider restructuring this check once the takeover modals are added.
   const isDoorOpen = runStatus != null && DOOR_OPEN_STATUSES.includes(runStatus)
-  const isProhibitedDoorOpen = isDoorOpen && !isDoorPermittedOpen(recoveryMap)
+  const isProhibitedDoorOpen =
+    isDoorOpen &&
+    !isDoorPermittedOpen(recoveryMap) &&
+    !GRIPPER_MOVE_STEPS.includes(currentStep)
 
   return { isDoorOpen, isProhibitedDoorOpen }
 }

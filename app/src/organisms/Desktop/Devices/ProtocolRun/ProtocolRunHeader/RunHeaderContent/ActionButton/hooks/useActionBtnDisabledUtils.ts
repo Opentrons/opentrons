@@ -23,7 +23,7 @@ interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
 }
 
 type UseActionButtonDisabledUtilsResult =
-  | { isDisabled: true; disabledReason: string }
+  | { isDisabled: true; disabledReason: string | null }
   | { isDisabled: false; disabledReason: null }
 
 // Manages the various reasons the ActionButton may be disabled, returning the disabled state and user-facing disabled
@@ -45,7 +45,6 @@ export function useActionBtnDisabledUtils(
     isClosingCurrentRun,
   } = props
 
-  const { t } = useTranslation('shared')
   const {
     isPlayRunActionLoading,
     isPauseRunActionLoading,
@@ -77,7 +76,7 @@ export function useActionBtnDisabledUtils(
   })
 
   return isDisabled
-    ? { isDisabled: true, disabledReason: disabledReason ?? t('robot_is_busy') }
+    ? { isDisabled: true, disabledReason }
     : { isDisabled: false, disabledReason: null }
 }
 

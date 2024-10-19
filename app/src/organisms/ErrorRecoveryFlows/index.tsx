@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -17,6 +17,7 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getIsOnDevice } from '/app/redux/config'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
 import { RecoveryTakeover } from './RecoveryTakeover'
@@ -125,6 +126,15 @@ export function ErrorRecoveryFlows(
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const robotName = useHost()?.robotName ?? 'robot'
 
+  const isValidRobotSideAnalysis = protocolAnalysis != null
+  const allRunDefs = useMemo(
+    () =>
+      protocolAnalysis != null
+        ? getLabwareDefinitionsFromCommands(protocolAnalysis.commands)
+        : [],
+    [isValidRobotSideAnalysis]
+  )
+
   const {
     showTakeover,
     isActiveUser,
@@ -140,6 +150,7 @@ export function ErrorRecoveryFlows(
     robotType,
     showTakeover,
     failedCommand: failedCommandBySource,
+    allRunDefs,
   })
 
   const renderWizard =
@@ -164,6 +175,7 @@ export function ErrorRecoveryFlows(
           robotType={robotType}
           isOnDevice={isOnDevice}
           failedCommand={failedCommandBySource}
+          allRunDefs={allRunDefs}
         />
       ) : null}
       {showSplash ? (
@@ -176,6 +188,7 @@ export function ErrorRecoveryFlows(
           toggleERWizAsActiveUser={toggleERWizAsActiveUser}
           failedCommand={failedCommandBySource}
           resumePausedRecovery={!renderWizard && !showTakeover}
+          allRunDefs={allRunDefs}
         />
       ) : null}
     </>

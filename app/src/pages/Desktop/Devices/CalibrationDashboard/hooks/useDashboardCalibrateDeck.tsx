@@ -39,7 +39,7 @@ export function useDashboardCalibrateDeck(
     }
   )
 
-  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
+  const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current =
@@ -113,6 +113,7 @@ export function useDashboardCalibrateDeck(
         robotName={robotName}
         showSpinner={showSpinner}
         dispatchRequests={dispatchRequests}
+        requestIds={requestIds}
         isJogging={isJogging}
         exitBeforeDeckConfigCompletion={exitBeforeDeckConfigCompletion}
         offsetInvalidationHandler={invalidateHandlerRef.current}

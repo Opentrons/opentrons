@@ -70,6 +70,7 @@ class DispenseInPlaceImplementation(
     async def execute(self, params: DispenseInPlaceParams) -> _ExecuteReturn:
         """Dispense without moving the pipette."""
         try:
+            current_position = await self._gantry_mover.get_position(params.pipetteId)
             volume = await self._pipetting.dispense_in_place(
                 pipette_id=params.pipetteId,
                 volume=params.volume,
@@ -77,7 +78,6 @@ class DispenseInPlaceImplementation(
                 push_out=params.pushOut,
             )
         except PipetteOverpressureError as e:
-            current_position = await self._gantry_mover.get_position(params.pipetteId)
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),

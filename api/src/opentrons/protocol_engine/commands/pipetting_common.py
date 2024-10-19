@@ -5,7 +5,7 @@ from typing import Literal, Optional, Tuple, TypedDict
 
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
-from ..types import WellLocation, DeckPoint
+from ..types import WellLocation, LiquidHandlingWellLocation, DeckPoint
 
 
 class PipetteIdMixin(BaseModel):
@@ -64,6 +64,23 @@ class WellLocationMixin(BaseModel):
     )
     wellLocation: WellLocation = Field(
         default_factory=WellLocation,
+        description="Relative well location at which to perform the operation",
+    )
+
+
+class LiquidHandlingWellLocationMixin(BaseModel):
+    """Mixin for command requests that take a location that's somewhere in a well."""
+
+    labwareId: str = Field(
+        ...,
+        description="Identifier of labware to use.",
+    )
+    wellName: str = Field(
+        ...,
+        description="Name of well to use in labware.",
+    )
+    wellLocation: LiquidHandlingWellLocation = Field(
+        default_factory=LiquidHandlingWellLocation,
         description="Relative well location at which to perform the operation",
     )
 
@@ -168,3 +185,19 @@ class LiquidNotFoundError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.code
     detail: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.detail
+
+
+class TipPhysicallyAttachedError(ErrorOccurrence):
+    """Returned when sensors determine that a tip remains on the pipette after a drop attempt.
+
+    The pipette will act as if the tip was not dropped. So, you won't be able to pick
+    up a new tip without dropping the current one, and movement commands will assume
+    there is a tip hanging off the bottom of the pipette.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["tipPhysicallyAttached"] = "tipPhysicallyAttached"
+
+    errorCode: str = ErrorCodes.TIP_DROP_FAILED.value.code
+    detail: str = ErrorCodes.TIP_DROP_FAILED.value.detail

@@ -13,14 +13,15 @@ import type { RecoveryContentProps } from '../types'
 
 export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
   const {
-    failedPipetteInfo,
     routeUpdateActions,
     recoveryCommands,
     isOnDevice,
     failedLabwareUtils,
+    failedPipetteUtils,
   } = props
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { pickUpTips } = recoveryCommands
+  const { isPartialTipConfigValid, failedPipetteInfo } = failedPipetteUtils
   const {
     goBackPrevStep,
     handleMotionRouting,
@@ -44,7 +45,8 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     tertiaryBtnOnClick?: () => void
     tertiaryBtnText?: string
   } => {
-    if (isOnDevice) {
+    // If partial tip config, do not give users the option to select tip location.
+    if (isOnDevice && !isPartialTipConfigValid) {
       return {
         tertiaryBtnDisabled: failedPipetteInfo?.data.channels === 96,
         tertiaryBtnOnClick: toggleModal,
@@ -55,12 +57,17 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     }
   }
 
+  const buildBannerText = (): string =>
+    isPartialTipConfigValid
+      ? t('replace_tips_and_select_loc_partial_tip')
+      : t('replace_tips_and_select_location')
+
   return (
     <>
       {showTipSelectModal && (
         <TipSelectionModal
           {...props}
-          allowTipSelection={true}
+          allowTipSelection={!isPartialTipConfigValid}
           toggleModal={toggleModal}
         />
       )}
@@ -70,9 +77,12 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
             {...props}
             title={t('select_tip_pickup_location')}
             type="location"
-            bannerText={t('replace_tips_and_select_location')}
+            bannerText={buildBannerText()}
           />
-          <TipSelection {...props} allowTipSelection={!isOnDevice} />
+          <TipSelection
+            {...props}
+            allowTipSelection={!isOnDevice && !isPartialTipConfigValid}
+          />
         </TwoColumn>
         <RecoveryFooterButtons
           primaryBtnOnClick={primaryBtnOnClick}

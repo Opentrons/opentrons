@@ -21,6 +21,12 @@ describe('robot admin actions', () => {
         payload: { requestId: 'requestId' },
       },
     },
+    {
+      name: 'robotApi:DISMISS_ALL_REQUESTS',
+      creator: Actions.dismissAllRequests,
+      args: [],
+      expected: { type: 'robotApi:DISMISS_ALL_REQUESTS' },
+    },
   ]
 
   SPECS.forEach(spec => {

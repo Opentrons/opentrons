@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   useDropTipLocations,
@@ -22,15 +22,20 @@ import type {
  */
 export function useDropTipWizardFlows(): {
   showDTWiz: boolean
-  toggleDTWiz: () => void
+  enableDTWiz: () => void
+  disableDTWiz: () => void
 } {
   const [showDTWiz, setShowDTWiz] = useState(false)
 
-  const toggleDTWiz = (): void => {
-    setShowDTWiz(!showDTWiz)
+  return {
+    showDTWiz,
+    enableDTWiz: () => {
+      setShowDTWiz(true)
+    },
+    disableDTWiz: () => {
+      setShowDTWiz(false)
+    },
   }
-
-  return { showDTWiz, toggleDTWiz }
 }
 
 export interface DropTipWizardFlowsProps {
@@ -58,6 +63,14 @@ export function DropTipWizardFlows(
   })
   const dropTipRoutingUtils = useDropTipRouting(fixitCommandTypeUtils)
   const dropTipCommandLocations = useDropTipLocations(props.robotType) // Prefetch to reduce client latency
+
+  // If the flow unrenders for any reason (ex, the pipette card managing the flow unrenders), don't re-render the flow
+  // after it closes.
+  useEffect(() => {
+    return () => {
+      dropTipWithTypeUtils.dropTipCommands.handleCleanUpAndClose()
+    }
+  }, [])
 
   return (
     <DropTipWizard

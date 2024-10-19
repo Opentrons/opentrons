@@ -149,23 +149,6 @@ def test_get_center(
     assert subject.get_center() == Point(1, 2, 3)
 
 
-def test_get_meniscus(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
-) -> None:
-    """It should get a well bottom."""
-    decoy.when(
-        mock_engine_client.state.geometry.get_well_position(
-            labware_id="labware-id",
-            well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.MENISCUS, offset=WellOffset(x=0, y=0, z=2.5)
-            ),
-        )
-    ).then_return(Point(1, 2, 3))
-
-    assert subject.get_meniscus(z_offset=2.5) == Point(1, 2, 3)
-
-
 def test_has_tip(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:

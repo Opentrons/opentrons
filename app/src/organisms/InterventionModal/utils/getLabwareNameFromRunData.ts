@@ -1,6 +1,8 @@
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
-import { getLoadedLabware } from '/app/molecules/Command/utils/accessors'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import {
+  getLoadedLabware,
+  getLabwareDefinitionsFromCommands,
+} from '/app/local-resources/labware'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
@@ -15,7 +17,7 @@ export function getLabwareNameFromRunData(
   labwareId: string,
   commands: RunTimeCommand[]
 ): string {
-  const loadedLabware = getLoadedLabware(protocolData, labwareId)
+  const loadedLabware = getLoadedLabware(protocolData.labware, labwareId)
   if (loadedLabware == null) {
     return ''
   } else if (FIXED_TRASH_DEF_URIS.includes(loadedLabware.definitionUri)) {

@@ -11,7 +11,7 @@ import {
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 import { LabwarePositionCheck } from '.'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { RobotType } from '@opentrons/shared-data'
 
@@ -61,12 +61,12 @@ export function useLaunchLPC(
         Promise.all(
           getLabwareDefinitionsFromCommands(
             mostRecentAnalysis?.commands ?? []
-          ).map(def =>
+          ).map(def => {
             createLabwareDefinition({
               maintenanceRunId: maintenanceRun?.data?.id,
               labwareDef: def,
             })
-          )
+          })
         ).then(() => {
           setMaintenanceRunId(maintenanceRun.data.id)
         })

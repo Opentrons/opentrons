@@ -112,8 +112,8 @@ export function OffDeck(props: DeckSetupTabType): JSX.Element {
   return (
     <>
       {selectedSlot.slot === 'offDeck' ? (
-        <>
-          <Flex justifyContent={JUSTIFY_CENTER} width="calc(100% - 25rem)">
+        <Flex alignItems={ALIGN_CENTER}>
+          <Flex justifyContent={JUSTIFY_CENTER} width="100%">
             <Flex
               width="39.4275rem"
               height="32.125rem"
@@ -156,7 +156,7 @@ export function OffDeck(props: DeckSetupTabType): JSX.Element {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
             }}
           />
-        </>
+        </Flex>
       ) : (
         <OffDeckDetails
           tab={tab}

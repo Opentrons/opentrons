@@ -5,7 +5,9 @@ import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
+import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
@@ -20,7 +22,11 @@ import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/P
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
+import type { LocalizationProviderProps } from '/app/LocalizationProvider'
+
+vi.mock('/app/LocalizationProvider')
 vi.mock('/app/organisms/Desktop/Breadcrumbs')
+vi.mock('/app/organisms/Desktop/SystemLanguagePreferenceModal')
 vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
 vi.mock('/app/pages/Desktop/Devices/CalibrationDashboard')
 vi.mock('/app/pages/Desktop/Devices/DeviceDetails')
@@ -65,8 +71,16 @@ describe('DesktopApp', () => {
     vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
     vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)
+    vi.mocked(SystemLanguagePreferenceModal).mockReturnValue(
+      <div>Mock SystemLanguagePreferenceModal</div>
+    )
     vi.mocked(AlertsModal).mockReturnValue(<></>)
     vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(
+      LocalizationProvider
+    ).mockImplementation((props: LocalizationProviderProps) => (
+      <>{props.children}</>
+    ))
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -74,6 +88,11 @@ describe('DesktopApp', () => {
   it('renders a Breadcrumbs component', () => {
     render('/devices')
     screen.getByText('Mock Breadcrumbs')
+  })
+
+  it('renders a SystemLanguagePreferenceModal component', () => {
+    render('/protocols')
+    screen.getByText('Mock SystemLanguagePreferenceModal')
   })
 
   it('renders an AppSettings component', () => {

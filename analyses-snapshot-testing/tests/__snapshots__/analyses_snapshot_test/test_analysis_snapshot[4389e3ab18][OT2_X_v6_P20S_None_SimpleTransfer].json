@@ -1757,7 +1757,7 @@
       "createdAt": "TIMESTAMP",
       "error": {
         "createdAt": "TIMESTAMP",
-        "detail": "Cannot aspirate 21.0 µL when only 20 is available.",
+        "detail": "Cannot aspirate 21.0 µL when only 20 is available in the tip.",
         "errorCode": "4000",
         "errorInfo": {
           "attempted_aspirate_volume": 21.0,
@@ -1784,7 +1784,8 @@
             "y": 0,
             "z": 1.0
           },
-          "origin": "bottom"
+          "origin": "bottom",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -1800,7 +1801,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "Cannot aspirate 21.0 µL when only 20 is available.",
+      "detail": "Cannot aspirate 21.0 µL when only 20 is available in the tip.",
       "errorCode": "4000",
       "errorInfo": {
         "attempted_aspirate_volume": 21.0,

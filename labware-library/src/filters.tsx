@@ -6,7 +6,6 @@ import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
 
 import { getAllDefinitions } from './definitions'
-import { getPublicPath } from './public-path'
 
 import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 import type { Location } from 'react-router-dom'
@@ -55,7 +54,7 @@ export function buildFiltersUrl(filters: FilterParams): string {
   const params = pickBy(filters, v => v !== FILTER_OFF)
 
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  return `${getPublicPath()}?${queryString.stringify(params)}`
+  return `/?${queryString.stringify(params)}`
 }
 
 export function getFilteredDefinitions(filters: FilterParams): LabwareList {

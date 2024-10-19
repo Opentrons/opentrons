@@ -21,7 +21,7 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { CommandText } from '/app/molecules/Command'
 import { RunTimer } from '/app/molecules/RunTimer'
-import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
+import { getCommandTextData } from '/app/local-resources/commands'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
@@ -30,6 +30,7 @@ import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type {
   CompletedProtocolAnalysis,
+  LabwareDefinition2,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -123,6 +124,7 @@ interface CurrentRunningProtocolCommandProps {
   lastAnimatedCommand: string | null
   lastRunCommand: RunCommandSummary | null
   updateLastAnimatedCommand: (newCommandKey: string) => void
+  allRunDefs: LabwareDefinition2[]
   protocolName?: string
   currentRunCommandIndex?: number
 }
@@ -143,6 +145,7 @@ export function CurrentRunningProtocolCommand({
   lastRunCommand,
   lastAnimatedCommand,
   updateLastAnimatedCommand,
+  allRunDefs,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { data: mostRecentCommandData } = useNotifyAllCommandsQuery(runId, {
@@ -261,6 +264,7 @@ export function CurrentRunningProtocolCommand({
             commandTextData={getCommandTextData(robotSideAnalysis)}
             robotType={robotType}
             isOnDevice={true}
+            allRunDefs={allRunDefs}
           />
         ) : null}
       </Flex>

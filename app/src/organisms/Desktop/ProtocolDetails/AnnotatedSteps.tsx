@@ -1,4 +1,6 @@
+import { useMemo } from 'react'
 import { css } from 'styled-components'
+
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
@@ -11,12 +13,15 @@ import {
   TYPOGRAPHY,
   OVERFLOW_AUTO,
 } from '@opentrons/components'
+
 import { CommandIcon, CommandText } from '/app/molecules/Command'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
   RunTimeCommand,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 interface AnnotatedStepsProps {
@@ -31,6 +36,15 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       display: none;
     }
   `
+
+  const isValidRobotSideAnalysis = analysis != null
+  const allRunDefs = useMemo(
+    () =>
+      analysis != null
+        ? getLabwareDefinitionsFromCommands(analysis.commands)
+        : [],
+    [isValidRobotSideAnalysis]
+  )
 
   return (
     <Flex
@@ -52,6 +66,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             command={c}
             isHighlighted={i === currentCommandIndex}
             analysis={analysis}
+            allRunDefs={allRunDefs}
           />
         ))}
       </Flex>
@@ -64,9 +79,15 @@ interface IndividualCommandProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   stepNumber: string
   isHighlighted: boolean
+  allRunDefs: LabwareDefinition2[]
 }
-function IndividualCommand(props: IndividualCommandProps): JSX.Element {
-  const { command, analysis, stepNumber, isHighlighted } = props
+function IndividualCommand({
+  command,
+  analysis,
+  stepNumber,
+  isHighlighted,
+  allRunDefs,
+}: IndividualCommandProps): JSX.Element {
   const backgroundColor = isHighlighted ? COLORS.blue30 : COLORS.grey20
   const iconColor = isHighlighted ? COLORS.blue60 : COLORS.grey50
   return (
@@ -101,6 +122,7 @@ function IndividualCommand(props: IndividualCommandProps): JSX.Element {
             robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
             color={COLORS.black90}
             commandTextData={analysis}
+            allRunDefs={allRunDefs}
           />
         </Flex>
       </Flex>

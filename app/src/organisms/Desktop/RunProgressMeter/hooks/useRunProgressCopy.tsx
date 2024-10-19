@@ -1,10 +1,14 @@
+import { useMemo } from 'react'
+
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
 import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
+
+import { getCommandTextData } from '/app/local-resources/commands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { LegacyStyledText } from '@opentrons/components'
 import { CommandText } from '/app/molecules/Command'
 import { TERMINAL_RUN_STATUSES } from '../constants'
@@ -52,6 +56,15 @@ export function useRunProgressCopy({
       runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR) ||
     runStatus === RUN_STATUS_IDLE
 
+  const isValidRobotSideAnalysis = analysis != null
+  const allRunDefs = useMemo(
+    () =>
+      analysis != null
+        ? getLabwareDefinitionsFromCommands(analysis.commands)
+        : [],
+    [isValidRobotSideAnalysis]
+  )
+
   const currentStepContents = ((): JSX.Element | null => {
     if (runHasNotBeenStarted) {
       return <LegacyStyledText as="h2">{t('not_started_yet')}</LegacyStyledText>
@@ -61,6 +74,7 @@ export function useRunProgressCopy({
           commandTextData={getCommandTextData(analysis)}
           command={analysisCommands[(currentStepNumber as number) - 1]}
           robotType={robotType}
+          allRunDefs={allRunDefs}
         />
       )
     } else if (
@@ -73,6 +87,7 @@ export function useRunProgressCopy({
           commandTextData={getCommandTextData(analysis)}
           command={runCommandDetails.data}
           robotType={robotType}
+          allRunDefs={allRunDefs}
         />
       )
     } else {

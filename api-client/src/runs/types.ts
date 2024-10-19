@@ -7,6 +7,7 @@ import type {
   RunCommandError,
   RunTimeCommand,
   RunTimeParameter,
+  NozzleLayoutConfig,
 } from '@opentrons/shared-data'
 import type { ResourceLink, ErrorDetails } from '../types'
 export * from './commands/types'
@@ -200,4 +201,3 @@ export interface NozzleLayoutValues {
   activeNozzles: string[]
   config: NozzleLayoutConfig
 }
-export type NozzleLayoutConfig = 'column' | 'row' | 'full' | 'subrect'

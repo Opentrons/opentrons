@@ -67,8 +67,9 @@
     },
     "SphericalSegment": {
       "type": "object",
+      "description": "A partial sphere shaped section at the bottom of the well.",
       "additionalProperties": false,
-      "required": ["shape", "radiusOfCurvature", "depth"],
+      "required": ["shape", "radiusOfCurvature", "topHeight", "bottomHeight"],
       "properties": {
         "shape": {
           "type": "string",
@@ -77,70 +78,182 @@
         "radiusOfCurvature": {
           "type": "number"
         },
-        "depth": {
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
           "type": "number"
         }
       }
     },
-    "CircularBoundedSection": {
+    "ConicalFrustum": {
       "type": "object",
-      "required": ["shape", "diameter", "topHeight"],
+      "description": "A cone or conical segment, bounded by two circles on the top and bottom.",
+      "required": [
+        "shape",
+        "bottomDiameter",
+        "topDiameter",
+        "topHeight",
+        "bottomHeight"
+      ],
       "properties": {
         "shape": {
           "type": "string",
-          "enum": ["circular"]
+          "enum": ["conical"]
         },
-        "diameter": {
+        "bottomDiameter": {
+          "type": "number"
+        },
+        "topDiameter": {
           "type": "number"
         },
         "topHeight": {
-          "type": "number",
-          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
         }
       }
     },
-    "RectangularBoundedSection": {
+    "CuboidalFrustum": {
       "type": "object",
-      "required": ["shape", "xDimension", "yDimension", "topHeight"],
+      "description": "A cuboidal shape bounded by two rectangles on the top and bottom",
+      "required": [
+        "shape",
+        "bottomXDimension",
+        "bottomYDimension",
+        "topXDimension",
+        "topYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
       "properties": {
         "shape": {
           "type": "string",
-          "enum": ["rectangular"]
+          "enum": ["cuboidal"]
         },
-        "xDimension": {
+        "bottomXDimension": {
           "type": "number"
         },
-        "yDimension": {
+        "bottomYDimension": {
+          "type": "number"
+        },
+        "topXDimension": {
+          "type": "number"
+        },
+        "topYDimension": {
           "type": "number"
         },
         "topHeight": {
-          "type": "number",
-          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
+        }
+      }
+    },
+    "SquaredConeSegment": {
+      "type": "object",
+      "description": "The intersection of a pyramid and a cone that both share a central axis where one face is a circle and one face is a rectangle",
+      "required": [
+        "shape",
+        "bottomCrossSection",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["squaredcone"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"]
+        },
+        "circleDiameter": {
+          "type": "number"
+        },
+        "rectangleXDimension": {
+          "type": "number"
+        },
+        "rectangleYDimension": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
+        }
+      }
+    },
+    "RoundedCuboidSegment": {
+      "type": "object",
+      "description": "A cuboidal frustum where each corner is filleted out by circles with centers on the diagonals between opposite corners",
+      "required": [
+        "shape",
+        "bottomCrossSection",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["roundedcuboid"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"]
+        },
+        "circleDiameter": {
+          "type": "number"
+        },
+        "rectangleXDimension": {
+          "type": "number"
+        },
+        "rectangleYDimension": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
         }
       }
     },
     "InnerWellGeometry": {
       "type": "object",
-      "required": ["frusta"],
+      "required": ["sections"],
       "properties": {
-        "frusta": {
+        "sections": {
           "description": "A list of all of the sections of the well that have a contiguous shape",
           "type": "array",
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/CircularBoundedSection"
+                "$ref": "#/definitions/ConicalFrustum"
               },
               {
-                "$ref": "#/definitions/RectangularBoundedSection"
+                "$ref": "#/definitions/CuboidalFrustum"
+              },
+              {
+                "$ref": "#/definitions/SquaredConeSegment"
+              },
+              {
+                "$ref": "#/definitions/RoundedCuboidSegment"
+              },
+              {
+                "$ref": "#/definitions/SphericalSegment"
               }
             ]
           }
-        },
-        "bottomShape": {
-          "type": "object",
-          "description": "The shape at the bottom of the well: either a spherical segment or a cross-section",
-          "$ref": "#/definitions/SphericalSegment"
         }
       }
     }
@@ -406,7 +519,7 @@
       "description": "Allowed behaviors and usage of a labware in a protocol.",
       "items": {
         "type": "string",
-        "enum": ["labware", "adapter", "fixture", "maintenance"]
+        "enum": ["labware", "adapter", "fixture", "maintenance", "lid"]
       }
     },
     "stackingOffsetWithLabware": {

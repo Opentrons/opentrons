@@ -10,9 +10,7 @@ from typing import (
     Tuple,
     Union,
 )
-from typing_extensions import assert_type
 
-from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -21,8 +19,6 @@ from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
     NozzleMap,
 )
-from opentrons.protocol_engine.actions.actions import FailCommandAction
-from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.types import MountType, Mount as HwMount, Point
 
 from . import update_types
@@ -40,8 +36,10 @@ from ..types import (
 )
 from ..actions import (
     Action,
+    FailCommandAction,
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
+    get_state_update,
 )
 from ._abstract_store import HasState, HandlesActions
 
@@ -98,7 +96,7 @@ class StaticPipetteConfig:
     nozzle_offset_z: float
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
-    default_nozzle_map: NozzleMap
+    default_nozzle_map: NozzleMap  # todo(mm, 2024-10-14): unused, remove?
     lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
@@ -106,6 +104,9 @@ class StaticPipetteConfig:
 class PipetteState:
     """Basic pipette data state and getter methods."""
 
+    # todo(mm, 2024-10-14): It's getting difficult to ensure that all of these
+    # attributes are populated at the appropriate times. Refactor to a
+    # single dict-of-many-things instead of many dicts-of-single-things.
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, Optional[float]]
     current_location: Optional[CurrentPipetteLocation]
@@ -114,7 +115,7 @@ class PipetteState:
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
-    nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
+    nozzle_configuration_by_id: Dict[str, NozzleMap]
     liquid_presence_detection_by_id: Dict[str, bool]
 
 
@@ -140,58 +141,41 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
+        state_update = get_state_update(action)
+        if state_update is not None:
+            self._set_load_pipette(state_update)
+            self._update_current_location(state_update)
+            self._update_pipette_config(state_update)
+            self._update_pipette_nozzle_map(state_update)
+            self._update_tip_state(state_update)
+
         if isinstance(action, (SucceedCommandAction, FailCommandAction)):
-            self._handle_command(action)
+            self._update_volumes(action)
+
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
-    def _handle_command(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
-    ) -> None:
-        self._set_load_pipette(action)
-        self._update_current_location(action)
-        self._update_pipette_config(action)
-        self._update_pipette_nozzle_map(action)
-        self._update_tip_state(action)
-        self._update_volumes(action)
-
-    def _set_load_pipette(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
-    ) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.loaded_pipette != update_types.NO_CHANGE
-        ):
-            pipette_id = action.state_update.loaded_pipette.pipette_id
+    def _set_load_pipette(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.loaded_pipette != update_types.NO_CHANGE:
+            pipette_id = state_update.loaded_pipette.pipette_id
 
             self._state.pipettes_by_id[pipette_id] = LoadedPipette(
                 id=pipette_id,
-                pipetteName=action.state_update.loaded_pipette.pipette_name,
-                mount=action.state_update.loaded_pipette.mount,
+                pipetteName=state_update.loaded_pipette.pipette_name,
+                mount=state_update.loaded_pipette.mount,
             )
             self._state.liquid_presence_detection_by_id[pipette_id] = (
-                action.state_update.loaded_pipette.liquid_presence_detection or False
+                state_update.loaded_pipette.liquid_presence_detection or False
             )
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                self._state.nozzle_configuration_by_id[
-                    pipette_id
-                ] = static_config.default_nozzle_map
 
-    def _update_tip_state(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
-    ) -> None:
-
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.pipette_tip_state != update_types.NO_CHANGE
-        ):
-            pipette_id = action.state_update.pipette_tip_state.pipette_id
-            if action.state_update.pipette_tip_state.tip_geometry:
-                attached_tip = action.state_update.pipette_tip_state.tip_geometry
+    def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.pipette_tip_state != update_types.NO_CHANGE:
+            pipette_id = state_update.pipette_tip_state.pipette_id
+            if state_update.pipette_tip_state.tip_geometry:
+                attached_tip = state_update.pipette_tip_state.tip_geometry
 
                 self._state.attached_tip_by_id[pipette_id] = attached_tip
                 self._state.aspirated_volume_by_id[pipette_id] = 0
@@ -220,7 +204,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     )
 
             else:
-                pipette_id = action.state_update.pipette_tip_state.pipette_id
+                pipette_id = state_update.pipette_tip_state.pipette_id
                 self._state.aspirated_volume_by_id[pipette_id] = None
                 self._state.attached_tip_by_id[pipette_id] = None
 
@@ -236,17 +220,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                     )
 
-    def _update_current_location(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
-    ) -> None:
-        if isinstance(action, SucceedCommandAction):
-            location_update = action.state_update.pipette_location
-        elif isinstance(action.error, DefinedErrorData):
-            location_update = action.error.state_update.pipette_location
-        else:
-            # The command failed with some undefined error. We have nothing to do.
-            assert_type(action.error, EnumeratedError)
-            return
+    def _update_current_location(self, state_update: update_types.StateUpdate) -> None:
+        location_update = state_update.pipette_location
 
         if location_update is update_types.NO_CHANGE:
             pass
@@ -282,18 +257,13 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     mount=loaded_pipette.mount, deck_point=new_deck_point
                 )
 
-    def _update_pipette_config(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
-    ) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.pipette_config != update_types.NO_CHANGE
-        ):
-            config = action.state_update.pipette_config.config
+    def _update_pipette_config(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.pipette_config != update_types.NO_CHANGE:
+            config = state_update.pipette_config.config
             self._state.static_config_by_id[
-                action.state_update.pipette_config.pipette_id
+                state_update.pipette_config.pipette_id
             ] = StaticPipetteConfig(
-                serial_number=action.state_update.pipette_config.serial_number,
+                serial_number=state_update.pipette_config.serial_number,
                 model=config.model,
                 display_name=config.display_name,
                 min_volume=config.min_volume,
@@ -325,26 +295,26 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 lld_settings=config.pipette_lld_settings,
             )
             self._state.flow_rates_by_id[
-                action.state_update.pipette_config.pipette_id
+                state_update.pipette_config.pipette_id
             ] = config.flow_rates
             self._state.nozzle_configuration_by_id[
-                action.state_update.pipette_config.pipette_id
+                state_update.pipette_config.pipette_id
             ] = config.nozzle_map
 
     def _update_pipette_nozzle_map(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
+        self, state_update: update_types.StateUpdate
     ) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.pipette_nozzle_map != update_types.NO_CHANGE
-        ):
+        if state_update.pipette_nozzle_map != update_types.NO_CHANGE:
             self._state.nozzle_configuration_by_id[
-                action.state_update.pipette_nozzle_map.pipette_id
-            ] = action.state_update.pipette_nozzle_map.nozzle_map
+                state_update.pipette_nozzle_map.pipette_id
+            ] = state_update.pipette_nozzle_map.nozzle_map
 
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
+        # todo(mm, 2024-10-10): Port these isinstance checks to StateUpdate.
+        # https://opentrons.atlassian.net/browse/EXEC-754
+
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (commands.AspirateResult, commands.AspirateInPlaceResult),
@@ -660,31 +630,23 @@ class PipetteView(HasState[PipetteState]):
 
     def get_nozzle_layout_type(self, pipette_id: str) -> NozzleConfigurationType:
         """Get the current set nozzle layout configuration."""
-        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
-        if nozzle_map_for_pipette:
-            return nozzle_map_for_pipette.configuration
-        else:
-            return NozzleConfigurationType.FULL
+        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map_for_pipette.configuration
 
     def get_is_partially_configured(self, pipette_id: str) -> bool:
         """Determine if the provided pipette is partially configured."""
         return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
 
-    def get_primary_nozzle(self, pipette_id: str) -> Optional[str]:
+    def get_primary_nozzle(self, pipette_id: str) -> str:
         """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
-        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
-        return nozzle_map.starting_nozzle if nozzle_map else None
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map.starting_nozzle
 
     def _get_critical_point_offset_without_tip(
         self, pipette_id: str, critical_point: Optional[CriticalPoint]
     ) -> Point:
         """Get the offset of the specified critical point from pipette's mount position."""
-        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
-        # Nozzle map is unavailable only when there's no pipette loaded
-        # so this is merely for satisfying the type checker
-        assert (
-            nozzle_map is not None
-        ), "Error getting critical point offset. Nozzle map not found."
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
         match critical_point:
             case CriticalPoint.INSTRUMENT_XY_CENTER:
                 return nozzle_map.instrument_xy_center_offset

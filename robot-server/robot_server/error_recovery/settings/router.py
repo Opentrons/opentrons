@@ -61,10 +61,6 @@ async def _get_current_response(
     store: ErrorRecoverySettingStore,
 ) -> PydanticResponse[SimpleBody[ResponseData]]:
     is_enabled = store.get_is_enabled()
-    if is_enabled is None:
-        # todo(mm, 2024-09-30): This defaulting will probably need to move down a layer
-        # when we connect this setting to `POST /runs`.
-        is_enabled = True
     return await PydanticResponse.create(
         SimpleBody.construct(data=ResponseData.construct(enabled=is_enabled))
     )

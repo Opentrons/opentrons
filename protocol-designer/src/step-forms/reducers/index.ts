@@ -113,6 +113,7 @@ import type {
   CreateContainerAction,
   DeleteContainerAction,
   DuplicateLabwareAction,
+  RenameStepAction,
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type {
@@ -157,6 +158,7 @@ export type UnsavedFormActions =
   | ToggleIsGripperRequiredAction
   | CreateDeckFixtureAction
   | DeleteDeckFixtureAction
+  | RenameStepAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -203,6 +205,17 @@ export const unsavedForm = (
     }
 
     case 'CHANGE_FORM_INPUT': {
+      const fieldUpdate = handleFormChange(
+        action.payload.update,
+        unsavedFormState,
+        _getPipetteEntitiesRootState(rootState),
+        _getLabwareEntitiesRootState(rootState)
+      )
+      // @ts-expect-error (IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+      return { ...unsavedFormState, ...fieldUpdate }
+    }
+
+    case 'CHANGE_STEP_DETAILS': {
       const fieldUpdate = handleFormChange(
         action.payload.update,
         unsavedFormState,

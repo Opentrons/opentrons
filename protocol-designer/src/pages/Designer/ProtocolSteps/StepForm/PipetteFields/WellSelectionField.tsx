@@ -67,6 +67,7 @@ export const WellSelectionField = (
   const onOpen = (key: string): void => {
     dispatch(stepsActions.setWellSelectionLabwareKey(key))
   }
+
   const handleOpen = (): void => {
     if (onFieldFocus) {
       onFieldFocus()
@@ -109,7 +110,7 @@ export const WellSelectionField = (
           {t(`tooltip:${tooltipContent}`)}
         </Tooltip>
         <InputField
-          disabled={disabled}
+          disabled={disabled ?? labwareId != null}
           readOnly
           name={name}
           error={errorToShow}

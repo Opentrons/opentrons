@@ -156,9 +156,6 @@ async def create_run_command(
     # behavior is to pass through `command_intent` without overriding it
     command_intent = pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
-
-    # TODO (spp): re-add `RunStoppedError` exception catching if/when maintenance runs
-    #  have actions.
     command = await run_orchestrator_store.add_command_and_wait_for_interval(
         request=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
     )

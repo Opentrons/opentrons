@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, useState, forwardRef, useRef } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { ViewportList } from 'react-viewport-list'
@@ -31,6 +31,7 @@ import {
 import { CommandText, CommandIcon } from '/app/molecules/Command'
 import { Divider } from '/app/atoms/structure'
 import { NAV_BAR_WIDTH } from '/app/App/constants'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
@@ -70,19 +71,27 @@ export const RunPreviewComponent = (
     }
   )
   const commandsFromQuery = commandsFromQueryResponse?.data
-  const viewPortRef = React.useRef<HTMLDivElement | null>(null)
+  const viewPortRef = useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })?.key
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
-  ] = React.useState<boolean>(true)
+  ] = useState<boolean>(true)
+
+  const isValidRobotSideAnalysis = robotSideAnalysis != null
+  const allRunDefs = useMemo(
+    () =>
+      robotSideAnalysis != null
+        ? getLabwareDefinitionsFromCommands(robotSideAnalysis.commands)
+        : [],
+    [isValidRobotSideAnalysis]
+  )
 
   if (robotSideAnalysis == null) {
     return null
   }
-
   const commands = isRunTerminal
     ? commandsFromQuery
     : robotSideAnalysis.commands
@@ -196,6 +205,7 @@ export const RunPreviewComponent = (
                       commandTextData={protocolDataFromAnalysisOrRun}
                       robotType={robotType}
                       color={COLORS.black90}
+                      allRunDefs={allRunDefs}
                     />
                   </Flex>
                 </Flex>
@@ -227,4 +237,4 @@ export const RunPreviewComponent = (
   )
 }
 
-export const RunPreview = React.forwardRef(RunPreviewComponent)
+export const RunPreview = forwardRef(RunPreviewComponent)

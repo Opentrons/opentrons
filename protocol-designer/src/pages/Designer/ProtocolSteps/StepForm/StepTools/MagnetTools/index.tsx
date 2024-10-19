@@ -3,13 +3,17 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
+  DeckInfoLabel,
   Divider,
   Flex,
   ListItem,
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
+import {
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+} from '@opentrons/shared-data'
 import {
   MAX_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V2,
@@ -21,7 +25,11 @@ import {
   getMagneticLabwareOptions,
 } from '../../../../../../ui/modules/selectors'
 import { ToggleExpandStepFormField } from '../../../../../../molecules'
-import { getModuleEntities } from '../../../../../../step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getModuleEntities,
+} from '../../../../../../step-forms/selectors'
+import { getModulesOnDeckByType } from '../../../../../../ui/modules/utils'
 
 import type { StepFormProps } from '../../types'
 
@@ -31,7 +39,13 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const moduleLabwareOptions = useSelector(getMagneticLabwareOptions)
   const moduleEntities = useSelector(getModuleEntities)
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
+  const deckSetup = useSelector(getInitialDeckSetup)
+  const modulesOnDeck = getModulesOnDeckByType(deckSetup, MAGNETIC_MODULE_TYPE)
+
   const moduleModel = moduleEntities[formData.moduleId].model
+
+  const slotInfo = moduleLabwareOptions[0].name.split('in')
+  const slotLocation = modulesOnDeck != null ? modulesOnDeck[0].slot : ''
 
   const mmUnits = t('units.millimeter')
   const isGen1 = moduleModel === MAGNETIC_MODULE_V1
@@ -53,7 +67,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           })
       : ''
   const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
-
+  // TODO (10-9-2024): Replace ListItem with ListItemDescriptor
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
@@ -66,10 +80,21 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           {t('protocol_steps:module')}
         </StyledText>
         <ListItem type="noActive">
-          <Flex padding={SPACING.spacing12}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {moduleLabwareOptions[0].name}
-            </StyledText>
+          <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing32}>
+            <Flex>
+              <DeckInfoLabel deckLabel={slotLocation} />
+            </Flex>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {slotInfo[0]}
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                {slotInfo[1]}
+              </StyledText>
+            </Flex>
           </Flex>
         </ListItem>
       </Flex>
@@ -88,6 +113,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
             'form:step_edit_form.field.magnetAction.options.disengage'
           )}
           caption={engageHeightCaption}
+          islabel={true}
         />
       </Flex>
     </Flex>

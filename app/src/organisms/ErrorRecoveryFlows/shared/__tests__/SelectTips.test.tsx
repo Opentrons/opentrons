@@ -13,7 +13,6 @@ import type { Mock } from 'vitest'
 
 vi.mock('../TipSelectionModal')
 vi.mock('../TipSelection')
-vi.mock('../LeftColumnLabwareInfo')
 
 const render = (props: React.ComponentProps<typeof SelectTips>) => {
   return renderWithProviders(<SelectTips {...props} />, {
@@ -44,14 +43,17 @@ describe('SelectTips', () => {
       recoveryCommands: {
         pickUpTips: mockPickUpTips,
       } as any,
-      failedPipetteInfo: {
-        data: {
-          channels: 8,
-        },
+      failedPipetteUtils: {
+        failedPipetteInfo: {
+          data: {
+            channels: 8,
+          },
+        } as any,
       } as any,
       failedLabwareUtils: {
         selectedTipLocations: { A1: null },
         areTipsSelected: true,
+        failedLabwareLocations: { newLoc: null, currentLoc: 'A1' },
       } as any,
     }
 
@@ -126,13 +128,23 @@ describe('SelectTips', () => {
     expect(mockGoBackPrevStep).toHaveBeenCalled()
   })
 
+  it('renders expected banner text', () => {
+    render(props)
+
+    screen.getByText(
+      "It's best to replace tips and select the last location used for tip pickup."
+    )
+  })
+
   it('disables the tertiary button when the pipette has 96 channels', () => {
     props = {
       ...props,
-      failedPipetteInfo: {
-        data: {
-          channels: 96,
-        },
+      failedPipetteUtils: {
+        failedPipetteInfo: {
+          data: {
+            channels: 96,
+          },
+        } as any,
       } as any,
     }
     render(props)
@@ -149,6 +161,7 @@ describe('SelectTips', () => {
       failedLabwareUtils: {
         selectedTipLocations: null,
         areTipsSelected: false,
+        failedLabwareLocations: { newLoc: null, currentLoc: '' },
       } as any,
     }
 
@@ -159,5 +172,50 @@ describe('SelectTips', () => {
     })
 
     expect(primaryBtn[0]).toBeDisabled()
+  })
+
+  it('does not render the tertiary button if a partial tip config is used', () => {
+    const mockFailedPipetteUtils = {
+      failedPipetteInfo: {
+        data: {
+          channels: 8,
+        },
+      } as any,
+      isPartialTipConfigValid: true,
+      relevantActiveNozzleLayout: {
+        activeNozzles: ['H1', 'G1'],
+        startingNozzle: 'A1',
+        config: 'column',
+      },
+    } as any
+
+    render({ ...props, failedPipetteUtils: mockFailedPipetteUtils })
+
+    const tertiaryBtn = screen.queryByRole('button', {
+      name: 'Change location',
+    })
+    expect(tertiaryBtn).not.toBeInTheDocument()
+  })
+
+  it('renders alternative banner text if partial tip config is used', () => {
+    const mockFailedPipetteUtils = {
+      failedPipetteInfo: {
+        data: {
+          channels: 8,
+        },
+      } as any,
+      isPartialTipConfigValid: true,
+      relevantActiveNozzleLayout: {
+        activeNozzles: ['H1', 'G1'],
+        startingNozzle: 'A1',
+        config: 'column',
+      },
+    } as any
+
+    render({ ...props, failedPipetteUtils: mockFailedPipetteUtils })
+
+    screen.getByText(
+      'Replace tips and select the last location used for partial tip pickup.'
+    )
   })
 })
