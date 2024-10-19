@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import enum
 from typing import Optional, Union, List, Dict, AsyncGenerator
+from logging import getLogger
 
 from anyio import move_on_after
 
@@ -42,6 +43,8 @@ from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
 
+
+log = getLogger(__name__)
 
 class NoProtocolRunAvailable(RuntimeError):
     """An error raised if there is no protocol run available."""
@@ -339,9 +342,11 @@ class RunOrchestrator:
         added_command = self._protocol_engine.add_command(
             request=command, failed_command_id=failed_command_id
         )
+        log.warning(f"PE: added commmand: {added_command}")
         if wait_until_complete:
             timeout_sec = None if timeout is None else timeout / 1000.0
             with move_on_after(timeout_sec):
+                log.warning(f"PE: executing command")
                 await self._protocol_engine.wait_for_command(added_command.id)
         return added_command
 

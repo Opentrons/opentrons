@@ -272,12 +272,8 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         return self._usb_port
 
     async def deactivate(self, must_be_running: bool = True) -> None:
-        """Deactivate the module.
-
-        Contains an override to the `wait_for_is_running` step in cases where the
-        module must be deactivated regardless of context."""
-        await self._poller.stop()
-        await self._driver.disconnect()
+        """Deactivate the module."""
+        pass
 
     async def wait_for_is_running(self) -> None:
         if not self.is_simulated:
@@ -336,7 +332,8 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
         object destruction.
         """
-        await self.deactivate()
+        await self._poller.stop()
+        await self._driver.disconnect()
 
     async def set_sample_wavelength(
         self,
