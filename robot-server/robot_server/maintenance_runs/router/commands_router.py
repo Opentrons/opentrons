@@ -2,7 +2,6 @@
 import textwrap
 from typing import Annotated, Optional, Union
 from typing_extensions import Final, Literal
-from logging import getLogger
 
 from fastapi import APIRouter, Depends, Query, status
 
@@ -37,7 +36,6 @@ from ..dependencies import (
 )
 from .base_router import RunNotFound
 
-log = getLogger(__name__)
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
@@ -158,7 +156,6 @@ async def create_run_command(
     # behavior is to pass through `command_intent` without overriding it
     command_intent = pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
-    log.warning(f"Create Command: {command_create}")
     command = await run_orchestrator_store.add_command_and_wait_for_interval(
         request=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
     )

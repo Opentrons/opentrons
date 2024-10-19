@@ -4,7 +4,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
 from typing_extensions import ParamSpec
-from logging import getLogger
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.robot.types import RobotDefinition
@@ -34,8 +33,6 @@ from .config import Config
 from .state_summary import StateSummary
 from ..types import DeckConfigurationType
 
-
-log = getLogger(__name__)
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")
@@ -320,13 +317,9 @@ class StateStore(StateView, ActionHandler):
         current_value = condition()
 
         while bool(current_value) != truthiness_to_wait_for:
-            log.warning("IM FUCKING STUCK!!") 
             await self._change_notifier.wait()
-            log.warning("CHECK CONDITION")
             current_value = condition()
-            log.warning(f"CONDITION: {current_value}")
 
-        log.warning("NOT STUCK! RETURN")
         return current_value
 
     def _get_next_state(self) -> State:
