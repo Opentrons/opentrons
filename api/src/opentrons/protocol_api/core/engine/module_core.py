@@ -586,11 +586,20 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
         )
         self._initialized_value = wavelengths
 
-    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
-        """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return None."""
+    def read(self, filename: Optional[str]) -> Dict[int, Dict[str, float]]:
+        """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return a measurement of zero for all wells."""
+        wavelengths = self._engine_client.state.modules.get_absorbance_reader_substate(
+            self.module_id
+        ).configured_wavelengths
+        if wavelengths is None:
+            raise CannotPerformModuleAction(
+                "Cannot perform Read action on Absorbance Reader without calling `.initialize(...)` first."
+            )
         if self._initialized_value:
             self._engine_client.execute_command(
-                cmd.absorbance_reader.ReadAbsorbanceParams(moduleId=self.module_id)
+                cmd.absorbance_reader.ReadAbsorbanceParams(
+                    moduleId=self.module_id, fileName=filename
+                )
             )
         if not self._engine_client.state.config.use_virtual_modules:
             read_result = (
@@ -603,7 +612,17 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
             raise CannotPerformModuleAction(
                 "Absorbance Reader failed to return expected read result."
             )
-        return None
+
+        # When using virtual modules, return all zeroes
+        virtual_asbsorbance_result: Dict[int, Dict[str, float]] = {}
+        for wavelength in wavelengths:
+            converted_values = (
+                self._engine_client.state.modules.convert_absorbance_reader_data_points(
+                    data=[0] * 96
+                )
+            )
+            virtual_asbsorbance_result[wavelength] = converted_values
+        return virtual_asbsorbance_result
 
     def close_lid(
         self,
