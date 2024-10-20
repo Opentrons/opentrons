@@ -31,7 +31,7 @@ class UnsafePlaceLabwareParams(BaseModel):
     """Payload required for an UnsafePlaceLabware command."""
 
     labwareId: str = Field(..., description="The id of the labware to place.")
-    newLocation: LabwareLocation = Field(..., description="Where to place the labware.")
+    location: LabwareLocation = Field(..., description="Where to place the labware.")
 
 
 class UnsafePlaceLabwareResult(BaseModel):
@@ -81,13 +81,13 @@ class UnsafePlaceLabwareImplementation(
             cast(Point, final_offsets.dropOffset) if final_offsets else Point()
         )
 
-        if isinstance(params.newLocation, DeckSlotLocation):
+        if isinstance(params.location, DeckSlotLocation):
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
-                params.newLocation.slotName.id
+                params.location.slotName.id
             )
 
-        new_location = self._state_view.geometry.ensure_valid_gripper_location(
-            params.newLocation,
+        location = self._state_view.geometry.ensure_valid_gripper_location(
+            params.location,
         )
 
         # NOTE: when we e-stop, the gantry position goes bad, so the robot needs to
@@ -100,7 +100,7 @@ class UnsafePlaceLabwareImplementation(
         )
 
         to_labware_center = self._state_view.geometry.get_labware_grip_point(
-            labware_id=labware_id, location=new_location
+            labware_id=labware_id, location=location
         )
 
         movement_waypoints = get_gripper_labware_placement_waypoints(

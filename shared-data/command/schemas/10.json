@@ -4741,7 +4741,7 @@
     },
     "UnsafePlaceLabwareParams": {
       "title": "UnsafePlaceLabwareParams",
-      "description": "Payload required for an PlaceLabware command.",
+      "description": "Payload required for an UnsafePlaceLabware command.",
       "type": "object",
       "properties": {
         "labwareId": {
@@ -4749,8 +4749,8 @@
           "description": "The id of the labware to place.",
           "type": "string"
         },
-        "newLocation": {
-          "title": "Newlocation",
+        "location": {
+          "title": "Location",
           "description": "Where to place the labware.",
           "anyOf": [
             {
@@ -4772,11 +4772,11 @@
           ]
         }
       },
-      "required": ["labwareId", "newLocation"]
+      "required": ["labwareId", "location"]
     },
     "UnsafePlaceLabwareCreate": {
       "title": "UnsafePlaceLabwareCreate",
-      "description": "UnsafeEngageAxes command request model.",
+      "description": "UnsafePlaceLabware command request model.",
       "type": "object",
       "properties": {
         "commandType": {

@@ -12,7 +12,11 @@ from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
-from robot_server.service.legacy.models.modules import HeaterShakerModuleLiveData
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
+from opentrons.hardware_control.types import EstopState
+from opentrons.protocol_engine.commands.move_labware import MoveLabware
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths
 from opentrons.protocol_engine import (
     errors as pe_errors,
@@ -28,6 +32,7 @@ from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
+from robot_server.hardware import get_hardware, get_robot_type_enum
 
 from robot_server.service.json_api import (
     RequestModel,
@@ -49,7 +54,7 @@ from robot_server.protocols.protocol_store import (
 from robot_server.protocols.router import ProtocolNotFound
 
 from ..run_models import (
-    PlateReaderState,
+    PlaceLabwareState,
     RunNotFoundError,
     ActiveNozzleLayout,
     RunCurrentState,
@@ -566,6 +571,8 @@ async def get_run_commands_error(
 async def get_current_state(
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> PydanticResponse[Body[RunCurrentState, CurrentStateLinks]]:
     """Get current state associated with a run if the run is current.
 
@@ -574,6 +581,7 @@ async def get_current_state(
         run_data_manager: Run data retrieval interface.
     """
     try:
+        run = run_data_manager.get(run_id=runId)
         active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
 
         nozzle_layouts = {
@@ -599,18 +607,52 @@ async def get_current_state(
         else None
     )
 
-    # TODO: add the actual plate reader data
-    plate_reader_states = {
-        "test": PlateReaderState(
-            lidHeldByGripper=False,
-            plateReaderLidLocation="D3",
+    estop_engaged = False
+    place_labware = None
+    if robot_type == RobotTypeEnum.FLEX:
+        estop_engaged = hardware.get_estop_state() in [
+            EstopState.PHYSICALLY_ENGAGED,
+            EstopState.LOGICALLY_ENGAGED,
+        ]
+
+        command = (
+            run_data_manager.get_command(runId, current_command.command_id)
+            if current_command
+            else None
         )
-    }
+        if isinstance(command, MoveLabware):
+            place_down = False
+            labware_id = command.params.labwareId
+            location = command.params.newLocation
+            if estop_engaged:
+                for mod in run.modules:
+                    # Check if the plate reader lid was being moved and needs to be placed down.
+                    if (
+                        not isinstance(mod, AbsorbanceReader)
+                        and mod.location != location
+                    ):
+                        continue
+                    for hw_mod in hardware.attached_modules:
+                        if (
+                            hw_mod.serial_number == mod.serialNumber
+                            and hw_mod.live_data.get("lidStatus") != "on"
+                        ):
+                            place_down = True
+                            break
+                    if place_down:
+                        break
+            place_labware = PlaceLabwareState(
+                location=location,
+                labwareId=labware_id,
+                shouldPlaceDown=place_down,
+            )
 
     return await PydanticResponse.create(
         content=Body.construct(
             data=RunCurrentState.construct(
-                activeNozzleLayouts=nozzle_layouts, plateReaderState=plate_reader_states
+                estopEngaged=estop_engaged,
+                activeNozzleLayouts=nozzle_layouts,
+                placeLabwareState=place_labware,
             ),
             links=links,
         ),
