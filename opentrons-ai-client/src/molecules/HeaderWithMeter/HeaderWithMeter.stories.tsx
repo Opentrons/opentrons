@@ -1,4 +1,4 @@
-import { type Meta, type StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 import { HeaderWithMeter as HeaderWithMeterComponent } from '.'
 import { COLORS, Flex, SPACING } from '@opentrons/components'
 
