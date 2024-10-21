@@ -11,11 +11,10 @@ const meta: Meta<typeof HeaderComponent> = {
         <Story />
       </Flex>
     ),
-  ]
+  ],
 }
 export default meta
 
 type Story = StoryObj<typeof HeaderComponent>
 
-export const ChatHeaderExample: Story = {
-}
+export const ChatHeaderExample: Story = {}
