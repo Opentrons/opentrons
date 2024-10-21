@@ -53,10 +53,10 @@ export function Header(): JSX.Element {
     <HeaderBar>
       <HeaderBarContent>
         <Flex>
-          <HeaderTitle>{'Opentrons'}</HeaderTitle>
-          <HeaderGradientTitle>{'AI'}</HeaderGradientTitle>
+          <HeaderTitle>{t('opentrons')}</HeaderTitle>
+          <HeaderGradientTitle>{t('ai')}</HeaderGradientTitle>
         </Flex>
-        <LogoutButton onClick={() => logout()}>{t('Log out')}</LogoutButton>
+        <LogoutButton onClick={() => logout()}>{t('logout')}</LogoutButton>
       </HeaderBarContent>
     </HeaderBar>
   )
