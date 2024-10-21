@@ -241,6 +241,10 @@ class HardwareTipHandler(TipHandler):
         # Allow TipNotAttachedError to propagate.
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
 
+        # todo(mm, 2024-10-21): This sequence of cache_tip(), set_current_tiprack_diameter(),
+        # and set_working_volume() is almost the same as self.add_tip(), except one uses
+        # hwapi.cache_tip() and the other uses hwapi.add_tip(). Unify them and
+        # deduplicate if possible.
         self._hardware_api.cache_tip(hw_mount, actual_tip_length)
         await self._hardware_api.prepare_for_aspirate(hw_mount)
 
