@@ -11,7 +11,8 @@ import {
 
 import { Command, CommandIndex } from '../Command'
 
-import type { NonSkeletonCommandState, CommandTextData } from '../Command'
+import type { CommandTextData } from '/app/local-resources/commands'
+import type { NonSkeletonCommandState } from '../Command'
 import type {
   LabwareDefinition2,
   RobotType,

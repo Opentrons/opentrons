@@ -145,7 +145,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # ATTACHED-pF
         if not api.is_simulator:
             ui.get_user_ready(f"ATTACH probe to {probe.name} channel")
-        await api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
+        api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
         attached_pf = await _read_from_sensor(api, sensor_id, 10)
         if not attached_pf:
             ui.print_error(f"{probe} cap sensor not working, skipping")
@@ -229,4 +229,4 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.home_z(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready("REMOVE probe")
-        await api.remove_tip(OT3Mount.LEFT)
+        api.remove_tip(OT3Mount.LEFT)

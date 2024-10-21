@@ -17,7 +17,7 @@ import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import type { SetupScreens } from '../types'
 import { TerseOffsetTable } from '/app/organisms/LabwarePositionCheck/ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import {
   useNotifyRunQuery,
   useMostRecentCompletedAnalysis,

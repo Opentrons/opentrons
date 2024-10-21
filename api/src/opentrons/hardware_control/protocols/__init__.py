@@ -58,9 +58,6 @@ class HardwareControlInterface(
     def get_robot_type(self) -> Type[OT2RobotType]:
         return OT2RobotType
 
-    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
-        ...
-
 
 class FlexHardwareControlInterface(
     PositionEstimator,
@@ -87,12 +84,9 @@ class FlexHardwareControlInterface(
     def get_robot_type(self) -> Type[FlexRobotType]:
         return FlexRobotType
 
-    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
-        ...
-
 
 __all__ = [
-    "HardwareControlAPI",
+    "HardwareControlInterface",
     "FlexHardwareControlInterface",
     "Simulatable",
     "Stoppable",

@@ -4129,7 +4129,8 @@
             "y": 0.0,
             "z": 2.0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4139,7 +4140,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 0.0
+        "z_position": 26.85
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4162,7 +4163,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4195,7 +4197,8 @@
             "y": 0.0,
             "z": -13.95
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4302,7 +4305,8 @@
             "y": 0.0,
             "z": 2.0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A2"
       },
@@ -4312,7 +4316,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 0.0
+        "z_position": 26.85
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4335,7 +4339,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A2"
       },
@@ -4368,7 +4373,8 @@
             "y": 0.0,
             "z": -13.95
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A2"
       },
@@ -4399,7 +4405,8 @@
             "y": 0.0,
             "z": 2.0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A3"
       },
@@ -4409,7 +4416,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 0.0
+        "z_position": 26.85
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4432,7 +4439,8 @@
             "y": 0.0,
             "z": -25.85
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A3"
       },
@@ -4465,7 +4473,8 @@
             "y": 0.0,
             "z": -13.95
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A3"
       },
@@ -4588,7 +4597,8 @@
             "y": 0.0,
             "z": -38.55
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4691,7 +4701,8 @@
             "y": 0.0,
             "z": 0.0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4701,7 +4712,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 0.0
+        "z_position": 39.55
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4826,7 +4837,8 @@
             "y": 0.0,
             "z": 2.0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4836,7 +4848,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 0.0
+        "z_position": 39.55
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4859,7 +4871,8 @@
             "y": 0.0,
             "z": -38.55
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4980,7 +4993,8 @@
             "y": 0.0,
             "z": 0.0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -4990,7 +5004,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 0.0
+        "z_position": 39.55
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5011,7 +5025,8 @@
             "y": 0.0,
             "z": 0.0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -5021,7 +5036,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 0.0
+        "z_position": 39.55
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

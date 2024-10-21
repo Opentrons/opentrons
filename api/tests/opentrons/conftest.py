@@ -20,6 +20,7 @@ from typing import (
     Union,
     cast,
 )
+
 from typing_extensions import TypedDict
 
 import pytest
@@ -37,6 +38,23 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons_shared_data.protocol.types import JsonProtocol
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    LiquidClassSchemaV1,
+    ByPipetteSetting,
+    ByTipTypeSetting,
+    AspirateProperties,
+    Submerge,
+    PositionReference,
+    DelayProperties,
+    DelayParams,
+    RetractAspirate,
+    SingleDispenseProperties,
+    RetractDispense,
+    Coordinate,
+    MixProperties,
+    TouchTipProperties,
+    BlowoutProperties,
+)
 from opentrons_shared_data.deck.types import (
     RobotModel,
     DeckDefinitionV3,
@@ -317,6 +335,7 @@ def _make_ot3_pe_ctx(
             block_on_door_open=False,
         ),
         deck_configuration=None,
+        file_provider=None,
         error_recovery_policy=error_recovery_policy.never_recover,
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
@@ -763,3 +782,84 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
         "twoDimensionalRendering": {},
     }
+
+
+@pytest.fixture
+def minimal_liquid_class_def1() -> LiquidClassSchemaV1:
+    return LiquidClassSchemaV1(
+        liquidClassName="water1",
+        displayName="water 1",
+        schemaVersion=1,
+        namespace="test-fixture-1",
+        byPipette=[],
+    )
+
+
+@pytest.fixture
+def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
+    return LiquidClassSchemaV1(
+        liquidClassName="water2",
+        displayName="water 2",
+        schemaVersion=1,
+        namespace="test-fixture-2",
+        byPipette=[
+            ByPipetteSetting(
+                pipetteModel="p20_single_gen2",
+                byTipType=[
+                    ByTipTypeSetting(
+                        tiprack="opentrons_96_tiprack_20ul",
+                        aspirate=AspirateProperties(
+                            submerge=Submerge(
+                                positionReference=PositionReference.LIQUID_MENISCUS,
+                                offset=Coordinate(x=0, y=0, z=-5),
+                                speed=100,
+                                delay=DelayProperties(
+                                    enable=True, params=DelayParams(duration=1.5)
+                                ),
+                            ),
+                            retract=RetractAspirate(
+                                positionReference=PositionReference.WELL_TOP,
+                                offset=Coordinate(x=0, y=0, z=5),
+                                speed=100,
+                                airGapByVolume={"default": 2, "5": 3, "10": 4},
+                                touchTip=TouchTipProperties(enable=False),
+                                delay=DelayProperties(enable=False),
+                            ),
+                            positionReference=PositionReference.WELL_BOTTOM,
+                            offset=Coordinate(x=0, y=0, z=-5),
+                            flowRateByVolume={"default": 50, "10": 40, "20": 30},
+                            preWet=True,
+                            mix=MixProperties(enable=False),
+                            delay=DelayProperties(
+                                enable=True, params=DelayParams(duration=2)
+                            ),
+                        ),
+                        singleDispense=SingleDispenseProperties(
+                            submerge=Submerge(
+                                positionReference=PositionReference.LIQUID_MENISCUS,
+                                offset=Coordinate(x=0, y=0, z=-5),
+                                speed=100,
+                                delay=DelayProperties(enable=False),
+                            ),
+                            retract=RetractDispense(
+                                positionReference=PositionReference.WELL_TOP,
+                                offset=Coordinate(x=0, y=0, z=5),
+                                speed=100,
+                                airGapByVolume={"default": 2, "5": 3, "10": 4},
+                                blowout=BlowoutProperties(enable=False),
+                                touchTip=TouchTipProperties(enable=False),
+                                delay=DelayProperties(enable=False),
+                            ),
+                            positionReference=PositionReference.WELL_BOTTOM,
+                            offset=Coordinate(x=0, y=0, z=-5),
+                            flowRateByVolume={"default": 50, "10": 40, "20": 30},
+                            mix=MixProperties(enable=False),
+                            pushOutByVolume={"default": 5, "10": 7, "20": 10},
+                            delay=DelayProperties(enable=False),
+                        ),
+                        multiDispense=None,
+                    )
+                ],
+            )
+        ],
+    )

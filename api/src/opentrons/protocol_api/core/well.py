@@ -72,10 +72,6 @@ class AbstractWellCore(ABC):
         """Get the coordinate of the well's center."""
 
     @abstractmethod
-    def get_meniscus(self, z_offset: float) -> Point:
-        """Get the coordinate of the well's meniscus, with an z-offset."""
-
-    @abstractmethod
     def load_liquid(
         self,
         liquid: Liquid,

@@ -109,7 +109,7 @@ export function TwoColLwInfoAndDeck(
           type={buildType()}
           bannerText={buildBannerText()}
         />
-        <Flex marginTop="1.742rem">
+        <Flex marginTop="0.7rem">
           <DeckMapContent {...deckMapUtils} />
         </Flex>
       </TwoColumn>

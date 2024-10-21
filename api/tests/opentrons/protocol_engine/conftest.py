@@ -22,6 +22,7 @@ from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
+from opentrons.protocol_engine.resources.file_provider import FileProvider
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -252,3 +253,9 @@ def supported_tip_fixture() -> pipette_definition.SupportedTipsDefinition:
 def mock_command_note_adder(decoy: Decoy) -> CommandNoteAdder:
     """Get a command note adder."""
     return decoy.mock(cls=CommandNoteAdder)
+
+
+@pytest.fixture
+def file_provider(decoy: Decoy) -> FileProvider:
+    """Get a mocked out FileProvider."""
+    return decoy.mock(cls=FileProvider)

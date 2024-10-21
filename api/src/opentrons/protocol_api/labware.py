@@ -226,13 +226,13 @@ class Well:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
             negative offsets are lower.
-        :return: A :py:class:`~opentrons.types.Location` corresponding to the
-            absolute position of the meniscus-center of the well, plus the ``z`` offset
-            (if specified).
+        :return: A :py:class:`~opentrons.types.Location` that indicates location is meniscus and that holds the ``z`` offset in its point.z field.
 
         :meta private:
         """
-        return Location(self._core.get_meniscus(z_offset=z), self)
+        return Location(
+            point=Point(x=0, y=0, z=z), labware=self, _ot_internal_is_meniscus=True
+        )
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

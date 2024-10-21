@@ -11,10 +11,11 @@ import {
 
 import { ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
-import { getLoadedLabware } from '/app/molecules/Command/utils/accessors'
-import { getLabwareDisplayLocation } from '/app/molecules/Command'
+import {
+  getLoadedLabware,
+  getLabwareDisplayLocation,
+} from '/app/local-resources/labware'
 
-import type { TFunction } from 'i18next'
 import type { WellGroup } from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
@@ -281,7 +282,7 @@ export function getFailedCmdRelevantLabware(
   const labwareNickname =
     protocolAnalysis != null
       ? getLoadedLabware(
-          protocolAnalysis,
+          protocolAnalysis.labware,
           recentRelevantFailedLabwareCmd?.params.labwareId || ''
         )?.displayName ?? null
       : null
@@ -350,39 +351,37 @@ export function useRelevantFailedLwLocations({
   allRunDefs,
 }: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
   const { t } = useTranslation('protocol_command_text')
-  const canGetDisplayLocation =
-    protocolAnalysis != null && failedLabware != null
 
-  const buildLocationCopy = useMemo(() => {
-    return (location: LabwareLocation | undefined): string | null => {
-      return canGetDisplayLocation && location != null
-        ? getLabwareDisplayLocation(
-            protocolAnalysis,
-            allRunDefs,
-            location,
-            t as TFunction,
-            FLEX_ROBOT_TYPE,
-            false // Always return the "full" copy, which is the desktop copy.
-          )
-        : null
-    }
-  }, [canGetDisplayLocation, allRunDefs])
+  const currentLocation = getLabwareDisplayLocation({
+    loadedLabwares: protocolAnalysis?.labware ?? [],
+    loadedModules: protocolAnalysis?.modules ?? [],
+    location: failedLabware?.location ?? null,
+    allRunDefs,
+    robotType: FLEX_ROBOT_TYPE,
+    t,
+  })
 
-  const currentLocation = useMemo(() => {
-    return buildLocationCopy(failedLabware?.location) ?? ''
-  }, [canGetDisplayLocation])
-
-  const newLocation = useMemo(() => {
+  const getNewLocation = (): LabwareLocation | null => {
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
-        return buildLocationCopy(failedCommandByRunRecord.params.newLocation)
+        return failedCommandByRunRecord.params.newLocation
       default:
         return null
     }
-  }, [canGetDisplayLocation, failedCommandByRunRecord?.key])
+  }
+
+  const newLocationByDisplayName = getLabwareDisplayLocation({
+    loadedLabwares: protocolAnalysis?.labware ?? [],
+    loadedModules: protocolAnalysis?.modules ?? [],
+    location: getNewLocation(),
+    allRunDefs,
+    robotType: FLEX_ROBOT_TYPE,
+    t,
+  })
 
   return {
     currentLoc: currentLocation,
-    newLoc: newLocation,
+    newLoc:
+      newLocationByDisplayName.length === 0 ? null : newLocationByDisplayName,
   }
 }

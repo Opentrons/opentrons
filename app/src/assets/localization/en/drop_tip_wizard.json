@@ -47,5 +47,5 @@
   "waste_chute_in_slot": "Waste chute in {{slot}}",
   "where_to_blowout": "Where do you want to blow out the aspirated liquid?",
   "where_to_drop_tips": "Where do you want to drop the attached tips?",
-  "yes_blow_out_liquid": "Yes, blow out liquid in labware"
+  "yes_blow_out_liquid": "Yes, choose blowout location"
 }

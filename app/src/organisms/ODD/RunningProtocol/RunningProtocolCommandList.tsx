@@ -23,7 +23,7 @@ import {
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { CommandText, CommandIcon } from '/app/molecules/Command'
-import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
+import { getCommandTextData } from '/app/local-resources/commands'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'

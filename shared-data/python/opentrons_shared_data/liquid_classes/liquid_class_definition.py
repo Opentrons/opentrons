@@ -312,9 +312,9 @@ class MultiDispenseProperties(BaseModel):
 class ByTipTypeSetting(BaseModel):
     """Settings for each kind of tip this pipette can use."""
 
-    tipType: str = Field(
+    tiprack: str = Field(
         ...,
-        description="The tip type whose properties will be used when handling this specific liquid class with this pipette",
+        description="The name of tiprack whose tip will be used when handling this specific liquid class with this pipette",
     )
     aspirate: AspirateProperties = Field(
         ..., description="Aspirate parameters for this tip type."
@@ -339,9 +339,10 @@ class ByPipetteSetting(BaseModel):
 class LiquidClassSchemaV1(BaseModel):
     """Defines a single liquid class's properties for liquid handling functions."""
 
-    liquidName: str = Field(
+    liquidClassName: str = Field(
         ..., description="The name of the liquid (e.g., water, ethanol, serum)."
     )
+    displayName: str = Field(..., description="User-readable name of the liquid class.")
     schemaVersion: Literal[1] = Field(
         ..., description="Which schema version a liquid class is using"
     )
