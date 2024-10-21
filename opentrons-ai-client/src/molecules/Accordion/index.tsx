@@ -131,7 +131,6 @@ export function Accordion({
         aria-controls={`${id}-${CONTENT}`}
         isOpen={isOpen}
         onClick={handleButtonClick}
-        aria-disabled={!isCompleted}
         disabled={disabled}
       >
         <HeadingText desktopStyle="headingSmallBold">{heading}</HeadingText>
