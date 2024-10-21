@@ -14,14 +14,8 @@ import {
   RECOVERY_MAP,
   ERROR_KINDS,
   ODD_SECTION_TITLE_STYLE,
-  ODD_ONLY,
-  DESKTOP_ONLY,
 } from '../constants'
-import {
-  RecoveryODDOneDesktopTwoColumnContentWrapper,
-  RecoveryRadioGroup,
-  FailedStepNextStep,
-} from '../shared'
+import { RecoverySingleColumnContentWrapper } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '/app/organisms/DropTipWizardFlows'
@@ -52,7 +46,7 @@ export function SelectRecoveryOptionHome({
   currentRecoveryOptionUtils,
   getRecoveryOptionCopy,
   analytics,
-  ...rest
+  isOnDevice,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -66,7 +60,7 @@ export function SelectRecoveryOptionHome({
   useCurrentTipStatus(determineTipStatus)
 
   return (
-    <RecoveryODDOneDesktopTwoColumnContentWrapper
+    <RecoverySingleColumnContentWrapper
       footerDetails={{
         primaryBtnOnClick: () => {
           analytics.reportActionSelectedEvent(selectedRoute)
@@ -83,27 +77,16 @@ export function SelectRecoveryOptionHome({
         >
           {t('choose_a_recovery_action')}
         </StyledText>
-        <Flex css={ODD_ONLY}>
-          <ODDRecoveryOptions
-            validRecoveryOptions={validRecoveryOptions}
-            setSelectedRoute={setSelectedRoute}
-            selectedRoute={selectedRoute}
-            getRecoveryOptionCopy={getRecoveryOptionCopy}
-            errorKind={errorKind}
-          />
-        </Flex>
-        <Flex css={DESKTOP_ONLY}>
-          <DesktopRecoveryOptions
-            validRecoveryOptions={validRecoveryOptions}
-            setSelectedRoute={setSelectedRoute}
-            selectedRoute={selectedRoute}
-            getRecoveryOptionCopy={getRecoveryOptionCopy}
-            errorKind={errorKind}
-          />
-        </Flex>
+        <RecoveryOptions
+          validRecoveryOptions={validRecoveryOptions}
+          setSelectedRoute={setSelectedRoute}
+          selectedRoute={selectedRoute}
+          getRecoveryOptionCopy={getRecoveryOptionCopy}
+          errorKind={errorKind}
+          isOnDevice={isOnDevice}
+        />
       </Flex>
-      <FailedStepNextStep {...rest} />
-    </RecoveryODDOneDesktopTwoColumnContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -111,16 +94,18 @@ interface RecoveryOptionsProps {
   validRecoveryOptions: RecoveryRoute[]
   setSelectedRoute: (route: RecoveryRoute) => void
   getRecoveryOptionCopy: RecoveryContentProps['getRecoveryOptionCopy']
-  errorKind: ErrorKind
+  errorKind: RecoveryContentProps['errorKind']
+  isOnDevice: RecoveryContentProps['isOnDevice']
   selectedRoute?: RecoveryRoute
 }
-// For ODD use only.
-export function ODDRecoveryOptions({
+
+export function RecoveryOptions({
   errorKind,
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
   getRecoveryOptionCopy,
+  isOnDevice,
 }: RecoveryOptionsProps): JSX.Element {
   return (
     <Flex
@@ -140,6 +125,7 @@ export function ODDRecoveryOptions({
             }}
             isSelected={recoveryOption === selectedRoute}
             radioButtonType="large"
+            largeDesktopBorderRadius={!isOnDevice}
           />
         )
       })}
@@ -147,38 +133,6 @@ export function ODDRecoveryOptions({
   )
 }
 
-export function DesktopRecoveryOptions({
-  errorKind,
-  validRecoveryOptions,
-  selectedRoute,
-  setSelectedRoute,
-  getRecoveryOptionCopy,
-}: RecoveryOptionsProps): JSX.Element {
-  return (
-    <RecoveryRadioGroup
-      css={RADIO_GAP}
-      onChange={e => {
-        setSelectedRoute(e.currentTarget.value)
-      }}
-      value={selectedRoute}
-      options={validRecoveryOptions.map(
-        (option: RecoveryRoute) =>
-          ({
-            value: option,
-            children: (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                role="label"
-                htmlFor={option}
-              >
-                {getRecoveryOptionCopy(option, errorKind)}
-              </StyledText>
-            ),
-          } as const)
-      )}
-    />
-  )
-}
 // Pre-fetch tip attachment status. Users are not blocked from proceeding at this step.
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
@@ -254,7 +208,3 @@ export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_STEP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
-
-const RADIO_GAP = `
-  gap: ${SPACING.spacing4};
-`

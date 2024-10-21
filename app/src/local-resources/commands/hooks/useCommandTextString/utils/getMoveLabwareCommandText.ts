@@ -1,10 +1,10 @@
 import { GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 
+import { getFinalLabwareLocation } from './getFinalLabwareLocation'
 import {
   getLabwareName,
   getLabwareDisplayLocation,
-  getFinalLabwareLocation,
-} from '../../../utils'
+} from '/app/local-resources/labware'
 
 import type { MoveLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from './types'
@@ -26,16 +26,23 @@ export function getMoveLabwareCommandText({
     allPreviousCommands != null
       ? getFinalLabwareLocation(labwareId, allPreviousCommands)
       : null
-  const newDisplayLocation =
-    commandTextData != null
-      ? getLabwareDisplayLocation(
-          commandTextData,
-          allRunDefs,
-          newLocation,
-          t,
-          robotType
-        )
-      : null
+
+  const oldDisplayLocation = getLabwareDisplayLocation({
+    location: oldLocation,
+    robotType,
+    allRunDefs,
+    loadedLabwares: commandTextData?.labware ?? [],
+    loadedModules: commandTextData?.modules ?? [],
+    t,
+  })
+  const newDisplayLocation = getLabwareDisplayLocation({
+    location: newLocation,
+    robotType,
+    allRunDefs,
+    loadedLabwares: commandTextData?.labware ?? [],
+    loadedModules: commandTextData?.modules ?? [],
+    t,
+  })
 
   const location = newDisplayLocation?.includes(
     GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA
@@ -47,35 +54,25 @@ export function getMoveLabwareCommandText({
     ? t('move_labware_using_gripper', {
         labware:
           commandTextData != null
-            ? getLabwareName(commandTextData, labwareId)
-            : null,
-        old_location:
-          oldLocation != null && commandTextData != null
-            ? getLabwareDisplayLocation(
-                commandTextData,
+            ? getLabwareName({
                 allRunDefs,
-                oldLocation,
-                t,
-                robotType
-              )
-            : '',
+                loadedLabwares: commandTextData.labware ?? [],
+                labwareId,
+              })
+            : null,
+        old_location: oldDisplayLocation,
         new_location: location,
       })
     : t('move_labware_manually', {
         labware:
           commandTextData != null
-            ? getLabwareName(commandTextData, labwareId)
-            : null,
-        old_location:
-          oldLocation != null && commandTextData != null
-            ? getLabwareDisplayLocation(
-                commandTextData,
+            ? getLabwareName({
                 allRunDefs,
-                oldLocation,
-                t,
-                robotType
-              )
-            : '',
+                loadedLabwares: commandTextData.labware ?? [],
+                labwareId,
+              })
+            : null,
+        old_location: oldDisplayLocation,
         new_location: location,
       })
 }

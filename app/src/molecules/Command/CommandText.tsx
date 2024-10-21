@@ -11,7 +11,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { useCommandTextString } from './hooks'
+import { useCommandTextString } from '/app/local-resources/commands'
 
 import type {
   LabwareDefinition2,
@@ -19,11 +19,11 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
-import type { CommandTextData } from './types'
 import type {
   GetTCRunExtendedProfileCommandTextResult,
   GetTCRunProfileCommandTextResult,
-} from './hooks'
+  CommandTextData,
+} from '/app/local-resources/commands'
 
 interface LegacySTProps {
   as?: React.ComponentProps<typeof LegacyStyledText>['as']

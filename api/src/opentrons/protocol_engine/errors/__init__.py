@@ -75,6 +75,7 @@ from .exceptions import (
     IncompleteWellDefinitionError,
     OperationLocationNotInWellError,
     InvalidDispenseVolumeError,
+    StorageLimitReachedError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -158,4 +159,5 @@ __all__ = [
     "IncompleteWellDefinitionError",
     "OperationLocationNotInWellError",
     "InvalidDispenseVolumeError",
+    "StorageLimitReachedError",
 ]

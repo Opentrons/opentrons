@@ -119,7 +119,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
         # SEALED-Pa
         sealed_pa = 0.0
-        await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+        api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
         await api.prepare_for_aspirate(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
@@ -171,4 +171,4 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
         if not api.is_simulator:
             ui.get_user_ready("REMOVE tip")
-        await api.remove_tip(OT3Mount.LEFT)
+        api.remove_tip(OT3Mount.LEFT)

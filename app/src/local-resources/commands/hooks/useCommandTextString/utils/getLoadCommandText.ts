@@ -5,13 +5,14 @@ import {
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 
+import { getPipetteNameOnMount } from './getPipetteNameOnMount'
+import { getLiquidDisplayName } from './getLiquidDisplayName'
+
+import { getLabwareName } from '/app/local-resources/labware'
 import {
-  getLabwareName,
-  getPipetteNameOnMount,
   getModuleModel,
   getModuleDisplayLocation,
-  getLiquidDisplayName,
-} from '../../../utils'
+} from '/app/local-resources/modules'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { GetCommandText } from '..'
@@ -21,12 +22,16 @@ export const getLoadCommandText = ({
   commandTextData,
   robotType,
   t,
+  allRunDefs,
 }: GetCommandText): string => {
   switch (command?.commandType) {
     case 'loadPipette': {
       const pipetteModel =
         commandTextData != null
-          ? getPipetteNameOnMount(commandTextData, command.params.mount)
+          ? getPipetteNameOnMount(
+              commandTextData.pipettes,
+              command.params.mount
+            )
           : null
       return t('load_pipette_protocol_setup', {
         pipette_name:
@@ -54,7 +59,10 @@ export const getLoadCommandText = ({
       ) {
         const moduleModel =
           commandTextData != null
-            ? getModuleModel(commandTextData, command.params.location.moduleId)
+            ? getModuleModel(
+                commandTextData.modules ?? [],
+                command.params.location.moduleId
+              )
             : null
         const moduleName =
           moduleModel != null ? getModuleDisplayName(moduleModel) : ''
@@ -71,7 +79,7 @@ export const getLoadCommandText = ({
           slot_name:
             commandTextData != null
               ? getModuleDisplayLocation(
-                  commandTextData,
+                  commandTextData.modules ?? [],
                   command.params.location.moduleId
                 )
               : null,
@@ -105,7 +113,10 @@ export const getLoadCommandText = ({
         } else if (adapterLoc != null && 'moduleId' in adapterLoc) {
           const moduleModel =
             commandTextData != null
-              ? getModuleModel(commandTextData, adapterLoc?.moduleId ?? '')
+              ? getModuleModel(
+                  commandTextData.modules ?? [],
+                  adapterLoc?.moduleId ?? ''
+                )
               : null
           const moduleName =
             moduleModel != null ? getModuleDisplayName(moduleModel) : ''
@@ -116,7 +127,7 @@ export const getLoadCommandText = ({
             slot_name:
               commandTextData != null
                 ? getModuleDisplayLocation(
-                    commandTextData,
+                    commandTextData.modules ?? [],
                     adapterLoc?.moduleId ?? ''
                   )
                 : null,
@@ -144,7 +155,11 @@ export const getLoadCommandText = ({
       const { labwareId } = command.params
       const labware =
         commandTextData != null
-          ? getLabwareName(commandTextData, labwareId)
+          ? getLabwareName({
+              loadedLabwares: commandTextData?.labware ?? [],
+              labwareId,
+              allRunDefs,
+            })
           : null
       return t('reloading_labware', { labware })
     }
@@ -153,11 +168,15 @@ export const getLoadCommandText = ({
       return t('load_liquids_info_protocol_setup', {
         liquid:
           commandTextData != null
-            ? getLiquidDisplayName(commandTextData, liquidId)
+            ? getLiquidDisplayName(commandTextData.liquids ?? [], liquidId)
             : null,
         labware:
           commandTextData != null
-            ? getLabwareName(commandTextData, labwareId)
+            ? getLabwareName({
+                loadedLabwares: commandTextData?.labware ?? [],
+                labwareId,
+                allRunDefs,
+              })
             : null,
       })
     }

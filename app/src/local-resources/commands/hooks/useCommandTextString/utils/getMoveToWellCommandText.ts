@@ -1,10 +1,10 @@
 import {
-  getFinalLabwareLocation,
-  getLabwareDisplayLocation,
   getLabwareName,
-} from '../../../utils'
+  getLabwareDisplayLocation,
+} from '/app/local-resources/labware'
 
-import type { TFunction } from 'i18next'
+import { getFinalLabwareLocation } from './getFinalLabwareLocation'
+
 import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from './types'
 
@@ -24,22 +24,25 @@ export function getMoveToWellCommandText({
     allPreviousCommands != null
       ? getFinalLabwareLocation(labwareId, allPreviousCommands)
       : null
-  const displayLocation =
-    labwareLocation != null && commandTextData != null
-      ? getLabwareDisplayLocation(
-          commandTextData,
-          allRunDefs,
-          labwareLocation,
-          t as TFunction,
-          robotType
-        )
-      : ''
+
+  const displayLocation = getLabwareDisplayLocation({
+    location: labwareLocation,
+    robotType,
+    allRunDefs,
+    loadedLabwares: commandTextData?.labware ?? [],
+    loadedModules: commandTextData?.modules ?? [],
+    t,
+  })
 
   return t('move_to_well', {
     well_name: wellName,
     labware:
       commandTextData != null
-        ? getLabwareName(commandTextData, labwareId)
+        ? getLabwareName({
+            loadedLabwares: commandTextData.labware ?? [],
+            labwareId,
+            allRunDefs,
+          })
         : null,
     labware_location: displayLocation,
   })
