@@ -383,7 +383,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
                     location=3)
                 p300 = protocol.load_instrument(
                     instrument_name="p300_single", 
-                    mount="right",
+                    mount="left",
                     tip_racks=[tiprack_1])
 
                 p300.pick_up_tip()
@@ -474,7 +474,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                     location=4)
                 p300 = protocol.load_instrument(
                     instrument_name="p300_single",
-                    mount="right",
+                    mount="left",
                     tip_racks=[tiprack_1, tiprack_2])
                 # Dispense diluent
                 p300.distribute(50, reservoir["A12"], plate.wells())
@@ -482,7 +482,6 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                 # loop through each row
                 for i in range(8):
                     # save the source well and destination column to variables
-                    source = reservoir.wells()[i]
                     source = reservoir.wells()[i]
                     row = plate.rows()[i]
 
