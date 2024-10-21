@@ -1,10 +1,16 @@
 """Protocol engine exceptions."""
 
+from __future__ import annotations
+
 from logging import getLogger
-from typing import Any, Dict, Optional, Union, Iterator, Sequence
+from typing import Any, Dict, Final, Optional, Union, Iterator, Sequence, TYPE_CHECKING
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
+
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.types import TipGeometry
+
 
 log = getLogger(__name__)
 
@@ -130,6 +136,21 @@ class TipNotAttachedError(ProtocolEngineError):
     ) -> None:
         """Build a PipetteNotAttachedError."""
         super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, details, wrapping)
+
+
+class PickUpTipTipNotAttachedError(TipNotAttachedError):
+    """Raised from TipHandler.pick_up_tip().
+
+    This is like TipNotAttachedError except that it carries some extra information
+    about the attempted operation.
+    """
+
+    tip_geometry: Final[TipGeometry]
+    """The tip geometry that would have been on the pipette, had the operation succeeded."""
+
+    def __init__(self, tip_geometry: TipGeometry) -> None:
+        super().__init__()
+        self.tip_geometry = tip_geometry
 
 
 class TipAttachedError(ProtocolEngineError):

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
 
-from ..errors import ErrorOccurrence, TipNotAttachedError
+from ..errors import ErrorOccurrence, PickUpTipTipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
 from ..types import PickUpTipWellLocation, DeckPoint
@@ -140,7 +140,12 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 labware_id=labware_id,
                 well_name=well_name,
             )
-        except TipNotAttachedError as e:
+        except PickUpTipTipNotAttachedError as e:
+            state_update_if_false_positive = update_types.StateUpdate()
+            state_update_if_false_positive.update_pipette_tip_state(
+                pipette_id=pipette_id,
+                tip_geometry=e.tip_geometry,
+            )
             state_update.mark_tips_as_used(
                 pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
             )
@@ -157,6 +162,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                     ],
                 ),
                 state_update=state_update,
+                state_update_if_false_positive=state_update_if_false_positive,
             )
         else:
             state_update.update_pipette_tip_state(

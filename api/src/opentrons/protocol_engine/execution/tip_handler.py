@@ -1,9 +1,10 @@
 """Tip pickup and drop procedures."""
-from typing import Optional, Dict
+from typing import Final, Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import FailedTipStateCheck, InstrumentProbeType
+from opentrons.protocol_engine.errors.exceptions import PickUpTipTipNotAttachedError
 from opentrons.types import Mount
 
 from opentrons_shared_data.errors.exceptions import (
@@ -72,7 +73,7 @@ class TipHandler(TypingProtocol):
             Tip geometry of the picked up tip.
 
         Raises:
-            TipNotAttachedError
+            PickUpTipTipNotAttachedError
         """
         ...
 
@@ -245,11 +246,19 @@ class HardwareTipHandler(TipHandler):
             nominal_fallback=nominal_tip_geometry.length,
         )
 
+        tip_geometry = TipGeometry(
+            length=actual_tip_length,
+            diameter=nominal_tip_geometry.diameter,
+            volume=nominal_tip_geometry.volume,
+        )
+
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
         )
-        # Allow TipNotAttachedError to propagate.
-        await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+        try:
+            await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+        except TipNotAttachedError as e:
+            raise PickUpTipTipNotAttachedError(tip_geometry=tip_geometry) from e
 
         # todo(mm, 2024-10-21): This sequence of cache_tip(), set_current_tiprack_diameter(),
         # and set_working_volume() is almost the same as self.add_tip(), except one uses
@@ -268,11 +277,7 @@ class HardwareTipHandler(TipHandler):
             tip_volume=nominal_tip_geometry.volume,
         )
 
-        return TipGeometry(
-            length=actual_tip_length,
-            diameter=nominal_tip_geometry.diameter,
-            volume=nominal_tip_geometry.volume,
-        )
+        return tip_geometry
 
     async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
         """See documentation on abstract base class."""
