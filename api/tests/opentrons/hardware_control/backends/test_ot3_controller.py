@@ -1292,7 +1292,7 @@ def move_group_run_side_effect(
     target_nodes = {axis_to_node(ax): ax for ax in target_pos.keys() if ax != Axis.Q}
     res = {}
     for node in motor_nodes:
-        pos = 0
+        pos = 0.0
         if target_nodes.get(node):
             pos = target_pos[target_nodes[node]]
         res[node] = MotorPositionStatus(pos, pos, True, True, MoveCompleteAck(1))
@@ -1383,7 +1383,7 @@ async def test_controller_move(
     origin_pos: Dict[Axis, float],
     target_pos: Dict[Axis, float],
     expected_pos: Dict[Axis, float],
-    gear_position: Optional[int],
+    gear_position: Optional[float],
 ) -> None:
     from copy import deepcopy
 

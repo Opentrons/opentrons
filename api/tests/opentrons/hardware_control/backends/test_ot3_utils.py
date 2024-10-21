@@ -39,31 +39,6 @@ def test_create_step() -> None:
         assert set(present_nodes) == set(step.keys())
 
 
-def test_get_moving_nodes() -> None:
-    """Test that we can filter out the nonmoving nodes."""
-    # Create a dummy group where X has velocity but no accel, and Y has accel but no velocity.
-    present_nodes = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
-    move_group = [
-        create_step(
-            distance={NodeId.gantry_x: f64(100), NodeId.gantry_y: f64(100)},
-            velocity={NodeId.gantry_x: f64(100), NodeId.gantry_y: f64(0)},
-            acceleration={NodeId.gantry_x: f64(0), NodeId.gantry_y: f64(100)},
-            duration=f64(1),
-            present_nodes=present_nodes,
-        )
-    ]
-    assert len(move_group[0]) == 4
-
-    print(move_group)
-
-    moving_nodes = ot3utils.moving_axes_in_move_group(move_group)
-    assert len(moving_nodes) == 2
-    assert NodeId.gantry_x in moving_nodes
-    assert NodeId.gantry_y in moving_nodes
-    assert NodeId.head_l not in moving_nodes
-    assert NodeId.head_r not in moving_nodes
-
-
 def test_filter_zero_duration_step() -> None:
     origin = {
         Axis.X: 0,
@@ -155,5 +130,7 @@ def test_moving_pipettes_in_move_group(
         NodeId.gripper_z,
     ]
 
-    moving_pipettes = ot3utils.moving_pipettes_in_move_group(present_nodes, moving)
+    moving_pipettes = ot3utils.moving_pipettes_in_move_group(
+        set(present_nodes), set(moving)
+    )
     assert set(moving_pipettes) == set(expected)

@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from typing import TypeVar, Optional
+from typing import Optional
 
 from opentrons.types import AxisMapType, Mount, Point
 

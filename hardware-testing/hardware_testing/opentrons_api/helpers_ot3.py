@@ -662,7 +662,7 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[Axis, float]:
     """Get the endstop's position per mount."""
-    carriage_pos = api._deck_from_machine(api._backend.home_position())
+    carriage_pos = api.get_deck_from_machine(api._backend.home_position())
     pos_at_home = api._effector_pos_from_carriage_pos(
         OT3Mount.from_mount(mount), carriage_pos, None
     )
