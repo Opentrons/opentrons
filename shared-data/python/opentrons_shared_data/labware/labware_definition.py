@@ -431,6 +431,8 @@ class SquaredConeSegment(BaseModel):
     def volume_to_height_table(self) -> Dict[float, float]:
         return dict((v, k) for k, v in self.height_to_volume_table.items())
 
+    class Config:
+        keep_untouched = (cached_property,)
 
 """
 module filitedCuboidSquare(bottom_shape, diameter, width, length, height, steps) {
