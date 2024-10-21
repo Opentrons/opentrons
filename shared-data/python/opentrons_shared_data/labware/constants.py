@@ -8,9 +8,11 @@ from typing import Literal, Union
 WELL_NAME_PATTERN: Final["re.Pattern[str]"] = re.compile(r"^([A-Z]+)([0-9]+)$", re.X)
 
 # These shapes are for wellshape definitions and describe the top of the well
-Circular = Literal["circular"]
-Rectangular = Literal["rectangular"]
-WellShape = Union[Circular, Rectangular]
+CircularType = Literal["circular"]
+Circular: CircularType = "circular"
+RectangularType = Literal["rectangular"]
+Rectangular: RectangularType = "rectangular"
+WellShape = Union[Literal["circular"], Literal["rectangular"]]
 
 # These shapes are used to describe the 3D primatives used to build wells
 Conical = Literal["conical"]
