@@ -108,9 +108,6 @@ export function ProtocolRunHeader(
             'outputFileIds' in runRecord.data &&
             runRecord.data.outputFileIds.length > 0
           }
-          deviceDetailsLink={() => {
-            navigate(`/devices/${robotName}`)
-          }}
           {...props}
         />
         <RunHeaderContent

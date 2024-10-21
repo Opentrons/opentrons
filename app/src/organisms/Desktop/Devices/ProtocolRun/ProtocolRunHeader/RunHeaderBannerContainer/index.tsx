@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Box,
@@ -34,24 +35,24 @@ export type RunHeaderBannerContainerProps = ProtocolRunHeaderProps & {
   runErrors: UseRunErrorsResult
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
   hasDownloadableFiles: boolean
-  deviceDetailsLink: () => void
 }
 
 // Holds all the various banners that render in ProtocolRunHeader.
 export function RunHeaderBannerContainer(
   props: RunHeaderBannerContainerProps
 ): JSX.Element | null {
+  const navigate = useNavigate()
   const {
     runStatus,
     enteredER,
     runHeaderModalContainerUtils,
     hasDownloadableFiles,
-    deviceDetailsLink,
+    robotName,
   } = props
   const { analysisErrorModalUtils } = runHeaderModalContainerUtils
 
   const { t } = useTranslation(['run_details', 'shared'])
-  const isDoorOpen = useIsDoorOpen(props.robotName)
+  const isDoorOpen = useIsDoorOpen(robotName)
 
   const {
     showRunCanceledBanner,
@@ -114,7 +115,9 @@ export function RunHeaderBannerContainer(
             </Flex>
             <Link
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={deviceDetailsLink}
+              onClick={() => {
+                navigate(`/devices/${robotName}`)
+              }}
             >
               {t('device_details')}
             </Link>
