@@ -72,8 +72,6 @@ class UnsafePlaceLabwareImplementation(
         labware_id = params.labwareId
         self._state_view.labware.get(labware_id=labware_id)
 
-        # TODO: do we need these offsets instead?
-        # self._state_view.geometry.get_final_labware_movement_offset_vectors
         final_offsets = self._state_view.labware.get_labware_gripper_offsets(
             labware_id, None
         )
@@ -95,11 +93,16 @@ class UnsafePlaceLabwareImplementation(
             module = self._state_view.modules.get_by_slot(location.slotName)
             if module and module.model == ModuleModel.ABSORBANCE_READER_V1:
                 for hw_mod in ot3api.attached_modules:
-                    lid_status = hw_mod.live_data["data"].get('lidStatus')
-                    if hw_mod.serial_number == module.serialNumber and lid_status == 'on':
+                    lid_status = hw_mod.live_data["data"].get("lidStatus")
+                    if (
+                        hw_mod.serial_number == module.serialNumber
+                        and lid_status == "on"
+                    ):
                         await ot3api.ungrip()
                         await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
-                        return SuccessData(public=UnsafePlaceLabwareResult(), private=None)
+                        return SuccessData(
+                            public=UnsafePlaceLabwareResult(), private=None
+                        )
 
         # NOTE: When the estop is pressed, the gantry loses postion,
         # so the robot needs to home x, y to sync.

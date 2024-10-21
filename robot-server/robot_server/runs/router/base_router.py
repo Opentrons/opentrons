@@ -632,10 +632,13 @@ async def get_current_state(
         # Handle absorbance reader lid
         elif isinstance(command, (OpenLid, CloseLid)):
             for mod in run.modules:
-                if not isinstance(mod, AbsorbanceReader) and mod.id != command.params.moduleId:
+                if (
+                    not isinstance(mod, AbsorbanceReader)
+                    and mod.id != command.params.moduleId
+                ):
                     continue
                 for hw_mod in hardware.attached_modules:
-                    lid_status = hw_mod.live_data['data'].get('lidStatus')
+                    lid_status = hw_mod.live_data["data"].get("lidStatus")
                     if (
                         mod.location is not None
                         and hw_mod.serial_number == mod.serialNumber
