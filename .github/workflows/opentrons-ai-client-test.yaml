@@ -9,12 +9,9 @@ on:
     paths:
       - 'Makefile'
       - 'opentrons-ai-client/**/*'
-      - 'components/**/*'
-      - '*.js'
-      - '*.json'
-      - 'yarn.lock'
-      - '.github/workflows/app-test-build-deploy.yaml'
-      - '.github/workflows/utils.js'
+      - 'components/**'
+      - 'shared-data/**'
+      - '.github/workflows/opentrons-ai-client-test.yml'
     branches:
       - '**'
     tags:
@@ -24,10 +21,9 @@ on:
     paths:
       - 'Makefile'
       - 'opentrons-ai-client/**/*'
-      - 'components/**/*'
-      - '*.js'
-      - '*.json'
-      - 'yarn.lock'
+      - 'components/**'
+      - 'shared-data/**'
+      - '.github/workflows/opentrons-ai-client-test.yml'
   workflow_dispatch:
 
 concurrency:

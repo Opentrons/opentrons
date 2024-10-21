@@ -6,6 +6,7 @@ from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
 
 from ..state.state import StateStore
 from ..actions import ActionDispatcher
+from ..resources import FileProvider
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .gantry_mover import create_gantry_mover
@@ -20,6 +21,7 @@ from .status_bar import StatusBarHandler
 
 def create_queue_worker(
     hardware_api: HardwareControlAPI,
+    file_provider: FileProvider,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     command_generator: Callable[[], AsyncGenerator[str, None]],
@@ -28,6 +30,7 @@ def create_queue_worker(
 
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
+        file_provider: Provides access to robot server file writing procedures for protocol output.
         state_store: StateStore to pass down to dependencies.
         action_dispatcher: ActionDispatcher to pass down to dependencies.
         error_recovery_policy: ErrorRecoveryPolicy to pass down to dependencies.
@@ -78,6 +81,7 @@ def create_queue_worker(
 
     command_executor = CommandExecutor(
         hardware_api=hardware_api,
+        file_provider=file_provider,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         equipment=equipment_handler,

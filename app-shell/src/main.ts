@@ -18,7 +18,6 @@ import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
 import { registerNotify, closeAllNotifyConnections } from './notifications'
-
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch, Logger } from './types'
 import type { LogEntry } from 'winston'
