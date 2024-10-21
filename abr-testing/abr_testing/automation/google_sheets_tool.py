@@ -167,20 +167,13 @@ class google_sheet:
             self.spread_sheet.batch_update(body=body)
         except gspread.exceptions.APIError as e:
             print(f"ERROR MESSAGE: {e}")
+            raise
 
     def update_cell(
         self, sheet_title: str, row: int, column: int, single_data: Any
     ) -> Tuple[int, int, Any]:
         """Update ONE individual cell according to a row and column."""
-        try:
-            self.spread_sheet.worksheet(sheet_title).update_cell(
-                row, column, single_data
-            )
-        except gspread.exceptions.APIError:
-            t.sleep(30)
-            self.spread_sheet.worksheet(sheet_title).update_cell(
-                row, column, single_data
-            )
+        self.spread_sheet.worksheet(sheet_title).update_cell(row, column, single_data)
         return row, column, single_data
 
     def get_all_data(

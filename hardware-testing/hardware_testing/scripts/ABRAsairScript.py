@@ -3,7 +3,7 @@ import sys
 import paramiko as pmk
 import time
 import multiprocessing
-from typing import Optional, List
+from typing import Optional, List, Any
 
 
 def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
@@ -15,19 +15,8 @@ def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
         stdin, stdout, stderr = client.exec_command(command, get_pty=True)
         stdout_lines: List[str] = []
         stderr_lines: List[str] = []
-        time.sleep(15)
+        time.sleep(25)
 
-        # check stdout, stderr
-
-        # Check the exit status of the command.
-        # while not stdout.channel.exit_status_ready():
-        #     if stdout.channel.recv_ready():
-        #         stdout_lines = stdout.readlines()
-        #         print(f"{args[0]} output:", "".join(stdout_lines))
-        # if stderr.channel.recv_ready():
-        #     stderr_lines = stderr.readlines()
-        #     print(f"{args[0]} ERROR:", "".join(stdout_lines))
-        #     return 1
         if stderr.channel.recv_ready:
             stderr_lines = stderr.readlines()
             if stderr_lines != []:
@@ -58,24 +47,9 @@ def connect_ssh(ip: str) -> pmk.SSHClient:
     return client
 
 
-# Load Robot IPs
-file_name = sys.argv[1]
-robot_ips = []
-robot_names = []
-
-with open(file_name) as file:
-    for line in file.readlines():
-        info = line.split(",")
-        if "Y" in info[2]:
-            robot_ips.append(info[0])
-            robot_names.append(info[1])
-
-cmd = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
-cd = "cd /opt/opentrons-robot-server && "
-print("Executing Script on All Robots:")
-
-
-def run_command_on_ip(index: int) -> None:
+def run_command_on_ip(
+    index: int, robot_ips: List[str], robot_names: List[str], cd: str, cmd: str
+) -> None:
     """Execute ssh command and start abr_asair script on the specified robot."""
     curr_ip = robot_ips[index]
     try:
@@ -87,15 +61,35 @@ def run_command_on_ip(index: int) -> None:
         print(f"Error running command on {curr_ip}: {e}")
 
 
-# Launch the processes for each robot.
-processes = []
-for index in range(len(robot_ips)):
-    process = multiprocessing.Process(target=run_command_on_ip, args=(index,))
-    processes.append(process)
+def run(file_name: str) -> List[Any]:
+    """Run asair script module."""
+    # Load Robot IPs
+    cmd = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
+    cd = "cd /opt/opentrons-robot-server && "
+    robot_ips = []
+    robot_names = []
+    with open(file_name) as file:
+        for line in file.readlines():
+            info = line.split(",")
+            if "Y" in info[2]:
+                robot_ips.append(info[0])
+                robot_names.append(info[1])
+    print("Executing Script on All Robots:")
+    # Launch the processes for each robot.
+    processes = []
+    for index in range(len(robot_ips)):
+        process = multiprocessing.Process(
+            target=run_command_on_ip, args=(index, robot_ips, robot_names, cd, cmd)
+        )
+        processes.append(process)
+    return processes
 
 
 if __name__ == "__main__":
     # Wait for all processes to finish.
+    file_name = sys.argv[1]
+    processes = run(file_name)
+
     for process in processes:
         process.start()
         time.sleep(20)

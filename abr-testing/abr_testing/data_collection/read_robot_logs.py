@@ -13,7 +13,6 @@ from typing import List, Dict, Any, Tuple, Set, Optional
 import time as t
 import json
 import requests
-import sys
 from abr_testing.tools import plate_reader
 
 
@@ -695,7 +694,7 @@ def get_calibration_offsets(
         print(f"Connected to {ip}")
     except Exception:
         print(f"ERROR: Failed to read IP address: {ip}")
-        sys.exit()
+        raise
     health_data = response.json()
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
