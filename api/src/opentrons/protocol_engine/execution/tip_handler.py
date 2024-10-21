@@ -83,7 +83,7 @@ class TipHandler(TypingProtocol):
             TipAttachedError
         """
 
-    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
 
     async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
@@ -279,7 +279,7 @@ class HardwareTipHandler(TipHandler):
         self._hardware_api.remove_tip(hw_mount)
         self._hardware_api.set_current_tiprack_diameter(hw_mount, 0)
 
-    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """See documentation on abstract base class."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
@@ -422,7 +422,7 @@ class VirtualTipHandler(TipHandler):
             expected_has_tip=True,
         )
 
-    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Add a tip using a virtual pipette.
 
         This should not be called when using virtual pipettes.

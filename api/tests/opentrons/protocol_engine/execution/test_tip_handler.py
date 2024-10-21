@@ -266,7 +266,7 @@ async def test_drop_tip(
     )
 
 
-async def test_add_tip(
+def test_add_tip(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -289,7 +289,7 @@ async def test_add_tip(
         MountType.LEFT
     )
 
-    await subject.add_tip(pipette_id="pipette-id", tip=tip)
+    subject.add_tip(pipette_id="pipette-id", tip=tip)
 
     decoy.verify(
         mock_hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
