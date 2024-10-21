@@ -16,6 +16,7 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
 from opentrons.hardware_control.types import EstopState
+from opentrons.protocol_engine.commands.absorbance_reader import CloseLid, OpenLid
 from opentrons.protocol_engine.commands.move_labware import MoveLabware
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths
 from opentrons.protocol_engine import (
@@ -620,32 +621,35 @@ async def get_current_state(
             if current_command
             else None
         )
+
+        # Labware state when estop is engaged
         if isinstance(command, MoveLabware):
-            place_down = False
-            labware_id = command.params.labwareId
-            location = command.params.newLocation
-            if estop_engaged:
-                for mod in run.modules:
-                    # Check if the plate reader lid was being moved and needs to be placed down.
-                    if (
-                        not isinstance(mod, AbsorbanceReader)
-                        and mod.location != location
-                    ):
-                        continue
-                    for hw_mod in hardware.attached_modules:
-                        if (
-                            hw_mod.serial_number == mod.serialNumber
-                            and hw_mod.live_data.get("lidStatus") != "on"
-                        ):
-                            place_down = True
-                            break
-                    if place_down:
-                        break
             place_labware = PlaceLabwareState(
-                location=location,
-                labwareId=labware_id,
-                shouldPlaceDown=place_down,
+                location=command.params.newLocation,
+                labwareId=command.params.labwareId,
+                shouldPlaceDown=False,
             )
+        # Handle absorbance reader lid
+        elif isinstance(command, (OpenLid, CloseLid)):
+            for mod in run.modules:
+                if not isinstance(mod, AbsorbanceReader) and mod.id != command.params.moduleId:
+                    continue
+                for hw_mod in hardware.attached_modules:
+                    lid_status = hw_mod.live_data['data'].get('lidStatus')
+                    if (
+                        mod.location is not None
+                        and hw_mod.serial_number == mod.serialNumber
+                    ):
+                        location = mod.location
+                        labware_id = f"{mod.model}Lid{location.slotName}"
+                        place_labware = PlaceLabwareState(
+                            location=location,
+                            labwareId=labware_id,
+                            shouldPlaceDown=estop_engaged,
+                        )
+                        break
+                if place_labware:
+                    break
 
     return await PydanticResponse.create(
         content=Body.construct(

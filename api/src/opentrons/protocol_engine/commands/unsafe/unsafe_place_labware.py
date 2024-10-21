@@ -13,7 +13,7 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 from opentrons.types import Point
 
-from ...types import DeckSlotLocation, LabwareLocation
+from ...types import DeckSlotLocation, LabwareLocation, ModuleModel
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...resources import ensure_ot3_hardware
@@ -90,9 +90,19 @@ class UnsafePlaceLabwareImplementation(
             params.location,
         )
 
-        # NOTE: when we e-stop, the gantry position goes bad, so the robot needs to
-        # home x, y. This can be a problem if a pipette is holding tips.
-        # so maybe home everything? and then drop the tips?
+        # If this is an Aborbance Reader, and the lid is already on, just ungrip and home the gripper.
+        if isinstance(location, DeckSlotLocation):
+            module = self._state_view.modules.get_by_slot(location.slotName)
+            if module and module.model == ModuleModel.ABSORBANCE_READER_V1:
+                for hw_mod in ot3api.attached_modules:
+                    lid_status = hw_mod.live_data["data"].get('lidStatus')
+                    if hw_mod.serial_number == module.serialNumber and lid_status == 'on':
+                        await ot3api.ungrip()
+                        await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
+                        return SuccessData(public=UnsafePlaceLabwareResult(), private=None)
+
+        # NOTE: When the estop is pressed, the gantry loses postion,
+        # so the robot needs to home x, y to sync.
         await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G, Axis.X, Axis.Y])
         gripper_homed_position = await ot3api.gantry_position(
             mount=OT3Mount.GRIPPER,
