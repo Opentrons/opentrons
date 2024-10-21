@@ -1149,7 +1149,7 @@ async def test_liquid_not_found(
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
         response_queue: Optional[
-            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+            asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
         ] = None,
     ) -> float:
         pos = self._position

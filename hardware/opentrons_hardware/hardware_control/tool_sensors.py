@@ -272,7 +272,7 @@ async def liquid_probe(
     sensor_id: SensorId = SensorId.S0,
     force_both_sensors: bool = False,
     response_queue: Optional[
-        asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+        asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
     ] = None,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""

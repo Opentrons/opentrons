@@ -2636,7 +2636,7 @@ class OT3API(
         p_travel: float,
         force_both_sensors: bool = False,
         response_queue: Optional[
-            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+            asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
         ] = None,
     ) -> float:
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
@@ -2672,7 +2672,7 @@ class OT3API(
         probe: Optional[InstrumentProbeType] = None,
         force_both_sensors: bool = False,
         response_queue: Optional[
-            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+            asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
         ] = None,
     ) -> float:
         """Search for and return liquid level height.

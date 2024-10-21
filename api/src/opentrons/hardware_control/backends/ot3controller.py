@@ -1373,7 +1373,7 @@ class OT3Controller(FlexBackend):
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
         response_queue: Optional[
-            asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+            asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
         ] = None,
     ) -> float:
         head_node = axis_to_node(Axis.by_mount(mount))
