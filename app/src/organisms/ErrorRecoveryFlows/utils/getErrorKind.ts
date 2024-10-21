@@ -13,9 +13,12 @@ export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
   const errorType = failedCommand?.error?.errorType
 
   if (errorIsDefined) {
-    // todo(mm, 2024-07-02): Also handle aspirateInPlace and dispenseInPlace.
-    // https://opentrons.atlassian.net/browse/EXEC-593
     if (
+      commandType === 'prepareToAspirate' &&
+      errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
+    ) {
+      return ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE
+    } else if (
       (commandType === 'aspirate' || commandType === 'aspirateInPlace') &&
       errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
     ) {
