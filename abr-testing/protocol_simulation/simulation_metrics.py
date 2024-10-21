@@ -14,7 +14,7 @@ from abr_testing.tools import plate_reader
 
 
 
-def set_api_level(protocol_file_path) -> None:
+def set_api_level(protocol_file_path: str) -> None:
     with open(protocol_file_path, "r") as file:
         file_contents = file.readlines()
     # Look for current'apiLevel:'
