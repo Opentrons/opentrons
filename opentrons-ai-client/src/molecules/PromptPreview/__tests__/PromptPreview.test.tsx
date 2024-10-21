@@ -2,9 +2,13 @@ import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { PROMPT_PREVIEW_PLACEHOLDER_MESSAGE, PromptPreview } from '..'
+import { PromptPreview } from '..'
+
+const PROMPT_PREVIEW_PLACEHOLDER_MESSAGE =
+  'As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol.'
 
 const mockHandleClick = vi.fn()
+
 const render = (props: React.ComponentProps<typeof PromptPreview>) => {
   return renderWithProviders(<PromptPreview {...props} />, {
     i18nInstance: i18n,

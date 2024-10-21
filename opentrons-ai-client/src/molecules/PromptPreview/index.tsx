@@ -13,9 +13,7 @@ import {
 } from '@opentrons/components'
 import { PromptPreviewSection } from '../PromptPreviewSection'
 import type { PromptPreviewSectionProps } from '../PromptPreviewSection'
-
-export const PROMPT_PREVIEW_PLACEHOLDER_MESSAGE =
-  'As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol.'
+import { useTranslation } from 'react-i18next'
 
 interface PromptPreviewProps {
   isSubmitButtonEnabled?: boolean
@@ -49,6 +47,8 @@ export function PromptPreview({
   handleSubmit,
   promptPreviewData = [],
 }: PromptPreviewProps): JSX.Element {
+  const { t } = useTranslation('protocol_generator')
+
   const areAllSectionsEmpty = (): boolean => {
     return promptPreviewData.every(section => section.items.length === 0)
   }
@@ -58,7 +58,7 @@ export function PromptPreview({
       <PromptPreviewHeading>
         <StyledText desktopStyle="headingLargeBold">Prompt</StyledText>
         <LargeButton
-          buttonText="Submit prompt"
+          buttonText={t('prompt_preview_submit_button')}
           disabled={!isSubmitButtonEnabled}
           onClick={handleSubmit}
         />
@@ -66,7 +66,7 @@ export function PromptPreview({
 
       {areAllSectionsEmpty() && (
         <PromptPreviewPlaceholderMessage desktopStyle="headingSmallRegular">
-          {PROMPT_PREVIEW_PLACEHOLDER_MESSAGE}
+          {t('prompt_preview_placeholder_message')}
         </PromptPreviewPlaceholderMessage>
       )}
 
