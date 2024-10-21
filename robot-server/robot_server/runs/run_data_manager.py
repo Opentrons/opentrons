@@ -456,10 +456,7 @@ class RunDataManager:
         if self._run_orchestrator_store.current_run_id == run_id:
             return self._run_orchestrator_store.get_current_command()
         else:
-            # todo(mm, 2024-05-20):
-            # For historical runs to behave consistently with the current run,
-            # this should be the most recently completed command, not `None`.
-            return None
+            return self._get_historical_run_last_command(run_id=run_id)
 
     def get_last_completed_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "last" command, if any.
