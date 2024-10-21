@@ -3,6 +3,7 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_SHARED_DATA
   depends on BR2_PACKAGE_PYTHON3
   select BR2_PACKAGE_PYTHON_JSONSCHEMA # runtime
   select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
+  select BR2_PACKAGE_PYTHON_NUMPY # runtime
 
   help
     Opentrons data sources. Used on an OT-2 robot.
