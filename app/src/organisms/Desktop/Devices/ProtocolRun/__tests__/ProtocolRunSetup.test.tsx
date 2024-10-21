@@ -30,6 +30,7 @@ import {
 } from '/app/resources/runs'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 
 import { SetupLabware } from '../SetupLabware'
@@ -38,6 +39,8 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import * as ReduxRuns from '/app/redux/protocol-runs'
+
 import type { MissingSteps } from '../ProtocolRunSetup'
 
 import type * as SharedData from '@opentrons/shared-data'
@@ -59,6 +62,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux-resources/runs')
 vi.mock('/app/resources/analysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
@@ -112,6 +116,15 @@ describe('ProtocolRunSetup', () => {
         ...noModulesProtocol,
         ...MOCK_PROTOCOL_LIQUID_KEY,
       } as unknown) as SharedData.ProtocolAnalysisOutput)
+    when(vi.mocked(useRequiredSetupStepsInOrder))
+      .calledWith({
+        runId: RUN_ID,
+        protocolAnalysis: { ...noModulesProtocol, ...MOCK_PROTOCOL_LIQUID_KEY },
+      })
+      .thenReturn({
+        orderedSteps: ReduxRuns.SETUP_STEP_KEYS,
+        orderedApplicableSteps: ReduxRuns.SETUP_STEP_KEYS,
+      })
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
     when(vi.mocked(useRobot))
@@ -179,6 +192,13 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
+    when(vi.mocked(useRequiredSetupStepsInOrder))
+      .calledWith({ runId: RUN_ID, protocolAnalysis: null })
+      .thenReturn([
+        ReduxRuns.ROBOT_CALIBRATION_STEP_KEY,
+        ReduxRuns.LPC_STEP_KEY,
+        ReduxRuns.LABWARE_SETUP_STEP_KEY,
+      ])
     render()
     screen.getByText('Loading data...')
   })

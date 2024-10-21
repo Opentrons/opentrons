@@ -30,6 +30,7 @@ import {
 } from '/app/resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useMostRecentCompletedAnalysis,
@@ -90,6 +91,10 @@ export function ProtocolRunSetup({
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const {
+    orderedSteps,
+    orderedApplicableSteps,
+  } = useRequiredSetupStepsInOrder({ runId, protocolAnalysis })
   const modules = parseAllRequiredModuleModels(protocolAnalysis?.commands ?? [])
 
   const robot = useRobot(robotName)
@@ -125,43 +130,6 @@ export function ProtocolRunSetup({
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 
   const isMissingModule = missingModuleIds.length > 0
-
-  const stepsKeysInOrder =
-    protocolAnalysis != null
-      ? [
-          ROBOT_CALIBRATION_STEP_KEY,
-          MODULE_SETUP_STEP_KEY,
-          LPC_STEP_KEY,
-          LABWARE_SETUP_STEP_KEY,
-          LIQUID_SETUP_STEP_KEY,
-        ]
-      : [ROBOT_CALIBRATION_STEP_KEY, LPC_STEP_KEY, LABWARE_SETUP_STEP_KEY]
-
-  const targetStepKeyInOrder = stepsKeysInOrder.filter((stepKey: StepKey) => {
-    if (protocolAnalysis == null) {
-      return (
-        stepKey !== MODULE_SETUP_STEP_KEY && stepKey !== LIQUID_SETUP_STEP_KEY
-      )
-    }
-
-    if (
-      protocolAnalysis.modules.length === 0 &&
-      protocolAnalysis.liquids.length === 0
-    ) {
-      return (
-        stepKey !== MODULE_SETUP_STEP_KEY && stepKey !== LIQUID_SETUP_STEP_KEY
-      )
-    }
-
-    if (protocolAnalysis.modules.length === 0) {
-      return stepKey !== MODULE_SETUP_STEP_KEY
-    }
-
-    if (protocolAnalysis.liquids.length === 0) {
-      return stepKey !== LIQUID_SETUP_STEP_KEY
-    }
-    return true
-  })
 
   const liquids = protocolAnalysis?.liquids ?? []
   const hasLiquids = liquids.length > 0
@@ -216,8 +184,8 @@ export function ProtocolRunSetup({
           robotName={robotName}
           runId={runId}
           nextStep={
-            targetStepKeyInOrder[
-              targetStepKeyInOrder.findIndex(
+            orderedApplicableSteps[
+              orderedApplicableSteps.findIndex(
                 v => v === ROBOT_CALIBRATION_STEP_KEY
               ) + 1
             ]
@@ -310,10 +278,10 @@ export function ProtocolRunSetup({
                 missingSteps.filter(step => step !== 'labware_placement')
               )
               const nextStep =
-                targetStepKeyInOrder.findIndex(
+                orderedApplicableSteps.findIndex(
                   v => v === LABWARE_SETUP_STEP_KEY
                 ) ===
-                targetStepKeyInOrder.length - 1
+                orderedApplicableSteps.length - 1
                   ? null
                   : LIQUID_SETUP_STEP_KEY
               setExpandedStepKey(nextStep)
@@ -375,7 +343,7 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </LegacyStyledText>
           ) : (
-            stepsKeysInOrder.map((stepKey, index) => {
+            orderedSteps.map((stepKey, index) => {
               const setupStepTitle = t(`${stepKey}_title`)
               const showEmptySetupStep =
                 (stepKey === 'liquid_setup_step' && !hasLiquids) ||
@@ -413,7 +381,7 @@ export function ProtocolRunSetup({
                       {StepDetailMap[stepKey].stepInternals}
                     </SetupStep>
                   )}
-                  {index !== stepsKeysInOrder.length - 1 ? (
+                  {index !== orderedSteps.length - 1 ? (
                     <Line marginTop={SPACING.spacing24} />
                   ) : null}
                 </Flex>
