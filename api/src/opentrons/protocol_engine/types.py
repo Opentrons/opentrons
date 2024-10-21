@@ -360,6 +360,7 @@ class LiquidHeightInfo(BaseModel):
 
     height: float
     last_measured: datetime
+    operations_since_measurement: int
 
 
 class LiquidHeightSummary(BaseModel):
