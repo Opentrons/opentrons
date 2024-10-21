@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -47,6 +48,8 @@ import {
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
   LIQUID_SETUP_STEP_KEY,
+  updateRunSetupStepsComplete,
+  getMissingSetupSteps,
 } from '/app/redux/protocol-runs'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
@@ -57,37 +60,30 @@ import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
 import { HowLPCWorksModal } from './SetupLabwarePositionCheck/HowLPCWorksModal'
 
+import type { Dispatch, State } from '/app/redux'
 import type { StepKey } from '/app/redux/protocol-runs'
 
-export type MissingStep =
-  | 'applied_labware_offsets'
-  | 'labware_placement'
-  | 'liquids'
-
-export type MissingSteps = MissingStep[]
-
-export const initialMissingSteps = (): MissingSteps => [
-  'applied_labware_offsets',
-  'labware_placement',
-  'liquids',
-]
+const STEP_KEY_TO_I18N_KEY = {
+  LPC_STEP_KEY: 'applied_labware_offsets',
+  LABWARE_SETUP_STEP_KEY: 'labware_placement',
+  LIQUID_SETUP_STEP_KEY: 'liquids',
+  MODULE_SETUP_STEP_KEY: 'module_setup',
+  ROBOT_CALIBRATION_STEP_KEY: 'robot_calibrtion',
+}
 
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
-  setMissingSteps: (missingSteps: MissingSteps) => void
-  missingSteps: MissingSteps
 }
 
 export function ProtocolRunSetup({
   protocolRunHeaderRef,
   robotName,
   runId,
-  setMissingSteps,
-  missingSteps,
 }: ProtocolRunSetupProps): JSX.Element | null {
   const { t, i18n } = useTranslation('protocol_setup')
+  const dispatch = useDispatch<Dispatch>()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -147,26 +143,8 @@ export function ProtocolRunSetup({
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
 
-  const [
-    labwareSetupComplete,
-    setLabwareSetupComplete,
-  ] = React.useState<boolean>(false)
-  const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
-    false
-  )
-  React.useEffect(() => {
-    if ((robotProtocolAnalysis || storedProtocolAnalysis) && !hasLiquids) {
-      setLiquidSetupComplete(true)
-    }
-  }, [robotProtocolAnalysis, storedProtocolAnalysis, hasLiquids])
-  if (
-    !hasLiquids &&
-    protocolAnalysis != null &&
-    missingSteps.includes('liquids')
-  ) {
-    setMissingSteps(missingSteps.filter(step => step !== 'liquids'))
-  }
-  const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)
+  const missingSteps = useSelector(state => getMissingSetupSteps(state, runId))
+
   if (robot == null) {
     return null
   }
@@ -245,21 +223,20 @@ export function ProtocolRunSetup({
         <SetupLabwarePositionCheck
           {...{ runId, robotName }}
           setOffsetsConfirmed={confirmed => {
-            setLpcComplete(confirmed)
+            dispatch(
+              updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: true })
+            )
             if (confirmed) {
               setExpandedStepKey(LABWARE_SETUP_STEP_KEY)
-              setMissingSteps(
-                missingSteps.filter(step => step !== 'applied_labware_offsets')
-              )
             }
           }}
-          offsetsConfirmed={lpcComplete}
+          offsetsConfirmed={!missingSteps.includes(LPC_STEP_KEY)}
         />
       ),
       description: t('labware_position_check_step_description'),
       rightElProps: {
         stepKey: LPC_STEP_KEY,
-        complete: lpcComplete,
+        complete: !missingSteps.includes(LPC_STEP_KEY),
         completeText: t('offsets_ready'),
         incompleteText: null,
         incompleteElement: <LearnAboutLPC />,
@@ -270,8 +247,13 @@ export function ProtocolRunSetup({
         <SetupLabware
           robotName={robotName}
           runId={runId}
-          labwareConfirmed={labwareSetupComplete}
+          labwareConfirmed={!missingSteps.includes(LABWARE_SETUP_STEP_KEY)}
           setLabwareConfirmed={(confirmed: boolean) => {
+            dispatch(
+              updateRunSetupStepsComplete(runId, {
+                [LABWARE_SETUP_STEP_KEY]: true,
+              })
+            )
             setLabwareSetupComplete(confirmed)
             if (confirmed) {
               setMissingSteps(
