@@ -26,11 +26,9 @@ export interface UpdateDriver {
   teardown: () => Promise<void>
 }
 
-export function registerUpdateDriver(upstreamDispatch: Dispatch): UpdateDriver {
+export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
   log.info(`Running robot system updates storing to ${getSystemUpdateDir()}`)
-  const dispatch: Dispatch = action => {
-    upstreamDispatch(action)
-  }
+
   let webUpdate: UnresolvedUpdate = {
     version: null,
     files: null,
@@ -340,7 +338,7 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
       if (action.type === CONFIG_INITIALIZED) {
         log.info('Initializing update driver')
         return new Promise(resolve => {
-          updateDriver = registerUpdateDriver(dispatch)
+          updateDriver = createUpdateDriver(dispatch)
           resolve()
         })
       } else if (updateDriver != null) {

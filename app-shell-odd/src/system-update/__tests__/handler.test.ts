@@ -8,7 +8,7 @@ import * as Cfg from '../../config'
 import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../../constants'
 import {
   manageDriver,
-  registerUpdateDriver,
+  createUpdateDriver,
   CURRENT_SYSTEM_VERSION,
 } from '../handler'
 import { FLEX_MANIFEST_URL } from '../constants'
@@ -224,7 +224,7 @@ describe('update driver', () => {
           massStorageRootPath: '/some/other/usb/path',
         } as any) as USBUpdateSource),
     }
-    subject = registerUpdateDriver(dispatch)
+    subject = createUpdateDriver(dispatch)
   })
 
   afterEach(() => {

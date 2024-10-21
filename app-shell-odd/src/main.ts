@@ -85,7 +85,7 @@ function startUp(): void {
   log.info('Starting App')
   console.log('Starting App')
   const storeNeedsReset = fse.existsSync(
-    path.join(app.getPath('userData'), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
+    path.join(setUserDataPath(), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
   if (storeNeedsReset) {
     log.debug('store marked to be reset, resetting store')
