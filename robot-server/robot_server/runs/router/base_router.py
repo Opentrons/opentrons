@@ -132,9 +132,9 @@ class AllRunsLinks(BaseModel):
 class CurrentStateLinks(BaseModel):
     """Links returned with the current state of a run."""
 
-    current: Optional[CommandLinkNoMeta] = Field(
+    last: Optional[CommandLinkNoMeta] = Field(
         None,
-        description="Path to the current command when current state was reported, if any.",
+        description="Path to the last completed command when current state was reported, if any.",
     )
 
 
@@ -564,7 +564,7 @@ async def get_run_commands_error(
         """
     ),
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[RunCurrentState]},
+        status.HTTP_200_OK: {"model": Body[RunCurrentState, CurrentStateLinks]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
@@ -590,17 +590,18 @@ async def get_current_state(
             for pipetteId, nozzle_map in active_nozzle_maps.items()
         }
 
-        current_command = run_data_manager.get_current_command(run_id=runId)
+        last_completed_command = run_data_manager.get_last_completed_command(
+            run_id=runId
+        )
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    # TODO(jh, 03-11-24): Use `last_completed_command` instead of `current_command` to avoid concurrency gotchas.
     links = CurrentStateLinks.construct(
-        current=CommandLinkNoMeta.construct(
-            id=current_command.command_id,
-            href=f"/runs/{runId}/commands/{current_command.command_id}",
+        last=CommandLinkNoMeta.construct(
+            id=last_completed_command.command_id,
+            href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
         )
-        if current_command is not None
+        if last_completed_command is not None
         else None
     )
 

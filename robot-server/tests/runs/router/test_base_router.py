@@ -876,10 +876,12 @@ async def test_get_current_state_success(
     decoy.when(mock_run_data_manager.get_nozzle_maps(run_id=run_id)).then_return(
         mock_nozzle_maps
     )
-    decoy.when(mock_run_data_manager.get_current_command(run_id=run_id)).then_return(
+    decoy.when(
+        mock_run_data_manager.get_last_completed_command(run_id=run_id)
+    ).then_return(
         CommandPointer(
-            command_id="current-command-id",
-            command_key="current-command-key",
+            command_id="last-command-id",
+            command_key="last-command-key",
             created_at=datetime(year=2024, month=4, day=4),
             index=101,
         )
@@ -901,9 +903,9 @@ async def test_get_current_state_success(
         }
     )
     assert result.content.links == CurrentStateLinks(
-        current=CommandLinkNoMeta(
-            href="/runs/test-run-id/commands/current-command-id",
-            id="current-command-id",
+        last=CommandLinkNoMeta(
+            href="/runs/test-run-id/commands/last-command-id",
+            id="last-command-id",
         )
     )
 
