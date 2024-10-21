@@ -42,7 +42,7 @@ _MOTOR_AXIS_TO_HARDWARE_MOUNT: Dict[MotorAxis, Mount] = {
     MotorAxis.EXTENSION_Z: Mount.EXTENSION,
 }
 
-_HARDWARE_MOUNT_MOTOR_AXIS_TO: Dict[MotorAxis, Mount] = {
+_HARDWARE_MOUNT_MOTOR_AXIS_TO: Dict[Mount, MotorAxis] = {
     Mount.LEFT: MotorAxis.LEFT_Z,
     Mount.RIGHT: MotorAxis.RIGHT_Z,
     Mount.EXTENSION: MotorAxis.EXTENSION_Z,
@@ -179,7 +179,7 @@ class HardwareGantryMover(GantryMover):
         return {_MOTOR_AXIS_TO_HARDWARE_AXIS[ax]: dist for ax, dist in axis_map.items()}
 
     def _critical_point_for(
-        self, mount: Mount, cp_override: Dict[MotorAxis, float] = None
+        self, mount: Mount, cp_override: Optional[Dict[MotorAxis, float]] = None
     ) -> Point:
         if cp_override:
             return Point(
@@ -313,10 +313,11 @@ class HardwareGantryMover(GantryMover):
                 current_position = await self._hardware_api.current_position(
                     mount, refresh=True
                 )
-                converted_current_position_deck = self._hardware_api._deck_from_machine(
+                log.info(f"The current position of the robot is: {current_position}.")
+                converted_current_position_deck = self._hardware_api.get_deck_from_machine(
                     current_position
                 )
-                log.info(f"The current position of the robot is: {current_position}.")
+                log.info(f"The converted deck position of the robot is: {converted_current_position_deck}.")
                 absolute_pos = target_axis_map_from_relative(
                     pos_hw, converted_current_position_deck
                 )
@@ -344,7 +345,7 @@ class HardwareGantryMover(GantryMover):
         current_position = await self._hardware_api.current_position(
             mount, refresh=True
         )
-        converted_current_position_deck = self._hardware_api._deck_from_machine(
+        converted_current_position_deck = self._hardware_api.get_deck_from_machine(
             current_position
         )
         return {

@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Mapping
+from typing import Dict, Union, List, Optional, Mapping
 from typing_extensions import Protocol
 
 from opentrons.types import Point
@@ -8,6 +8,11 @@ from .types import MountArgType
 
 class MotionController(Protocol[MountArgType]):
     """Protocol specifying fundamental motion controls."""
+
+    def get_deck_from_machine(self, machine_pos: Dict[Axis, float]) -> Dict[Axis, float]:
+        """Convert machine coordinates to deck coordinates."""
+        ...
+
 
     async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately stop motion.
