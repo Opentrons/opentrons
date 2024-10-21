@@ -9,6 +9,7 @@ import {
   COLORS,
   Flex,
   Icon,
+  OVERFLOW_HIDDEN,
   POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
@@ -40,6 +41,7 @@ import { getSaveStepSnackbarText } from './utils'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FormData, StepType } from '../../../../form-types'
 import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
+import { css } from 'styled-components'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null
@@ -209,8 +211,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         height="calc(100vh - 64px)"
         title={
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-            <Icon size="1rem" name={icon} />
-            <StyledText desktopStyle="bodyLargeSemiBold">
+            <Icon size="1rem" name={icon}  style={{ flexShrink: 0 }}/>
+            <StyledText desktopStyle="bodyLargeSemiBold" css={MENU_TEXT_STYLE}>
               {i18n.format(t(formData.stepName), 'capitalize')}
             </StyledText>
           </Flex>
@@ -229,3 +231,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     </>
   )
 }
+
+const MENU_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: ${OVERFLOW_HIDDEN};
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+`
