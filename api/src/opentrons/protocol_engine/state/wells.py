@@ -1,29 +1,29 @@
 """Basic well data state and store."""
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Dict, List, Optional
 from opentrons.protocol_engine.actions.actions import (
     FailCommandAction,
     SucceedCommandAction,
 )
-from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
-from opentrons.protocol_engine.commands.load_liquid import LoadLiquidResult
-from opentrons.protocol_engine.commands.aspirate import AspirateResult
-from opentrons.protocol_engine.commands.dispense import DispenseResult
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.types import LiquidHeightInfo, LiquidHeightSummary
+from opentrons.protocol_engine.types import (
+    ProbedHeightInfo,
+    ProbedVolumeInfo,
+    LoadedVolumeInfo,
+    LiquidHeightSummary,
+)
 
+from . import update_types
 from ._abstract_store import HasState, HandlesActions
-from ..actions import Action
-from ..commands import Command
-from .geometry import get_well_height_at_volume, get_well_height_after_volume
+from ..actions import Action, get_state_update
 
 
 @dataclass
 class WellState:
     """State of all wells."""
 
-    measured_liquid_heights: Dict[str, Dict[str, LiquidHeightInfo]]
+    loaded_volumes: Dict[str, Dict[str, LoadedVolumeInfo]]
+    probed_heights: Dict[str, Dict[str, ProbedHeightInfo]]
+    probed_volumes: Dict[str, Dict[str, ProbedVolumeInfo]]
 
 
 class WellStore(HasState[WellState], HandlesActions):
@@ -33,109 +33,63 @@ class WellStore(HasState[WellState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a well store and its state."""
-        self._state = WellState(measured_liquid_heights={})
+        self._state = WellState(loaded_volumes={}, probed_heights={}, probed_volumes={})
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, SucceedCommandAction):
-            self._handle_succeeded_command(action.command)
-        if isinstance(action, FailCommandAction):
-            self._handle_failed_command(action)
+        state_update = get_state_update(action)
+        if state_update is not None:
+            self._set_loaded_liquid(state_update)
+            self._set_probed_liquid(state_update)
+            self._set_operated_liquid(state_update)
 
-    def _handle_succeeded_command(self, command: Command) -> None:
-        if isinstance(command.result, LiquidProbeResult):
-            self._set_liquid_height_after_probe(
-                labware_id=command.params.labwareId,
-                well_name=command.params.wellName,
-                height=command.result.z_position,
-                time=command.completedAt
-                if command.completedAt is not None
-                else command.createdAt,
+    def _set_loaded_liquid(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.loaded_liquid != update_types.NO_CHANGE:
+            labware_id = state_update.loaded_liquid.labware_id
+            for (well, volume) in state_update.loaded_liquid.volumes.items():
+                self._state.loaded_volumes[labware_id][well] = LoadedVolumeInfo(
+                    volume=volume,
+                    last_loaded=state_update.loaded_liquid.last_loaded,
+                    operations_since_load=0,
+                )
+
+    def _set_probed_liquid(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.probed_liquid != update_types.NO_CHANGE:
+            labware_id = state_update.probed_liquid.labware_id
+            well_name = state_update.probed_liquid.well_name
+            self._state.probed_heights[labware_id][well_name] = ProbedHeightInfo(
+                height=state_update.probed_liquid.height,
+                last_probed=state_update.probed_liquid.last_probed,
             )
-        if isinstance(command.result, LoadLiquidResult):
-            self._set_liquid_height_after_load(
-                labware_id=command.params.labwareId,
-                well_name=next(iter(command.params.volumeByWell)),
-                volume=next(iter(command.params.volumeByWell.values())),
-                time=command.completedAt
-                if command.completedAt is not None
-                else command.createdAt,
-            )
-        if isinstance(command.result, AspirateResult):
-            self._update_liquid_height_after_operation(
-                labware_id=command.params.labwareId,
-                well_name=command.params.wellName,
-                volume=-command.result.volume,
-            )
-        if isinstance(command.result, DispenseResult):
-            self._update_liquid_height_after_operation(
-                labware_id=command.params.labwareId,
-                well_name=command.params.wellName,
-                volume=command.result.volume,
+            self._state.probed_volumes[labware_id][well_name] = ProbedVolumeInfo(
+                volume=state_update.probed_liquid.volume,
+                last_probed=state_update.probed_liquid.last_probed,
+                operations_since_probe=0,
             )
 
-    def _handle_failed_command(self, action: FailCommandAction) -> None:
-        if isinstance(action.error, LiquidNotFoundError):
-            self._set_liquid_height_after_probe(
-                labware_id=action.error.private.labware_id,
-                well_name=action.error.private.well_name,
-                height=None,
-                time=action.failed_at,
-            )
-
-    def _set_liquid_height_after_probe(
-        self, labware_id: str, well_name: str, height: float, time: datetime
-    ) -> None:
-        """Set the liquid height of the well from a LiquidProbe command."""
-        lhi = LiquidHeightInfo(
-            height=height, last_measured=time, operations_since_measurement=0
-        )
-        if labware_id not in self._state.measured_liquid_heights:
-            self._state.measured_liquid_heights[labware_id] = {}
-        self._state.measured_liquid_heights[labware_id][well_name] = lhi
-
-    def _set_liquid_height_after_load(
-        self, labware_id: str, well_name: str, volume: float, time: datetime
-    ) -> None:
-        """Set the liquid height of the well from a LoadLiquid command."""
-        height = get_well_height_at_volume(
-            labware_id=labware_id, well_name=well_name, volume=volume
-        )
-        lhi = LiquidHeightInfo(
-            height=height, last_measured=time, operations_since_measurement=0
-        )
-        if labware_id not in self._state.measured_liquid_heights:
-            self._state.measured_liquid_heights[labware_id] = {}
-        self._state.measured_liquid_heights[labware_id][well_name] = lhi
-
-    def _update_liquid_height_after_operation(
-        self, labware_id: str, well_name: str, volume: float
-    ) -> None:
-        """Update the liquid height of the well after an Aspirate or Dispense command."""
-        time = self._state.measured_liquid_heights[labware_id][well_name].last_measured
-        operations_since_measurement = (
-            self._state.measured_liquid_heights[labware_id][
-                well_name
-            ].operations_since_measurement
-            + 1
-        )
-        initial_height = self._state.measured_liquid_heights[labware_id][
-            well_name
-        ].height
-        height = get_well_height_after_volume(
-            labware_id=labware_id,
-            well_name=well_name,
-            initial_height=initial_height,
-            volume=volume,
-        )
-        lhi = LiquidHeightInfo(
-            height=height,
-            last_measured=time,
-            operations_since_measurement=operations_since_measurement,
-        )
-        if labware_id not in self._state.measured_liquid_heights:
-            self._state.measured_liquid_heights[labware_id] = {}
-        self._state.measured_liquid_heights[labware_id][well_name] = lhi
+    def _set_operated_liquid(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.operated_liquid != update_types.NO_CHANGE:
+            labware_id = state_update.operated_liquid.labware_id
+            well_name = state_update.operated_liquid.well_name
+            # clear well probed_height info? Update types.py docstring
+            prev_loaded_vol_info = self._state.loaded_volumes[labware_id][well_name]
+            if prev_loaded_vol_info.volume:
+                self._state.loaded_volumes[labware_id][well_name] = LoadedVolumeInfo(
+                    volume=prev_loaded_vol_info.volume
+                    + state_update.operated_liquid.volume,
+                    last_loaded=prev_loaded_vol_info.last_loaded,
+                    operations_since_load=prev_loaded_vol_info.operations_since_load
+                    + 1,
+                )
+            prev_probed_vol_info = self._state.probed_volumes[labware_id][well_name]
+            if prev_probed_vol_info.volume:
+                self._state.probed_volumes[labware_id][well_name] = ProbedVolumeInfo(
+                    volume=prev_probed_vol_info.volume
+                    + state_update.operated_liquid.volume,
+                    last_probed=prev_probed_vol_info.last_probed,
+                    operations_since_probe=prev_probed_vol_info.operations_since_probe
+                    + 1,
+                )
 
 
 class WellView(HasState[WellState]):
@@ -151,29 +105,35 @@ class WellView(HasState[WellState]):
         """
         self._state = state
 
+    # if volume requested, loaded_volumes or probed_volumes
+    # if height requested, probed_heights or loaded_vols_to_height or probed_vols_to_height
+    # to get height, call GeometryView.get_well_height, which does conversion if needed
+
+    # update this
     def get_all(self) -> List[LiquidHeightSummary]:
         """Get all well liquid heights."""
         all_heights: List[LiquidHeightSummary] = []
-        for labware, wells in self._state.measured_liquid_heights.items():
+        for labware, wells in self._state.probed_heights.items():
             for well, lhi in wells.items():
                 lhs = LiquidHeightSummary(
                     labware_id=labware,
                     well_name=well,
                     height=lhi.height,
-                    last_measured=lhi.last_measured,
+                    last_measured=lhi.last_probed,
                 )
             all_heights.append(lhs)
         return all_heights
 
+    # update this
     def get_all_in_labware(self, labware_id: str) -> List[LiquidHeightSummary]:
         """Get all well liquid heights for a particular labware."""
         all_heights: List[LiquidHeightSummary] = []
-        for well, lhi in self._state.measured_liquid_heights[labware_id].items():
+        for well, lhi in self._state.probed_heights[labware_id].items():
             lhs = LiquidHeightSummary(
                 labware_id=labware_id,
                 well_name=well,
                 height=lhi.height,
-                last_measured=lhi.last_measured,
+                last_measured=lhi.last_probed,
             )
             all_heights.append(lhs)
         return all_heights
@@ -186,7 +146,7 @@ class WellView(HasState[WellState]):
         Returns None if no liquid probe has been done.
         """
         try:
-            height = self._state.measured_liquid_heights[labware_id][well_name].height
+            height = self._state.probed_heights[labware_id][well_name].height
             return height
         except KeyError:
             return None
@@ -194,8 +154,6 @@ class WellView(HasState[WellState]):
     def has_measured_liquid_height(self, labware_id: str, well_name: str) -> bool:
         """Returns True if the well has been liquid level probed previously."""
         try:
-            return bool(
-                self._state.measured_liquid_heights[labware_id][well_name].height
-            )
+            return bool(self._state.probed_heights[labware_id][well_name].height)
         except KeyError:
             return False

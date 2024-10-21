@@ -355,12 +355,27 @@ class CurrentWell:
     well_name: str
 
 
-class LiquidHeightInfo(BaseModel):
-    """Payload required to store recent measured liquid heights."""
+class ProbedHeightInfo(BaseModel):
+    """A well's liquid height, initialized by a LiquidProbe, cleared by Aspirate and Dispense."""
 
-    height: float
-    last_measured: datetime
-    operations_since_measurement: int
+    height: Optional[float] = None
+    last_probed: datetime
+
+
+class ProbedVolumeInfo(BaseModel):
+    """A well's liquid volume, initialized by a LiquidProbe, updated by Aspirate and Dispense."""
+
+    volume: Optional[float] = None
+    last_probed: datetime
+    operations_since_probe: int
+
+
+class LoadedVolumeInfo(BaseModel):
+    """A well's liquid volume, initialized by a LoadLiquid, updated by Aspirate and Dispense."""
+
+    volume: Optional[float] = None
+    last_loaded: datetime
+    operations_since_load: int
 
 
 class LiquidHeightSummary(BaseModel):
@@ -368,8 +383,8 @@ class LiquidHeightSummary(BaseModel):
 
     labware_id: str
     well_name: str
-    height: float
     last_measured: datetime
+    height: Optional[float] = None
 
 
 @dataclass(frozen=True)

@@ -205,6 +205,13 @@ class LiquidProbeImplementation(
             self._state_view, self._movement, self._pipetting, params
         )
         if isinstance(z_pos_or_error, PipetteLiquidNotFoundError):
+            state_update.set_probed_liquid(
+                labware_id=params.labwareId,
+                well_name=params.wellName,
+                height=None,
+                volume=None,
+                last_probed=self._model_utils.get_timestamp(),
+            )
             return DefinedErrorData(
                 public=LiquidNotFoundError(
                     id=self._model_utils.generate_id(),
@@ -220,6 +227,18 @@ class LiquidProbeImplementation(
                 state_update=state_update,
             )
         else:
+            well_volume = self._state_view.geometry.get_well_volume_at_height(
+                labware_id=params.labwareId,
+                well_name=params.wellName,
+                height=z_pos_or_error,
+            )
+            state_update.set_probed_liquid(
+                labware_id=params.labwareId,
+                well_name=params.wellName,
+                height=z_pos_or_error,
+                volume=well_volume,
+                last_probed=self._model_utils.get_timestamp(),
+            )
             return SuccessData(
                 public=LiquidProbeResult(
                     z_position=z_pos_or_error, position=deck_point
@@ -239,11 +258,13 @@ class TryLiquidProbeImplementation(
         state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
+        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
+        self._model_utils = model_utils
 
     async def execute(self, params: _CommonParams) -> _TryLiquidProbeExecuteReturn:
         """Execute a `tryLiquidProbe` command.
@@ -256,11 +277,23 @@ class TryLiquidProbeImplementation(
             self._state_view, self._movement, self._pipetting, params
         )
 
-        z_pos = (
-            None
-            if isinstance(z_pos_or_error, PipetteLiquidNotFoundError)
-            else z_pos_or_error
+        if isinstance(z_pos_or_error, PipetteLiquidNotFoundError):
+            z_pos = None
+            well_volume = None
+        else:
+            z_pos = z_pos_or_error
+            well_volume = self._state_view.geometry.get_well_volume_at_height(
+                labware_id=params.labwareId, well_name=params.wellName, height=z_pos
+            )
+
+        state_update.set_probed_liquid(
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            height=z_pos,
+            volume=well_volume,
+            last_probed=self._model_utils.get_timestamp(),
         )
+
         return SuccessData(
             public=TryLiquidProbeResult(
                 z_position=z_pos,

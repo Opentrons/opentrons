@@ -107,6 +107,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                 push_out=params.pushOut,
             )
         except PipetteOverpressureError as e:
+            # can we get aspirated_amount_prior_to_error? If not, can we assume no liquid was removed from well? Ask Ryan
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),
@@ -123,6 +124,11 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                 state_update=state_update,
             )
         else:
+            state_update.set_operated_liquid(
+                labware_id=labware_id,
+                well_name=well_name,
+                volume=volume,
+            )
             return SuccessData(
                 public=DispenseResult(volume=volume, position=deck_point),
                 private=None,
