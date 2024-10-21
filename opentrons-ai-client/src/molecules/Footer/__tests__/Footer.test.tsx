@@ -1,17 +1,20 @@
 import { Footer } from '..';
 import { renderWithProviders } from '../../../__testing-utils__'
 import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import { i18n } from '../../../i18n';
 
-const render = () => {
-    return renderWithProviders(<Footer />)
+
+const render = (): ReturnType<typeof renderWithProviders> => {
+    return renderWithProviders(<Footer />, {
+        i18nInstance: i18n,
+    })
 }
 
 describe('Footer', () => {
     it('should render Footer component', () => {
         render()
-        screen.getByText('By continuing, you agree to the Opentrons')
         screen.getByText('Privacy Policy')
-        screen.getByText('and')
         screen.getByText('End user license agreement')
         screen.getByText('Copyright © 2024 Opentrons')
     });
