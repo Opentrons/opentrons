@@ -203,6 +203,11 @@ class HardwareTipHandler(TipHandler):
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._state_view = state_view
 
+        # WARNING: HardwareStateSynchronizer can currently construct several
+        # instances of this class per run, in addition to the main instance used
+        # for command execution. We're therefore depending on this class being
+        # stateless, so consider that before adding additional attributes here.
+
     async def available_for_nozzle_layout(
         self,
         pipette_id: str,

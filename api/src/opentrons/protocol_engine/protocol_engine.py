@@ -7,6 +7,9 @@ from opentrons.protocol_engine.actions.actions import (
     SetErrorRecoveryPolicyAction,
 )
 
+from opentrons.protocol_engine.execution.hardware_state_synchronizer import (
+    HardwareStateSynchronizer,
+)
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
@@ -114,6 +117,8 @@ class ProtocolEngine:
             state=self._state_store,
             action_dispatcher=self._action_dispatcher,
         )
+        # TODO: Probably want to dependency-inject this.
+        self._hardware_state_synchronizer = HardwareStateSynchronizer()
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api,
             state_store=state_store,
@@ -214,10 +219,10 @@ class ProtocolEngine:
             ResumeFromRecoveryAction(state_update)
         )
 
-        # TODO: Insert some kind of HardwareStateFixer thing here that takes the
-        # hardware API, state update, and state store, and reverse-engineers
-        # what fix it needs to apply.
         self._action_dispatcher.dispatch(action)
+        self._hardware_state_synchronizer.synchronize(
+            self._hardware_api, self._state_store, state_update
+        )
 
     def add_command(
         self, request: commands.CommandCreate, failed_command_id: Optional[str] = None
