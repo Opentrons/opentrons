@@ -12,6 +12,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_START,
+  OVERFLOW_HIDDEN,
   OverflowBtn,
   SPACING,
   StyledText,
@@ -21,6 +22,7 @@ import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
 import type { IconName } from '@opentrons/components'
+import { css } from 'styled-components'
 
 const STARTING_DECK_STATE = 'Starting deck state'
 const FINAL_DECK_STATE = 'Final deck state'
@@ -141,9 +143,17 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               width="100%"
             >
               {iconName && (
-                <Icon size="1rem" name={iconName} color={iconColor ?? color} />
+                <Icon
+                  size="1rem"
+                  name={iconName}
+                  color={iconColor ?? color}
+                  style={{ flexShrink: 0 }}
+                />
               )}
-              <StyledText desktopStyle="bodyDefaultRegular">
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                css={MENU_TEXT_STYLE}
+              >
                 {capitalizeFirstLetterAfterNumber(title)}
               </StyledText>
             </Flex>
@@ -176,3 +186,13 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     </>
   )
 }
+
+const MENU_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: ${OVERFLOW_HIDDEN};
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 1;
+  word-break: break-all;
+`
