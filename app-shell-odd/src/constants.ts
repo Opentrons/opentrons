@@ -257,3 +257,5 @@ export const FAILURE_STATUSES = {
 } as const
 
 export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
+
+export const ODD_DATA_DIR = '/data/ODD'

@@ -52,6 +52,9 @@ jobs:
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'build'
+        env:
+            # inject dev id since this is for staging
+            OT_AI_CLIENT_MIXPANEL_ID: ${{ secrets.OT_AI_CLIENT_MIXPANEL_DEV_ID }}
         run: |
           make -C opentrons-ai-client build-staging
       - name: Configure AWS Credentials

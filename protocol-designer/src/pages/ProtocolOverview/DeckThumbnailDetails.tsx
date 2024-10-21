@@ -10,6 +10,7 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { LabwareOnDeck } from '../../components/DeckSetup/LabwareOnDeck'
 import { getStagingAreaAddressableAreas } from '../../utils'
@@ -65,22 +66,23 @@ export const DeckThumbnailDetails = (
   return (
     <>
       {/* all modules */}
-      {allModules.map(moduleOnDeck => {
-        const slotId = moduleOnDeck.slot
+      {allModules.map(({ id, slot, model, type, moduleState }) => {
+        const slotId =
+          slot === SPAN7_8_10_11_SLOT && type === THERMOCYCLER_MODULE_TYPE
+            ? '7'
+            : slot
 
         const slotPosition = getPositionFromSlotId(slotId, deckDef)
         if (slotPosition == null) {
-          console.warn(`no slot ${slotId} for module ${moduleOnDeck.id}`)
+          console.warn(`no slot ${slotId} for module ${id}`)
           return null
         }
-        const moduleDef = getModuleDef2(moduleOnDeck.model)
-        const labwareLoadedOnModule = allLabware.find(
-          lw => lw.slot === moduleOnDeck.id
-        )
+        const moduleDef = getModuleDef2(model)
+        const labwareLoadedOnModule = allLabware.find(lw => lw.slot === id)
         return (
-          <React.Fragment key={moduleOnDeck.id}>
+          <React.Fragment key={id}>
             <Module
-              key={moduleOnDeck.slot}
+              key={slot}
               x={slotPosition[0]}
               y={slotPosition[1]}
               def={moduleDef}
@@ -88,7 +90,7 @@ export const DeckThumbnailDetails = (
                 slotPosition[0]
               )}
               innerProps={
-                moduleOnDeck.moduleState.type === THERMOCYCLER_MODULE_TYPE
+                moduleState.type === THERMOCYCLER_MODULE_TYPE
                   ? { lidMotorState: 'open' }
                   : {}
               }
