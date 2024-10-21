@@ -1,10 +1,12 @@
 import {
-  MAGNETIC_BLOCK_TYPE,
-  STAGING_AREA_CUTOUTS,
-  THERMOCYCLER_MODULE_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getPipetteSpecsV2,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  STAGING_AREA_CUTOUTS,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import wasteChuteImage from '../../assets/images/waste_chute.png'
@@ -15,15 +17,59 @@ import type {
   LabwareDefByDefURI,
   LabwareDefinition2,
   PipetteName,
+  ModuleType,
 } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
 import type { AdditionalEquipment, WizardFormState } from './types'
+import type { FormModules } from '../../step-forms'
 
 const TOTAL_MODULE_SLOTS = 8
 const MIDDLE_SLOT_NUM = 4
 
 export const getNumOptions = (length: number): DropdownOption[] => {
   return Array.from({ length }, (_, i) => ({
+    name: `${i + 1}`,
+    value: `${i + 1}`,
+  }))
+}
+
+export const getNumOptionsForModules = (
+  moduleType: ModuleType,
+  distribution: ModuleDistribution
+): DropdownOption[] => {
+  const { tc, hs, mb, tm } = distribution
+  let maxCount: number
+
+  const totalOccupiedSlots = tc * 2 + hs + tm + mb
+  const maxSlots = mb === 0 ? 7 : 11
+  const availableSlots = maxSlots - totalOccupiedSlots
+
+  switch (moduleType) {
+    case THERMOCYCLER_MODULE_TYPE:
+      maxCount = tc === 0 ? 1 : 0
+      break
+    case MAGNETIC_BLOCK_TYPE:
+      maxCount = Math.min(11 - (tc * 2 + hs + tm), 11)
+      break
+    case HEATERSHAKER_MODULE_TYPE:
+    case TEMPERATURE_MODULE_TYPE:
+      if (tc === 0) {
+        maxCount = Math.min(
+          7,
+          availableSlots + (moduleType === HEATERSHAKER_MODULE_TYPE ? hs : tm)
+        )
+      } else {
+        maxCount = Math.min(
+          5,
+          availableSlots + (moduleType === HEATERSHAKER_MODULE_TYPE ? hs : tm)
+        )
+      }
+      break
+    default:
+      maxCount = 0
+  }
+
+  return Array.from({ length: maxCount }, (_, i) => ({
     name: `${i + 1}`,
     value: `${i + 1}`,
   }))
@@ -49,7 +95,7 @@ export const getNumSlotsAvailable = (
     filteredModuleLength = filteredModuleLength + 1
   }
   if (magneticBlocks.length > 0) {
-    //  once blocks exceed 4, then we dont' want to subtract the amount available
+    //  once blocks exceed 4, then we don't want to subtract the amount available
     //  because block can go into the center slots where all other modules/trashes can not
     const numBlocks =
       magneticBlocks.length > 4 ? MIDDLE_SLOT_NUM : magneticBlocks.length
@@ -236,4 +282,84 @@ export const getTrashSlot = (values: WizardFormState): string => {
     return ''
   }
   return unoccupiedSlot?.value
+}
+
+interface ModuleDistribution {
+  tc: number
+  hs: number
+  mb: number
+  tm: number
+}
+
+const TOTAL_SLOTS_WITHOUT_TWO_COL = 7
+const TWO_COL_SLOTS = 4
+
+export const getModuleDistribution = (
+  modules: FormModules | null
+): ModuleDistribution => {
+  let tc = 0
+  let hs = 0
+  let mb = 0
+  let tm = 0
+
+  if (modules === null) return { tc, hs, mb, tm }
+
+  Object.values(modules).forEach(module => {
+    switch (module.type) {
+      case THERMOCYCLER_MODULE_TYPE:
+        // TC occupies A1+B1
+        tc++
+        break
+      case HEATERSHAKER_MODULE_TYPE:
+        hs++
+        break
+      case MAGNETIC_BLOCK_TYPE:
+        mb++
+        break
+      case TEMPERATURE_MODULE_TYPE:
+        tm++
+        break
+    }
+  })
+
+  return { tc, hs, mb, tm }
+}
+
+export const getAvailableSlots = (
+  distribution: ModuleDistribution
+): {
+  regular: number
+  magnetic: number
+} => {
+  if (distribution === null)
+    return { regular: TOTAL_SLOTS_WITHOUT_TWO_COL, magnetic: TWO_COL_SLOTS }
+  const { tc, hs, mb, tm } = distribution
+  const availableMagneticSlots = 11 - (tc * 2 + hs + tm + mb)
+  const availableRegularSlots = 7 - (hs + tm + (tc > 0 ? 2 : 0))
+
+  return {
+    regular: Math.max(0, availableRegularSlots),
+    magnetic: Math.max(0, availableMagneticSlots),
+  }
+}
+
+export const getCanAddModule = (
+  moduleType: ModuleType,
+  distribution: ModuleDistribution
+): boolean => {
+  const availableSlots = getAvailableSlots(distribution)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { tc, hs, mb, tm } = distribution
+
+  switch (moduleType) {
+    case THERMOCYCLER_MODULE_TYPE:
+      return tc === 0 && availableSlots.regular >= 2
+    case MAGNETIC_BLOCK_TYPE:
+      return availableSlots.magnetic > 0
+    case HEATERSHAKER_MODULE_TYPE:
+    case TEMPERATURE_MODULE_TYPE:
+      return availableSlots.regular > 0 || (hs + tm < 5 && tc === 0)
+    default:
+      return false
+  }
 }
