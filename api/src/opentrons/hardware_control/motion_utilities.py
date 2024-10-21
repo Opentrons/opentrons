@@ -84,6 +84,7 @@ def target_position_from_absolute(
     )
     primary_cp = get_critical_point(mount)
     primary_z = Axis.by_mount(mount)
+
     target_position = OrderedDict(
         (
             (Axis.X, abs_position.x - offset.x - primary_cp.x),
@@ -131,14 +132,15 @@ def target_axis_map_from_absolute(
     primary_z = Axis.by_mount(primary_mount)
     target_position = OrderedDict()
 
-    log.info(f"The primary critical point {primary_cp} and primary_mount {primary_mount} and type {type(primary_cp)}")
-    log.info(f"The offset {offset} and type is {type(offset)}")
     if Axis.X in keys_for_target_position:
         target_position[Axis.X] = axis_map[Axis.X] - offset.x - primary_cp.x
     if Axis.Y in keys_for_target_position:
         target_position[Axis.Y] = axis_map[Axis.Y] - offset.y - primary_cp.y
     if primary_z in keys_for_target_position:
-        target_position[primary_z] = axis_map[primary_z] - offset.z - primary_cp.z
+        # Since this function is intended to be used in conjunction with `API.move_axes`
+        # we must leave out the carriage offset subtraction from the target position as
+        # `move_axes` already does this calculation.
+        target_position[primary_z] = axis_map[primary_z] - primary_cp.z
 
     target_position.update(
         {ax: val for ax, val in axis_map.items() if ax not in Axis.gantry_axes()}
@@ -158,6 +160,8 @@ def target_axis_map_from_relative(
             if ax in axis_map.keys()
         )
     )
+    log.info(f"Current position {current_position} and axis map delta {axis_map}")
+    log.info(f"Relative move target {target_position}")
     return target_position
 
 

@@ -668,8 +668,12 @@ class OT3Controller(FlexBackend):
         )
 
     def _build_move_gear_axis_runner(
-        self, possible_q_axis_origin, possible_q_axis_target, speed, nodes_in_moves_only
-    ) -> Optional[MoveGroupRunner]:
+        self,
+        possible_q_axis_origin: Optional[float],
+        possible_q_axis_target: Optional[float],
+        speed: float,
+        nodes_in_moves_only: bool,
+    ) -> Tuple[Optional[MoveGroupRunner], bool]:
         if possible_q_axis_origin is None or possible_q_axis_target is None:
             return None, True
         tip_motor_move_group = self._build_tip_action_group(
@@ -744,7 +748,9 @@ class OT3Controller(FlexBackend):
             gather_moving_nodes, all_moving_nodes
         )
 
-        async def _runner_coroutine(runner: MoveGroupRunner, is_gear_move: bool):
+        async def _runner_coroutine(
+            runner: MoveGroupRunner, is_gear_move: bool
+        ) -> Tuple[Dict[NodeId, MotorPositionStatus], bool]:
             positions = await runner.run(can_messenger=self._messenger)
             return positions, is_gear_move
 

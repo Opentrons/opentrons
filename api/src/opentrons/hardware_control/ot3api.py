@@ -352,7 +352,7 @@ class OT3API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    def _deck_from_machine(self, machine_pos: Dict[Axis, float]) -> Dict[Axis, float]:
+    def get_deck_from_machine(self, machine_pos: Dict[Axis, float]) -> Dict[Axis, float]:
         return deck_from_machine(
             machine_pos=machine_pos,
             attitude=self._robot_calibration.deck_calibration.attitude,
@@ -1020,14 +1020,14 @@ class OT3API(
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
-        self._current_position = self._deck_from_machine(
+        self._current_position = self.get_deck_from_machine(
             await self._backend.update_position()
         )
         return self._current_position
 
     async def _cache_encoder_position(self) -> Dict[Axis, float]:
         """Cache encoder position from backend and return in absolute deck coords."""
-        self._encoder_position = self._deck_from_machine(
+        self._encoder_position = self.get_deck_from_machine(
             await self._backend.update_encoder_position()
         )
         if self.has_gripper():
@@ -2558,7 +2558,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        carriage_pos = self._deck_from_machine(self._backend.home_position())
+        carriage_pos = self.get_deck_from_machine(self._backend.home_position())
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
         )
@@ -2653,7 +2653,7 @@ class OT3API(
         )
         machine_pos = await self._backend.update_position()
         machine_pos[Axis.by_mount(mount)] = end_z
-        deck_end_z = self._deck_from_machine(machine_pos)[Axis.by_mount(mount)]
+        deck_end_z = self.get_deck_from_machine(machine_pos)[Axis.by_mount(mount)]
         offset = offset_for_mount(
             mount,
             top_types.Point(*self._config.left_mount_offset),

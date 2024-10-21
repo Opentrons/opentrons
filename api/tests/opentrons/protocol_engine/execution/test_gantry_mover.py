@@ -472,33 +472,33 @@ async def test_home_z(
     ],
     argvalues=[
         [
-            {MotorAxis.X: 10, MotorAxis.Y: 15, MotorAxis.RIGHT_Z: 20},
-            {MotorAxis.X: 2, MotorAxis.Y: 1, MotorAxis.RIGHT_Z: 1},
+            {MotorAxis.X: 10.0, MotorAxis.Y: 15.0, MotorAxis.RIGHT_Z: 20.0},
+            {MotorAxis.X: 2.0, MotorAxis.Y: 1.0, MotorAxis.RIGHT_Z: 1.0},
             False,
             Mount.RIGHT,
-            {HardwareAxis.X: -2, HardwareAxis.Y: 4, HardwareAxis.A: 9},
-            {HardwareAxis.X: -2, HardwareAxis.Y: 4, HardwareAxis.A: 9},
+            {HardwareAxis.X: -2.0, HardwareAxis.Y: 4.0, HardwareAxis.A: 9.0},
+            {HardwareAxis.X: -2.0, HardwareAxis.Y: 4.0, HardwareAxis.A: 9.0},
         ],
         [
-            {MotorAxis.RIGHT_Z: 20},
+            {MotorAxis.RIGHT_Z: 20.0},
             None,
             True,
             Mount.RIGHT,
-            {HardwareAxis.A: 30},
+            {HardwareAxis.A: 30.0},
             {
-                HardwareAxis.X: 10,
-                HardwareAxis.Y: 15,
-                HardwareAxis.Z: 10,
-                HardwareAxis.A: 30,
+                HardwareAxis.X: 10.0,
+                HardwareAxis.Y: 15.0,
+                HardwareAxis.Z: 10.0,
+                HardwareAxis.A: 30.0,
             },
         ],
         [
-            {MotorAxis.CLAMP_JAW_96_CHANNEL: 10},
+            {MotorAxis.CLAMP_JAW_96_CHANNEL: 10.0},
             None,
             False,
             Mount.LEFT,
-            {HardwareAxis.Q: 10},
-            {HardwareAxis.Q: 10},
+            {HardwareAxis.Q: 10.0},
+            {HardwareAxis.Q: 10.0},
         ],
     ],
 )
@@ -514,14 +514,14 @@ async def test_move_axes(
     final_position: Dict[HardwareAxis, float],
 ) -> None:
     curr_pos = {
-        HardwareAxis.X: 10,
-        HardwareAxis.Y: 15,
-        HardwareAxis.Z: 10,
-        HardwareAxis.A: 10,
+        HardwareAxis.X: 10.0,
+        HardwareAxis.Y: 15.0,
+        HardwareAxis.Z: 10.0,
+        HardwareAxis.A: 10.0,
     }
     call_count = 0
 
-    def _current_position(mount, refresh) -> Dict[HardwareAxis, float]:
+    def _current_position(mount: Mount, refresh: bool) -> Dict[HardwareAxis, float]:
         nonlocal call_count
         nonlocal curr_pos
         nonlocal final_position
@@ -543,13 +543,13 @@ async def test_move_axes(
         Point(0.5, 0.5, 0.5)
     )
 
-    decoy.when(mock_hardware_api._deck_from_machine(curr_pos)).then_return(curr_pos)
+    decoy.when(mock_hardware_api.get_deck_from_machine(curr_pos)).then_return(curr_pos)
 
-    decoy.when(mock_hardware_api._deck_from_machine(final_position)).then_return(
+    decoy.when(mock_hardware_api.get_deck_from_machine(final_position)).then_return(
         final_position
     )
     if not critical_point:
-        decoy.when(mock_hardware_api._critical_point_for(expected_mount)).then_return(
+        decoy.when(mock_hardware_api.critical_point_for(expected_mount)).then_return(
             Point(1, 1, 1)
         )
 

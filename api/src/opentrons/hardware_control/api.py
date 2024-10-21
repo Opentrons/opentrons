@@ -169,6 +169,14 @@ class API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
+    def get_deck_from_machine(self, machine_pos: Dict[Axis, float]) -> Dict[Axis, float]:
+        return deck_from_machine(
+            machine_pos=machine_pos,
+            attitude=self._robot_calibration.deck_calibration.attitude,
+            offset=top_types.Point(0, 0, 0),
+            robot_type=cast(RobotType, "OT-2 Standard"),
+        )
+
     @classmethod
     async def build_hardware_controller(  # noqa: C901
         cls,
@@ -657,12 +665,7 @@ class API(
         async with self._motion_lock:
             if smoothie_gantry:
                 smoothie_pos.update(await self._backend.home(smoothie_gantry))
-                self._current_position = deck_from_machine(
-                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                    attitude=self._robot_calibration.deck_calibration.attitude,
-                    offset=top_types.Point(0, 0, 0),
-                    robot_type=cast(RobotType, "OT-2 Standard"),
-                )
+                self._current_position = self.get_deck_from_machine(self._axis_map_from_string_map(smoothie_pos))
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
 
@@ -703,12 +706,7 @@ class API(
         async with self._motion_lock:
             if refresh:
                 smoothie_pos = await self._backend.update_position()
-                self._current_position = deck_from_machine(
-                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                    attitude=self._robot_calibration.deck_calibration.attitude,
-                    offset=top_types.Point(0, 0, 0),
-                    robot_type=cast(RobotType, "OT-2 Standard"),
-                )
+                self._current_position = self.get_deck_from_machine(self._axis_map_from_string_map(smoothie_pos))
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
@@ -938,12 +936,7 @@ class API(
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
-            self._current_position = deck_from_machine(
-                machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                attitude=self._robot_calibration.deck_calibration.attitude,
-                offset=top_types.Point(0, 0, 0),
-                robot_type=cast(RobotType, "OT-2 Standard"),
-            )
+            self._current_position = self.get_deck_from_machine(self._axis_map_from_string_map(smoothie_pos))
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1261,12 +1254,7 @@ class API(
                     axes=[ot2_axis_to_string(ax) for ax in move.home_axes],
                     margin=move.home_after_safety_margin,
                 )
-                self._current_position = deck_from_machine(
-                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                    attitude=self._robot_calibration.deck_calibration.attitude,
-                    offset=top_types.Point(0, 0, 0),
-                    robot_type=cast(RobotType, "OT-2 Standard"),
-                )
+                self._current_position = self.get_deck_from_machine(self._axis_map_from_string_map(smoothie_pos))
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
