@@ -74,6 +74,7 @@ MessageDefinition = Union[
     defs.BaselineSensorResponse,
     defs.SetSensorThresholdRequest,
     defs.ReadFromSensorResponse,
+    defs.BatchReadFromSensorResponse,
     defs.SensorThresholdResponse,
     defs.SensorDiagnosticRequest,
     defs.SensorDiagnosticResponse,

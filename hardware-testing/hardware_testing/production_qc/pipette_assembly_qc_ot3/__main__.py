@@ -18,7 +18,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId
 
-from opentrons.config.types import LiquidProbeSettings, OutputOptions
+from opentrons.config.types import LiquidProbeSettings
 from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
@@ -1378,13 +1378,11 @@ async def _test_liquid_probe(
                 plunger_speed=probe_cfg.plunger_speed,
                 plunger_impulse_time=0.2,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
-                output_option=OutputOptions.can_bus_only,  # FIXME: remove
                 aspirate_while_sensing=False,
                 z_overlap_between_passes_mm=0.1,
                 plunger_reset_offset=2.0,
                 samples_for_baselining=20,
                 sample_time_sec=0.004,
-                data_files=None,
             )
             end_z = await api.liquid_probe(
                 mount, max_z_distance_machine_coords, probe_settings, probe=probe

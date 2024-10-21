@@ -2,7 +2,7 @@
 import argparse
 import asyncio
 
-from opentrons.config.types import CapacitivePassSettings, OutputOptions
+from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
@@ -44,14 +44,12 @@ PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
     sensor_threshold_pf=STABLE_CAP_PF,
-    output_option=OutputOptions.sync_only,
 )
 PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
     prep_distance_mm=CUTOUT_SIZE / 2,
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
     sensor_threshold_pf=STABLE_CAP_PF,
-    output_option=OutputOptions.sync_only,
 )
 
 
