@@ -102,6 +102,13 @@ function startUp(): void {
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
+    // This function now dispatches actions to all the handlers in the app shell. That would make it
+    // vulnerable to infinite recursion:
+    // - handler handles action A
+    // - handler dispatches action A as a response (calls this function)
+    // - this function calls handler with action A
+    // By deferring to nextTick(), we would still be executing the code over and over but we should have
+    // broken the stack.
     process.nextTick(() => {
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (mainWindow) {
@@ -111,6 +118,8 @@ function startUp(): void {
       log.debug(
         `bouncing action ${action.type} to ${actionHandlers.length} handlers`
       )
+      // Make actions that are sourced from the shell also go to the app shell without needing
+      // round tripping. This call is the reason for the nextTick() above.
       actionHandlers.forEach(handler => {
         handler(action)
       })
