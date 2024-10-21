@@ -15,7 +15,7 @@ def build_arg_parser():
     arg_parser.add_argument('-t', '--test', action="store_true", required=False, help='Gets sample histogram data from the sensor')
     arg_parser.add_argument('-w', '--labware', action="store_true", required=False, help='Measures the sensor for different labware quantity')
     arg_parser.add_argument('-m', '--labware_max', type=int, required=False, help='Sets the maximum number of labware', default=3)
-    arg_parser.add_argument('-z', '--zones', action="append", type=int, required=False, help='Sets the zone numbers for histogram data (0-9)', default=[1,2,3])
+    arg_parser.add_argument('-z', '--zones', nargs="*", type=int, required=False, help='Sets the zone numbers for histogram data (0-9)', default=[1,2,3])
     arg_parser.add_argument('-l', '--log', type=float, required=False, help='Sets the log duration (min)', default=0.1)
     arg_parser.add_argument('-p', '--port_name', type=str, required=False, help='Sets serial connection port, ex: -p COM5')
     return arg_parser
@@ -303,7 +303,9 @@ class TOF_Sensor_Driver():
         if param["y2_title"] is not None:
             fig.update_layout(yaxis2_title=param["y2_title"], yaxis2_range=param["y2_range"])
 
-        fig.write_image(self.plot_folder + "/" + param["filename"] + self.PLOT_FORMAT)
+        img_name = param["filename"] + self.PLOT_FORMAT
+        img_path = os.path.join(self.plot_folder, img_name)
+        fig.write_image(img_path)
 
         for key, value in self.plot_param.items():
             self.plot_param[key] = None
