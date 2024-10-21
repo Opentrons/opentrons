@@ -442,13 +442,13 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                     source = reservoir.wells()[i]
                     row = plate.rows()[i]
 
-                # transfer 30 µL of source to first well in column
-                pipette.transfer(30, source, row[0], mix_after=(3, 25))
+                    # transfer 30 µL of source to first well in column
+                    pipette.transfer(30, source, row[0], mix_after=(3, 25))
 
-                # dilute the sample down the column
-                pipette.transfer(
-                    30, row[:11], row[1:],
-                    mix_after=(3, 25))
+                    # dilute the sample down the column
+                    pipette.transfer(
+                        30, row[:11], row[1:],
+                        mix_after=(3, 25))
     
     .. tab:: OT-2
 
@@ -485,13 +485,13 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                     source = reservoir.wells()[i]
                     row = plate.rows()[i]
 
-                # transfer 30 µL of source to first well in column
-                p300.transfer(30, source, row[0], mix_after=(3, 25))
+                    # transfer 30 µL of source to first well in column
+                    p300.transfer(30, source, row[0], mix_after=(3, 25))
 
-                # dilute the sample down the column
-                p300.transfer(
-                    30, row[:11], row[1:],
-                    mix_after=(3, 25))
+                    # dilute the sample down the column
+                    p300.transfer(
+                        30, row[:11], row[1:],
+                        mix_after=(3, 25))
 
 Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see the Loops and Air Gaps examples above. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
