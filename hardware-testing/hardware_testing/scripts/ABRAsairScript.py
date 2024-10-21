@@ -62,7 +62,7 @@ def run_command_on_ip(
 
 
 def run(file_name: str) -> List[Any]:
-    """Run asair script module"""
+    """Run asair script module."""
     # Load Robot IPs
     cmd = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
     cd = "cd /opt/opentrons-robot-server && "
