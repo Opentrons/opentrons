@@ -11,6 +11,7 @@ import {
 export interface PromptPreviewSectionProps {
   title: string
   items: string[]
+  itemMaxWidth?: string
 }
 
 const PromptPreviewSectionContainer = styled(Flex)`
@@ -29,11 +30,12 @@ const TagsContainer = styled(Flex)`
   width: 100%;
 `
 
-const TagItemWrapper = styled(Flex)`
+const TagItemWrapper = styled.div<{ itemMaxWidth: string }>`
+  display: flex;
   width: auto;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 35%;
+  max-width: ${props => props.itemMaxWidth};
 
   & > div {
     overflow: hidden;
@@ -48,6 +50,7 @@ const TagItemWrapper = styled(Flex)`
 export function PromptPreviewSection({
   title,
   items,
+  itemMaxWidth = '35%',
 }: PromptPreviewSectionProps): JSX.Element {
   return (
     <PromptPreviewSectionContainer>
@@ -56,7 +59,11 @@ export function PromptPreviewSection({
         {items.map(
           (item: string, index: number) =>
             item.trim() !== '' && (
-              <TagItemWrapper key={`item-tag-${index}`}>
+              <TagItemWrapper
+                data-testid={`item-tag-wrapper-${index}`}
+                key={`item-tag-${index}`}
+                itemMaxWidth={itemMaxWidth}
+              >
                 <Tag text={item} type={'default'} />
               </TagItemWrapper>
             )

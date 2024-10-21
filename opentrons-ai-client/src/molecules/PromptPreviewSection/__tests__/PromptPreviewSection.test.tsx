@@ -48,4 +48,13 @@ describe('PromptPreviewSection', () => {
     const items = screen.getAllByTestId('Tag_default')
     expect(items).toHaveLength(1)
   })
+
+  it('should render the item with the correct max item width', () => {
+    props.items = ['test item 1 long text long text long text long text']
+    props.itemMaxWidth = '23%'
+    render(props)
+
+    const item = screen.getByTestId('item-tag-wrapper-0')
+    expect(item).toHaveStyle({ maxWidth: '23%' })
+  })
 })
