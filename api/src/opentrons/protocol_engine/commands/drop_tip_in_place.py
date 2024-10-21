@@ -83,7 +83,11 @@ class DropTipInPlaceImplementation(
                     )
                 ],
             )
-            return DefinedErrorData(public=error, state_update=state_update)
+            # FIX BEFORE MERGE: state_update_if_false_positive
+            return DefinedErrorData(
+                public=error,
+                state_update=state_update,
+            )
         else:
             state_update.update_pipette_tip_state(
                 pipette_id=params.pipetteId, tip_geometry=None
