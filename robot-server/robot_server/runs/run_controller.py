@@ -94,7 +94,13 @@ class RunController:
                 self._task_runner.run(self._run_orchestrator_store.stop)
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
-                self._run_orchestrator_store.resume_from_recovery()
+                self._run_orchestrator_store.resume_from_recovery(
+                    # FIX BEFORE MERGE:
+                    # Hard-coding `True` is for experimentation. We probably want
+                    # this to be `False` for `resumeFromRecovery` actions and `True`
+                    # for some new type of action.
+                    reconcile_false_positive=True
+                )
 
         except ProtocolEngineError as e:
             raise RunActionNotAllowedError(message=e.message, wrapping=[e]) from e

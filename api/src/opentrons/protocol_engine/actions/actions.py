@@ -69,7 +69,7 @@ class StopAction:
 class ResumeFromRecoveryAction:
     """See `ProtocolEngine.resume_from_recovery()`."""
 
-    pass
+    state_update: StateUpdate
 
 
 @dataclasses.dataclass(frozen=True)

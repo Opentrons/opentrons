@@ -6,7 +6,6 @@ from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     SetErrorRecoveryPolicyAction,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -19,6 +18,7 @@ from opentrons_shared_data.errors import (
 
 from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
 from .errors.exceptions import EStopActivatedError
+from .error_recovery_policy import ErrorRecoveryPolicy
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
@@ -39,6 +39,7 @@ from .execution import (
     HardwareStopper,
 )
 from .state.state import StateStore, StateView
+from .state.update_types import StateUpdate
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
     ActionDispatcher,
@@ -184,11 +185,38 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-    def resume_from_recovery(self) -> None:
-        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`."""
+    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`.
+
+        If `reconcile_false_positive` is `False`, the engine will continue naively from
+        whatever state the error left it in. (Each defined error individually documents
+        exactly how it affects state.) This is appropriate for client-driven error
+        recovery, where the client wants predictable behavior from the engine.
+
+        If `reconcile_false_positive` is `True`, the engine may apply additional fixups
+        to its state to try to get the rest of the run to just work, assuming the error
+        was a false-positive.
+
+        For example, a `tipPhysicallyMissing` error from a `pickUpTip` would normally
+        leave the engine state without a tip on the pipette. If `reconcile_false_positive=True`,
+        the engine will set the pipette to have that missing tip before continuing, so
+        subsequent path planning, aspirates, dispenses, etc. will work as if nothing
+        went wrong.
+        """
+        if reconcile_false_positive:
+            state_update = (
+                self._state_store.commands.get_state_update_for_false_positive()
+            )
+        else:
+            state_update = StateUpdate()  # Empty/no-op.
+
         action = self._state_store.commands.validate_action_allowed(
-            ResumeFromRecoveryAction()
+            ResumeFromRecoveryAction(state_update)
         )
+
+        # TODO: Insert some kind of HardwareStateFixer thing here that takes the
+        # hardware API, state update, and state store, and reverse-engineers
+        # what fix it needs to apply.
         self._action_dispatcher.dispatch(action)
 
     def add_command(

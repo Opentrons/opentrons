@@ -613,20 +613,22 @@ def test_pause(
     )
 
 
+@pytest.mark.parametrize("reconcile_false_positive", [True, False])
 def test_resume_from_recovery(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
+    reconcile_false_positive: bool,
 ) -> None:
     """It should dispatch a ResumeFromRecoveryAction."""
-    expected_action = ResumeFromRecoveryAction()
+    expected_action = ResumeFromRecoveryAction(reconcile_false_positive)
 
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action)
     ).then_return(expected_action)
 
-    subject.resume_from_recovery()
+    subject.resume_from_recovery(reconcile_false_positive)
 
     decoy.verify(action_dispatcher.dispatch(expected_action))
 
