@@ -15,6 +15,7 @@ import welcomeImage from '../../assets/images/welcome_dashboard.png'
 import { useTranslation } from 'react-i18next'
 import { useIsMobile } from '../../resources/hooks/useIsMobile'
 import { useNavigate } from 'react-router-dom'
+import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
 export interface InputType {
   userPrompt: string
@@ -24,13 +25,15 @@ export function Landing(): JSX.Element | null {
   const navigate = useNavigate()
   const { t } = useTranslation('protocol_generator')
   const isMobile = useIsMobile()
+  const trackEvent = useTrackEvent()
 
   function handleCreateNewProtocol(): void {
-    // add analytics in these handlers
+    trackEvent({ name: 'create-new-protocol', properties: {} })
     navigate('/new-protocol')
   }
 
   function handleUpdateProtocol(): void {
+    trackEvent({ name: 'update-protocol', properties: {} })
     navigate('/update-protocol')
   }
 

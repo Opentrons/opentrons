@@ -11,6 +11,6 @@ import type { AnalyticsEvent } from '../types'
 export function useTrackEvent(): (e: AnalyticsEvent) => void {
   const [mixpanel] = useAtom(mixpanelAtom)
   return event => {
-    trackEvent(event, mixpanel?.analytics.hasOptedIn ?? false)
+    trackEvent(event, mixpanel?.analytics?.hasOptedIn ?? false)
   }
 }

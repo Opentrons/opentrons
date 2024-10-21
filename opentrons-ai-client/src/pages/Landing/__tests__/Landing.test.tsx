@@ -7,6 +7,7 @@ import { Landing } from '../index'
 import { i18n } from '../../../i18n'
 
 const mockNavigate = vi.fn()
+const mockUseTrackEvent = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
@@ -15,6 +16,10 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
+
+vi.mock('../../../hooks/useTrackEvent', () => ({
+  useTrackEvent: () => mockUseTrackEvent,
+}))
 
 const render = () => {
   return renderWithProviders(<Landing />, {

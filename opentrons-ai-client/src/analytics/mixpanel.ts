@@ -13,9 +13,7 @@ export type AnalyticsEvent =
   | { superProperties: Record<string, unknown> }
 
 // pulled in from environment at build time
-const MIXPANEL_ID = getIsProduction()
-  ? process.env.OT_AI_CLIENT_MIXPANEL_ID
-  : 'process.env.OT_AI_CLIENT_MIXPANEL_DEV_ID'
+const MIXPANEL_ID = process.env.OT_AI_CLIENT_MIXPANEL_ID
 
 const MIXPANEL_OPTS = {
   // opt out by default
