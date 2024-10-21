@@ -3,7 +3,7 @@ import sys
 import paramiko as pmk
 import time
 import multiprocessing
-from typing import Optional, List
+from typing import Optional, List, Any
 
 
 def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
@@ -47,7 +47,9 @@ def connect_ssh(ip: str) -> pmk.SSHClient:
     return client
 
 
-def run_command_on_ip(index: int, robot_ips, robot_names, cd, cmd) -> None:
+def run_command_on_ip(
+    index: int, robot_ips: List[str], robot_names: List[str], cd: str, cmd: str
+) -> None:
     """Execute ssh command and start abr_asair script on the specified robot."""
     curr_ip = robot_ips[index]
     try:
@@ -59,7 +61,8 @@ def run_command_on_ip(index: int, robot_ips, robot_names, cd, cmd) -> None:
         print(f"Error running command on {curr_ip}: {e}")
 
 
-def run(file_name):
+def run(file_name: str) -> List[Any]:
+    """Run asair script module"""
     # Load Robot IPs
     cmd = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
     cd = "cd /opt/opentrons-robot-server && "
