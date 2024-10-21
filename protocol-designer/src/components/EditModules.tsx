@@ -17,12 +17,12 @@ import { EditMultipleModulesModal } from './modals/EditModulesModal/EditMultiple
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 import { EditModulesModal } from './modals/EditModulesModal'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { ModuleModel,  } from '@opentrons/shared-data'
 
 export interface EditModulesProps {
   moduleToEdit: {
     moduleId?: string | null
-    moduleType: ModuleType
+    : 
   }
   onCloseClick: () => void
 }
@@ -35,16 +35,16 @@ export interface ModelModuleInfo {
 export const EditModules = (props: EditModulesProps): JSX.Element => {
   const { onCloseClick, moduleToEdit } = props
   const enableMoam = useSelector(getEnableMoam)
-  const { moduleId, moduleType } = moduleToEdit
+  const { moduleId,  } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const robotType = useSelector(getRobotType)
 
-  const MOAM_MODULE_TYPES: ModuleType[] = enableMoam
+  const MOAM_MODULE_TYPES: [] = enableMoam
     ? [TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE, MAGNETIC_BLOCK_TYPE]
     : [TEMPERATURE_MODULE_TYPE]
 
   const showMultipleModuleModal =
-    robotType === FLEX_ROBOT_TYPE && MOAM_MODULE_TYPES.includes(moduleType)
+    robotType === FLEX_ROBOT_TYPE && MOAM_MODULE_TYPES.includes()
 
   const moduleOnDeck = moduleId ? _initialDeckSetup.modules[moduleId] : null
   const [
@@ -94,7 +94,7 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
 
   let modal = (
     <EditModulesModal
-      moduleType={moduleType}
+      ={}
       moduleOnDeck={moduleOnDeck}
       onCloseClick={onCloseClick}
       editModuleSlot={editModuleSlot}
@@ -107,7 +107,7 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
       <EditMultipleModulesModal
         onCloseClick={onCloseClick}
         allModulesOnDeck={Object.values(_initialDeckSetup.modules)}
-        moduleType={moduleType}
+        ={}
       />
     )
   }

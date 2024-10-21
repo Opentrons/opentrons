@@ -26,14 +26,14 @@ import type { FormModules } from '../../step-forms'
 const TOTAL_MODULE_SLOTS = 8
 const MIDDLE_SLOT_NUM = 4
 
-// export const getNumOptions = (length: number): DropdownOption[] => {
-//   return Array.from({ length }, (_, i) => ({
-//     name: `${i + 1}`,
-//     value: `${i + 1}`,
-//   }))
-// }
+export const getNumOptions = (length: number): DropdownOption[] => {
+  return Array.from({ length }, (_, i) => ({
+    name: `${i + 1}`,
+    value: `${i + 1}`,
+  }))
+}
 
-export const getNumOptions = (
+export const getNumOptionsForModules = (
   moduleType: ModuleType,
   distribution: ModuleDistribution
 ): DropdownOption[] => {
@@ -95,7 +95,7 @@ export const getNumSlotsAvailable = (
     filteredModuleLength = filteredModuleLength + 1
   }
   if (magneticBlocks.length > 0) {
-    //  once blocks exceed 4, then we dont' want to subtract the amount available
+    //  once blocks exceed 4, then we don't want to subtract the amount available
     //  because block can go into the center slots where all other modules/trashes can not
     const numBlocks =
       magneticBlocks.length > 4 ? MIDDLE_SLOT_NUM : magneticBlocks.length
@@ -334,11 +334,7 @@ export const getAvailableSlots = (
   if (distribution === null)
     return { regular: TOTAL_SLOTS_WITHOUT_TWO_COL, magnetic: TWO_COL_SLOTS }
   const { tc, hs, mb, tm } = distribution
-
-  // マグネティックブロック用のスロット
   const availableMagneticSlots = 11 - (tc * 2 + hs + tm + mb)
-
-  // 通常のモジュール用のスロット
   const availableRegularSlots = 7 - (hs + tm + (tc > 0 ? 2 : 0))
 
   return {
@@ -352,6 +348,7 @@ export const getCanAddModule = (
   distribution: ModuleDistribution
 ): boolean => {
   const availableSlots = getAvailableSlots(distribution)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { tc, hs, mb, tm } = distribution
 
   switch (moduleType) {

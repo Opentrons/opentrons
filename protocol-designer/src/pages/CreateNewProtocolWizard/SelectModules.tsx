@@ -39,7 +39,7 @@ import {
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
 import {
-  getNumOptions,
+  getNumOptionsForModules,
   getNumSlotsAvailable,
   getModuleDistribution,
   getAvailableSlots,
@@ -53,7 +53,6 @@ import type { FormModule, FormModules } from '../../step-forms'
 import type { WizardTileProps } from './types'
 
 const MAX_MAGNETIC_BLOCKS = 4
-// const MAGNETIC_BLOCKS_ADJUSTMENT = 3
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -97,25 +96,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const MOAM_MODULE_TYPES: ModuleType[] = enableMoam
     ? [TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE, MAGNETIC_BLOCK_TYPE]
     : [TEMPERATURE_MODULE_TYPE]
-
-  // const handleAddModule = (moduleModel: ModuleModel): void => {
-  //   // Need to fix since this condition isn't quite right
-  //   if (hasNoAvailableSlots) {
-  //     makeSnackbar(t('slots_limit_reached') as string)
-  //   } else {
-  //     setValue('modules', {
-  //       ...modules,
-  //       [uuid()]: {
-  //         model: moduleModel,
-  //         type: getModuleType(moduleModel),
-  //         slot:
-  //           robotType === FLEX_ROBOT_TYPE
-  //             ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-  //             : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
-  //       },
-  //     })
-  //   }
-  // }
 
   const handleAddModule = (moduleModel: ModuleModel): void => {
     const moduleType = getModuleType(moduleModel)
@@ -289,14 +269,10 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                           )
                         },
                         dropdownType: 'neutral' as DropdownBorder,
-                        // filterOptions: getNumOptions(
-                        //   module.model === 'magneticBlockV1'
-                        //     ? numSlotsAvailable +
-                        //         MAGNETIC_BLOCKS_ADJUSTMENT +
-                        //         module.count
-                        //     : numSlotsAvailable + module.count
-                        // ),
-                        filterOptions: getNumOptions(module.type, distribution),
+                        filterOptions: getNumOptionsForModules(
+                          module.type,
+                          distribution
+                        ),
                       }
                       return (
                         <ListItem type="noActive" key={`${module.model}`}>
