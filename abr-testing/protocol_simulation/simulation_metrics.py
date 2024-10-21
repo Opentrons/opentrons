@@ -14,6 +14,25 @@ from abr_testing.tools import plate_reader
 
 
 
+def set_api_level(protocol_file_path) -> None:
+    with open(protocol_file_path, "r") as file:
+        file_contents = file.readlines()
+    # Look for current'apiLevel:'
+    for i, line in enumerate(file_contents):
+        print(line)
+        if 'apiLevel' in line:
+            print(f"The current API level of this protocol is: {line}")
+            change = input("Would you like to simulate with a different API level? (Y/N) ").strip().upper()
+
+            if change == "Y":
+                api_level = input("Protocol API Level to Simulate with: ")
+                # Update new API level
+                file_contents[i] = f'apiLevel: {api_level}\n'
+                print(f"Updated line: {file_contents[i]}")
+            break
+    with open(protocol_file_path, "w") as file:
+        file.writelines(file_contents)
+    print("File updated successfully.")
 
 def look_for_air_gaps(protocol_file_path: str) -> int:
     """Search Protocol for Air Gaps"""
@@ -351,7 +370,7 @@ if __name__ == "__main__":
         
     # set_api_level()
     if CLEAN_PROTOCOL:
-        # set_api_level(Path(protocol_file_path))
+        set_api_level(Path(protocol_file_path))
         main(
             protocol_file_path,
             True,

@@ -173,7 +173,15 @@ class google_sheet:
         self, sheet_title: str, row: int, column: int, single_data: Any
     ) -> Tuple[int, int, Any]:
         """Update ONE individual cell according to a row and column."""
-        self.spread_sheet.worksheet(sheet_title).update_cell(row, column, single_data)
+        try:
+            self.spread_sheet.worksheet(sheet_title).update_cell(
+                row, column, single_data
+            )
+        except gspread.exceptions.APIError:
+            t.sleep(30)
+            self.spread_sheet.worksheet(sheet_title).update_cell(
+                row, column, single_data
+            )
         return row, column, single_data
 
     def get_all_data(
