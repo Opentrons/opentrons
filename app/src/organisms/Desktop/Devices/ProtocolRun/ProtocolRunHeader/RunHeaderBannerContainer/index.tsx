@@ -1,6 +1,18 @@
 import { useTranslation } from 'react-i18next'
 
-import { Box, SPACING, Banner } from '@opentrons/components'
+import {
+  Box,
+  StyledText,
+  Link,
+  SPACING,
+  Banner,
+  Flex,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_ROW,
+  ALIGN_CENTER,
+  TEXT_DECORATION_UNDERLINE,
+} from '@opentrons/components'
 
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import {
@@ -21,13 +33,21 @@ export type RunHeaderBannerContainerProps = ProtocolRunHeaderProps & {
   isResetRunLoading: boolean
   runErrors: UseRunErrorsResult
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
+  hasDownloadableFiles: boolean
+  deviceDetailsLink: () => void
 }
 
 // Holds all the various banners that render in ProtocolRunHeader.
 export function RunHeaderBannerContainer(
   props: RunHeaderBannerContainerProps
 ): JSX.Element | null {
-  const { runStatus, enteredER, runHeaderModalContainerUtils } = props
+  const {
+    runStatus,
+    enteredER,
+    runHeaderModalContainerUtils,
+    hasDownloadableFiles,
+    deviceDetailsLink,
+  } = props
   const { analysisErrorModalUtils } = runHeaderModalContainerUtils
 
   const { t } = useTranslation(['run_details', 'shared'])
@@ -72,6 +92,34 @@ export function RunHeaderBannerContainer(
           bannerType={terminalBannerType}
           {...props}
         />
+      ) : null}
+      {hasDownloadableFiles ? (
+        <Banner type="informing" marginTop={SPACING.spacing16}>
+          <Flex
+            width="100%"
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
+          >
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText
+                desktopStyle="captionSemiBold"
+                marginBottom={SPACING.spacing4}
+              >
+                {t('download_files')}
+              </StyledText>
+              <StyledText desktopStyle="captionRegular">
+                {t('files_available_robot_details')}
+              </StyledText>
+            </Flex>
+            <Link
+              textDecoration={TEXT_DECORATION_UNDERLINE}
+              onClick={deviceDetailsLink}
+            >
+              {t('device_details')}
+            </Link>
+          </Flex>
+        </Banner>
       ) : null}
     </Box>
   )
