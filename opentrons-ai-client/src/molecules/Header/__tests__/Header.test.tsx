@@ -18,6 +18,6 @@ describe('Header', () => {
 
   it('should render log out button', () => {
     render()
-    screen.getByText('Log out')
+    screen.getByText('Logout')
   })
 })
