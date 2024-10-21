@@ -37,7 +37,6 @@ import gripperImage from '../../../assets/images/flex_gripper.png'
 import wasteChuteImage from '../../../assets/images/waste_chute.png'
 import trashBinImage from '../../../assets/images/flex_trash_bin.png'
 import { uuid } from '../../../utils'
-import { getEnableMoam } from '../../../feature-flags/selectors'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { CrashInfoBox, ModuleDiagram } from '../../modules'
 import { ModuleFields } from '../FilePipettesModal/ModuleFields'
@@ -202,15 +201,17 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { watch, setValue } = props
-  const enableMoam = useSelector(getEnableMoam)
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
   const enableAbsorbanceReader = useSelector(
     featureFlagSelectors.getEnableAbsorbanceReader
   )
-  const MOAM_MODULE_TYPES: ModuleType[] = enableMoam
-    ? [TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE, MAGNETIC_BLOCK_TYPE]
-    : [TEMPERATURE_MODULE_TYPE]
+  const MOAM_MODULE_TYPES: ModuleType[] = [
+    TEMPERATURE_MODULE_TYPE,
+    HEATERSHAKER_MODULE_TYPE,
+    MAGNETIC_BLOCK_TYPE,
+  ]
+
   const moduleTypesOnDeck =
     modules != null ? Object.values(modules).map(module => module.type) : []
 

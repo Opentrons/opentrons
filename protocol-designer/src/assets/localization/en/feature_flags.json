@@ -20,10 +20,6 @@
     "title": "Enable redesign",
     "description": "A whole new world."
   },
-  "OT_PD_ENABLE_MOAM": {
-    "title": "Enable multiple modules",
-    "description": "Enable multiple heater-shakers and magnetic blocks for Flex only."
-  },
   "OT_PD_ENABLE_COMMENT": {
     "title": "Enable comment step",
     "description": "You can add comments anywhere between timeline steps."

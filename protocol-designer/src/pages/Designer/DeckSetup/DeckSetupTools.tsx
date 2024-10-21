@@ -37,14 +37,11 @@ import {
   selectNestedLabware,
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
-import {
-  getEnableAbsorbanceReader,
-  getEnableMoam,
-} from '../../../feature-flags/selectors'
+import { getEnableAbsorbanceReader } from '../../../feature-flags/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
 import { useKitchen } from '../../../organisms/Kitchen/hooks'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
-import { FIXTURES, MOAM_MODELS, MOAM_MODELS_WITH_FF } from './constants'
+import { FIXTURES, MOAM_MODELS } from './constants'
 import { getSlotInformation } from '../utils'
 import { getModuleModelsBySlot, getDeckErrors } from './utils'
 import { LabwareTools } from './LabwareTools'
@@ -70,7 +67,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
-  const enableMoam = useSelector(getEnableMoam)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
     selectedLabwareDefUri,
@@ -293,9 +289,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                       module.type === getModuleType(model) &&
                       module.slot !== slot
                   )
-                  const moamModels = enableMoam
-                    ? MOAM_MODELS
-                    : MOAM_MODELS_WITH_FF
+                  const moamModels = MOAM_MODELS
 
                   const collisionError = getDeckErrors({
                     modules: deckSetupModules,

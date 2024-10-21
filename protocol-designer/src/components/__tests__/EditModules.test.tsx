@@ -9,7 +9,6 @@ import {
 import { i18n } from '../../assets/localization'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getDismissedHints } from '../../tutorial/selectors'
-import { getEnableMoam } from '../../feature-flags/selectors'
 import { renderWithProviders } from '../../__testing-utils__'
 import { getRobotType } from '../../file-data/selectors'
 import { EditMultipleModulesModal } from '../modals/EditModulesModal/EditMultipleModulesModal'
@@ -58,7 +57,6 @@ describe('EditModules', () => {
       labware: {},
       additionalEquipmentOnDeck: {},
     })
-    vi.mocked(getEnableMoam).mockReturnValue(true)
     vi.mocked(EditModulesModal).mockReturnValue(
       <div>mock EditModulesModal</div>
     )
