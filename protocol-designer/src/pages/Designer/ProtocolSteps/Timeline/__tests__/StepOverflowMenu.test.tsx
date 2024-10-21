@@ -29,6 +29,8 @@ vi.mock('../../../../../step-forms/selectors')
 vi.mock('../../../../../ui/steps/actions/actions')
 vi.mock('../../../../../ui/steps/actions/thunks')
 vi.mock('../../../../../steplist/actions')
+vi.mock('../../../../../feature-flags/selectors')
+
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
@@ -56,6 +58,10 @@ describe('StepOverflowMenu', () => {
       top: 0,
       menuRootRef: { current: null },
       setStepOverflowMenu: vi.fn(),
+      multiSelectItemIds: [],
+      handleEdit: vi.fn(),
+      confirmDelete: mockConfirm,
+      confirmMultiDelete: vi.fn(),
     }
     vi.mocked(getMultiSelectItemIds).mockReturnValue(null)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
@@ -71,24 +77,19 @@ describe('StepOverflowMenu', () => {
 
   it('renders each button and clicking them calls the action', () => {
     render(props)
-    fireEvent.click(screen.getAllByText('Delete step')[0])
-    screen.getByText('Are you sure you want to delete this step?')
-    fireEvent.click(screen.getByText('delete step'))
+    fireEvent.click(screen.getByText('Delete step'))
     expect(mockConfirm).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Duplicate step'))
     expect(vi.mocked(stepsActions.duplicateStep)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Edit step'))
-    expect(mockConfirm).toHaveBeenCalled()
     fireEvent.click(screen.getByText('View details'))
     expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()
     expect(vi.mocked(toggleViewSubstep)).toHaveBeenCalled()
   })
 
   it('renders the multi select overflow menu', () => {
-    vi.mocked(getMultiSelectItemIds).mockReturnValue(['1', '2'])
-    render(props)
+    render({ ...props, multiSelectItemIds: ['abc', '123'] })
     screen.getByText('Duplicate steps')
     screen.getByText('Delete steps')
-    screen.getByText('Delete multiple steps')
   })
 })

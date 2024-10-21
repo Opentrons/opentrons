@@ -4,6 +4,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { AutoAddPauseUntilTempStepModal } from '../AutoAddPauseUntilTempStepModal'
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+
+vi.mock('../../../feature-flags/selectors')
 
 const render = (
   props: React.ComponentProps<typeof AutoAddPauseUntilTempStepModal>
@@ -20,6 +23,7 @@ describe('AutoAddPauseUntilTempStepModal ', () => {
       displayTemperature: '10',
       handleCancelClick: vi.fn(),
       handleContinueClick: vi.fn(),
+      moduleType: TEMPERATURE_MODULE_TYPE,
     }
   })
   it('should render the correct text with 10 C temp and buttons are clickable', () => {

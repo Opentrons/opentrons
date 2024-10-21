@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,12 +16,27 @@ import {
   OverflowBtn,
   SPACING,
   StyledText,
+  useConditionalConfirm,
 } from '@opentrons/components'
+import {
+  ConfirmDeleteModal,
+  DELETE_MULTIPLE_STEP_FORMS,
+  DELETE_STEP_FORM,
+} from '../../../../components/modals/ConfirmDeleteModal'
 import { getTopPortalEl } from '../../../../components/portals/TopPortal'
+import { actions as steplistActions } from '../../../../steplist'
+import {
+  deselectAllSteps,
+  populateForm,
+} from '../../../../ui/steps/actions/actions'
+import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
+import type { ThunkDispatch } from 'redux-thunk'
 import type { IconName } from '@opentrons/components'
+import type { StepIdType } from '../../../../form-types'
+import type { BaseState } from '../../../../types'
 
 const STARTING_DECK_STATE = 'Starting deck state'
 const FINAL_DECK_STATE = 'Final deck state'
@@ -60,6 +76,8 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   const [stepOverflowMenu, setStepOverflowMenu] = React.useState<boolean>(false)
   const isStartingOrEndingState =
     title === STARTING_DECK_STATE || title === FINAL_DECK_STATE
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
+  const multiSelectItemIds = useSelector(getMultiSelectItemIds)
 
   let backgroundColor = isStartingOrEndingState ? COLORS.blue20 : COLORS.grey20
   let color = COLORS.black90
@@ -74,6 +92,17 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   if (hasError) {
     backgroundColor = COLORS.red50
     color = COLORS.white
+  }
+
+  const handleClick = (event: MouseEvent): void => {
+    const wasOutside = !(
+      event.target instanceof Node &&
+      menuRootRef.current?.contains(event.target)
+    )
+
+    if (wasOutside && stepOverflowMenu) {
+      setStepOverflowMenu(false)
+    }
   }
 
   const handleOverflowClick = (event: React.MouseEvent): void => {
@@ -98,19 +127,66 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     }
   })
 
-  const handleClick = (event: MouseEvent): void => {
-    const wasOutside = !(
-      event.target instanceof Node &&
-      menuRootRef.current?.contains(event.target)
-    )
+  const handleStepItemSelection = (): void => {
+    if (stepId != null) {
+      dispatch(populateForm(stepId))
+    }
+    setStepOverflowMenu(false)
+  }
 
-    if (wasOutside && stepOverflowMenu) {
-      setStepOverflowMenu(false)
+  const onDeleteClickAction = (): void => {
+    if (multiSelectItemIds) {
+      dispatch(steplistActions.deleteMultipleSteps(multiSelectItemIds))
+      dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
+    } else {
+      console.warn(
+        'something went wrong, you cannot delete multiple steps if none are selected'
+      )
     }
   }
 
+  const {
+    confirm: confirmMultiDelete,
+    showConfirmation: showMultiDeleteConfirmation,
+    cancel: cancelMultiDelete,
+  } = useConditionalConfirm(onDeleteClickAction, true)
+
+  const deleteStep = (stepId: StepIdType): void => {
+    dispatch(steplistActions.deleteStep(stepId))
+  }
+
+  const handleDelete = (): void => {
+    if (stepId != null) {
+      deleteStep(stepId)
+    } else {
+      console.warn(
+        'something went wrong, cannot delete a step without a step id'
+      )
+    }
+  }
+
+  const {
+    confirm: confirmDelete,
+    showConfirmation: showDeleteConfirmation,
+    cancel: cancelDelete,
+  } = useConditionalConfirm(handleDelete, true)
+
   return (
     <>
+      {showDeleteConfirmation && (
+        <ConfirmDeleteModal
+          modalType={DELETE_STEP_FORM}
+          onCancelClick={cancelDelete}
+          onContinueClick={confirmDelete}
+        />
+      )}
+      {showMultiDeleteConfirmation && (
+        <ConfirmDeleteModal
+          modalType={DELETE_MULTIPLE_STEP_FORMS}
+          onContinueClick={confirmMultiDelete}
+          onCancelClick={cancelMultiDelete}
+        />
+      )}
       <Box
         id={stepId}
         {...{
@@ -169,6 +245,10 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               stepId={stepId}
               menuRootRef={menuRootRef}
               top={top}
+              handleEdit={handleStepItemSelection}
+              confirmDelete={confirmDelete}
+              confirmMultiDelete={confirmMultiDelete}
+              multiSelectItemIds={multiSelectItemIds}
             />,
             getTopPortalEl()
           )

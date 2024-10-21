@@ -2,6 +2,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
+import {
+  getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
@@ -12,7 +18,6 @@ import {
 import { maskField } from '../../steplist/fieldLevel'
 import { getInvariantContext } from '../../step-forms/selectors'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
-import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
@@ -166,20 +171,31 @@ const StepEditFormManager = (
           onContinueClick={confirmClose}
         />
       )}
-      {showAddPauseUntilTempStepModal && (
+      {showAddPauseUntilTempStepModal ||
+      showAddPauseUntilHeaterShakerTempStepModal ? (
         <AutoAddPauseUntilTempStepModal
-          displayTemperature={formData?.targetTemperature ?? '?'}
+          displayTemperature={
+            showAddPauseUntilTempStepModal
+              ? formData?.targetTemperature
+              : formData?.targetHeaterShakerTemperature
+          }
+          displayModule={
+            formData.moduleId != null
+              ? getModuleDisplayName(
+                  invariantContext.moduleEntities[formData.moduleId].model
+                )
+              : ''
+          }
           handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilTempStep}
+          // TODO (nd: 10/21/2024) can remove this prop once redesign FF removed
+          moduleType={
+            showAddPauseUntilTempStepModal
+              ? TEMPERATURE_MODULE_TYPE
+              : HEATERSHAKER_MODULE_TYPE
+          }
         />
-      )}
-      {showAddPauseUntilHeaterShakerTempStepModal && (
-        <AutoAddPauseUntilHeaterShakerTempStepModal
-          displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
-          handleCancelClick={saveStepForm}
-          handleContinueClick={confirmAddPauseUntilHeaterShakerTempStep}
-        />
-      )}
+      ) : null}
       <StepEditFormComponent
         {...{
           canSave,

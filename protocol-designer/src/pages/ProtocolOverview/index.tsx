@@ -203,16 +203,16 @@ export function ProtocolOverview(): JSX.Element {
     fixtureWithoutStep.wasteChute ||
     fixtureWithoutStep.stagingAreaSlots.length > 0
 
-  const warning =
-    hasWarning &&
-    getWarningContent({
-      noCommands,
-      pipettesWithoutStep,
-      modulesWithoutStep,
-      gripperWithoutStep,
-      fixtureWithoutStep,
-      t,
-    })
+  const warning = hasWarning
+    ? getWarningContent({
+        noCommands,
+        pipettesWithoutStep,
+        modulesWithoutStep,
+        gripperWithoutStep,
+        fixtureWithoutStep,
+        t,
+      })
+    : null
 
   const cancelModal = (): void => {
     setShowExportWarningModal(false)
@@ -239,11 +239,13 @@ export function ProtocolOverview(): JSX.Element {
           <Modal
             title={warning && warning.heading}
             onClose={cancelModal}
+            titleElement1={warning?.titleElement}
+            childrenPadding={SPACING.spacing24}
             footer={
               <Flex
                 justifyContent={JUSTIFY_END}
                 gridGap={SPACING.spacing8}
-                padding={SPACING.spacing12}
+                padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
               >
                 <SecondaryButton onClick={cancelModal}>
                   {t('shared:cancel')}
