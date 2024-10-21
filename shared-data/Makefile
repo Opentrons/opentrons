@@ -9,19 +9,24 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
+FORMAT_FILE_GLOB = "**/*.@(ts|tsx|js|json|md|yml)"
+
 # Top level targets
 
 .PHONY: all
 all: clean dist
 
 .PHONY: setup
-setup: setup-py setup-js
+setup: setup-py
 
 .PHONY: dist
-dist: dist-js dist-py
+dist: dist-py
 
 .PHONY: clean
 clean: clean-py
+
+.PHONY: format
+format: format-js format-py
 
 # JavaScript targets
 
@@ -33,6 +38,14 @@ lib-js:
 .PHONY: build-ts
 build-ts:
 	yarn tsc --build --emitDeclarationOnly
+
+.PHONY: format-js
+format-js:
+	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+
+.PHONY: lint-js
+lint-js:
+	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 # Python targets
 
