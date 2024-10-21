@@ -40,5 +40,7 @@
   "landing_page_body": "Get started building a prompt that will generate a Python protocol that you can use on your Opentrons robot. OpentronsAI lets you create and optimize your protocol by responding in natural language.",
   "landing_page_body_mobile": "Use a desktop browser to use OpentronsAI.",
   "landing_page_button_new_protocol": "Create a new protocol",
-  "landing_page_button_update_protocol": "Update an existing protocol"
+  "landing_page_button_update_protocol": "Update an existing protocol",
+  "prompt_preview_submit_button": "Submit prompt",
+  "prompt_preview_placeholder_message": "As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol."
 }
