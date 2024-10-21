@@ -4,10 +4,7 @@ import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
-import {
-  getEnableAbsorbanceReader,
-  getEnableMoam,
-} from '../../../feature-flags/selectors'
+import { getEnableAbsorbanceReader } from '../../../feature-flags/selectors'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { SelectModules } from '../SelectModules'
 import type { WizardFormState, WizardTileProps } from '../types'
@@ -46,7 +43,6 @@ describe('SelectModules', () => {
     props = {
       ...mockWizardTileProps,
     } as WizardTileProps
-    vi.mocked(getEnableMoam).mockReturnValue(true)
     vi.mocked(getEnableAbsorbanceReader).mockReturnValue(true)
   })
 
