@@ -9,6 +9,9 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
+# warning suppression variables for tests and linting
+quiet ?= false
+
 FORMAT_FILE_GLOB = "**/*.@(ts|tsx|js|json|md|yml)"
 
 # Top level targets
@@ -28,6 +31,9 @@ clean: clean-py
 .PHONY: format
 format: format-js format-py
 
+.PHONY: lint
+lint: lint-js lint-py
+
 # JavaScript targets
 
 .PHONY: lib-js
@@ -41,11 +47,19 @@ build-ts:
 
 .PHONY: format-js
 format-js:
-	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	yarn prettier --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-js
-lint-js:
-	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+lint-js: lint-js-eslint lint-js-prettier
+
+.PHONY: lint-js-eslint
+lint-js-eslint:
+	yarn eslint --ignore-path ../.eslintignore --quiet=$(quiet) --ignore-pattern "node_modules/" "**/*.@(js|ts|tsx)"
+
+.PHONY: lint-js-prettier
+lint-js-prettier:
+	yarn prettier --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
+
 
 # Python targets
 
