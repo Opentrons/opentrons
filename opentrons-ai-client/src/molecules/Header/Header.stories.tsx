@@ -1,4 +1,4 @@
-import { type Meta, type StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 import { Header as HeaderComponent } from '.'
 import { COLORS, Flex, SPACING } from '@opentrons/components'
 
@@ -11,11 +11,10 @@ const meta: Meta<typeof HeaderComponent> = {
         <Story />
       </Flex>
     ),
-  ]
+  ],
 }
 export default meta
 
 type Story = StoryObj<typeof HeaderComponent>
 
-export const ChatHeaderExample: Story = {
-}
+export const ChatHeaderExample: Story = {}
