@@ -34,5 +34,11 @@
   "well_allocations": "Well allocations: Describe where liquids should go in labware.",
   "what_if_you": "<span>What if you don’t provide all of those pieces of information? <bold>OpentronsAI asks you to provide it!</bold></span>",
   "what_typeof_protocol": "What type of protocol do you need?",
-  "you": "You"
+  "you": "You",
+  "landing_page_image_alt": "welcome image",
+  "landing_page_heading": "Welcome to OpentronsAI",
+  "landing_page_body": "Get started building a prompt that will generate a Python protocol that you can use on your Opentrons robot. OpentronsAI lets you create and optimize your protocol by responding in natural language.",
+  "landing_page_body_mobile": "Use a desktop browser to use OpentronsAI.",
+  "landing_page_button_new_protocol": "Create a new protocol",
+  "landing_page_button_update_protocol": "Update an existing protocol"
 }
