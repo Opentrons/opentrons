@@ -7,6 +7,10 @@ from __future__ import annotations
 
 from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from math import sqrt, asin
+from scipy.integrate import quad  # type: ignore[import-untyped]
+from numpy import pi
+from functools import cached_property
 
 from pydantic import (
     BaseModel,
@@ -26,6 +30,8 @@ from .constants import (
     SquaredCone,
     Spherical,
     WellShape,
+    Circular,
+    Rectangular,
 )
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
@@ -348,6 +354,82 @@ class SquaredConeSegment(BaseModel):
         ...,
         description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
     )
+
+    @staticmethod
+    def _volume_from_height_squared_cone(
+        target_height: float,
+        total_frustum_height: float,
+        bottom_cross_section: WellShape,
+        circle_diameter: float,
+        rectangle_x: float,
+        rectangle_y: float,
+    ) -> float:
+        """Fight the volume given a height within a squared cone segment."""
+
+        def _area_arcs(r: float, c: float, d: float) -> float:
+            theata_y = asin(c / r)
+            theata_x = asin(d / r)
+            theata_arc = pi - theata_y - theata_x
+            return 2 * r**2 * theata_arc
+
+        def _area(r: float) -> float:
+            # distance from the center of y axis of the rectangle to where the arc intercepts that side
+            c: float = sqrt(rectangle_y**2 - r**2) if (rectangle_y / 2) < r else 0
+            # distance from the center of x axis of the rectangle to where the arc intercepts that side
+            d: float = sqrt(rectangle_x**2 - r**2) if (rectangle_x / 2) < r else 0
+            arc_area = _area_arcs(r, c, d)
+            y_triangles: float = rectangle_y * c
+            x_triangles: float = rectangle_x * d
+            return arc_area + y_triangles + x_triangles
+
+        r_0 = circle_diameter / 2
+        r_h = max(rectangle_y, rectangle_x)
+        r_y = (target_height / total_frustum_height) * (r_h - r_0) + r_0
+
+        if bottom_cross_section is Circular:
+            # if the bottom section is circular, the bottom r = r_0
+            return float(quad(func=_area, a=r_0, b=r_y)[0])
+        elif bottom_cross_section is Rectangular:
+            # if the bottom section is rectangular, the bottom r = r_h
+            return float(quad(func=_area, a=r_h, b=r_y)[0])
+        else:
+            raise NotImplementedError(
+                "If you see this error a new well shape has been added without updating this code"
+            )
+
+    @cached_property
+    def height_to_volume_table(self) -> Dict[float, float]:
+        """Return a lookup table of heights to volumes."""
+        y = 0.0
+        total_height = self.topHeight - self.bottomHeight
+        table: Dict[float, float] = {}
+        # fill in the table
+        while y < total_height:
+            table[y] = SquaredConeSegment._volume_from_height_squared_cone(
+                y,
+                total_height,
+                self.bottomCrossSection,
+                self.circleDiameter,
+                self.rectangleXDimension,
+                self.rectangleYDimension,
+            )
+            y = y + 0.01
+
+        # we always want to include the volume at the max height
+        table[total_height] = SquaredConeSegment._volume_from_height_squared_cone(
+            total_height,
+            total_height,
+            self.bottomCrossSection,
+            self.circleDiameter,
+            self.rectangleXDimension,
+            self.rectangleYDimension,
+        )
+
+        return table
+
+    @cached_property
+    def volume_to_height_table(self) -> Dict[float, float]:
+        return dict((v, k) for k, v in self.height_to_volume_table.items())
 
 
 """
