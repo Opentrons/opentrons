@@ -34,5 +34,7 @@
   "well_allocations": "Well allocations: Describe where liquids should go in labware.",
   "what_if_you": "<span>What if you don’t provide all of those pieces of information? <bold>OpentronsAI asks you to provide it!</bold></span>",
   "what_typeof_protocol": "What type of protocol do you need?",
-  "you": "You"
+  "you": "You",
+  "prompt_preview_submit_button": "Submit prompt",
+  "prompt_preview_placeholder_message": "As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol."
 }
