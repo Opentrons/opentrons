@@ -1,12 +1,10 @@
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import {
     ALIGN_CENTER,
     COLORS,
-    DIRECTION_COLUMN,
     Flex,
     JUSTIFY_CENTER,
     SPACING,
-    StyledText,
     TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
@@ -24,7 +22,7 @@ const BlueLink = styled.a`
   }
 `;
 
-const DISCLAIMER_TEXT_STYLE = css`
+const FooterText = styled.p`
   color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSizeH4};
   line-height: ${TYPOGRAPHY.lineHeight16};
@@ -46,13 +44,13 @@ export function Footer(): JSX.Element {
             justifyContent={JUSTIFY_CENTER}
             paddingTop={SPACING.spacing24}
         >
-            <StyledText css={DISCLAIMER_TEXT_STYLE}>
+            <FooterText>
                 {firstPart}
                 <BlueLink href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons-Labworks-Privacy-Policy-5-4-23.docx-1.pdf" target="_blank" rel="noopener noreferrer">{privacyPolicy}</BlueLink>
                 {and}
                 <BlueLink href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons%20EULA%2020240710.pdf" target="_blank" rel="noopener noreferrer">{EULA}</BlueLink>
                 <NewLineText>{copyright}</NewLineText>
-            </StyledText>
+            </FooterText>
         </Flex>
     )
 }
