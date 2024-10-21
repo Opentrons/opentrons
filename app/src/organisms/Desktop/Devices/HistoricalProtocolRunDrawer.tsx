@@ -56,7 +56,7 @@ export function HistoricalProtocolRunDrawer(
           return acc
         }, [])
       : []
-  if (run.outputFileIds?.length > 0) {
+  if ('outputFileIds' in run && run.outputFileIds.length > 0) {
     runDataFileIds.push(...run.outputFileIds)
   }
 
