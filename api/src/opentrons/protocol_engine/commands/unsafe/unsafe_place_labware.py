@@ -17,11 +17,13 @@ from ...types import DeckSlotLocation, LabwareLocation, ModuleModel
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...resources import ensure_ot3_hardware
+from ...state.update_types import StateUpdate
 
 from opentrons.hardware_control import HardwareControlAPI
 
 if TYPE_CHECKING:
     from ...state.state import StateView
+    from ...execution.equipment import EquipmentHandler
 
 
 UnsafePlaceLabwareCommandType = Literal["unsafe/placeLabware"]
@@ -50,10 +52,12 @@ class UnsafePlaceLabwareImplementation(
         self,
         hardware_api: HardwareControlAPI,
         state_view: StateView,
+        equipment: EquipmentHandler,
         **kwargs: object,
     ) -> None:
         self._hardware_api = hardware_api
         self._state_view = state_view
+        self._equipment = equipment
 
     async def execute(
         self, params: UnsafePlaceLabwareParams
@@ -70,7 +74,8 @@ class UnsafePlaceLabwareImplementation(
 
         # Allow propagation of LabwareNotLoadedError.
         labware_id = params.labwareId
-        self._state_view.labware.get(labware_id=labware_id)
+        current_labware = self._state_view.labware.get(labware_id=labware_id)
+        definition_uri = current_labware.definitionUri
 
         final_offsets = self._state_view.labware.get_labware_gripper_offsets(
             labware_id, None
@@ -88,21 +93,18 @@ class UnsafePlaceLabwareImplementation(
             params.location,
         )
 
-        # If this is an Aborbance Reader, and the lid is already on, just ungrip and home the gripper.
+        # This is an absorbance reader, move the lid to its dock (staging area).
         if isinstance(location, DeckSlotLocation):
             module = self._state_view.modules.get_by_slot(location.slotName)
             if module and module.model == ModuleModel.ABSORBANCE_READER_V1:
-                for hw_mod in ot3api.attached_modules:
-                    lid_status = hw_mod.live_data["data"].get("lidStatus")
-                    if (
-                        hw_mod.serial_number == module.serialNumber
-                        and lid_status == "on"
-                    ):
-                        await ot3api.ungrip()
-                        await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
-                        return SuccessData(
-                            public=UnsafePlaceLabwareResult(), private=None
-                        )
+                location = self._state_view.modules.absorbance_reader_dock_location(
+                    module.id
+                )
+
+        new_offset_id = self._equipment.find_applicable_labware_offset_id(
+            labware_definition_uri=definition_uri,
+            labware_location=location,
+        )
 
         # NOTE: When the estop is pressed, the gantry loses postion,
         # so the robot needs to home x, y to sync.
@@ -140,7 +142,17 @@ class UnsafePlaceLabwareImplementation(
             await ot3api.move_to(
                 mount=OT3Mount.GRIPPER, abs_position=waypoint_data.position
             )
-        return SuccessData(public=UnsafePlaceLabwareResult(), private=None)
+
+        state_update = StateUpdate()
+
+        state_update.set_labware_location(
+            labware_id=labware_id,
+            new_location=location,
+            new_offset_id=new_offset_id,
+        )
+        return SuccessData(
+            public=UnsafePlaceLabwareResult(), private=None, state_update=state_update
+        )
 
 
 class UnsafePlaceLabware(
