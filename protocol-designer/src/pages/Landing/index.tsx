@@ -36,7 +36,7 @@ export function Landing(): JSX.Element {
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     false
   )
-  const { bakeToast } = useKitchen()
+  const { bakeToast, eatToast } = useKitchen()
   const announcements = useAnnouncements()
   const lastAnnouncement = announcements[announcements.length - 1]
   const announcementKey = lastAnnouncement
@@ -50,7 +50,7 @@ export function Landing(): JSX.Element {
 
   useEffect(() => {
     if (userHasNotSeenAnnouncement) {
-      bakeToast(
+      const toastId = bakeToast(
         t('learn_more', { version: process.env.OT_PD_VERSION }) as string,
         INFO_TOAST,
         {
@@ -58,6 +58,7 @@ export function Landing(): JSX.Element {
           closeButton: true,
           linkText: t('view_release_notes'),
           onLinkClick: () => {
+            eatToast(toastId)
             setShowAnnouncementModal(true)
           },
           disableTimeout: true,

@@ -302,7 +302,7 @@ export const useAnnouncements = (): Announcement[] => {
       ),
     },
     {
-      announcementKey: 'redesign9.0',
+      announcementKey: process.env.OT_PD_VERSION ?? 'redesign9.0',
       image: <Flex />,
       heading: t('announcements.redesign.body1'),
       message: (
