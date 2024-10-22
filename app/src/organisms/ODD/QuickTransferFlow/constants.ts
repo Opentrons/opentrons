@@ -95,7 +95,6 @@ export const SINGLE_CHANNEL_COMPATIBLE_LABWARE = [
   'opentrons/opentrons_flex_96_tiprack_1000ul/1',
   'opentrons/opentrons_flex_96_tiprack_200ul/1',
   'opentrons/opentrons_flex_96_tiprack_50ul/1',
-  'opentrons/opentrons_tough_pcr_auto_sealing_lid/1',
   'opentrons/opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1',
   'opentrons/thermoscientificnunc_96_wellplate_1300ul/1',
   'opentrons/thermoscientificnunc_96_wellplate_2000ul/1',

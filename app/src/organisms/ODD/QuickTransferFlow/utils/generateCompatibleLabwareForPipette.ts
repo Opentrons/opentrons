@@ -14,7 +14,8 @@ export function generateCompatibleLabwareForPipette(
     (acc, definition) => {
       if (
         definition.allowedRoles != null &&
-        definition.allowedRoles.includes('adapter')
+        (definition.allowedRoles.includes('adapter') ||
+          definition.allowedRoles.includes('lid'))
       ) {
         return acc
       } else if (pipetteSpecs.channels === 1) {
