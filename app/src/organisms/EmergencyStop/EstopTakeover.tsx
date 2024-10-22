@@ -69,7 +69,9 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
             isDismissedModal={isEmergencyStopModalDismissed}
             setIsDismissedModal={setIsEmergencyStopModalDismissed}
             isWaitingForLogicalDisengage={isWaitingForLogicalDisengage}
-            isWaitingForPlateReaderLidPlacement={isWaitingForPlateReaderLidPlacement}
+            isWaitingForPlateReaderLidPlacement={
+              isWaitingForPlateReaderLidPlacement
+            }
             setShouldSeeLogicalDisengage={() => {
               setIsWaitingForLogicalDisengage(true)
             }}

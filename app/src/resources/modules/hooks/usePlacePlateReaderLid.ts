@@ -1,64 +1,94 @@
-import { useRobotControlCommands } from '/app/resources/maintenance_runs'
+import { useState } from 'react'
 
-import { LabwareLocation, type CreateCommand } from '@opentrons/shared-data'
-import type {
-  UseRobotControlCommandsProps,
-  UseRobotControlCommandsResult,
+import { LabwareLocation, type CreateCommand, ModuleLocation } from '@opentrons/shared-data'
+import {
+  useChainMaintenanceCommands,
 } from '/app/resources/maintenance_runs'
-import { useRunCurrentState } from '@opentrons/react-api-client'
-import { useCurrentRunId } from '../../runs'
+import { useDeleteMaintenanceRunMutation, useRunCurrentState } from '@opentrons/react-api-client'
+import { useCreateTargetedMaintenanceRunMutation, useCurrentRunId } from '../../runs'
+import { MaintenanceRun } from '@opentrons/api-client'
 
 interface UsePlacePlateReaderLidResult {
-  isPlacing: UseRobotControlCommandsResult['isExecuting']
-  placeReaderLid: UseRobotControlCommandsResult['executeCommands']
+  placeReaderLid: () => Promise<MaintenanceRun>
+  isPlacing: boolean
 }
 
-export type UsePlacePlateReaderLidProps = Pick<
-  UseRobotControlCommandsProps,
-  'pipetteInfo' | 'onSettled'
->
+export interface UsePlacePlateReaderLidProps {
+
+}
 
 export function usePlacePlateReaderLid(
   props: UsePlacePlateReaderLidProps
 ): UsePlacePlateReaderLidResult {
+  const [isPlacing, setIsPlacing] = useState(false)
+  const { chainRunCommands } = useChainMaintenanceCommands()
+  const {
+    mutateAsync: deleteMaintenanceRun,
+  } = useDeleteMaintenanceRunMutation()
+
   const runId = useCurrentRunId()
   const { data: runCurrentState } = useRunCurrentState(runId)
-  const estopEngaged = runCurrentState?.data.estopEngaged
-  const placeLabware = runCurrentState?.data.placeLabwareState?.shouldPlaceDown
-  const labwareId = runCurrentState?.data.placeLabwareState?.labwareId
-  const location = runCurrentState?.data.placeLabwareState?.location
+  const placeLabware = runCurrentState?.data.placeLabwareState ?? null
 
-  const LOAD_PLATE_READER: CreateCommand = {
+  const {
+    createTargetedMaintenanceRun,
+  } = useCreateTargetedMaintenanceRunMutation({
+    onSuccess: response => {
+      const runId = response.data.id as string
+
+      const loadModuleIfSupplied = (): Promise<void> => {
+        if (placeLabware !== null && placeLabware.shouldPlaceDown) {
+          const location = placeLabware.location
+          const labwareId = placeLabware.labwareId
+          const moduleLocation: ModuleLocation = location as ModuleLocation
+          const loadModuleCommand = buildLoadModuleCommand(moduleLocation)
+          const placeLabwareCommand = buildPlaceLabwareCommand(labwareId, location)
+          console.log({location, labwareId})
+          console.log({loadModuleCommand, placeLabwareCommand})
+          return chainRunCommands(runId, [loadModuleCommand, placeLabwareCommand], false)
+            .then(() => Promise.resolve())
+            .catch((error: Error) => {
+              console.error(error.message)
+            })
+        }
+        return Promise.resolve()
+      }
+
+      loadModuleIfSupplied()
+        .catch((error: Error) => {
+          console.error(error.message)
+        })
+        .finally(() =>
+          deleteMaintenanceRun(runId).catch((error: Error) => {
+            console.error('Failed to delete maintenance run:', error.message)
+        }))
+        setIsPlacing(false)
+    }
+  })
+
+  const placeReaderLid = (): Promise<MaintenanceRun> => {
+    setIsPlacing(true)
+    return createTargetedMaintenanceRun({})
+  }
+
+  return { placeReaderLid, isPlacing }
+}
+
+const buildLoadModuleCommand = (
+  location: ModuleLocation
+): CreateCommand => {
+  return {
     commandType: 'loadModule' as const,
     params: { model: 'absorbanceReaderV1', location: location },
   }
+}
 
-  const PLACE_READER_LID: CreateCommand = {
-    commandType: 'unsafe/placeLabware' as const,
-    params: {
-      labwareId: labwareId,
-      location: location,
-    },
-  }
-
-  const { executeCommands, isExecuting } = useRobotControlCommands({
-    ...props,
-    commands: [LOAD_PLATE_READER, PLACE_READER_LID],
-    continuePastCommandFailure: true,
-  })
-
-  const decideFunction = (): void => {
-    console.log("DECIDE!")
-    if (estopEngaged != null && placeLabware) {
-        console.log("PLACE")
-        executeCommands()
-    } else {
-        console.log("DONT PLACE")
-    }
-  }
-
+const buildPlaceLabwareCommand = (
+  labwaerId: string,
+  location: LabwareLocation
+): CreateCommand => {
   return {
-    isPlacing: isExecuting,
-    placeReaderLid: decideFunction,
+    commandType: 'unsafe/placeLabware' as const,
+    params: { labwareId, location },
   }
 }

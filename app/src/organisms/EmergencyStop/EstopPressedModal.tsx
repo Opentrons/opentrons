@@ -23,9 +23,8 @@ import {
 } from '@opentrons/components'
 
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
+
 import { usePlacePlateReaderLid } from '/app/resources/modules'
-
-
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
@@ -65,7 +64,9 @@ export function EstopPressedModal({
         isEngaged={isEngaged}
         closeModal={closeModal}
         isWaitingForLogicalDisengage={isWaitingForLogicalDisengage}
-        isWaitingForPlateReaderLidPlacement={isWaitingForPlateReaderLidPlacement}
+        isWaitingForPlateReaderLidPlacement={
+          isWaitingForPlateReaderLidPlacement
+        }
         setShouldSeeLogicalDisengage={setShouldSeeLogicalDisengage}
       />
     ) : (
@@ -76,7 +77,9 @@ export function EstopPressedModal({
             closeModal={closeModal}
             setIsDismissedModal={setIsDismissedModal}
             isWaitingForLogicalDisengage={isWaitingForLogicalDisengage}
-            isWaitingForPlateReaderLidPlacement={isWaitingForPlateReaderLidPlacement}
+            isWaitingForPlateReaderLidPlacement={
+              isWaitingForPlateReaderLidPlacement
+            }
             setShouldSeeLogicalDisengage={setShouldSeeLogicalDisengage}
           />
         ) : null}
@@ -98,7 +101,7 @@ function TouchscreenModal({
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
 
   const { placeReaderLid, isPlacing } = usePlacePlateReaderLid({
-    pipetteInfo: null
+    pipetteInfo: null,
   })
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
@@ -143,15 +146,29 @@ function TouchscreenModal({
           data-testid="Estop_pressed_button"
           width="100%"
           iconName={
-            isResuming || isPlacing || isWaitingForLogicalDisengage || isWaitingForPlateReaderLidPlacement
+            isResuming ||
+            isPlacing ||
+            isWaitingForLogicalDisengage ||
+            isWaitingForPlateReaderLidPlacement
               ? 'ot-spinner'
               : undefined
           }
           iconPlacement={
-            isResuming || isPlacing || isWaitingForLogicalDisengage || isWaitingForPlateReaderLidPlacement ? 'startIcon' : undefined
+            isResuming ||
+            isPlacing ||
+            isWaitingForLogicalDisengage ||
+            isWaitingForPlateReaderLidPlacement
+              ? 'startIcon'
+              : undefined
           }
           buttonText={t('resume_robot_operations')}
-          disabled={isEngaged || isResuming || isPlacing || isWaitingForLogicalDisengage || isWaitingForPlateReaderLidPlacement}
+          disabled={
+            isEngaged ||
+            isResuming ||
+            isPlacing ||
+            isWaitingForLogicalDisengage ||
+            isWaitingForPlateReaderLidPlacement
+          }
           onClick={handleClick}
         />
       </Flex>
@@ -171,7 +188,7 @@ function DesktopModal({
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
   const { placeReaderLid, isPlacing } = usePlacePlateReaderLid({
-    pipetteInfo: null
+    pipetteInfo: null,
   })
 
   const handleCloseModal = (): void => {
@@ -221,14 +238,23 @@ function DesktopModal({
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton
             onClick={handleClick}
-            disabled={isEngaged || isPlacing || isResuming || isWaitingForLogicalDisengage || isWaitingForPlateReaderLidPlacement}
+            disabled={
+              isEngaged ||
+              isPlacing ||
+              isResuming ||
+              isWaitingForLogicalDisengage ||
+              isWaitingForPlateReaderLidPlacement
+            }
           >
             <Flex
               flexDirection={DIRECTION_ROW}
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              {isResuming || isPlacing || isWaitingForLogicalDisengage || isWaitingForPlateReaderLidPlacement ? (
+              {isResuming ||
+              isPlacing ||
+              isWaitingForLogicalDisengage ||
+              isWaitingForPlateReaderLidPlacement ? (
                 <Icon size="1rem" spin name="ot-spinner" />
               ) : null}
               {t('resume_robot_operations')}

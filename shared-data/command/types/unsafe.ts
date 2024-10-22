@@ -1,4 +1,8 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo, LabwareLocation } from '.'
+import type {
+  CommonCommandRunTimeInfo,
+  CommonCommandCreateInfo,
+  LabwareLocation,
+} from '.'
 import type { MotorAxes } from '../../js/types'
 
 export type UnsafeRunTimeCommand =
@@ -88,8 +92,8 @@ export interface UnsafeUngripLabwareRunTimeCommand
   result?: any
 }
 export interface UnsafePlaceLabwareParams {
-  labwareId: string,
-  location: LabwareLocation,
+  labwareId: string
+  location: LabwareLocation
 }
 export interface UnsafePlaceLabwareCreateCommand
   extends CommonCommandCreateInfo {

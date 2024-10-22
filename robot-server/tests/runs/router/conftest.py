@@ -1,4 +1,5 @@
 """Common test fixtures for runs route tests."""
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 import pytest
 from decoy import Decoy
 
@@ -63,3 +64,9 @@ def mock_maintenance_run_orchestrator_store(
 def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
     """Get a mock DeckConfigurationStore."""
     return decoy.mock(cls=DeckConfigurationStore)
+
+
+@pytest.fixture
+def mock_hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mock HardwareControlAPI."""
+    return decoy.mock(cls=OT3HardwareControlAPI)

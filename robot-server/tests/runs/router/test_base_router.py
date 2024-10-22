@@ -1,6 +1,8 @@
 """Tests for base /runs routes."""
 from typing import Dict
 
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.robot.types import RobotTypeEnum
 import pytest
 from datetime import datetime
 from decoy import Decoy
@@ -843,6 +845,7 @@ async def test_get_run_commands_errors_defualt_cursor(
 async def test_get_current_state_success(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_hardware_api: HardwareControlAPI,
     mock_nozzle_maps: Dict[str, NozzleMap],
 ) -> None:
     """It should return the active nozzle layout for a specific pipette."""
@@ -863,6 +866,8 @@ async def test_get_current_state_success(
     result = await get_current_state(
         runId=run_id,
         run_data_manager=mock_run_data_manager,
+        hardware=mock_hardware_api,
+        robot_type=RobotTypeEnum.FLEX,
     )
 
     assert result.status_code == 200
