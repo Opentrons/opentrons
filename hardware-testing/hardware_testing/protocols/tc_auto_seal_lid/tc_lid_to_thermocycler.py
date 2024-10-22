@@ -10,7 +10,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 
 
-metadata = {"protocolName": "Tough Auto Seal Lid to Thermocycler - with x offset change"}
+metadata = {"protocolName": "Tough Auto Seal Lid to Thermocycler - with z offset change"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 
