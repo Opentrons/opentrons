@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { InputField } from '../../components/modals/CreateFileWizard/InputField'
 import { WizardBody } from './WizardBody'
-import { HandleEnter } from './HandleEnter'
+import { HandleEnter } from '../../atoms/HandleEnter'
 
 import type { WizardTileProps } from './types'
 

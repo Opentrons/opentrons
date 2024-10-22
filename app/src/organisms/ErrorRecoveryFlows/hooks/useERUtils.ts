@@ -151,7 +151,6 @@ export function useERUtils({
     failedPipetteInfo,
     runRecord,
     runCommands,
-    allRunDefs,
   })
 
   const recoveryCommands = useRecoveryCommands({

@@ -27,7 +27,7 @@ import {
   wellFillFromWellContents,
 } from './utils'
 import { CommandItem } from './CommandItem'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { ComponentProps } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'

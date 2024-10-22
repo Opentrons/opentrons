@@ -17,6 +17,7 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getIsOnDevice } from '/app/redux/config'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
 import { RecoveryTakeover } from './RecoveryTakeover'
@@ -30,7 +31,6 @@ import {
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { FailedCommand } from './types'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,

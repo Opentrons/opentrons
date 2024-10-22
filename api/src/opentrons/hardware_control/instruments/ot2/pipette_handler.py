@@ -415,7 +415,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         if instr:
             instr.reset_nozzle_configuration()
 
-    async def add_tip(self, mount: MountType, tip_length: float) -> None:
+    def add_tip(self, mount: MountType, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -430,7 +430,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 f"attach tip called while tip already attached to {instr}"
             )
 
-    async def remove_tip(self, mount: MountType) -> None:
+    def remove_tip(self, mount: MountType) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]

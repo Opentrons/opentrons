@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
@@ -11,6 +11,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  Link as LinkComponent,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -31,6 +32,8 @@ import { getFeatureFlagData } from '../../feature-flags/selectors'
 import type { FlagTypes } from '../../feature-flags'
 
 const HOT_KEY_FLAG = 'OT_PD_ENABLE_HOT_KEYS_DISPLAY'
+const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
+const EULA_URL = 'https://opentrons.com/eula'
 
 export function Settings(): JSX.Element {
   const dispatch = useDispatch()
@@ -235,11 +238,28 @@ export function Settings(): JSX.Element {
                   <StyledText desktopStyle="bodyDefaultSemiBold">
                     {t('shared:shared_sessions')}
                   </StyledText>
-                  <Flex color={COLORS.grey60}>
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('shared:we_are_improving')}
-                    </StyledText>
-                  </Flex>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    <Trans
+                      t={t}
+                      i18nKey="shared:we_are_improving"
+                      components={{
+                        link1: (
+                          <LinkComponent
+                            external
+                            href={PRIVACY_POLICY_URL}
+                            color={COLORS.blue50}
+                          />
+                        ),
+                        link2: (
+                          <LinkComponent
+                            external
+                            href={EULA_URL}
+                            color={COLORS.blue50}
+                          />
+                        ),
+                      }}
+                    />
+                  </StyledText>
                 </Flex>
                 <Btn
                   role="switch"

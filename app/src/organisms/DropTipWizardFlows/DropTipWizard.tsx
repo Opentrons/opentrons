@@ -17,6 +17,7 @@ import {
   ModalShell,
   DISPLAY_FLEX,
   OVERFLOW_HIDDEN,
+  OVERFLOW_AUTO,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -307,7 +308,11 @@ function useInitiateExit(): {
 const SHARED_STYLE = `
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_COLUMN};
-  overflow: ${OVERFLOW_HIDDEN};
+  overflow-y: ${OVERFLOW_AUTO};
+  
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    overflow: ${OVERFLOW_HIDDEN};
+  }
 `
 
 const INTERVENTION_CONTAINER_STYLE = css`

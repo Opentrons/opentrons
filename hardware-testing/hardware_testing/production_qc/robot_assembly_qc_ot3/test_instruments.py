@@ -1,7 +1,7 @@
 """Test Instruments."""
 from typing import List, Tuple, Optional, Union
 
-from opentrons.config.types import CapacitivePassSettings, OutputOptions
+from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.data.csv_report import (
@@ -30,7 +30,6 @@ PROBE_SETTINGS = CapacitivePassSettings(
     max_overrun_distance_mm=0,
     speed_mm_per_s=Z_PROBE_DISTANCE_MM / Z_PROBE_TIME_SECONDS,
     sensor_threshold_pf=1.0,
-    output_option=OutputOptions.can_bus_only,
 )
 
 RELATIVE_MOVE_FROM_HOME_DELTA = Point(x=-500, y=-300)
@@ -101,7 +100,7 @@ async def _probe_mount_and_record_result(
             ui.get_user_ready(f"attach {probe.name} calibration probe")
         api.add_gripper_probe(probe)
     else:
-        await api.add_tip(mount, 0.1)
+        api.add_tip(mount, 0.1)
 
     # probe downwards
     pos = await api.gantry_position(mount)
@@ -131,7 +130,7 @@ async def _probe_mount_and_record_result(
         api.remove_gripper_probe()
         await api.ungrip()
     else:
-        await api.remove_tip(mount)
+        api.remove_tip(mount)
 
 
 async def _test_pipette(

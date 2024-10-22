@@ -13,7 +13,7 @@ import {
 } from '@opentrons/shared-data'
 import { UnorderedList } from '/app/molecules/UnorderedList'
 import { getLabwareDef } from './utils/labware'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'

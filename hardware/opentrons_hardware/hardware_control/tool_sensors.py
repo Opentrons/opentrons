@@ -1,5 +1,6 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
+from contextlib import AsyncExitStack
 from functools import partial
 from typing import (
     Union,
@@ -11,6 +12,7 @@ from typing import (
     AsyncContextManager,
     Optional,
     AsyncIterator,
+    Mapping,
 )
 from logging import getLogger
 from numpy import float64
@@ -41,6 +43,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
     sensor_fixed_point_conversion,
+    SensorDataType,
 )
 from opentrons_hardware.sensors.sensor_types import (
     SensorInformation,
@@ -61,26 +64,11 @@ from opentrons_hardware.hardware_control.types import (
 )
 
 LOG = getLogger(__name__)
+
 PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
 InstrumentProbeTarget = Union[PipetteProbeTarget, Literal[NodeId.gripper]]
 ProbeSensorDict = Union[
     Dict[SensorId, PressureSensor], Dict[SensorId, CapacitiveSensor]
-]
-
-pressure_output_file_heading = [
-    "time(s)",
-    "Pressure(pascals)",
-    "z_velocity(mm/s)",
-    "plunger_velocity(mm/s)",
-    "threshold(pascals)",
-]
-
-capacitive_output_file_heading = [
-    "time(s)",
-    "Capacitance(farads)",
-    "z_velocity(mm/s)",
-    "plunger_velocity(mm/s)",
-    "threshold(farads)",
 ]
 
 
@@ -167,124 +155,6 @@ def _build_pass_step(
     return move_group
 
 
-async def run_sync_buffer_to_csv(
-    messenger: CanMessenger,
-    mount_speed: float,
-    plunger_speed: float,
-    threshold: float,
-    head_node: NodeId,
-    move_group: MoveGroupRunner,
-    log_files: Dict[SensorId, str],
-    tool: InstrumentProbeTarget,
-    sensor_type: SensorType,
-    output_file_heading: list[str],
-    raise_z: Optional[MoveGroupRunner] = None,
-) -> Dict[NodeId, MotorPositionStatus]:
-    """Runs the sensor pass move group and creates a csv file with the results."""
-    sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold]
-    positions = await move_group.run(can_messenger=messenger)
-    # wait a little to see the dropoff curve
-    await asyncio.sleep(0.15)
-    for sensor_id in log_files.keys():
-        await messenger.ensure_send(
-            node_id=tool,
-            message=BindSensorOutputRequest(
-                payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor_type),
-                    sensor_id=SensorIdField(sensor_id),
-                    binding=SensorOutputBindingField(SensorOutputBinding.none),
-                )
-            ),
-            expected_nodes=[tool],
-        )
-    if raise_z is not None:
-        #  if probing is finished, move the head node back up before requesting the data buffer
-        if positions[head_node].move_ack == MoveCompleteAck.stopped_by_condition:
-            await raise_z.run(can_messenger=messenger)
-    for sensor_id in log_files.keys():
-        sensor_capturer = LogListener(
-            mount=head_node,
-            data_file=log_files[sensor_id],
-            file_heading=output_file_heading,
-            sensor_metadata=sensor_metadata,
-        )
-        async with sensor_capturer:
-            messenger.add_listener(sensor_capturer, None)
-            request = SendAccumulatedSensorDataRequest(
-                payload=SendAccumulatedSensorDataPayload(
-                    sensor_id=SensorIdField(sensor_id),
-                    sensor_type=SensorTypeField(sensor_type),
-                )
-            )
-            await messenger.send(
-                node_id=tool,
-                message=request,
-            )
-            await sensor_capturer.wait_for_complete(
-                message_index=request.payload.message_index.value
-            )
-            messenger.remove_listener(sensor_capturer)
-    return positions
-
-
-async def run_stream_output_to_csv(
-    messenger: CanMessenger,
-    sensors: ProbeSensorDict,
-    mount_speed: float,
-    plunger_speed: float,
-    threshold: float,
-    head_node: NodeId,
-    move_group: MoveGroupRunner,
-    log_files: Dict[SensorId, str],
-    output_file_heading: list[str],
-) -> Dict[NodeId, MotorPositionStatus]:
-    """Runs the sensor pass move group and creates a csv file with the results."""
-    sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold]
-    sensor_capturer = LogListener(
-        mount=head_node,
-        data_file=log_files[
-            next(iter(log_files))
-        ],  # hardcode to the first file, need to think more on this
-        file_heading=output_file_heading,
-        sensor_metadata=sensor_metadata,
-    )
-    binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
-    binding_field = SensorOutputBindingField.from_flags(binding)
-    for sensor_id in sensors.keys():
-        sensor_info = sensors[sensor_id].sensor
-        await messenger.ensure_send(
-            node_id=sensor_info.node_id,
-            message=BindSensorOutputRequest(
-                payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor_info.sensor_type),
-                    sensor_id=SensorIdField(sensor_info.sensor_id),
-                    binding=binding_field,
-                )
-            ),
-            expected_nodes=[sensor_info.node_id],
-        )
-
-    messenger.add_listener(sensor_capturer, None)
-    async with sensor_capturer:
-        positions = await move_group.run(can_messenger=messenger)
-    messenger.remove_listener(sensor_capturer)
-
-    for sensor_id in sensors.keys():
-        sensor_info = sensors[sensor_id].sensor
-        await messenger.ensure_send(
-            node_id=sensor_info.node_id,
-            message=BindSensorOutputRequest(
-                payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor_info.sensor_type),
-                    sensor_id=SensorIdField(sensor_info.sensor_id),
-                    binding=SensorOutputBindingField(SensorOutputBinding.none),
-                )
-            ),
-            expected_nodes=[sensor_info.node_id],
-        )
-    return positions
-
-
 async def _setup_pressure_sensors(
     messenger: CanMessenger,
     sensor_id: SensorId,
@@ -351,42 +221,42 @@ async def _setup_capacitive_sensors(
     return result
 
 
-async def _run_with_binding(
+async def finalize_logs(
     messenger: CanMessenger,
-    sensors: ProbeSensorDict,
-    sensor_runner: MoveGroupRunner,
-    binding: List[SensorOutputBinding],
-) -> Dict[NodeId, MotorPositionStatus]:
-    binding_field = SensorOutputBindingField.from_flags(binding)
-    for sensor_id in sensors.keys():
-        sensor_info = sensors[sensor_id].sensor
+    tool: NodeId,
+    listeners: Dict[SensorId, LogListener],
+    sensors: Mapping[SensorId, Union[CapacitiveSensor, PressureSensor]],
+) -> None:
+    """Signal the sensors to finish sending their data and wait for it to flush out."""
+    for s_id in sensors.keys():
+        # Tell the sensor to stop recording
         await messenger.ensure_send(
-            node_id=sensor_info.node_id,
+            node_id=tool,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor_info.sensor_type),
-                    sensor_id=SensorIdField(sensor_info.sensor_id),
-                    binding=binding_field,
-                )
-            ),
-            expected_nodes=[sensor_info.node_id],
-        )
-
-    result = await sensor_runner.run(can_messenger=messenger)
-    for sensor_id in sensors.keys():
-        sensor_info = sensors[sensor_id].sensor
-        await messenger.ensure_send(
-            node_id=sensor_info.node_id,
-            message=BindSensorOutputRequest(
-                payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor_info.sensor_type),
-                    sensor_id=SensorIdField(sensor_info.sensor_id),
+                    sensor=SensorTypeField(sensors[s_id].sensor.sensor_type),
+                    sensor_id=SensorIdField(s_id),
                     binding=SensorOutputBindingField(SensorOutputBinding.none),
                 )
             ),
-            expected_nodes=[sensor_info.node_id],
+            expected_nodes=[tool],
         )
-    return result
+        request = SendAccumulatedSensorDataRequest(
+            payload=SendAccumulatedSensorDataPayload(
+                sensor_id=SensorIdField(s_id),
+                sensor_type=SensorTypeField(sensors[s_id].sensor.sensor_type),
+            )
+        )
+        # set the message index of the Ack that signals this sensor is finished sending data
+        listeners[s_id].set_stop_ack(request.payload.message_index.value)
+        # tell the sensor to clear it's queue
+        await messenger.send(
+            node_id=tool,
+            message=request,
+        )
+    # wait for the data to finish sending
+    for listener in listeners.values():
+        await listener.wait_for_complete()
 
 
 async def liquid_probe(
@@ -399,15 +269,13 @@ async def liquid_probe(
     threshold_pascals: float,
     plunger_impulse_time: float,
     num_baseline_reads: int,
-    csv_output: bool = False,
-    sync_buffer_output: bool = False,
-    can_bus_only_output: bool = False,
-    data_files: Optional[Dict[SensorId, str]] = None,
     sensor_id: SensorId = SensorId.S0,
     force_both_sensors: bool = False,
+    response_queue: Optional[
+        asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
+    ] = None,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
-    log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     sensor_binding = None
@@ -420,7 +288,7 @@ async def liquid_probe(
             + SensorOutputBinding.report
             + SensorOutputBinding.multi_sensor_sync
         )
-    pressure_sensors = await _setup_pressure_sensors(
+    pressure_sensors: Dict[SensorId, PressureSensor] = await _setup_pressure_sensors(
         messenger,
         sensor_id,
         tool,
@@ -440,6 +308,7 @@ async def liquid_probe(
         duration=float64(plunger_impulse_time),
         present_nodes=[tool],
     )
+
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: p_pass_distance},
@@ -449,64 +318,56 @@ async def liquid_probe(
         stop_condition=MoveStopCondition.sync_line,
         binding_flags=sensor_binding,
     )
-    if sync_buffer_output:
-        sensor_group = _fix_pass_step_for_buffer(
-            sensor_group,
-            movers=[head_node, tool],
-            distance={head_node: max_z_distance, tool: p_pass_distance},
-            speed={head_node: mount_speed, tool: plunger_speed},
-            sensor_type=SensorType.pressure,
-            sensor_id=sensor_id,
-            stop_condition=MoveStopCondition.sync_line,
-            binding_flags=sensor_binding,
-        )
 
+    sensor_group = _fix_pass_step_for_buffer(
+        sensor_group,
+        movers=[head_node, tool],
+        distance={head_node: max_z_distance, tool: p_pass_distance},
+        speed={head_node: mount_speed, tool: plunger_speed},
+        sensor_type=SensorType.pressure,
+        sensor_id=sensor_id,
+        stop_condition=MoveStopCondition.sync_line,
+        binding_flags=sensor_binding,
+    )
     sensor_runner = MoveGroupRunner(move_groups=[[lower_plunger], [sensor_group]])
-    if csv_output:
-        return await run_stream_output_to_csv(
-            messenger,
-            pressure_sensors,
-            mount_speed,
-            plunger_speed,
-            threshold_pascals,
-            head_node,
-            sensor_runner,
-            log_files,
-            pressure_output_file_heading,
-        )
-    elif sync_buffer_output:
-        raise_z = create_step(
-            distance={head_node: float64(max_z_distance)},
-            velocity={head_node: float64(-1 * mount_speed)},
-            acceleration={},
-            duration=float64(max_z_distance / mount_speed),
-            present_nodes=[head_node],
-        )
-        raise_z_runner = MoveGroupRunner(move_groups=[[raise_z]])
 
-        return await run_sync_buffer_to_csv(
-            messenger=messenger,
-            mount_speed=mount_speed,
-            plunger_speed=plunger_speed,
-            threshold=threshold_pascals,
-            head_node=head_node,
-            move_group=sensor_runner,
-            raise_z=raise_z_runner,
-            log_files=log_files,
-            tool=tool,
-            sensor_type=SensorType.pressure,
-            output_file_heading=pressure_output_file_heading,
-        )
-    elif can_bus_only_output:
-        binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
-        return await _run_with_binding(
-            messenger, pressure_sensors, sensor_runner, binding
-        )
-    else:  # none
-        binding = [SensorOutputBinding.sync]
-        return await _run_with_binding(
-            messenger, pressure_sensors, sensor_runner, binding
-        )
+    raise_z = create_step(
+        distance={head_node: float64(max_z_distance)},
+        velocity={head_node: float64(-1 * mount_speed)},
+        acceleration={},
+        duration=float64(max_z_distance / mount_speed),
+        present_nodes=[head_node],
+    )
+
+    raise_z_runner = MoveGroupRunner(move_groups=[[raise_z]])
+    listeners = {
+        s_id: LogListener(messenger, pressure_sensors[s_id])
+        for s_id in pressure_sensors.keys()
+    }
+
+    LOG.info(
+        f"Starting LLD pass: {head_node} {sensor_id} max p distance {max_p_distance} max z distance {max_z_distance}"
+    )
+    async with AsyncExitStack() as binding_stack:
+        for listener in listeners.values():
+            await binding_stack.enter_async_context(listener)
+        positions = await sensor_runner.run(can_messenger=messenger)
+        if positions[head_node].move_ack == MoveCompleteAck.stopped_by_condition:
+            LOG.info(
+                f"Liquid found {head_node} motor_postion {positions[head_node].motor_position} encoder position {positions[head_node].encoder_position}"
+            )
+            await raise_z_runner.run(can_messenger=messenger)
+        await finalize_logs(messenger, tool, listeners, pressure_sensors)
+
+    # give response data to any consumer that wants it
+    if response_queue:
+        for s_id in listeners.keys():
+            data = listeners[s_id].get_data()
+            if data:
+                for d in data:
+                    response_queue.put_nowait({s_id: data})
+
+    return positions
 
 
 async def check_overpressure(
@@ -536,10 +397,9 @@ async def capacitive_probe(
     mount_speed: float,
     sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
-    csv_output: bool = False,
-    sync_buffer_output: bool = False,
-    can_bus_only_output: bool = False,
-    data_files: Optional[Dict[SensorId, str]] = None,
+    response_queue: Optional[
+        asyncio.Queue[dict[SensorId, list[SensorDataType]]]
+    ] = None,
 ) -> MotorPositionStatus:
     """Move the specified tool down until its capacitive sensor triggers.
 
@@ -549,7 +409,6 @@ async def capacitive_probe(
     The direction is sgn(distance)*sgn(speed), so you can set the direction
     either by negating speed or negating distance.
     """
-    log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
     pipette_present = tool in [NodeId.pipette_left, NodeId.pipette_right]
 
@@ -577,53 +436,36 @@ async def capacitive_probe(
         sensor_id=sensor_id,
         stop_condition=MoveStopCondition.sync_line,
     )
-    if sync_buffer_output:
-        sensor_group = _fix_pass_step_for_buffer(
-            sensor_group,
-            movers=movers,
-            distance=probe_distance,
-            speed=probe_speed,
-            sensor_type=SensorType.capacitive,
-            sensor_id=sensor_id,
-            stop_condition=MoveStopCondition.sync_line,
-        )
+
+    sensor_group = _fix_pass_step_for_buffer(
+        sensor_group,
+        movers=movers,
+        distance=probe_distance,
+        speed=probe_speed,
+        sensor_type=SensorType.capacitive,
+        sensor_id=sensor_id,
+        stop_condition=MoveStopCondition.sync_line,
+    )
 
     runner = MoveGroupRunner(move_groups=[[sensor_group]])
-    if csv_output:
-        positions = await run_stream_output_to_csv(
-            messenger,
-            capacitive_sensors,
-            mount_speed,
-            0.0,
-            relative_threshold_pf,
-            mover,
-            runner,
-            log_files,
-            capacitive_output_file_heading,
-        )
-    elif sync_buffer_output:
-        positions = await run_sync_buffer_to_csv(
-            messenger,
-            mount_speed,
-            0.0,
-            relative_threshold_pf,
-            mover,
-            runner,
-            log_files,
-            tool=tool,
-            sensor_type=SensorType.capacitive,
-            output_file_heading=capacitive_output_file_heading,
-        )
-    elif can_bus_only_output:
-        binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
-        positions = await _run_with_binding(
-            messenger, capacitive_sensors, runner, binding
-        )
-    else:
-        binding = [SensorOutputBinding.sync]
-        positions = await _run_with_binding(
-            messenger, capacitive_sensors, runner, binding
-        )
+
+    listeners = {
+        s_id: LogListener(messenger, capacitive_sensors[s_id])
+        for s_id in capacitive_sensors.keys()
+    }
+    async with AsyncExitStack() as binding_stack:
+        for listener in listeners.values():
+            await binding_stack.enter_async_context(listener)
+        positions = await runner.run(can_messenger=messenger)
+        await finalize_logs(messenger, tool, listeners, capacitive_sensors)
+
+    # give response data to any consumer that wants it
+    if response_queue:
+        for s_id in listeners.keys():
+            data = listeners[s_id].get_data()
+            if data:
+                for d in data:
+                    response_queue.put_nowait({s_id: data})
     return positions[mover]
 
 

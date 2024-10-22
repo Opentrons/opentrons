@@ -1,3 +1,5 @@
+import { omit } from 'lodash'
+
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -8,17 +10,18 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
+
+import { CommandText } from './CommandText'
+import { CommandIcon } from './CommandIcon'
+import { Skeleton } from '/app/atoms/Skeleton'
+
 import type {
   LabwareDefinition2,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { CommandText } from './CommandText'
-import { CommandIcon } from './CommandIcon'
-import type { CommandTextData } from './types'
-import { Skeleton } from '/app/atoms/Skeleton'
+import type { CommandTextData } from '/app/local-resources/commands'
 import type { StyleProps } from '@opentrons/components'
-import { omit } from 'lodash'
 
 export type CommandState = NonSkeletonCommandState | 'loading'
 export type NonSkeletonCommandState = 'current' | 'failed' | 'future'

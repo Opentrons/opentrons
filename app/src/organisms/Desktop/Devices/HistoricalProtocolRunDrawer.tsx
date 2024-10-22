@@ -56,6 +56,10 @@ export function HistoricalProtocolRunDrawer(
           return acc
         }, [])
       : []
+  if ('outputFileIds' in run && run.outputFileIds.length > 0) {
+    runDataFileIds.push(...run.outputFileIds)
+  }
+
   const uniqueLabwareOffsets = allLabwareOffsets?.filter(
     (offset, index, array) => {
       return (
