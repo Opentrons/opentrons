@@ -1,0 +1,154 @@
+{
+  "ordering": [
+    ["A1"],
+    ["A2"],
+    ["A3"],
+    ["A4"],
+    ["A5"],
+    ["A6"],
+    ["A7"],
+    ["A8"],
+    ["A9"],
+    ["A10"]
+  ],
+  "brand": {
+    "brand": "TestPro",
+    "brandId": ["001"]
+  },
+  "metadata": {
+    "displayName": "TestPro 10 Reservoir 250 µL",
+    "displayCategory": "reservoir",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127,
+    "yDimension": 85,
+    "zDimension": 75
+  },
+  "wells": {
+    "A1": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 10,
+      "y": 40,
+      "z": 5
+    },
+    "A2": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 22,
+      "y": 40,
+      "z": 5
+    },
+    "A3": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 34,
+      "y": 40,
+      "z": 5
+    },
+    "A4": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 46,
+      "y": 40,
+      "z": 5
+    },
+    "A5": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 58,
+      "y": 40,
+      "z": 5
+    },
+    "A6": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 70,
+      "y": 40,
+      "z": 5
+    },
+    "A7": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 82,
+      "y": 40,
+      "z": 5
+    },
+    "A8": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 94,
+      "y": 40,
+      "z": 5
+    },
+    "A9": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 106,
+      "y": 40,
+      "z": 5
+    },
+    "A10": {
+      "depth": 70,
+      "totalLiquidVolume": 250,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 60,
+      "x": 118,
+      "y": 40,
+      "z": 5
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "wellBottomShape": "v"
+      },
+      "wells": ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10"]
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "testpro_10_reservoir_250ul"
+  },
+  "namespace": "custom_beta",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}

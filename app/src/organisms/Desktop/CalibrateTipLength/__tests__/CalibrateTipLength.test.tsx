@@ -9,8 +9,12 @@ import { getDeckDefinitions } from '@opentrons/shared-data'
 import { i18n } from '/app/i18n'
 import * as Sessions from '/app/redux/sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
-
 import { CalibrateTipLength } from '../index'
+import {
+  useCalibrationError,
+  CalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
+
 import type { TipLengthCalibrationStep } from '/app/redux/sessions/types'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
@@ -23,6 +27,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux/config')
+vi.mock('/app/organisms/Desktop/CalibrationError')
 
 interface CalibrateTipLengthSpec {
   heading: string
@@ -50,6 +55,7 @@ describe('CalibrateTipLength', () => {
         dispatchRequests={dispatchRequests}
         showSpinner={showSpinner}
         isJogging={isJogging}
+        requestIds={[]}
       />,
       { i18nInstance: i18n }
     )
@@ -76,6 +82,10 @@ describe('CalibrateTipLength', () => {
 
   beforeEach(() => {
     when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
+    vi.mocked(useCalibrationError).mockReturnValue(null)
+    vi.mocked(CalibrationError).mockReturnValue(
+      <div>MOCK_CALIBRATION_ERROR</div>
+    )
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -175,5 +185,16 @@ describe('CalibrateTipLength', () => {
         data: { vector: [0, -0.1, 0] },
       })
     )
+  })
+
+  it('renders an error modal if there is an error', () => {
+    vi.mocked(useCalibrationError).mockReturnValue({
+      title: 'test',
+      subText: 'test',
+    })
+
+    render()
+
+    screen.getByText('MOCK_CALIBRATION_ERROR')
   })
 })

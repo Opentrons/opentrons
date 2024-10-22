@@ -491,7 +491,7 @@ async def test_shake_during_drop(
         },
     }
     await hardware_api.cache_instruments()
-    await hardware_api.add_tip(types.Mount.RIGHT, 50.0)
+    hardware_api.add_tip(types.Mount.RIGHT, 50.0)
     hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 2.0 * 4)
 
     shake_tips_drop = mock.Mock(side_effect=hardware_api._shake_off_tips_drop)
@@ -515,7 +515,7 @@ async def test_shake_during_drop(
 
     # Test drop tip shake with 25% of tiprack well diameter
     # over upper (2.25 mm) limit
-    await hardware_api.add_tip(types.Mount.RIGHT, 20)
+    hardware_api.add_tip(types.Mount.RIGHT, 20)
     hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 2.3 * 4)
     shake_tips_drop.reset_mock()
     move_rel.reset_move()
@@ -530,7 +530,7 @@ async def test_shake_during_drop(
 
     # Test drop tip shake with 25% of tiprack well diameter
     # below lower (1.0 mm) limit
-    await hardware_api.add_tip(types.Mount.RIGHT, 50)
+    hardware_api.add_tip(types.Mount.RIGHT, 50)
     hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 0.9 * 4)
     shake_tips_drop.reset_mock()
     move_rel.reset_mock()

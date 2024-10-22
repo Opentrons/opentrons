@@ -30,7 +30,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {

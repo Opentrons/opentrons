@@ -6,14 +6,7 @@ import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
-
-const testAliases: {} | { 'file-saver': string } =
-  process.env.CYPRESS === '1'
-    ? {
-        'file-saver':
-          path.resolve(__dirname, 'cypress/mocks/file-saver.js') ?? '',
-      }
-    : {}
+import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 export default defineConfig({
   // this makes imports relative rather than absolute
@@ -21,6 +14,13 @@ export default defineConfig({
   build: {
     // Relative to the root
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        // entry points for both Labware Library and Labware Creator
+        main: path.resolve(__dirname, 'index.html'),
+        create: path.resolve(__dirname, 'create/index.html'),
+      },
+    },
   },
   plugins: [
     react({
@@ -30,6 +30,7 @@ export default defineConfig({
         configFile: true,
       },
     }),
+    cssModuleSideEffect(), // Note for treeshake
   ],
   optimizeDeps: {
     esbuildOptions: {
@@ -61,7 +62,6 @@ export default defineConfig({
       '@opentrons/step-generation': path.resolve(
         '../step-generation/src/index.ts'
       ),
-      ...testAliases,
     },
   },
   server: {

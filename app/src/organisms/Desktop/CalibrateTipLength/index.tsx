@@ -23,7 +23,10 @@ import {
 } from '/app/organisms/Desktop/CalibrationPanels'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '/app/App/portal'
-
+import {
+  CalibrationError,
+  useCalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
 import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
 
@@ -60,19 +63,17 @@ const STEPS_IN_ORDER: CalibrationSessionStep[] = [
   Sessions.TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
 ]
 
-export function CalibrateTipLength(
-  props: CalibrateTipLengthParentProps
-): JSX.Element | null {
+export function CalibrateTipLength({
+  session,
+  robotName,
+  showSpinner,
+  dispatchRequests,
+  requestIds,
+  isJogging,
+  offsetInvalidationHandler,
+  allowChangeTipRack = false,
+}: CalibrateTipLengthParentProps): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const {
-    session,
-    robotName,
-    showSpinner,
-    dispatchRequests,
-    isJogging,
-    offsetInvalidationHandler,
-    allowChangeTipRack = false,
-  } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details ?? {}
 
@@ -89,6 +90,8 @@ export function CalibrateTipLength(
     labware != null ? labware.find(l => l.isTiprack) ?? null : null
   const calBlock: CalibrationLabware | null =
     labware != null ? labware.find(l => !l.isTiprack) ?? null : null
+
+  const errorInfo = useCalibrationError(requestIds, session?.id)
 
   function sendCommands(...commands: SessionCommandParams[]): void {
     if (session?.id != null && !isJogging) {
@@ -160,6 +163,8 @@ export function CalibrateTipLength(
             sessionType: t('tip_length_calibration'),
           })}
         />
+      ) : errorInfo != null ? (
+        <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
       ) : (
         <Panel
           sendCommands={sendCommands}

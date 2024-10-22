@@ -1,24 +1,44 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Divider, Flex } from '@opentrons/components'
-import { InputStepFormField } from '../../../../../../molecules'
+import { useState } from 'react'
+import {
+  DIRECTION_COLUMN,
+  Divider,
+  Flex,
+  SPACING,
+  StyledText,
+  Tabs,
+} from '@opentrons/components'
+import {
+  CheckboxExpandStepFormField,
+  InputStepFormField,
+} from '../../../../../../molecules'
 import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
 import {
+  BlowoutLocationField,
+  BlowoutOffsetField,
   ChangeTipField,
   DropTipField,
+  FlowRateField,
   LabwareField,
   PartialTipField,
   PickUpTipField,
   PipetteField,
+  PositionField,
   TipWellSelectionField,
   TiprackField,
   VolumeField,
   WellSelectionField,
+  WellsOrderField,
 } from '../../PipetteFields'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../../utils'
 import type { StepFormProps } from '../../types'
 
 export function MixTools(props: StepFormProps): JSX.Element {
@@ -26,7 +46,23 @@ export function MixTools(props: StepFormProps): JSX.Element {
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)
-  const { t } = useTranslation(['application', 'form'])
+  const [tab, setTab] = useState<'aspirate' | 'dispense'>('aspirate')
+  const { t, i18n } = useTranslation(['application', 'form'])
+  const aspirateTab = {
+    text: i18n.format(t('aspirate'), 'capitalize'),
+    isActive: tab === 'aspirate',
+    onClick: () => {
+      setTab('aspirate')
+    },
+  }
+  const dispenseTab = {
+    text: i18n.format(t('dispense'), 'capitalize'),
+
+    isActive: tab === 'dispense',
+    onClick: () => {
+      setTab('dispense')
+    },
+  }
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
@@ -102,6 +138,145 @@ export function MixTools(props: StepFormProps): JSX.Element {
       ) : null}
     </Flex>
   ) : (
-    <div>wire this up</div>
+    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+      <Flex padding={SPACING.spacing16}>
+        <Tabs tabs={[aspirateTab, dispenseTab]} />
+      </Flex>
+      <Divider marginY="0" />
+      <Flex padding={SPACING.spacing16} width="100%">
+        <FlowRateField
+          {...propsForFields[`${tab}_flowRate`]}
+          pipetteId={formData.pipette}
+          flowRateType={tab}
+          volume={propsForFields.volume?.value ?? 0}
+          tiprack={propsForFields.tipRack.value}
+        />
+      </Flex>
+      <Divider marginY="0" />
+      {tab === 'aspirate' ? (
+        <>
+          <WellsOrderField
+            prefix={tab}
+            updateFirstWellOrder={
+              propsForFields.mix_wellOrder_first.updateValue
+            }
+            updateSecondWellOrder={
+              propsForFields.mix_wellOrder_second.updateValue
+            }
+            firstValue={formData.mix_wellOrder_first}
+            secondValue={formData.mix_wellOrder_second}
+            firstName={'mix_wellOrder_first'}
+            secondName={'mix_wellOrder_second'}
+          />
+          <Divider marginY="0" />
+          <PositionField
+            prefix="mix"
+            propsForFields={propsForFields}
+            zField="mix_mmFromBottom"
+            xField="mix_x_position"
+            yField="mix_y_position"
+            labwareId={
+              formData[getLabwareFieldForPositioningField('mix_mmFromBottom')]
+            }
+          />
+          <Divider marginY="0" />
+        </>
+      ) : null}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing12}
+        gridGap={SPACING.spacing8}
+      >
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t('protocol_steps:advanced_settings')}
+        </StyledText>
+        <CheckboxExpandStepFormField
+          title={i18n.format(
+            t('form:step_edit_form.field.delay.label'),
+            'capitalize'
+          )}
+          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
+          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
+          checkboxUpdateValue={
+            propsForFields[`${tab}_delay_checkbox`].updateValue
+          }
+        >
+          {formData[`${tab}_delay_checkbox`] === true ? (
+            <InputStepFormField
+              showTooltip={false}
+              padding="0"
+              title={t('protocol_steps:delay_duration')}
+              {...propsForFields[`${tab}_delay_seconds`]}
+              units={t('application:units.seconds')}
+            />
+          ) : null}
+        </CheckboxExpandStepFormField>
+        {tab === 'dispense' ? (
+          <>
+            <CheckboxExpandStepFormField
+              title={i18n.format(
+                t('form:step_edit_form.field.blowout.label'),
+                'capitalize'
+              )}
+              checkboxValue={propsForFields.blowout_checkbox.value}
+              isChecked={propsForFields.blowout_checkbox.value === true}
+              checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
+            >
+              {formData.blowout_checkbox === true ? (
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing6}
+                >
+                  <BlowoutLocationField
+                    {...propsForFields.blowout_location}
+                    options={getBlowoutLocationOptionsForForm({
+                      stepType: formData.stepType,
+                    })}
+                  />
+                  <FlowRateField
+                    {...propsForFields.blowout_flowRate}
+                    pipetteId={formData.pipette}
+                    flowRateType="blowout"
+                    volume={propsForFields.volume?.value ?? 0}
+                    tiprack={propsForFields.tipRack.value}
+                  />
+                  <BlowoutOffsetField
+                    {...propsForFields.blowout_z_offset}
+                    destLabwareId={propsForFields.labware.value}
+                    blowoutLabwareId={propsForFields.blowout_location.value}
+                  />
+                </Flex>
+              ) : null}
+            </CheckboxExpandStepFormField>
+            <CheckboxExpandStepFormField
+              title={i18n.format(
+                t('form:step_edit_form.field.touchTip.label'),
+                'capitalize'
+              )}
+              checkboxValue={propsForFields.mix_touchTip_checkbox.value}
+              isChecked={propsForFields.mix_touchTip_checkbox.value === true}
+              checkboxUpdateValue={
+                propsForFields.mix_touchTip_checkbox.updateValue
+              }
+            >
+              {formData.mix_touchTip_checkbox === true ? (
+                <PositionField
+                  prefix={tab}
+                  propsForFields={propsForFields}
+                  zField="mix_touchTip_mmFromBottom"
+                  labwareId={
+                    formData[
+                      getLabwareFieldForPositioningField(
+                        'mix_touchTip_mmFromBottom'
+                      )
+                    ]
+                  }
+                />
+              ) : null}
+            </CheckboxExpandStepFormField>
+          </>
+        ) : null}
+      </Flex>
+    </Flex>
   )
 }

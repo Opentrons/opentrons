@@ -1,12 +1,9 @@
-// Scrolling seems wonky, so I disabled checking to see if
-// an element is in view before clicking or checking with
-// { force: true }
+import { navigateToUrl, wellBottomImageLocator } from '../../support/e2e'
 
 context('Tubes and Rack', () => {
   describe('Six tubes', () => {
     before(() => {
-      cy.visit('/create')
-      cy.viewport('macbook-15')
+      navigateToUrl('/#/create')
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -95,21 +92,21 @@ context('Tubes and Rack', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()
@@ -137,9 +134,7 @@ context('Tubes and Rack', () => {
 
   describe('Fifteen tubes', () => {
     before(() => {
-      cy.visit('/create')
-      cy.viewport('macbook-15')
-
+      navigateToUrl('#/create')
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -226,21 +221,21 @@ context('Tubes and Rack', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()
@@ -268,9 +263,7 @@ context('Tubes and Rack', () => {
 
   describe('Twentyfour tubes', () => {
     before(() => {
-      cy.visit('/create')
-      cy.viewport('macbook-15')
-
+      navigateToUrl('/#/create')
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -356,21 +349,21 @@ context('Tubes and Rack', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()

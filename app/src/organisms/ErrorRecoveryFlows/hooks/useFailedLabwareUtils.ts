@@ -11,10 +11,11 @@ import {
 
 import { ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
-import { getLoadedLabware } from '/app/molecules/Command/utils/accessors'
-import { getLabwareDisplayLocation } from '/app/molecules/Command'
+import {
+  getLoadedLabware,
+  getLabwareDisplayLocation,
+} from '/app/local-resources/labware'
 
-import type { TFunction } from 'i18next'
 import type { WellGroup } from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
@@ -27,6 +28,7 @@ import type {
   MoveLabwareRunTimeCommand,
   LabwareLocation,
 } from '@opentrons/shared-data'
+import type { LabwareDisplayLocationSlotOnly } from '/app/local-resources/labware'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps } from './useERUtils'
 
@@ -34,14 +36,15 @@ interface UseFailedLabwareUtilsProps {
   failedCommandByRunRecord: ERUtilsProps['failedCommandByRunRecord']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   failedPipetteInfo: PipetteData | null
-  allRunDefs: LabwareDefinition2[]
   runCommands?: CommandsData
   runRecord?: Run
 }
 
 interface RelevantFailedLabwareLocations {
-  currentLoc: string
-  newLoc: string | null
+  displayNameCurrentLoc: string
+  displayNameNewLoc: string | null
+  currentLoc: LabwareLocation | null
+  newLoc: LabwareLocation | null
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
@@ -53,6 +56,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   relevantWellName: string | null
   /* The user-content nickname of the failed labware, if any */
   failedLabwareNickname: string | null
+  /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
 }
 
@@ -68,7 +72,6 @@ export function useFailedLabwareUtils({
   failedPipetteInfo,
   runCommands,
   runRecord,
-  allRunDefs,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const recentRelevantFailedLabwareCmd = useMemo(
     () =>
@@ -104,8 +107,7 @@ export function useFailedLabwareUtils({
   const failedLabwareLocations = useRelevantFailedLwLocations({
     failedLabware,
     failedCommandByRunRecord,
-    protocolAnalysis,
-    allRunDefs,
+    runRecord,
   })
 
   return {
@@ -281,7 +283,7 @@ export function getFailedCmdRelevantLabware(
   const labwareNickname =
     protocolAnalysis != null
       ? getLoadedLabware(
-          protocolAnalysis,
+          protocolAnalysis.labware,
           recentRelevantFailedLabwareCmd?.params.labwareId || ''
         )?.displayName ?? null
       : null
@@ -336,9 +338,9 @@ export function getRelevantWellName(
   }
 }
 
-type GetRelevantLwLocationsParams = Pick<
+export type GetRelevantLwLocationsParams = Pick<
   UseFailedLabwareUtilsProps,
-  'protocolAnalysis' | 'failedCommandByRunRecord' | 'allRunDefs'
+  'runRecord' | 'failedCommandByRunRecord'
 > & {
   failedLabware: UseFailedLabwareUtilsResult['failedLabware']
 }
@@ -346,43 +348,51 @@ type GetRelevantLwLocationsParams = Pick<
 export function useRelevantFailedLwLocations({
   failedLabware,
   failedCommandByRunRecord,
-  protocolAnalysis,
-  allRunDefs,
+  runRecord,
 }: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
   const { t } = useTranslation('protocol_command_text')
-  const canGetDisplayLocation =
-    protocolAnalysis != null && failedLabware != null
 
-  const buildLocationCopy = useMemo(() => {
-    return (location: LabwareLocation | undefined): string | null => {
-      return canGetDisplayLocation && location != null
-        ? getLabwareDisplayLocation(
-            protocolAnalysis,
-            allRunDefs,
-            location,
-            t as TFunction,
-            FLEX_ROBOT_TYPE,
-            false // Always return the "full" copy, which is the desktop copy.
-          )
-        : null
-    }
-  }, [canGetDisplayLocation, allRunDefs])
+  const BASE_DISPLAY_PARAMS: Omit<
+    LabwareDisplayLocationSlotOnly,
+    'location'
+  > = {
+    loadedLabwares: runRecord?.data?.labware ?? [],
+    loadedModules: runRecord?.data?.modules ?? [],
+    robotType: FLEX_ROBOT_TYPE,
+    t,
+    detailLevel: 'slot-only',
+    isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.
+  }
 
-  const currentLocation = useMemo(() => {
-    return buildLocationCopy(failedLabware?.location) ?? ''
-  }, [canGetDisplayLocation])
+  const displayNameCurrentLoc = getLabwareDisplayLocation({
+    ...BASE_DISPLAY_PARAMS,
+    location: failedLabware?.location ?? null,
+  })
 
-  const newLocation = useMemo(() => {
+  const getNewLocation = (): Pick<
+    RelevantFailedLabwareLocations,
+    'displayNameNewLoc' | 'newLoc'
+  > => {
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
-        return buildLocationCopy(failedCommandByRunRecord.params.newLocation)
+        return {
+          displayNameNewLoc: getLabwareDisplayLocation({
+            ...BASE_DISPLAY_PARAMS,
+            location: failedCommandByRunRecord.params.newLocation,
+          }),
+          newLoc: failedCommandByRunRecord.params.newLocation,
+        }
       default:
-        return null
+        return {
+          displayNameNewLoc: null,
+          newLoc: null,
+        }
     }
-  }, [canGetDisplayLocation, failedCommandByRunRecord?.key])
+  }
 
   return {
-    currentLoc: currentLocation,
-    newLoc: newLocation,
+    displayNameCurrentLoc,
+    currentLoc: failedLabware?.location ?? null,
+    ...getNewLocation(),
   }
 }

@@ -1,12 +1,9 @@
-import 'cypress-file-upload'
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
-
-const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
+import { navigateToUrl, fileHelper } from '../../support/e2e'
+const fileHolder = fileHelper('generic_1_tiprack_20ul')
 
 describe('Create a Tip Rack', () => {
   before(() => {
-    cy.visit('/create')
-    cy.viewport('macbook-15')
+    navigateToUrl('/#/create')
   })
   it('Should create a tip rack', () => {
     // Tip Rack Selection from drop down
@@ -242,26 +239,19 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="displayName"]')
       .clear()
       .type('Brand Chalu 1 Tip Rack 20ul')
-    cy.get('input[name="loadName"]').clear().type('generic_1_tiprack_20ul')
+    cy.get('input[name="loadName"]').clear().type(fileHolder.downloadFileStem)
 
     // Verify the exported file to the fixture
     cy.get('button').contains('EXPORT FILE').click()
 
-    cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-      cy.window()
-        .its('__lastSavedFileBlob__')
-        .should('be.a', 'blob')
-        .should(async blob => {
-          const labwareDefText = await blob.text()
-          const savedDef = JSON.parse(labwareDefText)
-
-          expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
+    cy.fixture(fileHolder.expectedExportFixture).then(
+      expectedExportLabwareDef => {
+        cy.readFile(fileHolder.downloadPath).then(actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
         })
-    })
+      }
+    )
 
-    cy.window()
-      .its('__lastSavedFileName__')
-      .should('equal', `generic_1_tiprack_20ul.json`)
     // 'verify the too big, too small error
     cy.get('input[name="gridOffsetY"]').clear().type('24')
     cy.get('#CheckYourWork span')

@@ -22,6 +22,10 @@ import {
 } from '/app/organisms/Desktop/CalibrationPanels'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '/app/App/portal'
+import {
+  CalibrationError,
+  useCalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
 
 import type { Mount } from '@opentrons/components'
 import type {
@@ -57,19 +61,18 @@ const STEPS_IN_ORDER: CalibrationSessionStep[] = [
   Sessions.DECK_STEP_CALIBRATION_COMPLETE,
 ]
 
-export function CalibrateDeck(
-  props: CalibrateDeckParentProps
-): JSX.Element | null {
+export function CalibrateDeck({
+  session,
+  robotName,
+  dispatchRequests,
+  requestIds,
+  showSpinner,
+  isJogging,
+  exitBeforeDeckConfigCompletion,
+  offsetInvalidationHandler,
+}: CalibrateDeckParentProps): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const {
-    session,
-    robotName,
-    dispatchRequests,
-    showSpinner,
-    isJogging,
-    exitBeforeDeckConfigCompletion,
-    offsetInvalidationHandler,
-  } = props
+
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
 
@@ -83,6 +86,8 @@ export function CalibrateDeck(
   } = useConditionalConfirm(() => {
     cleanUpAndExit()
   }, true)
+
+  const errorInfo = useCalibrationError(requestIds, session?.id)
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
@@ -160,6 +165,8 @@ export function CalibrateDeck(
             sessionType: t('deck_calibration'),
           })}
         />
+      ) : errorInfo != null ? (
+        <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
       ) : (
         <Panel
           sendCommands={sendCommands}

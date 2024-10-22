@@ -63,17 +63,17 @@ export function ProtocolSteps(): JSX.Element {
       ? savedStepForms[currentstepIdForStepSummary]
       : null
 
+  const stepDetails = currentStep?.stepDetails ?? null
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      // alignItems={ALIGN_CENTER}
       width="100%"
       gridGap={SPACING.spacing16}
       height="calc(100vh - 4rem)"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing12}
     >
       <TimelineToolbox />
-      {selectedSubstep ? <SubstepsToolbox stepId={selectedSubstep} /> : null}
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
@@ -99,19 +99,26 @@ export function ProtocolSteps(): JSX.Element {
               />
             </Flex>
           ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing16}
+            maxWidth="46.9375rem"
+          >
             {deckView === leftString ? (
               <DeckSetupContainer tab="protocolSteps" />
             ) : (
               <OffDeck tab="protocolSteps" />
             )}
             {formData == null ? (
-              <StepSummary currentStep={currentStep} />
+              <StepSummary
+                currentStep={currentStep}
+                stepDetails={stepDetails}
+              />
             ) : null}
           </Flex>
         </Flex>
         {enableHoyKeyDisplay ? (
-          <Box position={POSITION_FIXED} left="20.25rem" bottom="0.75rem">
+          <Box position={POSITION_FIXED} left="21rem" bottom="0.75rem">
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <Tag text={t('double_click_to_edit')} type="default" />
               <Tag text={t('shift_click_to_select_all')} type="default" />
@@ -120,6 +127,7 @@ export function ProtocolSteps(): JSX.Element {
           </Box>
         ) : null}
       </Flex>
+      {selectedSubstep ? <SubstepsToolbox stepId={selectedSubstep} /> : null}
       <StepForm />
       {isMultiSelectMode ? <BatchEditToolbox /> : null}
     </Flex>

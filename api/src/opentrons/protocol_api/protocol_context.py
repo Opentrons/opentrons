@@ -14,8 +14,10 @@ from typing import (
 
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
+from opentrons.config import feature_flags
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
@@ -61,7 +63,7 @@ from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
-from ._liquid import Liquid
+from ._liquid import Liquid, LiquidClass
 from .disposal_locations import TrashBin, WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
@@ -1283,6 +1285,18 @@ class ProtocolContext(CommandPublisher):
             description=description,
             display_color=display_color,
         )
+
+    def define_liquid_class(
+        self,
+        name: str,
+    ) -> LiquidClass:
+        """Define a liquid class for use in the protocol."""
+        if feature_flags.allow_liquid_classes(
+            robot_type=RobotTypeEnum.robot_literal_to_enum(self._core.robot_type)
+        ):
+            return self._core.define_liquid_class(name=name)
+        else:
+            raise NotImplementedError("This method is not implemented.")
 
     @property
     @requires_version(2, 5)

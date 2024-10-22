@@ -11,7 +11,7 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { WizardBody } from './WizardBody'
-import { HandleEnter } from './HandleEnter'
+import { HandleEnter } from '../../atoms/HandleEnter'
 
 import type { WizardTileProps } from './types'
 

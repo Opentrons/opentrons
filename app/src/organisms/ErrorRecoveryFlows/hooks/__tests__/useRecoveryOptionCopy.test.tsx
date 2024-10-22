@@ -48,6 +48,15 @@ describe('useRecoveryOptionCopy', () => {
     screen.getByText('Retry dropping tip')
   })
 
+  it(`renders the correct copy for ${RECOVERY_MAP.RETRY_STEP.ROUTE} when the error kind is ${ERROR_KINDS.TIP_NOT_DETECTED}`, () => {
+    render({
+      route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+      errorKind: ERROR_KINDS.TIP_NOT_DETECTED,
+    })
+
+    screen.getByText('Retry picking up tip')
+  })
+
   it(`renders the correct copy for ${RECOVERY_MAP.CANCEL_RUN.ROUTE}`, () => {
     render({ route: RECOVERY_MAP.CANCEL_RUN.ROUTE })
 

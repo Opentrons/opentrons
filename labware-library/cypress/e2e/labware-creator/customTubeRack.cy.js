@@ -1,13 +1,13 @@
-import 'cypress-file-upload'
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
-
-const expectedExportFixture =
-  '../fixtures/somerackbrand_24_tuberack_1500ul.json'
+import {
+  navigateToUrl,
+  fileHelper,
+  wellBottomImageLocator,
+} from '../../support/e2e'
+const fileHolder = fileHelper('somerackbrand_24_tuberack_1500ul')
 
 context('Tubes and Rack', () => {
   before(() => {
-    cy.visit('/create')
-    cy.viewport('macbook-15')
+    navigateToUrl('/#/create')
   })
 
   describe('Custom 6 x 4 tube rack', () => {
@@ -109,24 +109,29 @@ context('Tubes and Rack', () => {
       cy.contains('Diameter is a required field').should('not.exist')
 
       // well bottom shape and depth
+      // check flat
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
+
+      // check u shaped
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
+
+      // check v shaped
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('100').blur()
@@ -159,28 +164,20 @@ context('Tubes and Rack', () => {
       cy.get(
         "input[placeholder='somerackbrand 24 Tube Rack with sometubebrand 1.5 mL']"
       ).should('exist')
-      cy.get("input[placeholder='somerackbrand_24_tuberack_1500ul']").should(
+      cy.get(`input[placeholder='${fileHolder.downloadFileStem}']`).should(
         'exist'
       )
+      cy.get('button').contains('EXPORT FILE').click()
 
-      // now try again with all fields inputed
-      cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-        cy.get('button').contains('EXPORT FILE').click()
-
-        cy.window()
-          .its('__lastSavedFileBlob__')
-          .should('be.a', 'blob')
-          .should(async blob => {
-            const labwareDefText = await blob.text()
-            const savedDef = JSON.parse(labwareDefText)
-
-            expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
+      cy.fixture(fileHolder.expectedExportFixture).then(
+        expectedExportLabwareDef => {
+          cy.readFile(fileHolder.downloadPath).then(actualExportLabwareDef => {
+            expect(actualExportLabwareDef).to.deep.equal(
+              expectedExportLabwareDef
+            )
           })
-
-        cy.window()
-          .its('__lastSavedFileName__')
-          .should('equal', `somerackbrand_24_tuberack_1500ul.json`)
-      })
+        }
+      )
     })
   })
 })

@@ -92,6 +92,7 @@ class AspirateInPlaceImplementation(
                 " so the plunger can be reset in a known safe position."
             )
         try:
+            current_position = await self._gantry_mover.get_position(params.pipetteId)
             volume = await self._pipetting.aspirate_in_place(
                 pipette_id=params.pipetteId,
                 volume=params.volume,
@@ -99,7 +100,6 @@ class AspirateInPlaceImplementation(
                 command_note_adder=self._command_note_adder,
             )
         except PipetteOverpressureError as e:
-            current_position = await self._gantry_mover.get_position(params.pipetteId)
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),

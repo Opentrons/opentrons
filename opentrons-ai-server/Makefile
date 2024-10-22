@@ -95,8 +95,8 @@ live-client:
 live-hf:
 	python -m pipenv run python -m tests.helpers.huggingface_client
 
-.PHONY: test-live
-test-live:
+.PHONY: live-test
+live-test:
 	python -m pipenv run python -m pytest tests -m live --env $(ENV)
 
 IMAGE_NAME=ai-server-local

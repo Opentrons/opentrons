@@ -50,7 +50,7 @@ export function useCalibratePipetteOffset(
     }
   )
 
-  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
+  const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
@@ -175,6 +175,7 @@ export function useCalibratePipetteOffset(
         showSpinner={startingSession || showSpinner}
         dispatchRequests={dispatchRequests}
         isJogging={isJogging}
+        requestIds={requestIds}
       />
     ),
     getTopPortalEl()

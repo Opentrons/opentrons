@@ -143,7 +143,8 @@ from .backends.types import HWStopCondition
 from .backends.flex_protocol import FlexBackend
 from .backends.ot3simulator import OT3Simulator
 from .backends.errors import SubsystemUpdating
-
+from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons_hardware.sensors.types import SensorDataType
 
 mod_log = logging.getLogger(__name__)
 
@@ -2289,17 +2290,10 @@ class OT3API(
         )
         instrument.working_volume = tip_volume
 
-    async def drop_tip(
+    async def tip_drop_moves(
         self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
-        """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
-        instrument = self._pipette_handler.get_pipette(realmount)
-
-        def _remove_tips() -> None:
-            instrument.set_current_volume(0)
-            instrument.current_tiprack_diameter = 0.0
-            instrument.remove_tip()
 
         await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
 
@@ -2326,10 +2320,26 @@ class OT3API(
         if home_after:
             await self._home([Axis.by_mount(mount)])
 
-        _remove_tips()
-        # call this in case we're simulating
+        # call this in case we're simulating:
         if isinstance(self._backend, OT3Simulator):
             self._backend._update_tip_state(realmount, False)
+
+    async def drop_tip(
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+    ) -> None:
+        """Drop tip at the current location."""
+        await self.tip_drop_moves(mount=mount, home_after=home_after)
+
+        # todo(mm, 2024-10-17): Ideally, callers would be able to replicate the behavior
+        # of this method via self.drop_tip_moves() plus other public methods. This
+        # currently prevents that: there is no public equivalent for
+        # instrument.set_current_volume().
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+        instrument.set_current_volume(0)
+
+        self.set_current_tiprack_diameter(mount, 0.0)
+        self.remove_tip(mount)
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
@@ -2598,13 +2608,13 @@ class OT3API(
                 starting_nozzle,
             )
 
-    async def add_tip(
+    def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
     ) -> None:
-        await self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
+        self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
 
-    async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
-        await self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
+    def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+        self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
 
     def add_gripper_probe(self, probe: GripperProbe) -> None:
         self._gripper_handler.add_probe(probe)
@@ -2634,6 +2644,9 @@ class OT3API(
         probe: InstrumentProbeType,
         p_travel: float,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
+        ] = None,
     ) -> float:
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         end_z = await self._backend.liquid_probe(
@@ -2644,10 +2657,9 @@ class OT3API(
             probe_settings.sensor_threshold_pascals,
             probe_settings.plunger_impulse_time,
             probe_settings.samples_for_baselining,
-            probe_settings.output_option,
-            probe_settings.data_files,
             probe=probe,
             force_both_sensors=force_both_sensors,
+            response_queue=response_queue,
         )
         machine_pos = await self._backend.update_position()
         machine_pos[Axis.by_mount(mount)] = end_z
@@ -2668,6 +2680,9 @@ class OT3API(
         probe_settings: Optional[LiquidProbeSettings] = None,
         probe: Optional[InstrumentProbeType] = None,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
+        ] = None,
     ) -> float:
         """Search for and return liquid level height.
 
@@ -2793,6 +2808,8 @@ class OT3API(
                     probe_settings,
                     checked_probe,
                     plunger_travel_mm + sensor_baseline_plunger_move_mm,
+                    force_both_sensors,
+                    response_queue,
                 )
                 # if we made it here without an error we found the liquid
                 error = None
@@ -2861,8 +2878,6 @@ class OT3API(
             pass_settings.speed_mm_per_s,
             pass_settings.sensor_threshold_pf,
             probe,
-            pass_settings.output_option,
-            pass_settings.data_files,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:

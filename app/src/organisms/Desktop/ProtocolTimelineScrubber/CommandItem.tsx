@@ -8,7 +8,7 @@ import {
   LegacyStyledText,
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
-import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
+import { getCommandTextData } from '/app/local-resources/commands'
 import { CommandText } from '/app/molecules/Command'
 import { COMMAND_WIDTH_PX } from './index'
 

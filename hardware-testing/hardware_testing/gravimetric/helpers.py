@@ -36,11 +36,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 import opentrons.protocol_engine.execution.pipetting as PE_pipetting
 from opentrons.protocol_engine.notes import CommandNoteAdder
 
-from opentrons.protocol_engine import (
-    StateView,
-    WellLocation,
-    DropTipWellLocation,
-)
+from opentrons.protocol_engine import StateView
 from opentrons.protocol_api.core.engine import pipette_movement_conflict
 
 
@@ -267,7 +263,7 @@ def _override_check_safe_for_pipette_movement(
     pipette_id: str,
     labware_id: str,
     well_name: str,
-    well_location: Union[WellLocation, DropTipWellLocation],
+    well_location: object,
 ) -> None:
     pass
 

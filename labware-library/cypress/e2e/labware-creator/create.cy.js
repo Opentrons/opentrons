@@ -2,10 +2,11 @@
 // an element is in view before clicking or checking with
 // { force: true }
 
+import { navigateToUrl } from '../../support/e2e'
+
 context('The Labware Creator Landing Page', () => {
   beforeEach(() => {
-    cy.visit('/create')
-    cy.viewport('macbook-15')
+    navigateToUrl('/#/create')
   })
 
   describe('The initial text', () => {

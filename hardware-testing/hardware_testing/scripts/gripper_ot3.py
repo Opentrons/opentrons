@@ -4,7 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Optional, List, Any, Dict
 
-from opentrons.config.defaults_ot3 import CapacitivePassSettings, OutputOptions
+from opentrons.config.defaults_ot3 import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
@@ -73,7 +73,6 @@ ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
     max_overrun_distance_mm=1,
     speed_mm_per_s=1,
     sensor_threshold_pf=0.5,
-    output_option=OutputOptions.sync_only,
 )
 LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
     "plate": Point(x=5, y=-5),
@@ -287,7 +286,7 @@ async def _probe_labware_corners(
 ) -> List[float]:
     nominal_corners = _calculate_probe_positions(slot, labware_key, deck_item)
     await api.home([types.Axis.by_mount(PROBE_MOUNT)])
-    await api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
+    api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
     found_heights: List[float] = list()
     for corner in nominal_corners:
         current_pos = await api.gantry_position(PROBE_MOUNT)
@@ -300,7 +299,7 @@ async def _probe_labware_corners(
         )
         found_heights.append(found_z)
     await api.home([types.Axis.by_mount(PROBE_MOUNT)])
-    await api.remove_tip(PROBE_MOUNT)
+    api.remove_tip(PROBE_MOUNT)
     print(f'\tLabware Corners ("{deck_item}" at slot {slot})')
     print(f"\t\tTop-Left = {found_heights[0]}")
     print(f"\t\tTop-Right = {found_heights[1]}")

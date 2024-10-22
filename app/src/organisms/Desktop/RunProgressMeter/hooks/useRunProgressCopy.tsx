@@ -6,12 +6,11 @@ import {
 } from '@opentrons/api-client'
 import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
+
+import { getCommandTextData } from '/app/local-resources/commands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { LegacyStyledText } from '@opentrons/components'
-import {
-  CommandText,
-  getLabwareDefinitionsFromCommands,
-} from '/app/molecules/Command'
+import { CommandText } from '/app/molecules/Command'
 import { TERMINAL_RUN_STATUSES } from '../constants'
 
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
