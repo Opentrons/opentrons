@@ -314,15 +314,12 @@ class HardwareGantryMover(GantryMover):
                     mount, refresh=True
                 )
                 log.info(f"The current position of the robot is: {current_position}.")
-                converted_current_position_deck = self._hardware_api.get_deck_from_machine(
-                    current_position
-                )
-                log.info(f"The converted deck position of the robot is: {converted_current_position_deck}.")
+
                 absolute_pos = target_axis_map_from_relative(
-                    pos_hw, converted_current_position_deck
+                    pos_hw, current_position
                 )
                 log.info(
-                    f"The absolute position is: {absolute_pos} and hw pos map is {absolute_pos}."
+                    f"The absolute position is: {absolute_pos} and hw pos map is {pos_hw}."
                 )
             else:
                 log.info(f"Absolute move {axis_map} and {mount}")
