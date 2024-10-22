@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 
 import {
   getDeckDefFromRobotType,
-  getLoadedLabwareDefinitionsByUri,
   getFixedTrashLabwareDefinition,
   getModuleDef2,
   getPositionFromSlotId,
@@ -22,14 +21,17 @@ import type {
   LoadedLabware,
   RobotType,
   LabwareDefinitionsByUri,
+  LoadedModule,
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
+import type { ERUtilsProps } from './useERUtils'
 
 interface UseDeckMapUtilsProps {
   runId: ErrorRecoveryFlowsProps['runId']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   failedLabwareUtils: UseFailedLabwareUtilsResult
+  labwareDefinitionsByUri: ERUtilsProps['labwareDefinitionsByUri']
   runRecord?: Run
 }
 
@@ -37,6 +39,9 @@ export interface UseDeckMapUtilsResult {
   deckConfig: CutoutConfigProtocolSpec[]
   modulesOnDeck: RunCurrentModulesOnDeck[]
   labwareOnDeck: RunCurrentLabwareOnDeck[]
+  loadedLabware: LoadedLabware[]
+  loadedModules: LoadedModule[]
+  movedLabwareDef: LabwareDefinition2 | null
   highlightLabwareEventuallyIn: string[]
   kind: 'intervention'
   robotType: RobotType
@@ -47,18 +52,11 @@ export function useDeckMapUtils({
   runRecord,
   runId,
   failedLabwareUtils,
+  labwareDefinitionsByUri,
 }: UseDeckMapUtilsProps): UseDeckMapUtilsResult {
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const deckDef = getDeckDefFromRobotType(robotType)
-
-  const labwareDefinitionsByUri = useMemo(
-    () =>
-      protocolAnalysis != null
-        ? getLoadedLabwareDefinitionsByUri(protocolAnalysis?.commands)
-        : null,
-    [protocolAnalysis]
-  )
 
   const currentModulesInfo = useMemo(
     () =>
@@ -93,6 +91,11 @@ export function useDeckMapUtils({
     [runId, protocolAnalysis, runRecord, deckDef, failedLabwareUtils]
   )
 
+  const movedLabwareDef =
+    labwareDefinitionsByUri != null && failedLabwareUtils.failedLabware != null
+      ? labwareDefinitionsByUri[failedLabwareUtils.failedLabware.definitionUri]
+      : null
+
   return {
     deckConfig,
     modulesOnDeck: runCurrentModules.map(
@@ -112,6 +115,9 @@ export function useDeckMapUtils({
       .filter(maybeSlot => maybeSlot != null) as string[],
     kind: 'intervention',
     robotType,
+    loadedModules: runRecord?.data.modules ?? [],
+    loadedLabware: runRecord?.data.labware ?? [],
+    movedLabwareDef,
   }
 }
 
