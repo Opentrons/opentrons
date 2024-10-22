@@ -7,6 +7,7 @@ import {
 import { Controller } from 'react-hook-form'
 
 interface ControlledInputFieldProps {
+  id?: string
   name: string
   rules?: any
   title?: string
@@ -14,6 +15,7 @@ interface ControlledInputFieldProps {
 }
 
 export function ControlledInputField({
+  id,
   name,
   rules,
   title,
@@ -27,8 +29,8 @@ export function ControlledInputField({
         <InputField
           title={title}
           caption={caption}
-          id="otherApplication"
-          name="otherApplication"
+          id={id}
+          name={name}
           type="text"
           onChange={field.onChange}
           value={field.value}
