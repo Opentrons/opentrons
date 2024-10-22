@@ -27,7 +27,7 @@ export function LevelingVideo(props: {
 }): JSX.Element {
   const { pipetteName, mount } = props
   const video = new URL(
-    `../../../../app/assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
+    `../../../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
     import.meta.url
   ).href
 
