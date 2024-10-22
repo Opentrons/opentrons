@@ -40,12 +40,12 @@ export function GateModal(): JSX.Element | null {
               onClick={() => dispatch(analyticsActions.optOut())}
             >
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('agree')}
+                {t('reject')}
               </StyledText>
             </SecondaryButton>
             <PrimaryButton onClick={() => dispatch(analyticsActions.optIn())}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('reject')}
+                {t('agree')}
               </StyledText>
             </PrimaryButton>
           </Flex>
