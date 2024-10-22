@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -16,25 +16,24 @@ import {
 } from '@opentrons/components'
 import { actions } from '../../tutorial'
 import { getMainPagePortalEl } from '../../components/portals/MainPageModalPortal'
+import type { ReactNode } from 'react'
 import type { HintKey } from '../../tutorial'
 
 export interface HintProps {
   hintKey: HintKey
   handleCancel: () => void
   handleContinue: () => void
-  content: React.ReactNode
+  content: ReactNode
 }
 
-export const BlockingHintModal = (props: HintProps): JSX.Element => {
+export function BlockingHintModal(props: HintProps): JSX.Element {
   const { content, hintKey, handleCancel, handleContinue } = props
   const { t, i18n } = useTranslation(['alert', 'shared'])
   const dispatch = useDispatch()
 
-  const [rememberDismissal, setRememberDismissal] = React.useState<boolean>(
-    false
-  )
+  const [rememberDismissal, setRememberDismissal] = useState<boolean>(false)
 
-  const toggleRememberDismissal = React.useCallback(() => {
+  const toggleRememberDismissal = useCallback(() => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
 

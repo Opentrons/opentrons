@@ -28,8 +28,7 @@ export function MagnetModuleChangeContent(): JSX.Element {
         <StyledText desktopStyle="bodyDefaultRegular">
           {t('read_more_gen1_gen2')}{' '}
           <Link
-            target="_blank"
-            rel="noopener noreferrer"
+            external
             href="http://support.opentrons.com/en/articles/1820112-magnetic-module"
           >
             {t('here')}

@@ -1,21 +1,21 @@
-import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { BlockingHintModal } from '..'
 import { removeHint } from '../../../tutorial/actions'
+import { BlockingHintModal } from '..'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../../tutorial/actions')
 
-const render = (props: React.ComponentProps<typeof BlockingHintModal>) => {
+const render = (props: ComponentProps<typeof BlockingHintModal>) => {
   return renderWithProviders(<BlockingHintModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('BlockingHintModal', () => {
-  let props: React.ComponentProps<typeof BlockingHintModal>
+  let props: ComponentProps<typeof BlockingHintModal>
 
   beforeEach(() => {
     props = {
