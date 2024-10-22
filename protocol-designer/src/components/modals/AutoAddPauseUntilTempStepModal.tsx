@@ -25,8 +25,8 @@ import type { ModuleType } from '@opentrons/shared-data'
 
 interface Props {
   displayTemperature: string
-  handleCancelClick: () => unknown
-  handleContinueClick: () => unknown
+  handleCancelClick: () => void
+  handleContinueClick: () => void
   moduleType: ModuleType
   displayModule?: string
 }

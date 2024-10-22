@@ -145,8 +145,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     handleSave = confirmAddPauseUntilHeaterShakerTempStep
   }
 
-  console.log(formData)
-
   return (
     <>
       {/* TODO: update these modals to match new modal design */}
