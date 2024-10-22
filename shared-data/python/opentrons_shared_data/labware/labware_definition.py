@@ -8,8 +8,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 from math import sqrt, asin
-from scipy.integrate import quad  # type: ignore[import-untyped]
-from numpy import pi
+from numpy import pi, trapz
 from functools import cached_property
 
 from pydantic import (
@@ -356,75 +355,76 @@ class SquaredConeSegment(BaseModel):
     )
 
     @staticmethod
-    def _volume_from_height_squared_cone(
-        target_height: float,
+    def _area_trap_points(
         total_frustum_height: float,
-        bottom_cross_section: WellShape,
         circle_diameter: float,
         rectangle_x: float,
         rectangle_y: float,
-    ) -> float:
-        """Fight the volume given a height within a squared cone segment."""
+        dx: float,
+    ) -> List[float]:
+        """Grab a bunch of data points of area at given heights."""
 
         def _area_arcs(r: float, c: float, d: float) -> float:
+            """Return the area of all 4 arc segments."""
             theata_y = asin(c / r)
             theata_x = asin(d / r)
-            theata_arc = pi - theata_y - theata_x
+            theata_arc = (pi / 2) - theata_y - theata_x
+            # area of all 4 arcs is 4 * pi*r^2*(theata/2pi)
             return 2 * r**2 * theata_arc
 
         def _area(r: float) -> float:
+            """Return the area of a given r_y."""
             # distance from the center of y axis of the rectangle to where the arc intercepts that side
-            c: float = sqrt(rectangle_y**2 - r**2) if (rectangle_y / 2) < r else 0
+            c: float = (
+                sqrt(r**2 - (rectangle_y / 2) ** 2) if (rectangle_y / 2) < r else 0
+            )
             # distance from the center of x axis of the rectangle to where the arc intercepts that side
-            d: float = sqrt(rectangle_x**2 - r**2) if (rectangle_x / 2) < r else 0
+            d: float = (
+                sqrt(r**2 - (rectangle_x / 2) ** 2) if (rectangle_x / 2) < r else 0
+            )
             arc_area = _area_arcs(r, c, d)
             y_triangles: float = rectangle_y * c
             x_triangles: float = rectangle_x * d
             return arc_area + y_triangles + x_triangles
 
         r_0 = circle_diameter / 2
-        r_h = max(rectangle_y, rectangle_x)
-        r_y = (target_height / total_frustum_height) * (r_h - r_0) + r_0
+        r_h = sqrt(rectangle_x**2 + rectangle_y**2) / 2
 
-        if bottom_cross_section is Circular:
-            # if the bottom section is circular, the bottom r = r_0
-            return float(quad(func=_area, a=r_0, b=r_y)[0])
-        elif bottom_cross_section is Rectangular:
-            # if the bottom section is rectangular, the bottom r = r_h
-            return float(quad(func=_area, a=r_h, b=r_y)[0])
-        else:
-            raise NotImplementedError(
-                "If you see this error a new well shape has been added without updating this code"
-            )
+        num_steps = int(total_frustum_height / dx)
+        points = [0.0]
+        for i in range(num_steps + 1):
+            r_y = (i * dx / total_frustum_height) * (r_h - r_0) + r_0
+            points.append(_area(r_y))
+        return points
 
     @cached_property
     def height_to_volume_table(self) -> Dict[float, float]:
         """Return a lookup table of heights to volumes."""
-        y = 0.0
+        dx = 0.001
         total_height = self.topHeight - self.bottomHeight
-        table: Dict[float, float] = {}
-        # fill in the table
-        while y < total_height:
-            table[y] = SquaredConeSegment._volume_from_height_squared_cone(
-                y,
-                total_height,
-                self.bottomCrossSection,
-                self.circleDiameter,
-                self.rectangleXDimension,
-                self.rectangleYDimension,
-            )
-            y = y + 0.01
-
-        # we always want to include the volume at the max height
-        table[total_height] = SquaredConeSegment._volume_from_height_squared_cone(
+        points = SquaredConeSegment._area_trap_points(
             total_height,
-            total_height,
-            self.bottomCrossSection,
             self.circleDiameter,
             self.rectangleXDimension,
             self.rectangleYDimension,
+            dx,
         )
+        if self.bottomCrossSection is Rectangular:
+            # The points function assumes the circle is at the bottom but if its flipped we just reverse the points
+            points.reverse()
+        elif self.bottomCrossSection is not Circular:
+            raise NotImplementedError(
+                "If you see this error a new well shape has been added without updating this code"
+            )
+        y = 0.0
+        table: Dict[float, float] = {}
+        # fill in the table
+        while y < total_height:
+            table[y] = trapz(points[0 : int(y / dx)], dx=dx)
+            y = y + dx
 
+        # we always want to include the volume at the max height
+        table[total_height] = trapz(points, dx=dx)
         return table
 
     @cached_property
