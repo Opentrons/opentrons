@@ -1,4 +1,11 @@
-import { Flex } from '@opentrons/components'
+import {
+  Flex,
+  MoveLabwareOnDeck,
+  COLORS,
+  Module,
+  LabwareRender,
+} from '@opentrons/components'
+import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
 import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
@@ -8,8 +15,8 @@ import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { getSlotNameAndLwLocFrom } from '../hooks/useDeckMapUtils'
 import { RECOVERY_MAP } from '../constants'
 
-import type { RecoveryContentProps } from '../types'
 import type * as React from 'react'
+import type { RecoveryContentProps } from '../types'
 import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
 export function TwoColLwInfoAndDeck(
@@ -21,6 +28,7 @@ export function TwoColLwInfoAndDeck(
     failedLabwareUtils,
     deckMapUtils,
     currentRecoveryOptionUtils,
+    isOnDevice,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -100,6 +108,76 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
+  // TODO(jh, 10-22-24): Componentize an app-only abstraction above MoveLabwareOnDeck. EXEC-788.
+  const buildDeckView = (): JSX.Element => {
+    switch (selectedRecoveryOption) {
+      case MANUAL_MOVE_AND_SKIP.ROUTE: {
+        const { newLoc, currentLoc } = failedLabwareUtils.failedLabwareLocations
+        const {
+          movedLabwareDef,
+          moduleRenderInfo,
+          labwareRenderInfo,
+          ...restUtils
+        } = deckMapUtils
+
+        const failedLwId = failedLabware?.id ?? ''
+
+        const isValidDeck =
+          currentLoc != null && newLoc != null && movedLabwareDef != null
+
+        return isValidDeck ? (
+          <MoveLabwareOnDeck
+            deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
+            initialLabwareLocation={currentLoc}
+            finalLabwareLocation={newLoc}
+            movedLabwareDef={movedLabwareDef}
+            {...restUtils}
+            backgroundItems={
+              <>
+                {moduleRenderInfo.map(
+                  ({
+                    x,
+                    y,
+                    moduleId,
+                    moduleDef,
+                    nestedLabwareDef,
+                    nestedLabwareId,
+                  }) => (
+                    <Module
+                      key={moduleId}
+                      def={moduleDef}
+                      x={x}
+                      y={y}
+                      orientation={inferModuleOrientationFromXCoordinate(x)}
+                    >
+                      {nestedLabwareDef != null &&
+                      nestedLabwareId !== failedLwId ? (
+                        <LabwareRender definition={nestedLabwareDef} />
+                      ) : null}
+                    </Module>
+                  )
+                )}
+                {labwareRenderInfo
+                  .filter(l => l.labwareId !== failedLwId)
+                  .map(({ x, y, labwareDef, labwareId }) => (
+                    <g key={labwareId} transform={`translate(${x},${y})`}>
+                      {labwareDef != null && labwareId !== failedLwId ? (
+                        <LabwareRender definition={labwareDef} />
+                      ) : null}
+                    </g>
+                  ))}
+              </>
+            }
+          />
+        ) : (
+          <Flex />
+        )
+      }
+      default:
+        return <DeckMapContent {...deckMapUtils} />
+    }
+  }
+
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
@@ -109,9 +187,7 @@ export function TwoColLwInfoAndDeck(
           type={buildType()}
           bannerText={buildBannerText()}
         />
-        <Flex marginTop="1.742rem">
-          <DeckMapContent {...deckMapUtils} />
-        </Flex>
+        <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
       </TwoColumn>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
     </RecoverySingleColumnContentWrapper>

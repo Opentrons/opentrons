@@ -15,7 +15,6 @@ from .types import (
     LiquidProbeSettings,
     ZSenseSettings,
     EdgeSenseSettings,
-    OutputOptions,
 )
 
 
@@ -27,13 +26,11 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     plunger_speed=15,
     plunger_impulse_time=0.2,
     sensor_threshold_pascals=15,
-    output_option=OutputOptions.sync_buffer_to_csv,
     aspirate_while_sensing=False,
     z_overlap_between_passes_mm=0.1,
     plunger_reset_offset=2.0,
     samples_for_baselining=20,
     sample_time_sec=0.004,
-    data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
@@ -43,7 +40,6 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             max_overrun_distance_mm=5.0,
             speed_mm_per_s=1.0,
             sensor_threshold_pf=3.0,
-            output_option=OutputOptions.sync_only,
         ),
     ),
     edge_sense=EdgeSenseSettings(
@@ -54,7 +50,6 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             max_overrun_distance_mm=0.5,
             speed_mm_per_s=1,
             sensor_threshold_pf=3.0,
-            output_option=OutputOptions.sync_only,
         ),
         search_initial_tolerance_mm=12.0,
         search_iteration_limit=8,
@@ -195,23 +190,6 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
 )
 
 
-def _build_output_option_with_default(
-    from_conf: Any, default: OutputOptions
-) -> OutputOptions:
-    if from_conf is None:
-        return default
-    else:
-        if isinstance(from_conf, OutputOptions):
-            return from_conf
-        else:
-            try:
-                enumval = OutputOptions[from_conf]
-            except KeyError:  # not an enum entry
-                return default
-            else:
-                return enumval
-
-
 def _build_log_files_with_default(
     from_conf: Any,
     default: Optional[Dict[InstrumentProbeType, str]],
@@ -316,24 +294,12 @@ def _build_default_cap_pass(
         sensor_threshold_pf=from_conf.get(
             "sensor_threshold_pf", default.sensor_threshold_pf
         ),
-        output_option=from_conf.get("output_option", default.output_option),
     )
 
 
 def _build_default_liquid_probe(
     from_conf: Any, default: LiquidProbeSettings
 ) -> LiquidProbeSettings:
-    output_option = _build_output_option_with_default(
-        from_conf.get("output_option", None), default.output_option
-    )
-    data_files: Optional[Dict[InstrumentProbeType, str]] = None
-    if (
-        output_option is OutputOptions.sync_buffer_to_csv
-        or output_option is OutputOptions.stream_to_csv
-    ):
-        data_files = _build_log_files_with_default(
-            from_conf.get("data_files", None), default.data_files
-        )
     return LiquidProbeSettings(
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
         plunger_speed=from_conf.get("plunger_speed", default.plunger_speed),
@@ -343,7 +309,6 @@ def _build_default_liquid_probe(
         sensor_threshold_pascals=from_conf.get(
             "sensor_threshold_pascals", default.sensor_threshold_pascals
         ),
-        output_option=from_conf.get("output_option", default.output_option),
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
         ),
@@ -357,7 +322,6 @@ def _build_default_liquid_probe(
             "samples_for_baselining", default.samples_for_baselining
         ),
         sample_time_sec=from_conf.get("sample_time_sec", default.sample_time_sec),
-        data_files=data_files,
     )
 
 

@@ -144,7 +144,7 @@ async def _drop_tip(api: OT3API, trash: Point) -> None:
     # NOTE: a FW bug (as of v14) will sometimes not fully drop tips.
     #       so here we ask if the operator needs to try again
     while not api.is_simulator and ui.get_user_answer("try dropping again"):
-        await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+        api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
         await api.drop_tip(OT3Mount.LEFT)
     await api.home_z(OT3Mount.LEFT)
 
@@ -172,7 +172,7 @@ async def _partial_pick_up(api: OT3API, position: Point, current: float) -> None
         safe_height=position.z + 10,
     )
     await _partial_pick_up_z_motion(api, current=current, distance=13, speed=5)
-    await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+    api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
     await api.prepare_for_aspirate(OT3Mount.LEFT)
     await api.home_z(OT3Mount.LEFT)
 

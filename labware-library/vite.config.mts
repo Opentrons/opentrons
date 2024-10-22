@@ -6,6 +6,7 @@ import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
+import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 export default defineConfig({
   // this makes imports relative rather than absolute
@@ -29,6 +30,7 @@ export default defineConfig({
         configFile: true,
       },
     }),
+    cssModuleSideEffect(), // Note for treeshake
   ],
   optimizeDeps: {
     esbuildOptions: {

@@ -7129,7 +7129,8 @@
             "y": 0.0,
             "z": -37.72
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -7162,7 +7163,8 @@
             "y": 0.0,
             "z": -2.0000000000000018
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -7194,7 +7196,8 @@
             "y": 0.0,
             "z": -2.0000000000000018
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -7205,413 +7208,6 @@
           "z": 14.059999999999999
         }
       },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "7de854c900b928456d12434bc16a69dc",
-      "notes": [],
-      "params": {
-        "flowRate": 16.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 40.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -18.610000000000003
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 14.38,
-          "y": 74.24,
-          "z": 9.199999999999998
-        },
-        "volume": 40.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "660be9aec4cfa3bbfdcc63f8ee88ff8b",
-      "notes": [],
-      "params": {
-        "flowRate": 160.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 40.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -2.0000000000000018
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 14.059999999999999
-        },
-        "volume": 40.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "01e8b60c57090d9d697b30c14535a4d4",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "308d19b3cd9df6cdc6cddd15bcbae301",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "pushOut": 0.0,
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "eb8ae6cb4c25d9922b51fb35ada546c3",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "478aaa06d4bf8b11ce231a0f5f85f0ac",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "pushOut": 0.0,
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "a3517f93f014e4b6b6dc7b3ab5871265",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "97d14eacc5cefb72a6ab7a4a9fe5618c",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "pushOut": 0.0,
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "41a4b8e3c2805a03f4df30235e175c9c",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "4616314bfe9fda29ecf3fe9f309f31c3",
-      "notes": [],
-      "params": {
-        "flowRate": 48.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -12.510000000000002
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 3.549999999999999
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "blowout",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "2d0162cb149a68bbf7497839eecc333a",
-      "notes": [],
-      "params": {
-        "flowRate": 80.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -1.0000000000000018
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 15.059999999999999
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToAddressableAreaForDropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "dbcf7b08d6adae7c756d59c3df5b0d87",
-      "notes": [],
-      "params": {
-        "addressableAreaName": "movableTrashA3",
-        "alternateDropLocation": true,
-        "forceDirect": false,
-        "ignoreTipConfiguration": true,
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "pipetteId": "UUID"
-      },
-      "result": {
-        "position": {
-          "x": 466.25,
-          "y": 364.0,
-          "z": 40.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ad0d4c10fb9650544d779560d768bd0e",
-      "notes": [],
-      "params": {
-        "pipetteId": "UUID"
-      },
-      "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     }
@@ -7624,7 +7220,29 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "OperationLocationNotInWellError [line 90]: Error 4000 GENERAL_ERROR (OperationLocationNotInWellError): Specifying bottom with an offset of x=0.0 y=0.0 z=-3.8 and a volume offset of 0.0 results in an operation location below the bottom of the well",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "Specifying bottom with an offset of x=0.0 y=0.0 z=-3.8 and a volume offset of 0.0 results in an operation location below the bottom of the well",
+          "errorCode": "4000",
+          "errorInfo": {},
+          "errorType": "OperationLocationNotInWellError",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "pl_sample_dilution_with_96_channel_pipette.py",
@@ -7716,7 +7334,7 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

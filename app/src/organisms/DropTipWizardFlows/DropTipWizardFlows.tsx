@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   useDropTipLocations,
@@ -63,6 +63,14 @@ export function DropTipWizardFlows(
   })
   const dropTipRoutingUtils = useDropTipRouting(fixitCommandTypeUtils)
   const dropTipCommandLocations = useDropTipLocations(props.robotType) // Prefetch to reduce client latency
+
+  // If the flow unrenders for any reason (ex, the pipette card managing the flow unrenders), don't re-render the flow
+  // after it closes.
+  useEffect(() => {
+    return () => {
+      dropTipWithTypeUtils.dropTipCommands.handleCleanUpAndClose()
+    }
+  }, [])
 
   return (
     <DropTipWizard

@@ -47,6 +47,7 @@ stages:
               location: !anydict
           labwareOffsets: []
           runTimeParameters: []
+          outputFileIds: []
           liquids:
             - id: waterId
               displayName: Water
@@ -322,6 +323,7 @@ stages:
                   x: 0
                   'y': 0
                   z: 2
+                volumeOffset: 0
               volume: 5
               flowRate: 3
           - id: !anystr
@@ -342,6 +344,7 @@ stages:
                   x: 0
                   'y': 0
                   z: 1
+                volumeOffset: 0
               volume: 4.5
               flowRate: 2.5
           - id: !anystr
@@ -362,6 +365,7 @@ stages:
                   x: 0
                   'y': 0
                   z: 0
+                volumeOffset: 0
               forceDirect: false
           - id: !anystr
             key: !anystr
@@ -381,6 +385,7 @@ stages:
                   x: 2
                   y: 3
                   z: 10
+                volumeOffset: 0
               minimumZHeight: 35
               forceDirect: true
               speed: 12.3
