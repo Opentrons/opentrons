@@ -26,6 +26,7 @@ export function CreateProtocol(): JSX.Element | null {
   const [applicationAccordionIsOpen, setApplicationAccordionIsOpen] = useState(
     true
   )
+  const [activeSection, setActiveSection] = useState(0)
 
   const methods = useForm<CreateProtocolFormData>({
     defaultValues: {
@@ -49,12 +50,22 @@ export function CreateProtocol(): JSX.Element | null {
         <ProtocolSections>
           <Accordion
             heading={t('application_title')}
-            isOpen={applicationAccordionIsOpen}
+            isOpen={activeSection === 0}
             handleClick={function (): void {
-              throw new Error('Function not implemented.')
+              setActiveSection(0)
             }}
           >
             <ApplicationSection />
+          </Accordion>
+
+          <Accordion
+            heading={t('instruments_title')}
+            isOpen={activeSection === 1}
+            handleClick={function (): void {
+              setActiveSection(1)
+            }}
+          >
+            <Flex>Content</Flex>
           </Accordion>
         </ProtocolSections>
         <PromptPreview
@@ -71,4 +82,5 @@ export function CreateProtocol(): JSX.Element | null {
 const ProtocolSections = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   width: 100%;
+  gap: ${SPACING.spacing16};
 `
