@@ -1,11 +1,11 @@
 import {
-    ROBOT_CALIBRATION_STEP_KEY,
-    MODULE_SETUP_STEP_KEY,
-    LPC_STEP_KEY,
-    LABWARE_SETUP_STEP_KEY,
-    LIQUID_SETUP_STEP_KEY,
-    UPDATE_RUN_SETUP_STEPS_COMPLETE,
-    UPDATE_RUN_SETUP_STEPS_REQUIRED,
+  ROBOT_CALIBRATION_STEP_KEY,
+  MODULE_SETUP_STEP_KEY,
+  LPC_STEP_KEY,
+  LABWARE_SETUP_STEP_KEY,
+  LIQUID_SETUP_STEP_KEY,
+  UPDATE_RUN_SETUP_STEPS_COMPLETE,
+  UPDATE_RUN_SETUP_STEPS_REQUIRED,
 } from './constants'
 
 export type RobotCalibrationStepKey = typeof ROBOT_CALIBRATION_STEP_KEY
@@ -15,47 +15,47 @@ export type LabwareSetupStepKey = typeof LABWARE_SETUP_STEP_KEY
 export type LiquidSetupStepKey = typeof LIQUID_SETUP_STEP_KEY
 
 export type StepKey =
-    | RobotCalibrationStepKey
-    | ModuleSetupStepKey
-    | LPCStepKey
-    | LabwareSetupStepKey
-    | LiquidSetupStepKey
+  | RobotCalibrationStepKey
+  | ModuleSetupStepKey
+  | LPCStepKey
+  | LabwareSetupStepKey
+  | LiquidSetupStepKey
 
 export interface StepState {
-    required: boolean
-    complete: boolean
+  required: boolean
+  complete: boolean
 }
 
 export type StepMap<V> = { [Step in StepKey]: V }
 
 export type RunSetupStatus = {
-    [Step in StepKey]: StepState
+  [Step in StepKey]: StepState
 }
 
 export interface PerRunUIState {
-    setup: RunSetupStatus
+  setup: RunSetupStatus
 }
 
 export type ProtocolRunState = Partial<{
-    readonly [runId: string]: PerRunUIState
+  readonly [runId: string]: PerRunUIState
 }>
 
 export interface UpdateRunSetupStepsCompleteAction {
-    type: typeof UPDATE_RUN_SETUP_STEPS_COMPLETE
-    payload: {
-        runId: string
-        complete: Partial<{ [Step in StepKey]: boolean }>
-    }
+  type: typeof UPDATE_RUN_SETUP_STEPS_COMPLETE
+  payload: {
+    runId: string
+    complete: Partial<{ [Step in StepKey]: boolean }>
+  }
 }
 
 export interface UpdateRunSetupStepsRequiredAction {
-    type: typeof UPDATE_RUN_SETUP_STEPS_REQUIRED
-    payload: {
-        runId: string
-        required: Partial<{ [Step in StepKey]: boolean }>
-    }
+  type: typeof UPDATE_RUN_SETUP_STEPS_REQUIRED
+  payload: {
+    runId: string
+    required: Partial<{ [Step in StepKey]: boolean }>
+  }
 }
 
 export type ProtocolRunAction =
-    | UpdateRunSetupStepsCompleteAction
-    | UpdateRunSetupStepsRequiredAction
+  | UpdateRunSetupStepsCompleteAction
+  | UpdateRunSetupStepsRequiredAction

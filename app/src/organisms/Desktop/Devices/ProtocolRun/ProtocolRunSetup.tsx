@@ -60,7 +60,7 @@ import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
 import { HowLPCWorksModal } from './SetupLabwarePositionCheck/HowLPCWorksModal'
 
-import type { Dispatch, State } from '/app/redux'
+import type { Dispatch, State } from '/app/redux/types'
 import type { StepKey } from '/app/redux/protocol-runs'
 
 const STEP_KEY_TO_I18N_KEY = {
@@ -143,7 +143,9 @@ export function ProtocolRunSetup({
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
 
-  const missingSteps = useSelector(state => getMissingSetupSteps(state, runId))
+  const missingSteps = useSelector<State, StepKey[]>(
+    (state: State): StepKey[] => getMissingSetupSteps(state, runId)
+  )
 
   if (robot == null) {
     return null
@@ -224,7 +226,7 @@ export function ProtocolRunSetup({
           {...{ runId, robotName }}
           setOffsetsConfirmed={confirmed => {
             dispatch(
-              updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: true })
+              updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: confirmed })
             )
             if (confirmed) {
               setExpandedStepKey(LABWARE_SETUP_STEP_KEY)
@@ -251,14 +253,10 @@ export function ProtocolRunSetup({
           setLabwareConfirmed={(confirmed: boolean) => {
             dispatch(
               updateRunSetupStepsComplete(runId, {
-                [LABWARE_SETUP_STEP_KEY]: true,
+                [LABWARE_SETUP_STEP_KEY]: confirmed,
               })
             )
-            setLabwareSetupComplete(confirmed)
             if (confirmed) {
-              setMissingSteps(
-                missingSteps.filter(step => step !== 'labware_placement')
-              )
               const nextStep =
                 orderedApplicableSteps.findIndex(
                   v => v === LABWARE_SETUP_STEP_KEY
@@ -274,7 +272,7 @@ export function ProtocolRunSetup({
       description: t(`${LABWARE_SETUP_STEP_KEY}_description`),
       rightElProps: {
         stepKey: LABWARE_SETUP_STEP_KEY,
-        complete: labwareSetupComplete,
+        complete: !missingSteps.includes(LABWARE_SETUP_STEP_KEY),
         completeText: t('placements_ready'),
         incompleteText: null,
         incompleteElement: null,
@@ -286,11 +284,14 @@ export function ProtocolRunSetup({
           robotName={robotName}
           runId={runId}
           protocolAnalysis={protocolAnalysis}
-          isLiquidSetupConfirmed={liquidSetupComplete}
+          isLiquidSetupConfirmed={!missingSteps.includes(LIQUID_SETUP_STEP_KEY)}
           setLiquidSetupConfirmed={(confirmed: boolean) => {
-            setLiquidSetupComplete(confirmed)
+            dispatch(
+              updateRunSetupStepsComplete(runId, {
+                [LIQUID_SETUP_STEP_KEY]: confirmed,
+              })
+            )
             if (confirmed) {
-              setMissingSteps(missingSteps.filter(step => step !== 'liquids'))
               setExpandedStepKey(null)
             }
           }}
@@ -301,7 +302,7 @@ export function ProtocolRunSetup({
         : i18n.format(t('liquids_not_in_the_protocol'), 'capitalize'),
       rightElProps: {
         stepKey: LIQUID_SETUP_STEP_KEY,
-        complete: liquidSetupComplete,
+        complete: !missingSteps.includes(LIQUID_SETUP_STEP_KEY),
         completeText: t('liquids_ready'),
         incompleteText: null,
         incompleteElement: null,

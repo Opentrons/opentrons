@@ -35,7 +35,6 @@ export interface ProtocolRunHeaderProps {
   robotName: string
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
-  missingSetupSteps: string[]
 }
 
 export function ProtocolRunHeader(
