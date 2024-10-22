@@ -41,7 +41,4 @@ class RunAction(ResourceModel):
 
     id: str = Field(..., description="A unique identifier to reference the command.")
     createdAt: datetime = Field(..., description="When the command was created.")
-    actionType: RunActionType = Field(
-        ...,
-        description="Specific type of action, which determines behavior.",
-    )
+    actionType: RunActionType
