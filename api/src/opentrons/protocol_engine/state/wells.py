@@ -45,6 +45,8 @@ class WellStore(HasState[WellState], HandlesActions):
     ) -> None:
         if state_update.loaded_liquid != update_types.NO_CHANGE:
             labware_id = state_update.loaded_liquid.labware_id
+            if labware_id not in self._state.loaded_volumes:
+                self._state.loaded_volumes[labware_id] = {}
             for (well, volume) in state_update.loaded_liquid.volumes.items():
                 self._state.loaded_volumes[labware_id][well] = LoadedVolumeInfo(
                     volume=volume,
@@ -58,6 +60,10 @@ class WellStore(HasState[WellState], HandlesActions):
         if state_update.probed_liquid != update_types.NO_CHANGE:
             labware_id = state_update.probed_liquid.labware_id
             well_name = state_update.probed_liquid.well_name
+            if labware_id not in self._state.probed_heights:
+                self._state.probed_heights[labware_id] = {}
+            if labware_id not in self._state.probed_volumes:
+                self._state.probed_volumes[labware_id] = {}
             self._state.probed_heights[labware_id][well_name] = ProbedHeightInfo(
                 height=state_update.probed_liquid.height,
                 last_probed=state_update.probed_liquid.last_probed,
@@ -74,9 +80,12 @@ class WellStore(HasState[WellState], HandlesActions):
         if state_update.operated_liquid != update_types.NO_CHANGE:
             labware_id = state_update.operated_liquid.labware_id
             well_name = state_update.operated_liquid.well_name
-            del self._state.probed_heights[labware_id][well_name]
-            prev_loaded_vol_info = self._state.loaded_volumes[labware_id][well_name]
-            if prev_loaded_vol_info.volume:
+            if (
+                labware_id in self._state.loaded_volumes
+                and well_name in self._state.loaded_volumes[labware_id]
+            ):
+                prev_loaded_vol_info = self._state.loaded_volumes[labware_id][well_name]
+                assert prev_loaded_vol_info.volume is not None
                 self._state.loaded_volumes[labware_id][well_name] = LoadedVolumeInfo(
                     volume=prev_loaded_vol_info.volume
                     + state_update.operated_liquid.volume,
@@ -84,8 +93,17 @@ class WellStore(HasState[WellState], HandlesActions):
                     operations_since_load=prev_loaded_vol_info.operations_since_load
                     + 1,
                 )
-            prev_probed_vol_info = self._state.probed_volumes[labware_id][well_name]
-            if prev_probed_vol_info.volume:
+            if (
+                labware_id in self._state.probed_heights
+                and well_name in self._state.probed_heights[labware_id]
+            ):
+                del self._state.probed_heights[labware_id][well_name]
+            if (
+                labware_id in self._state.probed_volumes
+                and well_name in self._state.probed_volumes[labware_id]
+            ):
+                prev_probed_vol_info = self._state.probed_volumes[labware_id][well_name]
+                assert prev_probed_vol_info.volume is not None
                 self._state.probed_volumes[labware_id][well_name] = ProbedVolumeInfo(
                     volume=prev_probed_vol_info.volume
                     + state_update.operated_liquid.volume,
