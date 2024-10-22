@@ -12,10 +12,7 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { deleteContainer } from '../../../../labware-ingred/actions'
 import { createModule, deleteModule } from '../../../../step-forms/actions'
 import { getRobotType } from '../../../../file-data/selectors'
-import {
-  getEnableAbsorbanceReader,
-  getEnableMoam,
-} from '../../../../feature-flags/selectors'
+import { getEnableAbsorbanceReader } from '../../../../feature-flags/selectors'
 import {
   createDeckFixture,
   deleteDeckFixture,
@@ -63,7 +60,6 @@ describe('DeckSetupTools', () => {
     vi.mocked(LabwareTools).mockReturnValue(<div>mock labware tools</div>)
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getEnableAbsorbanceReader).mockReturnValue(true)
-    vi.mocked(getEnableMoam).mockReturnValue(true)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
       modules: {},

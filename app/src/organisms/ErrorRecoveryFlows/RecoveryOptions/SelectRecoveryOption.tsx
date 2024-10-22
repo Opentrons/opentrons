@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import head from 'lodash/head'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
+  RESPONSIVENESS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -108,11 +110,7 @@ export function RecoveryOptions({
   isOnDevice,
 }: RecoveryOptionsProps): JSX.Element {
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
-      width="100%"
-    >
+    <Flex css={RECOVERY_OPTION_CONTAINER_STYLE}>
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
         const optionName = getRecoveryOptionCopy(recoveryOption, errorKind)
         return (
@@ -132,6 +130,16 @@ export function RecoveryOptions({
     </Flex>
   )
 }
+
+const RECOVERY_OPTION_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing4};
+  width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing8};
+  }
+`
 
 // Pre-fetch tip attachment status. Users are not blocked from proceeding at this step.
 export function useCurrentTipStatus(
