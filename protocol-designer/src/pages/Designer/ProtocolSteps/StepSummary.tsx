@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import first from 'lodash/first'
 import flatten from 'lodash/flatten'
 import last from 'lodash/last'
@@ -23,9 +24,7 @@ import {
   getModuleEntities,
 } from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-
 import type { FormData } from '../../../form-types'
-import { css } from 'styled-components'
 
 interface StyledTransProps {
   i18nKey: string

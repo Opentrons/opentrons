@@ -2,7 +2,7 @@ import { useState } from 'react'
 import get from 'lodash/get'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
+import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
@@ -41,7 +41,6 @@ import { getSaveStepSnackbarText } from './utils'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FormData, StepType } from '../../../../form-types'
 import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
-import { css } from 'styled-components'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null
