@@ -7,6 +7,17 @@ import { titleCase } from '@opentrons/shared-data'
 
 import type { InitOptions } from 'i18next'
 
+export const US_ENGLISH = 'en-US'
+export const SIMPLIFIED_CHINESE = 'zh-CN'
+
+export type Language = typeof US_ENGLISH | typeof SIMPLIFIED_CHINESE
+
+// these strings will not be translated so should not be localized
+export const LANGUAGES: Array<{ name: string; value: Language }> = [
+  { name: 'English (US)', value: US_ENGLISH },
+  { name: '中文', value: SIMPLIFIED_CHINESE },
+]
+
 const i18nConfig: InitOptions = {
   resources,
   lng: 'en',

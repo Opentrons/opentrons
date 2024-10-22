@@ -8,8 +8,8 @@ import type {
   ProtocolsOnDeviceSortKey,
   QuickTransfersOnDeviceSortKey,
   OnDeviceDisplaySettings,
-  Language,
 } from './types'
+import type { Language } from '/app/i18n'
 import type { ProtocolSort } from '/app/redux/protocol-storage'
 
 export interface SelectOption {

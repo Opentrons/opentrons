@@ -1,4 +1,5 @@
 import type { LogLevel } from '../../logger'
+import type { Language } from '/app/i18n'
 import type { ProtocolSort } from '/app/redux/protocol-storage'
 
 export type UrlProtocol = 'file:' | 'http:'
@@ -30,8 +31,6 @@ export type QuickTransfersOnDeviceSortKey =
   | 'reverse'
   | 'recentCreated'
   | 'oldCreated'
-
-export type Language = 'en-US' | 'zh-CN'
 
 export interface OnDeviceDisplaySettings {
   sleepMs: number
