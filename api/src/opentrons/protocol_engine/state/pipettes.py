@@ -39,7 +39,7 @@ from ..actions import (
     FailCommandAction,
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
-    get_state_update,
+    get_state_updates,
 )
 from ._abstract_store import HasState, HandlesActions
 
@@ -141,8 +141,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        state_update = get_state_update(action)
-        if state_update is not None:
+        for state_update in get_state_updates(action):
             self._set_load_pipette(state_update)
             self._update_current_location(state_update)
             self._update_pipette_config(state_update)

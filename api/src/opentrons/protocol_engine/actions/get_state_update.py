@@ -8,29 +8,28 @@ from .actions import (
     FailCommandAction,
 )
 from ..commands.command import DefinedErrorData
+from ..error_recovery_policy import ErrorRecoveryType
 from ..state.update_types import StateUpdate
 
 
-def get_state_update(action: Action) -> StateUpdate | None:
-    """Extract the StateUpdate from an action, if there is one."""
+def get_state_updates(action: Action) -> list[StateUpdate]:
+    """Extract the StateUpdates that we should apply when we're applying an action."""
     if isinstance(action, SucceedCommandAction):
-        return action.state_update
+        return [action.state_update]
+
     elif isinstance(action, FailCommandAction) and isinstance(
         action.error, DefinedErrorData
     ):
-        return action.error.state_update
-    elif isinstance(action, ResumeFromRecoveryAction):
-        return action.state_update
-    else:
-        return None
+        if action.type == ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE:
+            return [
+                action.error.state_update,
+                action.error.state_update_if_false_positive,
+            ]
+        else:
+            return [action.error.state_update]
 
-    # FIX BEFORE MERGE:
-    # If it's a FailCommandAction, and the error recovery policy was
-    # "assume false-positive and continue," there are actually two StateUpdates
-    # that we need to return here:
-    #
-    # 1. The "main" one from the command failure.
-    # 2. The "extra" one from assuming it's a false-positive and fixing things up
-    #    so we're ready to continue.
-    #
-    # Or we need to merge them into a single update or something.
+    elif isinstance(action, ResumeFromRecoveryAction):
+        return [action.state_update]
+
+    else:
+        return []

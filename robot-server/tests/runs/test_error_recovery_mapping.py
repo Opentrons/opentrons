@@ -72,7 +72,7 @@ def test_create_error_recovery_policy_with_rules(
     mock_error_data: CommandDefinedErrorData,
     mock_rule: ErrorRecoveryRule,
 ) -> None:
-    """Should return IGNORE_AND_CONTINUE if that's what we specify as the rule."""
+    """Should return CONTINUE_WITH_ERROR if we specified IGNORE_AND_CONTINUE as the rule."""
     policy = create_error_recovery_policy_from_rules([mock_rule], enabled=True)
     example_config = Config(
         robot_type="OT-3 Standard",
@@ -80,7 +80,7 @@ def test_create_error_recovery_policy_with_rules(
     )
     assert (
         policy(example_config, mock_command, mock_error_data)
-        == ErrorRecoveryType.IGNORE_AND_CONTINUE
+        == ErrorRecoveryType.CONTINUE_WITH_ERROR
     )
 
 
@@ -141,7 +141,7 @@ def test_enabled_boolean(enabled: bool) -> None:
     policy = create_error_recovery_policy_from_rules(rules, enabled)
     result = policy(example_config, command, error_data)
     expected_result = (
-        ErrorRecoveryType.IGNORE_AND_CONTINUE if enabled else ErrorRecoveryType.FAIL_RUN
+        ErrorRecoveryType.CONTINUE_WITH_ERROR if enabled else ErrorRecoveryType.FAIL_RUN
     )
     assert result == expected_result
 
@@ -187,7 +187,7 @@ def test_enabled_on_flex_disabled_on_ot2(
     policy = create_error_recovery_policy_from_rules(rules, enabled=True)
     result = policy(example_config, command, error_data)
     expected_result = (
-        ErrorRecoveryType.IGNORE_AND_CONTINUE
+        ErrorRecoveryType.CONTINUE_WITH_ERROR
         if expect_error_recovery_to_be_enabled
         else ErrorRecoveryType.FAIL_RUN
     )

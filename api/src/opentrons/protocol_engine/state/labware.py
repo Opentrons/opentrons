@@ -53,7 +53,7 @@ from ..actions import (
     Action,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
-    get_state_update,
+    get_state_updates,
 )
 from ._abstract_store import HasState, HandlesActions
 from ._move_types import EdgePathType
@@ -149,8 +149,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        state_update = get_state_update(action)
-        if state_update is not None:
+        for state_update in get_state_updates(action):
             self._add_loaded_labware(state_update)
             self._set_labware_location(state_update)
 

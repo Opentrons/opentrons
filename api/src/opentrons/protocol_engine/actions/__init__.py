@@ -30,7 +30,7 @@ from .actions import (
     SetPipetteMovementSpeedAction,
     AddAbsorbanceReaderLidAction,
 )
-from .get_state_update import get_state_update
+from .get_state_update import get_state_updates
 
 __all__ = [
     # action pipeline interface
@@ -63,5 +63,5 @@ __all__ = [
     "PauseSource",
     "FinishErrorDetails",
     # helper functions
-    "get_state_update",
+    "get_state_updates",
 ]
