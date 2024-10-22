@@ -143,7 +143,7 @@ function TouchscreenModal({
           data-testid="Estop_pressed_button"
           width="100%"
           iconName={
-            isResuming || isPlacing ||  isWaitingForLogicalDisengage || isWaitingForPlateReaderLidPlacement
+            isResuming || isPlacing || isWaitingForLogicalDisengage || isWaitingForPlateReaderLidPlacement
               ? 'ot-spinner'
               : undefined
           }

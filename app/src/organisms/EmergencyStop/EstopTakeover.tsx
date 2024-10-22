@@ -27,6 +27,10 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
     isWaitingForLogicalDisengage,
     setIsWaitingForLogicalDisengage,
   ] = useState<boolean>(false)
+  const [
+    isWaitingForPlateReaderLidPlacement,
+    setisWaitingForPlateReaderLidPlacement,
+  ] = useState<boolean>(false)
   const { data: estopStatus } = useEstopQuery({
     refetchInterval: estopEngaged
       ? ESTOP_CURRENTLY_ENGAGED_REFETCH_INTERVAL_MS
@@ -65,6 +69,7 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
             isDismissedModal={isEmergencyStopModalDismissed}
             setIsDismissedModal={setIsEmergencyStopModalDismissed}
             isWaitingForLogicalDisengage={isWaitingForLogicalDisengage}
+            isWaitingForPlateReaderLidPlacement={isWaitingForPlateReaderLidPlacement}
             setShouldSeeLogicalDisengage={() => {
               setIsWaitingForLogicalDisengage(true)
             }}

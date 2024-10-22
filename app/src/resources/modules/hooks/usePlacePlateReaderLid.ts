@@ -5,6 +5,8 @@ import type {
   UseRobotControlCommandsProps,
   UseRobotControlCommandsResult,
 } from '/app/resources/maintenance_runs'
+import { useRunCurrentState } from '@opentrons/react-api-client'
+import { useCurrentRunId } from '../../runs'
 
 interface UsePlacePlateReaderLidResult {
   isPlacing: UseRobotControlCommandsResult['isExecuting']
@@ -16,12 +18,15 @@ export type UsePlacePlateReaderLidProps = Pick<
   'pipetteInfo' | 'onSettled'
 >
 
-// TODO: Need to conditionally run this function based on `runs/currentState` value
 export function usePlacePlateReaderLid(
   props: UsePlacePlateReaderLidProps
 ): UsePlacePlateReaderLidResult {
-  const labwareId: string = 'absorbanceReaderV1LidC3'
-  const location: LabwareLocation = {slotName: 'C3'}
+  const runId = useCurrentRunId()
+  const { data: runCurrentState } = useRunCurrentState(runId)
+  const estopEngaged = runCurrentState?.data.estopEngaged
+  const placeLabware = runCurrentState?.data.placeLabwareState?.shouldPlaceDown
+  const labwareId = runCurrentState?.data.placeLabwareState?.labwareId
+  const location = runCurrentState?.data.placeLabwareState?.location
 
   const LOAD_PLATE_READER: CreateCommand = {
     commandType: 'loadModule' as const,
@@ -42,8 +47,18 @@ export function usePlacePlateReaderLid(
     continuePastCommandFailure: true,
   })
 
+  const decideFunction = (): void => {
+    console.log("DECIDE!")
+    if (estopEngaged != null && placeLabware) {
+        console.log("PLACE")
+        executeCommands()
+    } else {
+        console.log("DONT PLACE")
+    }
+  }
+
   return {
     isPlacing: isExecuting,
-    placeReaderLid: executeCommands,
+    placeReaderLid: decideFunction,
   }
 }

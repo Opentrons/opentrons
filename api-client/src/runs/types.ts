@@ -8,6 +8,7 @@ import type {
   RunTimeCommand,
   RunTimeParameter,
   NozzleLayoutConfig,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type { ResourceLink, ErrorDetails } from '../types'
 export * from './commands/types'
@@ -116,7 +117,9 @@ export interface Runs {
 }
 
 export interface RunCurrentStateData {
+  estopEngaged: boolean
   activeNozzleLayouts: Record<string, NozzleLayoutValues> // keyed by pipetteId
+  placeLabwareState?: PlaceLabwareState
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
@@ -200,4 +203,10 @@ export interface NozzleLayoutValues {
   startingNozzle: string
   activeNozzles: string[]
   config: NozzleLayoutConfig
+}
+
+export interface PlaceLabwareState {
+  labwareId: string
+  location: LabwareLocation
+  shouldPlaceDown: boolean
 }
