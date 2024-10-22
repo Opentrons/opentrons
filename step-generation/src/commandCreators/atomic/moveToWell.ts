@@ -44,7 +44,6 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   if (!pipetteSpec) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName,
         pipette,
       })
     )

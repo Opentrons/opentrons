@@ -85,7 +85,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     nozzles,
   } = args
 
-  const actionName = 'consolidate'
   const pipetteData = prevRobotState.pipettes[args.pipette]
   const is96Channel =
     invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
@@ -95,7 +94,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return {
       errors: [
         errorCreators.pipetteDoesNotExist({
-          actionName,
           pipette: args.pipette,
         }),
       ],

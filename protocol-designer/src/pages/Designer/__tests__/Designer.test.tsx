@@ -5,7 +5,7 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { selectors } from '../../../labware-ingred/selectors'
-import { getFileMetadata } from '../../../file-data/selectors'
+import { getDesignerTab, getFileMetadata } from '../../../file-data/selectors'
 import { generateNewProtocol } from '../../../labware-ingred/actions'
 import { DeckSetupContainer } from '../DeckSetup'
 import { Designer } from '../index'
@@ -44,6 +44,7 @@ const render = () => {
 
 describe('Designer', () => {
   beforeEach(() => {
+    vi.mocked(getDesignerTab).mockReturnValue('startingDeck')
     vi.mocked(ProtocolSteps).mockReturnValue(<div>mock ProtocolSteps</div>)
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mockProtocolName',
@@ -103,6 +104,7 @@ describe('Designer', () => {
   })
 
   it('renders the protocol steps page', () => {
+    vi.mocked(getDesignerTab).mockReturnValue('protocolSteps')
     render()
     fireEvent.click(screen.getByText('Protocol steps'))
     screen.getByText('mock ProtocolSteps')
