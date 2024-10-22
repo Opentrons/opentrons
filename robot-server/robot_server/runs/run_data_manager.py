@@ -569,6 +569,8 @@ class RunDataManager:
         command_slice = self._run_store.get_commands_slice(
             run_id=run_id, cursor=None, length=1, include_fixit_commands=True
         )
+        if not command_slice.commands:
+            return None
         command = command_slice.commands[-1]
 
         return (
