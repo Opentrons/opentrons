@@ -306,9 +306,35 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
 	$(MAKE) push-ot3
-	$(MAKE) apply-patches-gravimetric
-	cd ../ && $(MAKE) -C shared-data push-ot3
-	$(MAKE) remove-patches-gravimetric
+	#$(MAKE) apply-patches-gravimetric
+	cd ../ && $(MAKE) -C shared-data push-no-restart-ot3 && $(MAKE) -C api push-no-restart-ot3
+	#$(MAKE) remove-patches-gravimetric
+
+.PHONY: push-low-rez
+push-low-rez:
+	$(MAKE) push-ot3 host=10.14.19.71
+
+.PHONY: push-high-rez
+push-high-rez:
+	$(MAKE) push-ot3 host=10.14.19.72
+
+.PHONY: sync-low-rez
+sync-low-rez:
+	$(MAKE) push-ot3-gravimetric host=10.14.19.71
+
+.PHONY: sync-high-rez
+sync-high-rez:
+	$(MAKE) push-ot3-gravimetric host=10.14.19.72
+
+.PHONY: push-both
+push-both:
+	$(MAKE) push-low-rez
+	$(MAKE) push-high-rez
+
+.PHONY: sync-both
+sync-both:
+	$(MAKE) sync-low-rez
+	$(MAKE) sync-high-rez
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
