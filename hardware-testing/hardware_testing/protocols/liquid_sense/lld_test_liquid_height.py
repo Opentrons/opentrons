@@ -10,7 +10,6 @@ from opentrons.protocol_api import (
 from opentrons.types import Point
 
 
-
 ###########################################
 #  VARIABLES - START
 ###########################################
@@ -36,17 +35,11 @@ SLOT_RESERVOIR = "C1"
 SLOT_DIAL = "B3"
 
 
-def add_parameters(parameters: ParameterContext):
-    parameters.add_str(
-        variable_name="liquid_type",
-        display_name="Liquid Type",
-        description="Liquid being tested.",
-        choices=[
-            {"display_name": "Water", "value": "water"},
-            {"display_name": "Ethanol", "value": "ethanol"},
-        ],
-        default="water",
-    ),
+def add_parameters(parameters: ParameterContext) -> None:
+    """Add parameters."""
+    from hardware_testing import protocols
+
+    protocols.create_liquid_parameter(parameters)
     parameters.add_str(
         variable_name="probe_yes_or_no",
         display_name="Probe (Y/N)",
@@ -57,34 +50,7 @@ def add_parameters(parameters: ParameterContext):
         ],
         default="yes",
     )
-    parameters.add_str(
-        variable_name="labware_type",
-        display_name="Labware Type",
-        description="Labware to probe",
-        choices=[
-            {
-                "display_name": "Armadillo PCR Plate",
-                "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
-            },
-            {
-                "display_name": "NEST 96 Deep Well Plate",
-                "value": "nest_96_wellplate_2ml_deep",
-            },
-            {
-                "display_name": "Tube Rack",
-                "value": "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical",
-            },
-            {
-                "display_name": "12 Well Reservoir",
-                "value": "nest_12_reservoir_15ml",
-            },
-            {
-                "display_name": "Corning 96 Well Flat Plate",
-                "value": "corning_96_wellplate_360ul_flat",
-            },
-        ],
-        default="nest_12_reservoir_15ml",
-    )
+    protocols.create_labware_parameters(parameters)
 
 
 ###########################################
@@ -130,7 +96,6 @@ def _setup(
     Labware,
     Labware,
     Labware,
-    Any,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE_TYPE, VOLUMES, LIQUID_TYPE, NUM_TRIALS
     # TODO: use runtime-variables instead of constants
@@ -280,6 +245,7 @@ def _get_height_of_liquid_in_well(
         height = 0.0
     return height
 
+
 def _test_for_finding_liquid_height(
     ctx: ProtocolContext,
     volume: float,
@@ -305,14 +271,20 @@ def _test_for_finding_liquid_height(
     corrected_height_list = []
     volume_to_record = volume
     if LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical":
-        prev_vol = 0
+        prev_vol = 0.0
     for liq_tip, probe_tip, well in zip(liquid_tips, probing_tips, wells):
         trial_counter += 1
         if trial_counter == 1:
             corrected_height_list.append(str(RUN_ID))
-            if LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical" and prev_vol == 0:
+            if (
+                LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"
+                and prev_vol == 0.0
+            ):
                 prev_vol = volume
-            elif LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical" and prev_vol > 0:
+            elif (
+                LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"
+                and prev_vol > 0.0
+            ):
                 volume_to_record += prev_vol
             corrected_height_list.append(str(volume_to_record))
         # pickup probing tip, then measure Z-error
@@ -354,20 +326,27 @@ def _test_for_finding_liquid_height(
         if probe_yes_or_no == "yes":
             probing_pipette.return_tip()
         # save data
-        trial_data = [trial_counter, volume_to_record, height, tip_z_error, corrected_height]
+        trial_data = [
+            trial_counter,
+            volume_to_record,
+            height,
+            tip_z_error,
+            corrected_height,
+        ]
         corrected_height_list.append(corrected_height)  # type: ignore[arg-type]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
-        
+
     avg = sum(all_corrected_heights) / len(all_corrected_heights)
     error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
     corrected_height_list.append(avg)  # type: ignore[arg-type]
     corrected_height_list.append(error_mm)  # type: ignore[arg-type]
     error_percent = error_mm / avg if avg else 0.0
-    corrected_height_list.append(error_percent * 100)
+    corrected_height_list.append(str(error_percent * 100))
     _write_line_to_csv(ctx, ["average", str(round(avg, 3))])
     _write_line_to_csv(ctx, ["error (mm)", str(round(error_mm, 3))])
     _write_line_to_csv(ctx, ["error (%)", str(round(error_percent * 100, 1))])
     _write_line_to_csv(ctx, ["Liquid Type", LIQUID_TYPE])
+
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
@@ -389,7 +368,7 @@ def run(ctx: ProtocolContext) -> None:
     test_tips_probe = _get_test_tips(probe_rack, channels=8)
     stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
     assert min(stuff_lengths) >= NUM_TRIALS * len(VOLUMES), f"{stuff_lengths}"
-    
+
     for _vol in VOLUMES:
         if LABWARE_TYPE == "nest_12_reservoir_15ml":
             _test_for_finding_liquid_height(
@@ -423,4 +402,3 @@ def run(ctx: ProtocolContext) -> None:
             test_wells = test_wells[NUM_TRIALS:]
             test_tips_liquid = test_tips_liquid[NUM_TRIALS:]
             test_tips_probe = test_tips_probe[NUM_TRIALS:]
-
