@@ -8,6 +8,7 @@ import {
   COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
+  EndUserAgreementFooter,
   Flex,
   INFO_TOAST,
   JUSTIFY_CENTER,
@@ -96,7 +97,7 @@ export function Landing(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        height="calc(100vh - 3.5rem)"
+        height="calc(100vh - 9rem)"
         width="100%"
         gridGap={SPACING.spacing32}
       >
@@ -142,6 +143,7 @@ export function Landing(): JSX.Element {
           <input type="file" onChange={loadFile}></input>
         </StyledLabel>
       </Flex>
+      <EndUserAgreementFooter />
     </>
   )
 }
