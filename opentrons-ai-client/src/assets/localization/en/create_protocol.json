@@ -1,0 +1,8 @@
+{
+  "application_title": "Application",
+  "application_scientific_dropdown_label": "What's your scientific application?",
+  "application_scientific_dropdown_placeholder": "Select an option",
+  "application_describe_label": "Describe what you are trying to do",
+  "application_describe_example": "Example: “The protocol performs automated liquid handling for Pierce BCA Protein Assay Kit to determine protein concentrations in various sample types, such as cell lysates and eluates of purification process.",
+  "section_confirm_button": "Confirm"
+}

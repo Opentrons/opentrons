@@ -22,7 +22,7 @@ export interface InputType {
 }
 
 export function CreateProtocol(): JSX.Element | null {
-  const { t } = useTranslation('protocol_generator')
+  const { t } = useTranslation('create_protocol')
   const [applicationAccordionIsOpen, setApplicationAccordionIsOpen] = useState(
     true
   )
@@ -37,38 +37,45 @@ export function CreateProtocol(): JSX.Element | null {
     >
       <ProtocolSections>
         <Accordion
-          heading={t('create_protocol_page_application_title')}
+          heading={t('application_title')}
           isOpen={applicationAccordionIsOpen}
           handleClick={function (): void {
             throw new Error('Function not implemented.')
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} height="100%">
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('create_protocol_page_application_scientific_dropdown_label')}
-            </StyledText>
-            <DropdownMenu
-              dropdownType="neutral"
-              filterOptions={[
-                { name: 'test', value: 'test' },
-                { name: 'test2', value: 'test2' },
-              ]}
-              onClick={function (value: string): void {
-                throw new Error('Function not implemented.')
-              }}
-              currentOption={{ name: 'test', value: 'test' }}
-            ></DropdownMenu>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('create_protocol_page_application_describe_label')}
-            </StyledText>
-            <InputField></InputField>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('create_protocol_page_application_describe_example')}
-            </StyledText>
+            <FormField>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('application_scientific_dropdown_label')}
+              </StyledText>
+              <DropdownMenu
+                width="100%"
+                dropdownType="neutral"
+                filterOptions={[
+                  { name: 'test', value: 'test' },
+                  { name: 'test2', value: 'test2' },
+                ]}
+                onClick={function (value: string): void {
+                  throw new Error('Function not implemented.')
+                }}
+                currentOption={{ name: 'test', value: 'test' }}
+              ></DropdownMenu>
+            </FormField>
+
+            <FormField>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('application_describe_label')}
+              </StyledText>
+              <InputField></InputField>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('application_describe_example')}
+              </StyledText>
+            </FormField>
+
             <ButtonContainer>
               <LargeButton
                 disabled={true}
-                buttonText={t('create_protocol_page_section_confirm_button')}
+                buttonText={t('section_confirm_button')}
               ></LargeButton>
             </ButtonContainer>
           </Flex>
@@ -92,4 +99,11 @@ const ProtocolSections = styled(Flex)`
 const ButtonContainer = styled.div`
   display: ${DISPLAY_FLEX};
   justify-content: ${JUSTIFY_FLEX_END};
+`
+
+const FormField = styled.div`
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing4};
+  margin-bottom: ${SPACING.spacing16};
 `

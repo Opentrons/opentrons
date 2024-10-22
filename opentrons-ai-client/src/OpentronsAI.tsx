@@ -6,6 +6,7 @@ import {
   TYPOGRAPHY,
   Link as LinkButton,
   COLORS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -67,26 +68,28 @@ export function OpentronsAI(): JSX.Element | null {
     >
       <Flex
         height="100%"
-        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_CENTER}
         backgroundColor={COLORS.grey10}
       >
-        {/* this will be replaced by the header component */}
-        <Flex>
-          HEADER
-          <LinkButton
-            onClick={() => logout()}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-          >
-            {t('logout')}
-          </LinkButton>
+        <Flex maxWidth="1440px" flexDirection={DIRECTION_COLUMN}>
+          {/* this will be replaced by the header component */}
+          <Flex>
+            HEADER
+            <LinkButton
+              onClick={() => logout()}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            >
+              {t('logout')}
+            </LinkButton>
+          </Flex>
+
+          <HashRouter>
+            <OpentronsAIRoutes />
+          </HashRouter>
+
+          {/* This will be replaced by the Footer component */}
+          <div>FOOTER</div>
         </Flex>
-
-        <HashRouter>
-          <OpentronsAIRoutes />
-        </HashRouter>
-
-        {/* This will be replaced by the Footer component */}
-        <div>FOOTER</div>
       </Flex>
     </div>
   )
