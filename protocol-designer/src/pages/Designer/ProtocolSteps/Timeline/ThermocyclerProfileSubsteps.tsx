@@ -25,6 +25,8 @@ export function ThermocyclerProfileSubsteps(
 ): JSX.Element {
   const { stepId } = props
 
+  const { t } = useTranslation('protocol_steps')
+
   const savedStepForms = useSelector(getSavedStepForms)
   const step = savedStepForms[stepId]
   const orderedSubsteps = step.orderedProfileItems.map(
@@ -63,7 +65,9 @@ export function ThermocyclerProfileSubsteps(
                   desktopStyle="bodyDefaultRegular"
                   alignSelf={ALIGN_FLEX_END}
                 >
-                  {`Repeat ${substep.repetitions} times `}
+                  {t('thermocycler_module.repeat', {
+                    repetitions: substep.repetitions,
+                  })}
                 </StyledText>
               </Flex>
             ) : (
