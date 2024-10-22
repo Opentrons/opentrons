@@ -87,7 +87,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
       height={height}
       {...positionStyles}
       borderRadius={BORDERS.borderRadius8}
-      minWidth="19.5rem"
+      width={width}
       flex="0"
     >
       <Flex
