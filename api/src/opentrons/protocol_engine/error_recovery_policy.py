@@ -26,10 +26,20 @@ class ErrorRecoveryType(enum.Enum):
     """
 
     WAIT_FOR_RECOVERY = enum.auto()
-    """Stop and wait for the error to be recovered from manually."""
+    """Enter interactive error recovery mode."""
 
-    IGNORE_AND_CONTINUE = enum.auto()
-    """Continue with the run, as if the command never failed."""
+    CONTINUE_WITH_ERROR = enum.auto()
+    """Continue without interruption, carrying on from whatever error state the failed
+    command left the engine in.
+
+    This is like `ProtocolEngine.resume_from_recovery(reconcile_false_positive=False)`.
+    """
+
+    ASSUME_FALSE_POSITIVE_AND_CONTINUE = enum.auto()
+    """Continue without interruption, acting as if the underlying error was a false positive.
+
+    This is like `ProtocolEngine.resume_from_recovery(reconcile_false_positive=True)`.
+    """
 
 
 class ErrorRecoveryPolicy(Protocol):

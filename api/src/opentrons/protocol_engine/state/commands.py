@@ -400,7 +400,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 )
             elif (
                 action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
-                or action.type == ErrorRecoveryType.IGNORE_AND_CONTINUE
+                or action.type == ErrorRecoveryType.CONTINUE_WITH_ERROR
+                or action.type == ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE
             ):
                 other_command_ids_to_fail = []
             else:
