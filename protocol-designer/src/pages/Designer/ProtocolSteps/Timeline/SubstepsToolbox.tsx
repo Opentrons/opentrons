@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  FLEX_MAX_CONTENT,
   Flex,
   PrimaryButton,
   SPACING,
@@ -54,7 +55,7 @@ export function SubstepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      width="max-content"
+      width={FLEX_MAX_CONTENT}
       childrenPadding="0"
       confirmButton={
         <PrimaryButton
