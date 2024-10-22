@@ -53,6 +53,7 @@ export function ThermocyclerProfileSubsteps(
                   } = profileStep
                   return (
                     <ThermocyclerSubstep
+                      key={profileStep.id}
                       temperature={temperature}
                       duration={`${durationMinutes}:${durationSeconds}`}
                     />
@@ -72,7 +73,12 @@ export function ThermocyclerProfileSubsteps(
               />
             )
           return (
-            <ListItem type="noActive" width="100%" padding={SPACING.spacing12}>
+            <ListItem
+              key={substep.id}
+              type="noActive"
+              width="100%"
+              padding={SPACING.spacing12}
+            >
               {content}
             </ListItem>
           )
@@ -87,7 +93,7 @@ interface ThermocyclerSubstepProps {
   duration: string
 }
 
-function ThermocyclerSubstep(props: ThermocyclerSubstepProps) {
+function ThermocyclerSubstep(props: ThermocyclerSubstepProps): JSX.Element {
   const { temperature, duration } = props
   const { t } = useTranslation(['application', 'protocol_steps'])
   return (
