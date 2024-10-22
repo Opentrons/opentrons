@@ -36,7 +36,7 @@
   "simulate_description": "Once OpentronsAI has written your protocol, type `simulate` in the prompt box to try it out.",
   "submit_prompt": "Submit prompt",
   "try_example_prompts": "Stuck? Try these example prompts to get started.",
-  "type_of_update" : "Type of update",
+  "type_of_update": "Type of update",
   "type_your_prompt": "Type your prompt...",
   "update_existing_protocol": "Update an existing protocol",
   "well_allocations": "Well allocations: Describe where liquids should go in labware.",
