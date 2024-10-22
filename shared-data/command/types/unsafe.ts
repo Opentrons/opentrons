@@ -1,4 +1,4 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo, LabwareLocation } from '.'
 import type { MotorAxes } from '../../js/types'
 
 export type UnsafeRunTimeCommand =
@@ -7,6 +7,7 @@ export type UnsafeRunTimeCommand =
   | UnsafeUpdatePositionEstimatorsRunTimeCommand
   | UnsafeEngageAxesRunTimeCommand
   | UnsafeUngripLabwareRunTimeCommand
+  | UnsafePlaceLabwareRunTimeCommand
 
 export type UnsafeCreateCommand =
   | UnsafeBlowoutInPlaceCreateCommand
@@ -14,6 +15,7 @@ export type UnsafeCreateCommand =
   | UnsafeUpdatePositionEstimatorsCreateCommand
   | UnsafeEngageAxesCreateCommand
   | UnsafeUngripLabwareCreateCommand
+  | UnsafePlaceLabwareCreateCommand
 
 export interface UnsafeBlowoutInPlaceParams {
   pipetteId: string
@@ -83,5 +85,19 @@ export interface UnsafeUngripLabwareCreateCommand
 export interface UnsafeUngripLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     UnsafeUngripLabwareCreateCommand {
+  result?: any
+}
+export interface UnsafePlaceLabwareParams {
+  labwareId: string,
+  location: LabwareLocation,
+}
+export interface UnsafePlaceLabwareCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsafe/placeLabware'
+  params: UnsafePlaceLabwareParams
+}
+export interface UnsafePlaceLabwareRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    UnsafePlaceLabwareCreateCommand {
   result?: any
 }
