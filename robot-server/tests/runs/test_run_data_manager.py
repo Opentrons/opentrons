@@ -1004,12 +1004,105 @@ def test_get_current_command_not_current_run(
     subject: RunDataManager,
     mock_run_store: RunStore,
     mock_run_orchestrator_store: RunOrchestratorStore,
+    run_command: commands.Command,
 ) -> None:
-    """Should return None because the run is not current."""
+    """Should get the last command from the run store for a historical run."""
+    last_command_slice = commands.WaitForResume(
+        id="command-id-1",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.WaitForResumeParams(message="Hello"),
+    )
+
+    expected_last_command = CommandPointer(
+        command_id="command-id-1",
+        command_key="command-key",
+        created_at=datetime(year=2021, month=1, day=1),
+        index=0,
+    )
+
+    command_slice = CommandSlice(
+        commands=[last_command_slice], cursor=0, total_length=1
+    )
+
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("not-run-id")
+    decoy.when(
+        mock_run_store.get_commands_slice(
+            run_id="run-id", cursor=None, length=1, include_fixit_commands=True
+        )
+    ).then_return(command_slice)
     result = subject.get_current_command("run-id")
 
-    assert result is None
+    assert result == expected_last_command
+
+
+def test_get_last_completed_command_current_run(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    run_command: commands.Command,
+) -> None:
+    """Should get the last command from the engine store for the current run."""
+    run_id = "current-run-id"
+    expected_last_command = CommandPointer(
+        command_id=run_command.id,
+        command_key=run_command.key,
+        created_at=run_command.createdAt,
+        index=1,
+    )
+
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
+    decoy.when(
+        mock_run_orchestrator_store.get_most_recently_finalized_command()
+    ).then_return(expected_last_command)
+
+    result = subject.get_last_completed_command(run_id)
+
+    assert result == expected_last_command
+
+
+def test_get_last_completed_command_not_current_run(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+    run_command: commands.Command,
+) -> None:
+    """Should get the last command from the run store for a historical run."""
+    run_id = "historical-run-id"
+
+    last_command_slice = commands.WaitForResume(
+        id="command-id-1",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.WaitForResumeParams(message="Hello"),
+    )
+
+    expected_last_command = CommandPointer(
+        command_id="command-id-1",
+        command_key="command-key",
+        created_at=datetime(year=2021, month=1, day=1),
+        index=1,
+    )
+
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(
+        "different-run-id"
+    )
+
+    command_slice = CommandSlice(
+        commands=[last_command_slice], cursor=1, total_length=1
+    )
+    decoy.when(
+        mock_run_store.get_commands_slice(
+            run_id=run_id, cursor=None, length=1, include_fixit_commands=True
+        )
+    ).then_return(command_slice)
+
+    result = subject.get_last_completed_command(run_id)
+
+    assert result == expected_last_command
 
 
 def test_get_command_from_engine(
