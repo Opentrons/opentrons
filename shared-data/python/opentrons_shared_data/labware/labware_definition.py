@@ -400,6 +400,7 @@ class SquaredConeSegment(BaseModel):
     @cached_property
     def height_to_volume_table(self) -> Dict[float, float]:
         """Return a lookup table of heights to volumes."""
+        # the accuracy of this method is approximately +- 10*dx so for dx of 0.001 we have a +- 0.01 ul
         dx = 0.001
         total_height = self.topHeight - self.bottomHeight
         points = SquaredConeSegment._area_trap_points(
