@@ -383,8 +383,8 @@ class LiquidHeightSummary(BaseModel):
 
     labware_id: str
     well_name: str
-    last_measured: datetime
     height: Optional[float] = None
+    last_measured: datetime
 
 
 @dataclass(frozen=True)
