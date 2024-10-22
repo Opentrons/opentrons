@@ -63,10 +63,10 @@ export function ProtocolSteps(): JSX.Element {
       ? savedStepForms[currentstepIdForStepSummary]
       : null
 
+  const stepDetails = currentStep?.stepDetails ?? null
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      // alignItems={ALIGN_CENTER}
       width="100%"
       gridGap={SPACING.spacing16}
       height="calc(100vh - 4rem)"
@@ -99,14 +99,21 @@ export function ProtocolSteps(): JSX.Element {
               />
             </Flex>
           ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing16}
+            maxWidth="46.9375rem"
+          >
             {deckView === leftString ? (
               <DeckSetupContainer tab="protocolSteps" />
             ) : (
               <OffDeck tab="protocolSteps" />
             )}
             {formData == null ? (
-              <StepSummary currentStep={currentStep} />
+              <StepSummary
+                currentStep={currentStep}
+                stepDetails={stepDetails}
+              />
             ) : null}
           </Flex>
         </Flex>

@@ -1,2 +1,7 @@
 export * from './getAllDefinitions'
 export * from './labwareImages'
+export * from './getAllDefs'
+export * from './getLabwareDefinitionsFromCommands'
+export * from './getLabwareName'
+export * from './getLoadedLabware'
+export * from './getLabwareDisplayLocation'

@@ -2,9 +2,8 @@
 import argparse
 import asyncio
 
-from opentrons.config.types import CapacitivePassSettings, OutputOptions
+from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import InstrumentProbeType
 
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
@@ -46,15 +45,12 @@ PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
     sensor_threshold_pf=CAP_REL_THRESHOLD_PF,
-    output_option=OutputOptions.sync_only,
 )
 PROBE_SETTINGS_Z_AXIS_OUTPUT = CapacitivePassSettings(
     prep_distance_mm=10,
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
     sensor_threshold_pf=CAP_REL_THRESHOLD_PF,
-    output_option=OutputOptions.sync_buffer_to_csv,
-    data_files={InstrumentProbeType.PRIMARY: "/data/capacitive_sensor_data.csv"},
 )
 
 
@@ -85,7 +81,7 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
         raise RuntimeError("No pipette attached")
 
     # add length to the pipette, to account for the attached probe
-    await api.add_tip(mount, PROBE_LENGTH)
+    api.add_tip(mount, PROBE_LENGTH)
 
     await helpers_ot3.home_ot3(api)
     for c in range(cycles):
@@ -96,7 +92,7 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
     z_ax = types.Axis.by_mount(mount)
     top_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
     await api.move_to(mount, ASSUMED_XY_LOCATION._replace(z=top_z))
-    await api.remove_tip(mount)
+    api.remove_tip(mount)
     await api.disengage_axes([types.Axis.X, types.Axis.Y])
 
 

@@ -425,7 +425,7 @@ class OT3PipetteHandler:
         if instr:
             instr.reset_nozzle_configuration()
 
-    async def add_tip(self, mount: OT3Mount, tip_length: float) -> None:
+    def add_tip(self, mount: OT3Mount, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -440,7 +440,7 @@ class OT3PipetteHandler:
                 "attach tip called while tip already attached to {instr}"
             )
 
-    async def remove_tip(self, mount: OT3Mount) -> None:
+    def remove_tip(self, mount: OT3Mount) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]

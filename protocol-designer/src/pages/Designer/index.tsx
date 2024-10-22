@@ -23,7 +23,6 @@ import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
-import { SettingsIcon } from '../../molecules'
 import { getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
@@ -171,8 +170,6 @@ export function Designer(): JSX.Element {
             }
           />
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-            <SettingsIcon />
-
             <Btn
               alignItems={ALIGN_CENTER}
               onClick={() => {

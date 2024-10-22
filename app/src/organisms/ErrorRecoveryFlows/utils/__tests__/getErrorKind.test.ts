@@ -8,6 +8,11 @@ import type { RunCommandError, RunTimeCommand } from '@opentrons/shared-data'
 describe('getErrorKind', () => {
   it.each([
     {
+      commandType: 'prepareToAspirate',
+      errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
+      expectedError: ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE,
+    },
+    {
       commandType: 'aspirate',
       errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
       expectedError: ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING,

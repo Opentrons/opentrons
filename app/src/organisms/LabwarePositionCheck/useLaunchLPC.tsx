@@ -11,7 +11,7 @@ import {
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 import { LabwarePositionCheck } from '.'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { RobotType } from '@opentrons/shared-data'
 

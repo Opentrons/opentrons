@@ -2677,7 +2677,8 @@
             "y": 0,
             "z": 0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -2710,7 +2711,8 @@
             "y": 0,
             "z": 0
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },

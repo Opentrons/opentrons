@@ -14,11 +14,8 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 
-import {
-  CommandIcon,
-  CommandText,
-  getLabwareDefinitionsFromCommands,
-} from '/app/molecules/Command'
+import { CommandIcon, CommandText } from '/app/molecules/Command'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type {
   CompletedProtocolAnalysis,

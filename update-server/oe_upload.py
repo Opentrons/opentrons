@@ -26,7 +26,7 @@ async def do_update(update_file: str, host: str,
     timeout = aiohttp.ClientTimeout(total=7200)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         root = host + '/server/update'
-        filename = "ot3-system.zip"
+        filename = "system-update.zip"
         print(f"Starting update of {update_file.name} to {host}")
         begin_resp = await session.post(root + '/begin')
         if begin_resp.status == 409:

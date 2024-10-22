@@ -6102,7 +6102,8 @@
             "y": 0.0,
             "z": -9.8
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A4"
       },
@@ -6135,7 +6136,8 @@
             "y": 0.0,
             "z": -9.8
           },
-          "origin": "top"
+          "origin": "top",
+          "volumeOffset": 0.0
         },
         "wellName": "A2"
       },

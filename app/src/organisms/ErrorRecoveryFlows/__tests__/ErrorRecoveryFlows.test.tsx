@@ -8,7 +8,7 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -33,7 +33,7 @@ vi.mock('/app/redux/config')
 vi.mock('../RecoverySplash')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/molecules/Command')
+vi.mock('/app/local-resources/labware')
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {

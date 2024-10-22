@@ -55,6 +55,7 @@ export const configInitialized = (
 ): Types.ConfigInitializedAction => ({
   type: Constants.INITIALIZED,
   payload: { config },
+  meta: { shell: true },
 })
 
 // config value has been updated
@@ -64,6 +65,7 @@ export const configValueUpdated = (
 ): Types.ConfigValueUpdatedAction => ({
   type: Constants.VALUE_UPDATED,
   payload: { path, value },
+  meta: { shell: true },
 })
 
 export function toggleDevtools(): Types.ToggleConfigValueAction {

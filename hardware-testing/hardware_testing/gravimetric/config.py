@@ -3,9 +3,8 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from typing_extensions import Final
 from enum import Enum
-from opentrons.config.types import LiquidProbeSettings, OutputOptions
+from opentrons.config.types import LiquidProbeSettings
 from opentrons.protocol_api.labware import Well
-from opentrons.hardware_control.types import InstrumentProbeType
 
 
 class ConfigType(Enum):
@@ -170,13 +169,11 @@ def _get_liquid_probe_settings(
         plunger_speed=lqid_cfg["plunger_speed"],
         plunger_impulse_time=0.2,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        output_option=OutputOptions.sync_only,
         aspirate_while_sensing=False,
         z_overlap_between_passes_mm=0.1,
         plunger_reset_offset=2.0,
         samples_for_baselining=20,
         sample_time_sec=0.004,
-        data_files={InstrumentProbeType.PRIMARY: "/data/testing_data/pressure.csv"},
     )
 
 
