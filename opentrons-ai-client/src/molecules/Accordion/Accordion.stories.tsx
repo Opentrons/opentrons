@@ -36,6 +36,7 @@ type Story = StoryObj<typeof Accordion>
 export const AccordionCollapsed: Story = {
   args: {
     id: 'accordion',
+    isOpen: false,
     handleClick: () => {
       alert('Accordion clicked')
     },
