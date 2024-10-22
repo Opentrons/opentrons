@@ -32,6 +32,10 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import {
+  updateRunSetupStepsComplete,
+  getMissingSetupSteps,
+} from '/app/redux/protocol-runs'
 
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -40,6 +44,8 @@ import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import * as ReduxRuns from '/app/redux/protocol-runs'
+
+import type { State } from '/app/redux/types'
 
 import type { StepKey } from '/app/redux/protocol-runs'
 
@@ -59,6 +65,8 @@ vi.mock('/app/resources/runs/useUnmatchedModulesForProtocol')
 vi.mock('/app/resources/runs/useModuleCalibrationStatus')
 vi.mock('/app/resources/runs/useProtocolAnalysisErrors')
 vi.mock('/app/redux/config')
+vi.mock('/app/redux/protocol-runs')
+vi.mock('/app/resources/protocol-runs')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/redux-resources/robots')
@@ -79,13 +87,14 @@ const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_PROTOCOL_LIQUID_KEY = { liquids: [] }
 const render = () => {
-  return renderWithProviders(
+  return renderWithProviders<State>(
     <ProtocolRunSetup
       protocolRunHeaderRef={null}
       robotName={ROBOT_NAME}
       runId={RUN_ID}
     />,
     {
+      initialState: {},
       i18nInstance: i18n,
     }
   )[0]
@@ -100,6 +109,9 @@ describe('ProtocolRunSetup', () => {
         ...noModulesProtocol,
         ...MOCK_PROTOCOL_LIQUID_KEY,
       } as any)
+    when(vi.mocked(getMissingSetupSteps))
+      .calledWith(expect.any(Object), RUN_ID)
+      .thenReturn([])
     when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
     })
@@ -112,14 +124,23 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(useRequiredSetupStepsInOrder))
       .calledWith({
         runId: RUN_ID,
-        protocolAnalysis: ({
-          ...noModulesProtocol,
-          ...MOCK_PROTOCOL_LIQUID_KEY,
-        } as any) as SharedData.CompletedProtocolAnalysis,
+        protocolAnalysis: expect.any(Object),
       })
       .thenReturn({
-        orderedSteps: ReduxRuns.SETUP_STEP_KEYS,
-        orderedApplicableSteps: (ReduxRuns.SETUP_STEP_KEYS as any) as StepKey[],
+        orderedSteps: [
+          ReduxRuns.ROBOT_CALIBRATION_STEP_KEY,
+          ReduxRuns.MODULE_SETUP_STEP_KEY,
+          ReduxRuns.LPC_STEP_KEY,
+          ReduxRuns.LABWARE_SETUP_STEP_KEY,
+          ReduxRuns.LIQUID_SETUP_STEP_KEY,
+        ],
+        orderedApplicableSteps: [
+          ReduxRuns.ROBOT_CALIBRATION_STEP_KEY,
+          ReduxRuns.MODULE_SETUP_STEP_KEY,
+          ReduxRuns.LPC_STEP_KEY,
+          ReduxRuns.LABWARE_SETUP_STEP_KEY,
+          ReduxRuns.LIQUID_SETUP_STEP_KEY,
+        ],
       })
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
