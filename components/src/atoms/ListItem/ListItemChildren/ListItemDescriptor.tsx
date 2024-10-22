@@ -2,7 +2,6 @@ import { Flex } from '../../../primitives'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
-  // FLEX_AUTO,
   JUSTIFY_SPACE_BETWEEN,
 } from '../../../styles'
 import { SPACING } from '../../../ui-style-constants'
