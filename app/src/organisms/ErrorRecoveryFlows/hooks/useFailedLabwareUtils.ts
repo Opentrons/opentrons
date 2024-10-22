@@ -26,6 +26,7 @@ import type {
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
   MoveLabwareRunTimeCommand,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type { LabwareDisplayLocationSlotOnly } from '/app/local-resources/labware'
 import type { ErrorRecoveryFlowsProps } from '..'
@@ -40,8 +41,10 @@ interface UseFailedLabwareUtilsProps {
 }
 
 interface RelevantFailedLabwareLocations {
-  currentLoc: string
-  newLoc: string | null
+  displayNameCurrentLoc: string
+  displayNameNewLoc: string | null
+  currentLoc: LabwareLocation | null
+  newLoc: LabwareLocation | null
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
@@ -53,6 +56,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   relevantWellName: string | null
   /* The user-content nickname of the failed labware, if any */
   failedLabwareNickname: string | null
+  /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
 }
 
@@ -360,25 +364,35 @@ export function useRelevantFailedLwLocations({
     isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.
   }
 
-  const currentLocation = getLabwareDisplayLocation({
+  const displayNameCurrentLoc = getLabwareDisplayLocation({
     ...BASE_DISPLAY_PARAMS,
     location: failedLabware?.location ?? null,
   })
 
-  const getNewLocation = (): string | null => {
+  const getNewLocation = (): Pick<
+    RelevantFailedLabwareLocations,
+    'displayNameNewLoc' | 'newLoc'
+  > => {
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
-        return getLabwareDisplayLocation({
-          ...BASE_DISPLAY_PARAMS,
-          location: failedCommandByRunRecord.params.newLocation,
-        })
+        return {
+          displayNameNewLoc: getLabwareDisplayLocation({
+            ...BASE_DISPLAY_PARAMS,
+            location: failedCommandByRunRecord.params.newLocation,
+          }),
+          newLoc: failedCommandByRunRecord.params.newLocation,
+        }
       default:
-        return null
+        return {
+          displayNameNewLoc: null,
+          newLoc: null,
+        }
     }
   }
 
   return {
-    currentLoc: currentLocation,
-    newLoc: getNewLocation(),
+    displayNameCurrentLoc,
+    currentLoc: failedLabware?.location ?? null,
+    ...getNewLocation(),
   }
 }

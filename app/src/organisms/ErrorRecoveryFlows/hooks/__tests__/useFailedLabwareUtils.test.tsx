@@ -168,8 +168,8 @@ const TestWrapper = (props: GetRelevantLwLocationsParams) => {
   const displayLocation = useRelevantFailedLwLocations(props)
   return (
     <>
-      <div>{`Current Loc: ${displayLocation.currentLoc}`}</div>
-      <div>{`New Loc: ${displayLocation.newLoc}`}</div>
+      <div>{`Current Loc: ${displayLocation.displayNameCurrentLoc}`}</div>
+      <div>{`New Loc: ${displayLocation.displayNameNewLoc}`}</div>
     </>
   )
 }
