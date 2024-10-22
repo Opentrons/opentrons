@@ -1,8 +1,22 @@
 import type * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { AlertModal } from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import {
+  ALIGN_FLEX_END,
+  AlertModal,
+  AlertPrimaryButton,
+  COLORS,
+  Flex,
+  Icon,
+  Modal,
+  SPACING,
+  SecondaryButton,
+  StyledText,
+} from '@opentrons/components'
+import { getEnableRedesign } from '../../feature-flags/selectors'
 import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
+import { getTopPortalEl } from '../portals/TopPortal'
 import modalStyles from './modal.module.css'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
@@ -31,12 +45,12 @@ interface Props {
 }
 
 export function ConfirmDeleteModal(props: Props): JSX.Element {
-  const { t } = useTranslation(['modal', 'button'])
+  const { i18n, t } = useTranslation(['modal', 'button'])
   const { modalType, onCancelClick, onContinueClick } = props
-  const cancelCopy = t('button:cancel')
-  const continueCopy = t(
-    `confirm_delete_modal.${modalType}.confirm_button`,
-    t('button:continue')
+  const cancelCopy = i18n.format(t('button:cancel'), 'capitalize')
+  const continueCopy = i18n.format(
+    t(`confirm_delete_modal.${modalType}.confirm_button`, t('button:continue')),
+    'capitalize'
   )
   const buttons = [
     { title: cancelCopy, children: cancelCopy, onClick: onCancelClick },
@@ -47,17 +61,50 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
       onClick: onContinueClick,
     },
   ]
-  return createPortal(
-    <AlertModal
-      alertOverlay
-      restrictOuterScroll={false}
-      buttons={buttons}
-      onCloseClick={onCancelClick}
-      className={modalStyles.modal}
-      heading={t(`confirm_delete_modal.${modalType}.title`)}
-    >
-      <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
-    </AlertModal>,
-    getMainPagePortalEl()
-  )
+  const enableRedesign = useSelector(getEnableRedesign)
+  return enableRedesign
+    ? createPortal(
+        <Modal
+          title={t(`confirm_delete_modal.${modalType}.title`)}
+          titleElement1={
+            <Icon name="alert-circle" color={COLORS.yellow50} size="1.25rem" />
+          }
+          footer={
+            <Flex
+              padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
+              gridGap={SPACING.spacing8}
+              justifyContent={ALIGN_FLEX_END}
+            >
+              <SecondaryButton onClick={onCancelClick}>
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {cancelCopy}
+                </StyledText>
+              </SecondaryButton>
+              <AlertPrimaryButton onClick={onContinueClick}>
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {continueCopy}
+                </StyledText>
+              </AlertPrimaryButton>
+            </Flex>
+          }
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t(`confirm_delete_modal.${modalType}.body`)}
+          </StyledText>
+        </Modal>,
+        getTopPortalEl()
+      )
+    : createPortal(
+        <AlertModal
+          alertOverlay
+          restrictOuterScroll={false}
+          buttons={buttons}
+          onCloseClick={onCancelClick}
+          className={modalStyles.modal}
+          heading={t(`confirm_delete_modal.${modalType}.title`)}
+        >
+          <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
+        </AlertModal>,
+        getMainPagePortalEl()
+      )
 }
