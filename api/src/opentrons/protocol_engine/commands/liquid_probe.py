@@ -205,7 +205,7 @@ class LiquidProbeImplementation(
             self._state_view, self._movement, self._pipetting, params
         )
         if isinstance(z_pos_or_error, PipetteLiquidNotFoundError):
-            state_update.set_probed_liquid(
+            state_update.set_liquid_probed(
                 labware_id=params.labwareId,
                 well_name=params.wellName,
                 height=None,
@@ -232,7 +232,7 @@ class LiquidProbeImplementation(
                 well_name=params.wellName,
                 height=z_pos_or_error,
             )
-            state_update.set_probed_liquid(
+            state_update.set_liquid_probed(
                 labware_id=params.labwareId,
                 well_name=params.wellName,
                 height=z_pos_or_error,
@@ -286,7 +286,7 @@ class TryLiquidProbeImplementation(
                 labware_id=params.labwareId, well_name=params.wellName, height=z_pos
             )
 
-        state_update.set_probed_liquid(
+        state_update.set_liquid_probed(
             labware_id=params.labwareId,
             well_name=params.wellName,
             height=z_pos,

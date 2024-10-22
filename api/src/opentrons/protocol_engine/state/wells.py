@@ -43,43 +43,43 @@ class WellStore(HasState[WellState], HandlesActions):
     def _handle_loaded_liquid_update(
         self, state_update: update_types.StateUpdate
     ) -> None:
-        if state_update.loaded_liquid != update_types.NO_CHANGE:
-            labware_id = state_update.loaded_liquid.labware_id
+        if state_update.liquid_loaded != update_types.NO_CHANGE:
+            labware_id = state_update.liquid_loaded.labware_id
             if labware_id not in self._state.loaded_volumes:
                 self._state.loaded_volumes[labware_id] = {}
-            for (well, volume) in state_update.loaded_liquid.volumes.items():
+            for (well, volume) in state_update.liquid_loaded.volumes.items():
                 self._state.loaded_volumes[labware_id][well] = LoadedVolumeInfo(
                     volume=volume,
-                    last_loaded=state_update.loaded_liquid.last_loaded,
+                    last_loaded=state_update.liquid_loaded.last_loaded,
                     operations_since_load=0,
                 )
 
     def _handle_probed_liquid_update(
         self, state_update: update_types.StateUpdate
     ) -> None:
-        if state_update.probed_liquid != update_types.NO_CHANGE:
-            labware_id = state_update.probed_liquid.labware_id
-            well_name = state_update.probed_liquid.well_name
+        if state_update.liquid_probed != update_types.NO_CHANGE:
+            labware_id = state_update.liquid_probed.labware_id
+            well_name = state_update.liquid_probed.well_name
             if labware_id not in self._state.probed_heights:
                 self._state.probed_heights[labware_id] = {}
             if labware_id not in self._state.probed_volumes:
                 self._state.probed_volumes[labware_id] = {}
             self._state.probed_heights[labware_id][well_name] = ProbedHeightInfo(
-                height=state_update.probed_liquid.height,
-                last_probed=state_update.probed_liquid.last_probed,
+                height=state_update.liquid_probed.height,
+                last_probed=state_update.liquid_probed.last_probed,
             )
             self._state.probed_volumes[labware_id][well_name] = ProbedVolumeInfo(
-                volume=state_update.probed_liquid.volume,
-                last_probed=state_update.probed_liquid.last_probed,
+                volume=state_update.liquid_probed.volume,
+                last_probed=state_update.liquid_probed.last_probed,
                 operations_since_probe=0,
             )
 
     def _handle_operated_liquid_update(
         self, state_update: update_types.StateUpdate
     ) -> None:
-        if state_update.operated_liquid != update_types.NO_CHANGE:
-            labware_id = state_update.operated_liquid.labware_id
-            well_name = state_update.operated_liquid.well_name
+        if state_update.liquid_operated != update_types.NO_CHANGE:
+            labware_id = state_update.liquid_operated.labware_id
+            well_name = state_update.liquid_operated.well_name
             if (
                 labware_id in self._state.loaded_volumes
                 and well_name in self._state.loaded_volumes[labware_id]
@@ -88,7 +88,7 @@ class WellStore(HasState[WellState], HandlesActions):
                 assert prev_loaded_vol_info.volume is not None
                 self._state.loaded_volumes[labware_id][well_name] = LoadedVolumeInfo(
                     volume=prev_loaded_vol_info.volume
-                    + state_update.operated_liquid.volume,
+                    + state_update.liquid_operated.volume,
                     last_loaded=prev_loaded_vol_info.last_loaded,
                     operations_since_load=prev_loaded_vol_info.operations_since_load
                     + 1,
@@ -106,7 +106,7 @@ class WellStore(HasState[WellState], HandlesActions):
                 assert prev_probed_vol_info.volume is not None
                 self._state.probed_volumes[labware_id][well_name] = ProbedVolumeInfo(
                     volume=prev_probed_vol_info.volume
-                    + state_update.operated_liquid.volume,
+                    + state_update.liquid_operated.volume,
                     last_probed=prev_probed_vol_info.last_probed,
                     operations_since_probe=prev_probed_vol_info.operations_since_probe
                     + 1,

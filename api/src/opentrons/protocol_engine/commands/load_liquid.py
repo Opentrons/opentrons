@@ -61,7 +61,7 @@ class LoadLiquidImplementation(
         )
 
         state_update = StateUpdate()
-        state_update.set_loaded_liquid(
+        state_update.set_liquid_loaded(
             labware_id=params.labwareId,
             volumes=params.volumeByWell,
             last_loaded=self._model_utils.get_timestamp(),

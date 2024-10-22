@@ -157,7 +157,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                 state_update=state_update,
             )
         else:
-            state_update.set_operated_liquid(
+            state_update.set_liquid_operated(
                 labware_id=labware_id,
                 well_name=well_name,
                 volume=-volume_aspirated,

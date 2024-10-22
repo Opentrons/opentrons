@@ -104,6 +104,7 @@ async def test_liquid_probe_implementation(
     subject: EitherImplementation,
     params_type: EitherParamsType,
     result_type: EitherResultType,
+    model_utils: ModelUtils,
 ) -> None:
     """It should move to the destination and do a liquid probe there."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
@@ -137,6 +138,17 @@ async def test_liquid_probe_implementation(
         ),
     ).then_return(15.0)
 
+    decoy.when(
+        state_view.geometry.get_well_volume_at_height(
+            labware_id="123",
+            well_name="A3",
+            height=15.0,
+        ),
+    ).then_return(30.0)
+
+    timestamp = datetime(year=2020, month=1, day=2)
+    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
+
     result = await subject.execute(data)
 
     assert type(result.public) is result_type  # Pydantic v1 only compares the fields.
@@ -148,7 +160,14 @@ async def test_liquid_probe_implementation(
                 pipette_id="abc",
                 new_location=update_types.Well(labware_id="123", well_name="A3"),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
-            )
+            ),
+            liquid_probed=update_types.LiquidProbedUpdate(
+                labware_id="123",
+                well_name="A3",
+                height=15.0,
+                volume=30.0,
+                last_probed=timestamp,
+            ),
         ),
     )
 
@@ -212,7 +231,14 @@ async def test_liquid_not_found_error(
             pipette_id=pipette_id,
             new_location=update_types.Well(labware_id=labware_id, well_name=well_name),
             new_deck_point=DeckPoint(x=position.x, y=position.y, z=position.z),
-        )
+        ),
+        liquid_probed=update_types.LiquidProbedUpdate(
+            labware_id=labware_id,
+            well_name=well_name,
+            height=None,
+            volume=None,
+            last_probed=error_timestamp,
+        ),
     )
     if isinstance(subject, LiquidProbeImplementation):
         assert result == DefinedErrorData(

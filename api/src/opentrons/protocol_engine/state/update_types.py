@@ -177,7 +177,7 @@ class TipsUsedUpdate:
 
 
 @dataclasses.dataclass
-class LoadLiquidUpdate:
+class LiquidLoadedUpdate:
     """An update from loading a liquid."""
 
     labware_id: str
@@ -186,7 +186,7 @@ class LoadLiquidUpdate:
 
 
 @dataclasses.dataclass
-class ProbeLiquidUpdate:
+class LiquidProbedUpdate:
     """An update from probing a liquid."""
 
     labware_id: str
@@ -197,7 +197,7 @@ class ProbeLiquidUpdate:
 
 
 @dataclasses.dataclass
-class OperateLiquidUpdate:
+class LiquidOperatedUpdate:
     """An update from operating a liquid."""
 
     labware_id: str
@@ -225,11 +225,11 @@ class StateUpdate:
 
     tips_used: TipsUsedUpdate | NoChangeType = NO_CHANGE
 
-    loaded_liquid: LoadLiquidUpdate | NoChangeType = NO_CHANGE
+    liquid_loaded: LiquidLoadedUpdate | NoChangeType = NO_CHANGE
 
-    probed_liquid: ProbeLiquidUpdate | NoChangeType = NO_CHANGE
+    liquid_probed: LiquidProbedUpdate | NoChangeType = NO_CHANGE
 
-    operated_liquid: OperateLiquidUpdate | NoChangeType = NO_CHANGE
+    liquid_operated: LiquidOperatedUpdate | NoChangeType = NO_CHANGE
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree.
@@ -367,20 +367,20 @@ class StateUpdate:
             pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
         )
 
-    def set_loaded_liquid(
+    def set_liquid_loaded(
         self,
         labware_id: str,
         volumes: typing.Dict[str, float],
         last_loaded: datetime,
     ) -> None:
         """Add liquid volumes to well state. See `LoadLiquidUpdate`."""
-        self.loaded_liquid = LoadLiquidUpdate(
+        self.liquid_loaded = LiquidLoadedUpdate(
             labware_id=labware_id,
             volumes=volumes,
             last_loaded=last_loaded,
         )
 
-    def set_probed_liquid(
+    def set_liquid_probed(
         self,
         labware_id: str,
         well_name: str,
@@ -389,7 +389,7 @@ class StateUpdate:
         volume: typing.Optional[float] = None,
     ) -> None:
         """Add a liquid height and volume to well state. See `ProbeLiquidUpdate`."""
-        self.probed_liquid = ProbeLiquidUpdate(
+        self.liquid_probed = LiquidProbedUpdate(
             labware_id=labware_id,
             well_name=well_name,
             height=height,
@@ -397,14 +397,14 @@ class StateUpdate:
             last_probed=last_probed,
         )
 
-    def set_operated_liquid(
+    def set_liquid_operated(
         self,
         labware_id: str,
         well_name: str,
         volume: float,
     ) -> None:
         """Update liquid volumes in well state. See `OperateLiquidUpdate`."""
-        self.operated_liquid = OperateLiquidUpdate(
+        self.liquid_operated = LiquidOperatedUpdate(
             labware_id=labware_id,
             well_name=well_name,
             volume=volume,

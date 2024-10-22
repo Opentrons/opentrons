@@ -1,6 +1,7 @@
 """Test load-liquid command."""
 import pytest
 from decoy import Decoy
+from datetime import datetime
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands import (
@@ -10,6 +11,7 @@ from opentrons.protocol_engine.commands import (
 )
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.state import update_types
 
 
 @pytest.fixture
@@ -30,6 +32,7 @@ async def test_load_liquid_implementation(
     decoy: Decoy,
     subject: LoadLiquidImplementation,
     mock_state_view: StateView,
+    model_utils: ModelUtils,
 ) -> None:
     """Test LoadLiquid command execution."""
     data = LoadLiquidParams(
@@ -37,9 +40,23 @@ async def test_load_liquid_implementation(
         liquidId="liquid-id",
         volumeByWell={"A1": 30, "B2": 100},
     )
+
+    timestamp = datetime(year=2020, month=1, day=2)
+    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
+
     result = await subject.execute(data)
 
-    assert result == SuccessData(public=LoadLiquidResult(), private=None)
+    assert result == SuccessData(
+        public=LoadLiquidResult(),
+        private=None,
+        state_update=update_types.StateUpdate(
+            liquid_loaded=update_types.LiquidLoadedUpdate(
+                labware_id="labware-id",
+                volumes={"A1": 30, "B2": 100},
+                last_loaded=timestamp,
+            )
+        ),
+    )
 
     decoy.verify(mock_state_view.liquid.validate_liquid_id("liquid-id"))
 
