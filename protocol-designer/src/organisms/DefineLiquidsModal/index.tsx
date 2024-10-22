@@ -33,6 +33,7 @@ import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { swatchColors } from '../../components/swatchColors'
 import { checkColor } from './utils'
+import { HandleEnter } from '../../atoms/HandleEnter'
 
 import type { ColorResult, RGBColor } from 'react-color'
 import type { ThunkDispatch } from 'redux-thunk'
@@ -47,7 +48,10 @@ interface LiquidEditFormValues {
   [key: string]: unknown
 }
 
-const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', DEPRECATED_WHALE_GREY]
+const BLACK = '#000000'
+const WHITE = '#ffffff'
+
+const INVALID_DISPLAY_COLORS = [BLACK, WHITE, DEPRECATED_WHALE_GREY]
 
 const liquidEditFormSchema: any = Yup.object().shape({
   name: Yup.string().required('liquid name is required'),
@@ -92,8 +96,7 @@ export function DefineLiquidsModal(
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
-  const liquidGroupId =
-    selectedLiquidGroupState && selectedLiquidGroupState.liquidGroupId
+  const liquidGroupId = selectedLiquidGroupState.liquidGroupId
   const deleteLiquidGroup = (): void => {
     if (liquidGroupId != null) {
       dispatch(labwareIngredActions.deleteLiquidGroup(liquidGroupId))
@@ -110,7 +113,7 @@ export function DefineLiquidsModal(
     dispatch(
       labwareIngredActions.editLiquidGroup({
         ...formData,
-        liquidGroupId: liquidGroupId,
+        liquidGroupId,
       })
     )
     onClose()
@@ -159,105 +162,116 @@ export function DefineLiquidsModal(
   }
 
   return (
-    <Modal
-      width="673px"
-      title={
-        selectedIngredFields != null ? (
-          <Flex gridGap={SPACING.spacing8}>
-            <LiquidIcon color={initialValues.displayColor} />
-            <StyledText desktopStyle="bodyLargeSemiBold">
-              {initialValues.name}
-            </StyledText>
-          </Flex>
-        ) : (
-          t('define_liquid')
-        )
-      }
-      type="info"
-      onClose={onClose}
+    <HandleEnter
+      onEnter={() => {
+        void handleSubmit(handleLiquidEdits)()
+      }}
     >
-      <form onSubmit={handleSubmit(handleLiquidEdits)}>
-        <>
-          {showColorPicker ? (
-            <Flex
-              position={POSITION_ABSOLUTE}
-              left="4.375rem"
-              top="4.6875rem"
-              ref={chooseColorWrapperRef}
-            >
-              <Controller
-                name="displayColor"
-                control={control}
-                render={({ field }) => (
-                  <SketchPicker
-                    presetColors={DEFAULT_LIQUID_COLORS}
-                    color={color}
-                    onChange={(color: ColorResult) => {
-                      const hex = rgbaToHex(color.rgb)
-                      setValue('displayColor', hex)
-                      field.onChange(hex)
-                    }}
-                  />
-                )}
-              />
+      <Modal
+        width="42.0625rem"
+        title={
+          selectedIngredFields != null ? (
+            <Flex gridGap={SPACING.spacing8}>
+              <LiquidIcon color={initialValues.displayColor} />
+              <StyledText desktopStyle="bodyLargeSemiBold">
+                {initialValues.name}
+              </StyledText>
             </Flex>
-          ) : null}
-
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          ) : (
+            t('define_liquid')
+          )
+        }
+        type="info"
+        onClose={onClose}
+      >
+        <form
+          onSubmit={() => {
+            void handleSubmit(handleLiquidEdits)()
+          }}
+        >
+          <>
+            {showColorPicker ? (
               <Flex
-                flexDirection={DIRECTION_COLUMN}
-                color={COLORS.grey60}
-                gridGap={SPACING.spacing4}
+                position={POSITION_ABSOLUTE}
+                left="4.375rem"
+                top="4.6875rem"
+                ref={chooseColorWrapperRef}
               >
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('name')}
-                </StyledText>
                 <Controller
+                  name="displayColor"
                   control={control}
-                  name="name"
                   render={({ field }) => (
-                    <InputField
-                      name="name"
-                      error={
-                        touchedFields.name != null ? errors.name?.message : null
-                      }
-                      value={name}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
+                    <SketchPicker
+                      presetColors={DEFAULT_LIQUID_COLORS}
+                      color={color}
+                      onChange={(color: ColorResult) => {
+                        const hex = rgbaToHex(color.rgb)
+                        setValue('displayColor', hex)
+                        field.onChange(hex)
+                      }}
                     />
                   )}
                 />
               </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                color={COLORS.grey60}
-                gridGap={SPACING.spacing4}
-              >
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('description')}
-                </StyledText>
-                <DescriptionField {...register('description')} />
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                color={COLORS.grey60}
-                gridGap={SPACING.spacing4}
-              >
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('display_color')}
-                </StyledText>
+            ) : null}
 
-                <LiquidIcon
-                  onClick={() => {
-                    setShowColorPicker(prev => !prev)
-                  }}
-                  color={color}
-                  size="medium"
-                />
-              </Flex>
-              {/* NOTE: this is for serialization if we decide to add it back */}
-              {/* <Controller
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  color={COLORS.grey60}
+                  gridGap={SPACING.spacing4}
+                >
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('name')}
+                  </StyledText>
+                  <Controller
+                    control={control}
+                    name="name"
+                    render={({ field }) => (
+                      <InputField
+                        name="name"
+                        error={
+                          touchedFields.name != null
+                            ? errors.name?.message
+                            : null
+                        }
+                        value={name}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                      />
+                    )}
+                  />
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  color={COLORS.grey60}
+                  gridGap={SPACING.spacing4}
+                >
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('description')}
+                  </StyledText>
+                  <DescriptionField {...register('description')} />
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  color={COLORS.grey60}
+                  gridGap={SPACING.spacing4}
+                >
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('display_color')}
+                  </StyledText>
+
+                  <LiquidIcon
+                    onClick={() => {
+                      setShowColorPicker(prev => !prev)
+                    }}
+                    color={color}
+                    size="medium"
+                  />
+                </Flex>
+                {/* NOTE: this is for serialization if we decide to add it back */}
+                {/* <Controller
             control={control}
             name="serialize"
             render={({ field }) => (
@@ -271,44 +285,45 @@ export function DefineLiquidsModal(
               />
             )}
           /> */}
-            </Flex>
-            <Flex
-              justifyContent={
-                selectedIngredFields != null
-                  ? JUSTIFY_SPACE_BETWEEN
-                  : JUSTIFY_END
-              }
-              gridGap={SPACING.spacing8}
-            >
-              {selectedIngredFields != null ? (
-                <Btn
-                  onClick={deleteLiquidGroup}
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('delete_liquid')}
-                  </StyledText>
-                </Btn>
-              ) : (
-                <SecondaryButton onClick={cancelForm}>
-                  {t('shared:close')}
-                </SecondaryButton>
-              )}
-              <PrimaryButton
-                type="submit"
-                disabled={
-                  errors.name != null ||
-                  name === '' ||
-                  errors.displayColor != null
+              </Flex>
+              <Flex
+                justifyContent={
+                  selectedIngredFields != null
+                    ? JUSTIFY_SPACE_BETWEEN
+                    : JUSTIFY_END
                 }
+                gridGap={SPACING.spacing8}
               >
-                {t('shared:save')}
-              </PrimaryButton>
+                {selectedIngredFields != null ? (
+                  <Btn
+                    onClick={deleteLiquidGroup}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('delete_liquid')}
+                    </StyledText>
+                  </Btn>
+                ) : (
+                  <SecondaryButton onClick={cancelForm}>
+                    {t('shared:close')}
+                  </SecondaryButton>
+                )}
+                <PrimaryButton
+                  type="submit"
+                  disabled={
+                    errors.name != null ||
+                    name === '' ||
+                    errors.displayColor != null
+                  }
+                >
+                  {t('shared:save')}
+                </PrimaryButton>
+              </Flex>
             </Flex>
-          </Flex>
-        </>
-      </form>
-    </Modal>
+          </>
+        </form>
+      </Modal>
+    </HandleEnter>
   )
 }
 

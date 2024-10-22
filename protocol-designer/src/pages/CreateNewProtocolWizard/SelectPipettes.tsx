@@ -41,7 +41,7 @@ import { BUTTON_LINK_STYLE } from '../../atoms'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
-import { HandleEnter } from './HandleEnter'
+import { HandleEnter } from '../../atoms/HandleEnter'
 import { removeOpentronsPhrases } from '../../utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
