@@ -102,6 +102,8 @@ def create_liquid_parameter(parameters: ParameterContext) -> None:
 
 def create_tube_volume_parameter(parameters: ParameterContext) -> None:
     """Select if reagent tube should be 15 ml or 50 ml."""
+    # NOTE: Place function inside def add_parameters(parameters) in protocol.
+    # NOTE: Copy ctx.params.tube_volume # type: ignore[attr-defined] to get result
     parameters.add_int(
         variable_name="tube_volume",
         display_name="Tube Volume",

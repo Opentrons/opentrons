@@ -28,11 +28,6 @@ VOLUMES_3MM_TOP_BOTTOM = {
     "nest_96_wellplate_200ul_flat": [259.8, 96.3, 0.0],
     "opentrons_96_wellplate_200ul_pcr_full_skirt": [150.2, 14.3, 0.0],
     "nest_96_wellplate_2ml_deep": [2060.4, 118.3, 0.0],
-    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [
-        56267.2,
-        158.1,
-        0.0,
-    ],  # 50mL tubes only
     "nest_12_reservoir_15ml": [13236.1, 1219.0, 0.0],
     "nest_96_wellplate_100ul_pcr_full_skirt": [150.8, 15.5, 0.0],
     "appliedbiosystemsmicroamp_384_wellplate_40ul": [26.2, 7.44, 0.0],
@@ -62,8 +57,6 @@ NUM_TRIALS = 3
 DISPENSE_MM_FROM_MENISCUS = -0.5
 
 ASPIRATE_MM_FROM_MENISCUS = -2.0
-
-TUBE_VOLUME = 50
 
 LIQUID_MOUNT = "right"
 LIQUID_PIPETTE_SIZE = 1000
@@ -139,8 +132,9 @@ def _setup(
     Labware,
     Labware,
     Labware,
+    int,
 ]:
-    global DIAL_PORT, RUN_ID, FILE_NAME, TUBE_VOLUME
+    global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
     # Variables
     # Pipette Types
@@ -158,7 +152,7 @@ def _setup(
     probing_rack = ctx.load_labware(probing_rack_name, SLOT_PROBING_TIPRACK)
 
     LABWARE = ctx.params.labware_type  # type: ignore[attr-defined]
-    TUBE_VOLUME = ctx.params.tube_volume  # type: ignore[attr-defined]
+    tube_volume = ctx.params.tube_volume  # type: ignore[attr-defined]
 
     labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     labware_max_volume = labware["A1"].max_volume
@@ -168,16 +162,13 @@ def _setup(
     else:
         LIQUID_TIP_SIZE = 1000
     liquid_pip_channels = liquid_pipette.channels
-    try:
-        if TUBE_VOLUME == 15:
-            volumes = VOLUMES_3MM_TOP_BOTTOM_15ML[labware.load_name]
-        else:
-            volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
-    except KeyError:
-        volumes = [0.0, 0.0, 0.0]
-        ctx.comment("No volumes loaded for labware.")
+
+    if tube_volume == 15:
+        volumes = VOLUMES_3MM_TOP_BOTTOM_15ML[labware.load_name]
+    elif tube_volume == 50:
+        volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
+
     total_volume_to_aspirate = (volumes[0] * 3) + (volumes[1] * 3)
-    ctx.comment(f"total volume to aspirate {total_volume_to_aspirate}")
     if liquid_pip_channels == 1 and total_volume_to_aspirate < 1000:
         RESERVOIR = "opentrons_15_tuberack_nest_15ml_conical"
     else:
@@ -214,6 +205,7 @@ def _setup(
         labware,
         reservoir,
         dial,
+        tube_volume,
     )
 
 
@@ -332,6 +324,7 @@ def _test_for_finding_liquid_height(
             # try and get any remaining droplets out of the way
             probing_pipette.aspirate().dispense().prepare_to_aspirate()
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
+        total_vol_in_tube = 0.0
         if volume:
             # transfer over and over until all volume is moved
             need_to_transfer_per_ch = volume / liquid_pipette.channels
@@ -396,6 +389,7 @@ def _test_for_finding_liquid_height(
                 else:
                     dispense_loc = well.top(-3 + DISPENSE_MM_FROM_MENISCUS)
                 liquid_pipette.dispense(transfer_vol, dispense_loc)
+                total_vol_in_tube += transfer_vol
                 ctx.delay(seconds=1.5)
                 liquid_pipette.move_to(well.top())
                 ctx.delay(seconds=1.5)
@@ -437,20 +431,29 @@ def _test_for_finding_liquid_height(
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-    liq_pipette, liq_rack, probe_pipette, probe_rack, labware, reservoir, dial = _setup(
-        ctx
-    )
+    (
+        liq_pipette,
+        liq_rack,
+        probe_pipette,
+        probe_rack,
+        labware,
+        reservoir,
+        dial,
+        tube_volume,
+    ) = _setup(ctx)
     channels_liquid = liq_pipette.channels
     channels_probe = probe_pipette.channels
-    test_wells = _get_test_wells(labware, channels=8, tube_volume=TUBE_VOLUME)
+    test_wells = _get_test_wells(labware, channels=8, tube_volume=tube_volume)
     test_tips_liquid = _get_test_tips(liq_rack, channels=channels_liquid)
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
     stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
     # FIXME: calculate nominal volumes at +3mm from bottom and -3mm from top
     #        using Opentrons API (not Solidworks)
     try:
-
-        volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
+        if tube_volume == 15:
+            volumes = VOLUMES_3MM_TOP_BOTTOM_15ML[labware.load_name]
+        else:
+            volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
     except KeyError:
         volumes = [0.0, 0.0, 0.0]
         ctx.comment(f"No volumes loaded for labware {labware.load_name}")
