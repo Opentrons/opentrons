@@ -1,5 +1,3 @@
-from opentrons.config.types import OutputOptions
-
 ot3_dummy_settings = {
     "name": "Marie Curie",
     "model": "OT-3 Standard",
@@ -122,13 +120,11 @@ ot3_dummy_settings = {
         "plunger_speed": 10,
         "plunger_impulse_time": 0.2,
         "sensor_threshold_pascals": 17,
-        "output_option": OutputOptions.stream_to_csv,
         "aspirate_while_sensing": False,
         "z_overlap_between_passes_mm": 0.1,
         "plunger_reset_offset": 2.0,
         "samples_for_baselining": 20,
         "sample_time_sec": 0.004,
-        "data_files": {"PRIMARY": "/data/pressure_sensor_data.csv"},
     },
     "calibration": {
         "z_offset": {
@@ -137,8 +133,6 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 2,
                 "speed_mm_per_s": 3,
                 "sensor_threshold_pf": 4,
-                "output_option": OutputOptions.sync_only,
-                "data_files": None,
             },
         },
         "edge_sense": {
@@ -149,8 +143,6 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 5,
                 "speed_mm_per_s": 6,
                 "sensor_threshold_pf": 7,
-                "output_option": OutputOptions.sync_only,
-                "data_files": None,
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,

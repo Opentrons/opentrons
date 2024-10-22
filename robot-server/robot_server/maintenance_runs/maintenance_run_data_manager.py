@@ -33,6 +33,7 @@ def _build_run(
         modules=[],
         liquids=[],
         wells=[],
+        files=[],
         hasEverEnteredErrorRecovery=False,
     )
     return MaintenanceRun.construct(

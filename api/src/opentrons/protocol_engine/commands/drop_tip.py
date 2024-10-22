@@ -5,10 +5,23 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from opentrons.protocol_engine.errors.exceptions import TipAttachedError
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+
 from ..state import update_types
 from ..types import DropTipWellLocation, DeckPoint
-from .pipetting_common import PipetteIdMixin, DestinationPositionResult
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import (
+    PipetteIdMixin,
+    DestinationPositionResult,
+    TipPhysicallyAttachedError,
+)
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
 from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
@@ -54,9 +67,12 @@ class DropTipResult(DestinationPositionResult):
     pass
 
 
-class DropTipImplementation(
-    AbstractCommandImpl[DropTipParams, SuccessData[DropTipResult, None]]
-):
+_ExecuteReturn = (
+    SuccessData[DropTipResult, None] | DefinedErrorData[TipPhysicallyAttachedError]
+)
+
+
+class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
     """Drop tip command implementation."""
 
     def __init__(
@@ -64,13 +80,15 @@ class DropTipImplementation(
         state_view: StateView,
         tip_handler: TipHandler,
         movement: MovementHandler,
+        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._state_view = state_view
         self._tip_handler = tip_handler
         self._movement_handler = movement
+        self._model_utils = model_utils
 
-    async def execute(self, params: DropTipParams) -> SuccessData[DropTipResult, None]:
+    async def execute(self, params: DropTipParams) -> _ExecuteReturn:
         """Move to and drop a tip using the requested pipette."""
         pipette_id = params.pipetteId
         labware_id = params.labwareId
@@ -112,17 +130,32 @@ class DropTipImplementation(
             new_deck_point=deck_point,
         )
 
-        await self._tip_handler.drop_tip(pipette_id=pipette_id, home_after=home_after)
-
-        state_update.update_pipette_tip_state(
-            pipette_id=params.pipetteId, tip_geometry=None
-        )
-
-        return SuccessData(
-            public=DropTipResult(position=deck_point),
-            private=None,
-            state_update=state_update,
-        )
+        try:
+            await self._tip_handler.drop_tip(
+                pipette_id=pipette_id, home_after=home_after
+            )
+        except TipAttachedError as exception:
+            error = TipPhysicallyAttachedError(
+                id=self._model_utils.generate_id(),
+                createdAt=self._model_utils.get_timestamp(),
+                wrappedErrors=[
+                    ErrorOccurrence.from_failed(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        error=exception,
+                    )
+                ],
+            )
+            return DefinedErrorData(public=error, state_update=state_update)
+        else:
+            state_update.update_pipette_tip_state(
+                pipette_id=params.pipetteId, tip_geometry=None
+            )
+            return SuccessData(
+                public=DropTipResult(position=deck_point),
+                private=None,
+                state_update=state_update,
+            )
 
 
 class DropTip(BaseCommand[DropTipParams, DropTipResult, ErrorOccurrence]):

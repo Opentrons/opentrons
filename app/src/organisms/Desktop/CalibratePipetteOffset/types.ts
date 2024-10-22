@@ -11,6 +11,7 @@ export interface CalibratePipetteOffsetParentProps {
   robotName: string
   session: PipetteOffsetCalibrationSession | null
   dispatchRequests: DispatchRequestsType
+  requestIds: string[]
   showSpinner: boolean
   isJogging: boolean
 }

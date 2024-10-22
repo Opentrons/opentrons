@@ -14,11 +14,12 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
-import { useHomePipettes } from './hooks'
+import { useHomePipettes } from '/app/local-resources/instruments'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { UseHomePipettesProps, PipetteWithTip } from './hooks'
+import type { UseHomePipettesProps } from '/app/local-resources/instruments'
+import type { PipetteWithTip } from './hooks'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
 type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSettled'> & {
@@ -47,7 +48,7 @@ const TipsAttachedModal = NiceModal.create(
     const modal = useModal()
 
     const { mount, specs } = aPipetteWithTip
-    const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+    const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
     const { homePipettes, isHoming } = useHomePipettes({
       ...homePipetteProps,
       pipetteInfo: buildPipetteDetails(aPipetteWithTip),
@@ -68,7 +69,7 @@ const TipsAttachedModal = NiceModal.create(
     }
 
     const cleanUpAndClose = (isTakeover?: boolean): void => {
-      toggleDTWiz()
+      disableDTWiz()
 
       if (!isTakeover) {
         modal.remove()
@@ -106,7 +107,7 @@ const TipsAttachedModal = NiceModal.create(
               <SmallButton
                 flex="1"
                 buttonText={t('begin_removal')}
-                onClick={toggleDTWiz}
+                onClick={enableDTWiz}
                 disabled={isHoming}
               />
             </Flex>

@@ -43,4 +43,10 @@ describe('removeOpentronsPhrases', () => {
     const expectedOutput = ''
     expect(removeOpentronsPhrases(input)).toBe(expectedOutput)
   })
+
+  it('should remove "Eppendorf" from input ', () => {
+    const input = 'Eppendorf epT.I.P.S. Tip Rack is long'
+    const expectedOutput = 'epT.I.P.S. Tip Rack is long'
+    expect(removeOpentronsPhrases(input)).toBe(expectedOutput)
+  })
 })

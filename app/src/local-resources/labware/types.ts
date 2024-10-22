@@ -3,6 +3,7 @@ import type {
   LabwareWellShapeProperties,
   LabwareWellGroupMetadata,
   LabwareBrand,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 
 export interface LabwareDefAndDate {
@@ -35,3 +36,5 @@ export interface LabwareWellGroupProperties {
   metadata: LabwareWellGroupMetadata
   brand: LabwareBrand | null
 }
+
+export type LoadedLabwares = LoadedLabware[] | Record<string, LoadedLabware>

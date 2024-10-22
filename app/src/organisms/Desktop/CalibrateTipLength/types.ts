@@ -5,6 +5,7 @@ export interface CalibrateTipLengthParentProps {
   robotName: string
   session: TipLengthCalibrationSession | null
   dispatchRequests: DispatchRequestsType
+  requestIds: string[]
   showSpinner: boolean
   isJogging: boolean
   allowChangeTipRack?: boolean

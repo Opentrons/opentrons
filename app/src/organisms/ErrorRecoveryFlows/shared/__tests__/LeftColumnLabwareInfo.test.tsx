@@ -6,11 +6,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { i18n } from '/app/i18n'
 import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
-import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent/InterventionInfo'
-import { InlineNotification } from '/app/atoms/InlineNotification'
+import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
-vi.mock('/app/molecules/InterventionModal/InterventionContent/InterventionInfo')
-vi.mock('/app/atoms/InlineNotification')
+vi.mock('/app/molecules/InterventionModal/InterventionContent')
 
 const render = (props: React.ComponentProps<typeof LeftColumnLabwareInfo>) => {
   return renderWithProviders(<LeftColumnLabwareInfo {...props} />, {
@@ -27,60 +25,86 @@ describe('LeftColumnLabwareInfo', () => {
       title: 'MOCK_TITLE',
       failedLabwareUtils: {
         failedLabwareName: 'MOCK_LW_NAME',
-        failedLabware: {
-          location: { slotName: 'A1' },
+        failedLabwareNickname: 'MOCK_LW_NICKNAME',
+        failedLabwareLocations: {
+          displayNameCurrentLoc: 'slot A1',
+          displayNameNewLoc: 'slot B2',
         },
       } as any,
       type: 'location',
       bannerText: 'MOCK_BANNER_TEXT',
     }
 
-    vi.mocked(InterventionInfo).mockReturnValue(<div>MOCK_MOVE</div>)
-    vi.mocked(InlineNotification).mockReturnValue(
-      <div>MOCK_INLINE_NOTIFICATION</div>
+    vi.mocked(InterventionContent).mockReturnValue(
+      <div>MOCK_INTERVENTION_CONTENT</div>
     )
   })
 
-  it('renders the title, InterventionInfo component, and InlineNotification when bannerText is provided', () => {
+  it('renders the InterventionContent component with correct props', () => {
     render(props)
 
-    screen.getByText('MOCK_TITLE')
-    screen.getByText('MOCK_MOVE')
-    expect(vi.mocked(InterventionInfo)).toHaveBeenCalledWith(
+    screen.getByText('MOCK_INTERVENTION_CONTENT')
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'location',
-        labwareName: 'MOCK_LW_NAME',
-        currentLocationProps: { deckLabel: 'A1' },
-      }),
-      {}
-    )
-    screen.getByText('MOCK_INLINE_NOTIFICATION')
-    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'alert',
-        heading: 'MOCK_BANNER_TEXT',
+        headline: 'MOCK_TITLE',
+        infoProps: {
+          type: 'location',
+          labwareName: 'MOCK_LW_NAME',
+          labwareNickname: 'MOCK_LW_NICKNAME',
+          currentLocationProps: { deckLabel: 'SLOT A1' },
+          newLocationProps: { deckLabel: 'SLOT B2' },
+        },
+        notificationProps: {
+          type: 'alert',
+          heading: 'MOCK_BANNER_TEXT',
+        },
       }),
       {}
     )
   })
 
-  it('does not render the InlineNotification when bannerText is not provided', () => {
+  it('does not include notificationProps when bannerText is not provided', () => {
     props.bannerText = undefined
     render(props)
 
-    screen.getByText('MOCK_TITLE')
-    screen.getByText('MOCK_MOVE')
-    expect(screen.queryByText('MOCK_INLINE_NOTIFICATION')).toBeNull()
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        notificationProps: undefined,
+      }),
+      {}
+    )
   })
 
-  it('returns an empty string for slotName when failedLabware location is not an object with slotName', () => {
-    // @ts-expect-error yeah this is ok
-    props.failedLabwareUtils.failedLabware.location = 'offDeck'
+  it('does not include newLocationProps when newLoc is not provided', () => {
+    props.failedLabwareUtils.failedLabwareLocations.displayNameNewLoc = null
     render(props)
 
-    expect(vi.mocked(InterventionInfo)).toHaveBeenCalledWith(
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
       expect.objectContaining({
-        currentLocationProps: { deckLabel: '' },
+        infoProps: expect.not.objectContaining({
+          newLocationProps: expect.anything(),
+        }),
+      }),
+      {}
+    )
+  })
+
+  it('converts location labels to uppercase', () => {
+    props.failedLabwareUtils.failedLabwareLocations = {
+      displayNameCurrentLoc: 'slot A1',
+      displayNameNewLoc: 'slot B2',
+      newLoc: {} as any,
+      currentLoc: {} as any,
+    }
+
+    render(props)
+
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        infoProps: expect.objectContaining({
+          currentLocationProps: { deckLabel: 'SLOT A1' },
+          newLocationProps: { deckLabel: 'SLOT B2' },
+        }),
       }),
       {}
     )

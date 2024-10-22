@@ -4,7 +4,7 @@ import { renderHook, act, screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useHomePipettes } from '/app/organisms/DropTipWizardFlows'
+import { useHomePipettes } from '/app/local-resources/instruments'
 import {
   useProtocolDropTipModal,
   ProtocolDropTipModal,
@@ -12,7 +12,7 @@ import {
 
 import type { Mock } from 'vitest'
 
-vi.mock('/app/organisms/DropTipWizardFlows')
+vi.mock('/app/local-resources/instruments')
 
 describe('useProtocolDropTipModal', () => {
   let props: Parameters<typeof useProtocolDropTipModal>[0]
@@ -21,7 +21,7 @@ describe('useProtocolDropTipModal', () => {
   beforeEach(() => {
     props = {
       areTipsAttached: true,
-      toggleDTWiz: vi.fn(),
+      enableDTWiz: vi.fn(),
       isRunCurrent: true,
       onSkipAndHome: vi.fn(),
       currentRunId: 'MOCK_ID',
@@ -89,7 +89,7 @@ describe('useProtocolDropTipModal', () => {
       result.current.modalProps?.onBeginRemoval()
     })
 
-    expect(props.toggleDTWiz).toHaveBeenCalled()
+    expect(props.enableDTWiz).toHaveBeenCalled()
   })
 
   it('should set isDisabled to true when isHomingPipettes is true', () => {

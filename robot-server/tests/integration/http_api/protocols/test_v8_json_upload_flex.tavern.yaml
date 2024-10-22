@@ -329,6 +329,7 @@ stages:
                       x: 0.0
                       y: 0.0
                       z: 2.0
+                    volumeOffset: 0
                   volume: 5.0
                   flowRate: 3.0
                 result:
@@ -363,6 +364,7 @@ stages:
                       x: 0.0
                       y: 0.0
                       z: 1.0
+                    volumeOffset: 0
                   volume: 4.5
                   flowRate: 2.5
                 result:
@@ -386,6 +388,7 @@ stages:
                       x: 0.0
                       y: 0.0
                       z: 11.0
+                    volumeOffset: 0
                   radius: 1.0
                   speed: 42.0
                 result:
@@ -408,6 +411,7 @@ stages:
                       x: 0.0
                       y: 0.0
                       z: 12.0
+                    volumeOffset: 0
                   flowRate: 2.0
                 result:
                   position: { 'x': 342.38, 'y': 65.24, 'z': 51.05 }
@@ -446,6 +450,7 @@ stages:
                       x: 0
                       y: 0
                       z: 0
+                    volumeOffset: 0
                   forceDirect: false
                   speed: 12.3
                 result:
@@ -468,6 +473,7 @@ stages:
                       x: 2.0
                       y: 3.0
                       z: 10.0
+                    volumeOffset: 0
                   minimumZHeight: 35.0
                   forceDirect: true
                 result:

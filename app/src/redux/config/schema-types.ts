@@ -31,7 +31,7 @@ export type QuickTransfersOnDeviceSortKey =
   | 'recentCreated'
   | 'oldCreated'
 
-export type Language = 'en' | 'zh'
+export type Language = 'en-US' | 'zh-CN'
 
 export interface OnDeviceDisplaySettings {
   sleepMs: number

@@ -1,4 +1,4 @@
-import { DISMISS_REQUEST } from './constants'
+import { DISMISS_ALL_REQUESTS, DISMISS_REQUEST } from './constants'
 import type * as Types from './types'
 
 export const dismissRequest = (
@@ -8,4 +8,8 @@ export const dismissRequest = (
     type: DISMISS_REQUEST,
     payload: { requestId },
   }
+}
+
+export const dismissAllRequests = (): Types.DismissAllRequestsAction => {
+  return { type: DISMISS_ALL_REQUESTS }
 }

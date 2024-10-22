@@ -80,6 +80,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        is_meniscus: Optional[bool] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -122,6 +123,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
+        is_meniscus: Optional[bool] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:

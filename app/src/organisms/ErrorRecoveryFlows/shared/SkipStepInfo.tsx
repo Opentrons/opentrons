@@ -17,16 +17,24 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
     SKIP_STEP_WITH_SAME_TIPS,
     SKIP_STEP_WITH_NEW_TIPS,
     MANUAL_MOVE_AND_SKIP,
+    IGNORE_AND_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
+  const { moveLabwareWithoutPause } = recoveryCommands
   const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
     return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
-      skipFailedCommand()
+      if (selectedRecoveryOption === MANUAL_MOVE_AND_SKIP.ROUTE) {
+        void moveLabwareWithoutPause().then(() => {
+          skipFailedCommand()
+        })
+      } else {
+        skipFailedCommand()
+      }
     })
   }
 
@@ -36,6 +44,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         return t('skip_to_next_step_same_tips')
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
         return t('skip_to_next_step_new_tips')
+      case IGNORE_AND_SKIP.ROUTE:
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         return t('skip_to_next_step')
       default:
@@ -48,6 +57,8 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
 
   const buildBodyCopyKey = (): string => {
     switch (selectedRecoveryOption) {
+      case IGNORE_AND_SKIP.ROUTE:
+        return 'inspect_the_robot'
       case SKIP_STEP_WITH_SAME_TIPS.ROUTE:
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
         return 'failed_dispense_step_not_completed'

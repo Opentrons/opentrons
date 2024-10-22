@@ -14,6 +14,7 @@
   "destination_well": "Destination Well",
   "developer_ff": "Developer feature flags",
   "done": "Done",
+  "pipette": "Pipette",
   "edit_existing": "Edit existing protocol",
   "edit_instruments": "Edit Instruments",
   "edit_pipette": "Edit Pipette",
@@ -80,6 +81,7 @@
   "message_uses_standard_namespace": "This labware definition uses the Opentrons standard labware namespace. Change the namespace if it is custom, or use the standard labware in your protocol.",
   "mismatched": "The new labware has a different arrangement of wells than the labware it is replacing. Clicking Overwrite will deselect all wells in any existing steps that use this labware. You will have to edit each of those steps and select new wells.",
   "module": "Module",
+  "name_step": "Name step",
   "next": "next",
   "ninety_six_channel": "96-Channel",
   "no_hints_to_restore": "No hints to restore",
@@ -123,7 +125,7 @@
   "warning": "WARNING:",
   "wasteChute": "Waste chute",
   "wasteChuteAndStagingArea": "Waste chute and staging area slot",
-  "we_are_improving": "We’re working to improve Protocol Designer. Part of the process involves watching real user sessions to understand which parts of the interface are working and which could use improvement. We never share sessions outside of Opentrons.",
+  "we_are_improving": "In order to improve our products, Opentrons would like to collect data related to your use of Protocol Designer. With your consent, Opentrons will collect and store analytics and session data, including through the use of cookies and similar technologies, solely for the purpose enhancing our products. Find detailed information in our <link1>privacy policy</link1>. By using Protocol Designer, you consent to the Opentrons <link2>EULA</link2>.",
   "welcome": "Welcome to Protocol Designer!",
   "yes": "Yes"
 }

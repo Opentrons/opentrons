@@ -267,6 +267,7 @@ export const removeOpentronsPhrases = (input: string): string => {
     'Opentrons OT-2 96',
     '\\(Retired\\)',
     '96',
+    'Eppendorf',
   ]
 
   const updatedText = phrasesToRemove

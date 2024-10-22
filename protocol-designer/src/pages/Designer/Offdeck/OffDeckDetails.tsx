@@ -48,8 +48,8 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
     <Flex
       backgroundColor={COLORS.white}
       borderRadius={BORDERS.borderRadius8}
-      width={tab === 'startingDeck' ? '100%' : '90%'}
-      height="70vh"
+      width={tab === 'startingDeck' ? '100vw' : '75vh'}
+      height="65vh"
       padding={`${SPACING.spacing40} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_CENTER}
       gridGap={SPACING.spacing24}
@@ -64,13 +64,16 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
         </Flex>
       ) : null}
       <Flex
-        marginRight="17.375rem"
-        marginLeft={hoverSlot ? '0' : '17.375rem'}
+        marginRight={tab === 'startingDeck' ? '17.375rem' : '0'}
+        marginLeft={
+          (tab === 'startingDeck' && hoverSlot) || tab === 'protocolSteps'
+            ? '0'
+            : '17.375rem'
+        }
         width="100%"
         borderRadius={SPACING.spacing12}
         padding={`${SPACING.spacing16} ${SPACING.spacing40}`}
         backgroundColor={COLORS.grey20}
-        height="100%"
         overflowY={OVERFLOW_SCROLL}
         flexDirection={DIRECTION_COLUMN}
       >

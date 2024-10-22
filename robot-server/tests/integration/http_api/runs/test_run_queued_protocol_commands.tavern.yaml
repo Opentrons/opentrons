@@ -96,6 +96,7 @@ stages:
           labwareOffsets: []
           liquids: []
           runTimeParameters: []
+          outputFileIds: []
           modules: []
           pipettes: []
           status: 'idle'

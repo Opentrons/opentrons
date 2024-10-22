@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import head from 'lodash/head'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
+  RESPONSIVENESS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -14,14 +16,8 @@ import {
   RECOVERY_MAP,
   ERROR_KINDS,
   ODD_SECTION_TITLE_STYLE,
-  ODD_ONLY,
-  DESKTOP_ONLY,
 } from '../constants'
-import {
-  RecoveryODDOneDesktopTwoColumnContentWrapper,
-  RecoveryRadioGroup,
-  FailedStepNextStep,
-} from '../shared'
+import { RecoverySingleColumnContentWrapper } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '/app/organisms/DropTipWizardFlows'
@@ -52,7 +48,7 @@ export function SelectRecoveryOptionHome({
   currentRecoveryOptionUtils,
   getRecoveryOptionCopy,
   analytics,
-  ...rest
+  isOnDevice,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -66,7 +62,7 @@ export function SelectRecoveryOptionHome({
   useCurrentTipStatus(determineTipStatus)
 
   return (
-    <RecoveryODDOneDesktopTwoColumnContentWrapper
+    <RecoverySingleColumnContentWrapper
       footerDetails={{
         primaryBtnOnClick: () => {
           analytics.reportActionSelectedEvent(selectedRoute)
@@ -83,25 +79,16 @@ export function SelectRecoveryOptionHome({
         >
           {t('choose_a_recovery_action')}
         </StyledText>
-        <Flex css={ODD_ONLY}>
-          <ODDRecoveryOptions
-            validRecoveryOptions={validRecoveryOptions}
-            setSelectedRoute={setSelectedRoute}
-            selectedRoute={selectedRoute}
-            getRecoveryOptionCopy={getRecoveryOptionCopy}
-          />
-        </Flex>
-        <Flex css={DESKTOP_ONLY}>
-          <DesktopRecoveryOptions
-            validRecoveryOptions={validRecoveryOptions}
-            setSelectedRoute={setSelectedRoute}
-            selectedRoute={selectedRoute}
-            getRecoveryOptionCopy={getRecoveryOptionCopy}
-          />
-        </Flex>
+        <RecoveryOptions
+          validRecoveryOptions={validRecoveryOptions}
+          setSelectedRoute={setSelectedRoute}
+          selectedRoute={selectedRoute}
+          getRecoveryOptionCopy={getRecoveryOptionCopy}
+          errorKind={errorKind}
+          isOnDevice={isOnDevice}
+        />
       </Flex>
-      <FailedStepNextStep {...rest} />
-    </RecoveryODDOneDesktopTwoColumnContentWrapper>
+    </RecoverySingleColumnContentWrapper>
   )
 }
 
@@ -109,23 +96,23 @@ interface RecoveryOptionsProps {
   validRecoveryOptions: RecoveryRoute[]
   setSelectedRoute: (route: RecoveryRoute) => void
   getRecoveryOptionCopy: RecoveryContentProps['getRecoveryOptionCopy']
+  errorKind: RecoveryContentProps['errorKind']
+  isOnDevice: RecoveryContentProps['isOnDevice']
   selectedRoute?: RecoveryRoute
 }
-// For ODD use only.
-export function ODDRecoveryOptions({
+
+export function RecoveryOptions({
+  errorKind,
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
   getRecoveryOptionCopy,
+  isOnDevice,
 }: RecoveryOptionsProps): JSX.Element {
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
-      width="100%"
-    >
+    <Flex css={RECOVERY_OPTION_CONTAINER_STYLE}>
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
-        const optionName = getRecoveryOptionCopy(recoveryOption)
+        const optionName = getRecoveryOptionCopy(recoveryOption, errorKind)
         return (
           <RadioButton
             key={`recovery_option_${optionName}`}
@@ -136,6 +123,7 @@ export function ODDRecoveryOptions({
             }}
             isSelected={recoveryOption === selectedRoute}
             radioButtonType="large"
+            largeDesktopBorderRadius={!isOnDevice}
           />
         )
       })}
@@ -143,37 +131,16 @@ export function ODDRecoveryOptions({
   )
 }
 
-export function DesktopRecoveryOptions({
-  validRecoveryOptions,
-  selectedRoute,
-  setSelectedRoute,
-  getRecoveryOptionCopy,
-}: RecoveryOptionsProps): JSX.Element {
-  return (
-    <RecoveryRadioGroup
-      css={RADIO_GAP}
-      onChange={e => {
-        setSelectedRoute(e.currentTarget.value)
-      }}
-      value={selectedRoute}
-      options={validRecoveryOptions.map(
-        (option: RecoveryRoute) =>
-          ({
-            value: option,
-            children: (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                role="label"
-                htmlFor={option}
-              >
-                {getRecoveryOptionCopy(option)}
-              </StyledText>
-            ),
-          } as const)
-      )}
-    />
-  )
-}
+const RECOVERY_OPTION_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing4};
+  width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing8};
+  }
+`
+
 // Pre-fetch tip attachment status. Users are not blocked from proceeding at this step.
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
@@ -195,6 +162,8 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return OVERPRESSURE_WHILE_DISPENSING_OPTIONS
     case ERROR_KINDS.TIP_NOT_DETECTED:
       return TIP_NOT_DETECTED_OPTIONS
+    case ERROR_KINDS.TIP_DROP_FAILED:
+      return TIP_DROP_FAILED_OPTIONS
     case ERROR_KINDS.GRIPPER_ERROR:
       return GRIPPER_ERROR_OPTIONS
     case ERROR_KINDS.GENERAL_ERROR:
@@ -231,6 +200,12 @@ export const TIP_NOT_DETECTED_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
+export const TIP_DROP_FAILED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.RETRY_STEP.ROUTE,
+  RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
 export const GRIPPER_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
   RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
@@ -241,7 +216,3 @@ export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_STEP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
-
-const RADIO_GAP = `
-  gap: ${SPACING.spacing4};
-`

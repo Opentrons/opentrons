@@ -96,9 +96,11 @@ export type CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
 export interface ConfigInitializedAction {
   type: CONFIG_INITIALIZED_TYPE
   payload: { config: Config }
+  meta: { shell: true }
 }
 
 export interface ConfigValueUpdatedAction {
   type: CONFIG_VALUE_UPDATED_TYPE
   payload: { path: string; value: any }
+  meta: { shell: true }
 }

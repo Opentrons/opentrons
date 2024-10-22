@@ -1,6 +1,8 @@
 """Test drop tip commands."""
+from datetime import datetime
+
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     DropTipWellLocation,
@@ -9,17 +11,22 @@ from opentrons.protocol_engine import (
     WellOffset,
     DeckPoint,
 )
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.execution import MovementHandler, TipHandler
-from opentrons.types import Point
-
-from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.drop_tip import (
     DropTipParams,
     DropTipResult,
     DropTipImplementation,
 )
+from opentrons.protocol_engine.commands.pipetting_common import (
+    TipPhysicallyAttachedError,
+)
+from opentrons.protocol_engine.errors.exceptions import TipAttachedError
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.execution import MovementHandler, TipHandler
+
+from opentrons.types import Point
 
 
 @pytest.fixture
@@ -38,6 +45,12 @@ def mock_movement_handler(decoy: Decoy) -> MovementHandler:
 def mock_tip_handler(decoy: Decoy) -> TipHandler:
     """Get a mock TipHandler."""
     return decoy.mock(cls=TipHandler)
+
+
+@pytest.fixture
+def mock_model_utils(decoy: Decoy) -> ModelUtils:
+    """Get a mock ModelUtils."""
+    return decoy.mock(cls=ModelUtils)
 
 
 def test_drop_tip_params_defaults() -> None:
@@ -72,12 +85,14 @@ async def test_drop_tip_implementation(
     mock_state_view: StateView,
     mock_movement_handler: MovementHandler,
     mock_tip_handler: TipHandler,
+    mock_model_utils: ModelUtils,
 ) -> None:
     """A DropTip command should have an execution implementation."""
     subject = DropTipImplementation(
         state_view=mock_state_view,
         movement=mock_movement_handler,
         tip_handler=mock_tip_handler,
+        model_utils=mock_model_utils,
     )
 
     params = DropTipParams(
@@ -141,12 +156,14 @@ async def test_drop_tip_with_alternating_locations(
     mock_state_view: StateView,
     mock_movement_handler: MovementHandler,
     mock_tip_handler: TipHandler,
+    mock_model_utils: ModelUtils,
 ) -> None:
     """It should drop tip at random location within the labware every time."""
     subject = DropTipImplementation(
         state_view=mock_state_view,
         movement=mock_movement_handler,
         tip_handler=mock_tip_handler,
+        model_utils=mock_model_utils,
     )
     params = DropTipParams(
         pipetteId="abc",
@@ -202,6 +219,79 @@ async def test_drop_tip_with_alternating_locations(
             ),
             pipette_tip_state=update_types.PipetteTipStateUpdate(
                 pipette_id="abc", tip_geometry=None
+            ),
+        ),
+    )
+
+
+async def test_tip_attached_error(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_movement_handler: MovementHandler,
+    mock_tip_handler: TipHandler,
+    mock_model_utils: ModelUtils,
+) -> None:
+    """A DropTip command should have an execution implementation."""
+    subject = DropTipImplementation(
+        state_view=mock_state_view,
+        movement=mock_movement_handler,
+        tip_handler=mock_tip_handler,
+        model_utils=mock_model_utils,
+    )
+
+    params = DropTipParams(
+        pipetteId="abc",
+        labwareId="123",
+        wellName="A3",
+        wellLocation=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
+    )
+
+    decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
+    ).then_return(False)
+
+    decoy.when(
+        mock_state_view.geometry.get_checked_tip_drop_location(
+            pipette_id="abc",
+            labware_id="123",
+            well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            partially_configured=False,
+        )
+    ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
+
+    decoy.when(
+        await mock_movement_handler.move_to_well(
+            pipette_id="abc",
+            labware_id="123",
+            well_name="A3",
+            well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
+        )
+    ).then_return(Point(x=111, y=222, z=333))
+    decoy.when(
+        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=None)
+    ).then_raise(TipAttachedError("Egads!"))
+
+    decoy.when(mock_model_utils.generate_id()).then_return("error-id")
+    decoy.when(mock_model_utils.get_timestamp()).then_return(
+        datetime(year=1, month=2, day=3)
+    )
+
+    result = await subject.execute(params)
+
+    assert result == DefinedErrorData(
+        public=TipPhysicallyAttachedError.construct(
+            id="error-id",
+            createdAt=datetime(year=1, month=2, day=3),
+            wrappedErrors=[matchers.Anything()],
+        ),
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="abc",
+                new_location=update_types.Well(
+                    labware_id="123",
+                    well_name="A3",
+                ),
+                new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
         ),
     )

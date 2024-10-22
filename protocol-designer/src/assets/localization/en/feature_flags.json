@@ -20,10 +20,6 @@
     "title": "Enable redesign",
     "description": "A whole new world."
   },
-  "OT_PD_ENABLE_MOAM": {
-    "title": "Enable multiple modules",
-    "description": "Enable multiple heater-shakers and magnetic blocks for Flex only."
-  },
   "OT_PD_ENABLE_COMMENT": {
     "title": "Enable comment step",
     "description": "You can add comments anywhere between timeline steps."
@@ -31,5 +27,9 @@
   "OT_PD_ENABLE_RETURN_TIP": {
     "title": "Enable return tip",
     "description": "You can choose which tip to pick up and where to drop tip."
+  },
+  "OT_PD_ENABLE_HOT_KEYS_DISPLAY": {
+    "title": "Timeline editing tips",
+    "description": "Show tips for working with steps next to the protocol timeline"
   }
 }

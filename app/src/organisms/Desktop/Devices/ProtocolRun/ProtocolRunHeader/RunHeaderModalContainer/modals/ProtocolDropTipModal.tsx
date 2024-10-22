@@ -16,21 +16,19 @@ import {
 } from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
-import { useHomePipettes } from '/app/organisms/DropTipWizardFlows'
+import { useHomePipettes } from '/app/local-resources/instruments'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type {
-  UseHomePipettesProps,
-  TipAttachmentStatusResult,
-} from '/app/organisms/DropTipWizardFlows'
+import type { UseHomePipettesProps } from '/app/local-resources/instruments'
+import type { TipAttachmentStatusResult } from '/app/organisms/DropTipWizardFlows'
 
 type UseProtocolDropTipModalProps = Pick<
   UseHomePipettesProps,
   'pipetteInfo'
 > & {
   areTipsAttached: TipAttachmentStatusResult['areTipsAttached']
-  toggleDTWiz: () => void
+  enableDTWiz: () => void
   currentRunId: string
   onSkipAndHome: () => void
   /* True if the most recent run is the current run */
@@ -47,7 +45,7 @@ export type UseProtocolDropTipModalResult =
 // Wraps functionality required for rendering the related modal.
 export function useProtocolDropTipModal({
   areTipsAttached,
-  toggleDTWiz,
+  enableDTWiz,
   isRunCurrent,
   onSkipAndHome,
   pipetteInfo,
@@ -75,7 +73,7 @@ export function useProtocolDropTipModal({
   }
 
   const onBeginRemoval = (): void => {
-    toggleDTWiz()
+    enableDTWiz()
     setShowModal(false)
   }
 
