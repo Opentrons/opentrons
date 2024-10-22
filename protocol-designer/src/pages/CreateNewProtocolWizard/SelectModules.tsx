@@ -35,7 +35,13 @@ import {
   FLEX_SUPPORTED_MODULE_MODELS,
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
-import { getNumOptions, getNumSlotsAvailable } from './utils'
+import {
+  getNumOptionsForModules,
+  getNumSlotsAvailable,
+  getModuleDistribution,
+  getAvailableSlots,
+  getCanAddModule,
+} from './utils'
 import { HandleEnter } from './HandleEnter'
 
 import type { DropdownBorder } from '@opentrons/components'
@@ -44,7 +50,6 @@ import type { FormModule, FormModules } from '../../step-forms'
 import type { WizardTileProps } from './types'
 
 const MAX_MAGNETIC_BLOCKS = 4
-const MAGNETIC_BLOCKS_ADJUSTMENT = 3
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -59,6 +64,11 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
     robotType === FLEX_ROBOT_TYPE
       ? FLEX_SUPPORTED_MODULE_MODELS
       : OT2_SUPPORTED_MODULE_MODELS
+
+  const distribution = getModuleDistribution(modules)
+  console.log('distribution', distribution)
+  const availableSlots = getAvailableSlots(distribution)
+  console.log('availableSlots', availableSlots)
 
   const numSlotsAvailable = getNumSlotsAvailable(modules, additionalEquipment)
   const hasNoAvailableSlots = numSlotsAvailable === 0
@@ -86,20 +96,23 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
   ]
 
   const handleAddModule = (moduleModel: ModuleModel): void => {
-    if (hasNoAvailableSlots) {
-      makeSnackbar(t('slots_limit_reached') as string)
-    } else {
+    const moduleType = getModuleType(moduleModel)
+    const distribution = getModuleDistribution(modules)
+
+    if (getCanAddModule(moduleType, distribution)) {
       setValue('modules', {
         ...modules,
         [uuid()]: {
           model: moduleModel,
-          type: getModuleType(moduleModel),
+          type: moduleType,
           slot:
             robotType === FLEX_ROBOT_TYPE
               ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
               : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
         },
       })
+    } else {
+      makeSnackbar(t('cannot_add_module') as string)
     }
   }
 
@@ -254,12 +267,9 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                           )
                         },
                         dropdownType: 'neutral' as DropdownBorder,
-                        filterOptions: getNumOptions(
-                          module.model === 'magneticBlockV1'
-                            ? numSlotsAvailable +
-                                MAGNETIC_BLOCKS_ADJUSTMENT +
-                                module.count
-                            : numSlotsAvailable + module.count
+                        filterOptions: getNumOptionsForModules(
+                          module.type,
+                          distribution
                         ),
                       }
                       return (
