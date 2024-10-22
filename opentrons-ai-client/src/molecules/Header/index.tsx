@@ -10,15 +10,18 @@ import {
   COLORS,
   POSITION_RELATIVE,
   ALIGN_CENTER,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useAuth0 } from '@auth0/auth0-react'
+import { CLIENT_MAX_WIDTH } from '../../resources/constants'
 
 const HeaderBar = styled(Flex)`
   position: ${POSITION_RELATIVE};
   background-color: ${COLORS.white};
   width: 100%;
   align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
   height: 60px;
 `
 
@@ -27,6 +30,7 @@ const HeaderBarContent = styled(Flex)`
   padding: 18px 32px;
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   width: 100%;
+  max-width: ${CLIENT_MAX_WIDTH};
 `
 
 const HeaderGradientTitle = styled(StyledText)`
