@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -12,6 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   Tag,
   ToggleGroup,
 } from '@opentrons/components'
@@ -34,7 +35,7 @@ import { StepSummary } from './StepSummary'
 import { BatchEditToolbox } from './BatchEditToolbox'
 
 export function ProtocolSteps(): JSX.Element {
-  const { t } = useTranslation('starting_deck_state')
+  const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selectedSubstep = useSelector(getSelectedSubstep)
@@ -44,14 +45,6 @@ export function ProtocolSteps(): JSX.Element {
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
-
-  const formType = formData?.stepType
-
-  useEffect(() => {
-    if (formData != null && formType !== 'moveLabware') {
-      setDeckView(leftString)
-    }
-  }, [formData, formType, deckView])
 
   const currentHoveredStepId = useSelector(getHoveredStepId)
   const currentSelectedStepId = useSelector(getSelectedStepId)
@@ -76,29 +69,35 @@ export function ProtocolSteps(): JSX.Element {
       <TimelineToolbox />
       <Flex
         alignItems={ALIGN_CENTER}
+        alignSelf={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         width="100%"
-        paddingBottom={enableHoyKeyDisplay ? '5rem' : '0'}
-        paddingTop={SPACING.spacing16}
         justifyContent={JUSTIFY_FLEX_START}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          {formData == null || formType === 'moveLabware' ? (
-            <Flex justifyContent={JUSTIFY_FLEX_END}>
-              <ToggleGroup
-                selectedValue={deckView}
-                leftText={leftString}
-                rightText={rightString}
-                leftClick={() => {
-                  setDeckView(leftString)
-                }}
-                rightClick={() => {
-                  setDeckView(rightString)
-                }}
-              />
-            </Flex>
-          ) : null}
+          <Flex
+            justifyContent={
+              currentStep != null ? JUSTIFY_SPACE_BETWEEN : JUSTIFY_FLEX_END
+            }
+          >
+            {currentStep != null ? (
+              <StyledText desktopStyle="headingSmallBold">
+                {i18n.format(currentStep.stepName, 'capitalize')}
+              </StyledText>
+            ) : null}
+            <ToggleGroup
+              selectedValue={deckView}
+              leftText={leftString}
+              rightText={rightString}
+              leftClick={() => {
+                setDeckView(leftString)
+              }}
+              rightClick={() => {
+                setDeckView(rightString)
+              }}
+            />
+          </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing16}
@@ -127,7 +126,9 @@ export function ProtocolSteps(): JSX.Element {
           </Box>
         ) : null}
       </Flex>
-      {selectedSubstep ? <SubstepsToolbox stepId={selectedSubstep} /> : null}
+      {formData == null && selectedSubstep ? (
+        <SubstepsToolbox stepId={selectedSubstep} />
+      ) : null}
       <StepForm />
       {isMultiSelectMode ? <BatchEditToolbox /> : null}
     </Flex>
