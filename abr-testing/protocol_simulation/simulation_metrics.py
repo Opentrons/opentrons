@@ -27,7 +27,7 @@ def set_api_level(protocol_file_path: str) -> None:
             if change == "Y":
                 api_level = input("Protocol API Level to Simulate with: ")
                 # Update new API level
-                file_contents[i] = f'apiLevel: {api_level}\n'
+                file_contents[i] = f'    \"apiLevel\": \"{api_level}\",\n'
                 print(f"Updated line: {file_contents[i]}")
             break
     with open(protocol_file_path, "w") as file:
