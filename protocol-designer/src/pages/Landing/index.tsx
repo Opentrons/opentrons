@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,6 +9,7 @@ import {
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
+  INFO_TOAST,
   JUSTIFY_CENTER,
   LargeButton,
   SPACING,
@@ -16,9 +17,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { BUTTON_LINK_STYLE } from '../../atoms'
+import { AnnouncementModal } from '../../organisms'
 import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../navigation/actions'
+import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useAnnouncements } from '../../organisms/AnnouncementModal/announcements'
+import { getLocalStorageItem, localStorageAnnouncementKey } from '../../persist'
 import welcomeImage from '../../assets/images/welcome_page.png'
 
 import type { ThunkDispatch } from '../../types'
@@ -28,8 +33,41 @@ export function Landing(): JSX.Element {
   const dispatch: ThunkDispatch<any> = useDispatch()
   const metadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
+    false
+  )
+  const { bakeToast } = useKitchen()
+  const announcements = useAnnouncements()
+  const lastAnnouncement = announcements[announcements.length - 1]
+  const announcementKey = lastAnnouncement
+    ? lastAnnouncement.announcementKey
+    : null
+  const showGateModal =
+    process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+  const userHasNotSeenAnnouncement =
+    getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
+    !showGateModal
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (userHasNotSeenAnnouncement) {
+      bakeToast(
+        t('learn_more', { version: process.env.OT_PD_VERSION }) as string,
+        INFO_TOAST,
+        {
+          heading: t('updated_protocol_designer'),
+          closeButton: true,
+          linkText: t('view_release_notes'),
+          onLinkClick: () => {
+            setShowAnnouncementModal(true)
+          },
+          disableTimeout: true,
+          justifyContent: JUSTIFY_CENTER,
+        }
+      )
+    }
+  }, [userHasNotSeenAnnouncement])
+
+  useEffect(() => {
     if (metadata?.created != null) {
       console.warn('protocol already exists, navigating to overview')
       navigate('/overview')
@@ -43,57 +81,67 @@ export function Landing(): JSX.Element {
   }
 
   return (
-    <Flex
-      backgroundColor={COLORS.grey20}
-      flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      height="calc(100vh - 3.5rem)"
-      width="100%"
-      gridGap={SPACING.spacing32}
-    >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <img
-          src={welcomeImage}
-          height="132px"
-          width="548px"
-          aria-label="welcome image"
-        />
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          alignItems={ALIGN_CENTER}
-        >
-          <StyledText desktopStyle="headingLargeBold">
-            {t('welcome')}
-          </StyledText>
-          <StyledText
-            desktopStyle="headingSmallRegular"
-            color={COLORS.grey60}
-            maxWidth="34.25rem"
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
-            {t('no-code-required')}
-          </StyledText>
-        </Flex>
-      </Flex>
-      <StyledNavLink to={'/createNew'}>
-        <LargeButton
-          onClick={() => {
-            dispatch(toggleNewProtocolModal(true))
+    <>
+      {showAnnouncementModal ? (
+        <AnnouncementModal
+          isViewReleaseNotes={showAnnouncementModal}
+          onClose={() => {
+            setShowAnnouncementModal(false)
           }}
-          buttonText={<ButtonText>{t('create_a_protocol')}</ButtonText>}
         />
-      </StyledNavLink>
-      <StyledLabel>
-        <Flex css={BUTTON_LINK_STYLE}>
-          <StyledText desktopStyle="bodyLargeRegular">
-            {t('edit_existing')}
-          </StyledText>
+      ) : null}
+      <Flex
+        backgroundColor={COLORS.grey20}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+        height="calc(100vh - 3.5rem)"
+        width="100%"
+        gridGap={SPACING.spacing32}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <img
+            src={welcomeImage}
+            height="132px"
+            width="548px"
+            aria-label="welcome image"
+          />
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            alignItems={ALIGN_CENTER}
+          >
+            <StyledText desktopStyle="headingLargeBold">
+              {t('welcome')}
+            </StyledText>
+            <StyledText
+              desktopStyle="headingSmallRegular"
+              color={COLORS.grey60}
+              maxWidth="34.25rem"
+              textAlign={TYPOGRAPHY.textAlignCenter}
+            >
+              {t('no-code-required')}
+            </StyledText>
+          </Flex>
         </Flex>
-        <input type="file" onChange={loadFile}></input>
-      </StyledLabel>
-    </Flex>
+        <StyledNavLink to={'/createNew'}>
+          <LargeButton
+            onClick={() => {
+              dispatch(toggleNewProtocolModal(true))
+            }}
+            buttonText={<ButtonText>{t('create_a_protocol')}</ButtonText>}
+          />
+        </StyledNavLink>
+        <StyledLabel>
+          <Flex css={BUTTON_LINK_STYLE}>
+            <StyledText desktopStyle="bodyLargeRegular">
+              {t('edit_existing')}
+            </StyledText>
+          </Flex>
+          <input type="file" onChange={loadFile}></input>
+        </StyledLabel>
+      </Flex>
+    </>
   )
 }
 
