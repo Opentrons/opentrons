@@ -36,6 +36,7 @@ export function LiquidDefinitions({
               key={`${liquid.name}_${liquid.displayColor}_${index}`}
             >
               <ListItemDescriptor
+                paddingType="large"
                 type="default"
                 description={
                   <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>

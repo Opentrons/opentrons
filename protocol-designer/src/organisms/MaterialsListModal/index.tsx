@@ -93,6 +93,7 @@ export function MaterialsListModal({
                 ? fixtures.map(fixture => (
                     <ListItem type="noActive" key={fixture.id}>
                       <ListItemDescriptor
+                        paddingType="large"
                         type="default"
                         description={
                           fixture.location != null ? (
@@ -128,6 +129,7 @@ export function MaterialsListModal({
                   return (
                     <ListItem type="noActive" key={`hardware${id}`}>
                       <ListItemDescriptor
+                        paddingType="large"
                         type="default"
                         description={
                           <DeckInfoLabel deckLabel={formatLocation(hw.slot)} />
@@ -187,6 +189,7 @@ export function MaterialsListModal({
                   return (
                     <ListItem type="noActive" key={`labware_${lw.id}`}>
                       <ListItemDescriptor
+                        paddingType="large"
                         type="default"
                         description={
                           <DeckInfoLabel deckLabel={deckLabelSlot} />

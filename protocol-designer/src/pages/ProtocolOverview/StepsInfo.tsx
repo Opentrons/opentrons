@@ -33,6 +33,7 @@ export function StepsInfo({ savedStepForms }: StepsInfoProps): JSX.Element {
         ) : (
           <ListItem type="noActive" key="ProtocolOverview_Step">
             <ListItemDescriptor
+              paddingType="large"
               type="default"
               description={
                 <StyledText

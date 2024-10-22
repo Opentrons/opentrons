@@ -92,6 +92,7 @@ export function InstrumentsInfo({
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
           <ListItemDescriptor
+            paddingType="large"
             type="default"
             description={t('robotType')}
             content={
@@ -103,6 +104,7 @@ export function InstrumentsInfo({
         </ListItem>
         <ListItem type="noActive" key={`ProtocolOverview_left`}>
           <ListItemDescriptor
+            paddingType="large"
             type="default"
             description={t('left_pip')}
             content={pipetteInfo(leftPipette)}
@@ -110,6 +112,7 @@ export function InstrumentsInfo({
         </ListItem>
         <ListItem type="noActive" key={`ProtocolOverview_right`}>
           <ListItemDescriptor
+            paddingType="large"
             type="default"
             description={t('right_pip')}
             content={pipetteInfo(rightPipette)}
@@ -118,6 +121,7 @@ export function InstrumentsInfo({
         {robotType === FLEX_ROBOT_TYPE ? (
           <ListItem type="noActive" key={`ProtocolOverview_gripper`}>
             <ListItemDescriptor
+              paddingType="large"
               type="default"
               description={t('extension')}
               content={isGripperAttached ? t('gripper') : t('na')}
