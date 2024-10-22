@@ -69,10 +69,7 @@ class ErrorRecoveryRule(BaseModel):
         ...,
         description="The criteria that must be met for this rule to be applied.",
     )
-    ifMatch: ReactionIfMatch = Field(
-        ...,
-        description="How to handle errors matched by this rule.",
-    )
+    ifMatch: ReactionIfMatch
 
 
 class ErrorRecoveryPolicy(BaseModel):
