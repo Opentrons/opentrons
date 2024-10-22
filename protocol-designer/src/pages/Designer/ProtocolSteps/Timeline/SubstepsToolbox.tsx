@@ -44,7 +44,7 @@ export function SubstepsToolbox(
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(hoverOnSubstep(payload))
 
-  if (substeps == null) {
+  if (substeps == null || formData == null) {
     return null
   }
 
@@ -71,7 +71,9 @@ export function SubstepsToolbox(
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">
           {i18n.format(
-            t(`protocol_steps:step_substeps`, { stepType: formData.stepName }),
+            t(`protocol_steps:step_substeps`, {
+              stepType: formData?.stepName ?? formData.stepType,
+            }),
             'capitalize'
           )}
         </StyledText>
