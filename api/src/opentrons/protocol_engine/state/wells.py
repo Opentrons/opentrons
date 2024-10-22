@@ -36,11 +36,13 @@ class WellStore(HasState[WellState], HandlesActions):
         """Modify state in reaction to an action."""
         state_update = get_state_update(action)
         if state_update is not None:
-            self._set_loaded_liquid(state_update)
-            self._set_probed_liquid(state_update)
-            self._set_operated_liquid(state_update)
+            self._handle_loaded_liquid_update(state_update)
+            self._handle_probed_liquid_update(state_update)
+            self._handle_operated_liquid_update(state_update)
 
-    def _set_loaded_liquid(self, state_update: update_types.StateUpdate) -> None:
+    def _handle_loaded_liquid_update(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
         if state_update.loaded_liquid != update_types.NO_CHANGE:
             labware_id = state_update.loaded_liquid.labware_id
             for (well, volume) in state_update.loaded_liquid.volumes.items():
@@ -50,7 +52,9 @@ class WellStore(HasState[WellState], HandlesActions):
                     operations_since_load=0,
                 )
 
-    def _set_probed_liquid(self, state_update: update_types.StateUpdate) -> None:
+    def _handle_probed_liquid_update(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
         if state_update.probed_liquid != update_types.NO_CHANGE:
             labware_id = state_update.probed_liquid.labware_id
             well_name = state_update.probed_liquid.well_name
@@ -64,7 +68,9 @@ class WellStore(HasState[WellState], HandlesActions):
                 operations_since_probe=0,
             )
 
-    def _set_operated_liquid(self, state_update: update_types.StateUpdate) -> None:
+    def _handle_operated_liquid_update(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
         if state_update.operated_liquid != update_types.NO_CHANGE:
             labware_id = state_update.operated_liquid.labware_id
             well_name = state_update.operated_liquid.well_name
