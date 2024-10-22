@@ -228,10 +228,10 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
 
 def _get_test_wells(labware: Labware, channels: int, tube_volume: int) -> List[Well]:
     try:
-        if TUBE_VOLUME == 15:
+        if tube_volume == 15:
             well_names = TEST_WELLS_15[channels][labware.load_name]
         else:
-            well_names = TEST_WELLS_15[channels][labware.load_name]
+            well_names = TEST_WELLS[channels][labware.load_name]
     except KeyError:
         well_names = [str(well_name).split(" ")[0] for well_name in labware.wells()]
         print(len(well_names))
