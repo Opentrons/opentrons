@@ -10,6 +10,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FLEX_MAX_CONTENT,
+  ListItem,
+  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
   Tag,
@@ -23,6 +25,7 @@ import {
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 
 import type { FormData } from '../../../form-types'
+import { css } from 'styled-components'
 
 interface StyledTransProps {
   i18nKey: string
@@ -399,15 +402,23 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         </Flex>
       ) : null}
       {stepDetails != null && stepDetails !== '' ? (
-        <StyledText
-          backgroundColor={COLORS.grey30}
-          padding={SPACING.spacing12}
-          borderRadius={BORDERS.borderRadius4}
-          desktopStyle="bodyDefaultRegular"
-        >
-          {stepDetails}
-        </StyledText>
+        <ListItem type="noActive">
+          <Flex padding={SPACING.spacing12}>
+            <StyledText desktopStyle="bodyDefaultRegular" css={MENU_TEXT_STYLE}>
+              {stepDetails}
+            </StyledText>
+          </Flex>
+        </ListItem>
       ) : null}
     </Flex>
   ) : null
 }
+
+const MENU_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: ${OVERFLOW_HIDDEN};
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 4;
+`
