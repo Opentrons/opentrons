@@ -33,10 +33,11 @@ const BUTTON = 'button'
 const CONTENT = 'content'
 const OT_CHECK = 'ot-check'
 
-const AccordionContainer = styled(Flex)<{
+const AccordionContainer = styled.div<{
   isOpen: boolean
   disabled: boolean
 }>`
+  display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_COLUMN};
   width: 100%;
   height: ${SIZE_AUTO};

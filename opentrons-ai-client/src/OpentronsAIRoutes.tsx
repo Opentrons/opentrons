@@ -2,11 +2,11 @@ import { Route, Navigate, Routes } from 'react-router-dom'
 import { Landing } from './pages/Landing'
 
 import type { RouteProps } from './resources/types'
+import { CreateProtocol } from './pages/CreateProtocol'
 
 const opentronsAIRoutes: RouteProps[] = [
-  // replace Landing with the correct component
   {
-    Component: Landing,
+    Component: CreateProtocol,
     name: 'Create A New Protocol',
     navLinkTo: '/new-protocol',
     path: '/new-protocol',
