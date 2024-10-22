@@ -27,8 +27,8 @@ describe('LeftColumnLabwareInfo', () => {
         failedLabwareName: 'MOCK_LW_NAME',
         failedLabwareNickname: 'MOCK_LW_NICKNAME',
         failedLabwareLocations: {
-          currentLoc: 'slot A1',
-          newLoc: 'slot B2',
+          displayNameCurrentLoc: 'slot A1',
+          displayNameNewLoc: 'slot B2',
         },
       } as any,
       type: 'location',
@@ -93,7 +93,10 @@ describe('LeftColumnLabwareInfo', () => {
     props.failedLabwareUtils.failedLabwareLocations = {
       displayNameCurrentLoc: 'slot A1',
       displayNameNewLoc: 'slot B2',
+      newLoc: {} as any,
+      currentLoc: {} as any,
     }
+
     render(props)
 
     expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
