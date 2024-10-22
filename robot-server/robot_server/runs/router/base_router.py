@@ -442,7 +442,6 @@ async def update_run(
         See `PATCH /errorRecovery/settings`.
         """
     ),
-    status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
