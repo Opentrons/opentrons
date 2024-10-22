@@ -1,6 +1,10 @@
 For more details about this release, please see the full [technical changelog][].
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 
+## Internal Release 2.2.0-alpha.1
+
+This internal release, pulled from the `edge` branch, contains features being developed for 8.2.0. It's for internal testing only.
+
 ## Internal Release 2.2.0-alpha.0
 
 This internal release, pulled from the `edge` branch, contains features being developed for 8.2.0. It's for internal testing only.
