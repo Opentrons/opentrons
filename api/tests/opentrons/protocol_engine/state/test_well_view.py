@@ -1,6 +1,6 @@
 """Well view tests."""
 from datetime import datetime
-from opentrons.protocol_engine.types import LiquidHeightInfo
+from opentrons.protocol_engine.types import ProbedHeightInfo
 import pytest
 from opentrons.protocol_engine.state.wells import WellState, WellView
 
@@ -10,8 +10,12 @@ def subject() -> WellView:
     """Get a well view test subject."""
     labware_id = "labware-id"
     well_name = "well-name"
-    height_info = LiquidHeightInfo(height=0.5, last_measured=datetime.now())
-    state = WellState(measured_liquid_heights={labware_id: {well_name: height_info}})
+    height_info = ProbedHeightInfo(height=0.5, last_probed=datetime.now())
+    state = WellState(
+        loaded_volumes={},
+        probed_heights={labware_id: {well_name: height_info}},
+        probed_volumes={},
+    )
 
     return WellView(state)
 

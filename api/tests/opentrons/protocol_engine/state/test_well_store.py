@@ -23,6 +23,6 @@ def test_handles_liquid_probe_success(subject: WellStore) -> None:
         SucceedCommandAction(private_result=None, command=liquid_probe)
     )
 
-    assert len(subject.state.measured_liquid_heights) == 1
+    assert len(subject.state.probed_heights) == 1
 
-    assert subject.state.measured_liquid_heights[labware_id][well_name].height == 0.5
+    assert subject.state.probed_heights[labware_id][well_name].height == 0.5

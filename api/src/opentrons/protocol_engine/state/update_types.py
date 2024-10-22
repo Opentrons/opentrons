@@ -243,7 +243,7 @@ class StateUpdate:
         new_well_name: str,
         new_deck_point: DeckPoint,
     ) -> None:
-        """Schedule a pipette's location to be set to a well."""
+        pass
 
     @overload
     def set_pipette_location(
@@ -253,10 +253,9 @@ class StateUpdate:
         new_addressable_area_name: str,
         new_deck_point: DeckPoint,
     ) -> None:
-        """Schedule a pipette's location to be set to an addressable area."""
         pass
 
-    def set_pipette_location(  # noqa: D102
+    def set_pipette_location(
         self,
         *,
         pipette_id: str,
@@ -265,6 +264,7 @@ class StateUpdate:
         new_addressable_area_name: str | NoChangeType = NO_CHANGE,
         new_deck_point: DeckPoint,
     ) -> None:
+        """Schedule a pipette's location to be set to a well or an addressable area."""
         if new_addressable_area_name != NO_CHANGE:
             self.pipette_location = PipetteLocationUpdate(
                 pipette_id=pipette_id,

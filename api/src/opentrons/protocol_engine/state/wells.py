@@ -1,10 +1,7 @@
 """Basic well data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, Optional
-from opentrons.protocol_engine.actions.actions import (
-    FailCommandAction,
-    SucceedCommandAction,
-)
+from typing import Dict, List, Optional, Tuple
+
 from opentrons.protocol_engine.types import (
     ProbedHeightInfo,
     ProbedVolumeInfo,
@@ -71,7 +68,7 @@ class WellStore(HasState[WellState], HandlesActions):
         if state_update.operated_liquid != update_types.NO_CHANGE:
             labware_id = state_update.operated_liquid.labware_id
             well_name = state_update.operated_liquid.well_name
-            # clear well probed_height info? Update types.py docstring
+            del self._state.probed_heights[labware_id][well_name]
             prev_loaded_vol_info = self._state.loaded_volumes[labware_id][well_name]
             if prev_loaded_vol_info.volume:
                 self._state.loaded_volumes[labware_id][well_name] = LoadedVolumeInfo(
@@ -157,3 +154,16 @@ class WellView(HasState[WellState]):
             return bool(self._state.probed_heights[labware_id][well_name].height)
         except KeyError:
             return False
+
+    def get_well_liquid_info(
+        self, labware_id: str, well_name: str
+    ) -> Tuple[
+        Optional[LoadedVolumeInfo],
+        Optional[ProbedHeightInfo],
+        Optional[ProbedVolumeInfo],
+    ]:
+        """Return all the liquid info for a well."""
+        loaded_volume_info = self._state.loaded_volumes[labware_id][well_name]
+        probed_height_info = self._state.probed_heights[labware_id][well_name]
+        probed_volume_info = self._state.probed_volumes[labware_id][well_name]
+        return loaded_volume_info, probed_height_info, probed_volume_info

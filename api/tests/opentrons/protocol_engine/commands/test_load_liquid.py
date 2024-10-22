@@ -9,6 +9,7 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidParams,
 )
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 
 @pytest.fixture
@@ -18,9 +19,11 @@ def mock_state_view(decoy: Decoy) -> StateView:
 
 
 @pytest.fixture
-def subject(mock_state_view: StateView) -> LoadLiquidImplementation:
+def subject(
+    mock_state_view: StateView, model_utils: ModelUtils
+) -> LoadLiquidImplementation:
     """Load liquid implementation test subject."""
-    return LoadLiquidImplementation(state_view=mock_state_view)
+    return LoadLiquidImplementation(state_view=mock_state_view, model_utils=model_utils)
 
 
 async def test_load_liquid_implementation(
