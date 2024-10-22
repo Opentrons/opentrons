@@ -1023,7 +1023,7 @@ def test_get_current_command_not_current_run(
     )
 
     command_slice = CommandSlice(
-        commands=[last_command_slice], cursor=1, total_length=1
+        commands=[last_command_slice], cursor=0, total_length=1
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("not-run-id")
@@ -1049,7 +1049,7 @@ def test_get_last_completed_command_current_run(
         command_id=run_command.id,
         command_key=run_command.key,
         created_at=run_command.createdAt,
-        index=5,
+        index=1,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
@@ -1084,7 +1084,7 @@ def test_get_last_completed_command_not_current_run(
         command_id="command-id-1",
         command_key="command-key",
         created_at=datetime(year=2021, month=1, day=1),
-        index=0,
+        index=1,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(

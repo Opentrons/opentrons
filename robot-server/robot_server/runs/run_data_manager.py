@@ -578,7 +578,7 @@ class RunDataManager:
                 command_id=command.id,
                 command_key=command.key,
                 created_at=command.createdAt,
-                index=command_slice.total_length - 1,
+                index=command_slice.cursor,
             )
             if command
             else None

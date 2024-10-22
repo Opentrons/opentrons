@@ -132,7 +132,7 @@ class AllRunsLinks(BaseModel):
 class CurrentStateLinks(BaseModel):
     """Links returned with the current state of a run."""
 
-    last: Optional[CommandLinkNoMeta] = Field(
+    lastCompleted: Optional[CommandLinkNoMeta] = Field(
         None,
         description="Path to the last completed command when current state was reported, if any.",
     )
@@ -597,7 +597,7 @@ async def get_current_state(
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     links = CurrentStateLinks.construct(
-        last=CommandLinkNoMeta.construct(
+        lastCompleted=CommandLinkNoMeta.construct(
             id=last_completed_command.command_id,
             href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
         )

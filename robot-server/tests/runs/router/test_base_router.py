@@ -903,7 +903,7 @@ async def test_get_current_state_success(
         }
     )
     assert result.content.links == CurrentStateLinks(
-        last=CommandLinkNoMeta(
+        lastCompleted=CommandLinkNoMeta(
             href="/runs/test-run-id/commands/last-command-id",
             id="last-command-id",
         )
