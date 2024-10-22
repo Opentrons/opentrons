@@ -12,22 +12,9 @@ from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
 from abr_testing.tools import plate_reader
 
-def look_for_air_gaps(protocol_file_path: str) -> int:
-    instances = 0
-    try:
-        with open(protocol_file_path, "r") as open_file:
-            protocol_lines = open_file.readlines()
-            for line in protocol_lines:
-                if "air_gap" in line:
-                    print(line)
-                    instances += 1
-            print(f'Found {instances} instance(s) of the air gap function')
-        open_file.close()
-    except Exception as error:
-        print("Error reading protocol:", error.with_traceback())
-    return instances
-        
-def set_api_level(protocol_file_path) -> None:
+
+
+def set_api_level(protocol_file_path: str) -> None:
     with open(protocol_file_path, "r") as file:
         file_contents = file.readlines()
     # Look for current'apiLevel:'
@@ -47,13 +34,33 @@ def set_api_level(protocol_file_path) -> None:
         file.writelines(file_contents)
     print("File updated successfully.")
 
-original_exit = sys.exit
+def look_for_air_gaps(protocol_file_path: str) -> int:
+    """Search Protocol for Air Gaps"""
+    instances = 0
+    try:
+        with open(protocol_file_path, "r") as open_file:
+            protocol_lines = open_file.readlines()
+            for line in protocol_lines:
+                if "air_gap" in line:
+                    print(line)
+                    instances += 1
+            print(f'Found {instances} instance(s) of the air gap function')
+        open_file.close()
+    except Exception as error:
+        print("Error reading protocol:", error.with_traceback())
+    return instances
 
-def mock_exit(code=None) -> None:
+
+# Mock sys.exit to avoid program termination
+original_exit = sys.exit  # Save the original sys.exit function
+
+def mock_exit(code: Any = None) -> None:
+    """Prevents program from exiting after analyze"""
     print(f"sys.exit() called with code: {code}")
-    raise SystemExit(code)
+    raise SystemExit(code)  # Raise the exception but catch it to prevent termination
 
 def get_labware_name(id: str, object_dict: dict, json_data: dict) -> str:
+    """Recursively find the labware_name"""
     slot = ""
     for obj in object_dict:
         if obj['id'] == id:
@@ -62,6 +69,7 @@ def get_labware_name(id: str, object_dict: dict, json_data: dict) -> str:
                 slot = obj['location']['slotName']
                 return " SLOT: " + slot
             except KeyError:
+                # Handle KeyError when location or slotName is missing
                 location = obj.get('location', {})
                 
                 # Check if location contains 'moduleId'
@@ -74,15 +82,18 @@ def get_labware_name(id: str, object_dict: dict, json_data: dict) -> str:
     
     return " Labware not found"
 
+
 def parse_results_volume(json_data_file: str) -> Tuple[
     List[str], List[str], List[str], List[str],
     List[str], List[str], List[str], List[str],
     List[str], List[str], List[str]
     ]:
+    """Pars run log and extract neccessay information"""
     json_data = []
     with open(json_data_file, "r") as json_file:
         json_data = json.load(json_file)
     commands = json_data.get("commands", [])
+
     start_time = datetime.fromisoformat(commands[0]["createdAt"])
     end_time = datetime.fromisoformat(commands[len(commands)-1]["completedAt"])
     header = ["", "Protocol Name", "Date", "Time"]
@@ -127,6 +138,7 @@ def parse_results_volume(json_data_file: str) -> Tuple[
         "Average Liquid Probe Time (sec)",
         ]
     values_row = ["Value"]
+
     labware_well_dict = {}
     hs_dict, temp_module_dict, thermo_cycler_dict, plate_reader_dict, instrument_dict = {}, {}, {}, {}, {}
     try:
@@ -140,53 +152,52 @@ def parse_results_volume(json_data_file: str) -> Tuple[
 
     metrics = [hs_dict, temp_module_dict, thermo_cycler_dict, plate_reader_dict, instrument_dict]
 
-    # Iterate through all the commands executed in the protocol run log
     for x, command in enumerate(commands):
         if x != 0:
             prev_command = commands[x-1]
             if command["commandType"] == "aspirate":
-                if not (prev_command["commandType"] == "comment" and (prev_command['params']['message'] == "AIR GAP" or prev_command['params']['message'] == "MIXING")):
-                    labware_id = command["params"]["labwareId"]
-                    labware_name = ""
-                    for labware in json_data.get("labware"):
-                        if labware["id"] == labware_id:
-                            labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
-                    well_name = command["params"]["wellName"]
+                labware_id = command["params"]["labwareId"]
+                labware_name = ""
+                for labware in json_data.get("labware"):
+                    if labware["id"] == labware_id:
+                        labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
+                well_name = command["params"]["wellName"]
 
-                    if labware_id not in labware_well_dict:
-                        labware_well_dict[labware_id] = {}
+                if labware_id not in labware_well_dict:
+                    labware_well_dict[labware_id] = {}
 
-                    if well_name not in labware_well_dict[labware_id]:
-                        labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
+                if well_name not in labware_well_dict[labware_id]:
+                    labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
 
-                    vol = int(command["params"]["volume"])
+                vol = int(command["params"]["volume"])
 
-                    labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
+                labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
 
-                    subtracted_volumes += vol
-                    log+=(f"aspirated {vol} ")
-                    labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
+                subtracted_volumes += vol
+                log+=(f"aspirated {vol} ")
+                labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
+
             elif command["commandType"] == "dispense":
-                if not (prev_command["commandType"] == "comment" and (prev_command['params']['message'] == "MIXING")):
-                    labware_id = command["params"]["labwareId"]
-                    labware_name = ""
-                    for labware in json_data.get("labware"):
-                        if labware["id"] == labware_id:
-                            labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
-                    well_name = command["params"]["wellName"]
+                labware_id = command["params"]["labwareId"]
+                labware_name = ""
+                for labware in json_data.get("labware"):
+                    if labware["id"] == labware_id:
+                        labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
+                well_name = command["params"]["wellName"]
 
-                    if labware_id not in labware_well_dict:
-                        labware_well_dict[labware_id] = {}
+                if labware_id not in labware_well_dict:
+                    labware_well_dict[labware_id] = {}
 
-                    if well_name not in labware_well_dict[labware_id]:
-                        labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
+                if well_name not in labware_well_dict[labware_id]:
+                    labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
 
-                    vol = int(command["params"]["volume"])
-                    labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
-                    added_volumes += vol
-                    log+=(f"dispensed {vol} ")
-                    labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
-                    # file_date_formatted = file_date.strftime("%Y-%m-%d_%H-%M-%S")
+                vol = int(command["params"]["volume"])
+
+                labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
+
+                added_volumes += vol
+                log+=(f"dispensed {vol} ")
+                labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
     with open(f"{os.path.dirname(json_data_file)}\\{protocol_name}_well_volumes_{file_date_formatted}.json", "w") as output_file:
         json.dump(labware_well_dict, output_file)
         output_file.close()
@@ -224,9 +235,10 @@ def parse_results_volume(json_data_file: str) -> Tuple[
         metrics_row, 
         values_row)
     
-def main(storage_directory, google_sheet_name, protocol_file_path):
-    sys.exit = mock_exit
 
+def main(protocol_file_path: Path, save: bool, storage_directory: str = os.curdir, google_sheet_name: str = "") -> None:
+    """Main module control"""
+    sys.exit = mock_exit  # Replace sys.exit with the mock function
     # Read file path from arguments
     protocol_file_path = Path(protocol_file_path)
     global protocol_name
@@ -236,27 +248,41 @@ def main(storage_directory, google_sheet_name, protocol_file_path):
     file_date = datetime.now()
     global file_date_formatted
     file_date_formatted = file_date.strftime("%Y-%m-%d_%H-%M-%S")
-    # Prepare output file
-    json_file_path = f"{storage_directory}\\{protocol_name}_{file_date_formatted}.json"
-    json_file_output = open(json_file_path, "wb+")
-    error_output = f"{storage_directory}\\error_log"
+    error_output = f"{storage_directory}\\test_debug"
     # Run protocol simulation
     try:
         with Context(analyze) as ctx:
-            ctx.invoke(
-                analyze,
-                files=[protocol_file_path],
-                json_output=json_file_output,
-                human_json_output=None,
-                log_output=error_output,
-                log_level="ERROR",
-                check=False
-            )
+            if save:
+                # Prepare output file
+                json_file_path = f"{storage_directory}\\{protocol_name}_{file_date_formatted}.json"
+                json_file_output = open(json_file_path, "wb+")
+                # log_output_file = f"{protocol_name}_log"
+                ctx.invoke(
+                    analyze,
+                    files=[protocol_file_path],
+                    json_output=json_file_output,
+                    human_json_output=None,
+                    log_output=error_output,
+                    log_level="ERROR",
+                    check=False
+                )
+                json_file_output.close()
+            else:
+                ctx.invoke(
+                    analyze,
+                    files=[protocol_file_path],
+                    json_output=None,
+                    human_json_output=None,
+                    log_output=error_output,
+                    log_level="ERROR",
+                    check=True
+                )
+                
     except SystemExit as e:
         print(f"SystemExit caught with code: {e}")
     finally:
+        # Reset sys.exit to the original behavior
         sys.exit = original_exit
-        json_file_output.close()
         with open(error_output, "r") as open_file:
             try:
                 errors = open_file.readlines()
@@ -267,32 +293,30 @@ def main(storage_directory, google_sheet_name, protocol_file_path):
             except:
                 print("error simulating ...")
                 sys.exit()
+    if save:
+        try:
+            credentials_path = os.path.join(storage_directory, "credentials.json")
+            print(credentials_path)
 
-    try:
-        credentials_path = os.path.join(storage_directory, "credentials.json")
-        print(credentials_path)
-    except FileNotFoundError:
-        print(f"Add credentials.json file to: {storage_directory}.")
-        sys.exit()
-
-    global hellma_plate_standards
-
-    try:
-        hellma_plate_standards = plate_reader.read_hellma_plate_files(storage_directory, 101934)
-    except:
-        print(f"Add helma plate standard files to {storage_directory}.")
-        sys.exit()
-
-    google_sheet = google_sheets_tool.google_sheet(
-        credentials_path, google_sheet_name, 0
-    )
-
-    google_sheet.write_to_row([])
-
-    for row in parse_results_volume(json_file_path):
-        print("Writing results to", google_sheet_name)
-        print(str(row))
-        google_sheet.write_to_row(row)
+        except FileNotFoundError:
+            print(f"Add credentials.json file to: {storage_directory}.")
+            sys.exit()
+        
+        global hellma_plate_standards
+        try:
+            hellma_plate_standards = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+            
+        except:
+            print(f"Add helma plate standard files to {storage_directory}.")
+            sys.exit()
+        google_sheet = google_sheets_tool.google_sheet(
+            credentials_path, google_sheet_name, 0
+        )
+        google_sheet.write_to_row([])
+        for row in parse_results_volume(json_file_path):
+            print("Writing results to", google_sheet_name)
+            print(str(row))
+            google_sheet.write_to_row(row)
 
 if __name__ == "__main__":
     CLEAN_PROTOCOL = True
@@ -343,11 +367,13 @@ if __name__ == "__main__":
                     choice = ""
                     print("Please enter a valid response.")
         SETUP = False
-
+        
+    # set_api_level()
     if CLEAN_PROTOCOL:
+        set_api_level(Path(protocol_file_path))
         main(
-            storage_directory,
-            sheet_name,
             protocol_file_path,
-                )
+            True,
+            storage_directory,
+            sheet_name,)
     else: sys.exit(0)

@@ -36,7 +36,7 @@ import {
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
 import { getNumOptions, getNumSlotsAvailable } from './utils'
-import { HandleEnter } from './HandleEnter'
+import { HandleEnter } from '../../atoms/HandleEnter'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  FLEX_MAX_CONTENT,
   Flex,
   PrimaryButton,
   SPACING,
@@ -43,11 +44,9 @@ export function SubstepsToolbox(
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(hoverOnSubstep(payload))
 
-  if (substeps == null) {
+  if (substeps == null || formData == null) {
     return null
   }
-
-  const uiStepType = t(`application:stepType.${formData.stepType}`)
 
   return ('commandCreatorFnName' in substeps &&
     (substeps.commandCreatorFnName === 'transfer' ||
@@ -56,7 +55,7 @@ export function SubstepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      width="396px"
+      width={FLEX_MAX_CONTENT}
       childrenPadding="0"
       confirmButton={
         <PrimaryButton
@@ -72,15 +71,17 @@ export function SubstepsToolbox(
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">
           {i18n.format(
-            t(`protocol_steps:step_substeps`, { stepType: uiStepType }),
+            t(`protocol_steps:step_substeps`, {
+              stepType: formData?.stepName ?? formData.stepType,
+            }),
             'capitalize'
           )}
         </StyledText>
       }
     >
-      <Flex padding={SPACING.spacing12} width="100%">
+      <Flex padding={SPACING.spacing12}>
         {substeps.substepType === THERMOCYCLER_PROFILE ? (
-          <ThermocyclerProfileSubsteps />
+          <ThermocyclerProfileSubsteps key="substeps" stepId={stepId} />
         ) : (
           <PipettingSubsteps
             key="substeps"

@@ -16,14 +16,12 @@ import {
 } from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
-import { useHomePipettes } from '/app/organisms/DropTipWizardFlows'
+import { useHomePipettes } from '/app/local-resources/instruments'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type {
-  UseHomePipettesProps,
-  TipAttachmentStatusResult,
-} from '/app/organisms/DropTipWizardFlows'
+import type { UseHomePipettesProps } from '/app/local-resources/instruments'
+import type { TipAttachmentStatusResult } from '/app/organisms/DropTipWizardFlows'
 
 type UseProtocolDropTipModalProps = Pick<
   UseHomePipettesProps,

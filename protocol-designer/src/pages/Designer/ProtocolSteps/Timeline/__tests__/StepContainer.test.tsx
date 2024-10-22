@@ -9,6 +9,8 @@ import { StepContainer } from '../StepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
 vi.mock('../../../../../step-forms/selectors')
+vi.mock('../../../../../ui/steps/actions/actions')
+vi.mock('../../../../../ui/steps/selectors')
 vi.mock('../StepOverflowMenu')
 
 const render = (props: React.ComponentProps<typeof StepContainer>) => {
