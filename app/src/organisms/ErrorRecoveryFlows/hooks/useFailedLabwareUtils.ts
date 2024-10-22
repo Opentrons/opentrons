@@ -107,7 +107,7 @@ export function useFailedLabwareUtils({
   const failedLabwareLocations = useRelevantFailedLwLocations({
     failedLabware,
     failedCommandByRunRecord,
-    protocolAnalysis,
+    runRecord,
   })
 
   return {
@@ -340,7 +340,7 @@ export function getRelevantWellName(
 
 export type GetRelevantLwLocationsParams = Pick<
   UseFailedLabwareUtilsProps,
-  'protocolAnalysis' | 'failedCommandByRunRecord'
+  'runRecord' | 'failedCommandByRunRecord'
 > & {
   failedLabware: UseFailedLabwareUtilsResult['failedLabware']
 }
@@ -348,7 +348,7 @@ export type GetRelevantLwLocationsParams = Pick<
 export function useRelevantFailedLwLocations({
   failedLabware,
   failedCommandByRunRecord,
-  protocolAnalysis,
+  runRecord,
 }: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
   const { t } = useTranslation('protocol_command_text')
 
@@ -356,8 +356,8 @@ export function useRelevantFailedLwLocations({
     LabwareDisplayLocationSlotOnly,
     'location'
   > = {
-    loadedLabwares: protocolAnalysis?.labware ?? [],
-    loadedModules: protocolAnalysis?.modules ?? [],
+    loadedLabwares: runRecord?.data?.labware ?? [],
+    loadedModules: runRecord?.data?.modules ?? [],
     robotType: FLEX_ROBOT_TYPE,
     t,
     detailLevel: 'slot-only',
