@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -8,10 +7,10 @@ import {
   LiquidIcon,
   ListItem,
   ListItemDescriptor,
-  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 
 import type { AllIngredGroupFields } from '../../labware-ingred/types'
 
@@ -44,7 +43,7 @@ export function LiquidDefinitions({
                       desktopStyle="bodyDefaultRegular"
                       overflowWrap="anywhere"
                       id="liquid-name"
-                      css={LIQUID_DEFINITION_TEXT}
+                      css={LINE_CLAMP_TEXT_STYLE(3)}
                     >
                       {liquid.name}
                     </StyledText>
@@ -61,11 +60,3 @@ export function LiquidDefinitions({
     </Flex>
   )
 }
-
-const LIQUID_DEFINITION_TEXT = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: ${OVERFLOW_HIDDEN};
-  text-overflow: ellipsis;
-`

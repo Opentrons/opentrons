@@ -2,11 +2,12 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
-  DIRECTION_COLUMN,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   Divider,
   Flex,
   ListItem,
+  ListItemDescriptor,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -30,6 +31,7 @@ import {
   getModuleEntities,
 } from '../../../../../../step-forms/selectors'
 import { getModulesOnDeckByType } from '../../../../../../ui/modules/utils'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../../../../atoms'
 
 import type { StepFormProps } from '../../types'
 
@@ -80,22 +82,31 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           {t('protocol_steps:module')}
         </StyledText>
         <ListItem type="noActive">
-          <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing32}>
-            <Flex>
-              <DeckInfoLabel deckLabel={slotLocation} />
-            </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {slotInfo[0]}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-              >
-                {slotInfo[1]}
-              </StyledText>
-            </Flex>
-          </Flex>
+          <ListItemDescriptor
+            type="large"
+            isInSlideout
+            content={
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={LINE_CLAMP_TEXT_STYLE(2)}
+                >
+                  {slotInfo[0]}
+                </StyledText>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {slotInfo[1]}
+                </StyledText>
+              </Flex>
+            }
+            description={
+              <Flex width="2.875rem">
+                <DeckInfoLabel deckLabel={slotLocation} />
+              </Flex>
+            }
+          />
         </ListItem>
       </Flex>
       <Divider marginY="0" />
