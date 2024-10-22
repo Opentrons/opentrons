@@ -10,6 +10,11 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
+import {
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
+} from '/app/organisms/InterventionModal/utils'
+
 import type { Run } from '@opentrons/api-client'
 import type {
   DeckDefinition,
@@ -25,6 +30,10 @@ import type {
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
+import type {
+  RunLabwareInfo,
+  RunModuleInfo,
+} from '/app/organisms/InterventionModal/utils'
 import type { ERUtilsProps } from './useERUtils'
 
 interface UseDeckMapUtilsProps {
@@ -42,6 +51,8 @@ export interface UseDeckMapUtilsResult {
   loadedLabware: LoadedLabware[]
   loadedModules: LoadedModule[]
   movedLabwareDef: LabwareDefinition2 | null
+  moduleRenderInfo: RunModuleInfo[]
+  labwareRenderInfo: RunLabwareInfo[]
   highlightLabwareEventuallyIn: string[]
   kind: 'intervention'
   robotType: RobotType
@@ -96,6 +107,30 @@ export function useDeckMapUtils({
       ? labwareDefinitionsByUri[failedLabwareUtils.failedLabware.definitionUri]
       : null
 
+  const moduleRenderInfo = useMemo(
+    () =>
+      runRecord != null && labwareDefinitionsByUri != null
+        ? getRunModuleRenderInfo(
+            runRecord.data,
+            deckDef,
+            labwareDefinitionsByUri
+          )
+        : [],
+    [deckDef, labwareDefinitionsByUri, runRecord]
+  )
+
+  const labwareRenderInfo = useMemo(
+    () =>
+      runRecord != null && labwareDefinitionsByUri != null
+        ? getRunLabwareRenderInfo(
+            runRecord.data,
+            labwareDefinitionsByUri,
+            deckDef
+          )
+        : [],
+    [deckDef, labwareDefinitionsByUri, runRecord]
+  )
+
   return {
     deckConfig,
     modulesOnDeck: runCurrentModules.map(
@@ -118,6 +153,8 @@ export function useDeckMapUtils({
     loadedModules: runRecord?.data.modules ?? [],
     loadedLabware: runRecord?.data.labware ?? [],
     movedLabwareDef,
+    moduleRenderInfo,
+    labwareRenderInfo,
   }
 }
 
