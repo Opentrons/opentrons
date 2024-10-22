@@ -145,7 +145,8 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const isPipetteStep =
     savedStepFormData.stepType === 'moveLiquid' ||
     savedStepFormData.stepType === 'mix'
-  const isThermocyclerStep = savedStepFormData.stepType === 'thermocycler'
+  const isThermocyclerProfile =
+    savedStepFormData.thermocyclerFormType === 'thermocyclerProfile'
 
   return (
     <>
@@ -183,7 +184,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
       )}
       <Flex
         ref={menuRootRef}
-        zIndex={5}
+        zIndex={12}
         top={top}
         left="19.5rem"
         position={POSITION_ABSOLUTE}
@@ -211,9 +212,10 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
             {formData != null ? null : (
               <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
             )}
-            {isPipetteStep || isThermocyclerStep ? (
+            {isPipetteStep || isThermocyclerProfile ? (
               <MenuButton
                 onClick={() => {
+                  setStepOverflowMenu(false)
                   dispatch(hoverOnStep(stepId))
                   dispatch(toggleViewSubstep(stepId))
                 }}

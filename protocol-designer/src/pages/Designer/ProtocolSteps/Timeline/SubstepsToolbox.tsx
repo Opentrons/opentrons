@@ -47,8 +47,6 @@ export function SubstepsToolbox(
     return null
   }
 
-  const uiStepType = t(`application:stepType.${formData.stepType}`)
-
   return ('commandCreatorFnName' in substeps &&
     (substeps.commandCreatorFnName === 'transfer' ||
       substeps.commandCreatorFnName === 'consolidate' ||
@@ -56,7 +54,7 @@ export function SubstepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      width="396px"
+      width="max-content"
       childrenPadding="0"
       confirmButton={
         <PrimaryButton
@@ -72,15 +70,15 @@ export function SubstepsToolbox(
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">
           {i18n.format(
-            t(`protocol_steps:step_substeps`, { stepType: uiStepType }),
+            t(`protocol_steps:step_substeps`, { stepType: formData.stepName }),
             'capitalize'
           )}
         </StyledText>
       }
     >
-      <Flex padding={SPACING.spacing12} width="100%">
+      <Flex padding={SPACING.spacing12}>
         {substeps.substepType === THERMOCYCLER_PROFILE ? (
-          <ThermocyclerProfileSubsteps />
+          <ThermocyclerProfileSubsteps key="substeps" stepId={stepId} />
         ) : (
           <PipettingSubsteps
             key="substeps"

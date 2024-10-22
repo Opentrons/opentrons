@@ -105,6 +105,7 @@
       "closed": "closed",
       "open": "open"
     },
+    "substep_settings": "<text>Set block temperature to</text><tagTemperature/><text>for</text><tagDuration/>",
     "thermocycler_profile": {
       "end_hold": {
         "block": "<text>End at thermocycler block</text><tag/>",
