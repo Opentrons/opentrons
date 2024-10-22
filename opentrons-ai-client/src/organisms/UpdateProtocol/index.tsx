@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import {
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DropdownField,
@@ -9,12 +10,13 @@ import {
   JUSTIFY_END,
   LargeButton,
   StyledText,
+  Link as LinkComponent,
 } from '@opentrons/components'
 import { UploadInput } from '../../molecules/UploadInput'
 import { HeaderWithMeter } from '../../molecules/HeaderWithMeter'
 import { useState } from 'react'
 import type { ChangeEvent } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 const updateOptions = [
   {
@@ -76,13 +78,37 @@ export function UpdateProtocol(): JSX.Element {
         <ContentFlex>
           <HeadingText>{t('update_existing_protocol')}</HeadingText>
           <BodyText>{t('protocol_file')}</BodyText>
-          <UploadInput
-            uploadButtonText="Choose file"
-            dragAndDropText={'Drag and drop or browse your files'}
-            onUpload={function (file: File): unknown {
-              throw new Error('Function not implemented.')
-            }}
-          ></UploadInput>
+          <Flex
+            paddingTop="40px"
+            width="auto"
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <UploadInput
+              uploadButtonText="Choose file"
+              dragAndDropText={
+                <StyledText as="p">
+                  <Trans
+                    t={t}
+                    i18nKey={t('drag_and_drop')}
+                    components={{
+                      a: (
+                        <LinkComponent
+                          color={COLORS.blue55}
+                          role="button"
+                          to={''}
+                        />
+                      ),
+                    }}
+                  />
+                </StyledText>
+              }
+              onUpload={function (file: File): unknown {
+                throw new Error('Function not implemented.')
+              }}
+            ></UploadInput>
+          </Flex>
+
           <BodyText>{t('type_of_update')}</BodyText>
           <DropdownField
             options={updateOptions}
