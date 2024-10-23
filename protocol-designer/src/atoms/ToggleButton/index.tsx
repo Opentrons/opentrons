@@ -60,7 +60,7 @@ export function ToggleButton(props: ToggleButtonProps): JSX.Element {
       {...buttonProps}
     >
       <Flex>
-        <Icon name={iconName} size="1rem" />
+        <Icon name={iconName} size="2rem" />
       </Flex>
     </Btn>
   )
