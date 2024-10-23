@@ -11,7 +11,6 @@ import {
   Kitchen,
   FileUploadMessagesModal,
   LabwareUploadModal,
-  AnnouncementModal,
 } from './organisms'
 
 import type { RouteProps } from './types'
