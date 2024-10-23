@@ -100,8 +100,8 @@ function TouchscreenModal({
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
 
-  const { placeReaderLid, isPlacing } = usePlacePlateReaderLid({
-    pipetteInfo: null,
+  const { handlePlaceReaderLid, isPlacing } = usePlacePlateReaderLid({
+    onSettled: undefined,
   })
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
@@ -116,7 +116,7 @@ function TouchscreenModal({
     setIsResuming(true)
     acknowledgeEstopDisengage(null)
     setShouldSeeLogicalDisengage()
-    placeReaderLid()
+    handlePlaceReaderLid()
     closeModal()
   }
   return (
