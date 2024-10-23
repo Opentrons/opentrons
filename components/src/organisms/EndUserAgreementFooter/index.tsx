@@ -1,4 +1,3 @@
-import styled from 'styled-components'
 import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Flex, Link } from '../../primitives'
