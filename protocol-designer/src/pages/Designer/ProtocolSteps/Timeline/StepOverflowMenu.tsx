@@ -19,6 +19,8 @@ import {
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
 import {
+  getBatchEditFormHasUnsavedChanges,
+  getCurrentFormHasUnsavedChanges,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
@@ -49,13 +51,19 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     multiSelectItemIds,
   } = props
   const { t } = useTranslation('protocol_steps')
+  const singleEditFormHasUnsavedChanges = useSelector(
+    getCurrentFormHasUnsavedChanges
+  )
+  const batchEditFormHasUnstagedChanges = useSelector(
+    getBatchEditFormHasUnsavedChanges
+  )
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const formData = useSelector(getUnsavedForm)
   const savedStepFormData = useSelector(getSavedStepForms)[stepId]
   const isPipetteStep =
     savedStepFormData.stepType === 'moveLiquid' ||
     savedStepFormData.stepType === 'mix'
-  const isThermocyclerStep = savedStepFormData.stepType === 'thermocycler'
+  const isThermocyclerProfile = savedStepFormData.stepType === 'thermocycler'
 
   const duplicateStep = (
     stepId: StepIdType
@@ -76,7 +84,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     <>
       <Flex
         ref={menuRootRef}
-        zIndex={5}
+        zIndex={12}
         top={top}
         left="19.5rem"
         position={POSITION_ABSOLUTE}
@@ -93,6 +101,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         {multiSelectItemIds != null && multiSelectItemIds.length > 0 ? (
           <>
             <MenuButton
+              disabled={batchEditFormHasUnstagedChanges}
               onClick={() => {
                 duplicateMultipleSteps()
                 setStepOverflowMenu(false)
@@ -115,9 +124,11 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
             {formData != null ? null : (
               <MenuButton onClick={handleEdit}>{t('edit_step')}</MenuButton>
             )}
-            {isPipetteStep || isThermocyclerStep ? (
+            {isPipetteStep || isThermocyclerProfile ? (
               <MenuButton
+                disabled={formData != null}
                 onClick={() => {
+                  setStepOverflowMenu(false)
                   dispatch(hoverOnStep(stepId))
                   dispatch(toggleViewSubstep(stepId))
                 }}
@@ -126,6 +137,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
               </MenuButton>
             ) : null}
             <MenuButton
+              disabled={singleEditFormHasUnsavedChanges}
               onClick={() => {
                 duplicateStep(stepId)
                 setStepOverflowMenu(false)
@@ -165,5 +177,8 @@ const MenuButton = styled.button`
   &:disabled {
     color: ${COLORS.grey40};
     cursor: auto;
+    &:hover {
+      background-color: ${COLORS.transparent};
+    }
   }
 `
