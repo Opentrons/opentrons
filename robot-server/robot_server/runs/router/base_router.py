@@ -601,6 +601,7 @@ async def get_current_state(
             for pipetteId, nozzle_map in active_nozzle_maps.items()
         }
 
+        current_command = run_data_manager.get_current_command(run_id=runId)
         last_completed_command = run_data_manager.get_last_completed_command(
             run_id=runId
         )
