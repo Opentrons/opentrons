@@ -9,6 +9,10 @@ import { i18n } from '../../../i18n'
 const mockNavigate = vi.fn()
 const mockUseTrackEvent = vi.fn()
 
+vi.mock('../../../resources/hooks/useTrackEvent', () => ({
+  useTrackEvent: () => mockUseTrackEvent,
+}))
+
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
@@ -79,5 +83,25 @@ describe('Landing', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/update-protocol')
   })
 
-  // add analytics and tests
+  it('should track new protocol event when new protocol button is clicked', () => {
+    render()
+    const createProtocolButton = screen.getByText('Create a new protocol')
+    createProtocolButton.click()
+
+    expect(mockUseTrackEvent).toHaveBeenCalledWith({
+      name: 'create-new-protocol',
+      properties: {},
+    })
+  })
+
+  it('should track logout event when log out button is clicked', () => {
+    render()
+    const updateProtocolButton = screen.getByText('Update an existing protocol')
+    updateProtocolButton.click()
+
+    expect(mockUseTrackEvent).toHaveBeenCalledWith({
+      name: 'update-protocol',
+      properties: {},
+    })
+  })
 })

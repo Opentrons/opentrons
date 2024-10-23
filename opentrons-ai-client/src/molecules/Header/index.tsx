@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 import { useAuth0 } from '@auth0/auth0-react'
 import { CLIENT_MAX_WIDTH } from '../../resources/constants'
+import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
 const HeaderBar = styled(Flex)`
   position: ${POSITION_RELATIVE};
@@ -52,6 +53,12 @@ const LogoutButton = styled(LinkButton)`
 export function Header(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { logout } = useAuth0()
+  const trackEvent = useTrackEvent()
+
+  function handleLogout(): void {
+    logout()
+    trackEvent({ name: 'user-logout', properties: {} })
+  }
 
   return (
     <HeaderBar>
@@ -60,7 +67,7 @@ export function Header(): JSX.Element {
           <HeaderTitle>{t('opentrons')}</HeaderTitle>
           <HeaderGradientTitle>{t('ai')}</HeaderGradientTitle>
         </Flex>
-        <LogoutButton onClick={() => logout()}>{t('logout')}</LogoutButton>
+        <LogoutButton onClick={handleLogout}>{t('logout')}</LogoutButton>
       </HeaderBarContent>
     </HeaderBar>
   )

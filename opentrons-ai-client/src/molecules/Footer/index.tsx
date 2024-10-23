@@ -44,7 +44,7 @@ export function Footer(): JSX.Element {
     >
       <FooterText>
         <Trans
-          i18nKey={t('privacy_policy')}
+          i18nKey={'privacy_policy'}
           t={t}
           components={{
             privacyPolicyLink: (

@@ -18,6 +18,7 @@ import { initializeMixpanel } from './analytics/mixpanel'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 import { Header } from './molecules/Header'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
+import { Footer } from './molecules/Footer'
 
 export function OpentronsAI(): JSX.Element | null {
   const { t } = useTranslation('protocol_generator')
@@ -84,8 +85,7 @@ export function OpentronsAI(): JSX.Element | null {
           </HashRouter>
         </Flex>
 
-        {/* This will be replaced by the Footer component */}
-        <div>FOOTER</div>
+        <Footer />
       </Flex>
     </div>
   )
