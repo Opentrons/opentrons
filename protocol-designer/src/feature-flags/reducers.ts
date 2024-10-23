@@ -26,7 +26,6 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_ABSORBANCE_READER:
     process.env.OT_PD_ENABLE_ABSORBANCE_READER === '1' || false,
   OT_PD_ENABLE_REDESIGN: process.env.OT_PD_ENABLE_REDESIGN === '1' || false,
-  OT_PD_ENABLE_MOAM: process.env.OT_PD_ENABLE_MOAM === '1' || false,
   OT_PD_ENABLE_COMMENT: process.env.OT_PD_ENABLE_COMMENT === '1' || false,
   OT_PD_ENABLE_RETURN_TIP: process.env.OT_PD_ENABLE_RETURN_TIP === '1' || false,
   OT_PD_ENABLE_HOT_KEYS_DISPLAY:

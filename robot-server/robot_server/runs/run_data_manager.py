@@ -34,6 +34,7 @@ from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
 from .run_models import Run, BadRun, RunDataError
 
 from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
+from opentrons.protocol_engine.resources.file_provider import FileProvider
 
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
@@ -65,6 +66,7 @@ def _build_run(
             completedAt=state_summary.completedAt,
             startedAt=state_summary.startedAt,
             liquids=state_summary.liquids,
+            outputFileIds=state_summary.files,
             runTimeParameters=run_time_parameters,
         )
 
@@ -79,6 +81,7 @@ def _build_run(
             modules=[],
             liquids=[],
             wells=[],
+            files=[],
             hasEverEnteredErrorRecovery=False,
         )
         errors.append(state_summary.dataError)
@@ -122,6 +125,7 @@ def _build_run(
         startedAt=state.startedAt,
         liquids=state.liquids,
         runTimeParameters=run_time_parameters,
+        outputFileIds=state.files,
         hasEverEnteredErrorRecovery=state.hasEverEnteredErrorRecovery,
     )
 
@@ -170,6 +174,7 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        file_provider: FileProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
@@ -217,6 +222,7 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             initial_error_recovery_policy=initial_error_recovery_policy,
             deck_configuration=deck_configuration,
+            file_provider=file_provider,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,
@@ -450,10 +456,20 @@ class RunDataManager:
         if self._run_orchestrator_store.current_run_id == run_id:
             return self._run_orchestrator_store.get_current_command()
         else:
-            # todo(mm, 2024-05-20):
-            # For historical runs to behave consistently with the current run,
-            # this should be the most recently completed command, not `None`.
-            return None
+            return self._get_historical_run_last_command(run_id=run_id)
+
+    def get_last_completed_command(self, run_id: str) -> Optional[CommandPointer]:
+        """Get the "last" command, if any.
+
+        See `ProtocolEngine.state_view.commands.get_most_recently_finalized_command()` for the definition of "last."
+
+        Args:
+            run_id: ID of the run.
+        """
+        if self._run_orchestrator_store.current_run_id == run_id:
+            return self._run_orchestrator_store.get_most_recently_finalized_command()
+        else:
+            return self._get_historical_run_last_command(run_id=run_id)
 
     def get_recovery_target_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the current error recovery target.
@@ -548,3 +564,22 @@ class RunDataManager:
             return self._run_orchestrator_store.get_run_time_parameters()
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)
+
+    def _get_historical_run_last_command(self, run_id: str) -> Optional[CommandPointer]:
+        command_slice = self._run_store.get_commands_slice(
+            run_id=run_id, cursor=None, length=1, include_fixit_commands=True
+        )
+        if not command_slice.commands:
+            return None
+        command = command_slice.commands[-1]
+
+        return (
+            CommandPointer(
+                command_id=command.id,
+                command_key=command.key,
+                created_at=command.createdAt,
+                index=command_slice.cursor,
+            )
+            if command
+            else None
+        )

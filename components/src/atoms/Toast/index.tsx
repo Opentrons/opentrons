@@ -370,7 +370,7 @@ export function Toast(props: ToastProps): JSX.Element {
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
             <LegacyStyledText css={TEXT_STYLE}>{message}</LegacyStyledText>
-            {linkText ? (
+            {linkText != null ? (
               <Link
                 role="button"
                 onClick={() => {

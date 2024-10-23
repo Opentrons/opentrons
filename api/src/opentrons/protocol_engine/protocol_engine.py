@@ -23,7 +23,7 @@ from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllow
 from .errors.exceptions import EStopActivatedError
 from .error_recovery_policy import ErrorRecoveryPolicy
 from . import commands, slot_standardization
-from .resources import ModelUtils, ModuleDataProvider
+from .resources import ModelUtils, ModuleDataProvider, FileProvider
 from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -99,6 +99,7 @@ class ProtocolEngine:
         hardware_stopper: Optional[HardwareStopper] = None,
         door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
+        file_provider: Optional[FileProvider] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -108,6 +109,7 @@ class ProtocolEngine:
         Prefer the `create_protocol_engine()` factory function.
         """
         self._hardware_api = hardware_api
+        self._file_provider = file_provider or FileProvider()
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
         self._action_dispatcher = action_dispatcher or ActionDispatcher(
@@ -649,6 +651,7 @@ class ProtocolEngine:
         assert self._queue_worker is None
         self._queue_worker = create_queue_worker(
             hardware_api=self._hardware_api,
+            file_provider=self._file_provider,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
             command_generator=command_generator,

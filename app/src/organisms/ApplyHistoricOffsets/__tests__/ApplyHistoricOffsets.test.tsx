@@ -7,7 +7,7 @@ import { opentrons96PcrAdapterV1, fixture96Plate } from '@opentrons/shared-data'
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { ApplyHistoricOffsets } from '..'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -15,7 +15,7 @@ import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/LabwarePositionCheck/utils/labware')
-vi.mock('/app/molecules/Command/utils/getLabwareDefinitionsFromCommands')
+vi.mock('/app/local-resources/labware')
 
 const mockLabwareDef = fixture96Plate as LabwareDefinition2
 const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2

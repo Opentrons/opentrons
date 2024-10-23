@@ -1129,3 +1129,16 @@ class OperationLocationNotInWellError(ProtocolEngineError):
     ) -> None:
         """Build an OperationLocationNotInWellError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class StorageLimitReachedError(ProtocolEngineError):
+    """Raised to indicate that a file cannot be created due to storage limitations."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an StorageLimitReached."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, detail, wrapping)

@@ -72,6 +72,10 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.file_provider.fastapi_dependencies import (
+    get_file_provider,
+)
+from opentrons.protocol_engine.resources.file_provider import FileProvider
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
@@ -128,9 +132,9 @@ class AllRunsLinks(BaseModel):
 class CurrentStateLinks(BaseModel):
     """Links returned with the current state of a run."""
 
-    current: Optional[CommandLinkNoMeta] = Field(
+    lastCompleted: Optional[CommandLinkNoMeta] = Field(
         None,
-        description="Path to the current command when current state was reported, if any.",
+        description="Path to the last completed command when current state was reported, if any.",
     )
 
 
@@ -187,6 +191,7 @@ async def create_run(  # noqa: C901
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
+    file_provider: Annotated[FileProvider, Depends(get_file_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
@@ -206,6 +211,7 @@ async def create_run(  # noqa: C901
         resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
+        file_provider: Dependency to provide access to file Reading and Writing to Protocol engine.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
@@ -260,6 +266,7 @@ async def create_run(  # noqa: C901
             created_at=created_at,
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
+            file_provider=file_provider,
             run_time_param_values=rtp_values,
             run_time_param_paths=rtp_paths,
             protocol=protocol_resource,
@@ -557,7 +564,7 @@ async def get_run_commands_error(
         """
     ),
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[RunCurrentState]},
+        status.HTTP_200_OK: {"model": Body[RunCurrentState, CurrentStateLinks]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
@@ -583,17 +590,18 @@ async def get_current_state(
             for pipetteId, nozzle_map in active_nozzle_maps.items()
         }
 
-        current_command = run_data_manager.get_current_command(run_id=runId)
+        last_completed_command = run_data_manager.get_last_completed_command(
+            run_id=runId
+        )
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    # TODO(jh, 03-11-24): Use `last_completed_command` instead of `current_command` to avoid concurrency gotchas.
     links = CurrentStateLinks.construct(
-        current=CommandLinkNoMeta.construct(
-            id=current_command.command_id,
-            href=f"/runs/{runId}/commands/{current_command.command_id}",
+        lastCompleted=CommandLinkNoMeta.construct(
+            id=last_completed_command.command_id,
+            href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
         )
-        if current_command is not None
+        if last_completed_command is not None
         else None
     )
 

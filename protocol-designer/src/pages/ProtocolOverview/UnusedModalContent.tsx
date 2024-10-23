@@ -1,4 +1,6 @@
 import type * as React from 'react'
+import { COLORS, Icon, StyledText } from '@opentrons/components'
+
 import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
 import type { Fixture } from './index'
 
@@ -14,6 +16,7 @@ interface MissingContent {
 interface WarningContent {
   content: React.ReactNode
   heading: string
+  titleElement?: JSX.Element
 }
 
 // TODO(ja): update this to use StyledText
@@ -27,13 +30,15 @@ export function getWarningContent({
 }: MissingContent): WarningContent | null {
   if (noCommands) {
     return {
+      heading: t('alert:export_warnings.no_commands.redesign.heading'),
       content: (
-        <>
-          <p>{t('alert:export_warnings.no_commands.body1')}</p>
-          <p>{t('alert:export_warnings.no_commands.body2')}</p>
-        </>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('alert:export_warnings.no_commands.redesign.body')}
+        </StyledText>
       ),
-      heading: t('alert:export_warnings.no_commands.heading'),
+      titleElement: (
+        <Icon name="alert-circle" size="1.25rem" color={COLORS.yellow50} />
+      ),
     }
   }
 

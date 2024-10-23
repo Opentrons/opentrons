@@ -27,8 +27,8 @@ describe('LeftColumnLabwareInfo', () => {
         failedLabwareName: 'MOCK_LW_NAME',
         failedLabwareNickname: 'MOCK_LW_NICKNAME',
         failedLabwareLocations: {
-          currentLoc: 'slot A1',
-          newLoc: 'slot B2',
+          displayNameCurrentLoc: 'slot A1',
+          displayNameNewLoc: 'slot B2',
         },
       } as any,
       type: 'location',
@@ -76,7 +76,7 @@ describe('LeftColumnLabwareInfo', () => {
   })
 
   it('does not include newLocationProps when newLoc is not provided', () => {
-    props.failedLabwareUtils.failedLabwareLocations.newLoc = null
+    props.failedLabwareUtils.failedLabwareLocations.displayNameNewLoc = null
     render(props)
 
     expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
@@ -91,9 +91,12 @@ describe('LeftColumnLabwareInfo', () => {
 
   it('converts location labels to uppercase', () => {
     props.failedLabwareUtils.failedLabwareLocations = {
-      currentLoc: 'slot A1',
-      newLoc: 'slot B2',
+      displayNameCurrentLoc: 'slot A1',
+      displayNameNewLoc: 'slot B2',
+      newLoc: {} as any,
+      currentLoc: {} as any,
     }
+
     render(props)
 
     expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(

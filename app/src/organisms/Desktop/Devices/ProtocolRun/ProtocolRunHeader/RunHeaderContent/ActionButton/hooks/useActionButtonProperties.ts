@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import {
   RUN_STATUS_IDLE,
@@ -14,6 +15,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { getMissingSetupSteps } from '/app/redux/protocol-runs'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import {
@@ -24,6 +26,8 @@ import {
 
 import type { IconName } from '@opentrons/components'
 import type { BaseActionButtonProps } from '..'
+import type { State } from '/app/redux/types'
+import type { StepKey } from '/app/redux/protocol-runs'
 
 interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isProtocolNotReady: boolean
@@ -42,7 +46,6 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
 export function useActionButtonProperties({
   isProtocolNotReady,
   runStatus,
-  missingSetupSteps,
   robotName,
   runId,
   confirmAttachment,
@@ -66,6 +69,9 @@ export function useActionButtonProperties({
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const isHeaterShakerShaking = isAnyHeaterShakerShaking(attachedModules)
   const trackEvent = useTrackEvent()
+  const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>
+    getMissingSetupSteps(state, runId)
+  )
 
   let buttonText = ''
   let handleButtonClick = (): void => {}

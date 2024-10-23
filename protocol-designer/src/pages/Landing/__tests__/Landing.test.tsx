@@ -6,11 +6,21 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { loadProtocolFile } from '../../../load-file/actions'
 import { getFileMetadata } from '../../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../../navigation/actions'
+import { useKitchen } from '../../../organisms/Kitchen/hooks'
+import { useAnnouncements } from '../../../organisms/AnnouncementModal/announcements'
+import { getHasOptedIn } from '../../../analytics/selectors'
 import { Landing } from '../index'
 
 vi.mock('../../../load-file/actions')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../navigation/actions')
+vi.mock('../../../organisms/AnnouncementModal/announcements')
+vi.mock('../../../organisms/Kitchen/hooks')
+vi.mock('../../../analytics/selectors')
+
+const mockMakeSnackbar = vi.fn()
+const mockEatToast = vi.fn()
+const mockBakeToast = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -25,9 +35,17 @@ const render = () => {
 
 describe('Landing', () => {
   beforeEach(() => {
+    vi.mocked(getHasOptedIn).mockReturnValue(false)
     vi.mocked(getFileMetadata).mockReturnValue({})
     vi.mocked(loadProtocolFile).mockReturnValue(vi.fn())
+    vi.mocked(useAnnouncements).mockReturnValue({} as any)
+    vi.mocked(useKitchen).mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      bakeToast: mockBakeToast,
+      eatToast: mockEatToast,
+    })
   })
+
   it('renders the landing page image and text', () => {
     render()
     screen.getByLabelText('welcome image')
@@ -39,5 +57,10 @@ describe('Landing', () => {
     expect(vi.mocked(toggleNewProtocolModal)).toHaveBeenCalled()
     screen.getByText('Edit existing protocol')
     screen.getByRole('img', { name: 'welcome image' })
+  })
+
+  it('render toast when there is an announcement', () => {
+    render()
+    expect(mockBakeToast).toHaveBeenCalled()
   })
 })

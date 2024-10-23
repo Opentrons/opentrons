@@ -25,7 +25,7 @@ from typing import (
     Union,
     Mapping,
 )
-from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import gripper_config
 from .ot3utils import (
     axis_convert,
@@ -102,7 +102,9 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
     ErrorCode,
+    SensorId,
 )
+from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     StopRequest,
 )
@@ -1368,28 +1370,14 @@ class OT3Controller(FlexBackend):
         threshold_pascals: float,
         plunger_impulse_time: float,
         num_baseline_reads: int,
-        output_option: OutputOptions = OutputOptions.can_bus_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         force_both_sensors: bool = False,
+        response_queue: Optional[
+            asyncio.Queue[Dict[SensorId, List[SensorDataType]]]
+        ] = None,
     ) -> float:
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
-        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
-        sync_buffer_output = bool(
-            output_option.value & OutputOptions.sync_buffer_to_csv.value
-        )
-        can_bus_only_output = bool(
-            output_option.value & OutputOptions.can_bus_only.value
-        )
-        data_files_transposed = (
-            None
-            if data_files is None
-            else {
-                sensor_id_for_instrument(probe): data_files[probe]
-                for probe in data_files.keys()
-            }
-        )
         positions = await liquid_probe(
             messenger=self._messenger,
             tool=tool,
@@ -1400,12 +1388,9 @@ class OT3Controller(FlexBackend):
             threshold_pascals=threshold_pascals,
             plunger_impulse_time=plunger_impulse_time,
             num_baseline_reads=num_baseline_reads,
-            csv_output=csv_output,
-            sync_buffer_output=sync_buffer_output,
-            can_bus_only_output=can_bus_only_output,
-            data_files=data_files_transposed,
             sensor_id=sensor_id_for_instrument(probe),
             force_both_sensors=force_both_sensors,
+            response_queue=response_queue,
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
@@ -1432,41 +1417,13 @@ class OT3Controller(FlexBackend):
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
-        output_option: OutputOptions = OutputOptions.sync_only,
-        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
     ) -> bool:
-        if output_option == OutputOptions.sync_buffer_to_csv:
-            assert (
-                self._subsystem_manager.device_info[
-                    SubSystem.of_mount(mount)
-                ].revision.tertiary
-                == "1"
-            )
-        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
-        sync_buffer_output = bool(
-            output_option.value & OutputOptions.sync_buffer_to_csv.value
-        )
-        can_bus_only_output = bool(
-            output_option.value & OutputOptions.can_bus_only.value
-        )
-        data_files_transposed = (
-            None
-            if data_files is None
-            else {
-                sensor_id_for_instrument(probe): data_files[probe]
-                for probe in data_files.keys()
-            }
-        )
         status = await capacitive_probe(
             messenger=self._messenger,
             tool=sensor_node_for_mount(mount),
             mover=axis_to_node(moving),
             distance=distance_mm,
             mount_speed=speed_mm_per_s,
-            csv_output=csv_output,
-            sync_buffer_output=sync_buffer_output,
-            can_bus_only_output=can_bus_only_output,
-            data_files=data_files_transposed,
             sensor_id=sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
         )

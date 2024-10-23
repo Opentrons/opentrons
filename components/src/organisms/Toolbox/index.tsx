@@ -76,18 +76,18 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           ...(side === 'left' && { left: '0' }),
           ...(horizontalSide === 'bottom' && { bottom: '0' }),
           ...(horizontalSide === 'top' && { top: '5rem' }),
+          zIndex: 10,
         }
       : {}
   return (
     <Flex
-      zIndex={10}
       cursor="auto"
       backgroundColor={COLORS.white}
       boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
       height={height}
       {...positionStyles}
       borderRadius={BORDERS.borderRadius8}
-      minWidth="19.5rem"
+      width={width}
       flex="0"
     >
       <Flex

@@ -6,11 +6,7 @@ import path from 'path'
 import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
-import {
-  registerUpdate,
-  updateLatestVersion,
-  registerUpdateBrightness,
-} from './update'
+import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import { registerAppRestart } from './restart'
 import {
@@ -19,7 +15,6 @@ import {
   getOverrides,
   registerConfig,
   resetStore,
-  ODD_DIR,
 } from './config'
 import systemd from './systemd'
 import { registerDataFiles, watchForMassStorage } from './usb'
@@ -28,7 +23,9 @@ import {
   establishBrokerConnection,
   closeBrokerConnection,
 } from './notifications'
+import { setUserDataPath } from './early'
 
+import type { OTLogger } from './log'
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch, Logger } from './types'
 import type { LogEntry } from 'winston'
@@ -39,6 +36,7 @@ import type { LogEntry } from 'winston'
  * https://github.com/node-fetch/node-fetch/issues/1624
  */
 dns.setDefaultResultOrder('ipv4first')
+setUserDataPath()
 
 systemd.sendStatus('starting app')
 const config = getConfig()
@@ -87,12 +85,14 @@ function startUp(): void {
   log.info('Starting App')
   console.log('Starting App')
   const storeNeedsReset = fse.existsSync(
-    path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
+    path.join(setUserDataPath(), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
   if (storeNeedsReset) {
     log.debug('store marked to be reset, resetting store')
     resetStore()
-    fse.removeSync(path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`))
+    fse.removeSync(
+      path.join(app.getPath('userData'), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
+    )
   }
   systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
@@ -102,11 +102,28 @@ function startUp(): void {
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (mainWindow) {
-      log.silly('Sending action via IPC to renderer', { action })
-      mainWindow.webContents.send('dispatch', action)
-    }
+    // This function now dispatches actions to all the handlers in the app shell. That would make it
+    // vulnerable to infinite recursion:
+    // - handler handles action A
+    // - handler dispatches action A as a response (calls this function)
+    // - this function calls handler with action A
+    // By deferring to nextTick(), we would still be executing the code over and over but we should have
+    // broken the stack.
+    process.nextTick(() => {
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (mainWindow) {
+        log.silly('Sending action via IPC to renderer', { action })
+        mainWindow.webContents.send('dispatch', action)
+      }
+      log.debug(
+        `bouncing action ${action.type} to ${actionHandlers.length} handlers`
+      )
+      // Make actions that are sourced from the shell also go to the app shell without needing
+      // round tripping. This call is the reason for the nextTick() above.
+      actionHandlers.forEach(handler => {
+        handler(action)
+      })
+    })
   }
 
   mainWindow = createUi(dispatch)
@@ -114,15 +131,9 @@ function startUp(): void {
   void establishBrokerConnection()
   mainWindow.once('closed', () => (mainWindow = null))
 
-  log.info('Fetching latest software version')
-  updateLatestVersion().catch((error: Error) => {
-    log.error('Error fetching latest software version: ', { error })
-  })
-
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
     registerDiscovery(dispatch),
-    registerUpdate(dispatch),
     registerRobotSystemUpdate(dispatch),
     registerAppRestart(),
     registerUpdateBrightness(),
@@ -143,8 +154,19 @@ function startUp(): void {
     log.info('First dispatch, showing')
     systemd.sendStatus('started')
     systemd.ready()
-    const stopWatching = watchForMassStorage(dispatch)
-    ipcMain.once('quit', stopWatching)
+    try {
+      const stopWatching = watchForMassStorage(dispatch)
+      ipcMain.once('quit', stopWatching)
+    } catch (err: any) {
+      if (err instanceof Error) {
+        console.log(
+          `Failed to watch for mass storage: ${err.name}: ${err.message}`,
+          err
+        )
+      } else {
+        console.log(`Failed to watch for mass storage: ${err}`)
+      }
+    }
     // TODO: This is where we render the main window for the first time. See ui.ts
     // in the createUI function for more.
     if (!!!mainWindow) {
@@ -155,7 +177,7 @@ function startUp(): void {
   })
 }
 
-function createRendererLogger(): Logger {
+function createRendererLogger(): OTLogger {
   log.info('Creating renderer logger')
 
   const logger = createLogger('renderer')

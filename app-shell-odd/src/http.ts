@@ -7,15 +7,28 @@ import FormData from 'form-data'
 import { Transform } from 'stream'
 
 import { HTTP_API_VERSION } from './constants'
+import { createLogger } from './log'
 
 import type { Readable } from 'stream'
 import type { Request, RequestInit, Response } from 'node-fetch'
+
+const log = createLogger('http')
 
 type RequestInput = Request | string
 
 export interface DownloadProgress {
   downloaded: number
   size: number | null
+}
+
+export class LocalAbortError extends Error {
+  declare readonly name: 'LocalAbortError'
+  declare readonly type: 'aborted'
+  constructor(message: string) {
+    super(message)
+    this.name = 'LocalAbortError'
+    this.type = 'aborted'
+  }
 }
 
 export function fetch(
@@ -35,21 +48,29 @@ export function fetch(
   })
 }
 
-export function fetchJson<Body>(input: RequestInput): Promise<Body> {
-  return fetch(input).then(response => response.json())
+export function fetchJson<Body>(
+  input: RequestInput,
+  init?: RequestInit
+): Promise<Body> {
+  return fetch(input, init).then(response => response.json())
 }
 
-export function fetchText(input: Request): Promise<string> {
-  return fetch(input).then(response => response.text())
+export function fetchText(input: Request, init?: RequestInit): Promise<string> {
+  return fetch(input, init).then(response => response.text())
+}
+
+export interface FetchToFileOptions {
+  onProgress: (progress: DownloadProgress) => unknown
+  signal: AbortSignal
 }
 
 // TODO(mc, 2019-07-02): break this function up and test its components
 export function fetchToFile(
   input: RequestInput,
   destination: string,
-  options?: Partial<{ onProgress: (progress: DownloadProgress) => unknown }>
+  options?: Partial<FetchToFileOptions>
 ): Promise<string> {
-  return fetch(input).then(response => {
+  return fetch(input, { signal: options?.signal }).then(response => {
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) || null
 
@@ -75,13 +96,26 @@ export function fetchToFile(
       // pump calls stream.pipe, handles teardown if streams error, and calls
       // its callbacks when the streams are done
       pump(inputStream, progressReader, outputStream, error => {
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (error) {
+        const handleError = (problem: Error): void => {
           // if we error out, delete the temp dir to clean up
-          return remove(destination).then(() => {
+          log.error(`Aborting fetchToFile: ${problem.name}: ${problem.message}`)
+          remove(destination).then(() => {
             reject(error)
           })
         }
+        const listener = (): void => {
+          handleError(
+            new LocalAbortError(
+              (options?.signal?.reason as string | null) ?? 'aborted'
+            )
+          )
+        }
+        options?.signal?.addEventListener('abort', listener, { once: true })
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (error) {
+          handleError(error)
+        }
+        options?.signal?.removeEventListener('abort', listener, {})
         resolve(destination)
       })
     })

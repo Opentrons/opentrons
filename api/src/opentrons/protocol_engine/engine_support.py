@@ -6,7 +6,8 @@ from opentrons.protocol_runner import protocol_runner, RunOrchestrator
 
 
 def create_run_orchestrator(
-    hardware_api: HardwareControlAPI, protocol_engine: ProtocolEngine
+    hardware_api: HardwareControlAPI,
+    protocol_engine: ProtocolEngine,
 ) -> RunOrchestrator:
     """Create a RunOrchestrator instance."""
     return RunOrchestrator(
