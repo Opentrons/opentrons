@@ -223,7 +223,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
                   size="1rem"
                   name={iconName}
                   color={iconColor ?? color}
-                  style={{ flexShrink: 0 }}
+                  minWidth="1rem"
                 />
               )}
               <StyledText
