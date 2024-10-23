@@ -575,6 +575,7 @@ export type WarningType =
   | 'ASPIRATE_FROM_PRISTINE_WELL'
   | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
   | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
+  | 'TEMPERATURE_IS_POTENTIALLY_UNREACHABLE'
 
 export interface CommandCreatorWarning {
   message: string
