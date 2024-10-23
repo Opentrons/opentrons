@@ -101,7 +101,7 @@ class RunController:
                 action_type
                 == RunActionType.RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE
             ):
-                # FIX BEFORE MERGE: Connect to work in
+                # todo(mm, 2024-10-23): Connect to work in
                 # https://github.com/Opentrons/opentrons/pull/16556.
                 raise NotImplementedError
 
