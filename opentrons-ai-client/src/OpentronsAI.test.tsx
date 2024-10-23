@@ -1,5 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach } from 'vitest'
 import * as auth0 from '@auth0/auth0-react'
 
 import { renderWithProviders } from './__testing-utils__'
