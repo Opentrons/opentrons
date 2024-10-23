@@ -64,7 +64,7 @@ export const AnnouncementModal = (
             justifyContent={JUSTIFY_CENTER}
             gridGap={SPACING.spacing12}
           >
-            {image && image}
+            {image != null && image}
             {message}
           </Flex>
         </Modal>
