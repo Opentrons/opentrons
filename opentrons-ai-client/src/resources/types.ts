@@ -42,3 +42,8 @@ export interface AnalyticsEvent {
   properties: Record<string, unknown>
   superProperties?: Record<string, unknown>
 }
+
+export interface HeaderWithMeterAtomProps {
+  displayHeaderWithMeter: boolean
+  progress: number
+}

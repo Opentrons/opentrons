@@ -17,10 +17,6 @@ import { useIsMobile } from '../../resources/hooks/useIsMobile'
 import { useNavigate } from 'react-router-dom'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
-export interface InputType {
-  userPrompt: string
-}
-
 export function Landing(): JSX.Element | null {
   const navigate = useNavigate()
   const { t } = useTranslation('protocol_generator')

@@ -7,11 +7,13 @@ import {
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Accordion } from '../../molecules/Accordion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { PromptPreview } from '../../molecules/PromptPreview'
 import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { useForm, FormProvider } from 'react-hook-form'
+import { headerWithMeterAtom } from '../../resources/atoms'
+import { useAtom } from 'jotai'
 
 interface CreateProtocolFormData {
   application: {
@@ -23,6 +25,7 @@ interface CreateProtocolFormData {
 
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
+  const [, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
   const [applicationAccordionIsOpen, setApplicationAccordionIsOpen] = useState(
     true
   )
@@ -37,6 +40,13 @@ export function CreateProtocol(): JSX.Element | null {
       },
     },
   })
+
+  useEffect(() => {
+    setHeaderWithMeterAtom({
+      displayHeaderWithMeter: true,
+      progress: 0,
+    })
+  }, [])
 
   return (
     <FormProvider {...methods}>

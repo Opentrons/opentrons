@@ -11,20 +11,20 @@ import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useAtom } from 'jotai'
 import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { Loading } from './molecules/Loading'
-import { mixpanelAtom, tokenAtom } from './resources/atoms'
+import { headerWithMeterAtom, mixpanelAtom, tokenAtom } from './resources/atoms'
 import { useGetAccessToken } from './resources/hooks'
 import { initializeMixpanel } from './analytics/mixpanel'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 import { Header } from './molecules/Header'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
 import { Footer } from './molecules/Footer'
+import { HeaderWithMeter } from './molecules/HeaderWithMeter'
 
 export function OpentronsAI(): JSX.Element | null {
-  const { t } = useTranslation('protocol_generator')
-  const { isAuthenticated, logout, isLoading, loginWithRedirect } = useAuth0()
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
   const [, setToken] = useAtom(tokenAtom)
+  const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanel] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
   const trackEvent = useTrackEvent()
@@ -74,7 +74,11 @@ export function OpentronsAI(): JSX.Element | null {
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.grey10}
       >
-        <Header />
+        {displayHeaderWithMeter ? (
+          <HeaderWithMeter progressPercentage={progress} />
+        ) : (
+          <Header />
+        )}
 
         <Flex
           width="100%"
