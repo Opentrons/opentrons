@@ -187,7 +187,7 @@ const StepEditFormManager = (
               : ''
           }
           handleCancelClick={saveStepForm}
-          handleContinueClick={confirmAddPauseUntilTempStep}
+          handleContinueClick={handleSave}
           // TODO (nd: 10/21/2024) can remove this prop once redesign FF removed
           moduleType={
             showAddPauseUntilTempStepModal

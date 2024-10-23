@@ -1,7 +1,7 @@
 import type * as React from 'react'
 import { css } from 'styled-components'
 
-import { Btn, Icon, COLORS } from '@opentrons/components'
+import { Btn, Icon, COLORS, Flex } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -38,8 +38,8 @@ const TOGGLE_ENABLED_STYLES = css`
 `
 
 interface ToggleButtonProps extends StyleProps {
-  label: string
   toggledOn: boolean
+  label?: string | null
   disabled?: boolean | null
   id?: string
   onClick?: (e: React.MouseEvent) => void
@@ -59,7 +59,9 @@ export function ToggleButton(props: ToggleButtonProps): JSX.Element {
       css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
       {...buttonProps}
     >
-      <Icon name={iconName} height="1rem" />
+      <Flex>
+        <Icon name={iconName} size="2rem" />
+      </Flex>
     </Btn>
   )
 }

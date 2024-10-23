@@ -15,7 +15,7 @@ import {
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
 import { canPipetteUseLabware } from '../../utils'
 import { getWellRatio } from '../utils'
-import { getTimeFromPauseForm } from '../utils/getTimeFromPauseForm'
+import { getTimeFromForm } from '../utils/getTimeFromForm'
 
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
@@ -137,6 +137,22 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
+const SHAKE_SPEED_REQUIRED: FormError = {
+  title: 'Shake speed required',
+  dependentFields: ['setShake', 'targetSpeed'],
+}
+const SHAKE_TIME_REQUIRED: FormError = {
+  title: 'Shake duration required',
+  dependentFields: ['heaterShakerSetTimer', 'heaterShakerTimer'],
+}
+const HS_TEMPERATURE_REQUIRED: FormError = {
+  title: 'Temperature required',
+  dependentFields: [
+    'targetHeaterShakerTemperature',
+    'setHeaterShakerTemperature',
+  ],
+}
+
 export interface HydratedFormData {
   [key: string]: any
 }
@@ -198,7 +214,13 @@ export const pauseForTimeOrUntilTold = (
   const { pauseAction, moduleId, pauseTemperature } = fields
 
   if (pauseAction === PAUSE_UNTIL_TIME) {
-    const { hours, minutes, seconds } = getTimeFromPauseForm(fields)
+    const { hours, minutes, seconds } = getTimeFromForm(
+      fields,
+      'pauseTime',
+      'pauseSeconds',
+      'pauseMinutes',
+      'pauseSeconds'
+    )
     // user selected pause for amount of time
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0 ? TIME_PARAM_REQUIRED : null
@@ -340,6 +362,26 @@ export const lidTemperatureHoldRequired = (
   const { lidIsActiveHold, lidTargetTempHold } = fields
   return lidIsActiveHold === true && !lidTargetTempHold
     ? LID_TEMPERATURE_HOLD_REQUIRED
+    : null
+}
+export const shakeSpeedRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { targetSpeed, setShake } = fields
+  return setShake && !targetSpeed ? SHAKE_SPEED_REQUIRED : null
+}
+export const shakeTimeRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { heaterShakerTimer, heaterShakerSetTimer } = fields
+  return heaterShakerSetTimer && !heaterShakerTimer ? SHAKE_TIME_REQUIRED : null
+}
+export const temperatureRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { setHeaterShakerTemperature, targetHeaterShakerTemperature } = fields
+  return setHeaterShakerTemperature && !targetHeaterShakerTemperature
+    ? HS_TEMPERATURE_REQUIRED
     : null
 }
 export const engageHeightRangeExceeded = (

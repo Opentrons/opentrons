@@ -62,14 +62,16 @@ export function ToggleStepFormField(
               >
                 {isSelected ? onLabel : offLabel}
               </StyledText>
-              <ToggleButton
-                disabled={isDisabled}
-                onClick={() => {
-                  toggleUpdateValue(!toggleValue)
-                }}
-                label={isSelected ? onLabel : offLabel}
-                toggledOn={isSelected}
-              />
+              {isDisabled ? null : (
+                <ToggleButton
+                  disabled={isDisabled}
+                  onClick={() => {
+                    toggleUpdateValue(!toggleValue)
+                  }}
+                  label={isSelected ? onLabel : offLabel}
+                  toggledOn={isSelected}
+                />
+              )}
             </Flex>
           </Flex>
         </Flex>
