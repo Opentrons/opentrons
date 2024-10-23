@@ -7,7 +7,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 const NewLineText = styled.span`
   display: block;
@@ -32,14 +32,6 @@ const FooterText = styled.p`
 
 export function Footer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const privacyPolicyText = t('privacy_policy')
-  const [
-    firstPart,
-    privacyPolicy,
-    and,
-    EULA,
-    copyright,
-  ] = privacyPolicyText.split('\n')
 
   return (
     <Flex
@@ -51,23 +43,27 @@ export function Footer(): JSX.Element {
       paddingTop={SPACING.spacing24}
     >
       <FooterText>
-        {firstPart}
-        <BlueLink
-          href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons-Labworks-Privacy-Policy-5-4-23.docx-1.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {privacyPolicy}
-        </BlueLink>
-        {and}
-        <BlueLink
-          href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons%20EULA%2020240710.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {EULA}
-        </BlueLink>
-        <NewLineText>{copyright}</NewLineText>
+        <Trans
+          i18nKey={t('privacy_policy')}
+          t={t}
+          components={{
+            privacyPolicyLink: (
+              <BlueLink
+                href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons-Labworks-Privacy-Policy-5-4-23.docx-1.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            ),
+            EULALink: (
+              <BlueLink
+                href="https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons%20EULA%2020240710.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            ),
+          }}
+        />
+        <NewLineText>{t('copyright')}</NewLineText>
       </FooterText>
     </Flex>
   )
