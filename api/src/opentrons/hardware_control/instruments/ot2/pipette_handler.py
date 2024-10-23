@@ -430,6 +430,11 @@ class PipetteHandlerProvider(Generic[MountType]):
                 f"attach tip called while tip already attached to {instr}"
             )
 
+    def cache_tip(self, mount: MountType, tip_length: float) -> None:
+        instrument = self.get_pipette(mount)
+        instrument.add_tip(tip_length=tip_length)
+        instrument.set_current_volume(0)
+
     def remove_tip(self, mount: MountType) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
