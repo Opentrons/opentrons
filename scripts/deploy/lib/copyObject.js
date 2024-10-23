@@ -1,6 +1,7 @@
 'use strict'
 
 const mime = require('mime')
+const { CopyObjectCommand } = require('@aws-sdk/client-s3')
 
 // TODO(mc, 2019-07-16): optimize cache values
 const getCopyParams = obj => ({
@@ -12,7 +13,7 @@ const getCopyParams = obj => ({
 /**
  * Copy an object to an S3 bucket
  *
- * @param {S3} s3 - AWS.S3 instance
+ * @param {S3Client} s3 - AWS SDK v3 S3Client instance
  * @param {S3Object} sourceObj - Object to copy
  * @param {string} destBucket - Destination bucket
  * @param {string} [destPath] - Destination bucket folder (root if unspecified)
@@ -21,10 +22,10 @@ const getCopyParams = obj => ({
  *
  * @typedef S3Object
  * @property {string} Bucket - Object bucket
- * @property {String} Prefix - Deploy folder in bucket
+ * @property {string} Prefix - Deploy folder in bucket
  * @property {string} Key - Full key to object
  */
-module.exports = function copyObject(
+module.exports = async function copyObject(
   s3,
   sourceObj,
   destBucket,
@@ -37,18 +38,28 @@ module.exports = function copyObject(
   const copyParams = getCopyParams(sourceObj)
 
   console.log(
-    `${dryrun ? 'DRYRUN: ' : ''}Copy
-    Source: ${copySource}
-    Dest: /${destBucket}/${destKey}
-    Params: ${JSON.stringify(copyParams)}\n`
+    `${
+      dryrun ? 'DRYRUN: ' : ''
+    }Copy\nSource: ${copySource}\nDest: /${destBucket}/${destKey}\nParams: ${JSON.stringify(
+      copyParams
+    )}\n`
   )
 
   if (dryrun) return Promise.resolve()
 
-  const copyObjectParams = Object.assign(
-    { Bucket: destBucket, Key: destKey, CopySource: copySource },
-    copyParams
-  )
+  const copyObjectParams = {
+    Bucket: destBucket,
+    Key: destKey,
+    CopySource: copySource,
+    ...copyParams,
+  }
 
-  return s3.copyObject(copyObjectParams).promise()
+  try {
+    const command = new CopyObjectCommand(copyObjectParams)
+    await s3.send(command)
+    console.log(`Successfully copied to /${destBucket}/${destKey}`)
+  } catch (err) {
+    console.error(`Error copying object: ${err.message}`)
+    throw err
+  }
 }
