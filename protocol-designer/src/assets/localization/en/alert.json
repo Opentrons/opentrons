@@ -97,75 +97,75 @@
   "timeline": {
     "error": {
       "LABWARE_DISCARDED_IN_WASTE_CHUTE": {
-        "title": "The labware has been previously discarded into the waste chute",
-        "body": "Please select a different labware to move."
+        "title": "Labware not available",
+        "body": "This step uses labware that has previously been discarded into a Waste Chute."
       },
       "LABWARE_ON_ANOTHER_ENTITY": {
-        "title": "Attempting to move a labware on top of another entity",
+        "title": "Attempting to move labware on top of another entity",
         "body": "Please reselect which slot your labware should move to."
       },
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
-        "body": "Add another tip rack to an empty slot in "
+        "body": "Add another tip rack to your deck or change your tip management during transfer and mix steps.",
+        "link": "Edit starting deck"
       },
       "NO_TIP_SELECTED": {
         "title": "No tip rack was selected to complete action",
         "body": "Add a tip rack in the step"
       },
       "NO_TIP_ON_PIPETTE": {
-        "title": "No tip on pipette at the start of step",
-        "body1": "Choose a different Change Tip setting. Change Tip cannot be \"Never\" the first time a pipette is used in a protocol, or following a step that used the ",
-        "link": "Air gap dispense setting",
-        "body2": ". Pipetting steps must begin with a tip on."
+        "title": "No tip on pipette at start of step",
+        "body": "Use a different tip handling setting. Don't set it to Never the first time a pipette is used in a protocol, or following a step that air gaps when dispensing."
       },
       "MODULE_PIPETTE_COLLISION_DANGER": {
-        "title": "Pipette cannot access labware",
-        "body": "Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to modules. Read more "
+        "title": "GEN1 8-Channel Pipettes can't move adjacent to modules",
+        "body": "Move labware and modules or use a different pipette."
       },
       "MISSING_MODULE": {
-        "title": "Missing module for step",
-        "body": "A step requires a module that does not exist"
+        "title": "Module not in protocol",
+        "body": "This step tries to use a module not in the protocol. Add the module to your protocol or remove this step."
       },
       "MISSING_TEMPERATURE_STEP": {
-        "title": "Missing Temperature step",
-        "body": "Add a Temperature step prior to this Pause step. The module is not currently changing temperature because it has either been deactivated or is holding a temperature"
+        "title": "Unreachable target temperature",
+        "body": "The protocol can't proceed beyond this pause step, because the module is not changing temperature. Add or modify a temperature step before this step."
       },
       "THERMOCYCLER_LID_CLOSED": {
-        "title": "Thermocycler lid is closed",
-        "body": "Before the robot can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
+        "title": "Thermocycler lid closed",
+        "body": "This step tries to use labware in the Thermocycler. Open the lid before this step."
       },
       "HEATER_SHAKER_LATCH_OPEN": {
-        "title": "Heater-Shaker labware latch is open",
+        "title": "Heater-Shaker latch open",
         "body": "Before the robot can interact with labware on the Heater-Shaker module, the labware latch must be closed. To resolve this error, please add a Heater-Shaker step ahead of the current step, and set the labware latch status to \"closed\"."
       },
       "HEATER_SHAKER_IS_SHAKING": {
         "title": "Heater-Shaker is shaking",
-        "body": "the robot cannot interact with labware on the Heater-Shaker Module while it is shaking."
+        "body": "The robot cannot interact with labware on the Heater-Shaker Module while it is shaking. Add a step to stop shaking to interact with the labware."
       },
       "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
         "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
       },
       "HEATER_SHAKER_EAST_WEST_LATCH_OPEN": {
+        "title": "Heater-Shaker labware latch open",
         "body": "Pipettes cannot access labware on, or to the left or right of, the Heater-Shaker while the labware latch is open. Create a step before this one that closes the latch."
       },
       "HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING": {
-        "title": "The Heater-Shaker is shaking",
-        "body": "Pipettes cannot access labware on or adjacent to the Heater-Shaker while it is shaking. Create a step before this one that deactivates the shaker."
+        "title": "Robot unable to perform step",
+        "body": "The robot cannot interact with labware on or next to the Heater-Shaker Module while it is shaking. Add a heater-shaker step to stop shaking."
       },
       "HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL": {
-        "title": "8-Channel pipette cannot access labware",
-        "body": "8-Channel pipettes cannot access labware or tip racks to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette."
+        "title": "8-Channel unable to access slot",
+        "body": "8-Channel pipettes cannot access labware to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette."
       },
       "HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL": {
-        "title": "8-Channel pipette cannot access labware",
-        "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
+        "title": "8-Channel unable to access slot",
+        "body": "8-Channel pipettes cannot access non-tiprack labware to the top or bottom of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette."
       },
       "LABWARE_OFF_DECK": {
-        "title": "Labware is off-deck",
+        "title": "Labware not on deck",
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
       },
       "HEATER_SHAKER_LATCH_CLOSED": {
-        "title": "Heater-Shaker labware latch is closed",
+        "title": "Heater-Shaker latch closed",
         "body": "The Heater-Shaker’s labware latch must be open when moving labware to or from the module. Add a Heater-Shaker step that opens the latch before this step."
       },
       "DROP_TIP_LOCATION_DOES_NOT_EXIST": {
@@ -173,46 +173,52 @@
         "body": "The Waste Chute or Trash Bin to drop tip in does not exist."
       },
       "MISSING_96_CHANNEL_TIPRACK_ADAPTER": {
-        "title": "Missing 96-channel tip rack adapter",
-        "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
+        "title": "Tip rack adapter required",
+        "body": "The 96-channel pipette uses a tip rack adapter to pick up a full rack of tips. Add one to your starting deck or use partial tip pickup.",
+        "link": "Edit starting deck"
       },
       "EQUIPMENT_DOES_NOT_EXIST": {
-        "title": "Attempting to interact with an unknown entity",
+        "title": "Unable to perform step",
         "body": "An entity you are interacting with does not exist."
       },
       "GRIPPER_REQUIRED": {
-        "title": "A gripper is required to complete this action",
-        "body": "Attempting to move a labware without a gripper into the waste chute. Please add a gripper to this step."
+        "title": "Cannot move with gripper",
+        "body": "The gripper cannot move aluminum blocks. Deselect the 'Use Gripper' checkbox."
       },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
-        "title": "Do not use tip rack adapter for partial tip pickup",
-        "body": "Partial tip pickup requires a tip rack placed directly on the deck. Remove the adapter, or add a new tip rack without an adapter."
+        "title": "Extra tip rack adapter",
+        "body": "When picking up fewer than 96 tips, the tip rack must be placed directly on the deck, not in the tip rack adapter.",
+        "link": "Edit starting deck"
       },
       "CANNOT_MOVE_WITH_GRIPPER": {
         "title": "Cannot move with gripper",
         "body": "The gripper cannot move aluminum blocks. Edit the step and deselect the 'Use Gripper' checkbox."
       },
       "PIPETTE_HAS_TIP": {
-        "title": "Possible collision with tip",
-        "body": "The gripper cannot pick up labware while pipettes have tips attached. Drop all tips before this move labware step."
+        "title": "Gripper movement with tips attached",
+        "body": "Picking up labware with the gripper while tips are on an adjacent pipette can cause collisions. Drop tips from all pipettes before this step."
+      },
+      "POSSIBLE_PIPETTE_COLLISION": {
+        "title": "Pipette collisions likely",
+        "body": "There is a possibility that the pipette will collide with the adjascent labware or module for partial tip pick up."
       }
     },
     "warning": {
       "ASPIRATE_MORE_THAN_WELL_CONTENTS": {
-        "title": "Not enough liquid in well(s)",
-        "body": "You are trying to aspirate more than the current volume of one of your well(s)"
+        "title": "Not enough liquid",
+        "body": "This step tries to aspirate more than the current volume of a source well."
       },
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
-        "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
+        "body": "This step tries to aspirate from an empty well."
       },
       "LABWARE_IN_WASTE_CHUTE_HAS_LIQUID": {
-        "title": "Moving labware into waste chute",
-        "body": "This labware has remaining liquid, be advised that once you dispose of it, there is no way to get it back later in the protocol."
+        "title": "Disposing liquid-filled labware",
+        "body": "This step moves a labware that contains liquid to the waste chute. There is no way to retrieve the liquid after disposal."
       },
       "TIPRACK_IN_WASTE_CHUTE_HAS_TIPS": {
-        "title": "Moving tiprack into waste chute",
-        "body": "This tiprack has remaining tips, be advised that once you dispose of it, there is no way to get it back later in the protocol. "
+        "title": "Disposing unused tips",
+        "body": "This step moves a tip rack that contains unused tips to the waste chute. There is no way to retrieve the tips after disposal."
       }
     }
   },

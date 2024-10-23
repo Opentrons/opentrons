@@ -27,7 +27,6 @@ export const blowout: CommandCreator<BlowoutParams> = (
   if (!pipetteData) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName,
         pipette: pipetteId,
       })
     )

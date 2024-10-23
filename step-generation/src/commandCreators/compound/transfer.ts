@@ -118,7 +118,6 @@ export const transfer: CommandCreator<TransferArgs> = (
     // bail out before doing anything else
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName,
         pipette: args.pipette,
       })
     )
