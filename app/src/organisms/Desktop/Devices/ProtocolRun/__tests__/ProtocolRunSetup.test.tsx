@@ -94,7 +94,7 @@ const render = () => {
       runId={RUN_ID}
     />,
     {
-      initialState: {},
+      initialState: {} as State,
       i18nInstance: i18n,
     }
   )[0]
