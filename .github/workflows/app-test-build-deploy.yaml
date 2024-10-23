@@ -148,7 +148,7 @@ jobs:
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="${{}matrix.shell}/src" cov_opts="--coverage=true"
+        run: make test-js-internal tests="${{matrix.shell}}/src" cov_opts="--coverage=true"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
