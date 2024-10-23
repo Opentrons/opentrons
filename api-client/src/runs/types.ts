@@ -112,7 +112,7 @@ export interface GetRunsParams {
 }
 
 export interface Runs {
-  data: RunData[]
+  data: readonly RunData[]
   links: RunsLinks
 }
 
