@@ -1,21 +1,24 @@
+import styled from 'styled-components'
 import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Flex, Link } from '../../primitives'
-import { DIRECTION_COLUMN, TEXT_DECORATION_UNDERLINE } from '../../styles'
+import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  TEXT_DECORATION_UNDERLINE,
+} from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
 const EULA_URL = 'https://opentrons.com/eula'
 
-//  TODO(ja: 10/22/24): figure out the i18n stuff since components package.json does not have i18n and
-//  should not have i18n (since other projects use it). Due to the links, we would need access to both t and Trans
 export function EndUserAgreementFooter(): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.grey20}
       padding={SPACING.spacing24}
       width="100%"
-      alignItems="center"
+      alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing8}
     >
