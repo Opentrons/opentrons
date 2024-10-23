@@ -1,5 +1,6 @@
 import mixpanel from 'mixpanel-browser'
 import { getHasOptedIn } from './selectors'
+import type { Mixpanel } from '../resources/types'
 
 export type AnalyticsEvent =
   | {
@@ -17,7 +18,7 @@ const MIXPANEL_OPTS = {
   opt_out_tracking_by_default: true,
 }
 
-export function initializeMixpanel(state: any): void {
+export function initializeMixpanel(state: Mixpanel): void {
   const optedIn = getHasOptedIn(state) ?? false
   if (MIXPANEL_ID != null) {
     console.debug('Initializing Mixpanel', { optedIn })

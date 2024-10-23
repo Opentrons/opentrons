@@ -25,11 +25,9 @@ export function OpentronsAI(): JSX.Element | null {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
   const [, setToken] = useAtom(tokenAtom)
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
-  const [mixpanel] = useAtom(mixpanelAtom)
+  const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
   const trackEvent = useTrackEvent()
-
-  initializeMixpanel(mixpanel)
 
   const fetchAccessToken = async (): Promise<void> => {
     try {
@@ -38,6 +36,11 @@ export function OpentronsAI(): JSX.Element | null {
     } catch (error) {
       console.error('Error fetching access token:', error)
     }
+  }
+
+  if (mixpanelState?.isInitialized === false) {
+    setMixpanelState({ ...mixpanelState, isInitialized: true })
+    initializeMixpanel(mixpanelState)
   }
 
   useEffect(() => {

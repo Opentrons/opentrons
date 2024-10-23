@@ -16,6 +16,7 @@ export const tokenAtom = atom<string | null>(null)
 
 export const mixpanelAtom = atom<Mixpanel | null>({
   analytics: { hasOptedIn: true }, // TODO: set to false when we have the opt-in modal
+  isInitialized: false,
 })
 
 export const headerWithMeterAtom = atom<HeaderWithMeterAtomProps>({

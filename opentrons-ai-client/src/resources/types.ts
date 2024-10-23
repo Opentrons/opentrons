@@ -35,6 +35,7 @@ export interface Mixpanel {
   analytics: {
     hasOptedIn: boolean
   }
+  isInitialized: boolean
 }
 
 export interface AnalyticsEvent {
