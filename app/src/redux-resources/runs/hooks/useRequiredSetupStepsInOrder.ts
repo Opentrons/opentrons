@@ -68,6 +68,11 @@ const keysInOrder = (
   return { orderedSteps: orderedSteps as StepKey[], orderedApplicableSteps }
 }
 
+const keyFor = (
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
+  // @ts-expect-error(sf, 2024-10-23): purposeful weak object typing
+): string | null => analysis?.id ?? analysis?.metadata?.id ?? null
+
 export function useRequiredSetupStepsInOrder({
   runId,
   protocolAnalysis,
@@ -92,7 +97,7 @@ export function useRequiredSetupStepsInOrder({
         ),
       })
     )
-  }, [runId, protocolAnalysis, dispatch])
+  }, [runId, keyFor(protocolAnalysis), dispatch])
   return protocolAnalysis == null
     ? {
         orderedSteps: NO_ANALYSIS_STEPS_IN_ORDER,
