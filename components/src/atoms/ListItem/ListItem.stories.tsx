@@ -50,7 +50,7 @@ export const ListItemDescriptorDefault: Story = {
     type: 'noActive',
     children: (
       <ListItemDescriptor
-        type="default"
+        type="large"
         content={<div>mock content</div>}
         description={<div>mock description</div>}
       />
@@ -63,7 +63,7 @@ export const ListItemDescriptorMini: Story = {
     type: 'noActive',
     children: (
       <ListItemDescriptor
-        type="mini"
+        type="default"
         content={<div>mock content</div>}
         description={<div>mock description</div>}
       />

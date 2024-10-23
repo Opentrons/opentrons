@@ -8,14 +8,6 @@ import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
-const testAliases: {} | { 'file-saver': string } =
-  process.env.CYPRESS === '1'
-    ? {
-        'file-saver':
-          path.resolve(__dirname, 'cypress/mocks/file-saver.js') ?? '',
-      }
-    : {}
-
 export default defineConfig({
   // this makes imports relative rather than absolute
   base: '',
@@ -70,7 +62,6 @@ export default defineConfig({
       '@opentrons/step-generation': path.resolve(
         '../step-generation/src/index.ts'
       ),
-      ...testAliases,
     },
   },
   server: {

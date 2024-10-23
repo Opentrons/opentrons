@@ -306,11 +306,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       const destinationLabwareName = labwareNicknamesById[dispense_labware]
       const aspirateWellsDisplay = getWellsForStepSummary(
         aspirate_wells as string[],
-        flatten(labwareEntities[aspirate_labware].def.ordering)
+        flatten(labwareEntities[aspirate_labware]?.def.ordering)
       )
       const dispenseWellsDisplay = getWellsForStepSummary(
         dispense_wells as string[],
-        flatten(labwareEntities[dispense_labware].def.ordering)
+        flatten(labwareEntities[dispense_labware]?.def.ordering)
       )
       stepSummaryContent = (
         <StyledTrans

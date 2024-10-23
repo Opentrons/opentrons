@@ -61,7 +61,7 @@ export function ProtocolMetadata({
           return (
             <ListItem type="noActive" key={`ProtocolOverview_${title}`}>
               <ListItemDescriptor
-                type="default"
+                type="large"
                 description={t(`${title}`)}
                 content={value ?? t('na')}
               />
@@ -70,7 +70,7 @@ export function ProtocolMetadata({
         })}
         <ListItem type="noActive" key="ProtocolOverview_robotVersion">
           <ListItemDescriptor
-            type="default"
+            type="large"
             description={t('required_app_version')}
             content={t('app_version', {
               version: REQUIRED_APP_VERSION,
