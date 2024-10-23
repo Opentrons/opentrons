@@ -63,7 +63,6 @@ export function ProtocolRoutes(): JSX.Element {
       <NavigationBar />
       <Kitchen>
         <Box width="100%">
-          <AnnouncementModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
           <Routes>
