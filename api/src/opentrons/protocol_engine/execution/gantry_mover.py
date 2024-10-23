@@ -315,22 +315,22 @@ class HardwareGantryMover(GantryMover):
                 )
                 log.info(f"The current position of the robot is: {current_position}.")
 
-                absolute_pos = target_axis_map_from_relative(
+                pos_hw = target_axis_map_from_relative(
                     pos_hw, current_position
                 )
                 log.info(
-                    f"The absolute position is: {absolute_pos} and hw pos map is {pos_hw}."
+                    f"The absolute position is: {pos_hw} and hw pos map is {pos_hw}."
                 )
-            else:
-                log.info(f"Absolute move {axis_map} and {mount}")
-                absolute_pos = target_axis_map_from_absolute(
-                    mount,
-                    pos_hw,
-                    partial(self._critical_point_for, cp_override=critical_point),
-                    Point(*self._hardware_api.config.left_mount_offset),
-                    Point(*self._hardware_api.config.right_mount_offset),
-                    Point(*self._hardware_api.config.gripper_mount_offset),
-                )
+            log.info(f"The calculated move {pos_hw} and {mount}")
+            absolute_pos = target_axis_map_from_absolute(
+                mount,
+                pos_hw,
+                partial(self._critical_point_for, cp_override=critical_point),
+                Point(*self._hardware_api.config.left_mount_offset),
+                Point(*self._hardware_api.config.right_mount_offset),
+                Point(*self._hardware_api.config.gripper_mount_offset),
+            )
+            log.info(f"The prepped abs {absolute_pos}")
             await self._hardware_api.move_axes(
                 position=absolute_pos,
                 speed=speed,
