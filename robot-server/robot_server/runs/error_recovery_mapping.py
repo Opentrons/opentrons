@@ -105,7 +105,7 @@ def _map_error_recovery_type(reaction_if_match: ReactionIfMatch) -> ErrorRecover
         case ReactionIfMatch.ASSUME_FALSE_POSITIVE_AND_CONTINUE:
             # todo(mm, 2024-10-23): Connect to work in
             # https://github.com/Opentrons/opentrons/pull/16556.
-            raise NotImplementedError
+            return ErrorRecoveryType.IGNORE_AND_CONTINUE
         case ReactionIfMatch.FAIL_RUN:
             return ErrorRecoveryType.FAIL_RUN
         case ReactionIfMatch.WAIT_FOR_RECOVERY:

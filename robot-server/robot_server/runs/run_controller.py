@@ -103,7 +103,7 @@ class RunController:
             ):
                 # todo(mm, 2024-10-23): Connect to work in
                 # https://github.com/Opentrons/opentrons/pull/16556.
-                raise NotImplementedError
+                self._run_orchestrator_store.resume_from_recovery()
 
             else:
                 assert_never(action_type)
