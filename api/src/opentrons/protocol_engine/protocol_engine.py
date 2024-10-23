@@ -92,46 +92,34 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        action_dispatcher: Optional[ActionDispatcher] = None,
-        plugin_starter: Optional[PluginStarter] = None,
+        action_dispatcher: ActionDispatcher,
+        plugin_starter: PluginStarter,
+        model_utils: ModelUtils,
+        hardware_stopper: HardwareStopper,
+        door_watcher: DoorWatcher,
+        module_data_provider: ModuleDataProvider,
+        file_provider: FileProvider,
         queue_worker: Optional[QueueWorker] = None,
-        model_utils: Optional[ModelUtils] = None,
-        hardware_stopper: Optional[HardwareStopper] = None,
-        door_watcher: Optional[DoorWatcher] = None,
-        module_data_provider: Optional[ModuleDataProvider] = None,
-        file_provider: Optional[FileProvider] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         Must be called while an event loop is active.
 
-        This constructor does not inject provider implementations.
+        This constructor is only for `ProtocolEngine` unit tests.
         Prefer the `create_protocol_engine()` factory function.
         """
         self._hardware_api = hardware_api
-        self._file_provider = file_provider or FileProvider()
+        self._file_provider = file_provider
         self._state_store = state_store
-        self._model_utils = model_utils or ModelUtils()
-        self._action_dispatcher = action_dispatcher or ActionDispatcher(
-            sink=self._state_store
-        )
-        self._plugin_starter = plugin_starter or PluginStarter(
-            state=self._state_store,
-            action_dispatcher=self._action_dispatcher,
-        )
+        self._model_utils = model_utils
+        self._action_dispatcher = action_dispatcher
+        self._plugin_starter = plugin_starter
+        self._hardware_stopper = hardware_stopper
+        self._door_watcher = door_watcher
+        self._module_data_provider = module_data_provider
+        self._queue_worker = queue_worker
         # TODO: Probably want to dependency-inject this.
         self._hardware_state_synchronizer = HardwareStateSynchronizer()
-        self._hardware_stopper = hardware_stopper or HardwareStopper(
-            hardware_api=hardware_api,
-            state_store=state_store,
-        )
-        self._door_watcher = door_watcher or DoorWatcher(
-            state_store=state_store,
-            hardware_api=hardware_api,
-            action_dispatcher=self._action_dispatcher,
-        )
-        self._module_data_provider = module_data_provider or ModuleDataProvider()
-        self._queue_worker = queue_worker
         if self._queue_worker:
             self._queue_worker.start()
         self._door_watcher.start()

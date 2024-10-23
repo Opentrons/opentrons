@@ -38,7 +38,11 @@ from opentrons.protocol_engine.execution import (
     HardwareStopper,
     DoorWatcher,
 )
-from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
+from opentrons.protocol_engine.resources import (
+    FileProvider,
+    ModelUtils,
+    ModuleDataProvider,
+)
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
@@ -118,6 +122,12 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     return decoy.mock(cls=ModuleDataProvider)
 
 
+@pytest.fixture
+def file_provider(decoy: Decoy) -> FileProvider:
+    """Get a mock FileProvider."""
+    return decoy.mock(cls=FileProvider)
+
+
 @pytest.fixture(autouse=True)
 def _mock_slot_standardization_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
@@ -148,6 +158,7 @@ def subject(
     hardware_stopper: HardwareStopper,
     door_watcher: DoorWatcher,
     module_data_provider: ModuleDataProvider,
+    file_provider: FileProvider,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
@@ -160,6 +171,7 @@ def subject(
         hardware_stopper=hardware_stopper,
         door_watcher=door_watcher,
         module_data_provider=module_data_provider,
+        file_provider=file_provider,
     )
 
 
