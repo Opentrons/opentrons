@@ -23,7 +23,7 @@ import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
 import { OffsetVector } from '/app/molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
 import { getDisplayLocation } from '/app/organisms/LabwarePositionCheck/utils/getDisplayLocation'
-import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   RunTimeCommand,

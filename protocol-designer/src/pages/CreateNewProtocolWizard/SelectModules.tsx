@@ -25,10 +25,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
-import {
-  getEnableAbsorbanceReader,
-  getEnableMoam,
-} from '../../feature-flags/selectors'
+import { getEnableAbsorbanceReader } from '../../feature-flags/selectors'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { ModuleDiagram } from '../../components/modules'
 import { WizardBody } from './WizardBody'
@@ -39,7 +36,7 @@ import {
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
 import { getNumOptions, getNumSlotsAvailable } from './utils'
-import { HandleEnter } from './HandleEnter'
+import { HandleEnter } from '../../atoms/HandleEnter'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -56,7 +53,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const fields = watch('fields')
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
-  const enableMoam = useSelector(getEnableMoam)
   const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
   const robotType = fields.robotType
   const supportedModules =
@@ -83,9 +79,11 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
         )
       )
   )
-  const MOAM_MODULE_TYPES: ModuleType[] = enableMoam
-    ? [TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE, MAGNETIC_BLOCK_TYPE]
-    : [TEMPERATURE_MODULE_TYPE]
+  const MOAM_MODULE_TYPES: ModuleType[] = [
+    TEMPERATURE_MODULE_TYPE,
+    HEATERSHAKER_MODULE_TYPE,
+    MAGNETIC_BLOCK_TYPE,
+  ]
 
   const handleAddModule = (moduleModel: ModuleModel): void => {
     if (hasNoAvailableSlots) {

@@ -1,8 +1,8 @@
 from enum import Enum
 from dataclasses import dataclass, asdict, fields
-from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional
+from typing import Dict, Tuple, TypeVar, Generic, List, cast
 from typing_extensions import TypedDict, Literal
-from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
+from opentrons.hardware_control.types import OT3AxisKind
 
 
 class AxisDict(TypedDict):
@@ -103,25 +103,12 @@ class OT3CurrentSettings:
         )
 
 
-class OutputOptions(int, Enum):
-    """Specifies where we should report sensor data to during a sensor pass."""
-
-    stream_to_csv = 0x1  # compile sensor data stream into a csv file, in addition to can_bus_only behavior
-    sync_buffer_to_csv = 0x2  # collect sensor data on pipette mcu, then stream to robot server and compile into a csv file, in addition to can_bus_only behavior
-    can_bus_only = (
-        0x4  # stream sensor data over CAN bus, in addition to sync_only behavior
-    )
-    sync_only = 0x8  # trigger pipette sync line upon sensor's detection of something
-
-
 @dataclass(frozen=True)
 class CapacitivePassSettings:
     prep_distance_mm: float
     max_overrun_distance_mm: float
     speed_mm_per_s: float
     sensor_threshold_pf: float
-    output_option: OutputOptions
-    data_files: Optional[Dict[InstrumentProbeType, str]] = None
 
 
 @dataclass(frozen=True)
@@ -135,13 +122,11 @@ class LiquidProbeSettings:
     plunger_speed: float
     plunger_impulse_time: float
     sensor_threshold_pascals: float
-    output_option: OutputOptions
     aspirate_while_sensing: bool
     z_overlap_between_passes_mm: float
     plunger_reset_offset: float
     samples_for_baselining: int
     sample_time_sec: float
-    data_files: Optional[Dict[InstrumentProbeType, str]]
 
 
 @dataclass(frozen=True)

@@ -80,7 +80,7 @@ class _ABRAsairSensor:
                 break
             # write to google sheet
             try:
-                if google_sheet.creditals.access_token_expired:
+                if google_sheet.credentials.access_token_expired:
                     google_sheet.gc.login()
                 google_sheet.write_header(header)
                 google_sheet.update_row_index()

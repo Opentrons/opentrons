@@ -25,10 +25,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
-import {
-  ProtocolRunSetup,
-  initialMissingSteps,
-} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
@@ -187,10 +184,6 @@ function PageContents(props: PageContentsProps): JSX.Element {
     }
   }, [jumpedIndex])
 
-  const [missingSteps, setMissingSteps] = useState<
-    ReturnType<typeof initialMissingSteps>
-  >(initialMissingSteps())
-
   const makeHandleScrollToStep = (i: number) => () => {
     listRef.current?.scrollToIndex(i, true, -1 * JUMP_OFFSET_FROM_TOP_PX)
   }
@@ -210,8 +203,6 @@ function PageContents(props: PageContentsProps): JSX.Element {
           protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
-          setMissingSteps={setMissingSteps}
-          missingSteps={missingSteps}
         />
       ),
       backToTop: (
@@ -269,7 +260,6 @@ function PageContents(props: PageContentsProps): JSX.Element {
         robotName={robotName}
         runId={runId}
         makeHandleJumpToStep={makeHandleJumpToStep}
-        missingSetupSteps={missingSteps}
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab

@@ -107,6 +107,10 @@ const FOOTPRINT_DIAGRAMS: Diagrams = {
     new URL(FOOTPRINT_IMAGE_RELATIVE_PATH, import.meta.url).href,
     new URL(DIMENSIONS_HEIGHT_PLATE_IMAGE_RELATIVE_PATH, import.meta.url).href,
   ],
+  lid: [
+    new URL(FOOTPRINT_IMAGE_RELATIVE_PATH, import.meta.url).href,
+    new URL(DIMENSIONS_HEIGHT_PLATE_IMAGE_RELATIVE_PATH, import.meta.url).href,
+  ],
 }
 
 const ALUM_BLOCK_FOOTPRINTS: Diagrams = {

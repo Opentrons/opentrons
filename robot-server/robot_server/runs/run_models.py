@@ -147,6 +147,10 @@ class Run(ResourceModel):
             " if none are specified in the request."
         ),
     )
+    outputFileIds: List[str] = Field(
+        ...,
+        description="File IDs of files output during a protocol run.",
+    )
     protocolId: Optional[str] = Field(
         None,
         description=(
@@ -223,6 +227,10 @@ class BadRun(ResourceModel):
             " specified either in the run creation request or default values from the protocol"
             " if none are specified in the request."
         ),
+    )
+    outputFileIds: List[str] = Field(
+        ...,
+        description="File IDs of files output during a protocol run.",
     )
     protocolId: Optional[str] = Field(
         None,

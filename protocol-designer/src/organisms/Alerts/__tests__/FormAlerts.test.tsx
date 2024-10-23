@@ -54,9 +54,9 @@ describe('FormAlerts', () => {
       },
     ])
     render(props)
-    screen.getByText('Moving labware into waste chute')
+    screen.getByText('Disposing liquid-filled labware')
     screen.getByText(
-      'This labware has remaining liquid, be advised that once you dispose of it, there is no way to get it back later in the protocol.'
+      'This step moves a labware that contains liquid to the waste chute. There is no way to retrieve the liquid after disposal.'
     )
     fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(vi.mocked(dismissTimelineWarning)).toHaveBeenCalled()

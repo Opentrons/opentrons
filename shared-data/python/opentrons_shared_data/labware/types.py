@@ -7,8 +7,8 @@ from typing import Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict, NotRequired
 from .labware_definition import InnerWellGeometry
 from .constants import (
-    Circular,
-    Rectangular,
+    CircularType,
+    RectangularType,
 )
 
 LabwareUri = NewType("LabwareUri", str)
@@ -22,6 +22,7 @@ LabwareDisplayCategory = Union[
     Literal["aluminumBlock"],
     Literal["adapter"],
     Literal["other"],
+    Literal["lid"],
 ]
 
 LabwareFormat = Union[
@@ -83,7 +84,7 @@ class LabwareDimensions(TypedDict):
 
 
 class CircularWellDefinition(TypedDict):
-    shape: Circular
+    shape: CircularType
     depth: float
     totalLiquidVolume: float
     x: float
@@ -94,7 +95,7 @@ class CircularWellDefinition(TypedDict):
 
 
 class RectangularWellDefinition(TypedDict):
-    shape: Rectangular
+    shape: RectangularType
     depth: float
     totalLiquidVolume: float
     x: float

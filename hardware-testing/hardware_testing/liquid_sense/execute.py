@@ -4,7 +4,7 @@ import time
 from enum import Enum
 from typing import Dict, Any, List, Tuple, Optional
 from .report import store_tip_results, store_trial, store_baseline_trial
-from opentrons.config.types import LiquidProbeSettings, OutputOptions
+from opentrons.config.types import LiquidProbeSettings
 from .__main__ import RunArgs
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.helpers import (
@@ -445,13 +445,11 @@ def _run_trial(
         plunger_speed=plunger_speed,
         plunger_impulse_time=0.2,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        output_option=OutputOptions.sync_buffer_to_csv,
         aspirate_while_sensing=run_args.aspirate,
         z_overlap_between_passes_mm=0.1,
         plunger_reset_offset=2.0,
         samples_for_baselining=20,
         sample_time_sec=0.004,
-        data_files=data_files,
     )
 
     hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT

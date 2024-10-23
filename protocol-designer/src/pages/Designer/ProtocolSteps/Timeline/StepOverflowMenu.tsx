@@ -12,178 +12,79 @@ import {
   NO_WRAP,
   POSITION_ABSOLUTE,
   SPACING,
-  useConditionalConfirm,
 } from '@opentrons/components'
-import { actions as steplistActions } from '../../../../steplist'
-import {
-  getMultiSelectItemIds,
-  actions as stepsActions,
-} from '../../../../ui/steps'
-import {
-  CLOSE_BATCH_EDIT_FORM,
-  CLOSE_STEP_FORM_WITH_CHANGES,
-  CLOSE_UNSAVED_STEP_FORM,
-  ConfirmDeleteModal,
-  DELETE_MULTIPLE_STEP_FORMS,
-  DELETE_STEP_FORM,
-} from '../../../../components/modals/ConfirmDeleteModal'
+import { actions as stepsActions } from '../../../../ui/steps'
 import {
   hoverOnStep,
   toggleViewSubstep,
-  populateForm,
-  deselectAllSteps,
 } from '../../../../ui/steps/actions/actions'
 import {
   getBatchEditFormHasUnsavedChanges,
   getCurrentFormHasUnsavedChanges,
-  getCurrentFormIsPresaved,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
-import { deleteMultipleSteps } from '../../../../steplist/actions'
-import { duplicateMultipleSteps } from '../../../../ui/steps/actions/thunks'
-import type * as React from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../../types'
 import type { StepIdType } from '../../../../form-types'
-import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
 
 interface StepOverflowMenuProps {
   stepId: string
   menuRootRef: React.MutableRefObject<HTMLDivElement | null>
   top: number
   setStepOverflowMenu: React.Dispatch<React.SetStateAction<boolean>>
+  handleEdit: () => void
+  confirmDelete: () => void
+  confirmMultiDelete: () => void
+  multiSelectItemIds: string[] | null
 }
 
 export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
-  const { stepId, menuRootRef, top, setStepOverflowMenu } = props
+  const {
+    stepId,
+    menuRootRef,
+    top,
+    setStepOverflowMenu,
+    handleEdit,
+    confirmDelete,
+    confirmMultiDelete,
+    multiSelectItemIds,
+  } = props
   const { t } = useTranslation('protocol_steps')
-  const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const deleteStep = (stepId: StepIdType): void => {
-    dispatch(steplistActions.deleteStep(stepId))
-  }
-  const formData = useSelector(getUnsavedForm)
-  const savedStepFormData = useSelector(getSavedStepForms)[stepId]
-  const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const singleEditFormHasUnsavedChanges = useSelector(
     getCurrentFormHasUnsavedChanges
   )
-  const batchEditFormHasUnsavedChanges = useSelector(
+  const batchEditFormHasUnstagedChanges = useSelector(
     getBatchEditFormHasUnsavedChanges
   )
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
+  const formData = useSelector(getUnsavedForm)
+  const savedStepFormData = useSelector(getSavedStepForms)[stepId]
+  const isPipetteStep =
+    savedStepFormData.stepType === 'moveLiquid' ||
+    savedStepFormData.stepType === 'mix'
+  const isThermocyclerProfile = savedStepFormData.stepType === 'thermocycler'
+
   const duplicateStep = (
     stepId: StepIdType
   ): ReturnType<typeof stepsActions.duplicateStep> =>
     dispatch(stepsActions.duplicateStep(stepId))
 
-  const handleStepItemSelection = (): void => {
-    dispatch(populateForm(stepId))
-    setStepOverflowMenu(false)
-  }
-  const handleDelete = (): void => {
-    if (stepId != null) {
-      deleteStep(stepId)
-    } else {
-      console.warn(
-        'something went wrong, cannot delete a step without a step id'
-      )
-    }
-  }
-  const onDuplicateClickAction = (): void => {
+  const duplicateMultipleSteps = (): void => {
     if (multiSelectItemIds) {
-      dispatch(duplicateMultipleSteps(multiSelectItemIds))
+      dispatch(stepsActions.duplicateMultipleSteps(multiSelectItemIds))
     } else {
       console.warn(
         'something went wrong, you cannot duplicate multiple steps if none are selected'
       )
     }
   }
-  const onDeleteClickAction = (): void => {
-    if (multiSelectItemIds) {
-      dispatch(deleteMultipleSteps(multiSelectItemIds))
-      dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
-    } else {
-      console.warn(
-        'something went wrong, you cannot delete multiple steps if none are selected'
-      )
-    }
-  }
-
-  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    handleStepItemSelection,
-    currentFormIsPresaved || singleEditFormHasUnsavedChanges
-  )
-  const {
-    confirm: confirmDuplicate,
-    showConfirmation: showDuplicateConfirmation,
-    cancel: cancelDuplicate,
-  } = useConditionalConfirm(
-    onDuplicateClickAction,
-    batchEditFormHasUnsavedChanges
-  )
-
-  const {
-    confirm: confirmMultiDelete,
-    showConfirmation: showMultiDeleteConfirmation,
-    cancel: cancelMultiDelete,
-  } = useConditionalConfirm(onDeleteClickAction, true)
-
-  const {
-    confirm: confirmDelete,
-    showConfirmation: showDeleteConfirmation,
-    cancel: cancelDelete,
-  } = useConditionalConfirm(handleDelete, true)
-
-  const getModalType = (): DeleteModalType => {
-    if (currentFormIsPresaved) {
-      return CLOSE_UNSAVED_STEP_FORM
-    } else {
-      return CLOSE_STEP_FORM_WITH_CHANGES
-    }
-  }
-  const isPipetteStep =
-    savedStepFormData.stepType === 'moveLiquid' ||
-    savedStepFormData.stepType === 'mix'
-  const isThermocyclerStep = savedStepFormData.stepType === 'thermocycler'
 
   return (
     <>
-      {/* TODO: update this modal */}
-      {showConfirmation && (
-        <ConfirmDeleteModal
-          modalType={getModalType()}
-          onContinueClick={confirm}
-          onCancelClick={cancel}
-        />
-      )}
-      {/* TODO: update this modal */}
-      {showDuplicateConfirmation && (
-        <ConfirmDeleteModal
-          modalType={CLOSE_BATCH_EDIT_FORM}
-          onContinueClick={confirmDuplicate}
-          onCancelClick={cancelDuplicate}
-        />
-      )}
-      {/* TODO: update this modal */}
-      {showMultiDeleteConfirmation && (
-        <ConfirmDeleteModal
-          modalType={DELETE_MULTIPLE_STEP_FORMS}
-          onContinueClick={confirmMultiDelete}
-          onCancelClick={cancelMultiDelete}
-        />
-      )}
-      {/* TODO: update this modal */}
-      {showDeleteConfirmation && (
-        <ConfirmDeleteModal
-          modalType={DELETE_STEP_FORM}
-          onCancelClick={cancelDelete}
-          onContinueClick={confirmDelete}
-        />
-      )}
       <Flex
         ref={menuRootRef}
-        zIndex={5}
+        zIndex={12}
         top={top}
         left="19.5rem"
         position={POSITION_ABSOLUTE}
@@ -199,21 +100,35 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
       >
         {multiSelectItemIds != null && multiSelectItemIds.length > 0 ? (
           <>
-            <MenuButton onClick={confirmDuplicate}>
+            <MenuButton
+              disabled={batchEditFormHasUnstagedChanges}
+              onClick={() => {
+                duplicateMultipleSteps()
+                setStepOverflowMenu(false)
+              }}
+            >
               {t('duplicate_steps')}
             </MenuButton>
-            <MenuButton onClick={confirmMultiDelete}>
+            <Divider marginY="0" />
+            <MenuButton
+              onClick={() => {
+                confirmMultiDelete()
+                setStepOverflowMenu(false)
+              }}
+            >
               {t('delete_steps')}
             </MenuButton>
           </>
         ) : (
           <>
             {formData != null ? null : (
-              <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
+              <MenuButton onClick={handleEdit}>{t('edit_step')}</MenuButton>
             )}
-            {isPipetteStep || isThermocyclerStep ? (
+            {isPipetteStep || isThermocyclerProfile ? (
               <MenuButton
+                disabled={formData != null}
                 onClick={() => {
+                  setStepOverflowMenu(false)
                   dispatch(hoverOnStep(stepId))
                   dispatch(toggleViewSubstep(stepId))
                 }}
@@ -222,14 +137,23 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
               </MenuButton>
             ) : null}
             <MenuButton
+              disabled={singleEditFormHasUnsavedChanges}
               onClick={() => {
                 duplicateStep(stepId)
+                setStepOverflowMenu(false)
               }}
             >
               {t('duplicate')}
             </MenuButton>
             <Divider marginY="0" />
-            <MenuButton onClick={confirmDelete}>{t('delete')}</MenuButton>
+            <MenuButton
+              onClick={() => {
+                confirmDelete()
+                setStepOverflowMenu(false)
+              }}
+            >
+              {t('delete')}
+            </MenuButton>
           </>
         )}
       </Flex>
@@ -253,5 +177,8 @@ const MenuButton = styled.button`
   &:disabled {
     color: ${COLORS.grey40};
     cursor: auto;
+    &:hover {
+      background-color: ${COLORS.transparent};
+    }
   }
 `

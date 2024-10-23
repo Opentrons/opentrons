@@ -61,6 +61,7 @@ export interface LegacyGoodRunData {
 export interface KnownGoodRunData extends LegacyGoodRunData {
   ok: true
   runTimeParameters: RunTimeParameter[]
+  outputFileIds: string[]
 }
 
 export interface KnownInvalidRunData extends LegacyGoodRunData {
@@ -99,7 +100,7 @@ export interface RunsLinks {
 }
 
 export interface RunCommandLink {
-  current: CommandLinkNoMeta
+  lastCompleted: CommandLinkNoMeta
 }
 
 export interface CommandLinkNoMeta {

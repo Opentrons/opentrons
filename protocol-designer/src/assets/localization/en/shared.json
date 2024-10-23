@@ -37,6 +37,7 @@
   "labware_detail": "Labware detail",
   "labware_name_conflict": "Duplicate labware name",
   "labware": "Labware",
+  "learn_more": "Learn more about the recent changes in the {{version}} release.",
   "left_right": "Left+Right",
   "left": "Left",
   "liquid": "Liquid",
@@ -118,6 +119,7 @@
   "temperaturemoduletype": "Temperature Module",
   "thermocyclermoduletype": "Thermocycler Module",
   "trashBin": "Trash Bin",
+  "updated_protocol_designer": "We've updated Protocol Designer!",
   "user_settings": "User settings",
   "uses_standard_namespace": "Opentrons verified labware",
   "version": "Version {{version}}",
@@ -125,7 +127,7 @@
   "warning": "WARNING:",
   "wasteChute": "Waste chute",
   "wasteChuteAndStagingArea": "Waste chute and staging area slot",
-  "we_are_improving": "We’re working to improve Protocol Designer. Part of the process involves watching real user sessions to understand which parts of the interface are working and which could use improvement. We never share sessions outside of Opentrons.",
+  "we_are_improving": "In order to improve our products, Opentrons would like to collect data related to your use of Protocol Designer. With your consent, Opentrons will collect and store analytics and session data, including through the use of cookies and similar technologies, solely for the purpose enhancing our products. Find detailed information in our <link1>privacy policy</link1>. By using Protocol Designer, you consent to the Opentrons <link2>EULA</link2>.",
   "welcome": "Welcome to Protocol Designer!",
   "yes": "Yes"
 }
