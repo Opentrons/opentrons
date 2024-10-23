@@ -128,10 +128,6 @@ class WellView(HasState[WellState]):
         """
         self._state = state
 
-    # if volume requested, loaded_volumes or probed_volumes
-    # if height requested, probed_heights or loaded_vols_to_height or probed_vols_to_height
-    # to get height, call GeometryView.get_well_height, which does conversion if needed
-
     def get_all(
         self,
     ) -> List[Union[ProbedHeightSummary, ProbedVolumeSummary, LoadedVolumeSummary]]:

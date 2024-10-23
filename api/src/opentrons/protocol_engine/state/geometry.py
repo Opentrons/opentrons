@@ -1488,10 +1488,10 @@ class GeometryView:
         volume: float,
     ) -> None:
         """Raise InvalidDispenseVolumeError if planned dispense volume will overflow well."""
-        # update this (or where it's used)? Consider how many conversions are being done
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_volumetric_capacity = well_def.totalLiquidVolume
         if well_location.origin == WellOrigin.MENISCUS:
+            # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
             well_geometry = self._labware.get_well_geometry(labware_id, well_name)
             meniscus_height = self.get_meniscus_height(
                 labware_id=labware_id, well_name=well_name
