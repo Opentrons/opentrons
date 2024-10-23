@@ -14,7 +14,7 @@ import {
   RELEASE_GRIPPER_JAW,
   buildPickUpTips,
   buildIgnorePolicyRules,
-  HOME_GRIPPER_Z_AXIS,
+  HOME_GRIPPER,
 } from '../useRecoveryCommands'
 import { RECOVERY_MAP } from '../../constants'
 
@@ -271,10 +271,7 @@ describe('useRecoveryCommands', () => {
       await result.current.homeGripper()
     })
 
-    expect(mockChainRunCommands).toHaveBeenCalledWith(
-      [HOME_GRIPPER_Z_AXIS],
-      false
-    )
+    expect(mockChainRunCommands).toHaveBeenCalledWith([HOME_GRIPPER], false)
   })
 
   it('should call skipFailedCommand and show success toast on success', async () => {

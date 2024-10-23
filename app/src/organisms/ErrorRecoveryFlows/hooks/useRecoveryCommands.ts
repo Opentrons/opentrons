@@ -270,11 +270,7 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands])
 
   const homeGripper = useCallback((): Promise<CommandData[]> => {
-    const gripperAxis =
-      failedCommandByRunRecord?.error?.errorCode === '2003'
-        ? HOME_GRIPPER
-        : HOME_GRIPPER_Z_AXIS
-    return chainRunRecoveryCommands([gripperAxis])
+    return chainRunRecoveryCommands([HOME_GRIPPER])
   }, [chainRunRecoveryCommands])
 
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
@@ -311,12 +307,6 @@ export const HOME_PIPETTE_Z_AXES: CreateCommand = {
 export const RELEASE_GRIPPER_JAW: CreateCommand = {
   commandType: 'unsafe/ungripLabware',
   params: {},
-  intent: 'fixit',
-}
-
-export const HOME_GRIPPER_Z_AXIS: CreateCommand = {
-  commandType: 'home',
-  params: { axes: ['extensionZ'] },
   intent: 'fixit',
 }
 
