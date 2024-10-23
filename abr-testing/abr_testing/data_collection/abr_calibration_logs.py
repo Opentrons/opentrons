@@ -75,10 +75,6 @@ def module_helper(
         for module in range(len(modules)):
             one_module = modules[module]
             mod_serial = one_module["serialNumber"]
-            modified = "No data"
-            x = ""
-            y = ""
-            z = ""
             try:
                 modified = one_module["moduleOffset"].get("last_modified", "")
                 x = one_module["moduleOffset"]["offset"].get("x", "")
@@ -117,11 +113,14 @@ def deck_helper(
     )
     # DECK DATA
     deck = calibration_log["Deck"]
-    deck_modified = deck["data"].get("lastModified", "")
+    deck_modified = deck["data"].get("lastModified")
     slots = ["D3", "D1", "A1"]
     pipette_calibrated_with = deck["data"].get("pipetteCalibratedWith", "")
     for i in range(len(deck["data"]["matrix"])):
-        if slots[i] in deck_sheet_serials and deck_modified in deck_sheet_modify_dates:
+        if (
+            deck_modified in deck_sheet_modify_dates
+            and pipette_calibrated_with in deck_sheet_serials
+        ):
             continue
         coords = deck["data"]["matrix"][i]
         x = coords[0]
@@ -206,13 +205,13 @@ def upload_calibration_offsets(
             inst_sheet_serials = sheet.get_column(8)
             inst_sheet_modify_dates = sheet.get_column(15)
         if i == 1:
-            module_sheet_serials = sheet.get_column(8)
+            module_sheet_serials = sheet.get_column(6)
             module_modify_dates = sheet.get_column(15)
         elif i == 2:
-            deck_sheet_serials = sheet.get_column(6)
+            deck_sheet_serials = sheet.get_column(5)
             deck_sheet_modify_dates = sheet.get_column(10)
 
-    # Go through caliration logs and deterine what should be added to the sheet
+    # Go through calibration logs and determine what should be added to the sheet
     for calibration_log in calibration_data:
         for sheet_ind, sheet in enumerate(sheets):
             if sheet_ind == 0:
@@ -316,7 +315,7 @@ def run(
             google_sheet_deck,
             google_sheet_name,
         )
-        print("Successfully uploaded callibration data!")
+        print("Successfully uploaded calibration data!")
     except Exception:
         print("No calibration data to upload: ")
         traceback.print_exc()
