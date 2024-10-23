@@ -47,12 +47,11 @@ export function pipetteHasTip(): CommandCreatorError {
 }
 
 export function pipetteDoesNotExist(args: {
-  actionName: string
   pipette: string
 }): CommandCreatorError {
-  const { actionName, pipette } = args
+  const { pipette } = args
   return {
-    message: `Attempted to ${actionName} with pipette id "${pipette}", this pipette was not found under "pipettes"`,
+    message: `This step tries to use the ${pipette}. Add the pipette to your protocol or change the step to use a different pipette.`,
     type: 'PIPETTE_DOES_NOT_EXIST',
   }
 }
@@ -77,7 +76,7 @@ export function labwareDoesNotExist(args: {
     `Attempted to ${actionName} with labware id "${labware}", this labware was not found under "labware"`
   )
   return {
-    message: 'A step involves labware that has been deleted',
+    message: `This step tries to use ${labware}. Add the labware to your protocol or change the step to use a different labware.`,
     type: 'LABWARE_DOES_NOT_EXIST',
   }
 }
@@ -102,9 +101,9 @@ export function tipVolumeExceeded(args: {
   volume: string | number
   maxVolume: string | number
 }): CommandCreatorError {
-  const { actionName, volume, maxVolume } = args
+  const { volume, maxVolume, actionName } = args
   return {
-    message: `Attempted to ${actionName} volume greater than tip max volume (${volume} > ${maxVolume})`,
+    message: `This step tries to ${actionName} ${volume}μL, but the tip can only hold ${maxVolume}μL.`,
     type: 'TIP_VOLUME_EXCEEDED',
   }
 }
@@ -119,7 +118,7 @@ export function pipetteVolumeExceeded(args: {
   const message =
     disposalVolume != null
       ? `Attemped to ${actionName} volume + disposal volume greater than pipette max volume (${volume} + ${disposalVolume} > ${maxVolume})`
-      : `Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`
+      : `This step tries to ${actionName} ${volume}μL, but the tip can only hold ${maxVolume}μL.`
   return {
     message,
     type: 'PIPETTE_VOLUME_EXCEEDED',
@@ -236,7 +235,7 @@ export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
 export const equipmentDoesNotExist = (): CommandCreatorError => {
   return {
     type: 'EQUIPMENT_DOES_NOT_EXIST',
-    message: `The equipment does not exist`,
+    message: `Equipment does not exist.`,
   }
 }
 
