@@ -107,7 +107,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                 push_out=params.pushOut,
             )
         except PipetteOverpressureError as e:
-            # can we get aspirated_amount_prior_to_error? If not, can we assume no liquid was removed from well? Ask Ryan
+            # can we get dispensed_amount_prior_to_error? If not, can we assume no liquid was added to well? Ask Ryan
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),

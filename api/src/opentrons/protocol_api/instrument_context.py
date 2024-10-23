@@ -765,7 +765,7 @@ class InstrumentContext(publisher.CommandPublisher):
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
         self.move_to(target, publish=False)
-        self.aspirate(volume)
+        self.aspirate(volume) # add (is_liquid: bool = True) parameter to aspirate? Or deduce location is not in well in Aspirate command?
         return self
 
     @publisher.publish(command=cmds.return_tip)
