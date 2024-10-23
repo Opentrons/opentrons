@@ -11,6 +11,7 @@ from opentrons.protocol_engine.errors.exceptions import (
     MustHomeError,
     PipetteNotReadyToAspirateError,
     TipNotEmptyError,
+    IncompleteLabwareDefinitionError,
 )
 from opentrons.types import MountType
 from opentrons_shared_data.errors.exceptions import (
@@ -227,11 +228,14 @@ class LiquidProbeImplementation(
                 state_update=state_update,
             )
         else:
-            well_volume = self._state_view.geometry.get_well_volume_at_height(
-                labware_id=params.labwareId,
-                well_name=params.wellName,
-                height=z_pos_or_error,
-            )
+            try:
+                well_volume = self._state_view.geometry.get_well_volume_at_height(
+                    labware_id=params.labwareId,
+                    well_name=params.wellName,
+                    height=z_pos_or_error,
+                )
+            except IncompleteLabwareDefinitionError:
+                well_volume = None
             state_update.set_liquid_probed(
                 labware_id=params.labwareId,
                 well_name=params.wellName,
@@ -282,9 +286,12 @@ class TryLiquidProbeImplementation(
             well_volume = None
         else:
             z_pos = z_pos_or_error
-            well_volume = self._state_view.geometry.get_well_volume_at_height(
-                labware_id=params.labwareId, well_name=params.wellName, height=z_pos
-            )
+            try:
+                well_volume = self._state_view.geometry.get_well_volume_at_height(
+                    labware_id=params.labwareId, well_name=params.wellName, height=z_pos
+                )
+            except IncompleteLabwareDefinitionError:
+                well_volume = None
 
         state_update.set_liquid_probed(
             labware_id=params.labwareId,

@@ -460,6 +460,17 @@ def test_get_well_definition_get_first(well_plate_def: LabwareDefinition) -> Non
     assert result == expected_well_def
 
 
+def test_get_well_geometry_raises_error(well_plate_def: LabwareDefinition) -> None:
+    """It should raise an IncompleteLabwareDefinitionError when there's no innerLabwareGeometry."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
+    )
+
+    with pytest.raises(errors.IncompleteLabwareDefinitionError):
+        subject.get_well_geometry(labware_id="plate-id")
+
+
 def test_get_well_size_circular(well_plate_def: LabwareDefinition) -> None:
     """It should return the well dimensions of a circular well."""
     subject = get_labware_view(

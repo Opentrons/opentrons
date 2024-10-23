@@ -1,17 +1,19 @@
 """Public protocol run data models."""
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Union
 from datetime import datetime
 
 from ..errors import ErrorOccurrence
 from ..types import (
     EngineStatus,
-    LiquidHeightSummary,
     LoadedLabware,
     LabwareOffset,
     LoadedModule,
     LoadedPipette,
     Liquid,
+    LoadedVolumeSummary,
+    ProbedHeightSummary,
+    ProbedVolumeSummary,
 )
 
 
@@ -30,5 +32,7 @@ class StateSummary(BaseModel):
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
     liquids: List[Liquid] = Field(default_factory=list)
-    wells: List[LiquidHeightSummary] = Field(default_factory=list)
+    wells: List[
+        Union[LoadedVolumeSummary, ProbedHeightSummary, ProbedVolumeSummary]
+    ] = Field(default_factory=list)
     files: List[str] = Field(default_factory=list)

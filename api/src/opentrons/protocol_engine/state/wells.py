@@ -1,12 +1,14 @@
 """Basic well data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from opentrons.protocol_engine.types import (
     ProbedHeightInfo,
     ProbedVolumeInfo,
     LoadedVolumeInfo,
-    LiquidHeightSummary,
+    ProbedHeightSummary,
+    ProbedVolumeSummary,
+    LoadedVolumeSummary,
 )
 
 from . import update_types
@@ -36,11 +38,11 @@ class WellStore(HasState[WellState], HandlesActions):
         """Modify state in reaction to an action."""
         state_update = get_state_update(action)
         if state_update is not None:
-            self._handle_loaded_liquid_update(state_update)
-            self._handle_probed_liquid_update(state_update)
-            self._handle_operated_liquid_update(state_update)
+            self._handle_liquid_loaded_update(state_update)
+            self._handle_liquid_probed_update(state_update)
+            self._handle_liquid_operated_update(state_update)
 
-    def _handle_loaded_liquid_update(
+    def _handle_liquid_loaded_update(
         self, state_update: update_types.StateUpdate
     ) -> None:
         if state_update.liquid_loaded != update_types.NO_CHANGE:
@@ -54,7 +56,7 @@ class WellStore(HasState[WellState], HandlesActions):
                     operations_since_load=0,
                 )
 
-    def _handle_probed_liquid_update(
+    def _handle_liquid_probed_update(
         self, state_update: update_types.StateUpdate
     ) -> None:
         if state_update.liquid_probed != update_types.NO_CHANGE:
@@ -74,7 +76,7 @@ class WellStore(HasState[WellState], HandlesActions):
                 operations_since_probe=0,
             )
 
-    def _handle_operated_liquid_update(
+    def _handle_liquid_operated_update(
         self, state_update: update_types.StateUpdate
     ) -> None:
         if state_update.liquid_operated != update_types.NO_CHANGE:
@@ -130,60 +132,71 @@ class WellView(HasState[WellState]):
     # if height requested, probed_heights or loaded_vols_to_height or probed_vols_to_height
     # to get height, call GeometryView.get_well_height, which does conversion if needed
 
-    # update this
-    def get_all(self) -> List[LiquidHeightSummary]:
-        """Get all well liquid heights."""
-        all_heights: List[LiquidHeightSummary] = []
-        for labware, wells in self._state.probed_heights.items():
-            for well, lhi in wells.items():
-                lhs = LiquidHeightSummary(
-                    labware_id=labware,
-                    well_name=well,
-                    height=lhi.height,
-                    last_measured=lhi.last_probed,
+    def get_all(
+        self,
+    ) -> List[Union[ProbedHeightSummary, ProbedVolumeSummary, LoadedVolumeSummary]]:
+        """Get all well liquid info summaries."""
+        all_summaries: List[
+            Union[ProbedHeightSummary, ProbedVolumeSummary, LoadedVolumeSummary]
+        ] = []
+        for lv_labware, lv_wells in self._state.loaded_volumes.items():
+            for lv_well, lvi in lv_wells.items():
+                lvs = LoadedVolumeSummary(
+                    labware_id=lv_labware,
+                    well_name=lv_well,
+                    volume=lvi.volume,
+                    last_loaded=lvi.last_loaded,
+                    operations_since_load=lvi.operations_since_load,
                 )
-            all_heights.append(lhs)
-        return all_heights
+                all_summaries.append(lvs)
+        for ph_labware, ph_wells in self._state.probed_heights.items():
+            for ph_well, phi in ph_wells.items():
+                phs = ProbedHeightSummary(
+                    labware_id=ph_labware,
+                    well_name=ph_well,
+                    height=phi.height,
+                    last_probed=phi.last_probed,
+                )
+                all_summaries.append(phs)
+        for pv_labware, pv_wells in self._state.probed_volumes.items():
+            for pv_well, pvi in pv_wells.items():
+                pvs = ProbedVolumeSummary(
+                    labware_id=pv_labware,
+                    well_name=pv_well,
+                    volume=pvi.volume,
+                    last_probed=pvi.last_probed,
+                    operations_since_probe=pvi.operations_since_probe,
+                )
+                all_summaries.append(pvs)
+        return all_summaries
 
-    # update this
-    def get_all_in_labware(self, labware_id: str) -> List[LiquidHeightSummary]:
-        """Get all well liquid heights for a particular labware."""
-        all_heights: List[LiquidHeightSummary] = []
-        for well, lhi in self._state.probed_heights[labware_id].items():
-            lhs = LiquidHeightSummary(
-                labware_id=labware_id,
-                well_name=well,
-                height=lhi.height,
-                last_measured=lhi.last_probed,
-            )
-            all_heights.append(lhs)
-        return all_heights
-
-    def get_last_measured_liquid_height(
+    def get_well_liquid_info(
         self, labware_id: str, well_name: str
-    ) -> Optional[float]:
-        """Returns the height of the liquid according to the most recent liquid level probe to this well.
-
-        Returns None if no liquid probe has been done.
-        """
-        try:
-            height = self._state.probed_heights[labware_id][well_name].height
-            return height
-        except KeyError:
-            return None
-
-    def has_measured_liquid_height(self, labware_id: str, well_name: str) -> bool:
-        """Returns True if the well has been liquid level probed previously."""
-        try:
-            return bool(self._state.probed_heights[labware_id][well_name].height)
-        except KeyError:
-            return False
-
-    def get_well_liquid_values(
-        self, labware_id: str, well_name: str
-    ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
-        """Return all the liquid values for a well."""
-        loaded_volume = self._state.loaded_volumes[labware_id][well_name].volume
-        probed_height = self._state.probed_heights[labware_id][well_name].height
-        probed_volume = self._state.probed_volumes[labware_id][well_name].volume
-        return loaded_volume, probed_height, probed_volume
+    ) -> Tuple[
+        Optional[LoadedVolumeInfo],
+        Optional[ProbedHeightInfo],
+        Optional[ProbedVolumeInfo],
+    ]:
+        """Return all the liquid info for a well."""
+        if (
+            labware_id not in self._state.loaded_volumes
+            or well_name not in self._state.loaded_volumes[labware_id]
+        ):
+            loaded_volume_info = None
+        else:
+            loaded_volume_info = self._state.loaded_volumes[labware_id][well_name]
+        if (
+            labware_id not in self._state.probed_heights
+            or well_name not in self._state.probed_heights[labware_id]
+        ):
+            probed_height_info = None
+        else:
+            probed_height_info = self._state.probed_heights[labware_id][well_name]
+        if (
+            labware_id not in self._state.probed_volumes
+            or well_name not in self._state.probed_volumes[labware_id]
+        ):
+            probed_volume_info = None
+        else:
+            probed_volume_info = self._state.probed_volumes[labware_id][well_name]
+        return loaded_volume_info, probed_height_info, probed_volume_info

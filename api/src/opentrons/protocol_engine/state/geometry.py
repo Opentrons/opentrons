@@ -1371,7 +1371,7 @@ class GeometryView:
 
         Distance is with reference to the well bottom.
         """
-        # refactor? Consider how many conversions are being done
+        # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
         initial_handling_height = self.get_well_handling_height(
             labware_id=labware_id,
             well_name=well_name,
@@ -1402,25 +1402,23 @@ class GeometryView:
     ) -> float:
         """Returns stored meniscus height in specified well."""
         (
-            loaded_volume,
-            probed_height,
-            probed_volume,
-        ) = self._wells.get_well_liquid_values(
-            labware_id=labware_id, well_name=well_name
-        )
-        if probed_height:
-            return probed_height
-        elif loaded_volume:
+            loaded_volume_info,
+            probed_height_info,
+            probed_volume_info,
+        ) = self._wells.get_well_liquid_info(labware_id=labware_id, well_name=well_name)
+        if probed_height_info is not None and probed_height_info.height is not None:
+            return probed_height_info.height
+        elif loaded_volume_info is not None and loaded_volume_info.volume is not None:
             return self.get_well_height_at_volume(
                 labware_id=labware_id,
                 well_name=well_name,
-                volume=loaded_volume,
+                volume=loaded_volume_info.volume,
             )
-        elif probed_volume:
+        elif probed_volume_info is not None and probed_volume_info.volume is not None:
             return self.get_well_height_at_volume(
                 labware_id=labware_id,
                 well_name=well_name,
-                volume=probed_volume,
+                volume=probed_volume_info.volume,
             )
         else:
             raise errors.LiquidHeightUnknownError(
