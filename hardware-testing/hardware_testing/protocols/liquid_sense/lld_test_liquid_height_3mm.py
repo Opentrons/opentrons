@@ -53,7 +53,6 @@ VOLUMES_3MM_TOP_BOTTOM_15ML = {
 }
 SAME_TIP = True  # this is fine when using Ethanol (b/c it evaporates)
 RETURN_TIP = False
-NUM_TRIALS = 3
 DISPENSE_MM_FROM_MENISCUS = -0.5
 
 ASPIRATE_MM_FROM_MENISCUS = -2.0
@@ -87,6 +86,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     protocols.create_pipette_parameters(parameters)
     protocols.create_labware_parameters(parameters)
     protocols.create_tube_volume_parameter(parameters)
+    protocols.create_trials_parameter(parameters)
 
 
 _src_meniscus_height: Optional[float] = None
@@ -133,6 +133,7 @@ def _setup(
     Labware,
     Labware,
     int,
+    int,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
@@ -140,6 +141,7 @@ def _setup(
     # Pipette Types
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
+    num_trials = ctx.params.num_of_trials  # type: ignore[attr-defined]
     if left_mount != "None":
         probing_pipette = ctx.load_instrument(left_mount, "left")
     if right_mount != "None":
@@ -206,6 +208,7 @@ def _setup(
         reservoir,
         dial,
         tube_volume,
+        num_trials,
     )
 
 
@@ -314,7 +317,6 @@ def _test_for_finding_liquid_height(
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
     all_corrected_heights: List[float] = []
-
     for liq_tip, probe_tip, well in zip(liquid_tips, probing_tips, wells):
         trial_counter += 1
         # pickup probing tip, then measure Z-error
@@ -440,6 +442,7 @@ def run(ctx: ProtocolContext) -> None:
         reservoir,
         dial,
         tube_volume,
+        num_trials,
     ) = _setup(ctx)
     channels_liquid = liq_pipette.channels
     channels_probe = probe_pipette.channels
@@ -457,7 +460,7 @@ def run(ctx: ProtocolContext) -> None:
     except KeyError:
         volumes = [0.0, 0.0, 0.0]
         ctx.comment(f"No volumes loaded for labware {labware.load_name}")
-    assert min(stuff_lengths) >= NUM_TRIALS * len(volumes), f"{stuff_lengths}"
+    assert min(stuff_lengths) >= num_trials * len(volumes), f"{stuff_lengths}"
     for _vol in volumes:
         _test_for_finding_liquid_height(
             ctx,
@@ -465,14 +468,14 @@ def run(ctx: ProtocolContext) -> None:
             liq_pipette,
             probe_pipette,
             dial,
-            liquid_tips=test_tips_liquid[:NUM_TRIALS],
-            probing_tips=test_tips_probe[:NUM_TRIALS],
+            liquid_tips=test_tips_liquid[:num_trials],
+            probing_tips=test_tips_probe[:num_trials],
             src_well=reservoir["A1"],
-            wells=test_wells[:NUM_TRIALS],
+            wells=test_wells[:num_trials],
         )
-        test_wells = test_wells[NUM_TRIALS:]
-        test_tips_liquid = test_tips_liquid[NUM_TRIALS:]
-        test_tips_probe = test_tips_probe[NUM_TRIALS:]
+        test_wells = test_wells[num_trials:]
+        test_tips_liquid = test_tips_liquid[num_trials:]
+        test_tips_probe = test_tips_probe[num_trials:]
     if liq_pipette.has_tip:
         liq_pipette.return_tip() if RETURN_TIP else liq_pipette.drop_tip()
     if probe_pipette.has_tip:

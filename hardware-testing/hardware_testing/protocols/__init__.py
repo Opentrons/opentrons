@@ -5,6 +5,19 @@ from typing import List
 from opentrons.protocols.parameters.types import ParameterChoice
 
 
+def create_trials_parameter(parameters: ParameterContext) -> None:
+    """Create parameter for number of trials."""
+    # NOTE: Place function inside def add_parameters(parameters) in protocol.
+    # NOTE: Copy ctx.params.num_of_trials, ctx.params.right_mount # type: ignore[attr-defined]
+    parameters.add_int(
+        variable_name="num_of_trials",
+        display_name="Number of Trials",
+        minimum=1,
+        maximum=100,
+        default=5,
+    )
+
+
 def create_pipette_parameters(parameters: ParameterContext) -> None:
     """Create parameter for pipettes."""
     # NOTE: Place function inside def add_parameters(parameters) in protocol.
@@ -37,7 +50,7 @@ def create_pipette_parameters(parameters: ParameterContext) -> None:
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
-        default="flex_8channel_1000",
+        default="flex_1channel_1000",
     )
 
 
@@ -79,7 +92,7 @@ def create_labware_parameters(parameters: ParameterContext) -> None:
         display_name="Labware",
         description="Labware to probe.",
         choices=available_labware_choices,
-        default="opentrons_10_tuberack_nest_4x50ml_6x15ml_conical",
+        default="corning_24_wellplate_3.4ml_flat",
     )
 
 
@@ -107,7 +120,7 @@ def create_tube_volume_parameter(parameters: ParameterContext) -> None:
     parameters.add_int(
         variable_name="tube_volume",
         display_name="Tube Volume",
-        default=15,
+        default=50,
         minimum=15,
         maximum=50,
         unit="mL",
