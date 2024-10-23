@@ -1,11 +1,9 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach } from 'vitest'
 import * as auth0 from '@auth0/auth0-react'
-
 import { renderWithProviders } from './__testing-utils__'
 import { i18n } from './i18n'
 import { Loading } from './molecules/Loading'
-
 import { OpentronsAI } from './OpentronsAI'
 import { Landing } from './pages/Landing'
 import { useGetAccessToken } from './resources/hooks'
