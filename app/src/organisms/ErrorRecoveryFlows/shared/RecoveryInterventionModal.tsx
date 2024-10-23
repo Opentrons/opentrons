@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 
 import {
   Flex,
+  OVERFLOW_AUTO,
   OVERFLOW_HIDDEN,
   RESPONSIVENESS,
   SPACING,
@@ -56,19 +57,21 @@ const SMALL_MODAL_STYLE = css`
   height: 22rem;
   padding: ${SPACING.spacing32};
   width: 100%;
-  overflow: ${OVERFLOW_HIDDEN};
+  overflow-y: ${OVERFLOW_AUTO};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing32};
     height: 100%;
+    overflow: ${OVERFLOW_HIDDEN};
   }
 `
 const LARGE_MODAL_STYLE = css`
   height: 26.75rem;
   width: 100%;
-  overflow: ${OVERFLOW_HIDDEN};
+  overflow-y: ${OVERFLOW_AUTO};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 100%;
+    overflow: ${OVERFLOW_HIDDEN};
   }
 `

@@ -18,7 +18,6 @@ export const touchTip: CommandCreator<TouchTipParams> = (
   if (!pipetteData) {
     errors.push(
       pipetteDoesNotExist({
-        actionName,
         pipette,
       })
     )

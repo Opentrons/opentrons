@@ -3,10 +3,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   OVERFLOW_AUTO,
-  TYPOGRAPHY,
-  Link as LinkButton,
   COLORS,
   JUSTIFY_CENTER,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -18,6 +17,9 @@ import { mixpanelAtom, tokenAtom } from './resources/atoms'
 import { useGetAccessToken } from './resources/hooks'
 import { initializeMixpanel } from './analytics/mixpanel'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
+import { Header } from './molecules/Header'
+import { CLIENT_MAX_WIDTH } from './resources/constants'
+import { Footer } from './molecules/Footer'
 
 export function OpentronsAI(): JSX.Element | null {
   const { t } = useTranslation('protocol_generator')
@@ -69,27 +71,23 @@ export function OpentronsAI(): JSX.Element | null {
       <Flex
         height="100%"
         justifyContent={JUSTIFY_CENTER}
+        flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.grey10}
       >
-        <Flex maxWidth="1440px" flexDirection={DIRECTION_COLUMN}>
-          {/* this will be replaced by the header component */}
-          <Flex>
-            HEADER
-            <LinkButton
-              onClick={() => logout()}
-              textDecoration={TYPOGRAPHY.textDecorationUnderline}
-            >
-              {t('logout')}
-            </LinkButton>
-          </Flex>
+        <Header />
 
+        <Flex
+          width="100%"
+          height="100%"
+          maxWidth={CLIENT_MAX_WIDTH}
+          alignSelf={ALIGN_CENTER}
+        >
           <HashRouter>
             <OpentronsAIRoutes />
           </HashRouter>
-
-          {/* This will be replaced by the Footer component */}
-          <div>FOOTER</div>
         </Flex>
+
+        <Footer />
       </Flex>
     </div>
   )

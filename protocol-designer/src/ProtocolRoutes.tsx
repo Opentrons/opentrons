@@ -11,7 +11,6 @@ import {
   Kitchen,
   FileUploadMessagesModal,
   LabwareUploadModal,
-  AnnouncementModal,
 } from './organisms'
 
 import type { RouteProps } from './types'
@@ -63,7 +62,6 @@ export function ProtocolRoutes(): JSX.Element {
       <NavigationBar />
       <Kitchen>
         <Box width="100%">
-          <AnnouncementModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
           <Routes>

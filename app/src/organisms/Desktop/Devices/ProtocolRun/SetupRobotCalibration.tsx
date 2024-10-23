@@ -23,7 +23,7 @@ import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
-import type { StepKey } from './ProtocolRunSetup'
+import type { StepKey } from '/app/redux/protocol-runs'
 
 interface SetupRobotCalibrationProps {
   robotName: string

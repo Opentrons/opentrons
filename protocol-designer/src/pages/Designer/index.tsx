@@ -23,7 +23,8 @@ import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
-import { getFileMetadata } from '../../file-data/selectors'
+import { selectDesignerTab } from '../../file-data/actions'
+import { getDesignerTab, getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
@@ -53,9 +54,7 @@ export function Designer(): JSX.Element {
   const isNewProtocol = useSelector(selectors.getIsNewProtocol)
   const [liquidOverflowMenu, showLiquidOverflowMenu] = useState<boolean>(false)
   const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
-  const [tab, setTab] = useState<'startingDeck' | 'protocolSteps'>(
-    'startingDeck'
-  )
+  const tab = useSelector(getDesignerTab)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
 
@@ -73,7 +72,7 @@ export function Designer(): JSX.Element {
     text: t('protocol_starting_deck'),
     isActive: tab === 'startingDeck',
     onClick: () => {
-      setTab('startingDeck')
+      dispatch(selectDesignerTab({ tab: 'startingDeck' }))
     },
   }
   const protocolStepTab = {
@@ -81,7 +80,7 @@ export function Designer(): JSX.Element {
     isActive: tab === 'protocolSteps',
     onClick: () => {
       if (hasTrashEntity) {
-        setTab('protocolSteps')
+        dispatch(selectDesignerTab({ tab: 'protocolSteps' }))
       } else {
         makeSnackbar(t('trash_required') as string)
       }

@@ -8,7 +8,7 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -33,7 +33,13 @@ vi.mock('/app/redux/config')
 vi.mock('../RecoverySplash')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/local-resources/labware')
+vi.mock('@opentrons/shared-data', async () => {
+  const actual = await vi.importActual('@opentrons/shared-data')
+  return {
+    ...actual,
+    getLoadedLabwareDefinitionsByUri: vi.fn(),
+  }
+})
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -45,7 +51,6 @@ vi.mock('react-redux', async () => {
 describe('useErrorRecoveryFlows', () => {
   beforeEach(() => {
     vi.mocked(useCurrentlyRecoveringFrom).mockReturnValue('mockCommand' as any)
-    vi.mocked(getLabwareDefinitionsFromCommands).mockReturnValue([])
   })
 
   it('should have initial state of isERActive as false', () => {
@@ -143,7 +148,7 @@ describe('ErrorRecoveryFlows', () => {
       runStatus: RUN_STATUS_AWAITING_RECOVERY,
       failedCommandByRunRecord: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
-      protocolAnalysis: {} as any,
+      protocolAnalysis: null,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
     vi.mocked(RecoverySplash).mockReturnValue(<div>MOCK RUN PAUSED SPLASH</div>)
@@ -168,6 +173,7 @@ describe('ErrorRecoveryFlows', () => {
       intent: 'recovering',
       showTakeover: false,
     })
+    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
   })
 
   it('renders the wizard when showERWizard is true', () => {

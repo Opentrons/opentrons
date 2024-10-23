@@ -40,7 +40,8 @@ export function Landing(): JSX.Element | null {
   return (
     <Flex
       position={POSITION_RELATIVE}
-      margin={`${SPACING.spacing16} ${SPACING.spacing16}`}
+      margin={SPACING.spacing16}
+      marginBottom={0}
       borderRadius={BORDERS.borderRadius16}
       backgroundColor={COLORS.white}
       justifyContent={JUSTIFY_CENTER}

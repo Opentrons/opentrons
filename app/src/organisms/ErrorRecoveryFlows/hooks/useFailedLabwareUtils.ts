@@ -28,6 +28,7 @@ import type {
   MoveLabwareRunTimeCommand,
   LabwareLocation,
 } from '@opentrons/shared-data'
+import type { LabwareDisplayLocationSlotOnly } from '/app/local-resources/labware'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps } from './useERUtils'
 
@@ -35,14 +36,15 @@ interface UseFailedLabwareUtilsProps {
   failedCommandByRunRecord: ERUtilsProps['failedCommandByRunRecord']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   failedPipetteInfo: PipetteData | null
-  allRunDefs: LabwareDefinition2[]
   runCommands?: CommandsData
   runRecord?: Run
 }
 
 interface RelevantFailedLabwareLocations {
-  currentLoc: string
-  newLoc: string | null
+  displayNameCurrentLoc: string
+  displayNameNewLoc: string | null
+  currentLoc: LabwareLocation | null
+  newLoc: LabwareLocation | null
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
@@ -54,6 +56,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   relevantWellName: string | null
   /* The user-content nickname of the failed labware, if any */
   failedLabwareNickname: string | null
+  /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
 }
 
@@ -69,7 +72,6 @@ export function useFailedLabwareUtils({
   failedPipetteInfo,
   runCommands,
   runRecord,
-  allRunDefs,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const recentRelevantFailedLabwareCmd = useMemo(
     () =>
@@ -105,8 +107,7 @@ export function useFailedLabwareUtils({
   const failedLabwareLocations = useRelevantFailedLwLocations({
     failedLabware,
     failedCommandByRunRecord,
-    protocolAnalysis,
-    allRunDefs,
+    runRecord,
   })
 
   return {
@@ -337,9 +338,9 @@ export function getRelevantWellName(
   }
 }
 
-type GetRelevantLwLocationsParams = Pick<
+export type GetRelevantLwLocationsParams = Pick<
   UseFailedLabwareUtilsProps,
-  'protocolAnalysis' | 'failedCommandByRunRecord' | 'allRunDefs'
+  'runRecord' | 'failedCommandByRunRecord'
 > & {
   failedLabware: UseFailedLabwareUtilsResult['failedLabware']
 }
@@ -347,41 +348,51 @@ type GetRelevantLwLocationsParams = Pick<
 export function useRelevantFailedLwLocations({
   failedLabware,
   failedCommandByRunRecord,
-  protocolAnalysis,
-  allRunDefs,
+  runRecord,
 }: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
   const { t } = useTranslation('protocol_command_text')
 
-  const currentLocation = getLabwareDisplayLocation({
-    loadedLabwares: protocolAnalysis?.labware ?? [],
-    loadedModules: protocolAnalysis?.modules ?? [],
-    location: failedLabware?.location ?? null,
-    allRunDefs,
+  const BASE_DISPLAY_PARAMS: Omit<
+    LabwareDisplayLocationSlotOnly,
+    'location'
+  > = {
+    loadedLabwares: runRecord?.data?.labware ?? [],
+    loadedModules: runRecord?.data?.modules ?? [],
     robotType: FLEX_ROBOT_TYPE,
     t,
+    detailLevel: 'slot-only',
+    isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.
+  }
+
+  const displayNameCurrentLoc = getLabwareDisplayLocation({
+    ...BASE_DISPLAY_PARAMS,
+    location: failedLabware?.location ?? null,
   })
 
-  const getNewLocation = (): LabwareLocation | null => {
+  const getNewLocation = (): Pick<
+    RelevantFailedLabwareLocations,
+    'displayNameNewLoc' | 'newLoc'
+  > => {
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
-        return failedCommandByRunRecord.params.newLocation
+        return {
+          displayNameNewLoc: getLabwareDisplayLocation({
+            ...BASE_DISPLAY_PARAMS,
+            location: failedCommandByRunRecord.params.newLocation,
+          }),
+          newLoc: failedCommandByRunRecord.params.newLocation,
+        }
       default:
-        return null
+        return {
+          displayNameNewLoc: null,
+          newLoc: null,
+        }
     }
   }
 
-  const newLocationByDisplayName = getLabwareDisplayLocation({
-    loadedLabwares: protocolAnalysis?.labware ?? [],
-    loadedModules: protocolAnalysis?.modules ?? [],
-    location: getNewLocation(),
-    allRunDefs,
-    robotType: FLEX_ROBOT_TYPE,
-    t,
-  })
-
   return {
-    currentLoc: currentLocation,
-    newLoc:
-      newLocationByDisplayName.length === 0 ? null : newLocationByDisplayName,
+    displayNameCurrentLoc,
+    currentLoc: failedLabware?.location ?? null,
+    ...getNewLocation(),
   }
 }
