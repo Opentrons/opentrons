@@ -40,6 +40,7 @@ describe('TemperatureTools', () => {
         dirtyFields: [],
         focusedField: null,
       },
+      visibleFormErrors: [],
       toolboxStep: 1,
       propsForFields: {
         moduleId: {
