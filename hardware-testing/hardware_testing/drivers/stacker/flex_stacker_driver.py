@@ -63,12 +63,16 @@ RETRACT_DIST_Z = 1
 HOME_SPEED = 20
 HOME_ACCELERATION = 100
 MOVE_ACCELERATION_X = 1500
-MOVE_ACCELERATION_Z = 50
-MAX_SPEED_DISCONTINUITY_X = 20
-MAX_SPEED_DISCONTINUITY_Z = 20
-MOVE_SPEED_X = 300
+MOVE_ACCELERATION_Z = 200
+MOVE_ACCELERATION_L = 30
+MAX_SPEED_DISCONTINUITY_X = 10
+MAX_SPEED_DISCONTINUITY_Z = 5
+MAX_SPEED_DISCONTINUITY_L = 5
+MOVE_SPEED_X = 200
 MOVE_SPEED_UPZ = 200
+MOV_SPEED_L = 30
 MOVE_SPEED_DOWNZ = 200
+LATCH_DISTANCE_MM = 30
 LABWARE_CLEARANCE = 9
 
 class FlexStacker():
@@ -90,8 +94,10 @@ class FlexStacker():
         self.home_speed = HOME_SPEED
         self.move_acceleration_x = MOVE_ACCELERATION_X
         self.move_acceleration_z = MOVE_ACCELERATION_Z
+        self.move_acceleration_l = MOVE_ACCELERATION_L
         self.max_speed_discontinuity_x = MAX_SPEED_DISCONTINUITY_X
         self.max_speed_discontinuity_z = MAX_SPEED_DISCONTINUITY_Z
+        self.max_speed_discontinuity_l = MAX_SPEED_DISCONTINUITY_L
         self.labware_clearance = LABWARE_CLEARANCE
         self.current_position = {'X': None, 'Z': None, 'L': None}
         # self.__class__.__name__ == 'FlexStacker'
@@ -274,24 +280,26 @@ class FlexStacker():
                         })
         return states
 
-    def move(self, axis: AXIS, distance: float, direction: DIR,
-                velocity: Optional[float] = None, acceleration: Optional[float] = None):
-        if axis == AXIS.X:
-            self.max_speed_discontinuity = 80
-            if velocity == None or acceleration == None:
-                velocity = self.move_speed_x
-                acceleration = self.move_acceleration_x
-        elif axis == AXIS.Z:
-            self.max_speed_discontinuity = 10
-            if velocity == None or acceleration == None:
-                velocity = self.move_speed_up_z
-                acceleration = self.move_acceleration_z
-        else:
-            self.max_speed_discontinuity = 5
-            if velocity == None or acceleration == None:
-                velocity = self.move_speed_up_z
-                acceleration = self.move_acceleration_z
+    def set_default(self, value, default):
+        return value if value is not None else default
 
+    def move(self, axis: AXIS, distance: float, direction: DIR,
+                velocity: Optional[float] = None, acceleration: Optional[float] = None,
+                max_speed_discontinuity: Optional[float] = None):
+        if axis == AXIS.X:
+            velocity = set_default(velocity, MOVE_SPEED_X)
+            acceleration = set_default(acceleration, MOVE_ACCELERATION_X)
+            msd = set_default(msd, MAX_SPEED_DISCONTINUITY_X)
+        elif axis == AXIS.Z:
+            velocity = set_default(velocity, MOVE_SPEED_Z)
+            acceleration = set_default(acceleration, MOVE_ACCELERATION_Z)
+            msd = set_default(msd, MAX_SPEED_DISCONTINUITY_Z)
+        elif axis == AXIS.L:
+            velocity = set_default(velocity, MOVE_SPEED_L)
+            acceleration = set_default(acceleration, MOVE_ACCELERATION_L)
+            msd = set_default(msd, MAX_SPEED_DISCONTINUITY_L)
+        else:
+            raise(f"AXIS not defined!! {axis}")
         # if self.current_position['X'] == None or self.current_position['Z'] == None:
         #     raise(f"Motor must be Home{axis}")
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
@@ -303,7 +311,7 @@ class FlexStacker():
                                                     ).add_element(
                                                     f'A{acceleration}' #)
                                                     ).add_element(
-                                                    f'D{self.max_speed_discontinuity}')
+                                                    f'D{msd}')
 
         print(c)
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
@@ -399,29 +407,19 @@ class FlexStacker():
         ).add_element(axis + f'{current}')
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
-    def close_latch(self):
-        direction = DIR.NEGATIVE_HOME
-        distance = 30
-        velocity = 100
-        acceleration = 100
-        axis = AXIS.L
-        self.home(axis, direction, velocity, acceleration)
+    def close_latch(self, velocity: Optional[float] = None, acceleration: Optional[float]):
+        velocity = set_default(velocity, MOVE_SPEED_L)
+        acceleration = set_default(acceleration, MOVE_ACCELERATION_L)
+        self.home(AXIS.L, DIR.NEGATIVE_HOME, velocity, acceleration)
 
-    def open_latch(self):
-        direction = DIR.POSITIVE
-        distance = 30
-        velocity = 100
-        acceleration = 100
-        axis = AXIS.L
-        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
-                                                gcode=GCODE.MOVE_DIST).add_element(
-                                                axis.upper() +
-                                                f'{direction}' +
-                                                f'{distance}').add_element(
-                                                    f'V{velocity}'
-                                                    ).add_element(
-                                                    f'A{acceleration}')
-        self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+    def open_latch(self, distance: Optional[float] = None,
+                    velocity: Optional[float] = None, acceleration: Optional[float],
+                    max_speed_discontinuity: Optional[float] = None):
+        distance = set_default(distance, LATCH_DISTANCE_MM)
+        velocity = set_default(velocity, MOVE_SPEED_L)
+        acceleration = set_default(acceleration, MOVE_ACCELERATION_L)
+        msd = set_default(msd, MAX_SPEED_DISCONTINUITY_L)
+        self.move(AXIS.L, TOTAL_TRAVEL_X-5, DIR.POSITIVE, velocity, acceleration, msd)
 
     def load_labware(self, labware_z_offset: float):
         labware_clearance = labware_z_offset
