@@ -154,12 +154,18 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
       )
     }
   }
+<<<<<<< HEAD
   return [...formErrors, ...formWarnings, ...timelineWarnings].length > 0 ? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
       padding={`${SPACING.spacing16} ${SPACING.spacing16} 0`}
     >
+=======
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+>>>>>>> d7a4452d2b (form errors wiring up)
       {formErrors.map((error, key) => makeAlert('error', error, key))}
       {formWarnings.map((warning, key) => makeAlert('warning', warning, key))}
       {timelineWarnings.map((warning, key) =>

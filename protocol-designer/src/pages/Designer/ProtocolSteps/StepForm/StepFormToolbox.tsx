@@ -36,10 +36,15 @@ import {
   TemperatureTools,
   ThermocyclerTools,
 } from './StepTools'
-import { getSaveStepSnackbarText } from './utils'
+import {
+  getSaveStepSnackbarText,
+  getVisibleFormErrors,
+  getVisibleFormWarnings,
+} from './utils'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FormData, StepType } from '../../../../form-types'
 import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
+import { getFormLevelErrorsForUnsavedForm } from '../../../../step-forms/selectors'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null
@@ -91,6 +96,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const timelineWarningsForSelectedStep = useSelector(
     getTimelineWarningsForSelectedStep
   )
+  const formLevelErrorsForUnsavedForm = useSelector(
+    getFormLevelErrorsForUnsavedForm
+  )
   const timeline = useSelector(getRobotStateTimeline)
   const [toolboxStep, setToolboxStep] = useState<number>(
     // progress to step 2 if thermocycler form is populated
@@ -103,6 +111,16 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     showFormErrorsAndWarnings,
     setShowFormErrorsAndWarnings,
   ] = useState<boolean>(false)
+  const visibleFormWarnings = getVisibleFormWarnings({
+    focusedField,
+    dirtyFields: dirtyFields ?? [],
+    errors: formWarningsForSelectedStep,
+  })
+  const visibleFormErrors = getVisibleFormErrors({
+    focusedField,
+    dirtyFields: dirtyFields ?? [],
+    errors: formLevelErrorsForUnsavedForm,
+  })
   const [isRename, setIsRename] = useState<boolean>(false)
   const icon = stepIconsByType[formData.stepType]
 
@@ -126,7 +144,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     formData.stepType === 'mix' ||
     formData.stepType === 'thermocycler'
   const numWarnings =
-    formWarningsForSelectedStep.length + timelineWarningsForSelectedStep.length
+    visibleFormWarnings.length + timelineWarningsForSelectedStep.length
   const numErrors = timeline.errors?.length ?? 0
 
   const handleSaveClick = (): void => {
@@ -229,6 +247,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             propsForFields,
             focusHandlers,
             toolboxStep,
+            visibleFormErrors,
           }}
         />
       </Toolbox>

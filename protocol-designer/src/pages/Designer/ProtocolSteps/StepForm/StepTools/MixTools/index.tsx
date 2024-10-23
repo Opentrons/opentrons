@@ -42,7 +42,7 @@ import {
 import type { StepFormProps } from '../../types'
 
 export function MixTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, formData, toolboxStep } = props
+  const { propsForFields, formData, toolboxStep, visibleFormErrors } = props
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)
@@ -89,6 +89,11 @@ export function MixTools(props: StepFormProps): JSX.Element {
         labwareId={formData.labware}
         pipetteId={formData.pipette}
         nozzles={String(propsForFields.nozzles.value) ?? null}
+        hasFormError={
+          visibleFormErrors?.some(error =>
+            error.dependentFields.includes('labware')
+          ) ?? false
+        }
       />
       <Divider marginY="0" />
       <VolumeField {...propsForFields.volume} />
