@@ -80,6 +80,16 @@ export function ProtocolSteps(): JSX.Element {
         justifyContent={JUSTIFY_FLEX_START}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          {tab === 'protocolSteps' ? (
+            <Flex
+              justifyContent={JUSTIFY_CENTER}
+              width="100%"
+              paddingTop="2.34375rem"
+              paddingBottom="1.34375rem"
+            >
+              <TimelineAlerts />
+            </Flex>
+          ) : null}
           <Flex
             justifyContent={
               currentStep != null ? JUSTIFY_SPACE_BETWEEN : JUSTIFY_FLEX_END

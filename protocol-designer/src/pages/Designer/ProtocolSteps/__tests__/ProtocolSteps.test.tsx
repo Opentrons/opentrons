@@ -29,6 +29,7 @@ vi.mock('../StepSummary.tsx')
 vi.mock('../Timeline')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
+vi.mock('../../../../organisms/Alerts')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,
