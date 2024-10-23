@@ -15,7 +15,7 @@ export const chatHistoryAtom = atom<Chat[]>([])
 export const tokenAtom = atom<string | null>(null)
 
 export const mixpanelAtom = atom<Mixpanel | null>({
-  analytics: { hasOptedIn: true }, // TODO: set to false
+  analytics: { hasOptedIn: true }, // TODO: set to false when we have the opt-in modal
 })
 
 export const headerWithMeterAtom = atom<HeaderWithMeterAtomProps>({

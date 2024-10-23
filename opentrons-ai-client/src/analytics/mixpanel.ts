@@ -1,9 +1,6 @@
 import mixpanel from 'mixpanel-browser'
 import { getHasOptedIn } from './selectors'
 
-export const getIsProduction = (): boolean =>
-  global.location.host === 'designer.opentrons.com' // UPDATE THIS TO CORRECT URL
-
 export type AnalyticsEvent =
   | {
       name: string
@@ -53,7 +50,6 @@ export function setMixpanelTracking(optedIn: boolean): void {
       // Register "super properties" which are included with all events
       mixpanel.register({
         appVersion: 'test', // TODO update this?
-        // NOTE(IL, 2020): Since PD may be in the same Mixpanel project as other OT web apps, this 'appName' property is intended to distinguish it
         appName: 'opentronsAIClient',
       })
     } else {
