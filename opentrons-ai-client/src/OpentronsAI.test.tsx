@@ -19,6 +19,13 @@ vi.mock('./molecules/Header')
 vi.mock('./molecules/Footer')
 vi.mock('./molecules/Loading')
 vi.mock('./resources/hooks/useGetAccessToken')
+vi.mock('./analytics/mixpanel')
+
+const mockUseTrackEvent = vi.fn()
+
+vi.mock('./resources/hooks/useTrackEvent', () => ({
+  useTrackEvent: () => mockUseTrackEvent,
+}))
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<OpentronsAI />, {
