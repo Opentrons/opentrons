@@ -92,7 +92,6 @@ export const WellSelectionField = (
       ? t(`step_edit_form.wellSelectionLabel.columns_${name}`)
       : t(`step_edit_form.wellSelectionLabel.wells_${name}`)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  console.log(errorToShow)
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>

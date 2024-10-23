@@ -51,7 +51,6 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 
 export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const { toolboxStep, propsForFields, formData, visibleFormErrors } = props
-  console.log(visibleFormErrors)
   const { t, i18n } = useTranslation(['protocol_steps', 'form'])
   const { path } = formData
   const [tab, setTab] = useState<'aspirate' | 'dispense'>('aspirate')

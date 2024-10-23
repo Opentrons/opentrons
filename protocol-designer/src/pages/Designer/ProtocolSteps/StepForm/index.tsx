@@ -147,8 +147,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   ) {
     handleSave = confirmAddPauseUntilHeaterShakerTempStep
   }
-  console.log('dirty fields', dirtyFields)
-  console.log('focused field', focusedField)
   return (
     <>
       {/* TODO: update these modals to match new modal design */}
