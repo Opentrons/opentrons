@@ -2,14 +2,12 @@ import { useState } from 'react'
 import get from 'lodash/get'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
   COLORS,
   Flex,
   Icon,
-  OVERFLOW_HIDDEN,
   POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
@@ -25,7 +23,7 @@ import { RenameStepModal } from '../../../../organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { BUTTON_LINK_STYLE } from '../../../../atoms'
+import { BUTTON_LINK_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../../../atoms'
 import {
   CommentTools,
   HeaterShakerTools,
@@ -210,7 +208,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         title={
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <Icon size="1rem" name={icon} minWidth="1rem" />
-            <StyledText desktopStyle="bodyLargeSemiBold" css={MENU_TEXT_STYLE}>
+            <StyledText
+              desktopStyle="bodyLargeSemiBold"
+              css={`
+                ${LINE_CLAMP_TEXT_STYLE(2)}
+                word-break: break-all
+              `}
+            >
               {i18n.format(t(formData.stepName), 'capitalize')}
             </StyledText>
           </Flex>
@@ -229,13 +233,3 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     </>
   )
 }
-
-const MENU_TEXT_STYLE = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: ${OVERFLOW_HIDDEN};
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  -webkit-line-clamp: 2;
-  word-break: break-all;
-`

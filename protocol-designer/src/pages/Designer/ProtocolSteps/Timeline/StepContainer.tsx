@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -14,7 +13,6 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_START,
-  OVERFLOW_HIDDEN,
   OverflowBtn,
   SPACING,
   StyledText,
@@ -32,6 +30,7 @@ import {
   populateForm,
 } from '../../../../ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../../atoms'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
@@ -228,7 +227,10 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               )}
               <StyledText
                 desktopStyle="bodyDefaultRegular"
-                css={MENU_TEXT_STYLE}
+                css={`
+                  ${LINE_CLAMP_TEXT_STYLE(1)}
+                  word-break: break-all
+                `}
               >
                 {capitalizeFirstLetterAfterNumber(title)}
               </StyledText>
@@ -266,13 +268,3 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     </>
   )
 }
-
-const MENU_TEXT_STYLE = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: ${OVERFLOW_HIDDEN};
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  -webkit-line-clamp: 1;
-  word-break: break-all;
-`

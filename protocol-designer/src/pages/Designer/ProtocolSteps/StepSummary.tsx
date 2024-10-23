@@ -1,29 +1,24 @@
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import first from 'lodash/first'
 import flatten from 'lodash/flatten'
 import last from 'lodash/last'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  FLEX_MAX_CONTENT,
   ListItem,
-  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
   Tag,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-
 import {
   getLabwareEntities,
   getModuleEntities,
 } from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../atoms'
 import type { FormData } from '../../../form-types'
 
 interface StyledTransProps {
@@ -390,20 +385,17 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       width="100%"
     >
       {stepSummaryContent != null ? (
-        <Flex
-          backgroundColor={COLORS.grey30}
-          padding={SPACING.spacing12}
-          borderRadius={BORDERS.borderRadius4}
-          width={FLEX_MAX_CONTENT}
-          minWidth="100%"
-        >
-          {stepSummaryContent}
-        </Flex>
+        <ListItem type="noActive">
+          <Flex padding={SPACING.spacing12}>{stepSummaryContent}</Flex>
+        </ListItem>
       ) : null}
       {stepDetails != null && stepDetails !== '' ? (
         <ListItem type="noActive">
           <Flex padding={SPACING.spacing12}>
-            <StyledText desktopStyle="bodyDefaultRegular" css={MENU_TEXT_STYLE}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              css={LINE_CLAMP_TEXT_STYLE(3)}
+            >
               {stepDetails}
             </StyledText>
           </Flex>
@@ -412,12 +404,3 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     </Flex>
   ) : null
 }
-
-const MENU_TEXT_STYLE = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: ${OVERFLOW_HIDDEN};
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  -webkit-line-clamp: 4;
-`
