@@ -54,7 +54,7 @@ lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	yarn eslint --ignore-path ../.eslintignore --quiet=$(quiet) --ignore-pattern "node_modules/" "**/*.@(js|ts|tsx)"
+	yarn eslint --ignore-path ../.eslintignore --quiet=$(quiet) "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
