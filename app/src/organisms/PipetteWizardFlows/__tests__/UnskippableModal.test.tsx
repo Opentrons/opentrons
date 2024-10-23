@@ -24,7 +24,7 @@ describe('UnskippableModal', () => {
     render(props)
     screen.getByText('This is a critical step that should not be skipped')
     screen.getByText(
-      'You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.'
+      'You must detach the mounting plate and reattach the z-axis carriage before using other pipettes. We do not recommend exiting this process before completion.'
     )
     fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(props.goBack).toHaveBeenCalled()
@@ -39,7 +39,7 @@ describe('UnskippableModal', () => {
     render(props)
     screen.getByText('This is a critical step that should not be skipped')
     screen.getByText(
-      'You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.'
+      'You must detach the mounting plate and reattach the z-axis carriage before using other pipettes. We do not recommend exiting this process before completion.'
     )
     screen.getByText('Exit')
     screen.getByText('Go back')
