@@ -23,6 +23,7 @@ import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../navigation/actions'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { getHasOptedIn } from '../../analytics/selectors'
 import { useAnnouncements } from '../../organisms/AnnouncementModal/announcements'
 import { getLocalStorageItem, localStorageAnnouncementKey } from '../../persist'
 import welcomeImage from '../../assets/images/welcome_page.png'
@@ -37,17 +38,17 @@ export function Landing(): JSX.Element {
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     false
   )
+  const hasOptedIn = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()
   const announcements = useAnnouncements()
   const lastAnnouncement = announcements[announcements.length - 1]
   const announcementKey = lastAnnouncement
     ? lastAnnouncement.announcementKey
     : null
-  const showGateModal =
-    process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
-    !showGateModal
+    hasOptedIn != null
 
   useEffect(() => {
     if (userHasNotSeenAnnouncement) {
