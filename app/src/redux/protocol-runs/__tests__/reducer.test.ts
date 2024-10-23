@@ -31,7 +31,7 @@ describe('protocol runs reducer', () => {
   it('updates complete based on an action', () => {
     const nextState = protocolRunReducer(
       {
-        ['some-run-id']: {
+        'some-run-id': {
           setup: {
             ...INITIAL,
             [Constants.LIQUID_SETUP_STEP_KEY]: {
@@ -57,7 +57,7 @@ describe('protocol runs reducer', () => {
   it('updates required based on an action', () => {
     const nextState = protocolRunReducer(
       {
-        ['some-run-id']: {
+        'some-run-id': {
           setup: INITIAL,
         },
       },

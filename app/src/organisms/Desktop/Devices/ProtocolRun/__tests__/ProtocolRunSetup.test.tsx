@@ -32,10 +32,7 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import {
-  updateRunSetupStepsComplete,
-  getMissingSetupSteps,
-} from '/app/redux/protocol-runs'
+import { getMissingSetupSteps } from '/app/redux/protocol-runs'
 
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -46,8 +43,6 @@ import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import * as ReduxRuns from '/app/redux/protocol-runs'
 
 import type { State } from '/app/redux/types'
-
-import type { StepKey } from '/app/redux/protocol-runs'
 
 import type * as SharedData from '@opentrons/shared-data'
 

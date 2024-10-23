@@ -3,12 +3,7 @@ import * as Constants from './constants'
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
 
-import type {
-  ProtocolRunState,
-  RunSetupStatus,
-  StepKey,
-  StepState,
-} from './types'
+import type { ProtocolRunState, RunSetupStatus } from './types'
 
 const INITIAL_STATE: ProtocolRunState = {}
 

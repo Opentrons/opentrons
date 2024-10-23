@@ -18,13 +18,13 @@ export const getSetupStepsComplete: (
   }
   return (Object.entries(setup) as Array<
     [Types.StepKey, Types.StepState]
-  >).reduce<Types.StepMap<boolean>>(
+  >).reduce<Partial<Types.StepMap<boolean>>>(
     (acc, [step, state]) => ({
       ...acc,
       [step]: state.complete,
     }),
-    {} as Types.StepMap<boolean>
-  )
+    {}
+  ) as Types.StepMap<boolean>
 }
 
 export const getSetupStepRequired: (
@@ -44,10 +44,10 @@ export const getSetupStepsRequired: (
   }
   return (Object.entries(setup) as Array<
     [Types.StepKey, Types.StepState]
-  >).reduce<Types.StepMap<boolean>>(
+  >).reduce<Partial<Types.StepMap<boolean>>>(
     (acc, [step, state]) => ({ ...acc, [step]: state.required }),
-    {} as Types.StepMap<boolean>
-  )
+    {}
+  ) as Types.StepMap<boolean>
 }
 
 export const getSetupStepMissing: (
@@ -67,13 +67,13 @@ export const getSetupStepsMissing: (
   }
   return (Object.entries(setup) as Array<
     [Types.StepKey, Types.StepState]
-  >).reduce<Types.StepMap<boolean>>(
+  >).reduce<Partial<Types.StepMap<boolean>>>(
     (acc, [step, state]) => ({
       ...acc,
       [step]: state.required && !state.complete,
     }),
-    {} as Types.StepMap<boolean>
-  )
+    {}
+  ) as Types.StepMap<boolean>
 }
 
 export const getMissingSetupSteps: (

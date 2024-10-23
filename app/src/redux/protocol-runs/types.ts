@@ -1,4 +1,4 @@
-import {
+import type {
   ROBOT_CALIBRATION_STEP_KEY,
   MODULE_SETUP_STEP_KEY,
   LPC_STEP_KEY,

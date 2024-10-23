@@ -28,8 +28,8 @@ export interface UseRequiredSetupStepsInOrderProps {
 }
 
 export interface UseRequiredSetupStepsInOrderReturn {
-  orderedSteps: StepKey[]
-  orderedApplicableSteps: StepKey[]
+  orderedSteps: readonly StepKey[]
+  orderedApplicableSteps: readonly StepKey[]
 }
 
 const ALL_STEPS_IN_ORDER = [
@@ -76,7 +76,7 @@ const keyFor = (
 export function useRequiredSetupStepsInOrder({
   runId,
   protocolAnalysis,
-}: UseRequiredSetupStepsInOrderProps) {
+}: UseRequiredSetupStepsInOrderProps): UseRequiredSetupStepsInOrderReturn {
   const dispatch = useDispatch<Dispatch>()
   const requiredSteps = useSelector<State>(state =>
     getSetupStepsRequired(state, runId)
