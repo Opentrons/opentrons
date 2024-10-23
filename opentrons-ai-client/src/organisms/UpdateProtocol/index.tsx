@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { UploadInput } from '../../molecules/UploadInput'
 import { HeaderWithMeter } from '../../molecules/HeaderWithMeter'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -62,17 +62,73 @@ const BodyText = styled(StyledText).attrs({
   paddingTop: '16px',
 })``
 
+const isValidProtocolFileName = (protocolFileName: string): boolean => {
+  return protocolFileName.endsWith('.py')
+}
+
 export function UpdateProtocol(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
+  const [progressPercentage, setProgressPercentage] = useState<number>(0.0)
+  const [updateType, setUpdateType] = useState<string>('')
   const [detailsValue, setDetailsValue] = useState<string>('')
+  const [pythonText, setPythonTextValue] = useState<string>('')
+
+  useEffect(() => {
+    let progress = 0.0
+    if (updateType !== '') {
+      progress += 0.33
+    }
+
+    if (detailsValue !== '') {
+      progress += 0.33
+    }
+
+    if (pythonText !== '') {
+      progress += 0.34
+    }
+
+    setProgressPercentage(progress)
+  }, [updateType, detailsValue, pythonText])
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setDetailsValue(event.target.value)
   }
 
+  const handleUpload = async (
+    file: File2 & { name: string }
+  ): Promise<void> => {
+    if (file.path === null) {
+      // logger.warn('Failed to upload file, path not found')
+    }
+    if (isValidProtocolFileName(file.name)) {
+      // todo convert to text
+
+      console.log('compatible_file_type')
+      console.log(file.name)
+      // const text = await new Response(new Blob([await file.text()])).text()
+      const text = await file.text().catch(error => {
+        console.error('Error reading file:', error)
+      })
+
+      console.log(text)
+      if (text) {
+        setPythonTextValue(text)
+      }
+    } else {
+      console.log('incompatible_file_type')
+    }
+    // props.onUpload?.()
+    // trackEvent({
+    //   name: ANALYTICS_IMPORT_PROTOCOL_TO_APP,
+    //   properties: { protocolFileName: file.name },
+    // })
+  }
+
   return (
     <Container>
-      <HeaderWithMeter progressPercentage={0.5}></HeaderWithMeter>
+      <HeaderWithMeter
+        progressPercentage={progressPercentage}
+      ></HeaderWithMeter>
       <Spacer />
       <ContentBox>
         <ContentFlex>
@@ -103,31 +159,60 @@ export function UpdateProtocol(): JSX.Element {
                   />
                 </StyledText>
               }
-              onUpload={function (file: File): unknown {
-                throw new Error('Function not implemented.')
+              onUpload={async function (file: File) {
+                try {
+                  await handleUpload(file)
+                } catch (error) {
+                  console.error('Error uploading file:', error)
+                }
               }}
             ></UploadInput>
           </Flex>
 
           <BodyText>{t('type_of_update')}</BodyText>
           <DropdownField
+            value={updateType}
             options={updateOptions}
             onChange={function (event: ChangeEvent<HTMLSelectElement>): void {
-              throw new Error('Function not implemented.')
+              setUpdateType(event.target.value)
             }}
           />
           <BodyText>{t('provide_details_of_changes')}</BodyText>
-          <InputField value={detailsValue} onChange={handleInputChange} />
+          <InputField
+            value={detailsValue}
+            onChange={handleInputChange}
+            size="medium"
+          />
           <Flex
             paddingTop="40px"
             width="auto"
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_END}
           >
-            <LargeButton buttonText={t('submit_prompt')} />
+            <LargeButton
+              disabled={progressPercentage !== 1.0}
+              buttonText={t('submit_prompt')}
+            />
           </Flex>
         </ContentFlex>
       </ContentBox>
     </Container>
   )
+}
+
+interface File2 {
+  /**
+   * The real path to the file on the users filesystem
+   */
+  path?: string
+  /**
+   * The name of the file
+   */
+  name: string
+
+  /**
+   * The contents of the file
+   */
+  // contents: string
+  text: () => Promise<string>
 }
