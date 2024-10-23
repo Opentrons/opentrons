@@ -39,7 +39,6 @@ from opentrons.config.types import (
     OT3Config,
     GantryLoad,
     LiquidProbeSettings,
-    OutputOptions,
 )
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
@@ -61,7 +60,6 @@ from opentrons.hardware_control.types import (
     UpdateState,
     EstopState,
     CurrentConfig,
-    InstrumentProbeType,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -180,13 +178,11 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         plunger_speed=10,
         plunger_impulse_time=0.2,
         sensor_threshold_pascals=15,
-        output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
         z_overlap_between_passes_mm=0.1,
         plunger_reset_offset=2.0,
         samples_for_baselining=20,
         sample_time_sec=0.004,
-        data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
 
@@ -707,6 +703,17 @@ async def test_ready_for_movement(
     assert controller.check_motor_status(axes) == ready
 
 
+def probe_move_group_run_side_effect(
+    head: NodeId, tool: NodeId
+) -> Iterator[Dict[NodeId, MotorPositionStatus]]:
+    """Return homed position for axis that is present and was commanded to home."""
+    positions = {
+        head: MotorPositionStatus(0.0, 0.0, True, True, MoveCompleteAck(1)),
+        tool: MotorPositionStatus(0.0, 0.0, True, True, MoveCompleteAck(1)),
+    }
+    yield positions
+
+
 @pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
 async def test_liquid_probe(
     mount: OT3Mount,
@@ -716,6 +723,11 @@ async def test_liquid_probe(
     mock_send_stop_threshold: mock.AsyncMock,
 ) -> None:
     fake_max_p_dist = 70
+    head_node = axis_to_node(Axis.by_mount(mount))
+    tool_node = sensor_node_for_mount(mount)
+    mock_move_group_run.side_effect = probe_move_group_run_side_effect(
+        head_node, tool_node
+    )
     try:
         await controller.liquid_probe(
             mount=mount,
@@ -725,18 +737,17 @@ async def test_liquid_probe(
             threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
             plunger_impulse_time=fake_liquid_settings.plunger_impulse_time,
             num_baseline_reads=fake_liquid_settings.samples_for_baselining,
-            output_option=fake_liquid_settings.output_option,
         )
     except PipetteLiquidNotFoundError:
         # the move raises a liquid not found now since we don't call the move group and it doesn't
         # get any positions back
         pass
     move_groups = mock_move_group_run.call_args_list[0][0][0]._move_groups
-    head_node = axis_to_node(Axis.by_mount(mount))
-    tool_node = sensor_node_for_mount(mount)
     #  in tool_sensors, pipette moves down, then sensor move goes
     assert move_groups[0][0][tool_node].stop_condition == MoveStopCondition.none
-    assert move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sync_line
+    assert (
+        move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sensor_report
+    )
     assert len(move_groups) == 2
     assert move_groups[0][0][tool_node]
     assert move_groups[1][0][head_node], move_groups[2][0][tool_node]

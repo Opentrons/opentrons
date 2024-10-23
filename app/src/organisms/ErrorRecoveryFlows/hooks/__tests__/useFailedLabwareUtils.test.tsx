@@ -1,12 +1,17 @@
 import { describe, it, expect } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { screen, renderHook } from '@testing-library/react'
 
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   getRelevantWellName,
   getRelevantFailedLabwareCmdFrom,
   useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
 import { DEFINED_ERROR_TYPES } from '../../constants'
+
+import type { ComponentProps } from 'react'
+import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {
@@ -159,12 +164,26 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
   })
 })
 
-// TODO(jh 10-15-24): This testing will can more useful once translation is refactored out of this function.
+const TestWrapper = (props: GetRelevantLwLocationsParams) => {
+  const displayLocation = useRelevantFailedLwLocations(props)
+  return (
+    <>
+      <div>{`Current Loc: ${displayLocation.displayNameCurrentLoc}`}</div>
+      <div>{`New Loc: ${displayLocation.displayNameNewLoc}`}</div>
+    </>
+  )
+}
+
+const render = (props: ComponentProps<typeof TestWrapper>) => {
+  return renderWithProviders(<TestWrapper {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
 describe('useRelevantFailedLwLocations', () => {
-  const mockProtocolAnalysis = {} as any
-  const mockAllRunDefs = [] as any
+  const mockRunRecord = { data: { modules: [], labware: [] } } as any
   const mockFailedLabware = {
-    location: { slot: 'D1' },
+    location: { slotName: 'D1' },
   } as any
 
   it('should return current location for non-moveLabware commands', () => {
@@ -172,41 +191,53 @@ describe('useRelevantFailedLwLocations', () => {
       commandType: 'aspirate',
     } as any
 
+    render({
+      failedLabware: mockFailedLabware,
+      failedCommandByRunRecord: mockFailedCommand,
+      runRecord: mockRunRecord,
+    })
+
+    screen.getByText('Current Loc: Slot D1')
+    screen.getByText('New Loc: null')
+
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
-        protocolAnalysis: mockProtocolAnalysis,
-        allRunDefs: mockAllRunDefs,
+        runRecord: mockRunRecord,
       })
     )
 
-    expect(result.current).toEqual({
-      currentLoc: '',
-      newLoc: null,
-    })
+    expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.newLoc).toBeNull()
   })
 
-  it('should return current and new location for moveLabware commands', () => {
+  it('should return current and new locations for moveLabware commands', () => {
     const mockFailedCommand = {
       commandType: 'moveLabware',
       params: {
-        newLocation: { slot: 'C2' },
+        newLocation: { slotName: 'C2' },
       },
     } as any
+
+    render({
+      failedLabware: mockFailedLabware,
+      failedCommandByRunRecord: mockFailedCommand,
+      runRecord: mockRunRecord,
+    })
+
+    screen.getByText('Current Loc: Slot D1')
+    screen.getByText('New Loc: Slot C2')
 
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
-        protocolAnalysis: mockProtocolAnalysis,
-        allRunDefs: mockAllRunDefs,
+        runRecord: mockRunRecord,
       })
     )
 
-    expect(result.current).toEqual({
-      currentLoc: '',
-      newLoc: null,
-    })
+    expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.newLoc).toStrictEqual({ slotName: 'C2' })
   })
 })

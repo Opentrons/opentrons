@@ -1,8 +1,8 @@
-import type * as React from 'react'
 import { HandleKeypress } from '@opentrons/components'
+import type { ReactNode } from 'react'
 
 interface HandleEnterProps {
-  children: React.ReactNode
+  children: ReactNode
   onEnter: () => void
 }
 

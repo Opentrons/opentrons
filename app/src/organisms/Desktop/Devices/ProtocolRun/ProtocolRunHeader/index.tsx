@@ -103,6 +103,11 @@ export function ProtocolRunHeader(
           isResetRunLoading={isResetRunLoadingRef.current}
           runErrors={runErrors}
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
+          hasDownloadableFiles={
+            runRecord?.data != null &&
+            'outputFileIds' in runRecord.data &&
+            runRecord.data.outputFileIds.length > 0
+          }
           {...props}
         />
         <RunHeaderContent

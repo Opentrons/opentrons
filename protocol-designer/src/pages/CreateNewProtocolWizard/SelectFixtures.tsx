@@ -22,7 +22,7 @@ import {
   getNumOptions,
   getNumSlotsAvailable,
 } from './utils'
-import { HandleEnter } from './HandleEnter'
+import { HandleEnter } from '../../atoms/HandleEnter'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { AdditionalEquipment, WizardTileProps } from './types'

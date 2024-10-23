@@ -41,7 +41,8 @@
         "wellPlate",
         "aluminumBlock",
         "adapter",
-        "other"
+        "other",
+        "lid"
       ]
     },
     "safeString": {

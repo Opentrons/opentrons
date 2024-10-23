@@ -335,8 +335,12 @@ class RunOrchestratorStore:
         return self.run_orchestrator.get_run_time_parameters()
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Get the current running command."""
+        """Get the current running command, if any."""
         return self.run_orchestrator.get_current_command()
+
+    def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
+        """Get the most recently finalized command, if any."""
+        return self.run_orchestrator.get_most_recently_finalized_command()
 
     def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool

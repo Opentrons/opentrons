@@ -1,4 +1,7 @@
 import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
+
+import { MoveLabwareOnDeck } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -11,6 +14,13 @@ import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
 import type * as React from 'react'
 import type { Mock } from 'vitest'
 
+vi.mock('@opentrons/components', async () => {
+  const actual = await vi.importActual('@opentrons/components')
+  return {
+    ...actual,
+    MoveLabwareOnDeck: vi.fn(),
+  }
+})
 vi.mock('../LeftColumnLabwareInfo')
 vi.mock('../../hooks/useDeckMapUtils')
 
@@ -39,11 +49,17 @@ describe('TwoColLwInfoAndDeck', () => {
       failedLabwareUtils: {
         relevantWellName: 'A1',
         failedLabware: { location: 'C1' },
+        failedLabwareLocations: { newLoc: {}, currentLoc: {} },
       },
-      deckMapUtils: {},
+      deckMapUtils: {
+        movedLabwareDef: {},
+        moduleRenderInfo: [],
+        labwareRenderInfo: [],
+      },
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
       },
+      isOnDevice: true,
     } as any
 
     vi.mocked(LeftColumnLabwareInfo).mockReturnValue(
@@ -130,5 +146,35 @@ describe('TwoColLwInfoAndDeck', () => {
       }),
       expect.anything()
     )
+  })
+
+  it(`renders a move labware on deck view if the selected recovery option is ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE} and props are valid`, () => {
+    vi.mocked(MoveLabwareOnDeck).mockReturnValue(
+      <div>MOCK_MOVE_LW_ON_DECK</div>
+    )
+
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE
+    render(props)
+
+    screen.getByText('MOCK_MOVE_LW_ON_DECK')
+  })
+
+  it(`does not render a move labware on deck view if the selected recovery option is ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE} and props are invalid`, () => {
+    vi.mocked(MoveLabwareOnDeck).mockReturnValue(
+      <div>MOCK_MOVE_LW_ON_DECK</div>
+    )
+
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE
+    props.deckMapUtils = {
+      movedLabwareDef: null,
+      moduleRenderInfo: null,
+      labwareRenderInfo: null,
+    } as any
+
+    render(props)
+
+    expect(screen.queryByText('MOCK_MOVE_LW_ON_DECK')).not.toBeInTheDocument()
   })
 })

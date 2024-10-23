@@ -1,4 +1,5 @@
 {
+  "ai": "AI",
   "api": "API: An API level is 2.15",
   "application": "Application: Your protocol's name, describing what it does.",
   "commands": "Commands: List the protocol's steps, specifying quantities in microliters (uL) and giving exact source and destination locations.",
@@ -15,6 +16,7 @@
   "make_sure_your_prompt": "Write a prompt in a natural language for OpentronsAI to generate a protocol using the Opentrons Python Protocol API v2. The better the prompt, the better the quality of the protocol produced by OpentronsAI.",
   "modules_and_adapters": "Modules and adapters: Specify the modules and labware adapters required by your protocol.",
   "notes": "A few important things to note:",
+  "opentrons": "Opentrons",
   "opentronsai": "OpentronsAI",
   "ot2_pipettes": "OT-2 pipettes: Include volume, number of channels, and generation.",
   "pcr_flex": "PCR (Flex)",
@@ -34,5 +36,7 @@
   "well_allocations": "Well allocations: Describe where liquids should go in labware.",
   "what_if_you": "<span>What if you don’t provide all of those pieces of information? <bold>OpentronsAI asks you to provide it!</bold></span>",
   "what_typeof_protocol": "What type of protocol do you need?",
-  "you": "You"
+  "you": "You",
+  "prompt_preview_submit_button": "Submit prompt",
+  "prompt_preview_placeholder_message": "As you complete the sections on the left, your prompt will be built here. When all requirements are met you will be able to generate the protocol."
 }

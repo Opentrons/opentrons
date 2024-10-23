@@ -22,12 +22,14 @@ export function LeftColumnLabwareInfo({
     failedLabwareNickname,
     failedLabwareLocations,
   } = failedLabwareUtils
-  const { newLoc, currentLoc } = failedLabwareLocations
+  const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
 
   const buildNewLocation = (): React.ComponentProps<
     typeof InterventionContent
   >['infoProps']['newLocationProps'] =>
-    newLoc != null ? { deckLabel: newLoc.toUpperCase() } : undefined
+    displayNameNewLoc != null
+      ? { deckLabel: displayNameNewLoc.toUpperCase() }
+      : undefined
 
   return (
     <InterventionContent
@@ -36,7 +38,9 @@ export function LeftColumnLabwareInfo({
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: { deckLabel: currentLoc.toUpperCase() },
+        currentLocationProps: {
+          deckLabel: displayNameCurrentLoc.toUpperCase(),
+        },
         newLocationProps: buildNewLocation(),
       }}
       notificationProps={
