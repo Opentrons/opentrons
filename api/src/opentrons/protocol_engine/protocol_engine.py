@@ -8,7 +8,7 @@ from opentrons.protocol_engine.actions.actions import (
 )
 
 from opentrons.protocol_engine.execution.hardware_state_synchronizer import (
-    HardwareStateSynchronizer,
+    ErrorRecoveryHardwareStateSynchronizer,
 )
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -118,8 +118,6 @@ class ProtocolEngine:
         self._door_watcher = door_watcher
         self._module_data_provider = module_data_provider
         self._queue_worker = queue_worker
-        # TODO: Probably want to dependency-inject this.
-        self._hardware_state_synchronizer = HardwareStateSynchronizer()
         if self._queue_worker:
             self._queue_worker.start()
         self._door_watcher.start()
@@ -210,9 +208,6 @@ class ProtocolEngine:
         )
 
         self._action_dispatcher.dispatch(action)
-        self._hardware_state_synchronizer.synchronize(
-            self._hardware_api, self._state_store, state_update
-        )
 
     def add_command(
         self, request: commands.CommandCreate, failed_command_id: Optional[str] = None

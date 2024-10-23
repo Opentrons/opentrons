@@ -13,7 +13,7 @@ from ..state.update_types import StateUpdate
 
 
 def get_state_updates(action: Action) -> list[StateUpdate]:
-    """Extract the StateUpdates that we should apply when we're applying an action."""
+    """Extract all the StateUpdates that the StateStores should apply when they apply an action."""
     if isinstance(action, SucceedCommandAction):
         return [action.state_update]
 

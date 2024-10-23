@@ -5,6 +5,9 @@ import typing
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine.execution.hardware_state_synchronizer import (
+    ErrorRecoveryHardwareStateSynchronizer,
+)
 from opentrons.util.async_helpers import async_context_manager_in_thread
 
 from opentrons_shared_data.robot import load as load_robot
@@ -66,7 +69,11 @@ async def create_protocol_engine(
         deck_configuration=deck_configuration,
         notify_publishers=notify_publishers,
     )
+    hardware_state_synchronizer = ErrorRecoveryHardwareStateSynchronizer(
+        hardware_api, state_store
+    )
     action_dispatcher = ActionDispatcher(state_store)
+    action_dispatcher.add_handler(hardware_state_synchronizer)
     plugin_starter = PluginStarter(state_store, action_dispatcher)
     model_utils = ModelUtils()
     hardware_stopper = HardwareStopper(hardware_api, state_store)
