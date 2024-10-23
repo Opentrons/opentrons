@@ -179,15 +179,11 @@ class WellView(HasState[WellState]):
         except KeyError:
             return False
 
-    def get_well_liquid_info(
+    def get_well_liquid_values(
         self, labware_id: str, well_name: str
-    ) -> Tuple[
-        Optional[LoadedVolumeInfo],
-        Optional[ProbedHeightInfo],
-        Optional[ProbedVolumeInfo],
-    ]:
-        """Return all the liquid info for a well."""
-        loaded_volume_info = self._state.loaded_volumes[labware_id][well_name]
-        probed_height_info = self._state.probed_heights[labware_id][well_name]
-        probed_volume_info = self._state.probed_volumes[labware_id][well_name]
-        return loaded_volume_info, probed_height_info, probed_volume_info
+    ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
+        """Return all the liquid values for a well."""
+        loaded_volume = self._state.loaded_volumes[labware_id][well_name].volume
+        probed_height = self._state.probed_heights[labware_id][well_name].height
+        probed_volume = self._state.probed_volumes[labware_id][well_name].volume
+        return loaded_volume, probed_height, probed_volume
