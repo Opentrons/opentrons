@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   FLEX_MAX_CONTENT,
   Flex,
+  Icon,
   PrimaryButton,
   SPACING,
   StyledText,
@@ -48,6 +49,11 @@ export function SubstepsToolbox(
     return null
   }
 
+  const handleClose = (): void => {
+    dispatch(toggleViewSubstep(null))
+    dispatch(hoverOnStep(null))
+  }
+
   return ('commandCreatorFnName' in substeps &&
     (substeps.commandCreatorFnName === 'transfer' ||
       substeps.commandCreatorFnName === 'consolidate' ||
@@ -57,14 +63,10 @@ export function SubstepsToolbox(
     <Toolbox
       width={FLEX_MAX_CONTENT}
       childrenPadding="0"
+      closeButton={<Icon size="2rem" name="close" />}
+      onCloseClick={handleClose}
       confirmButton={
-        <PrimaryButton
-          onClick={() => {
-            dispatch(toggleViewSubstep(null))
-            dispatch(hoverOnStep(null))
-          }}
-          width="100%"
-        >
+        <PrimaryButton onClick={handleClose} width="100%">
           {t('shared:done')}
         </PrimaryButton>
       }
