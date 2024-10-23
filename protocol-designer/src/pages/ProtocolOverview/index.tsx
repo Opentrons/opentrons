@@ -41,7 +41,7 @@ import {
   getUnusedTrash,
 } from '../../components/FileSidebar/utils'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
-import { BUTTON_LINK_STYLE } from '../../atoms'
+import { BUTTON_LINK_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../../components/portals/MainPageModalPortal'
 import {
   EditProtocolMetadataModal,
@@ -203,16 +203,16 @@ export function ProtocolOverview(): JSX.Element {
     fixtureWithoutStep.wasteChute ||
     fixtureWithoutStep.stagingAreaSlots.length > 0
 
-  const warning =
-    hasWarning &&
-    getWarningContent({
-      noCommands,
-      pipettesWithoutStep,
-      modulesWithoutStep,
-      gripperWithoutStep,
-      fixtureWithoutStep,
-      t,
-    })
+  const warning = hasWarning
+    ? getWarningContent({
+        noCommands,
+        pipettesWithoutStep,
+        modulesWithoutStep,
+        gripperWithoutStep,
+        fixtureWithoutStep,
+        t,
+      })
+    : null
 
   const cancelModal = (): void => {
     setShowExportWarningModal(false)
@@ -239,11 +239,13 @@ export function ProtocolOverview(): JSX.Element {
           <Modal
             title={warning && warning.heading}
             onClose={cancelModal}
+            titleElement1={warning?.titleElement}
+            childrenPadding={SPACING.spacing24}
             footer={
               <Flex
                 justifyContent={JUSTIFY_END}
                 gridGap={SPACING.spacing8}
-                padding={SPACING.spacing12}
+                padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
               >
                 <SecondaryButton onClick={cancelModal}>
                   {t('shared:cancel')}
@@ -290,7 +292,7 @@ export function ProtocolOverview(): JSX.Element {
           <Flex flex="1">
             <StyledText
               desktopStyle="displayBold"
-              css={PROTOCOL_NAME_TEXT_STYLE}
+              css={LINE_CLAMP_TEXT_STYLE(3)}
             >
               {protocolName != null && protocolName !== ''
                 ? protocolName
@@ -415,15 +417,6 @@ export function ProtocolOverview(): JSX.Element {
     </Fragment>
   )
 }
-
-const PROTOCOL_NAME_TEXT_STYLE = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  -webkit-line-clamp: 3;
-`
 
 const MIN_OVERVIEW_WIDTH = '64rem'
 const COLUMN_GRID_GAP = '5rem'

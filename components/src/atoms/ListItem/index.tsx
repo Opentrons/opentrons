@@ -56,7 +56,6 @@ export function ListItem(props: ListItemProps): JSX.Element {
     background-color: ${listItemProps.backgroundColor};
     width: 100%;
     height: ${FLEX_MAX_CONTENT};
-    padding: 0;
     border-radius: ${BORDERS.borderRadius4};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

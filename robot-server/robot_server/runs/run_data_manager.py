@@ -456,10 +456,20 @@ class RunDataManager:
         if self._run_orchestrator_store.current_run_id == run_id:
             return self._run_orchestrator_store.get_current_command()
         else:
-            # todo(mm, 2024-05-20):
-            # For historical runs to behave consistently with the current run,
-            # this should be the most recently completed command, not `None`.
-            return None
+            return self._get_historical_run_last_command(run_id=run_id)
+
+    def get_last_completed_command(self, run_id: str) -> Optional[CommandPointer]:
+        """Get the "last" command, if any.
+
+        See `ProtocolEngine.state_view.commands.get_most_recently_finalized_command()` for the definition of "last."
+
+        Args:
+            run_id: ID of the run.
+        """
+        if self._run_orchestrator_store.current_run_id == run_id:
+            return self._run_orchestrator_store.get_most_recently_finalized_command()
+        else:
+            return self._get_historical_run_last_command(run_id=run_id)
 
     def get_recovery_target_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the current error recovery target.
@@ -554,3 +564,22 @@ class RunDataManager:
             return self._run_orchestrator_store.get_run_time_parameters()
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)
+
+    def _get_historical_run_last_command(self, run_id: str) -> Optional[CommandPointer]:
+        command_slice = self._run_store.get_commands_slice(
+            run_id=run_id, cursor=None, length=1, include_fixit_commands=True
+        )
+        if not command_slice.commands:
+            return None
+        command = command_slice.commands[-1]
+
+        return (
+            CommandPointer(
+                command_id=command.id,
+                command_key=command.key,
+                created_at=command.createdAt,
+                index=command_slice.cursor,
+            )
+            if command
+            else None
+        )

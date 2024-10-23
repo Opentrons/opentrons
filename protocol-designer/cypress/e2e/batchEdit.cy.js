@@ -76,7 +76,7 @@ describe('Batch Edit Transform', () => {
 
     // Delete the duplicated steps
     cy.get('#ClickableIcon_delete').click()
-    cy.get('button').contains('delete steps').click()
+    cy.get('button').contains('Delete steps').click()
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
       .contains('1 steps selected')
       .should('exist')
