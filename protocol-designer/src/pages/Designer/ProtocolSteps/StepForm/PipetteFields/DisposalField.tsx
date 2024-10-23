@@ -15,6 +15,7 @@ import { BlowoutOffsetField } from './BlowoutOffsetField'
 
 import type { PathOption, StepType } from '../../../../../form-types'
 import type { FieldPropsByName } from '../types'
+import { FormWarning } from '../../../../../organisms'
 
 interface DisposalFieldProps {
   path: PathOption
@@ -22,6 +23,7 @@ interface DisposalFieldProps {
   propsForFields: FieldPropsByName
   stepType: StepType
   volume: string | null
+  dirtyFields: string[]
   aspirate_airGap_checkbox?: boolean | null
   aspirate_airGap_volume?: string | null
   tipRack?: string | null
@@ -37,6 +39,7 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
     aspirate_airGap_checkbox,
     aspirate_airGap_volume,
     tipRack,
+    dirtyFields,
   } = props
   const { t } = useTranslation(['application', 'form'])
 
@@ -78,6 +81,10 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
       isChecked={value === true}
       checkboxUpdateValue={updateValue}
     >
+      <FormWarning
+        dirtyFields={dirtyFields}
+        focusedField="disposalVolume_volume"
+      />
       {value ? (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
           <InputStepFormField

@@ -12,6 +12,7 @@ import {
 import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
+  getCurrentFormIsPresaved,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
@@ -40,10 +41,12 @@ import {
 } from '../../PipetteFields'
 import {
   getBlowoutLocationOptionsForForm,
+  getDirtyFields,
   getLabwareFieldForPositioningField,
 } from '../../utils'
 import type { StepFieldName } from '../../../../../../form-types'
 import type { StepFormProps } from '../../types'
+import { FormWarning } from '../../../../../../organisms'
 
 const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
@@ -54,6 +57,8 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_steps', 'form'])
   const { path } = formData
   const [tab, setTab] = useState<'aspirate' | 'dispense'>('aspirate')
+  const isNewStep = useSelector(getCurrentFormIsPresaved)
+  const dirtyFields = getDirtyFields(isNewStep, formData)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -406,6 +411,10 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             propsForFields[`${tab}_airGap_checkbox`].updateValue
           }
         >
+          {/* <FormWarning
+            dirtyFields={dirtyFields}
+            focusedField={`${tab}_airGap_volume`}
+          /> */}
           {formData[`${tab}_airGap_checkbox`] === true ? (
             <InputStepFormField
               showTooltip={false}
@@ -418,6 +427,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         </CheckboxExpandStepFormField>
         {path === 'multiDispense' && tab === 'dispense' && (
           <DisposalField
+            dirtyFields={dirtyFields}
             aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
             aspirate_airGap_volume={formData.aspirate_airGap_volume}
             path={formData.path}

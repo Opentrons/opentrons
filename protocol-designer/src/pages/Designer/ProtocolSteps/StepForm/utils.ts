@@ -125,6 +125,7 @@ export const getVisibleFormWarnings = (args: {
   errors: FormWarning[]
 }): FormWarning[] => {
   const { focusedField, dirtyFields, errors } = args
+  console.log(errors)
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
       // @ts-expect-error(sa, 2021-6-22): focusedField might be undefined
