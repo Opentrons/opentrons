@@ -75,19 +75,16 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isValidRunAgain = isRunAgainStatus(runStatus)
   const { isClosingCurrentRun } = useCloseCurrentRun()
 
-  // const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
-  //   isCurrentRun,
-  //   isSetupComplete,
-  //   isOtherRunCurrent,
-  //   isProtocolNotReady,
-  //   isRobotOnWrongVersionOfSoftware,
-  //   isValidRunAgain,
-  //   isClosingCurrentRun,
-  //   ...props,
-  // })
-
-  const isDisabled = false
-  const disabledReason = ''
+  const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
+    isCurrentRun,
+    isSetupComplete,
+    isOtherRunCurrent,
+    isProtocolNotReady,
+    isRobotOnWrongVersionOfSoftware,
+    isValidRunAgain,
+    isClosingCurrentRun,
+    ...props,
+  })
 
   const robot = useRobot(robotName)
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
