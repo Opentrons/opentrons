@@ -264,11 +264,11 @@ describe('useRecoveryCommands', () => {
     )
   })
 
-  it('should call homeGripperZAxis and resolve the promise', async () => {
+  it('should call useHomeGripper and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
-      await result.current.homeGripperZAxis()
+      await result.current.homeGripper()
     })
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
