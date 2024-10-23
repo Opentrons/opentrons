@@ -340,6 +340,8 @@ class FlexStacker():
 
     def home(self, axis: AXIS, direction: DIR, velocity: Optional[float] = None,
                                                 acceleration: Optional[float] = None):
+        # Set this to max current to overcome spring force on platforms
+        self.set_run_current(1.5, axis)
         if axis == AXIS.X or axis == AXIS.Z or axis == AXIS.L:
             max_speed_discontinuity = 5
             if velocity == None or acceleration == None:
