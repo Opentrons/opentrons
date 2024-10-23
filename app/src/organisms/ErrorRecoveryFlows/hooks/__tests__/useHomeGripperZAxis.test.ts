@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { useHomeGripper } from '../useHomeGripperZAxis'
+import { useHomeGripper } from '../useHomeGripper'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 describe('useHomeGripper', () => {
