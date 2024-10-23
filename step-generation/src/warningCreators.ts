@@ -27,7 +27,6 @@ export function tiprackInWasteChuteHasTips(): CommandCreatorWarning {
 export function potentiallyUnreachableTemp(): CommandCreatorWarning {
   return {
     type: 'TEMPERATURE_IS_POTENTIALLY_UNREACHABLE',
-    message:
-      'The module set temperature is potentially unreachable.',
+    message: 'The module set temperature is potentially unreachable.',
   }
 }
