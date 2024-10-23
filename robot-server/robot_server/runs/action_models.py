@@ -27,10 +27,11 @@ class RunActionType(str, Enum):
     recovery mode after a `commandType: "pickUpTip"` command failed with an
     `errorType: "tipPhysicallyMissing"` error. That normally leaves the robot thinking
     it has no tip attached. If you use `"resume-from-recovery"`, the robot will run
-    the next protocol command acting as if it has no tip attached. (This may cause
-    another error, if it can't do that.)
-    If you use `"resume-from-recovery-assuming-false-positive"`,
-    the robot will act as if it *does* have a tip attached.
+    the next protocol command from that state, acting as if there's no tip attached.
+    (This may cause another error, if the next command needs a tip.)
+    Whereas if you use `"resume-from-recovery-assuming-false-positive"`,
+    the robot will try to nullify the error, thereby acting as if it *does* have a tip
+    attached.
 
     Generally:
 
