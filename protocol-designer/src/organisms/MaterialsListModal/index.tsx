@@ -96,13 +96,18 @@ export function MaterialsListModal({
                       <ListItemDescriptor
                         type="large"
                         description={
-                          fixture.location != null ? (
-                            <DeckInfoLabel
-                              deckLabel={fixture.location.replace('cutout', '')}
-                            />
-                          ) : (
-                            ''
-                          )
+                          <Flex minWidth="13.75rem">
+                            {fixture.location != null ? (
+                              <DeckInfoLabel
+                                deckLabel={fixture.location.replace(
+                                  'cutout',
+                                  ''
+                                )}
+                              />
+                            ) : (
+                              ''
+                            )}
+                          </Flex>
                         }
                         content={
                           <Flex
