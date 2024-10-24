@@ -105,6 +105,7 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
             : undefined
         }
         width="100%"
+        iconMarginLeft={SPACING.spacing4}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
