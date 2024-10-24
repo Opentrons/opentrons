@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from decoy import Decoy, matchers
+from unittest.mock import sentinel
 
 from opentrons.types import MountType, Point
 
@@ -11,7 +12,7 @@ from opentrons.protocol_engine import (
     WellOffset,
     DeckPoint,
 )
-from opentrons.protocol_engine.errors import TipNotAttachedError
+from opentrons.protocol_engine.errors import PickUpTipTipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import update_types
@@ -140,7 +141,7 @@ async def test_tip_physically_missing_error(
         await tip_handler.pick_up_tip(
             pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
         )
-    ).then_raise(TipNotAttachedError())
+    ).then_raise(PickUpTipTipNotAttachedError(tip_geometry=sentinel.tip_geometry))
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
 
@@ -163,5 +164,10 @@ async def test_tip_physically_missing_error(
             tips_used=update_types.TipsUsedUpdate(
                 pipette_id="pipette-id", labware_id="labware-id", well_name="well-name"
             ),
+        ),
+        state_update_if_false_positive=update_types.StateUpdate(
+            pipette_tip_state=update_types.PipetteTipStateUpdate(
+                pipette_id="pipette-id", tip_geometry=sentinel.tip_geometry
+            )
         ),
     )
