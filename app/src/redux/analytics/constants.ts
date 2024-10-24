@@ -97,3 +97,9 @@ export const ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE = 'quickTransferDetailsPage'
 export const ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS =
   'quickTransferRunFromDetails'
 export const ANALYTICS_QUICK_TRANSFER_RERUN = 'quickTransferReRunFromSummary'
+
+/**
+ * Resource Monitor Analytics
+ */
+export const ANALYTICS_RESOURCE_MONITOR_REPORT: 'analytics:RESOURCE_MONITOR_REPORT' =
+  'analytics:RESOURCE_MONITOR_REPORT'

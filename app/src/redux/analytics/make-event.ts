@@ -247,6 +247,15 @@ export function makeEvent(
       })
     }
 
+    case Constants.ANALYTICS_RESOURCE_MONITOR_REPORT: {
+      return Promise.resolve({
+        name: 'resourceMonitorReport',
+        properties: {
+          ...action.payload,
+        },
+      })
+    }
+
     case RobotAdmin.RESET_CONFIG: {
       const { resets } = action.payload
       return Promise.resolve({

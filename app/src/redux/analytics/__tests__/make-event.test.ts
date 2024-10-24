@@ -121,4 +121,23 @@ describe('analytics events map', () => {
       })
     })
   })
+
+  describe('events with calibration data', () => {
+    it('analytics:RESOURCE_MONITOR_REPORT -> resourceMonitorReport event', () => {
+      const state = {} as any
+      const action = {
+        type: 'analytics:RESOURCE_MONITOR_REPORT',
+        payload: {
+          systemAvailMemMb: '500',
+          systemUptimeHrs: '111',
+          processesDetails: [],
+        },
+      } as any
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'resourceMonitorReport',
+        properties: { ...action.payload },
+      })
+    })
+  })
 })
