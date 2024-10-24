@@ -3,8 +3,6 @@ import {
   Btn,
   COLORS,
   Check,
-  Checkbox,
-  CheckboxField,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
