@@ -1440,6 +1440,11 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
         self._log.info(f"Move: deck {target_position} becomes machine {machine_pos}")
         origin = await self._backend.update_position()
+
+        if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            origin[Axis.Q] = self._backend.gear_motor_position or 0.0
+        self._log.info(f"Move from: origin is {origin}")
+
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
