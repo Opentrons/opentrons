@@ -22,6 +22,9 @@ from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.state.commands import (
+    # todo(mm, 2024-10-24): Avoid testing internal implementation details like
+    # _RecoveryTargetInfo. See note above about porting to test_command_state.py.
+    _RecoveryTargetInfo,
     CommandState,
     CommandView,
     CommandSlice,
@@ -38,6 +41,7 @@ from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOc
 from opentrons_shared_data.errors.codes import ErrorCodes
 
 from opentrons.protocol_engine.state.command_history import CommandHistory
+from opentrons.protocol_engine.state.update_types import StateUpdate
 
 from .command_fixtures import (
     create_queued_command,
@@ -108,7 +112,12 @@ def get_command_view(  # noqa: C901
         finish_error=finish_error,
         failed_command=failed_command,
         command_error_recovery_types=command_error_recovery_types or {},
-        recovery_target_command_id=recovery_target_command_id,
+        recovery_target=_RecoveryTargetInfo(
+            command_id=recovery_target_command_id,
+            state_update_if_false_positive=StateUpdate(),
+        )
+        if recovery_target_command_id is not None
+        else None,
         run_started_at=run_started_at,
         latest_protocol_command_hash=latest_command_hash,
         stopped_by_estop=False,
@@ -592,7 +601,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
                 ),
             ),
         ),
-        action=ResumeFromRecoveryAction(),
+        action=ResumeFromRecoveryAction(StateUpdate()),
         expected_error=errors.ResumeFromRecoveryNotAllowedError,
     ),
     ActionAllowedSpec(

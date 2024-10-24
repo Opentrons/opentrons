@@ -32,6 +32,7 @@ from opentrons.protocol_engine.state.commands import (
     CommandView,
 )
 from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.protocol_engine.types import DeckType, EngineStatus
 
 
@@ -772,7 +773,7 @@ def test_recovery_target_tracking() -> None:
     assert recovery_target.command_id == "c1"
     assert subject_view.get_recovery_in_progress_for_command("c1")
 
-    resume_from_1_recovery = actions.ResumeFromRecoveryAction()
+    resume_from_1_recovery = actions.ResumeFromRecoveryAction(StateUpdate())
     subject.handle_action(resume_from_1_recovery)
 
     # c1 failed recoverably, but we've already completed its recovery.
@@ -808,7 +809,7 @@ def test_recovery_target_tracking() -> None:
     # even though it failed recoverably before.
     assert not subject_view.get_recovery_in_progress_for_command("c1")
 
-    resume_from_2_recovery = actions.ResumeFromRecoveryAction()
+    resume_from_2_recovery = actions.ResumeFromRecoveryAction(StateUpdate())
     subject.handle_action(resume_from_2_recovery)
     queue_3 = actions.QueueCommandAction(
         "c3",

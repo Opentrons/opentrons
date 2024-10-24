@@ -10,6 +10,7 @@ from decoy import Decoy
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_engine.actions.actions import SetErrorRecoveryPolicyAction
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
@@ -634,7 +635,16 @@ def test_resume_from_recovery(
     reconcile_false_positive: bool,
 ) -> None:
     """It should dispatch a ResumeFromRecoveryAction."""
-    expected_action = ResumeFromRecoveryAction(reconcile_false_positive)
+    decoy.when(state_store.commands.get_state_update_for_false_positive()).then_return(
+        sentinel.state_update_for_false_positive
+    )
+    empty_state_update = StateUpdate()
+
+    expected_action = ResumeFromRecoveryAction(
+        sentinel.state_update_for_false_positive
+        if reconcile_false_positive
+        else empty_state_update
+    )
 
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action)
