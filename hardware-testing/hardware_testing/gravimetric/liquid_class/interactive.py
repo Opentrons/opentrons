@@ -1,18 +1,18 @@
 """Interactive."""
 from copy import deepcopy
 from dataclasses import fields
-from typing import Optional
+from typing import Optional, Any
 
 from .definition import (
     LiquidClassSettings,
 )
 
 
-def _user_input_value_for_attribute(attribute: str, default: Optional[float]) -> float:
+def _user_input_value_for_attribute(attribute: str, default: Optional[Any]) -> float:
     if isinstance(default, bool):
         def_str = "y" if default else "n"
         type_str = "y/n"
-    elif isinstance(default, float):
+    elif isinstance(default, float) or isinstance(default, int):
         def_str = str(default)
         type_str = "float"
     else:
@@ -24,7 +24,7 @@ def _user_input_value_for_attribute(attribute: str, default: Optional[float]) ->
         assert default is not None
         return default
     try:
-        if isinstance(default, float):
+        if isinstance(default, float) or isinstance(default, int):
             return float(_inp.strip())
         elif isinstance(default, bool):
             return bool(_inp.strip()[0].lower() == "y")

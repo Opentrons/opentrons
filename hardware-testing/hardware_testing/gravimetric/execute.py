@@ -263,6 +263,7 @@ def _run_trial(
     trial: GravimetricTrial,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     global _PREV_TRIAL_GRAMS
+    assert trial.pipette.has_tip
     pipetting_callbacks = _generate_callbacks_for_trial(
         trial.ctx,
         trial.pipette,
@@ -334,25 +335,23 @@ def _run_trial(
 
     ui.print_info("recorded weights:")
 
-    # RUN MIX
     if trial.mix:
-        mix_with_liquid_class(
-            ctx=trial.ctx,
-            liquid_class=liquid_class,
-            pipette=trial.pipette,
-            mix_volume=max(trial.volume, 5),
-            well=trial.well,
-            channel_offset=trial.channel_offset,
-            channel_count=trial.channel_count,
-            liquid_tracker=trial.liquid_tracker,
-            callbacks=pipetting_callbacks,
-            blank=trial.blank,
-            mode=trial.mode,
-            clear_accuracy_function=trial.cfg.nominal_plunger,
+        raise NotImplementedError("mix testing not implemented")
+
+    # center channel over well
+    trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
+    if not trial.cfg.only_lld_once:
+        liq_height = _get_liquid_height(
+            trial.ctx,
+            trial.pipette,
+            trial.well,
+            jog=trial.cfg.jog,
+            same_tip=trial.cfg.same_tip,
         )
-    else:
-        # center channel over well
-        trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
+        trial.liquid_tracker.set_start_volume_from_liquid_height(
+            trial.well, liq_height, name=trial.cfg.liquid
+        )
+
     if not trial.recorder.is_simulator:
         trial.pipette._retract()  # retract to top of gantry
     else:
@@ -360,7 +359,7 @@ def _run_trial(
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
-    if _PREV_TRIAL_GRAMS is not None:
+    if not trial.cfg.jog and _PREV_TRIAL_GRAMS is not None:
         liq = SupportedLiquid.from_string(trial.cfg.liquid)
         _evaporation_loss_ul = abs(
             calculate_change_in_volume(
@@ -588,23 +587,27 @@ def _calculate_evaporation(
 
 
 def _get_liquid_height(
-    resources: TestResources, cfg: config.GravimetricConfig, well: Well
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    well: Well,
+    jog: bool = False,
+    same_tip: bool = False,
 ) -> float:
-    resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
-    if cfg.pipette_channels == 96:
-        if not resources.ctx.is_simulating() and not cfg.same_tip:
+    assert pipette.has_tip
+    pipette.move_to(well.top(0))
+    if pipette.channels == 96:
+        if not ctx.is_simulating() and not same_tip:
             ui.alert_user_ready(
-                f"Please replace the {cfg.tip_volume}ul tips in slot 2",
-                get_sync_hw_api(resources.ctx),
+                f"Please replace the tips in slot 2",
+                get_sync_hw_api(ctx),
             )
         _tip_counter[0] = 0
-    if cfg.jog:
-        _liquid_height = _jog_to_find_liquid_height(
-            resources.ctx, resources.pipette, well
-        )
+    if jog:
+        ui.print_title("FIND LIQUID HEIGHT")
+        _liquid_height = _jog_to_find_liquid_height(ctx, pipette, well)
     else:
-        _liquid_height = _sense_liquid_height(resources.ctx, resources.pipette, well)
-    resources.pipette.move_to(well.top().move(Point(0, 0, _minimum_z_height(cfg))))
+        _liquid_height = _sense_liquid_height(ctx, pipette, well)
+    pipette.move_to(well.top(0))
     return _liquid_height
 
 
@@ -648,23 +651,32 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
     try:
-        ui.print_title("FIND LIQUID HEIGHT")
-        first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
-        setup_channel_offset = _get_channel_offset(cfg, channel=0)
-        first_tip_location = first_tip.top().move(setup_channel_offset)
-        _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
-        ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
-        _liquid_height = _get_liquid_height(resources, cfg, well)
-        height_below_top = well.depth - _liquid_height
-        ui.print_info(f"liquid is {height_below_top} mm below top of vial")
+        if cfg.jog or cfg.blank or cfg.only_lld_once:
+            first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
+            setup_channel_offset = _get_channel_offset(cfg, channel=0)
+            first_tip_location = first_tip.top().move(setup_channel_offset)
+            _pick_up_tip(
+                resources.ctx, resources.pipette, cfg, location=first_tip_location
+            )
+            ui.print_info("moving to scale")
+        if cfg.jog or cfg.only_lld_once:
+            liq_height = _get_liquid_height(
+                resources.ctx,
+                resources.pipette,
+                well,
+                jog=cfg.jog,
+                same_tip=cfg.same_tip,
+            )
+        else:
+            # NOTE: give it a "safe" height near the top, knowing that
+            #       we will eventually be probing the liquid
+            liq_height = well.depth - 1
         liquid_tracker.set_start_volume_from_liquid_height(
-            well, _liquid_height, name="Water"
+            well, liq_height, name=cfg.liquid
         )
-        vial_volume = liquid_tracker.get_volume(well)
-        ui.print_info(
-            f"software thinks there is {vial_volume} uL of liquid in the vial"
-        )
+
+        # EVAPORATION MEASUREMENT
         if not cfg.blank:
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
@@ -682,8 +694,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 labware_on_scale,
             )
         hw_api.set_status_bar_state(StatusBarState.IDLE)
-        ui.print_info("dropping tip")
-        if not cfg.same_tip:
+
+        # drop that first "setup" tip
+        if not cfg.same_tip and resources.pipette.has_tip:
+            ui.print_info("dropping tip")
             _drop_tip(
                 resources.pipette,
                 return_tip=False,
@@ -691,6 +705,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 offset=_get_channel_offset(cfg, 0),
             )  # always trash calibration tips
         calibration_tip_in_use = False
+
+        # RUN TRIALS
         trial_count = 0
         trials = build_gravimetric_trials(
             resources.ctx,

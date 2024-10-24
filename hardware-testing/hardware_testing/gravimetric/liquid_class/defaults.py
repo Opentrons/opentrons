@@ -867,7 +867,6 @@ def get_liquid_class(
     _cls_per_volume = _defaults[tip][pipette][channels]
     defined_volumes = list(_cls_per_volume.keys())
     defined_volumes.sort()
-    print(defined_volumes)
 
     def _build_liquid_class(vol: float) -> LiquidClassSettings:
         _cls = deepcopy(_cls_per_volume[vol][cls_name])
@@ -922,6 +921,4 @@ def set_liquid_class(
     _cls_per_volume = _defaults[tip][pipette][channels]
     if volume not in _cls_per_volume:
         _cls_per_volume[volume] = {}
-    print(f"storing volume: {volume}")
-    print(new_settings.aspirate.z_speed)
     _cls_per_volume[volume][cls_name] = new_settings

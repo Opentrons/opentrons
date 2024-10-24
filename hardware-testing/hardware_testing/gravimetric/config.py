@@ -35,6 +35,7 @@ class VolumetricConfig:
     kind: ConfigType
     extra: bool
     jog: bool
+    only_lld_once: bool
     same_tip: bool
     ignore_fail: bool
     mode: str
