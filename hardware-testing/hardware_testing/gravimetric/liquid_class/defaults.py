@@ -48,7 +48,7 @@ _default_dispense: Dict[str, DispenseSettings] = {
         flow_rate=None,
         break_off=None,
         push_out=None,
-        submerge_mm=-3.0,
+        submerge_mm=3.0,
         retract_mm=3.0,
         delay=0.5,
         blow_out=False,
@@ -481,7 +481,7 @@ _defaults: Dict[
                             z_speed=None,
                             flow_rate=716,
                             break_off=_default_accel_p1000_ul_sec_sec,
-                            push_out=5,
+                            push_out=12,  # NOTE: production (contact) is 5uL
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -543,7 +543,7 @@ _defaults: Dict[
                             z_speed=None,
                             flow_rate=716,
                             break_off=_default_accel_p1000_ul_sec_sec,
-                            push_out=5,
+                            push_out=12,  # NOTE: production (contact) is 5uL
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -605,7 +605,7 @@ _defaults: Dict[
                             z_speed=None,
                             flow_rate=716,
                             break_off=_default_accel_p1000_ul_sec_sec,
-                            push_out=5,
+                            push_out=12,  # NOTE: production (contact) uses 5uL
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
