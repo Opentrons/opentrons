@@ -472,7 +472,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
-                            air_gap=0,
+                            air_gap=5,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -534,7 +534,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
-                            air_gap=0,
+                            air_gap=3.5,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -664,7 +664,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=160,
-                            air_gap=0,
+                            air_gap=10,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -726,7 +726,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
-                            air_gap=0,
+                            air_gap=10,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -788,7 +788,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
-                            air_gap=0,
+                            air_gap=10,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
