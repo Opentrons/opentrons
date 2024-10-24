@@ -28,6 +28,10 @@ function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
     })
   )
 
+  if (timelineErrors.length === 0) {
+    return null
+  }
+
   const makeAlert: MakeAlert = (alertType, data, key) => (
     <Banner
       type={alertType === 'error' ? 'error' : 'warning'}
@@ -43,11 +47,11 @@ function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
     </Banner>
   )
 
-  return timelineErrors.length > 0 ? (
+  return (
     <Flex {...props}>
       {timelineErrors.map((error, key) => makeAlert('error', error, key))}
     </Flex>
-  ) : null
+  )
 }
 
 export const TimelineAlerts = memo(TimelineAlertsComponent)
