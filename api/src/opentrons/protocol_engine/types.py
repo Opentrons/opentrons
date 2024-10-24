@@ -378,25 +378,18 @@ class ProbedVolumeInfo(BaseModel):
     operations_since_probe: int
 
 
-class LoadedVolumeSummary(LoadedVolumeInfo):
-    """Payload for a well's loaded volume in StateSummary."""
+class WellInfoSummary(BaseModel):
+    """Payload for a well's liquid info in StateSummary."""
 
     labware_id: str
     well_name: str
-
-
-class ProbedHeightSummary(ProbedHeightInfo):
-    """Payload for a well's probed height in StateSummary."""
-
-    labware_id: str
-    well_name: str
-
-
-class ProbedVolumeSummary(ProbedVolumeInfo):
-    """Payload for a well's probed volume in StateSummary."""
-
-    labware_id: str
-    well_name: str
+    loaded_volume: Optional[float] = None
+    last_loaded: Optional[datetime] = None
+    operations_since_load: Optional[int] = None
+    probed_height: Optional[float] = None
+    probed_volume: Optional[float] = None
+    last_probed: Optional[datetime] = None
+    operations_since_probe: Optional[int] = None
 
 
 @dataclass(frozen=True)

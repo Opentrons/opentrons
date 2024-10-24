@@ -166,5 +166,10 @@ async def test_overpressure_error(
                 ),
                 new_deck_point=DeckPoint.construct(x=1, y=2, z=3),
             ),
+            liquid_operated=update_types.LiquidOperatedUpdate(
+                labware_id="labware-id",
+                well_name="well-name",
+                volume=None,
+            ),
         ),
     )

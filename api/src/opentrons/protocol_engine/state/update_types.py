@@ -202,7 +202,7 @@ class LiquidOperatedUpdate:
 
     labware_id: str
     well_name: str
-    volume: float
+    volume: typing.Optional[float] = None
 
 
 @dataclasses.dataclass
@@ -401,7 +401,7 @@ class StateUpdate:
         self,
         labware_id: str,
         well_name: str,
-        volume: float,
+        volume: typing.Optional[float] = None,
     ) -> None:
         """Update liquid volumes in well state. See `OperateLiquidUpdate`."""
         self.liquid_operated = LiquidOperatedUpdate(

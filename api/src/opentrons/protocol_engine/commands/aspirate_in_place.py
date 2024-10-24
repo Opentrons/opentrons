@@ -100,6 +100,7 @@ class AspirateInPlaceImplementation(
                 command_note_adder=self._command_note_adder,
             )
         except PipetteOverpressureError as e:
+            # TODO(pbm, 10-24-24): if location is a well, get new tip and LiquidProbe in error recovery to reestablish well liquid level
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),
@@ -123,6 +124,7 @@ class AspirateInPlaceImplementation(
                 ),
             )
         else:
+            # if location is a well, update WellStore
             return SuccessData(
                 public=AspirateInPlaceResult(volume=volume), private=None
             )

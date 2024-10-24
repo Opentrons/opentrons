@@ -140,7 +140,12 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                 command_note_adder=self._command_note_adder,
             )
         except PipetteOverpressureError as e:
-            # can we get aspirated_amount_prior_to_error? If not, can we assume no liquid was removed from well? Ask Ryan
+            # TODO(pbm, 10-24-24): get new tip and LiquidProbe in error recovery to reestablish well liquid level
+            state_update.set_liquid_operated(
+                labware_id=labware_id,
+                well_name=well_name,
+                volume=None,
+            )
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),

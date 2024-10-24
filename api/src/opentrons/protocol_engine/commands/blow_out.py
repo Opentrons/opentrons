@@ -93,7 +93,6 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, _ExecuteReturn]):
                 pipette_id=params.pipetteId, flow_rate=params.flowRate
             )
         except PipetteOverpressureError as e:
-            # can we get blown_out_amount_prior_to_error? If not, can we assume no liquid was added to well? Ask Ryan
             return DefinedErrorData(
                 public=OverpressureError(
                     id=self._model_utils.generate_id(),
@@ -115,7 +114,6 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, _ExecuteReturn]):
                 ),
             )
         else:
-            # if blow out over a well, can we get pipette tip liquid volume and add that to well liquid volume?
             return SuccessData(
                 public=BlowOutResult(position=deck_point),
                 private=None,
