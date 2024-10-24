@@ -63,7 +63,7 @@
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
-        "x": 0,
+        "x": 0.25,
         "y": 0,
         "z": 0
       },
@@ -75,9 +75,9 @@
     },
     "lidOffsets": {
       "pickUpOffset": {
-        "x": 0.25,
+        "x": 0,
         "y": 0,
-        "z": 0
+        "z": -5
       },
       "dropOffset": {
         "x": 0,

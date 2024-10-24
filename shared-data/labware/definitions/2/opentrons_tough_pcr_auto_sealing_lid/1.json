@@ -44,7 +44,7 @@
     "opentrons_tough_pcr_auto_sealing_lid": {
       "x": 0,
       "y": 0,
-      "z": 6.492
+      "z": 6.31
     },
     "armadillo_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
@@ -62,13 +62,13 @@
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
-        "x": 0,
+        "x": 0.25,
         "y": 0,
-        "z": 1.5
+        "z": 0
       },
       "dropOffset": {
         "x": 0,
-        "y": 0.52,
+        "y": 0,
         "z": -6
       }
     },
@@ -79,9 +79,9 @@
         "z": -5
       },
       "dropOffset": {
-        "x": 0.5,
+        "x": 0,
         "y": 0,
-        "z": -1
+        "z": 0
       }
     }
   }
