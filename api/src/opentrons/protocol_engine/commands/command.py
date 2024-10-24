@@ -147,6 +147,10 @@ class DefinedErrorData(Generic[_ErrorT_co]):
     )
     """How the engine state should be updated to reflect this command failure."""
 
+    state_update_if_false_positive: StateUpdate = dataclasses.field(
+        default_factory=StateUpdate
+    )
+
 
 class BaseCommand(
     GenericModel,

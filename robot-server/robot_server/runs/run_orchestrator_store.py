@@ -310,9 +310,9 @@ class RunOrchestratorStore:
         """Stop the run."""
         await self.run_orchestrator.stop()
 
-    def resume_from_recovery(self) -> None:
+    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery mode."""
-        self.run_orchestrator.resume_from_recovery()
+        self.run_orchestrator.resume_from_recovery(reconcile_false_positive)
 
     async def finish(self, error: Optional[Exception]) -> None:
         """Finish the run."""

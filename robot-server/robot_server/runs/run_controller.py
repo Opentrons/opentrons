@@ -95,15 +95,22 @@ class RunController:
                 self._task_runner.run(self._run_orchestrator_store.stop)
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
-                self._run_orchestrator_store.resume_from_recovery()
+                log.info(f'Resuming run "{self._run_id}" from error recovery mode.')
+                self._run_orchestrator_store.resume_from_recovery(
+                    reconcile_false_positive=False
+                )
 
             elif (
                 action_type
                 == RunActionType.RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE
             ):
-                # todo(mm, 2024-10-23): Connect to work in
-                # https://github.com/Opentrons/opentrons/pull/16556.
-                self._run_orchestrator_store.resume_from_recovery()
+                log.info(
+                    f'Resuming run "{self._run_id}" from error recovery mode,'
+                    f" assuming false-positive."
+                )
+                self._run_orchestrator_store.resume_from_recovery(
+                    reconcile_false_positive=True
+                )
 
             else:
                 assert_never(action_type)

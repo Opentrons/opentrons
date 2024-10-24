@@ -304,7 +304,9 @@ def test_create_resume_from_recovery_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_run_orchestrator_store.resume_from_recovery())
+    decoy.verify(
+        mock_run_orchestrator_store.resume_from_recovery(reconcile_false_positive=False)
+    )
 
 
 @pytest.mark.parametrize(

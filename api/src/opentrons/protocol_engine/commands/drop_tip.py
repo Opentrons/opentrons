@@ -146,7 +146,15 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
                     )
                 ],
             )
-            return DefinedErrorData(public=error, state_update=state_update)
+            state_update_if_false_positive = update_types.StateUpdate()
+            state_update_if_false_positive.update_pipette_tip_state(
+                pipette_id=params.pipetteId, tip_geometry=None
+            )
+            return DefinedErrorData(
+                public=error,
+                state_update=state_update,
+                state_update_if_false_positive=state_update_if_false_positive,
+            )
         else:
             state_update.update_pipette_tip_state(
                 pipette_id=params.pipetteId, tip_geometry=None

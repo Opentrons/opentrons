@@ -6,7 +6,7 @@ from typing import Dict, Optional, List, Union
 from opentrons.protocol_engine.state import update_types
 
 from ._abstract_store import HasState, HandlesActions
-from ..actions import Action, SucceedCommandAction, ResetTipsAction, get_state_update
+from ..actions import Action, SucceedCommandAction, ResetTipsAction, get_state_updates
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -63,8 +63,7 @@ class TipStore(HasState[TipState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        state_update = get_state_update(action)
-        if state_update is not None:
+        for state_update in get_state_updates(action):
             self._handle_state_update(state_update)
 
         if isinstance(action, SucceedCommandAction):

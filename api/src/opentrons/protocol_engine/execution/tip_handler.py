@@ -4,6 +4,9 @@ from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import FailedTipStateCheck, InstrumentProbeType
+from opentrons.protocol_engine.errors.exceptions import PickUpTipTipNotAttachedError
+from opentrons.types import Mount
+
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -70,7 +73,7 @@ class TipHandler(TypingProtocol):
             Tip geometry of the picked up tip.
 
         Raises:
-            TipNotAttachedError
+            PickUpTipTipNotAttachedError
         """
         ...
 
@@ -83,8 +86,11 @@ class TipHandler(TypingProtocol):
             TipAttachedError
         """
 
-    async def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
+
+    def remove_tip(self, pipette_id: str) -> None:
+        """Tell the hardware API that no tip is attached."""
 
     async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
         """Get tip presence status on the pipette."""
@@ -198,6 +204,11 @@ class HardwareTipHandler(TipHandler):
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._state_view = state_view
 
+        # WARNING: ErrorRecoveryHardwareStateSynchronizer can currently construct several
+        # instances of this class per run, in addition to the main instance used
+        # for command execution. We're therefore depending on this class being
+        # stateless, so consider that before adding additional attributes here.
+
     async def available_for_nozzle_layout(
         self,
         pipette_id: str,
@@ -223,7 +234,7 @@ class HardwareTipHandler(TipHandler):
         well_name: str,
     ) -> TipGeometry:
         """See documentation on abstract base class."""
-        hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+        hw_mount = self._get_hw_mount(pipette_id)
 
         nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
             pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
@@ -234,6 +245,7 @@ class HardwareTipHandler(TipHandler):
             labware_definition=self._state_view.labware.get_definition(labware_id),
             nominal_fallback=nominal_tip_geometry.length,
         )
+
         tip_geometry = TipGeometry(
             length=actual_tip_length,
             diameter=nominal_tip_geometry.diameter,
@@ -243,10 +255,12 @@ class HardwareTipHandler(TipHandler):
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
         )
-        # Allow TipNotAttachedError to propagate.
-        await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+        try:
+            await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+        except TipNotAttachedError as e:
+            raise PickUpTipTipNotAttachedError(tip_geometry=tip_geometry) from e
 
-        await self.cache_tip(pipette_id, tip_geometry)
+        self.cache_tip(pipette_id, tip_geometry)
 
         await self._hardware_api.prepare_for_aspirate(hw_mount)
 
@@ -254,7 +268,7 @@ class HardwareTipHandler(TipHandler):
 
     async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
         """See documentation on abstract base class."""
-        hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+        hw_mount = self._get_hw_mount(pipette_id)
 
         # Let the hardware controller handle defaulting home_after since its behavior
         # differs between machines
@@ -268,12 +282,11 @@ class HardwareTipHandler(TipHandler):
         # Allow TipNotAttachedError to propagate.
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
 
-        self._hardware_api.remove_tip(hw_mount)
-        self._hardware_api.set_current_tiprack_diameter(hw_mount, 0)
+        self.remove_tip(pipette_id)
 
-    async def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """See documentation on abstract base class."""
-        hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+        hw_mount = self._get_hw_mount(pipette_id)
 
         self._hardware_api.cache_tip(mount=hw_mount, tip_length=tip.length)
 
@@ -287,12 +300,18 @@ class HardwareTipHandler(TipHandler):
             tip_volume=tip.volume,
         )
 
+    def remove_tip(self, pipette_id: str) -> None:
+        """See documentation on abstract base class."""
+        hw_mount = self._get_hw_mount(pipette_id)
+        self._hardware_api.remove_tip(hw_mount)
+        self._hardware_api.set_current_tiprack_diameter(hw_mount, 0)
+
     async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
         """See documentation on abstract base class."""
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
 
-            hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+            hw_mount = self._get_hw_mount(pipette_id)
 
             status = await ot3api.get_tip_presence_status(hw_mount)
             return TipPresenceStatus.from_hw_state(status)
@@ -333,7 +352,7 @@ class HardwareTipHandler(TipHandler):
             return
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
-            hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+            hw_mount = self._get_hw_mount(pipette_id)
             await ot3api.verify_tip_presence(
                 hw_mount, expected.to_hw_state(), follow_singular_sensor
             )
@@ -350,6 +369,9 @@ class HardwareTipHandler(TipHandler):
                     message="Unknown tip status in tip status check",
                     wrapping=[PythonException(e)],
                 )
+
+    def _get_hw_mount(self, pipette_id: str) -> Mount:
+        return self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
 
 class VirtualTipHandler(TipHandler):
@@ -414,12 +436,19 @@ class VirtualTipHandler(TipHandler):
             expected_has_tip=True,
         )
 
-    async def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
-        """Add a tip using a virtual pipette.
+    def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+        """See documentation on abstract base class.
 
         This should not be called when using virtual pipettes.
         """
         assert False, "TipHandler.cache_tip should not be used with virtual pipettes"
+
+    def remove_tip(self, pipette_id: str) -> None:
+        """See documentation on abstract base class.
+
+        This should not be called when using virtual pipettes.
+        """
+        assert False, "TipHandler.remove_tip should not be used with virtual pipettes"
 
     async def verify_tip_presence(
         self,

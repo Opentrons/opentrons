@@ -19,7 +19,7 @@ from opentrons.protocol_engine.actions.actions import (
     PlayAction,
     SetErrorRecoveryPolicyAction,
 )
-from opentrons.protocol_engine.commands.command import CommandIntent
+from opentrons.protocol_engine.commands.command import CommandIntent, DefinedErrorData
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import (
@@ -32,6 +32,7 @@ from opentrons.protocol_engine.state.commands import (
     CommandView,
 )
 from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.protocol_engine.types import DeckType, EngineStatus
 
 
@@ -772,7 +773,7 @@ def test_recovery_target_tracking() -> None:
     assert recovery_target.command_id == "c1"
     assert subject_view.get_recovery_in_progress_for_command("c1")
 
-    resume_from_1_recovery = actions.ResumeFromRecoveryAction()
+    resume_from_1_recovery = actions.ResumeFromRecoveryAction(StateUpdate())
     subject.handle_action(resume_from_1_recovery)
 
     # c1 failed recoverably, but we've already completed its recovery.
@@ -808,7 +809,7 @@ def test_recovery_target_tracking() -> None:
     # even though it failed recoverably before.
     assert not subject_view.get_recovery_in_progress_for_command("c1")
 
-    resume_from_2_recovery = actions.ResumeFromRecoveryAction()
+    resume_from_2_recovery = actions.ResumeFromRecoveryAction(StateUpdate())
     subject.handle_action(resume_from_2_recovery)
     queue_3 = actions.QueueCommandAction(
         "c3",
@@ -993,3 +994,57 @@ def test_set_and_get_error_recovery_policy() -> None:
     assert subject_view.get_error_recovery_policy() is initial_policy
     subject.handle_action(SetErrorRecoveryPolicyAction(sentinel.new_policy))
     assert subject_view.get_error_recovery_policy() is new_policy
+
+
+def test_get_state_update_for_false_positive() -> None:
+    """Test storage of false-positive state updates."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+
+    empty_state_update = StateUpdate()
+
+    assert subject_view.get_state_update_for_false_positive() == empty_state_update
+
+    queue = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+    )
+    subject.handle_action(queue)
+    run = actions.RunCommandAction(
+        command_id="command-id-1",
+        started_at=datetime(year=2022, month=2, day=2),
+    )
+    subject.handle_action(run)
+    fail = actions.FailCommandAction(
+        command_id="command-id-1",
+        running_command=subject_view.get("command-id-1"),
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=DefinedErrorData(
+            public=sentinel.public,
+            state_update_if_false_positive=sentinel.state_update_if_false_positive,
+        ),
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+        notes=[],
+    )
+    subject.handle_action(fail)
+
+    assert (
+        subject_view.get_state_update_for_false_positive()
+        == sentinel.state_update_if_false_positive
+    )
+
+    resume_from_recovery = actions.ResumeFromRecoveryAction(
+        state_update=sentinel.some_other_state_update
+    )
+    subject.handle_action(resume_from_recovery)
+
+    assert subject_view.get_state_update_for_false_positive() == empty_state_update

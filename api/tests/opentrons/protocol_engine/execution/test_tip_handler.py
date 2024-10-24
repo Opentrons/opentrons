@@ -266,7 +266,7 @@ async def test_drop_tip(
     )
 
 
-async def test_add_tip(
+def test_add_tip(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -289,7 +289,7 @@ async def test_add_tip(
         MountType.LEFT
     )
 
-    await subject.cache_tip(pipette_id="pipette-id", tip=tip)
+    subject.cache_tip(pipette_id="pipette-id", tip=tip)
 
     decoy.verify(
         mock_hardware_api.cache_tip(mount=Mount.LEFT, tip_length=50),
@@ -298,6 +298,31 @@ async def test_add_tip(
             tiprack_diameter=5,
         ),
         mock_hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
+    )
+
+
+def test_remove_tip(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    mock_labware_data_provider: LabwareDataProvider,
+) -> None:
+    """It should remove a tip manually from the hardware API."""
+    subject = HardwareTipHandler(
+        state_view=mock_state_view,
+        hardware_api=mock_hardware_api,
+        labware_data_provider=mock_labware_data_provider,
+    )
+
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.LEFT
+    )
+
+    subject.remove_tip(pipette_id="pipette-id")
+
+    decoy.verify(
+        mock_hardware_api.remove_tip(Mount.LEFT),
+        mock_hardware_api.set_current_tiprack_diameter(Mount.LEFT, 0),
     )
 
 

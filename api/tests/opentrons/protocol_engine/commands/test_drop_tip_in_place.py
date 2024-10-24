@@ -91,4 +91,7 @@ async def test_tip_attached_error(
             wrappedErrors=[matchers.Anything()],
         ),
         state_update=StateUpdate(),
+        state_update_if_false_positive=StateUpdate(
+            pipette_tip_state=PipetteTipStateUpdate(pipette_id="abc", tip_geometry=None)
+        ),
     )

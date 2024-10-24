@@ -101,11 +101,9 @@ def _rule_matches_error(
 def _map_error_recovery_type(reaction_if_match: ReactionIfMatch) -> ErrorRecoveryType:
     match reaction_if_match:
         case ReactionIfMatch.IGNORE_AND_CONTINUE:
-            return ErrorRecoveryType.IGNORE_AND_CONTINUE
+            return ErrorRecoveryType.CONTINUE_WITH_ERROR
         case ReactionIfMatch.ASSUME_FALSE_POSITIVE_AND_CONTINUE:
-            # todo(mm, 2024-10-23): Connect to work in
-            # https://github.com/Opentrons/opentrons/pull/16556.
-            return ErrorRecoveryType.IGNORE_AND_CONTINUE
+            return ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE
         case ReactionIfMatch.FAIL_RUN:
             return ErrorRecoveryType.FAIL_RUN
         case ReactionIfMatch.WAIT_FOR_RECOVERY:

@@ -6,7 +6,6 @@ from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     SetErrorRecoveryPolicyAction,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -19,6 +18,7 @@ from opentrons_shared_data.errors import (
 
 from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
 from .errors.exceptions import EStopActivatedError
+from .error_recovery_policy import ErrorRecoveryPolicy
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider, FileProvider
 from .types import (
@@ -39,6 +39,7 @@ from .execution import (
     HardwareStopper,
 )
 from .state.state import StateStore, StateView
+from .state.update_types import StateUpdate
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
     ActionDispatcher,
@@ -88,43 +89,31 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        action_dispatcher: Optional[ActionDispatcher] = None,
-        plugin_starter: Optional[PluginStarter] = None,
+        action_dispatcher: ActionDispatcher,
+        plugin_starter: PluginStarter,
+        model_utils: ModelUtils,
+        hardware_stopper: HardwareStopper,
+        door_watcher: DoorWatcher,
+        module_data_provider: ModuleDataProvider,
+        file_provider: FileProvider,
         queue_worker: Optional[QueueWorker] = None,
-        model_utils: Optional[ModelUtils] = None,
-        hardware_stopper: Optional[HardwareStopper] = None,
-        door_watcher: Optional[DoorWatcher] = None,
-        module_data_provider: Optional[ModuleDataProvider] = None,
-        file_provider: Optional[FileProvider] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         Must be called while an event loop is active.
 
-        This constructor does not inject provider implementations.
+        This constructor is only for `ProtocolEngine` unit tests.
         Prefer the `create_protocol_engine()` factory function.
         """
         self._hardware_api = hardware_api
-        self._file_provider = file_provider or FileProvider()
+        self._file_provider = file_provider
         self._state_store = state_store
-        self._model_utils = model_utils or ModelUtils()
-        self._action_dispatcher = action_dispatcher or ActionDispatcher(
-            sink=self._state_store
-        )
-        self._plugin_starter = plugin_starter or PluginStarter(
-            state=self._state_store,
-            action_dispatcher=self._action_dispatcher,
-        )
-        self._hardware_stopper = hardware_stopper or HardwareStopper(
-            hardware_api=hardware_api,
-            state_store=state_store,
-        )
-        self._door_watcher = door_watcher or DoorWatcher(
-            state_store=state_store,
-            hardware_api=hardware_api,
-            action_dispatcher=self._action_dispatcher,
-        )
-        self._module_data_provider = module_data_provider or ModuleDataProvider()
+        self._model_utils = model_utils
+        self._action_dispatcher = action_dispatcher
+        self._plugin_starter = plugin_starter
+        self._hardware_stopper = hardware_stopper
+        self._door_watcher = door_watcher
+        self._module_data_provider = module_data_provider
         self._queue_worker = queue_worker
         if self._queue_worker:
             self._queue_worker.start()
@@ -186,11 +175,35 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-    def resume_from_recovery(self) -> None:
-        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`."""
+    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`.
+
+        If `reconcile_false_positive` is `False`, the engine will continue naively from
+        whatever state the error left it in. (Each defined error individually documents
+        exactly how it affects state.) This is appropriate for client-driven error
+        recovery, where the client wants predictable behavior from the engine.
+
+        If `reconcile_false_positive` is `True`, the engine may apply additional fixups
+        to its state to try to get the rest of the run to just work, assuming the error
+        was a false-positive.
+
+        For example, a `tipPhysicallyMissing` error from a `pickUpTip` would normally
+        leave the engine state without a tip on the pipette. If `reconcile_false_positive=True`,
+        the engine will set the pipette to have that missing tip before continuing, so
+        subsequent path planning, aspirates, dispenses, etc. will work as if nothing
+        went wrong.
+        """
+        if reconcile_false_positive:
+            state_update = (
+                self._state_store.commands.get_state_update_for_false_positive()
+            )
+        else:
+            state_update = StateUpdate()  # Empty/no-op.
+
         action = self._state_store.commands.validate_action_allowed(
-            ResumeFromRecoveryAction()
+            ResumeFromRecoveryAction(state_update)
         )
+
         self._action_dispatcher.dispatch(action)
 
     def add_command(

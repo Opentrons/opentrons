@@ -10,6 +10,7 @@ from decoy import Decoy
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_engine.actions.actions import SetErrorRecoveryPolicyAction
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
@@ -38,7 +39,11 @@ from opentrons.protocol_engine.execution import (
     HardwareStopper,
     DoorWatcher,
 )
-from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
+from opentrons.protocol_engine.resources import (
+    FileProvider,
+    ModelUtils,
+    ModuleDataProvider,
+)
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
@@ -118,6 +123,12 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     return decoy.mock(cls=ModuleDataProvider)
 
 
+@pytest.fixture
+def file_provider(decoy: Decoy) -> FileProvider:
+    """Get a mock FileProvider."""
+    return decoy.mock(cls=FileProvider)
+
+
 @pytest.fixture(autouse=True)
 def _mock_slot_standardization_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
@@ -148,6 +159,7 @@ def subject(
     hardware_stopper: HardwareStopper,
     door_watcher: DoorWatcher,
     module_data_provider: ModuleDataProvider,
+    file_provider: FileProvider,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
@@ -160,6 +172,7 @@ def subject(
         hardware_stopper=hardware_stopper,
         door_watcher=door_watcher,
         module_data_provider=module_data_provider,
+        file_provider=file_provider,
     )
 
 
@@ -613,20 +626,31 @@ def test_pause(
     )
 
 
+@pytest.mark.parametrize("reconcile_false_positive", [True, False])
 def test_resume_from_recovery(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
+    reconcile_false_positive: bool,
 ) -> None:
     """It should dispatch a ResumeFromRecoveryAction."""
-    expected_action = ResumeFromRecoveryAction()
+    decoy.when(state_store.commands.get_state_update_for_false_positive()).then_return(
+        sentinel.state_update_for_false_positive
+    )
+    empty_state_update = StateUpdate()
+
+    expected_action = ResumeFromRecoveryAction(
+        sentinel.state_update_for_false_positive
+        if reconcile_false_positive
+        else empty_state_update
+    )
 
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action)
     ).then_return(expected_action)
 
-    subject.resume_from_recovery()
+    subject.resume_from_recovery(reconcile_false_positive)
 
     decoy.verify(action_dispatcher.dispatch(expected_action))
 

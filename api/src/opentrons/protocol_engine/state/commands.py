@@ -25,6 +25,7 @@ from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryType,
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
+from opentrons.protocol_engine.state import update_types
 
 from ..actions import (
     Action,
@@ -141,6 +142,16 @@ class CommandPointer:
     index: int
 
 
+@dataclass(frozen=True)
+class _RecoveryTargetInfo:
+    """Info about the failed command that we're currently recovering from."""
+
+    command_id: str
+
+    state_update_if_false_positive: update_types.StateUpdate
+    """See `CommandView.get_state_update_if_continued()`."""
+
+
 @dataclass
 class CommandState:
     """State of all protocol engine command resources."""
@@ -205,8 +216,8 @@ class CommandState:
     stable. Eventually, we might want this info to be stored directly on each command.
     """
 
-    recovery_target_command_id: Optional[str]
-    """If we're currently recovering from a command failure, which command it was."""
+    recovery_target: Optional[_RecoveryTargetInfo]
+    """If we're currently recovering from a command failure, info about that command."""
 
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
@@ -253,7 +264,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             finish_error=None,
             failed_command=None,
             command_error_recovery_types={},
-            recovery_target_command_id=None,
+            recovery_target=None,
             run_completed_at=None,
             run_started_at=None,
             latest_protocol_command_hash=None,
@@ -335,14 +346,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_fail_command_action(self, action: FailCommandAction) -> None:
         prev_entry = self.state.command_history.get(action.command_id)
 
-        if isinstance(action.error, EnumeratedError):
+        if isinstance(action.error, EnumeratedError):  # The error was undefined.
             public_error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id,
                 createdAt=action.failed_at,
                 error=action.error,
             )
-        else:
+            # An empty state update, to no-op.
+            state_update_if_false_positive = update_types.StateUpdate()
+        else:  # The error was defined.
             public_error_occurrence = action.error.public
+            state_update_if_false_positive = action.error.state_update_if_false_positive
 
         self._update_to_failed(
             command_id=action.command_id,
@@ -354,6 +368,19 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self._state.failed_command = self._state.command_history.get(action.command_id)
         self._state.failed_command_errors.append(public_error_occurrence)
 
+        if (
+            prev_entry.command.intent in (CommandIntent.PROTOCOL, None)
+            and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
+        ):
+            self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+            self._state.recovery_target = _RecoveryTargetInfo(
+                command_id=action.command_id,
+                state_update_if_false_positive=state_update_if_false_positive,
+            )
+            self._state.has_entered_error_recovery = True
+
+        # When one command fails, we generally also cancel the commands that
+        # would have been queued after it.
         other_command_ids_to_fail: List[str]
         if prev_entry.command.intent == CommandIntent.SETUP:
             other_command_ids_to_fail = list(
@@ -373,7 +400,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 )
             elif (
                 action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
-                or action.type == ErrorRecoveryType.IGNORE_AND_CONTINUE
+                or action.type == ErrorRecoveryType.CONTINUE_WITH_ERROR
+                or action.type == ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE
             ):
                 other_command_ids_to_fail = []
             else:
@@ -389,14 +417,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error_recovery_type=None,
                 notes=None,
             )
-
-        if (
-            prev_entry.command.intent in (CommandIntent.PROTOCOL, None)
-            and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
-        ):
-            self._state.queue_status = QueueStatus.AWAITING_RECOVERY
-            self._state.recovery_target_command_id = action.command_id
-            self._state.has_entered_error_recovery = True
 
     def _handle_play_action(self, action: PlayAction) -> None:
         if not self._state.run_result:
@@ -425,11 +445,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self, action: ResumeFromRecoveryAction
     ) -> None:
         self._state.queue_status = QueueStatus.RUNNING
-        self._state.recovery_target_command_id = None
+        self._state.recovery_target = None
 
     def _handle_stop_action(self, action: StopAction) -> None:
         if not self._state.run_result:
-            self._state.recovery_target_command_id = None
+            self._state.recovery_target = None
 
             self._state.queue_status = QueueStatus.PAUSED
             if action.from_estop:
@@ -866,11 +886,11 @@ class CommandView(HasState[CommandState]):
 
     def get_recovery_target(self) -> Optional[CommandPointer]:
         """Return the command currently undergoing error recovery, if any."""
-        recovery_target_command_id = self._state.recovery_target_command_id
-        if recovery_target_command_id is None:
+        recovery_target = self._state.recovery_target
+        if recovery_target is None:
             return None
         else:
-            entry = self._state.command_history.get(recovery_target_command_id)
+            entry = self._state.command_history.get(recovery_target.command_id)
             return CommandPointer(
                 command_id=entry.command.id,
                 command_key=entry.command.key,
@@ -1082,6 +1102,19 @@ class CommandView(HasState[CommandState]):
         higher-level code.
         """
         return self._state.error_recovery_policy
+
+    def get_state_update_for_false_positive(self) -> update_types.StateUpdate:
+        """Return the state update for if the current recovery target was a false positive.
+
+        If we're currently in error recovery mode, and you have decided that the
+        underlying command error was a false positive, this returns a state update
+        that will undo the error's effects on engine state.
+        See `ProtocolEngine.resume_from_recovery(reconcile_false_positive=True)`.
+        """
+        if self._state.recovery_target is None:
+            return update_types.StateUpdate()  # Empty/no-op.
+        else:
+            return self._state.recovery_target.state_update_if_false_positive
 
     def _may_run_with_door_open(
         self, *, fixit_command: Command | CommandCreate

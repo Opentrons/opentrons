@@ -5,12 +5,20 @@ import typing
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (
+    ErrorRecoveryHardwareStateSynchronizer,
+)
 from opentrons.util.async_helpers import async_context_manager_in_thread
+
 from opentrons_shared_data.robot import load as load_robot
 
+from .actions.action_dispatcher import ActionDispatcher
+from .error_recovery_policy import ErrorRecoveryPolicy
+from .execution.door_watcher import DoorWatcher
+from .execution.hardware_stopper import HardwareStopper
+from .plugins import PluginStarter
 from .protocol_engine import ProtocolEngine
-from .resources import DeckDataProvider, ModuleDataProvider, FileProvider
+from .resources import DeckDataProvider, ModuleDataProvider, FileProvider, ModelUtils
 from .state.config import Config
 from .state.state import StateStore
 from .types import PostRunHardwareState, DeckConfigurationType
@@ -61,10 +69,27 @@ async def create_protocol_engine(
         deck_configuration=deck_configuration,
         notify_publishers=notify_publishers,
     )
+    hardware_state_synchronizer = ErrorRecoveryHardwareStateSynchronizer(
+        hardware_api, state_store
+    )
+    action_dispatcher = ActionDispatcher(state_store)
+    action_dispatcher.add_handler(hardware_state_synchronizer)
+    plugin_starter = PluginStarter(state_store, action_dispatcher)
+    model_utils = ModelUtils()
+    hardware_stopper = HardwareStopper(hardware_api, state_store)
+    door_watcher = DoorWatcher(state_store, hardware_api, action_dispatcher)
+    module_data_provider = ModuleDataProvider()
+    file_provider = file_provider or FileProvider()
 
     return ProtocolEngine(
-        state_store=state_store,
         hardware_api=hardware_api,
+        state_store=state_store,
+        action_dispatcher=action_dispatcher,
+        plugin_starter=plugin_starter,
+        model_utils=model_utils,
+        hardware_stopper=hardware_stopper,
+        door_watcher=door_watcher,
+        module_data_provider=module_data_provider,
         file_provider=file_provider,
     )
 
