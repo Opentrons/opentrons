@@ -3,7 +3,10 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { getBlowoutLocationOptionsForForm } from '../utils'
+import {
+  capitalizeFirstLetter,
+  getBlowoutLocationOptionsForForm,
+} from '../utils'
 
 describe('getBlowoutLocationOptionsForForm', () => {
   const destOption = {
@@ -55,5 +58,14 @@ describe('getBlowoutLocationOptionsForForm', () => {
   it('should return an empty array for unknown stepType', () => {
     const result = getBlowoutLocationOptionsForForm({ stepType: 'comment' })
     expect(result).toEqual([])
+  })
+})
+
+describe('capitalizeFirstLetter', () => {
+  it('should capitalize the first letter of a step name and leave the rest unchanged', () => {
+    const stepName = 'move labware to D3 on top of Magnetic Block'
+    expect(capitalizeFirstLetter(stepName)).toBe(
+      'Move labware to D3 on top of Magnetic Block'
+    )
   })
 })

@@ -322,3 +322,6 @@ export const getSaveStepSnackbarText = (
     return t(`protocol_steps:save_no_errors`, { stepType: stepTypeDisplayName })
   }
 }
+
+export const capitalizeFirstLetter = (stepName: string): string =>
+  `${stepName.charAt(0).toUpperCase()}${stepName.slice(1)}`

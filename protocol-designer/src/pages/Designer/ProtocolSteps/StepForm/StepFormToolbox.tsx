@@ -39,6 +39,7 @@ import {
   getSaveStepSnackbarText,
   getVisibleFormErrors,
   getVisibleFormWarnings,
+  capitalizeFirstLetter,
 } from './utils'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FormData, StepType } from '../../../../form-types'
@@ -238,7 +239,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
                 word-break: break-all
               `}
             >
-              {i18n.format(t(formData.stepName), 'capitalize')}
+              {capitalizeFirstLetter(String(formData.stepName))}
             </StyledText>
           </Flex>
         }

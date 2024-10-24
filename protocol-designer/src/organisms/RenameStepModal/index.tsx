@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
   InputField,
 } from '@opentrons/components'
-import { i18n } from '../../assets/localization'
+import { capitalizeFirstLetter } from '../../pages/Designer/ProtocolSteps/StepForm/utils'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 import { renameStep } from '../../labware-ingred/actions'
 import type { FormData } from '../../form-types'
@@ -31,7 +31,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { onClose, formData } = props
   const dispatch = useDispatch()
   const { t } = useTranslation(['form', 'shared', 'protocol_steps'])
-  const initialName = i18n.format(t(formData.stepName), 'capitalize')
+  const initialName = capitalizeFirstLetter(String(formData.stepName))
   const [stepName, setStepName] = useState<string>(initialName)
   const [stepDetails, setStepDetails] = useState<string>(
     String(formData.stepDetails)
@@ -43,7 +43,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
       renameStep({
         stepId,
         update: {
-          stepName: stepName,
+          stepName: stepName !== '' ? stepName : initialName,
           stepDetails: stepDetails,
         },
       })
