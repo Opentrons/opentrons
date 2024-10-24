@@ -5,7 +5,11 @@ from typing import Any, Dict
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
-from opentrons_hardware.sensors import SENSOR_LOG_NAME
+if ARCHITECTURE is SystemArchitecture.BUILDROOT:
+    from opentrons_hardware.sensors import SENSOR_LOG_NAME
+else:
+    # we don't use the sensor log on ot2 or host
+    SENSOR_LOG_NAME = "unused"
 
 
 def _host_config(level_value: int) -> Dict[str, Any]:
