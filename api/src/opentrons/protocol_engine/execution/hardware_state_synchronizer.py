@@ -31,7 +31,7 @@ class ErrorRecoveryHardwareStateSynchronizer(ActionHandler):
             if tip_geometry is None:
                 tip_handler.remove_tip(pipette_id)
             else:
-                tip_handler.add_tip(pipette_id=pipette_id, tip=tip_geometry)
+                tip_handler.cache_tip(pipette_id=pipette_id, tip=tip_geometry)
 
 
 def _get_state_update(action: Action) -> update_types.StateUpdate | None:
