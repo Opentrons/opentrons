@@ -65,24 +65,24 @@
       "pickUpOffset": {
         "x": 0,
         "y": 0,
-        "z": 1.5
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": -6
+      }
+    },
+    "lidOffsets": {
+      "pickUpOffset": {
+        "x": 0.25,
+        "y": 0,
+        "z": 0
       },
       "dropOffset": {
         "x": 0,
         "y": 0,
         "z": 0
-      }
-    },
-    "lidOffsets": {
-      "pickUpOffset": {
-        "x": 1.0,
-        "y": 0,
-        "z": -5
-      },
-      "dropOffset": {
-        "x": 1.0,
-        "y": 0,
-        "z": -5
       }
     }
   }
