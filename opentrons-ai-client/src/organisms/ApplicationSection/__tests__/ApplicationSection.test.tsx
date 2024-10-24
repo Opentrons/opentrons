@@ -1,9 +1,9 @@
-import { fireEvent, renderHook, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ApplicationSection } from '..'
-import { FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 
 // TODO move to __testing-utils__
 const TestFormProviderComponent = () => {
@@ -25,11 +25,6 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 }
 
 describe('ApplicationSection', () => {
-  beforeEach(() => {
-    const { result } = renderHook(() => useFormContext())
-    const methods = result.current
-  })
-
   it('should render scientific application dropdown, describe input and confirm button', () => {
     render()
 
@@ -73,7 +68,9 @@ describe('ApplicationSection', () => {
     fireEvent.change(describeInput, { target: { value: 'Test description' } })
 
     const confirmButton = screen.getByRole('button')
-    await waitFor(() => expect(confirmButton).toBeEnabled())
+    await waitFor(() => {
+      expect(confirmButton).toBeEnabled()
+    })
   })
 
   it('should disable confirm button when all fields are not filled', () => {

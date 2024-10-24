@@ -1,9 +1,4 @@
-import {
-  DropdownBorder,
-  DropdownMenu,
-  DropdownOption,
-  InputField,
-} from '@opentrons/components'
+import { InputField } from '@opentrons/components'
 import { Controller } from 'react-hook-form'
 
 interface ControlledInputFieldProps {
