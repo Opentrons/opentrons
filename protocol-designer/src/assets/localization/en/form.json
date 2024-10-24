@@ -209,20 +209,20 @@
       },
       "thermocyclerState": {
         "block": {
-          "engage": "Engage block temperature",
+          "engage": "Block temperature",
           "label": "Thermocycler block",
           "temperature": "Block temperature",
-          "toggleOff": "Deactivated",
-          "toggleOn": "Active",
+          "toggleOff": "Deactivate",
+          "toggleOn": "Activate",
           "valid_range": "Valid range between 4 and 96ºC"
         },
         "ending_hold": "Ending hold",
         "lid": {
-          "engage": "Engage lid temperature",
+          "engage": "Lid temperature",
           "label": "Lid",
           "temperature": "Lid temperature",
-          "toggleOff": "Deactivated",
-          "toggleOn": "Active",
+          "toggleOff": "Deactivate",
+          "toggleOn": "Activate",
           "valid_range": "Valid range between 37 and 110ºC"
         },
         "lidPosition": {

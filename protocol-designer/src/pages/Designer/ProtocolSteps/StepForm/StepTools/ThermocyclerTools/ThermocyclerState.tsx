@@ -77,11 +77,9 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
         fieldTitle={i18n.format(t('stepType.temperature'), 'capitalize')}
         units={t('units.degrees')}
         isSelected={formData[lidFieldActive] === true}
-        onLabel={t(
-          'form:step_edit_form.field.thermocyclerState.lidPosition.toggleOn'
-        )}
+        onLabel={t('form:step_edit_form.field.thermocyclerState.lid.toggleOn')}
         offLabel={t(
-          'form:step_edit_form.field.thermocyclerState.lidPosition.toggleOff'
+          'form:step_edit_form.field.thermocyclerState.lid.toggleOff'
         )}
       />
       <ToggleStepFormField
