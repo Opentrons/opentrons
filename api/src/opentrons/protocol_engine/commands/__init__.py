@@ -338,6 +338,14 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
+from .load_liquid_class import (
+    LoadLiquidClass,
+    LoadLiquidClassParams,
+    LoadLiquidClassResult,
+    LoadLiquidClassCreate,
+    LoadLiquidClassCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -591,4 +599,10 @@ __all__ = [
     "TryLiquidProbeCreate",
     "TryLiquidProbeResult",
     "TryLiquidProbeCommandType",
+    # Load liquid class command bundle
+    "LoadLiquidClass",
+    "LoadLiquidClassParams",
+    "LoadLiquidClassResult",
+    "LoadLiquidClassCreate",
+    "LoadLiquidClassCommandType",
 ]

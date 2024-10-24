@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from typing import Any, List, Optional, Sequence, Union, cast, Dict, Literal, overload
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
@@ -32,12 +32,12 @@ from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
+from .core.engine.instrument import SingleTransfer, PickUpTipInfo, DropTipInfo
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
 from .disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import NozzleLayout
-from . import labware, validation
-
+from . import labware, validation, LiquidClass
 
 AdvancedLiquidHandling = transfers.AdvancedLiquidHandling
 
@@ -1279,6 +1279,40 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
+    @overload
+    def transfer(
+        self,
+        liquid_class: LiquidClass,
+        volume: Union[float, Sequence[float]],
+        source: AdvancedLiquidHandling,
+        dest: AdvancedLiquidHandling,
+        trash_location: Union[types.Location, TrashBin, WasteChute] = True,
+        new_tip: Literal["once", "never", "always"] = "once",
+    ):
+        """Transfer liquid from source to dest using the specified liquid class properties."""
+        # 1. Figure out tip locations to pick up from
+        # 2. Disambiguate src and dest locations
+        # 3. Wrap the above info in a dataclass that stores 1-to-1 transfer info
+
+        transfers = [
+            SingleTransfer(
+                pick_up_tip=PickUpTipInfo(pick_up_new=True, tip_location=tip_loc1),
+                source_well=src_well_location1,
+                dest_well=dest_well_location1,
+                drop_tip=DropTipInfo(drop_tip=True, location=trash_location),
+            ),
+            SingleTransfer(...),
+            ...,
+        ]
+
+        # This is for same volume aspirate-dispense pairs
+        self._core.transfer(
+            liquid_class=liquid_class,
+            volume=volume,
+            transfers=transfers,
+        )
+
+    @overload
     @publisher.publish(command=cmds.transfer)
     @requires_version(2, 0)
     def transfer(  # noqa: C901

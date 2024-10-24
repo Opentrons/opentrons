@@ -42,7 +42,11 @@ from opentrons_shared_data.pipette.types import (  # noqa: F401
     LabwareUri as LabwareUri,
 )
 from opentrons_shared_data.module.types import ModuleType as SharedDataModuleType
-
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    AspirateProperties,
+    SingleDispenseProperties,
+    MultiDispenseProperties,
+)
 
 # todo(mm, 2024-06-24): This monolithic status field is getting to be a bit much.
 # We should consider splitting this up into multiple fields.
@@ -1135,3 +1139,17 @@ CSVRuntimeParamPaths = Dict[str, Path]
 
 
 ABSMeasureMode = Literal["single", "multi"]
+
+
+# TODO: add frozen dataclass of all properties
+#  These properties can skip the 'enable' prop and just have params as optional.
+#  If the params exist, the action is performed, if not, it's not performed.
+@dataclass(frozen=True)
+class ImmutableLiquidClass:
+    id: str
+    hash: str
+    pipetteId: str
+    tiprackId: str
+    aspirateProperties: AspirateProperties
+    singleDispenseProperties: SingleDispenseProperties
+    multiDispenseProperties: MultiDispenseProperties

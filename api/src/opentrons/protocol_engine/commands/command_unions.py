@@ -320,6 +320,14 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
+from .load_liquid_class import (
+    LoadLiquidClass,
+    LoadLiquidClassParams,
+    LoadLiquidClassResult,
+    LoadLiquidClassCreate,
+    LoadLiquidClassCommandType,
+)
+
 Command = Annotated[
     Union[
         Aspirate,
@@ -339,6 +347,7 @@ Command = Annotated[
         LoadLabware,
         ReloadLabware,
         LoadLiquid,
+        LoadLiquidClass,
         LoadModule,
         LoadPipette,
         MoveLabware,
@@ -416,6 +425,7 @@ CommandParams = Union[
     LoadLabwareParams,
     ReloadLabwareParams,
     LoadLiquidParams,
+    LoadLiquidClassParams,
     LoadModuleParams,
     LoadPipetteParams,
     MoveLabwareParams,
@@ -491,6 +501,7 @@ CommandType = Union[
     LoadLabwareCommandType,
     ReloadLabwareCommandType,
     LoadLiquidCommandType,
+    LoadLiquidClassCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveLabwareCommandType,
@@ -644,6 +655,7 @@ CommandResult = Union[
     LoadLabwareResult,
     ReloadLabwareResult,
     LoadLiquidResult,
+    LoadLiquidClassResult,
     LoadModuleResult,
     LoadPipetteResult,
     MoveLabwareResult,

@@ -1,7 +1,7 @@
 """Basic liquid data state and store."""
 from dataclasses import dataclass
 from typing import Dict, List
-from opentrons.protocol_engine.types import Liquid
+from opentrons.protocol_engine.types import Liquid, ImmutableLiquidClass
 
 from ._abstract_store import HasState, HandlesActions
 from ..actions import Action, AddLiquidAction
@@ -13,6 +13,7 @@ class LiquidState:
     """State of all loaded liquids."""
 
     liquids_by_id: Dict[str, Liquid]
+    liquid_classes_by_id: Dict[str, ImmutableLiquidClass]
 
 
 class LiquidStore(HasState[LiquidState], HandlesActions):
@@ -22,7 +23,10 @@ class LiquidStore(HasState[LiquidState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a liquid store and its state."""
-        self._state = LiquidState(liquids_by_id={})
+        self._state = LiquidState(
+            liquids_by_id={},
+            liquid_classes_by_id={},
+        )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
