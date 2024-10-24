@@ -202,6 +202,30 @@ def connect_and_download(
     return file_paths, credentials_path
 
 
+def run(
+    storage_directory: str, abr_data_sheet_url: str, abr_room_conditions_sheet: str
+) -> None:
+    """Connect to storage and google sheets and update."""
+    google_sheets_to_download = {
+        "ABR-run-data": abr_data_sheet_url,
+        "ABR Ambient Conditions": abr_room_conditions_sheet,
+    }
+    # Download google sheets.
+
+    file_paths, credentials_path = connect_and_download(
+        google_sheets_to_download, storage_directory
+    )
+    # Read csvs.
+    abr_data = read_csv_as_dict(file_paths[0])
+    temp_data = read_csv_as_dict(file_paths[1])
+    # Compare robot and timestamps.
+    abr_google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, "ABR-run-data", 0
+    )
+    determine_lifetime(abr_google_sheet)
+    compare_run_to_temp_data(abr_data, temp_data, abr_google_sheet)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Adds average robot ambient conditions to run sheet."
@@ -225,21 +249,7 @@ if __name__ == "__main__":
         help="Path to long term storage directory for run logs.",
     )
     args = parser.parse_args()
-    google_sheets_to_download = {
-        "ABR-run-data": args.abr_data_sheet,
-        "ABR Ambient Conditions": args.room_conditions_sheet,
-    }
-    storage_directory = args.storage_directory
-    # Download google sheets.
-    file_paths, credentials_path = connect_and_download(
-        google_sheets_to_download, storage_directory
-    )
-    # TODO: read csvs.
-    abr_data = read_csv_as_dict(file_paths[0])
-    temp_data = read_csv_as_dict(file_paths[1])
-    # TODO: compare robot and timestamps.
-    abr_google_sheet = google_sheets_tool.google_sheet(
-        credentials_path, "ABR-run-data", 0
-    )
-    determine_lifetime(abr_google_sheet)
-    compare_run_to_temp_data(abr_data, temp_data, abr_google_sheet)
+    storage_directory = args.storage_directory[0]
+    abr_data_sheet_url = args.abr_data_sheet[0]
+    room_conditions_sheet_url = args.room_conditions_sheet[0]
+    run(storage_directory, abr_data_sheet_url, room_conditions_sheet_url)

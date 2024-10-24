@@ -18,7 +18,7 @@ slackclient = "*"
 slack-sdk = "*"
 pandas = "*"
 pandas-stubs = "*"
-numpy = "==1.8.3"
+paramiko = "*"
 
 [dev-packages]
 atomicwrites = "==1.4.1"

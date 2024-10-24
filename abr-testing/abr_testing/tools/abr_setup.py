@@ -10,6 +10,14 @@ from abr_testing.data_collection import (
     abr_google_drive,
     abr_calibration_logs,
 )
+from abr_testing.tools import sync_abr_sheet
+
+
+def run_sync_abr_sheet(
+    storage_directory: str, abr_data_sheet: str, room_conditions_sheet: str
+) -> None:
+    """Sync ABR sheet with temp and lifetime percents."""
+    sync_abr_sheet.run(storage_directory, abr_data_sheet, room_conditions_sheet)
 
 
 def run_temp_sensor(ip_file: str) -> None:
@@ -50,7 +58,7 @@ def get_calibration_data(
             storage_directory, folder_name, google_sheet_name, email
         )
     except Exception as e:
-        print("Cannot get callibration data", e)
+        print("Cannot get calibration data", e)
         traceback.print_exc()
 
 
@@ -61,6 +69,8 @@ def main(configurations: configparser.ConfigParser) -> None:
     email = None
     drive_folder = None
     sheet_name = None
+    ambient_conditions_sheet = None
+    sheet_url = None
 
     has_defaults = False
     # If default is not specified get all values
@@ -73,12 +83,14 @@ def main(configurations: configparser.ConfigParser) -> None:
             email = default["Email"]
             drive_folder = default["Drive_Folder"]
             sheet_name = default["Sheet_Name"]
+            sheet_url = default["Sheet_Url"]
     except KeyError as e:
         print("Cannot read config file\n" + str(e))
 
     # Run Temperature Sensors
     if not has_defaults:
         ip_file = configurations["TEMP-SENSOR"]["Robo_List"]
+        ambient_conditions_sheet = configurations["TEMP-SENSOR"]["Sheet_Url"]
     print("Starting temp sensors...")
     if ip_file:
         run_temp_sensor(ip_file)
@@ -92,6 +104,7 @@ def main(configurations: configparser.ConfigParser) -> None:
         email = configurations["RUN-LOG"]["Email"]
         drive_folder = configurations["RUN-LOG"]["Drive_Folder"]
         sheet_name = configurations["RUN-LOG"]["Sheet_Name"]
+        sheet_url = configurations["RUN-LOG"]["Sheet_Url"]
     print(sheet_name)
     if storage_directory and drive_folder and sheet_name and email:
         print("Retrieving robot run logs...")
@@ -102,7 +115,9 @@ def main(configurations: configparser.ConfigParser) -> None:
     else:
         print("Storage, Email, or Drive Folder is missing, please fix configs")
         sys.exit(1)
-
+    # Update Google Sheet with missing temp/rh
+    if storage_directory and sheet_url and ambient_conditions_sheet:
+        run_sync_abr_sheet(storage_directory, sheet_url, ambient_conditions_sheet)
     # Collect calibration data
     if not has_defaults:
         storage_directory = configurations["CALIBRATION"]["Storage"]

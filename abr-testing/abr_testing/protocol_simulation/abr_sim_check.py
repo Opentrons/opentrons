@@ -1,26 +1,27 @@
-from protocol_simulation import simulation_metrics
+"""Check ABR Protocols Simulate Successfully."""
+from abr_testing.protocol_simulation import simulation_metrics
 import os
 import traceback
 from pathlib import Path
 
-def run(file_to_simulate: Path):
-    protocol_name = file_to_simulate.stem
+
+def run(file_to_simulate: str) -> None:
+    """Simulate protocol and raise errors."""
+    protocol_name = Path(file_to_simulate).stem
     try:
         simulation_metrics.main(file_to_simulate, False)
-    except Exception as e:
+    except Exception:
         print(f"Error in protocol: {protocol_name}")
         traceback.print_exc()
 
 
-
-
 if __name__ == "__main__":
     # Directory to search
-    root_dir = 'abr_testing/protocols'
+    root_dir = "abr_testing/protocols"
 
     exclude = [
-        '__init__.py',
-        'shared_vars_and_funcs.py',
+        "__init__.py",
+        "shared_vars_and_funcs.py",
     ]
     # Walk through the root directory and its subdirectories
     for root, dirs, files in os.walk(root_dir):
@@ -30,4 +31,4 @@ if __name__ == "__main__":
                     continue
                 file_path = os.path.join(root, file)
                 print(f"Simulating protocol: {file_path}")
-                run(Path(file_path))
+                run(file_path)

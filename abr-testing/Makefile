@@ -95,7 +95,7 @@ abr-setup:
 
 .PHONY: simulate
 PROTOCOL_DIR := abr_testing/protocols
-SIMULATION_TOOL := protocol_simulation/abr_sim_check.py
+SIMULATION_TOOL := abr_testing/protocol_simulation/abr_sim_check.py
 EXTENSION := .py
 simulate:
 	$(python) $(SIMULATION_TOOL)

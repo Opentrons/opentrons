@@ -694,7 +694,7 @@ def get_calibration_offsets(
         print(f"Connected to {ip}")
     except Exception:
         print(f"ERROR: Failed to read IP address: {ip}")
-        raise
+        pass
     health_data = response.json()
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
