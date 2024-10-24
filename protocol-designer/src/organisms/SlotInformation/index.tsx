@@ -53,7 +53,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
           <ListItem type="noActive" width="max-content">
             <ListItemDescriptor
               type="default"
-              content={<StyledText>liquids.join(', ')</StyledText>}
+              content={<StyledText>{liquids.join(', ')}</StyledText>}
               description={t('liquid')}
             />
           </ListItem>
