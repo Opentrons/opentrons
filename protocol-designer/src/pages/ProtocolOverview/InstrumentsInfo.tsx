@@ -119,7 +119,6 @@ export function InstrumentsInfo({
             type="large"
             description={
               <Flex minWidth="13.75rem">
-                {' '}
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
@@ -140,7 +139,6 @@ export function InstrumentsInfo({
             type="large"
             description={
               <Flex minWidth="13.75rem">
-                {' '}
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
@@ -162,7 +160,6 @@ export function InstrumentsInfo({
               type="large"
               description={
                 <Flex minWidth="13.75rem">
-                  {' '}
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
                     color={COLORS.grey60}
