@@ -5,10 +5,12 @@ import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
   useUpdateErrorRecoveryPolicy,
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '/app/resources/runs'
-import { RECOVERY_MAP } from '../constants'
+import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
+import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 
 import type {
   CreateCommand,
@@ -23,7 +25,9 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   CommandData,
+  IfMatchType,
   RecoveryPolicyRulesParams,
+  RunAction,
 } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand, RecoveryRoute, RouteStep } from '../types'
@@ -89,6 +93,9 @@ export function useRecoveryCommands({
   const {
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
+  const {
+    mutateAsync: resumeRunFromRecoveryAssumingFalsePositive,
+  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const {
     mutateAsync: updateErrorRecoveryPolicy,
@@ -198,9 +205,16 @@ export function useRecoveryCommands({
   const handleIgnoringErrorKind = useCallback((): Promise<void> => {
     if (ignoreErrors) {
       if (failedCommandByRunRecord?.error != null) {
+        const ifMatch: IfMatchType = isAssumeFalsePositiveResumeKind(
+          failedCommandByRunRecord
+        )
+          ? 'assumeFalsePositiveAndContinue'
+          : 'ignoreAndContinue'
+
         const ignorePolicyRules = buildIgnorePolicyRules(
           failedCommandByRunRecord.commandType,
-          failedCommandByRunRecord.error.errorType
+          failedCommandByRunRecord.error.errorType,
+          ifMatch
         )
 
         return updateErrorRecoveryPolicy(ignorePolicyRules)
@@ -247,9 +261,17 @@ export function useRecoveryCommands({
     stopRun(runId)
   }, [runId])
 
+  const handleResumeAction = (): Promise<RunAction> => {
+    if (isAssumeFalsePositiveResumeKind(failedCommandByRunRecord)) {
+      return resumeRunFromRecoveryAssumingFalsePositive(runId)
+    } else {
+      return resumeRunFromRecovery(runId)
+    }
+  }
+
   const skipFailedCommand = useCallback((): void => {
     void handleIgnoringErrorKind().then(() =>
-      resumeRunFromRecovery(runId).then(() => {
+      handleResumeAction().then(() => {
         analytics.reportActionSelectedResult(
           selectedRecoveryOption,
           'succeeded'
@@ -300,6 +322,20 @@ export function useRecoveryCommands({
     moveLabwareWithoutPause,
     skipFailedCommand,
     ignoreErrorKindThisRun,
+  }
+}
+
+export function isAssumeFalsePositiveResumeKind(
+  failedCommandByRunRecord: UseRecoveryCommandsParams['failedCommandByRunRecord']
+): boolean {
+  const errorKind = getErrorKind(failedCommandByRunRecord)
+
+  switch (errorKind) {
+    case ERROR_KINDS.TIP_NOT_DETECTED:
+    case ERROR_KINDS.TIP_DROP_FAILED:
+      return true
+    default:
+      return false
   }
 }
 
@@ -372,13 +408,14 @@ export const buildPickUpTips = (
 
 export const buildIgnorePolicyRules = (
   commandType: FailedCommand['commandType'],
-  errorType: string
+  errorType: string,
+  ifMatch: IfMatchType
 ): RecoveryPolicyRulesParams => {
   return [
     {
       commandType,
       errorType,
-      ifMatch: 'ignoreAndContinue',
+      ifMatch,
     },
   ]
 }
