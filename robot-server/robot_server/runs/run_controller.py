@@ -2,6 +2,7 @@
 import logging
 from datetime import datetime
 from typing import Optional
+from typing_extensions import assert_never
 from opentrons.protocol_engine import ProtocolEngineError
 from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
@@ -95,12 +96,19 @@ class RunController:
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
                 self._run_orchestrator_store.resume_from_recovery(
-                    # FIX BEFORE MERGE:
-                    # Hard-coding `True` is for experimentation. We probably want
-                    # this to be `False` for `resumeFromRecovery` actions and `True`
-                    # for some new type of action.
+                    reconcile_false_positive=False
+                )
+
+            elif (
+                action_type
+                == RunActionType.RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE
+            ):
+                self._run_orchestrator_store.resume_from_recovery(
                     reconcile_false_positive=True
                 )
+
+            else:
+                assert_never(action_type)
 
         except ProtocolEngineError as e:
             raise RunActionNotAllowedError(message=e.message, wrapping=[e]) from e
