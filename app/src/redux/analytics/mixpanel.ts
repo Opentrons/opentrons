@@ -43,9 +43,12 @@ export function trackEvent(
 
   log.debug('Trackable event', { event, optedIn })
   if (MIXPANEL_ID != null && optedIn) {
-    if (event.superProperties != null) mixpanel.register(event.superProperties)
-    if ('name' in event && event.name != null)
+    if (event.superProperties != null) {
+      mixpanel.register(event.superProperties)
+    }
+    if ('name' in event && event.name != null) {
       mixpanel.track(event.name, event.properties)
+    }
   }
 }
 

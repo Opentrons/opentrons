@@ -5,6 +5,7 @@ import type { Config } from '../config/types'
 import type {
   ANALYTICS_PIPETTE_OFFSET_STARTED,
   ANALYTICS_TIP_LENGTH_STARTED,
+  ANALYTICS_RESOURCE_MONITOR_REPORT,
 } from './constants'
 
 export type AnalyticsConfig = Config['analytics']
@@ -118,9 +119,19 @@ export interface TipLengthStartedAnalyticsAction {
   }
 }
 
+export interface ResourceMonitorAnalyticsAction {
+  type: typeof ANALYTICS_RESOURCE_MONITOR_REPORT
+  payload: {
+    systemAvailMemMb: string
+    systemUptimeHrs: string
+    processesDetails: Array<Record<string, any>>
+  }
+}
+
 export type AnalyticsTriggerAction =
   | PipetteOffsetStartedAnalyticsAction
   | TipLengthStartedAnalyticsAction
+  | ResourceMonitorAnalyticsAction
 
 export interface SessionInstrumentAnalyticsData {
   sessionType: string
