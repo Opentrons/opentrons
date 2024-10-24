@@ -164,6 +164,7 @@ describe('getDefaultsForStepType', () => {
         heaterShakerSetTimer: null,
         heaterShakerTimerMinutes: null,
         heaterShakerTimerSeconds: null,
+        heaterShakerTimer: null,
       })
     })
   })

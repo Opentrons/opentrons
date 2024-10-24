@@ -289,10 +289,10 @@ async def test_add_tip(
         MountType.LEFT
     )
 
-    await subject.add_tip(pipette_id="pipette-id", tip=tip)
+    await subject.cache_tip(pipette_id="pipette-id", tip=tip)
 
     decoy.verify(
-        mock_hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
+        mock_hardware_api.cache_tip(mount=Mount.LEFT, tip_length=50),
         mock_hardware_api.set_current_tiprack_diameter(
             mount=Mount.LEFT,
             tiprack_diameter=5,

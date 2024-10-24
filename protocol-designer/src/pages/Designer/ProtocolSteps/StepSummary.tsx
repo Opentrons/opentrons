@@ -5,23 +5,20 @@ import flatten from 'lodash/flatten'
 import last from 'lodash/last'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  FLEX_MAX_CONTENT,
+  ListItem,
   SPACING,
   StyledText,
   Tag,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-
 import {
   getLabwareEntities,
   getModuleEntities,
 } from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-
+import { LINE_CLAMP_TEXT_STYLE } from '../../../atoms'
 import type { FormData } from '../../../form-types'
 
 interface StyledTransProps {
@@ -29,11 +26,19 @@ interface StyledTransProps {
   tagText?: string
   values?: object
 }
+
 function StyledTrans(props: StyledTransProps): JSX.Element {
   const { i18nKey, tagText, values } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
   return (
-    <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+    <Flex
+      gridGap={SPACING.spacing4}
+      alignItems={ALIGN_CENTER}
+      css={`
+        flex-wrap: wrap;
+        word-break: break-word;
+      `}
+    >
       <Trans
         t={t}
         i18nKey={i18nKey}
@@ -327,8 +332,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     case 'heaterShaker':
       const {
         latchOpen,
-        heaterShakerTimerMinutes,
-        heaterShakerTimerSeconds,
+        heaterShakerTimer,
         moduleId: heaterShakerModuleId,
         targetHeaterShakerTemperature,
         targetSpeed,
@@ -343,14 +347,14 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
               i18nKey="protocol_steps:heater_shaker.active.temperature"
               values={{ module: moduleDisplayName }}
               tagText={
-                targetHeaterShakerTemperature != null
+                targetHeaterShakerTemperature
                   ? `${targetHeaterShakerTemperature}${t(
                       'application:units.degrees'
                     )}`
                   : t('protocol_steps:heater_shaker.active.ambient')
               }
             />
-            {targetSpeed != null ? (
+            {targetSpeed ? (
               <StyledTrans
                 i18nKey="protocol_steps:heater_shaker.active.shake"
                 tagText={`${targetSpeed}${t('application:units.rpm')}`}
@@ -358,11 +362,10 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             ) : null}
           </Flex>
           <Flex gridGap={SPACING.spacing20}>
-            {heaterShakerTimerMinutes != null &&
-            heaterShakerTimerSeconds != null ? (
+            {heaterShakerTimer ? (
               <StyledTrans
                 i18nKey="protocol_steps:heater_shaker.active.time"
-                tagText={`${heaterShakerTimerMinutes}:${heaterShakerTimerSeconds}`}
+                tagText={heaterShakerTimer}
               />
             ) : null}
             <StyledTrans
@@ -388,25 +391,21 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       width="100%"
     >
       {stepSummaryContent != null ? (
-        <Flex
-          backgroundColor={COLORS.grey30}
-          padding={SPACING.spacing12}
-          borderRadius={BORDERS.borderRadius4}
-          width={FLEX_MAX_CONTENT}
-          minWidth="100%"
-        >
-          {stepSummaryContent}
-        </Flex>
+        <ListItem type="noActive">
+          <Flex padding={SPACING.spacing12}>{stepSummaryContent}</Flex>
+        </ListItem>
       ) : null}
       {stepDetails != null && stepDetails !== '' ? (
-        <StyledText
-          backgroundColor={COLORS.grey30}
-          padding={SPACING.spacing12}
-          borderRadius={BORDERS.borderRadius4}
-          desktopStyle="bodyDefaultRegular"
-        >
-          {stepDetails}
-        </StyledText>
+        <ListItem type="noActive">
+          <Flex padding={SPACING.spacing12}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              css={LINE_CLAMP_TEXT_STYLE(3)}
+            >
+              {stepDetails}
+            </StyledText>
+          </Flex>
+        </ListItem>
       ) : null}
     </Flex>
   ) : null

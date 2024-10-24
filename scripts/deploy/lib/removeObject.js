@@ -1,9 +1,11 @@
 'use strict'
 
+const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
+
 /**
  * Remove an object from S3
  *
- * @param {AWS.S3} s3 - AWS.S3 instance
+ * @param {S3Client} s3 - S3Client instance
  * @param {S3Object} obj - Object to remove
  * @param {boolean} [dryrun] - Don't actually remove anything
  * @returns {Promise} Promise that resolves when the removal is complete
@@ -13,13 +15,22 @@
  * @property {String} Prefix - Deploy folder in bucket
  * @property {string} Key - Full key to object
  */
-module.exports = function removeObject(s3, obj, dryrun) {
+module.exports = async function removeObject(s3, obj, dryrun) {
   console.log(
-    `${dryrun ? 'DRYRUN: ' : ''}Remove
-    Source: /${obj.Bucket}/${obj.Key}\n`
-  )
+    `${dryrun ? 'DRYRUN: ' : ''}Remove\nSource: /${obj.Bucket}/${obj.Key}\n`
+  );
 
-  if (dryrun) return Promise.resolve()
+  if (dryrun) return Promise.resolve();
 
-  return s3.deleteObject({ Bucket: obj.Bucket, Key: obj.Key }).promise()
-}
+  // Construct the deleteObject command with the bucket and key
+  const deleteParams = { Bucket: obj.Bucket, Key: obj.Key };
+
+  try {
+    // Use the send method with DeleteObjectCommand
+    const result = await s3.send(new DeleteObjectCommand(deleteParams));
+    return result;
+  } catch (error) {
+    console.error('Error removing object:', error);
+    throw error;
+  }
+};

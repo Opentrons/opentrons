@@ -32,7 +32,7 @@ interface FormAlertsProps {
   dirtyFields?: StepFieldName[]
 }
 
-function FormAlertsComponent(props: FormAlertsProps): JSX.Element {
+function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
   const { focusedField, dirtyFields } = props
   const { t } = useTranslation('alert')
   const dispatch = useDispatch()
@@ -95,7 +95,7 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element {
   }
 
   const makeAlert: MakeAlert = (alertType, data, key) => (
-    <Flex padding={`${SPACING.spacing16} ${SPACING.spacing16} 0`}>
+    <Flex>
       <Banner
         type={alertType === 'error' ? 'error' : 'warning'}
         key={`${alertType}:${key}`}
@@ -104,14 +104,18 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element {
             ? makeHandleCloseWarning(data.dismissId)
             : undefined
         }
+        width="100%"
+        iconMarginLeft={SPACING.spacing4}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {data.title}
           </StyledText>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {data.description}
-          </StyledText>
+          {data.description != null ? (
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {data.description}
+            </StyledText>
+          ) : null}
         </Flex>
       </Banner>
     </Flex>
@@ -151,15 +155,19 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element {
       )
     }
   }
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+  return [...formErrors, ...formWarnings, ...timelineWarnings].length > 0 ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      padding={`${SPACING.spacing16} ${SPACING.spacing16} 0`}
+    >
       {formErrors.map((error, key) => makeAlert('error', error, key))}
       {formWarnings.map((warning, key) => makeAlert('warning', warning, key))}
       {timelineWarnings.map((warning, key) =>
         makeAlert('warning', warning, key)
       )}
     </Flex>
-  )
+  ) : null
 }
 
 export const FormAlerts = memo(FormAlertsComponent)

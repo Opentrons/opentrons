@@ -72,23 +72,24 @@
         "range": "between {{min}} and {{max}}"
       },
       "heaterShaker": {
+        "duration": "Duration",
         "latch": {
-          "setLatch": "Labware Latch",
-          "toggleOff": "Closed & Locked",
+          "setLatch": "Labware latch",
+          "toggleOff": "Close",
           "toggleOn": "Open"
         },
         "shaker": {
-          "setShake": "Set shake speed",
-          "toggleOff": "Deactivated",
+          "setShake": "Shake speed",
+          "toggleOff": "Deactivate",
           "toggleOn": "Active"
         },
         "temperature": {
-          "setTemperature": "Set temperature",
-          "toggleOff": "Deactivated",
+          "setTemperature": "Temperature",
+          "toggleOff": "Deactivate",
           "toggleOn": "Active"
         },
         "timer": {
-          "heaterShakerSetTimer": "Set timer"
+          "heaterShakerSetTimer": "Timer"
         }
       },
       "location": {
@@ -144,6 +145,7 @@
         }
       },
       "pauseAction": {
+        "duration": "Delay duration",
         "options": {
           "untilResume": "Pause until told to resume",
           "untilTemperature": "Pause until temperature reached",
@@ -207,20 +209,20 @@
       },
       "thermocyclerState": {
         "block": {
-          "engage": "Engage block temperature",
+          "engage": "Block temperature",
           "label": "Thermocycler block",
           "temperature": "Block temperature",
-          "toggleOff": "Deactivated",
-          "toggleOn": "Active",
+          "toggleOff": "Deactivate",
+          "toggleOn": "Activate",
           "valid_range": "Valid range between 4 and 96ºC"
         },
         "ending_hold": "Ending hold",
         "lid": {
-          "engage": "Engage lid temperature",
+          "engage": "Lid temperature",
           "label": "Lid",
           "temperature": "Lid temperature",
-          "toggleOff": "Deactivated",
-          "toggleOn": "Active",
+          "toggleOff": "Deactivate",
+          "toggleOn": "Activate",
           "valid_range": "Valid range between 37 and 110ºC"
         },
         "lidPosition": {

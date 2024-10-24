@@ -37,11 +37,15 @@ export function LiquidDefinitions({
               <ListItemDescriptor
                 type="large"
                 description={
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                  <Flex
+                    alignItems={ALIGN_CENTER}
+                    gridGap={SPACING.spacing8}
+                    minWidth="13.75rem"
+                    width="13.75rem"
+                  >
                     <LiquidIcon color={liquid.displayColor} />
                     <StyledText
                       desktopStyle="bodyDefaultRegular"
-                      overflowWrap="anywhere"
                       id="liquid-name"
                       css={LINE_CLAMP_TEXT_STYLE(3)}
                     >
@@ -49,7 +53,14 @@ export function LiquidDefinitions({
                     </StyledText>
                   </Flex>
                 }
-                content={liquid.description ?? t('na')}
+                content={
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    css={LINE_CLAMP_TEXT_STYLE(10)}
+                  >
+                    {liquid.description ?? t('na')}
+                  </StyledText>
+                }
               />
             </ListItem>
           ))

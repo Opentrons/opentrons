@@ -79,9 +79,12 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     if (fieldName === focusedField) {
       setFocusedField(null)
     }
-    if (!dirtyFields.includes(fieldName)) {
-      setDirtyFields([...dirtyFields, fieldName])
-    }
+    setDirtyFields(prevDirtyFields => {
+      if (!prevDirtyFields.includes(fieldName)) {
+        return [...prevDirtyFields, fieldName]
+      }
+      return prevDirtyFields
+    })
   }
   const stepId = formData?.id
   const handleDelete = (): void => {
@@ -144,7 +147,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   ) {
     handleSave = confirmAddPauseUntilHeaterShakerTempStep
   }
-
   return (
     <>
       {/* TODO: update these modals to match new modal design */}
@@ -180,7 +182,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
               : ''
           }
           handleCancelClick={saveStepForm}
-          handleContinueClick={confirmAddPauseUntilTempStep}
+          handleContinueClick={handleSave}
           moduleType={
             showAddPauseUntilTempStepModal
               ? TEMPERATURE_MODULE_TYPE

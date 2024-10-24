@@ -1,14 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  StyledText,
   ListItem,
   ListItemDescriptor,
-  Btn,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { BUTTON_LINK_STYLE } from '../../atoms'
@@ -62,8 +63,21 @@ export function ProtocolMetadata({
             <ListItem type="noActive" key={`ProtocolOverview_${title}`}>
               <ListItemDescriptor
                 type="large"
-                description={t(`${title}`)}
-                content={value ?? t('na')}
+                description={
+                  <Flex minWidth="13.75rem">
+                    <StyledText
+                      desktopStyle="bodyDefaultRegular"
+                      color={COLORS.grey60}
+                    >
+                      {t(`${title}`)}
+                    </StyledText>
+                  </Flex>
+                }
+                content={
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {value ?? t('na')}
+                  </StyledText>
+                }
               />
             </ListItem>
           )
@@ -71,10 +85,23 @@ export function ProtocolMetadata({
         <ListItem type="noActive" key="ProtocolOverview_robotVersion">
           <ListItemDescriptor
             type="large"
-            description={t('required_app_version')}
-            content={t('app_version', {
-              version: REQUIRED_APP_VERSION,
-            })}
+            description={
+              <Flex minWidth="13.75rem">
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('required_app_version')}
+                </StyledText>
+              </Flex>
+            }
+            content={
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('app_version', {
+                  version: REQUIRED_APP_VERSION,
+                })}
+              </StyledText>
+            }
           />
         </ListItem>
       </Flex>
