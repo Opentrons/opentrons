@@ -1,6 +1,6 @@
 import {
   CreateCommand,
-  LabwareLocation,
+  OnDeckLabwareLocation,
   ModuleLocation,
 } from '@opentrons/shared-data'
 import { UseRobotControlCommandsProps } from '/app/resources/maintenance_runs'
@@ -72,7 +72,7 @@ const buildLoadModuleCommand = (location: ModuleLocation): CreateCommand => {
 
 const buildPlaceLabwareCommand = (
   labwareId: string,
-  location: LabwareLocation
+  location: OnDeckLabwareLocation
 ): CreateCommand => {
   return {
     commandType: 'unsafe/placeLabware' as const,

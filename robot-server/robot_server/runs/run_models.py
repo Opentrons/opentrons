@@ -21,7 +21,7 @@ from opentrons.protocol_engine import (
     CommandNote,
 )
 from opentrons.protocol_engine.types import (
-    LabwareLocation,
+    OnDeckLabwareLocation,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
     CSVRunTimeParamFilesType,
@@ -320,7 +320,7 @@ class PlaceLabwareState(BaseModel):
     """Details the labware being placed by the gripper."""
 
     labwareId: str = Field(..., description="The ID of the labware to place.")
-    location: LabwareLocation = Field(
+    location: OnDeckLabwareLocation = Field(
         ..., description="The location the Plate Reade lid should be in."
     )
     shouldPlaceDown: bool = Field(

@@ -4768,10 +4768,6 @@
               "$ref": "#/definitions/OnLabwareLocation"
             },
             {
-              "enum": ["offDeck"],
-              "type": "string"
-            },
-            {
               "$ref": "#/definitions/AddressableAreaLocation"
             }
           ]

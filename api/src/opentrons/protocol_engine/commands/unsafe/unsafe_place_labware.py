@@ -13,13 +13,13 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 from opentrons.types import Point
 
-from ...types import DeckSlotLocation, LabwareLocation, ModuleModel
+from ...types import DeckSlotLocation, ModuleModel, OnDeckLabwareLocation
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...resources import ensure_ot3_hardware
 from ...state.update_types import StateUpdate
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 
 if TYPE_CHECKING:
     from ...state.state import StateView
@@ -33,7 +33,9 @@ class UnsafePlaceLabwareParams(BaseModel):
     """Payload required for an UnsafePlaceLabware command."""
 
     labwareId: str = Field(..., description="The id of the labware to place.")
-    location: LabwareLocation = Field(..., description="Where to place the labware.")
+    location: OnDeckLabwareLocation = Field(
+        ..., description="Where to place the labware."
+    )
 
 
 class UnsafePlaceLabwareResult(BaseModel):
@@ -74,15 +76,11 @@ class UnsafePlaceLabwareImplementation(
 
         # Allow propagation of LabwareNotLoadedError.
         labware_id = params.labwareId
-        current_labware = self._state_view.labware.get(labware_id=labware_id)
-        definition_uri = current_labware.definitionUri
-
+        definition_uri = self._state_view.labware.get(labware_id).definitionUri
         final_offsets = self._state_view.labware.get_labware_gripper_offsets(
             labware_id, None
         )
-        drop_offset = (
-            cast(Point, final_offsets.dropOffset) if final_offsets else Point()
-        )
+        drop_offset = cast(Point, final_offsets.dropOffset) if final_offsets else None
 
         if isinstance(params.location, DeckSlotLocation):
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
@@ -109,6 +107,27 @@ class UnsafePlaceLabwareImplementation(
         # NOTE: When the estop is pressed, the gantry loses postion,
         # so the robot needs to home x, y to sync.
         await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G, Axis.X, Axis.Y])
+        state_update = StateUpdate()
+
+        # Place the labware down
+        await self._start_movement(ot3api, labware_id, location, drop_offset)
+
+        state_update.set_labware_location(
+            labware_id=labware_id,
+            new_location=location,
+            new_offset_id=new_offset_id,
+        )
+        return SuccessData(
+            public=UnsafePlaceLabwareResult(), private=None, state_update=state_update
+        )
+
+    async def _start_movement(
+        self,
+        ot3api: OT3HardwareControlAPI,
+        labware_id: str,
+        location: OnDeckLabwareLocation,
+        drop_offset: Optional[Point],
+    ) -> None:
         gripper_homed_position = await ot3api.gantry_position(
             mount=OT3Mount.GRIPPER,
             refresh=True,
@@ -142,17 +161,6 @@ class UnsafePlaceLabwareImplementation(
             await ot3api.move_to(
                 mount=OT3Mount.GRIPPER, abs_position=waypoint_data.position
             )
-
-        state_update = StateUpdate()
-
-        state_update.set_labware_location(
-            labware_id=labware_id,
-            new_location=location,
-            new_offset_id=new_offset_id,
-        )
-        return SuccessData(
-            public=UnsafePlaceLabwareResult(), private=None, state_update=state_update
-        )
 
 
 class UnsafePlaceLabware(

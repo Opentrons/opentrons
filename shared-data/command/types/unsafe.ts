@@ -1,7 +1,7 @@
 import type {
   CommonCommandRunTimeInfo,
   CommonCommandCreateInfo,
-  LabwareLocation,
+  OnDeckLabwareLocation,
 } from '.'
 import type { MotorAxes } from '../../js/types'
 
@@ -93,7 +93,7 @@ export interface UnsafeUngripLabwareRunTimeCommand
 }
 export interface UnsafePlaceLabwareParams {
   labwareId: string
-  location: LabwareLocation
+  location: OnDeckLabwareLocation
 }
 export interface UnsafePlaceLabwareCreateCommand
   extends CommonCommandCreateInfo {

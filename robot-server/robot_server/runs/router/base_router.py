@@ -18,7 +18,7 @@ from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReade
 from opentrons.hardware_control.types import EstopState
 from opentrons.protocol_engine.commands.absorbance_reader import CloseLid, OpenLid
 from opentrons.protocol_engine.commands.move_labware import MoveLabware
-from opentrons.protocol_engine.types import CSVRuntimeParamPaths
+from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons.protocol_engine import (
     errors as pe_errors,
 )
@@ -633,11 +633,13 @@ async def get_current_state(
 
         # Labware state when estop is engaged
         if isinstance(command, MoveLabware):
-            place_labware = PlaceLabwareState(
-                location=command.params.newLocation,
-                labwareId=command.params.labwareId,
-                shouldPlaceDown=False,
-            )
+            location = command.params.newLocation
+            if isinstance(location, DeckSlotLocation):
+                place_labware = PlaceLabwareState(
+                    location=location,
+                    labwareId=command.params.labwareId,
+                    shouldPlaceDown=False,
+                )
         # Handle absorbance reader lid
         elif isinstance(command, (OpenLid, CloseLid)):
             for mod in run.modules:
@@ -647,7 +649,6 @@ async def get_current_state(
                 ):
                     continue
                 for hw_mod in hardware.attached_modules:
-                    lid_status = hw_mod.live_data["data"].get("lidStatus")
                     if (
                         mod.location is not None
                         and hw_mod.serial_number == mod.serialNumber
