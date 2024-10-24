@@ -313,7 +313,6 @@ const HOME_EXCEPT_PLUNGERS: CreateCommand = {
   params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
 }
 
-// in case the gripper does not know the position after a stall/collision we must update the position.
 const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
   commandType: 'unsafe/updatePositionEstimators' as const,
   params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },

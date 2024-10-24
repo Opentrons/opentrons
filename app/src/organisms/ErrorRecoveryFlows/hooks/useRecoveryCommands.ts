@@ -315,6 +315,7 @@ export const RELEASE_GRIPPER_JAW: CreateCommand = {
   intent: 'fixit',
 }
 
+// in case the gripper does not know the position after a stall/collision we must update the position.
 export const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
   commandType: 'unsafe/updatePositionEstimators',
   params: { axes: ['x', 'y', 'extensionZ'] },
