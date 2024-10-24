@@ -1,22 +1,28 @@
+ifeq ($(CI), true)
+	PYTHON=python
+else
+	PYTHON=pyenv exec python
+endif
+
 .PHONY: black
 black:
-	python -m pipenv run python -m black .
+	$(PYTHON) -m pipenv run python -m black .
 
 .PHONY: black-check
 black-check:
-	python -m pipenv run python -m black . --check
+	$(PYTHON) -m pipenv run python -m black . --check
 
 .PHONY: ruff
 ruff:
-	python -m pipenv run python -m ruff check . --fix
+	$(PYTHON) -m pipenv run python -m ruff check . --fix
 
 .PHONY: ruff-check
 ruff-check:
-	python -m pipenv run python -m ruff check .
+	$(PYTHON) -m pipenv run python -m ruff check .
 
 .PHONY: mypy
 mypy:
-	python -m pipenv run python -m mypy automation tests citools
+	$(PYTHON) -m pipenv run python -m mypy automation tests citools
 
 .PHONY: lint
 lint: black-check ruff-check mypy
@@ -32,7 +38,7 @@ format:
 
 .PHONY: test-ci
 test-ci:
-	python -m pipenv run python -m pytest -m "emulated_alpha"
+	$(PYTHON) -m pipenv run python -m pytest -m "emulated_alpha"
 
 .PHONY: test-protocol-analysis
 test-protocol-analysis:
@@ -40,11 +46,11 @@ test-protocol-analysis:
 
 .PHONY: setup
 setup: install-pipenv
-	python -m pipenv install
+	$(PYTHON) -m pipenv install
 
 .PHONY: teardown
 teardown:
-	python -m pipenv --rm
+	$(PYTHON) -m pipenv --rm
 
 .PHONY: format-readme
 format-readme:
@@ -52,7 +58,7 @@ format-readme:
 
 .PHONY: install-pipenv
 install-pipenv:
-	python -m pip install -U pipenv
+	$(PYTHON) -m pip install -U pipenv
 
 ANALYSIS_REF ?= edge
 PROTOCOL_NAMES ?= all
@@ -67,14 +73,14 @@ snapshot-test:
 	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	python -m pipenv run pytest -k analyses_snapshot_test -vv
+	$(PYTHON) -m pipenv run pytest -k analyses_snapshot_test -vv
 
 .PHONY: snapshot-test-update
 snapshot-test-update:
 	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	python -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
+	$(PYTHON) -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
 
 CACHEBUST := $(shell date +%s)
 
@@ -88,7 +94,7 @@ build-opentrons-analysis:
 
 .PHONY: generate-protocols
 generate-protocols:
-	python -m pipenv run python -m automation.data.protocol_registry
+	$(PYTHON) -m pipenv run python -m automation.data.protocol_registry
 
 
 OPENTRONS_VERSION ?= edge
@@ -112,3 +118,29 @@ run-ot2:
 	@echo "Running opentrons-robot-server:$(OPENTRONS_VERSION)"
 	@echo "If you want to run a different version, run 'make run-ot2 OPENTRONS_VERSION=chore_release-8.0.0'"
 	docker run -p 31950:31950 --env-file ../robot-server/dev.env opentrons-robot-server:$(OPENTRONS_VERSION)
+
+BUILD_FLAGS := $(if $(NO_CACHE),--no-cache)
+
+.PHONY: local-build
+local-build:
+	@echo "Building docker image for your local opentrons code"
+	@echo "The image will be named opentrons-analysis:local"
+	@echo "For a fresh build, run 'make local-build NO_CACHE=1'"
+	docker build $(BUILD_FLAGS) -t opentrons-analysis:local -f citools/Dockerfile.local .. || true
+	@echo "Build complete"
+
+.PHONY: local-snapshot-test
+local-snapshot-test:
+	@echo "Running against local opentrons-analysis:local"
+	@echo "You must run this command like 'make local-snapshot-test ANALYSIS_REF=local'"
+	@echo "This is because the test suite reads the ANALYSIS_REF environment variable."
+	@echo "And uses it to determine which image to run against."
+	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
+	@if [ "$(ANALYSIS_REF)" = "local" ]; then \
+		echo "ANALYSIS_REF is correctly set to 'local'"; \
+	else \
+		echo "Warning: ANALYSIS_REF is not set to 'local'"; \
+	fi
+	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
+	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
+	$(PYTHON) -m pipenv run pytest -k analyses_snapshot_test -vv
