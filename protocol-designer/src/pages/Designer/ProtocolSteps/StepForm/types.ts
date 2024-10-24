@@ -1,4 +1,5 @@
 import type { FormData, StepFieldName } from '../../../../form-types'
+import type { StepFormErrors } from '../../../../steplist'
 export interface FocusHandlers {
   focusedField: StepFieldName | null
   dirtyFields: StepFieldName[]
@@ -24,4 +25,5 @@ export interface StepFormProps {
   focusHandlers: FocusHandlers
   propsForFields: FieldPropsByName
   toolboxStep: number
+  visibleFormErrors: StepFormErrors
 }

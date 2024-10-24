@@ -22,6 +22,8 @@ export function DropdownStepFormField(
     tooltipContent,
     addPadding = true,
     width = '17.5rem',
+    onFieldFocus,
+    onFieldBlur,
   } = props
   const { t } = useTranslation('tooltip')
   const availableOptionId = options.find(opt => opt.value === value)
@@ -35,6 +37,8 @@ export function DropdownStepFormField(
         dropdownType="neutral"
         filterOptions={options}
         title={title}
+        onBlur={onFieldBlur}
+        onFocus={onFieldFocus}
         currentOption={
           availableOptionId ?? { name: 'Choose option', value: '' }
         }

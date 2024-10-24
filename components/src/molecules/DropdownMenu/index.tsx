@@ -63,6 +63,10 @@ export interface DropdownMenuProps {
   tabIndex?: number
   /** optional error */
   error?: string | null
+  /** focus handler */
+  onFocus?: React.FocusEventHandler<HTMLButtonElement>
+  /** blur handler */
+  onBlur?: React.FocusEventHandler<HTMLButtonElement>
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -79,6 +83,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     tooltipText,
     tabIndex = 0,
     error,
+    onFocus,
+    onBlur,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
@@ -222,6 +228,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             e.preventDefault()
             toggleSetShowDropdownMenu()
           }}
+          onFocus={onFocus}
+          onBlur={onBlur}
           css={DROPDOWN_STYLE}
           tabIndex={tabIndex}
         >
