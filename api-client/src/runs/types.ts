@@ -99,7 +99,7 @@ export interface RunsLinks {
 }
 
 export interface RunCommandLink {
-  current: CommandLinkNoMeta
+  lastCompleted: CommandLinkNoMeta
 }
 
 export interface CommandLinkNoMeta {

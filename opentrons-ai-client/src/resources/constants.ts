@@ -19,3 +19,5 @@ export const LOCAL_AUTH0_CLIENT_ID = 'PcuD1wEutfijyglNeRBi41oxsKJ1HtKw'
 export const LOCAL_AUTH0_AUDIENCE = 'sandbox-ai-api'
 export const LOCAL_AUTH0_DOMAIN = 'identity.auth-dev.opentrons.com'
 export const LOCAL_END_POINT = 'http://localhost:8000/api/chat/completion'
+
+export const CLIENT_MAX_WIDTH = '1440px'

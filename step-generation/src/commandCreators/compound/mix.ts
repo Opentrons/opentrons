@@ -164,7 +164,6 @@ export const mix: CommandCreator<MixArgs> = (
     return {
       errors: [
         errorCreators.pipetteDoesNotExist({
-          actionName,
           pipette,
         }),
       ],

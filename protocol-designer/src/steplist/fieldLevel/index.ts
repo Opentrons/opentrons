@@ -8,6 +8,7 @@ import {
   temperatureRangeFieldValue,
   realNumber,
   isTimeFormat,
+  isTimeFormatMinutesSeconds,
 } from './errors'
 import {
   maskToInteger,
@@ -344,6 +345,11 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
+  },
+  heaterShakerTimer: {
+    maskValue: composeMaskers(maskToTime),
+    getErrors: composeErrors(isTimeFormatMinutesSeconds),
+    castValue: String,
   },
   pauseAction: {
     getErrors: composeErrors(requiredField),

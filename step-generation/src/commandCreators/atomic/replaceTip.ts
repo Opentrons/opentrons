@@ -162,7 +162,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     return {
       errors: [
         errorCreators.pipetteDoesNotExist({
-          actionName: 'replaceTip',
           pipette,
         }),
       ],

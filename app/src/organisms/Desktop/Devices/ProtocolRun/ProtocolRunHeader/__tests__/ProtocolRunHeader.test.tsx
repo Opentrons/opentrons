@@ -30,6 +30,7 @@ vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
+vi.mock('/app/redux/protocol-runs')
 vi.mock('../RunHeaderModalContainer')
 vi.mock('../RunHeaderBannerContainer')
 vi.mock('../RunHeaderContent')
@@ -51,7 +52,6 @@ describe('ProtocolRunHeader', () => {
       robotName: MOCK_ROBOT,
       runId: MOCK_RUN_ID,
       makeHandleJumpToStep: vi.fn(),
-      missingSetupSteps: [],
     }
 
     vi.mocked(useNavigate).mockReturnValue(mockNavigate)

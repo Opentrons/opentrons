@@ -7,7 +7,7 @@
   },
   "metadata": {
     "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
-    "displayCategory": "other",
+    "displayCategory": "lid",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -17,7 +17,12 @@
     "zDimension": 12.8
   },
   "wells": {},
-  "groups": [],
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
@@ -60,6 +65,11 @@
       "x": 0,
       "y": 0,
       "z": 8.193
+    },
+    "opentrons_flex_deck_riser": {
+      "x": 0,
+      "y": 0,
+      "z": 0
     }
   },
   "gripForce": 15,

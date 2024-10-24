@@ -52,7 +52,7 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
         {liquids.length > 1 ? (
           <ListItem type="noActive">
             <ListItemDescriptor
-              type="mini"
+              type="default"
               content={liquids.join(', ')}
               description={t('liquid')}
             />
@@ -113,7 +113,7 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
   return (
     <ListItem type="noActive">
       <ListItemDescriptor
-        type="mini"
+        type="default"
         content={
           stackInformation != null ? (
             <StyledText

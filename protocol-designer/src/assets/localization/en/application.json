@@ -43,7 +43,7 @@
     "thermocycler": "thermocycler"
   },
   "temperature": "Temperature (˚C)",
-  "time": "Time (hh:mm:ss)",
+  "time": "Time",
   "units": {
     "cycles": "cycles",
     "degrees": "°C",
@@ -55,6 +55,7 @@
     "rpm": "rpm",
     "seconds": "s",
     "time": "mm:ss",
+    "time_hms": "hh:mm:ss",
     "times": "x"
   },
   "update": "UPDATE",

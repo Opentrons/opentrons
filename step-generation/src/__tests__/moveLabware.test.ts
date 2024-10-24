@@ -372,7 +372,7 @@ describe('moveLabware', () => {
     )
     expect(result.warnings).toEqual([
       {
-        message: 'Disposing of a tiprack with tips',
+        message: 'Disposing unused tips',
         type: 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS',
       },
     ])

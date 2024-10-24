@@ -3,10 +3,19 @@ import {
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
-import { TEMPERATURE_AT_TARGET, TEMPERATURE_DEACTIVATED } from '../../constants'
-import * as errorCreators from '../../errorCreators'
-import type { CommandCreator, WaitForTemperatureArgs } from '../../types'
+import {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from '../../constants'
 import { getModuleState } from '../../robotStateSelectors'
+import * as errorCreators from '../../errorCreators'
+import * as warningCreators from '../../warningCreators'
+import type {
+  CommandCreator,
+  CommandCreatorWarning,
+  WaitForTemperatureArgs,
+} from '../../types'
 
 /** Set temperature target for specified module. */
 export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
@@ -16,6 +25,7 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
 ) => {
   const { module, temperature } = args
   const moduleState = module ? getModuleState(prevRobotState, module) : null
+  const warnings: CommandCreatorWarning[] = []
 
   if (module === null || !moduleState) {
     return {
@@ -42,6 +52,10 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
     'status' in moduleState &&
     moduleState.status === TEMPERATURE_AT_TARGET &&
     moduleState.targetTemperature !== temperature
+  const potentiallyUnreachableTemp =
+    'status' in moduleState &&
+    moduleState.status === TEMPERATURE_APPROACHING_TARGET &&
+    moduleState.targetTemperature !== temperature
 
   if (
     unreachableTemp ||
@@ -50,6 +64,10 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
     return {
       errors: [errorCreators.missingTemperatureStep()],
     }
+  }
+
+  if (potentiallyUnreachableTemp) {
+    warnings.push(warningCreators.potentiallyUnreachableTemp())
   }
 
   const moduleType = invariantContext.moduleEntities[module]?.type
@@ -67,6 +85,7 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
             },
           },
         ],
+        warnings: warnings.length > 0 ? warnings : undefined,
       }
 
     case HEATERSHAKER_MODULE_TYPE:
@@ -81,6 +100,7 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
             },
           },
         ],
+        warnings: warnings.length > 0 ? warnings : undefined,
       }
 
     default:

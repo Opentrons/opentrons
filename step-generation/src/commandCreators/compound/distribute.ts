@@ -88,7 +88,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
   ) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName,
         pipette: args.pipette,
       })
     )
