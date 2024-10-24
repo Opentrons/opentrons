@@ -54,6 +54,7 @@ const HeadingText = styled(StyledText).attrs({
 })``
 
 const BodyText = styled(StyledText).attrs({
+  color: COLORS.grey60,
   desktopStyle: 'bodyDefaultRegular',
   paddingBottom: '8px',
   paddingTop: '16px',
@@ -175,11 +176,9 @@ export function UpdateProtocol(): JSX.Element {
             />
           )}
         </Flex>
-
-        <BodyText>{t('type_of_update')}</BodyText>
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <DropdownMenu
-            // value={updateType}
+            title={t('type_of_update')}
             width="100%"
             dropdownType="neutral"
             filterOptions={updateOptions}
