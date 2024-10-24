@@ -95,6 +95,7 @@ class RunController:
                 self._task_runner.run(self._run_orchestrator_store.stop)
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
+                log.info(f'Resuming run "{self._run_id}" from error recovery mode.')
                 self._run_orchestrator_store.resume_from_recovery(
                     reconcile_false_positive=False
                 )
@@ -103,6 +104,10 @@ class RunController:
                 action_type
                 == RunActionType.RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE
             ):
+                log.info(
+                    f'Resuming run "{self._run_id}" from error recovery mode,'
+                    f" assuming false-positive."
+                )
                 self._run_orchestrator_store.resume_from_recovery(
                     reconcile_false_positive=True
                 )
