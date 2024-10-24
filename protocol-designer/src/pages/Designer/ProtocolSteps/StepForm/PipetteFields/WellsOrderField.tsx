@@ -10,7 +10,7 @@ import {
   DIRECTION_COLUMN,
   COLORS,
 } from '@opentrons/components'
-import { WellOrderModal } from '../../../../../components/StepEditForm/fields/WellOrderField/WellOrderModal'
+import { WellOrderModal } from '../../../../../organisms'
 import type { WellOrderOption } from '../../../../../form-types'
 import type { FieldProps } from '../types'
 
