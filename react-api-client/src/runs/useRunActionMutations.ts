@@ -5,6 +5,7 @@ import {
   usePauseRunMutation,
   useStopRunMutation,
   useResumeRunFromRecoveryMutation,
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '..'
 
 interface UseRunActionMutations {
@@ -12,10 +13,12 @@ interface UseRunActionMutations {
   pauseRun: () => void
   stopRun: () => void
   resumeRunFromRecovery: () => void
+  resumeRunFromRecoveryAssumingFalsePositive: () => void
   isPlayRunActionLoading: boolean
   isPauseRunActionLoading: boolean
   isStopRunActionLoading: boolean
   isResumeRunFromRecoveryActionLoading: boolean
+  isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: boolean
 }
 
 export function useRunActionMutations(runId: string): UseRunActionMutations {
@@ -43,6 +46,11 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
     isLoading: isResumeRunFromRecoveryActionLoading,
   } = useResumeRunFromRecoveryMutation()
 
+  const {
+    resumeRunFromRecoveryAssumingFalsePositive,
+    isLoading: isResumeRunFromRecoveryAssumingFalsePositiveActionLoading,
+  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
+
   return {
     playRun: () => {
       playRun(runId)
@@ -56,9 +64,13 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
     resumeRunFromRecovery: () => {
       resumeRunFromRecovery(runId)
     },
+    resumeRunFromRecoveryAssumingFalsePositive: () => {
+      resumeRunFromRecoveryAssumingFalsePositive(runId)
+    },
     isPlayRunActionLoading,
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
+    isResumeRunFromRecoveryAssumingFalsePositiveActionLoading,
   }
 }

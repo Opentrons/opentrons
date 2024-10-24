@@ -5,6 +5,7 @@ import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
   useUpdateErrorRecoveryPolicy,
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '/app/resources/runs'
@@ -14,13 +15,16 @@ import {
   RELEASE_GRIPPER_JAW,
   buildPickUpTips,
   buildIgnorePolicyRules,
+  isAssumeFalsePositiveResumeKind,
   UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
   HOME_GRIPPER_Z,
 } from '../useRecoveryCommands'
-import { RECOVERY_MAP } from '../../constants'
+import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
+import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
+vi.mock('/app/organisms/ErrorRecoveryFlows/utils')
 
 describe('useRecoveryCommands', () => {
   const mockFailedCommand = {
@@ -39,6 +43,9 @@ describe('useRecoveryCommands', () => {
   } as any
   const mockMakeSuccessToast = vi.fn()
   const mockResumeRunFromRecovery = vi.fn(() =>
+    Promise.resolve(mockMakeSuccessToast())
+  )
+  const mockResumeRunFromRecoveryAssumingFalsePositive = vi.fn(() =>
     Promise.resolve(mockMakeSuccessToast())
   )
   const mockStopRun = vi.fn()
@@ -72,6 +79,11 @@ describe('useRecoveryCommands', () => {
     } as any)
     vi.mocked(useUpdateErrorRecoveryPolicy).mockReturnValue({
       mutateAsync: mockUpdateErrorRecoveryPolicy,
+    } as any)
+    vi.mocked(
+      useResumeRunFromRecoveryAssumingFalsePositiveMutation
+    ).mockReturnValue({
+      mutateAsync: mockResumeRunFromRecoveryAssumingFalsePositive,
     } as any)
   })
 
@@ -317,7 +329,8 @@ describe('useRecoveryCommands', () => {
 
     const expectedPolicyRules = buildIgnorePolicyRules(
       'aspirateInPlace',
-      'mockErrorType'
+      'mockErrorType',
+      'ignoreAndContinue'
     )
 
     expect(mockUpdateErrorRecoveryPolicy).toHaveBeenCalledWith(
@@ -353,5 +366,55 @@ describe('useRecoveryCommands', () => {
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
     )
+  })
+
+  describe('skipFailedCommand with false positive handling', () => {
+    it('should call resumeRunFromRecoveryAssumingFalsePositive for tip-related errors', async () => {
+      vi.mocked(getErrorKind).mockReturnValue(ERROR_KINDS.TIP_NOT_DETECTED)
+
+      const { result } = renderHook(() => useRecoveryCommands(props))
+
+      await act(async () => {
+        await result.current.skipFailedCommand()
+      })
+
+      expect(
+        mockResumeRunFromRecoveryAssumingFalsePositive
+      ).toHaveBeenCalledWith(mockRunId)
+      expect(mockMakeSuccessToast).toHaveBeenCalled()
+    })
+
+    it('should call regular resumeRunFromRecovery for non-tip-related errors', async () => {
+      vi.mocked(getErrorKind).mockReturnValue(ERROR_KINDS.GRIPPER_ERROR)
+
+      const { result } = renderHook(() => useRecoveryCommands(props))
+
+      await act(async () => {
+        await result.current.skipFailedCommand()
+      })
+
+      expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
+      expect(mockMakeSuccessToast).toHaveBeenCalled()
+    })
+  })
+})
+
+describe('isAssumeFalsePositiveResumeKind', () => {
+  it(`should return true for ${ERROR_KINDS.TIP_NOT_DETECTED} error kind`, () => {
+    vi.mocked(getErrorKind).mockReturnValue(ERROR_KINDS.TIP_NOT_DETECTED)
+
+    expect(isAssumeFalsePositiveResumeKind({} as any)).toBe(true)
+  })
+
+  it(`should return true for ${ERROR_KINDS.TIP_DROP_FAILED} error kind`, () => {
+    vi.mocked(getErrorKind).mockReturnValue(ERROR_KINDS.TIP_DROP_FAILED)
+
+    expect(isAssumeFalsePositiveResumeKind({} as any)).toBe(true)
+  })
+
+  it('should return false for other error kinds', () => {
+    vi.mocked(getErrorKind).mockReturnValue(ERROR_KINDS.GRIPPER_ERROR)
+
+    expect(isAssumeFalsePositiveResumeKind({} as any)).toBe(false)
   })
 })
