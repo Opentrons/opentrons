@@ -99,6 +99,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       ? 1
       : 0
   )
+  const [
+    showFormErrorsAndWarnings,
+    setShowFormErrorsAndWarnings,
+  ] = useState<boolean>(false)
   const [isRename, setIsRename] = useState<boolean>(false)
   const icon = stepIconsByType[formData.stepType]
 
@@ -126,18 +130,22 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const numErrors = timeline.errors?.length ?? 0
 
   const handleSaveClick = (): void => {
-    handleSave()
-    makeSnackbar(
-      getSaveStepSnackbarText({
-        numWarnings,
-        numErrors,
-        stepTypeDisplayName: i18n.format(
-          t(`stepType.${formData.stepType}`),
-          'capitalize'
-        ),
-        t,
-      }) as string
-    )
+    if (canSave) {
+      handleSave()
+      makeSnackbar(
+        getSaveStepSnackbarText({
+          numWarnings,
+          numErrors,
+          stepTypeDisplayName: i18n.format(
+            t(`stepType.${formData.stepType}`),
+            'capitalize'
+          ),
+          t,
+        }) as string
+      )
+    } else {
+      setShowFormErrorsAndWarnings(true)
+    }
   }
 
   return (
@@ -195,9 +203,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
                     }
                   : handleSaveClick
               }
-              disabled={
-                isMultiStepToolbox && toolboxStep === 0 ? false : !canSave
-              }
               width="100%"
             >
               {isMultiStepToolbox && toolboxStep === 0
@@ -215,7 +220,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           </Flex>
         }
       >
-        <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
+        {showFormErrorsAndWarnings ? (
+          <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
+        ) : null}
         <ToolsComponent
           {...{
             formData,

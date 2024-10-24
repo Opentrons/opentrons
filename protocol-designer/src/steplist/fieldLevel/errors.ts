@@ -58,20 +58,20 @@ export const minimumWellCount = (minimum: number): ErrorChecker => (
 export const minFieldValue = (minimum: number): ErrorChecker => (
   value: unknown
 ): string | null =>
-  value === null || Number(value) >= minimum
+  !value || Number(value) >= minimum
     ? null
     : `${FIELD_ERRORS.UNDER_RANGE_MINIMUM} ${minimum}`
 export const maxFieldValue = (maximum: number): ErrorChecker => (
   value: unknown
 ): string | null =>
-  value === null || Number(value) <= maximum
+  !value || Number(value) <= maximum
     ? null
     : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
 export const temperatureRangeFieldValue = (
   minimum: number,
   maximum: number
 ): ErrorChecker => (value: unknown): string | null =>
-  value === null || (Number(value) <= maximum && Number(value) >= minimum)
+  !value || (Number(value) <= maximum && Number(value) >= minimum)
     ? null
     : `${FIELD_ERRORS.OUTSIDE_OF_RANGE} ${minimum} and ${maximum} °C`
 export const realNumber: ErrorChecker = (value: unknown) =>
