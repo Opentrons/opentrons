@@ -142,10 +142,12 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         """
         ...
 
-    # todo(mm, 2024-10-17): Consider deleting this in favor of cache_tip(), which is
-    # the same except for `assert`s, if we can do so without breaking anything.
+    # todo(mm, 2024-10-17): Consider deleting this in favor of cache_tip()
+    # if we can do so without breaking anything.
     def add_tip(self, mount: MountArgType, tip_length: float) -> None:
         """Inform the hardware that a tip is now attached to a pipette.
+
+        If a tip is already attached, this no-ops.
 
         This changes the critical point of the pipette to make sure that
         the end of the tip is what moves around, and allows liquid handling.
@@ -153,6 +155,11 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         ...
 
     def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
+        """Inform the hardware that a tip is now attached to a pipette.
+
+        This is like `add_tip()`, except that if a tip is already attached,
+        this replaces it instead of no-opping.
+        """
         ...
 
     def remove_tip(self, mount: MountArgType) -> None:

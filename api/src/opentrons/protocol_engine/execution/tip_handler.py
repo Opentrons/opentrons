@@ -83,7 +83,7 @@ class TipHandler(TypingProtocol):
             TipAttachedError
         """
 
-    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    async def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
 
     async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
@@ -234,6 +234,11 @@ class HardwareTipHandler(TipHandler):
             labware_definition=self._state_view.labware.get_definition(labware_id),
             nominal_fallback=nominal_tip_geometry.length,
         )
+        tip_geometry = TipGeometry(
+            length=actual_tip_length,
+            diameter=nominal_tip_geometry.diameter,
+            volume=nominal_tip_geometry.volume,
+        )
 
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
@@ -241,24 +246,11 @@ class HardwareTipHandler(TipHandler):
         # Allow TipNotAttachedError to propagate.
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
 
-        self._hardware_api.cache_tip(hw_mount, actual_tip_length)
+        await self.cache_tip(pipette_id, tip_geometry)
+
         await self._hardware_api.prepare_for_aspirate(hw_mount)
 
-        self._hardware_api.set_current_tiprack_diameter(
-            mount=hw_mount,
-            tiprack_diameter=nominal_tip_geometry.diameter,
-        )
-
-        self._hardware_api.set_working_volume(
-            mount=hw_mount,
-            tip_volume=nominal_tip_geometry.volume,
-        )
-
-        return TipGeometry(
-            length=actual_tip_length,
-            diameter=nominal_tip_geometry.diameter,
-            volume=nominal_tip_geometry.volume,
-        )
+        return tip_geometry
 
     async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
         """See documentation on abstract base class."""
@@ -279,11 +271,11 @@ class HardwareTipHandler(TipHandler):
         self._hardware_api.remove_tip(hw_mount)
         self._hardware_api.set_current_tiprack_diameter(hw_mount, 0)
 
-    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    async def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """See documentation on abstract base class."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        self._hardware_api.add_tip(mount=hw_mount, tip_length=tip.length)
+        self._hardware_api.cache_tip(mount=hw_mount, tip_length=tip.length)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
@@ -422,12 +414,12 @@ class VirtualTipHandler(TipHandler):
             expected_has_tip=True,
         )
 
-    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    async def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Add a tip using a virtual pipette.
 
         This should not be called when using virtual pipettes.
         """
-        assert False, "TipHandler.add_tip should not be used with virtual pipettes"
+        assert False, "TipHandler.cache_tip should not be used with virtual pipettes"
 
     async def verify_tip_presence(
         self,
