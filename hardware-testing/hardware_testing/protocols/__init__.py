@@ -42,7 +42,7 @@ def create_pipette_parameters(parameters: ParameterContext) -> None:
     parameters.add_str(
         variable_name="right_mount",
         display_name="Right Mount",
-        description="Pipette Type on Mount Mount.",
+        description="Pipette Type on Right Mount.",
         choices=[
             {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
             {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
@@ -78,6 +78,7 @@ def create_labware_parameters(parameters: ParameterContext) -> None:
     ]
 
     # Add labware to choices list
+    filtered_labware.sort()
     for labware in filtered_labware:
         shorten_opentrons_str = labware.replace("opentrons", "opt")
         available_labware_choices.append(
@@ -86,13 +87,14 @@ def create_labware_parameters(parameters: ParameterContext) -> None:
                 "value": labware,
             }
         )
+        
     # Create Parameter
     parameters.add_str(
         variable_name="labware_type",
         display_name="Labware",
         description="Labware to probe.",
         choices=available_labware_choices,
-        default="corning_24_wellplate_3.4ml_flat",
+        default="opentrons_10_tuberack_nest_4x50ml_6x15ml_conical",
     )
 
 
@@ -120,7 +122,7 @@ def create_tube_volume_parameter(parameters: ParameterContext) -> None:
     parameters.add_int(
         variable_name="tube_volume",
         display_name="Tube Volume",
-        default=50,
+        default=15,
         minimum=15,
         maximum=50,
         unit="mL",
