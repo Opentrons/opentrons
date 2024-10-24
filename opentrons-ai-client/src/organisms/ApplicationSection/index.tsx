@@ -13,6 +13,7 @@ import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
 import { ControlledInputField } from '../../atoms/ControlledInputField'
 import { useAtom } from 'jotai'
 import { createProtocolAtom } from '../../resources/atoms'
+import { APPLICATION_STEP } from '../ProtocolSectionsContainer'
 
 export const BASIC_ALIQUOTING = 'basic_aliquoting'
 export const PCR = 'pcr'
@@ -20,7 +21,7 @@ export const OTHER = 'other'
 export const APPLICATION_SCIENTIFIC_APPLICATION =
   'application.scientificApplication'
 export const APPLICATION_OTHER_APPLICATION = 'application.otherApplication'
-export const APPLICATION_DESCRIBE = 'application.describe'
+export const APPLICATION_DESCRIBE = 'application.description'
 
 export function ApplicationSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -28,7 +29,7 @@ export function ApplicationSection(): JSX.Element | null {
     watch,
     formState: { isValid },
   } = useFormContext()
-  const [, setCreateProtocolAtom] = useAtom(createProtocolAtom)
+  const [{ currentStep }, setCreateProtocolAtom] = useAtom(createProtocolAtom)
 
   const options = [
     { name: t(BASIC_ALIQUOTING), value: BASIC_ALIQUOTING },
@@ -39,7 +40,13 @@ export function ApplicationSection(): JSX.Element | null {
   const isOtherSelected = watch(APPLICATION_SCIENTIFIC_APPLICATION) === OTHER
 
   function handleConfirmButtonClick(): void {
-    setCreateProtocolAtom({ currentStep: 1 })
+    const step =
+      currentStep > APPLICATION_STEP ? currentStep : APPLICATION_STEP + 1
+
+    setCreateProtocolAtom({
+      currentStep: step,
+      focusStep: step,
+    })
   }
 
   return (

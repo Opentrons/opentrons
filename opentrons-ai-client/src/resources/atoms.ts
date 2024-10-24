@@ -27,4 +27,5 @@ export const headerWithMeterAtom = atom<HeaderWithMeterAtomProps>({
 
 export const createProtocolAtom = atom<createProtocolAtomProps>({
   currentStep: 0,
+  focusStep: 0,
 })

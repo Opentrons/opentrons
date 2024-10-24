@@ -1,19 +1,17 @@
 import {
-  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_EVENLY,
   POSITION_RELATIVE,
   SPACING,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { Accordion } from '../../molecules/Accordion'
 import { useEffect } from 'react'
-import styled from 'styled-components'
 import { PromptPreview } from '../../molecules/PromptPreview'
-import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { useForm, FormProvider } from 'react-hook-form'
 import { createProtocolAtom, headerWithMeterAtom } from '../../resources/atoms'
 import { useAtom } from 'jotai'
+import { ProtocolSectionsContainer } from '../../organisms/ProtocolSectionsContainer'
+import { OTHER } from '../../organisms/ApplicationSection'
 
 interface CreateProtocolFormData {
   application: {
@@ -23,10 +21,12 @@ interface CreateProtocolFormData {
   }
 }
 
+const TOTAL_STEPS = 5
+
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const [, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
-  const [{ currentStep }, setCreateProtocolAtom] = useAtom(createProtocolAtom)
+  const [{ currentStep }] = useAtom(createProtocolAtom)
 
   const methods = useForm<CreateProtocolFormData>({
     defaultValues: {
@@ -38,12 +38,47 @@ export function CreateProtocol(): JSX.Element | null {
     },
   })
 
+  function calculateProgress(): number {
+    return currentStep > 0 ? currentStep / TOTAL_STEPS : 0
+  }
+
   useEffect(() => {
     setHeaderWithMeterAtom({
       displayHeaderWithMeter: true,
-      progress: 0,
+      progress: calculateProgress(),
     })
-  }, [])
+  }, [currentStep])
+
+  // TODO: move to utils
+  function generatePromptPreviewApplicationItems(): string[] {
+    const {
+      application: { scientificApplication, otherApplication, description },
+    } = methods.watch()
+
+    const finalApplication =
+      scientificApplication === OTHER
+        ? otherApplication
+        : scientificApplication !== ''
+        ? t(scientificApplication)
+        : ''
+
+    return [
+      finalApplication !== '' && finalApplication,
+      description !== '' && description,
+    ].filter(Boolean)
+  }
+
+  function generatePromptPreviewData(): Array<{
+    title: string
+    items: string[]
+  }> {
+    return [
+      {
+        title: t('application_title'),
+        items: generatePromptPreviewApplicationItems(),
+      },
+    ]
+  }
 
   return (
     <FormProvider {...methods}>
@@ -54,70 +89,14 @@ export function CreateProtocol(): JSX.Element | null {
         margin={`${SPACING.spacing16} ${SPACING.spacing16}`}
         height="100%"
       >
-        <ProtocolSections>
-          <Accordion
-            heading={t('application_title')}
-            isOpen={currentStep === 0}
-            handleClick={function (): void {
-              setCreateProtocolAtom({ currentStep: 0 })
-            }}
-          >
-            <ApplicationSection />
-          </Accordion>
-
-          <Accordion
-            heading={t('instruments_title')}
-            isOpen={currentStep === 1}
-            handleClick={function (): void {
-              setCreateProtocolAtom({ currentStep: 1 })
-            }}
-          >
-            <Flex>Content</Flex>
-          </Accordion>
-
-          <Accordion
-            heading={'Modules'}
-            isOpen={currentStep === 2}
-            handleClick={function (): void {
-              setCreateProtocolAtom({ currentStep: 1 })
-            }}
-          >
-            <Flex>Content</Flex>
-          </Accordion>
-
-          <Accordion
-            heading={'Labware & Liquids'}
-            isOpen={currentStep === 3}
-            handleClick={function (): void {
-              setCreateProtocolAtom({ currentStep: 1 })
-            }}
-          >
-            <Flex>Content</Flex>
-          </Accordion>
-
-          <Accordion
-            heading={'Steps'}
-            isOpen={currentStep === 4}
-            handleClick={function (): void {
-              setCreateProtocolAtom({ currentStep: 1 })
-            }}
-          >
-            <Flex>Content</Flex>
-          </Accordion>
-        </ProtocolSections>
+        <ProtocolSectionsContainer />
         <PromptPreview
           handleSubmit={function (): void {
             throw new Error('Function not implemented.')
           }}
-          promptPreviewData={[]}
+          promptPreviewData={generatePromptPreviewData()}
         />
       </Flex>
     </FormProvider>
   )
 }
-
-const ProtocolSections = styled(Flex)`
-  flex-direction: ${DIRECTION_COLUMN};
-  width: 100%;
-  gap: ${SPACING.spacing16};
-`

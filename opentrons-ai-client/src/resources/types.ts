@@ -51,4 +51,21 @@ export interface HeaderWithMeterAtomProps {
 
 export interface createProtocolAtomProps {
   currentStep: number
+  focusStep: number
+}
+
+export interface PromptData {
+  /** assistant: ChatGPT API, user: user */
+  role: Role
+  /** content gathered from the user selection */
+  data: {
+    applicationSection: {
+      application: string
+      description: string
+    }
+    instrumentsSection: {
+      robot: string
+      instruments: string[]
+    }
+  }
 }
