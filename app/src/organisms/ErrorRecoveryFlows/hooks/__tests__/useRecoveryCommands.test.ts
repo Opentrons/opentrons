@@ -14,7 +14,8 @@ import {
   RELEASE_GRIPPER_JAW,
   buildPickUpTips,
   buildIgnorePolicyRules,
-  HOME_GRIPPER_Z_AXIS,
+  UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
+  HOME_GRIPPER_Z,
 } from '../useRecoveryCommands'
 import { RECOVERY_MAP } from '../../constants'
 
@@ -264,15 +265,15 @@ describe('useRecoveryCommands', () => {
     )
   })
 
-  it('should call homeGripperZAxis and resolve the promise', async () => {
+  it('should call useUpdatePositionEstimators and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
-      await result.current.homeGripperZAxis()
+      await result.current.updatePositionEstimatorsAndHomeGripper()
     })
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
-      [HOME_GRIPPER_Z_AXIS],
+      [UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, HOME_GRIPPER_Z],
       false
     )
   })

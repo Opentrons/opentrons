@@ -3,8 +3,8 @@ import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { ErrorRecoveryWizardProps } from '/app/organisms/ErrorRecoveryFlows/ErrorRecoveryWizard'
 
-// Home the gripper z-axis implicitly. Because the z-home is not tied to a CTA, it must be handled here.
-export function useHomeGripperZAxis({
+// Home the gripper implicitly. Because the home is not tied to a CTA, it must be handled here.
+export function useHomeGripper({
   recoveryCommands,
   routeUpdateActions,
   recoveryMap,
@@ -20,7 +20,7 @@ export function useHomeGripperZAxis({
 
   useLayoutEffect(() => {
     const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
-    const { homeGripperZAxis } = recoveryCommands
+    const { updatePositionEstimatorsAndHomeGripper } = recoveryCommands
 
     if (!hasHomedOnce) {
       if (isManualGripperStep) {
@@ -28,7 +28,7 @@ export function useHomeGripperZAxis({
           void goBackPrevStep()
         } else {
           void handleMotionRouting(true)
-            .then(() => homeGripperZAxis())
+            .then(() => updatePositionEstimatorsAndHomeGripper())
             .then(() => {
               setHasHomedOnce(true)
             })
