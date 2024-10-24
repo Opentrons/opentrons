@@ -20,7 +20,7 @@ export function useHomeGripper({
 
   useLayoutEffect(() => {
     const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
-    const { homeGripper } = recoveryCommands
+    const { updatePositionEstimatorsAndHomeGripper } = recoveryCommands
 
     if (!hasHomedOnce) {
       if (isManualGripperStep) {
@@ -28,7 +28,7 @@ export function useHomeGripper({
           void goBackPrevStep()
         } else {
           void handleMotionRouting(true)
-            .then(() => homeGripper())
+            .then(() => updatePositionEstimatorsAndHomeGripper())
             .then(() => {
               setHasHomedOnce(true)
             })
