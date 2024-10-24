@@ -5,6 +5,7 @@ import os
 import json
 import sys
 import traceback
+import hashlib
 from abr_testing.data_collection import read_robot_logs
 from abr_testing.automation import google_drive_tool, google_sheets_tool
 
@@ -93,13 +94,21 @@ def module_helper(
     return modules_upload_rows
 
 
+def create_hash(
+    robot_name: str, deck_slot: str, pipette_calibrated_with: str, last_modified: str
+) -> str:
+    """Create unique hash identifier for deck calibrations."""
+    combined_string = robot_name + deck_slot + pipette_calibrated_with + last_modified
+    hashed_obj = hashlib.sha256(combined_string.encode())
+    return hashed_obj.hexdigest()
+
+
 def deck_helper(
     headers_beg: List[str],
     headers_end: List[str],
     calibration_log: Dict[Any, Any],
     google_sheet_name: str,
-    deck_sheet_serials: Set[str],
-    deck_sheet_modify_dates: Set[str],
+    deck_sheet_hashes: Set[str],
     storage_directory: str,
 ) -> List[Any]:
     """Helper for parsing deck calibration data."""
@@ -113,14 +122,17 @@ def deck_helper(
     )
     # DECK DATA
     deck = calibration_log["Deck"]
-    deck_modified = deck["data"].get("lastModified")
+    deck_modified = str(deck["data"].get("lastModified"))
     slots = ["D3", "D1", "A1"]
-    pipette_calibrated_with = deck["data"].get("pipetteCalibratedWith", "")
+    pipette_calibrated_with = str(deck["data"].get("pipetteCalibratedWith", ""))
     for i in range(len(deck["data"]["matrix"])):
-        if (
-            deck_modified in deck_sheet_modify_dates
-            and pipette_calibrated_with in deck_sheet_serials
-        ):
+        robot = calibration_log["Robot"]
+        deck_slot = slots[i]
+        unique_hash = create_hash(
+            robot, deck_slot, pipette_calibrated_with, deck_modified
+        )
+        print(unique_hash)
+        if unique_hash in deck_sheet_hashes:
             continue
         coords = deck["data"]["matrix"][i]
         x = coords[0]
@@ -142,7 +154,7 @@ def send_batch_update(
     google_sheet_deck: google_sheets_tool.google_sheet,
 ) -> None:
     """Executes batch updates."""
-    # Prepare for batch updates
+    # Prepare data for batch update
     try:
         transposed_instruments_upload_rows = list(
             map(list, zip(*instruments_upload_rows))
@@ -196,9 +208,7 @@ def upload_calibration_offsets(
     inst_sheet_serials: Set[str] = set()
     inst_sheet_modify_dates: Set[str] = set()
     module_sheet_serials: Set[str] = set()
-    deck_sheet_serials: Set[str] = set()
-    deck_sheet_modify_dates: Set[str] = set()
-
+    deck_sheet_hashes: Set[str] = set()
     # Get current serials, and modified info from google sheet
     for i, sheet in enumerate(sheets):
         if i == 0:
@@ -208,10 +218,9 @@ def upload_calibration_offsets(
             module_sheet_serials = sheet.get_column(6)
             module_modify_dates = sheet.get_column(15)
         elif i == 2:
-            deck_sheet_serials = sheet.get_column(5)
-            deck_sheet_modify_dates = sheet.get_column(10)
+            deck_sheet_hashes = sheet.get_column(11)
 
-    # Go through calibration logs and determine what should be added to the sheet
+    # Iterate through calibration logs and accumulate data
     for calibration_log in calibration_data:
         for sheet_ind, sheet in enumerate(sheets):
             if sheet_ind == 0:
@@ -240,8 +249,7 @@ def upload_calibration_offsets(
                     headers_end,
                     calibration_log,
                     google_sheet_name,
-                    deck_sheet_serials,
-                    deck_sheet_modify_dates,
+                    deck_sheet_hashes,
                     storage_directory,
                 )
     send_batch_update(
@@ -293,7 +301,6 @@ def run(
                     ip, storage_directory
                 )
                 calibration_data.append(calibration)
-                # upload_calibration_offsets(calibration, storage_directory)
         else:
             try:
                 (
