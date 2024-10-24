@@ -31,7 +31,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
   const { onClose, formData } = props
   const dispatch = useDispatch()
   const { t } = useTranslation(['form', 'shared', 'protocol_steps'])
-  const initialName = capitalizeFirstLetter(t(formData.stepName))
+  const initialName = capitalizeFirstLetter(String(formData.stepName))
   const [stepName, setStepName] = useState<string>(initialName)
   const [stepDetails, setStepDetails] = useState<string>(
     String(formData.stepDetails)
