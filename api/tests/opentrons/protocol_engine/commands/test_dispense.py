@@ -92,6 +92,11 @@ async def test_dispense_implementation(
                 ),
                 new_deck_point=DeckPoint.construct(x=1, y=2, z=3),
             ),
+            liquid_operated=update_types.LiquidOperatedUpdate(
+                labware_id="labware-id-abc123",
+                well_name="A3",
+                volume=42,
+            ),
         ),
     )
 
@@ -160,6 +165,11 @@ async def test_overpressure_error(
                     well_name="well-name",
                 ),
                 new_deck_point=DeckPoint.construct(x=1, y=2, z=3),
+            ),
+            liquid_operated=update_types.LiquidOperatedUpdate(
+                labware_id="labware-id",
+                well_name="well-name",
+                volume=None,
             ),
         ),
     )

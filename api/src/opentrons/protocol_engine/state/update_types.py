@@ -4,6 +4,7 @@
 import dataclasses
 import enum
 import typing
+from datetime import datetime
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.resources import pipette_data_provider
@@ -176,6 +177,35 @@ class TipsUsedUpdate:
 
 
 @dataclasses.dataclass
+class LiquidLoadedUpdate:
+    """An update from loading a liquid."""
+
+    labware_id: str
+    volumes: typing.Dict[str, float]
+    last_loaded: datetime
+
+
+@dataclasses.dataclass
+class LiquidProbedUpdate:
+    """An update from probing a liquid."""
+
+    labware_id: str
+    well_name: str
+    last_probed: datetime
+    height: typing.Optional[float] = None
+    volume: typing.Optional[float] = None
+
+
+@dataclasses.dataclass
+class LiquidOperatedUpdate:
+    """An update from operating a liquid."""
+
+    labware_id: str
+    well_name: str
+    volume: typing.Optional[float] = None
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
@@ -194,6 +224,12 @@ class StateUpdate:
     loaded_labware: LoadedLabwareUpdate | NoChangeType = NO_CHANGE
 
     tips_used: TipsUsedUpdate | NoChangeType = NO_CHANGE
+
+    liquid_loaded: LiquidLoadedUpdate | NoChangeType = NO_CHANGE
+
+    liquid_probed: LiquidProbedUpdate | NoChangeType = NO_CHANGE
+
+    liquid_operated: LiquidOperatedUpdate | NoChangeType = NO_CHANGE
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree.
@@ -329,4 +365,47 @@ class StateUpdate:
         """Mark tips in a tip rack as used. See `TipsUsedUpdate`."""
         self.tips_used = TipsUsedUpdate(
             pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+        )
+
+    def set_liquid_loaded(
+        self,
+        labware_id: str,
+        volumes: typing.Dict[str, float],
+        last_loaded: datetime,
+    ) -> None:
+        """Add liquid volumes to well state. See `LoadLiquidUpdate`."""
+        self.liquid_loaded = LiquidLoadedUpdate(
+            labware_id=labware_id,
+            volumes=volumes,
+            last_loaded=last_loaded,
+        )
+
+    def set_liquid_probed(
+        self,
+        labware_id: str,
+        well_name: str,
+        last_probed: datetime,
+        height: typing.Optional[float] = None,
+        volume: typing.Optional[float] = None,
+    ) -> None:
+        """Add a liquid height and volume to well state. See `ProbeLiquidUpdate`."""
+        self.liquid_probed = LiquidProbedUpdate(
+            labware_id=labware_id,
+            well_name=well_name,
+            height=height,
+            volume=volume,
+            last_probed=last_probed,
+        )
+
+    def set_liquid_operated(
+        self,
+        labware_id: str,
+        well_name: str,
+        volume: typing.Optional[float] = None,
+    ) -> None:
+        """Update liquid volumes in well state. See `OperateLiquidUpdate`."""
+        self.liquid_operated = LiquidOperatedUpdate(
+            labware_id=labware_id,
+            well_name=well_name,
+            volume=volume,
         )

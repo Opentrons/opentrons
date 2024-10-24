@@ -109,7 +109,12 @@ async def test_aspirate_implementation_no_prep(
                 pipette_id="abc",
                 new_location=update_types.Well(labware_id="123", well_name="A3"),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
-            )
+            ),
+            liquid_operated=update_types.LiquidOperatedUpdate(
+                labware_id="123",
+                well_name="A3",
+                volume=-50,
+            ),
         ),
     )
 
@@ -178,7 +183,12 @@ async def test_aspirate_implementation_with_prep(
                 pipette_id="abc",
                 new_location=update_types.Well(labware_id="123", well_name="A3"),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
-            )
+            ),
+            liquid_operated=update_types.LiquidOperatedUpdate(
+                labware_id="123",
+                well_name="A3",
+                volume=-50,
+            ),
         ),
     )
 
@@ -313,7 +323,12 @@ async def test_overpressure_error(
                     labware_id=labware_id, well_name=well_name
                 ),
                 new_deck_point=DeckPoint(x=position.x, y=position.y, z=position.z),
-            )
+            ),
+            liquid_operated=update_types.LiquidOperatedUpdate(
+                labware_id=labware_id,
+                well_name=well_name,
+                volume=None,
+            ),
         ),
     )
 
@@ -378,6 +393,11 @@ async def test_aspirate_implementation_meniscus(
                 pipette_id="abc",
                 new_location=update_types.Well(labware_id="123", well_name="A3"),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
-            )
+            ),
+            liquid_operated=update_types.LiquidOperatedUpdate(
+                labware_id="123",
+                well_name="A3",
+                volume=-50,
+            ),
         ),
     )

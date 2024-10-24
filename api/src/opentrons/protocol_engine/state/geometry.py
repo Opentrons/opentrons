@@ -9,7 +9,6 @@ from functools import cached_property
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount
@@ -1372,6 +1371,7 @@ class GeometryView:
 
         Distance is with reference to the well bottom.
         """
+        # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
         initial_handling_height = self.get_well_handling_height(
             labware_id=labware_id,
             well_name=well_name,
@@ -1386,9 +1386,9 @@ class GeometryView:
             volume = operation_volume or 0.0
 
         if volume:
-            well_geometry = self._labware.get_well_geometry(labware_id, well_name)
             return self.get_well_height_after_volume(
-                well_geometry=well_geometry,
+                labware_id=labware_id,
+                well_name=well_name,
                 initial_height=initial_handling_height,
                 volume=volume,
             )
@@ -1401,15 +1401,29 @@ class GeometryView:
         well_name: str,
     ) -> float:
         """Returns stored meniscus height in specified well."""
-        meniscus_height = self._wells.get_last_measured_liquid_height(
-            labware_id=labware_id, well_name=well_name
-        )
-        if meniscus_height is None:
-            raise errors.LiquidHeightUnknownError(
-                "Must liquid probe before specifying WellOrigin.MENISCUS."
+        (
+            loaded_volume_info,
+            probed_height_info,
+            probed_volume_info,
+        ) = self._wells.get_well_liquid_info(labware_id=labware_id, well_name=well_name)
+        if probed_height_info is not None and probed_height_info.height is not None:
+            return probed_height_info.height
+        elif loaded_volume_info is not None and loaded_volume_info.volume is not None:
+            return self.get_well_height_at_volume(
+                labware_id=labware_id,
+                well_name=well_name,
+                volume=loaded_volume_info.volume,
+            )
+        elif probed_volume_info is not None and probed_volume_info.volume is not None:
+            return self.get_well_height_at_volume(
+                labware_id=labware_id,
+                well_name=well_name,
+                volume=probed_volume_info.volume,
             )
         else:
-            return meniscus_height
+            raise errors.LiquidHeightUnknownError(
+                "Must LiquidProbe or LoadLiquid before specifying WellOrigin.MENISCUS."
+            )
 
     def get_well_handling_height(
         self,
@@ -1431,18 +1445,39 @@ class GeometryView:
         return float(handling_height)
 
     def get_well_height_after_volume(
-        self, well_geometry: InnerWellGeometry, initial_height: float, volume: float
+        self, labware_id: str, well_name: str, initial_height: float, volume: float
     ) -> float:
         """Return the height of liquid in a labware well after a given volume has been handled.
 
         This is given an initial handling height, with reference to the well bottom.
         """
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
         initial_volume = find_volume_at_well_height(
             target_height=initial_height, well_geometry=well_geometry
         )
         final_volume = initial_volume + volume
         return find_height_at_well_volume(
             target_volume=final_volume, well_geometry=well_geometry
+        )
+
+    def get_well_height_at_volume(
+        self, labware_id: str, well_name: str, volume: float
+    ) -> float:
+        """Convert well volume to height."""
+        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
+        return find_height_at_well_volume(
+            target_volume=volume, well_geometry=well_geometry
+        )
+
+    def get_well_volume_at_height(
+        self, labware_id: str, well_name: str, height: float
+    ) -> float:
+        """Convert well height to volume."""
+        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
+        return find_volume_at_well_height(
+            target_height=height, well_geometry=well_geometry
         )
 
     def validate_dispense_volume_into_well(
@@ -1456,6 +1491,7 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_volumetric_capacity = well_def.totalLiquidVolume
         if well_location.origin == WellOrigin.MENISCUS:
+            # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
             well_geometry = self._labware.get_well_geometry(labware_id, well_name)
             meniscus_height = self.get_meniscus_height(
                 labware_id=labware_id, well_name=well_name

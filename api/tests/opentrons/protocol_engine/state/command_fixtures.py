@@ -1,7 +1,7 @@
 """Command factories to use in tests as data fixtures."""
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional, cast
+from typing import Optional, cast, Dict
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import MountType
@@ -329,6 +329,29 @@ def create_liquid_probe_command(
     result = cmd.LiquidProbeResult(position=destination, z_position=0.5)
 
     return cmd.LiquidProbe(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_load_liquid_command(
+    liquid_id: str = "liquid-id",
+    labware_id: str = "labware-id",
+    volume_by_well: Dict[str, float] = {"A1": 30, "B2": 100},
+) -> cmd.LoadLiquid:
+    """Get a completed Load Liquid command."""
+    params = cmd.LoadLiquidParams(
+        liquidId=liquid_id,
+        labwareId=labware_id,
+        volumeByWell=volume_by_well,
+    )
+    result = cmd.LoadLiquidResult()
+
+    return cmd.LoadLiquid(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
