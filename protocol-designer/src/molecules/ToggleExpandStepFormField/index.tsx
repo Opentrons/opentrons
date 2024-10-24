@@ -1,6 +1,10 @@
 import {
   ALIGN_CENTER,
+  Btn,
   COLORS,
+  Check,
+  Checkbox,
+  CheckboxField,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -23,6 +27,7 @@ interface ToggleExpandStepFormFieldProps extends FieldProps {
   onLabel?: string
   offLabel?: string
   caption?: string
+  toggleElement?: 'toggle' | 'checkbox'
 }
 export function ToggleExpandStepFormField(
   props: ToggleExpandStepFormFieldProps
@@ -37,6 +42,7 @@ export function ToggleExpandStepFormField(
     toggleUpdateValue,
     toggleValue,
     caption,
+    toggleElement = 'toggle',
     ...restProps
   } = props
 
@@ -58,6 +64,7 @@ export function ToggleExpandStepFormField(
     }
   }
 
+  const label = isSelected ? onLabel : offLabel ?? null
   return (
     <ListItem type="noActive">
       <Flex
@@ -68,16 +75,25 @@ export function ToggleExpandStepFormField(
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {isSelected ? onLabel : offLabel ?? null}
-            </StyledText>
-            <ToggleButton
-              onClick={() => {
-                onToggleUpdateValue()
-              }}
-              label={isSelected ? onLabel : offLabel}
-              toggledOn={isSelected}
-            />
+            {label != null ? (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                {isSelected ? onLabel : offLabel ?? null}
+              </StyledText>
+            ) : null}
+            {toggleElement === 'toggle' ? (
+              <ToggleButton
+                onClick={onToggleUpdateValue}
+                label={isSelected ? onLabel : offLabel}
+                toggledOn={isSelected}
+              />
+            ) : (
+              <Btn onClick={onToggleUpdateValue}>
+                <Check color={COLORS.blue50} isChecked={isSelected} />
+              </Btn>
+            )}
           </Flex>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
