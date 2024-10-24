@@ -8,15 +8,14 @@ import { SPACING } from '../../../ui-style-constants'
 
 interface ListItemDescriptorProps {
   type: 'default' | 'large'
-  description: JSX.Element | string
-  content: JSX.Element | string
-  isInSlideout?: boolean
+  description: JSX.Element
+  content: JSX.Element
 }
 
 export const ListItemDescriptor = (
   props: ListItemDescriptorProps
 ): JSX.Element => {
-  const { description, content, type, isInSlideout = false } = props
+  const { description, content, type } = props
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -26,10 +25,8 @@ export const ListItemDescriptor = (
       justifyContent={type === 'default' ? JUSTIFY_SPACE_BETWEEN : 'none'}
       padding={type === 'default' ? SPACING.spacing4 : SPACING.spacing12}
     >
-      <Flex minWidth={isInSlideout ? undefined : '13.75rem'}>
-        {description}
-      </Flex>
-      <Flex width="100%">{content}</Flex>
+      {description}
+      {content}
     </Flex>
   )
 }

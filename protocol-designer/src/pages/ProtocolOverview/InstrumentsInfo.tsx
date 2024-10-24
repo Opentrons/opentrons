@@ -1,15 +1,16 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  StyledText,
   Btn,
+  COLORS,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   ListItem,
   ListItemDescriptor,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteSpecsV2, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -93,34 +94,88 @@ export function InstrumentsInfo({
         <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
           <ListItemDescriptor
             type="large"
-            description={t('robotType')}
+            description={
+              <Flex minWidth="13.75rem">
+                {' '}
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('robotType')}
+                </StyledText>
+              </Flex>
+            }
             content={
-              robotType === FLEX_ROBOT_TYPE
-                ? t('shared:opentrons_flex')
-                : t('shared:ot2')
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {robotType === FLEX_ROBOT_TYPE
+                  ? t('shared:opentrons_flex')
+                  : t('shared:ot2')}
+              </StyledText>
             }
           />
         </ListItem>
         <ListItem type="noActive" key={`ProtocolOverview_left`}>
           <ListItemDescriptor
             type="large"
-            description={t('left_pip')}
-            content={pipetteInfo(leftPipette)}
+            description={
+              <Flex minWidth="13.75rem">
+                {' '}
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('left_pip')}
+                </StyledText>
+              </Flex>
+            }
+            content={
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {pipetteInfo(leftPipette)}
+              </StyledText>
+            }
           />
         </ListItem>
         <ListItem type="noActive" key={`ProtocolOverview_right`}>
           <ListItemDescriptor
             type="large"
-            description={t('right_pip')}
-            content={pipetteInfo(rightPipette)}
+            description={
+              <Flex minWidth="13.75rem">
+                {' '}
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('right_pip')}
+                </StyledText>
+              </Flex>
+            }
+            content={
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {pipetteInfo(rightPipette)}
+              </StyledText>
+            }
           />
         </ListItem>
         {robotType === FLEX_ROBOT_TYPE ? (
           <ListItem type="noActive" key={`ProtocolOverview_gripper`}>
             <ListItemDescriptor
               type="large"
-              description={t('extension')}
-              content={isGripperAttached ? t('gripper') : t('na')}
+              description={
+                <Flex minWidth="13.75rem">
+                  {' '}
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    color={COLORS.grey60}
+                  >
+                    {t('extension')}
+                  </StyledText>
+                </Flex>
+              }
+              content={
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {isGripperAttached ? t('gripper') : t('na')}
+                </StyledText>
+              }
             />
           </ListItem>
         ) : null}
