@@ -4,6 +4,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CreateProtocol } from '..'
 import { Provider } from 'jotai'
+import { fillApplicationSectionAndClickConfirm } from '../../../resources/utils/__tests__/createProtocolTestUtils.test'
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -67,21 +68,17 @@ describe('CreateProtocol', () => {
     expect(previewItems[0]).toHaveTextContent('Test Application')
     expect(previewItems[1]).toHaveTextContent('Test description')
   })
-})
 
-async function fillApplicationSectionAndClickConfirm() {
-  const applicationDropdown = screen.getByText('Select an option')
-  fireEvent.click(applicationDropdown)
+  it('should display a completed checkmark if the section is completed', async () => {
+    render()
 
-  const basicAliquotingOption = screen.getByText('Basic aliquoting')
-  fireEvent.click(basicAliquotingOption)
+    expect(screen.queryByTestId('accordion-ot-check')).not.toBeInTheDocument()
 
-  const describeInput = screen.getByRole('textbox')
-  fireEvent.change(describeInput, { target: { value: 'Test description' } })
+    const buttonsAndAccordions = screen.getAllByRole('button')
+    expect(buttonsAndAccordions[0]).toHaveAttribute('aria-expanded', 'true')
 
-  const confirmButton = screen.getByText('Confirm')
-  await waitFor(() => {
-    expect(confirmButton).toBeEnabled()
+    await fillApplicationSectionAndClickConfirm()
+
+    expect(screen.getByTestId('accordion-ot-check')).toBeInTheDocument()
   })
-  fireEvent.click(confirmButton)
-}
+})

@@ -49,13 +49,12 @@ export function CreateProtocol(): JSX.Element | null {
     })
   }, [currentStep])
 
-  // TODO: move to utils
   function generatePromptPreviewApplicationItems(): string[] {
     const {
       application: { scientificApplication, otherApplication, description },
     } = methods.watch()
 
-    const finalApplication =
+    const scientificOrOtherApplication =
       scientificApplication === OTHER
         ? otherApplication
         : scientificApplication !== ''
@@ -63,7 +62,7 @@ export function CreateProtocol(): JSX.Element | null {
         : ''
 
     return [
-      finalApplication !== '' && finalApplication,
+      scientificOrOtherApplication !== '' && scientificOrOtherApplication,
       description !== '' && description,
     ].filter(Boolean)
   }
