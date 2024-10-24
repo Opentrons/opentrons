@@ -5,7 +5,7 @@ import typing
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine.execution.hardware_state_synchronizer import (
+from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (
     ErrorRecoveryHardwareStateSynchronizer,
 )
 from opentrons.util.async_helpers import async_context_manager_in_thread

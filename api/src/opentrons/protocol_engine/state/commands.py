@@ -1104,6 +1104,13 @@ class CommandView(HasState[CommandState]):
         return self._state.error_recovery_policy
 
     def get_state_update_for_false_positive(self) -> update_types.StateUpdate:
+        """Return the deferred false-positive state update for the current error recovery target.
+
+        If we're currently in error recovery mode, and you have decided that the
+        underlying command error was a false positive, this returns a state update
+        that will undo the error's effects on engine state.
+        See `ProtocolEngine.resume_from_recovery(reconcile_false_positive=True)`.
+        """
         if self._state.recovery_target is None:
             return update_types.StateUpdate()  # Empty/no-op.
         else:

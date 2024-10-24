@@ -7,9 +7,6 @@ from opentrons.protocol_engine.actions.actions import (
     SetErrorRecoveryPolicyAction,
 )
 
-from opentrons.protocol_engine.execution.hardware_state_synchronizer import (
-    ErrorRecoveryHardwareStateSynchronizer,
-)
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI

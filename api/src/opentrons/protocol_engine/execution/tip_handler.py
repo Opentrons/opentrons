@@ -1,5 +1,5 @@
 """Tip pickup and drop procedures."""
-from typing import Final, Optional, Dict
+from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -204,7 +204,7 @@ class HardwareTipHandler(TipHandler):
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._state_view = state_view
 
-        # WARNING: HardwareStateSynchronizer can currently construct several
+        # WARNING: ErrorRecoveryHardwareStateSynchronizer can currently construct several
         # instances of this class per run, in addition to the main instance used
         # for command execution. We're therefore depending on this class being
         # stateless, so consider that before adding additional attributes here.
