@@ -3,7 +3,7 @@ import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { ErrorRecoveryWizardProps } from '/app/organisms/ErrorRecoveryFlows/ErrorRecoveryWizard'
 
-// Home the gripper z-axis implicitly. Because the z-home is not tied to a CTA, it must be handled here.
+// Home the gripper implicitly. Because the home is not tied to a CTA, it must be handled here.
 export function useHomeGripper({
   recoveryCommands,
   routeUpdateActions,
