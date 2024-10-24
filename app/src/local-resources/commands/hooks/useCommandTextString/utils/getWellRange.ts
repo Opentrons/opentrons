@@ -1,5 +1,42 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  PipetteName,
+  RunTimeCommand,
+  ConfigureNozzleLayoutRunTimeCommand,
+} from '@opentrons/shared-data'
+
+const usedChannelsFromCommand = (
+  command: ConfigureNozzleLayoutRunTimeCommand | undefined,
+  defaultChannels: number
+): number =>
+  command?.params?.configurationParams?.style === 'SINGLE'
+    ? 1
+    : command?.params?.configurationParams?.style === 'COLUMN'
+    ? 8
+    : defaultChannels
+
+const usedChannelsForPipette = (
+  pipetteId: string,
+  commands: RunTimeCommand[],
+  defaultChannels: number
+): number =>
+  usedChannelsFromCommand(
+    commands.findLast(
+      (c: RunTimeCommand): c is ConfigureNozzleLayoutRunTimeCommand =>
+        c.commandType === 'configureNozzleLayout' &&
+        c.params?.pipetteId === pipetteId
+    ),
+    defaultChannels
+  )
+
+const usedChannels = (
+  pipetteId: string,
+  commands: RunTimeCommand[],
+  pipetteChannels: number
+): number =>
+  pipetteChannels === 96
+    ? usedChannelsForPipette(pipetteId, commands, pipetteChannels)
+    : pipetteChannels
 
 /**
  * @param pipetteName name of pipette being used
@@ -16,26 +53,10 @@ export function getWellRange(
   const pipetteChannels = pipetteName
     ? getPipetteNameSpecs(pipetteName)?.channels ?? 1
     : 1
-  let usedChannels = pipetteChannels
-  if (pipetteChannels === 96) {
-    for (const c of commands.reverse()) {
-      if (
-        c.commandType === 'configureNozzleLayout' &&
-        c.params?.pipetteId === pipetteId
-      ) {
-        // TODO(sb, 11/9/23): add support for quadrant and row configurations when needed
-        if (c.params.configurationParams.style === 'SINGLE') {
-          usedChannels = 1
-        } else if (c.params.configurationParams.style === 'COLUMN') {
-          usedChannels = 8
-        }
-        break
-      }
-    }
-  }
-  if (usedChannels === 96) {
+  const channelCount = usedChannels(pipetteId, commands, pipetteChannels)
+  if (channelCount === 96) {
     return 'A1 - H12'
-  } else if (usedChannels === 8) {
+  } else if (channelCount === 8) {
     const column = wellName.substr(1)
     return `A${column} - H${column}`
   }

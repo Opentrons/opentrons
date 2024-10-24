@@ -30,6 +30,7 @@ import {
   populateForm,
 } from '../../../../ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../../atoms'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
@@ -217,9 +218,20 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               width="100%"
             >
               {iconName && (
-                <Icon size="1rem" name={iconName} color={iconColor ?? color} />
+                <Icon
+                  size="1rem"
+                  name={iconName}
+                  color={iconColor ?? color}
+                  minWidth="1rem"
+                />
               )}
-              <StyledText desktopStyle="bodyDefaultRegular">
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                css={`
+                  ${LINE_CLAMP_TEXT_STYLE(1)}
+                  word-break: break-all
+                `}
+              >
                 {capitalizeFirstLetterAfterNumber(title)}
               </StyledText>
             </Flex>

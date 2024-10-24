@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import {
@@ -13,6 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface SlotInformationProps {
@@ -25,7 +25,7 @@ interface SlotInformationProps {
   fixtures?: string[]
 }
 
-export const SlotInformation: React.FC<SlotInformationProps> = ({
+export const SlotInformation: FC<SlotInformationProps> = ({
   location,
   robotType,
   liquids = [],
@@ -50,10 +50,10 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {liquids.length > 1 ? (
-          <ListItem type="noActive">
+          <ListItem type="noActive" width="max-content">
             <ListItemDescriptor
               type="default"
-              content={liquids.join(', ')}
+              content={<StyledText>{liquids.join(', ')}</StyledText>}
               description={t('liquid')}
             />
           </ListItem>
@@ -115,18 +115,14 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
       <ListItemDescriptor
         type="default"
         content={
-          stackInformation != null ? (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              textAlign={TYPOGRAPHY.textAlignRight}
-            >
-              {stackInformation}
-            </StyledText>
-          ) : (
-            t('none')
-          )
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            textAlign={TYPOGRAPHY.textAlignRight}
+          >
+            {stackInformation ?? t('none')}
+          </StyledText>
         }
-        description={title}
+        description={<Flex width="7.40625rem">{title}</Flex>}
       />
     </ListItem>
   )

@@ -50,15 +50,15 @@ export interface FormError {
   dependentFields: StepFieldName[]
 }
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
-  title: 'Selected aspirate labware is incompatible with selected pipette',
+  title: 'Selected aspirate labware is incompatible with pipette',
   dependentFields: ['aspirate_labware', 'pipette'],
 }
 const INCOMPATIBLE_DISPENSE_LABWARE: FormError = {
-  title: 'Selected dispense labware is incompatible with selected pipette',
+  title: 'Selected dispense labware is incompatible with pipette',
   dependentFields: ['dispense_labware', 'pipette'],
 }
 const INCOMPATIBLE_LABWARE: FormError = {
-  title: 'Selected labware is incompatible with selected pipette',
+  title: 'Selected labware is incompatible with pipette',
   dependentFields: ['labware', 'pipette'],
 }
 const PAUSE_TYPE_REQUIRED: FormError = {

@@ -29,7 +29,7 @@ import {
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
-import { useHomeGripperZAxis } from './hooks'
+import { useHomeGripper } from './hooks'
 
 import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { RecoveryRoute, RouteStep, RecoveryContentProps } from './types'
@@ -90,7 +90,7 @@ export function ErrorRecoveryWizard(
     routeUpdateActions,
   })
 
-  useHomeGripperZAxis(props)
+  useHomeGripper(props)
 
   return <ErrorRecoveryComponent errorKind={errorKind} {...props} />
 }

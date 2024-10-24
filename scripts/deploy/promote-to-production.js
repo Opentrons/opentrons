@@ -65,7 +65,8 @@ async function runPromoteToProduction() {
     }
     const s3Client = new S3Client({
       apiVersion: '2006-03-01',
-      region: 'us-east-1',
+      region:
+        projectDomain === PROTOCOL_DESIGNER_DOMAIN ? 'us-east-1' : 'us-east-2',
       credentials: productionCredentials,
     })
 

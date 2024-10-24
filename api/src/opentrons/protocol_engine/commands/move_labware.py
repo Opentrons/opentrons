@@ -186,6 +186,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 top_labware_definition=current_labware_definition,
                 bottom_labware_id=available_new_location.labwareId,
             )
+            if params.labwareId == available_new_location.labwareId:
+                raise LabwareMovementNotAllowedError(
+                    "Cannot move a labware onto itself."
+                )
 
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(

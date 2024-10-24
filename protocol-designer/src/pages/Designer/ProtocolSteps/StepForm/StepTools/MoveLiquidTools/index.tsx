@@ -50,7 +50,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export function MoveLiquidTools(props: StepFormProps): JSX.Element {
-  const { toolboxStep, propsForFields, formData } = props
+  const { toolboxStep, propsForFields, formData, visibleFormErrors } = props
   const { t, i18n } = useTranslation(['protocol_steps', 'form'])
   const { path } = formData
   const [tab, setTab] = useState<'aspirate' | 'dispense'>('aspirate')
@@ -126,6 +126,11 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         labwareId={String(propsForFields.aspirate_labware.value)}
         pipetteId={formData.pipette}
         nozzles={String(propsForFields.nozzles.value) ?? null}
+        hasFormError={
+          visibleFormErrors?.some(error =>
+            error.dependentFields.includes('aspirate_labware')
+          ) ?? false
+        }
       />
       <Divider marginY="0" />
       <LabwareField {...propsForFields.dispense_labware} />
@@ -136,6 +141,11 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           labwareId={String(propsForFields.dispense_labware.value)}
           pipetteId={formData.pipette}
           nozzles={String(propsForFields.nozzles.value) ?? null}
+          hasFormError={
+            visibleFormErrors?.some(error =>
+              error.dependentFields.includes('dispense_wells')
+            ) ?? false
+          }
         />
       )}
       <Divider marginY="0" />

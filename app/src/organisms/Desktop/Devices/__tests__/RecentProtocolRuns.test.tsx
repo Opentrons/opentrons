@@ -52,9 +52,9 @@ describe('RecentProtocolRuns', () => {
   })
   it('renders table headers if there are runs', () => {
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
-    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue(({
       data: {
-        data: [
+        data: ([
           {
             createdAt: '2022-05-04T18:24:40.833862+00:00',
             current: false,
@@ -62,9 +62,9 @@ describe('RecentProtocolRuns', () => {
             protocolId: 'test_protocol_id',
             status: 'succeeded',
           },
-        ],
+        ] as any) as Runs,
       },
-    } as UseQueryResult<Runs, AxiosError>)
+    } as any) as UseQueryResult<Runs, AxiosError>)
     render()
     screen.getByText('Recent Protocol Runs')
     screen.getByText('Run')

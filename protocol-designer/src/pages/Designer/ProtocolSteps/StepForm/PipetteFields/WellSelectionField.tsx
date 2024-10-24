@@ -28,6 +28,7 @@ export type WellSelectionFieldProps = FieldProps & {
   nozzles: string | null
   pipetteId?: string | null
   labwareId?: string | null
+  hasFormError?: boolean
 }
 
 export const WellSelectionField = (
@@ -45,6 +46,7 @@ export const WellSelectionField = (
     disabled,
     errorToShow,
     tooltipContent,
+    hasFormError,
   } = props
   const { t, i18n } = useTranslation(['form', 'tooltip'])
   const dispatch = useDispatch()
@@ -90,7 +92,6 @@ export const WellSelectionField = (
       ? t(`step_edit_form.wellSelectionLabel.columns_${name}`)
       : t(`step_edit_form.wellSelectionLabel.wells_${name}`)
   const [targetProps, tooltipProps] = useHoverTooltip()
-
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
@@ -116,6 +117,7 @@ export const WellSelectionField = (
           error={errorToShow}
           value={primaryWellCount}
           onClick={handleOpen}
+          hasBackgroundError={hasFormError}
         />
       </Flex>
       {createPortal(

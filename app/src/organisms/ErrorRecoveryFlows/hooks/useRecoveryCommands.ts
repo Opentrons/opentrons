@@ -63,7 +63,7 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   releaseGripperJaws: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
-  homeGripperZAxis: () => Promise<CommandData[]>
+  updatePositionEstimatorsAndHomeGripper: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   moveLabwareWithoutPause: () => Promise<CommandData[]>
 }
@@ -269,8 +269,13 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
 
-  const homeGripperZAxis = useCallback((): Promise<CommandData[]> => {
-    return chainRunRecoveryCommands([HOME_GRIPPER_Z_AXIS])
+  const updatePositionEstimatorsAndHomeGripper = useCallback((): Promise<
+    CommandData[]
+  > => {
+    return chainRunRecoveryCommands([
+      UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
+      HOME_GRIPPER_Z,
+    ])
   }, [chainRunRecoveryCommands])
 
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
@@ -291,7 +296,7 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     releaseGripperJaws,
-    homeGripperZAxis,
+    updatePositionEstimatorsAndHomeGripper,
     moveLabwareWithoutPause,
     skipFailedCommand,
     ignoreErrorKindThisRun,
@@ -310,10 +315,15 @@ export const RELEASE_GRIPPER_JAW: CreateCommand = {
   intent: 'fixit',
 }
 
-export const HOME_GRIPPER_Z_AXIS: CreateCommand = {
+// in case the gripper does not know the position after a stall/collision we must update the position.
+export const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
+  commandType: 'unsafe/updatePositionEstimators',
+  params: { axes: ['x', 'y', 'extensionZ'] },
+}
+
+export const HOME_GRIPPER_Z: CreateCommand = {
   commandType: 'home',
   params: { axes: ['extensionZ'] },
-  intent: 'fixit',
 }
 
 const buildMoveLabwareWithoutPause = (

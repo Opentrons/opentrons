@@ -1189,11 +1189,6 @@ class API(
 
         await self.retract(mount, spec.retract_target)
 
-    def cache_tip(self, mount: top_types.Mount, tip_length: float) -> None:
-        instrument = self.get_pipette(mount)
-        instrument.add_tip(tip_length=tip_length)
-        instrument.set_current_volume(0)
-
     async def pick_up_tip(
         self,
         mount: top_types.Mount,

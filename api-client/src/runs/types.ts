@@ -112,7 +112,7 @@ export interface GetRunsParams {
 }
 
 export interface Runs {
-  data: RunData[]
+  data: readonly RunData[]
   links: RunsLinks
 }
 
@@ -125,12 +125,15 @@ export const RUN_ACTION_TYPE_PAUSE: 'pause' = 'pause'
 export const RUN_ACTION_TYPE_STOP: 'stop' = 'stop'
 export const RUN_ACTION_TYPE_RESUME_FROM_RECOVERY: 'resume-from-recovery' =
   'resume-from-recovery'
+export const RUN_ACTION_TYPE_RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE: 'resume-from-recovery-assuming-false-positive' =
+  'resume-from-recovery-assuming-false-positive'
 
 export type RunActionType =
   | typeof RUN_ACTION_TYPE_PLAY
   | typeof RUN_ACTION_TYPE_PAUSE
   | typeof RUN_ACTION_TYPE_STOP
   | typeof RUN_ACTION_TYPE_RESUME_FROM_RECOVERY
+  | typeof RUN_ACTION_TYPE_RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE
 
 export interface RunAction {
   id: string
@@ -172,7 +175,11 @@ export type RunError = RunCommandError
  * Error Policy
  */
 
-export type IfMatchType = 'ignoreAndContinue' | 'failRun' | 'waitForRecovery'
+export type IfMatchType =
+  | 'assumeFalsePositiveAndContinue'
+  | 'ignoreAndContinue'
+  | 'failRun'
+  | 'waitForRecovery'
 
 export interface ErrorRecoveryPolicy {
   policyRules: Array<{

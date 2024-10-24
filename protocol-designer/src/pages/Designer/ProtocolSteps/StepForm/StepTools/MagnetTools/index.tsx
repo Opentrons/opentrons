@@ -83,7 +83,6 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         <ListItem type="noActive">
           <ListItemDescriptor
             type="large"
-            isInSlideout
             content={
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 <StyledText
