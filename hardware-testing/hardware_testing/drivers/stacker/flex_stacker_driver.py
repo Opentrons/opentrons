@@ -56,13 +56,14 @@ FS_BAUDRATE = 115200
 DEFAULT_FS_TIMEOUT = 0.1
 FS_COMMAND_TERMINATOR = "\r\n"
 FS_ACK = "OK"+ FS_COMMAND_TERMINATOR.strip("\r")
+FS_STALL = "async ERR403:motor stall error" + FS_COMMAND_TERMINATOR.strip("\r")
 DEFAULT_COMMAND_RETRIES = 1
 TOTAL_TRAVEL_X = 202
-# TOTAL_TRAVEL_Z = 113.75
 TOTAL_TRAVEL_Z = 113.75
+LATCH_DISTANCE_MM = 30
 RETRACT_DIST_X = 1
 RETRACT_DIST_Z = 1
-HOME_SPEED = 20
+HOME_SPEED = 10
 HOME_ACCELERATION = 100
 MOVE_ACCELERATION_X = 1500
 MOVE_ACCELERATION_Z = 200
@@ -70,11 +71,17 @@ MOVE_ACCELERATION_L = 30
 MAX_SPEED_DISCONTINUITY_X = 10
 MAX_SPEED_DISCONTINUITY_Z = 5
 MAX_SPEED_DISCONTINUITY_L = 5
+HOME_CURRENT_X = 1.5
+HOME_CURRENT_Z = 1.5
+HOME_CURRENT_L = 0.5
+MOVE_CURRENT_X = 1.1
+MOVE_CURRENT_Z = 0.6
+MOVE_CURRENT_L = 0.5
 MOVE_SPEED_X = 200
 MOVE_SPEED_UPZ = 200
 MOV_SPEED_L = 30
 MOVE_SPEED_DOWNZ = 200
-LATCH_DISTANCE_MM = 30
+
 LABWARE_CLEARANCE = 9
 
 class FlexStacker():
@@ -89,6 +96,7 @@ class FlexStacker():
         """
         self._stacker_connection = connection
         self._ack = FS_ACK.encode()
+        self._stall = FS_STALL.encode()
         self.move_speed_x = MOVE_SPEED_X
         self.move_speed_up_z = MOVE_SPEED_UPZ
         self.move_speed_down_z = MOVE_SPEED_DOWNZ
@@ -153,7 +161,7 @@ class FlexStacker():
             #response = self._stacker_connection.read_until(expected = f'{x} OK\n')
             response = self._stacker_connection.readline()
             print(response)
-            if (self._ack in response):
+            if (self._ack in response) or (self._stall in response):
                 # Remove ack from response
                 response = response.replace(self._ack, b"OK\n")
                 str_response = self.process_raw_response(
@@ -288,19 +296,26 @@ class FlexStacker():
 
     def move(self, axis: AXIS, distance: float, direction: DIR,
                 velocity: Optional[float] = None, acceleration: Optional[float] = None,
-                max_speed_discontinuity: Optional[float] = None):
+                msd: Optional[float] = None,
+                current: Optional[float] = None):
         if axis == AXIS.X:
-            velocity = set_default(velocity, MOVE_SPEED_X)
-            acceleration = set_default(acceleration, MOVE_ACCELERATION_X)
-            msd = set_default(msd, MAX_SPEED_DISCONTINUITY_X)
+            current = self.set_default(current, MOVE_CURRENT_X)
+            self.set_run_current(current, AXIS.X)
+            velocity = self.set_default(velocity, MOVE_SPEED_X)
+            acceleration = self.set_default(acceleration, MOVE_ACCELERATION_X)
+            msd = self.set_default(msd, MAX_SPEED_DISCONTINUITY_X)
         elif axis == AXIS.Z:
-            velocity = set_default(velocity, MOVE_SPEED_Z)
-            acceleration = set_default(acceleration, MOVE_ACCELERATION_Z)
-            msd = set_default(msd, MAX_SPEED_DISCONTINUITY_Z)
+            current = self.set_default(current, MOVE_CURRENT_Z)
+            self.set_run_current(current, AXIS.Z)
+            velocity = self.set_default(velocity, MOVE_SPEED_Z)
+            acceleration = self.set_default(acceleration, MOVE_ACCELERATION_Z)
+            msd = self.set_default(msd, MAX_SPEED_DISCONTINUITY_Z)
         elif axis == AXIS.L:
-            velocity = set_default(velocity, MOVE_SPEED_L)
-            acceleration = set_default(acceleration, MOVE_ACCELERATION_L)
-            msd = set_default(msd, MAX_SPEED_DISCONTINUITY_L)
+            current = self.set_default(current, MOVE_CURRENT_L)
+            self.set_run_current(current, AXIS.L)
+            velocity = self.set_default(velocity, MOVE_SPEED_L)
+            acceleration = self.set_default(acceleration, MOVE_ACCELERATION_L)
+            msd = self.set_default(msd, MAX_SPEED_DISCONTINUITY_L)
         else:
             raise(f"AXIS not defined!! {axis}")
         # if self.current_position['X'] == None or self.current_position['Z'] == None:
@@ -342,14 +357,30 @@ class FlexStacker():
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     def home(self, axis: AXIS, direction: DIR, velocity: Optional[float] = None,
-                                                acceleration: Optional[float] = None):
+                                                acceleration: Optional[float] = None,
+                                                current: Optional[float] = None):
         # Set this to max current to overcome spring force on platforms
-        self.set_run_current(1.5, axis)
-        if axis == AXIS.X or axis == AXIS.Z or axis == AXIS.L:
-            max_speed_discontinuity = 5
-            if velocity == None or acceleration == None:
-                velocity = self.home_speed
-                acceleration = self.home_acceleration
+        if axis == AXIS.X:
+            current = self.set_default(current, HOME_CURRENT_X)
+            print(f"current set: {current}")
+            self.set_run_current(current, AXIS.X)
+            velocity = self.set_default(velocity, self.home_speed)
+            acceleration = self.set_default(acceleration, self.home_acceleration)
+            # msd = self.set_default(msd, MAX_SPEED_DISCONTINUITY_X)
+        elif axis == AXIS.Z:
+            current = self.set_default(current, HOME_CURRENT_Z)
+            self.set_run_current(current, AXIS.Z)
+            velocity = self.set_default(velocity, self.home_speed)
+            acceleration = self.set_default(acceleration, self.home_acceleration)
+            # msd = self.set_default(msd, MAX_SPEED_DISCONTINUITY_Z)
+        elif axis == AXIS.L:
+            current = self.set_default(current, HOME_CURRENT_L)
+            self.set_run_current(current, AXIS.L)
+            velocity = self.set_default(velocity, self.home_speed)
+            acceleration = self.set_default(acceleration, self.home_acceleration)
+            # msd = self.set_default(msd, MAX_SPEED_DISCONTINUITY_L)
+        else:
+            raise(f"AXIS not defined!! {axis}")
         # G5 X[dir: 0|1] V100 A50
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
                                                             gcode=GCODE.MOVE_LS
@@ -413,17 +444,17 @@ class FlexStacker():
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     def close_latch(self, velocity: Optional[float] = None, acceleration: Optional[float] = None):
-        velocity = set_default(velocity, MOVE_SPEED_L)
-        acceleration = set_default(acceleration, MOVE_ACCELERATION_L)
+        velocity = self.set_default(velocity, MOVE_SPEED_L)
+        acceleration = self.set_default(acceleration, MOVE_ACCELERATION_L)
         self.home(AXIS.L, DIR.NEGATIVE_HOME, velocity, acceleration)
 
     def open_latch(self, distance: Optional[float] = None,
                     velocity: Optional[float] = None, acceleration: Optional[float] = None,
                     max_speed_discontinuity: Optional[float] = None):
-        distance = set_default(distance, LATCH_DISTANCE_MM)
-        velocity = set_default(velocity, MOVE_SPEED_L)
-        acceleration = set_default(acceleration, MOVE_ACCELERATION_L)
-        msd = set_default(msd, MAX_SPEED_DISCONTINUITY_L)
+        distance = self.set_default(distance, LATCH_DISTANCE_MM)
+        velocity = self.set_default(velocity, MOVE_SPEED_L)
+        acceleration = self.set_default(acceleration, MOVE_ACCELERATION_L)
+        msd = self.set_default(msd, MAX_SPEED_DISCONTINUITY_L)
         self.move(AXIS.L, TOTAL_TRAVEL_X-5, DIR.POSITIVE, velocity, acceleration, msd)
 
     def load_labware(self, labware_z_offset: float):
@@ -458,7 +489,7 @@ class FlexStacker():
         self.home(AXIS.Z, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         # #------------------- transfer -----------------------------
         self.open_latch()
-        self.move(AXIS.Z, labware_clearance, DIR.NEGATIVE, labware_retract_speed, HOME_ACCELERATION)
+        self.move(AXIS.Z, labware_clearance, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.close_latch()
         self.move(AXIS.Z, TOTAL_TRAVEL_Z-30, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
@@ -493,7 +524,7 @@ class FlexStacker():
 
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
 
-    def enable_SG(self, axis: AXIS, sg_value: int):
+    def enable_SG(self, axis: AXIS, sg_value: int, enable: bool):
         """
         Enable StallGuard and set SGT
 
@@ -505,7 +536,7 @@ class FlexStacker():
         """
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.STALLGUARD
-        ).add_element(axis.upper()).add_element(f'T{sg_value}')
+        ).add_element(f'{axis.upper()}{int(enable)}').add_element(f'T{sg_value}')
         print(c)
 
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
