@@ -1,7 +1,14 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING, cast, Union
+import dataclasses
+from typing import Optional, TYPE_CHECKING, cast, Union, List
+
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    AspirateProperties,
+    BlowoutLocation,
+)
+
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.types import Location, Mount
@@ -26,6 +33,7 @@ from opentrons.protocol_engine.types import (
     PRIMARY_NOZZLE_LITERAL,
     NozzleLayoutConfigurationType,
     AddressableOffsetVector,
+    ImmutableLiquidClass,
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -38,8 +46,9 @@ from . import overlap_versions, pipette_movement_conflict
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
+from ... import LiquidClass
 
-from ...disposal_locations import TrashBin, WasteChute
+from ...disposal_locations import TrashBin, WasteChute, _DisposalLocation
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -920,3 +929,404 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
         return result.z_position
+
+    def transfer(
+        self,
+        liquid_class: LiquidClass,
+        volume: float,
+        transfers: List[SingleTransfer],
+    ) -> None:
+        """Perform transfers as specified."""
+        tiprack_name_for_transfer = "get-tiprack-name-from-appropriate-info"
+        transfer_props = liquid_class.get_for(
+            self.get_pipette_name(), tiprack_name_for_transfer
+        )
+
+        pe_liquid_class = self._engine_client.execute_command_without_recovery(
+            cmd.LoadLiquidClassParams(
+                pipetteId=self._pipette_id,
+                tiprackId=tiprack_name_for_transfer,
+                aspirateProperties=transfer_props.aspirate,
+                singleDispenseProperties=transfer_props.dispense,
+                multiDispenseProperties=transfer_props.multi_dispense,
+            )
+        ).loadedLiquidClass
+
+        self._transfer_steps_for_aspirate(
+            liquid_class=pe_liquid_class,
+            volume=volume,
+            transfers=transfers,
+        )
+        self._transfer_steps_for_single_dispense(
+            liquid_class=pe_liquid_class,
+            volume=volume,
+            transfers=transfers,
+        )
+
+    def _transfer_steps_for_aspirate(
+        self,
+        liquid_class: ImmutableLiquidClass,
+        volume: float,
+        transfers: List[SingleTransfer],
+    ) -> None:
+        """Perform pre-aspirate steps, aspirate and post-aspiration steps.
+
+        Sequence:
+            1. Submerge
+            2. Delay (optional)
+            3. Pre-wet (optional)
+            4. Mix (optional)
+            5. Aspirate
+            6. Delay (optional)
+            7. Retract
+            8. Delay (optional)
+            9. Touch tip (optional)
+            10. Air gap (optional)
+        """
+
+        aspirate_props = liquid_class.aspirateProperties
+        for transfer in transfers:
+            if transfer.pick_up_tip.pick_up_new:
+                self._engine_client.execute_command(
+                    cmd.PickUpTipParams(..., liquidClassId=liquid_class.id)
+                )
+
+            # Submerge
+            # ------------
+            # Drawback of using the existing move-to command is that there's no good way
+            # to differentiate between the different move-to's to have the run log show
+            # that it's a submerge step or retract step
+            self._engine_client.execute_command(
+                cmd.MoveToWellParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=transfer.source_well.labware_id,
+                    wellName=transfer.source_well.get_name(),
+                    wellLocation="<get well location from well core + submerge params>",
+                    speed=aspirate_props.submerge.speed,
+                    liquidClassId=liquid_class.id,
+                )
+            )
+            # Post-submerge delay
+            if aspirate_props.submerge.delay.enable:
+                self._engine_client.execute_command(
+                    cmd.WaitForDurationParams(
+                        seconds=aspirate_props.submerge.delay.params.duration,
+                        liquidClassId=liquid_class.id,
+                        # hmm.. adding a liquid class id to a wait for feels kinda weird
+                    )
+                )
+            # Pre-wet
+            if aspirate_props.preWet:
+                self._engine_client.execute_command(
+                    cmd.AspirateParams(
+                        ..., liquidClassId=liquid_class.id
+                    )  # use same vol as transfer volume
+                )
+            # Mix
+            # -----
+            # Similar drawback as noted in 'submerge' - can't show that this
+            # aspirate-dispense combo step is a part of a mix
+            if aspirate_props.mix.enable:
+                for _ in range(aspirate_props.mix.params.repetitions):
+                    self._engine_client.execute_command(
+                        cmd.AspirateParams(
+                            pipetteId=self._pipette_id,
+                            volume=aspirate_props.mix.params.volume,
+                            flowRate=aspirate_props.flowRateByVolume.get(volume),
+                            # This will need to provide interpolated/ extrapolated value for the volume in question
+                            labwareId=transfer.source_well.labware_id,
+                            wellName=transfer.source_well.get_name(),
+                            wellLocation="<get well location from well core + aspirate well offset? >",
+                            # find out which well location to use for mix
+                            liquidClassId=liquid_class.id,
+                        )
+                    )
+                    self._engine_client.execute_command(
+                        cmd.DispenseParams(
+                            pipetteId=self._pipette_id,
+                            volume=aspirate_props.mix.params.volume,
+                            flowRate=liquid_class.singleDispenseProperties.flowRateByVolume.get(
+                                volume
+                            ),
+                            # This will need to provide interpolated/ extrapolated value for the volume in question
+                            labwareId=transfer.source_well.labware_id,
+                            wellName=transfer.source_well.get_name(),
+                            wellLocation="<get well location from well core + aspirate well offset? >",
+                            # find out which well location to use for mix
+                            liquidClassId=liquid_class.id,
+                        )
+                    )
+            # Aspirate
+            self._engine_client.execute_command(
+                cmd.AspirateParams(
+                    pipetteId=self._pipette_id,
+                    volume=volume,
+                    flowRate=aspirate_props.flowRateByVolume.get(volume),
+                    # This will need to provide interpolated/ extrapolated value for the volume in question
+                    labwareId=transfer.source_well.labware_id,
+                    wellName=transfer.source_well.get_name(),
+                    wellLocation="<get well location from well core + aspirate well offset >",
+                    liquidClassId=liquid_class.id,
+                )
+            )
+            # Post-aspirate delay
+            if aspirate_props.delay.enable:
+                self._engine_client.execute_command(
+                    cmd.WaitForDurationParams(
+                        seconds=aspirate_props.delay.params.duration,
+                        liquidClassId=liquid_class.id,
+                    )
+                )
+            # Post-aspirate retract
+            self._engine_client.execute_command(
+                cmd.MoveToWellParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=transfer.source_well.labware_id,
+                    wellName=transfer.source_well.get_name(),
+                    wellLocation="<get well location from well core + retract params>",
+                    speed=aspirate_props.retract.speed,
+                    liquidClassId=liquid_class.id,
+                )
+            )
+            # Post-aspirate touch tip
+            if aspirate_props.retract.touchTip.enable:
+                self._engine_client.execute_command(
+                    cmd.TouchTipParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=transfer.source_well.labware_id,
+                        wellName=transfer.source_well.get_name(),
+                        wellLocation=transfer.source_well.get_top(
+                            z_offset=aspirate_props.retract.touchTip.params.zOffset
+                        ),
+                        mmToEdge=aspirate_props.retract.touchTip.params.mmToEdge,  # anticipated new param to touch tip command
+                        speed=aspirate_props.retract.touchTip.params.speed,
+                        liquidClassId=liquid_class.id,
+                    )
+                )
+            # Post-retract delay
+            if aspirate_props.retract.delay.enable:
+                self._engine_client.execute_command(
+                    cmd.WaitForDurationParams(
+                        seconds=aspirate_props.retract.delay.params.duration,
+                        liquidClassId=liquid_class.id,
+                    )
+                )
+            # Post-retract air gap
+            self._engine_client.execute_command(
+                cmd.AspirateInPlaceParams(
+                    pipetteId=self._pipette_id,
+                    volume=aspirate_props.retract.airGapByVolume(volume),
+                    flowRate=aspirate_props.flowRateByVolume.get(
+                        volume
+                    ),  # This will need to provide interpolated/ extrapolated value for the volume in question
+                    liquidClassId=liquid_class.id,
+                )
+            )
+
+    def _transfer_steps_for_single_dispense(
+        self,
+        liquid_class: ImmutableLiquidClass,
+        volume: float,
+        transfers: List[SingleTransfer],
+    ) -> None:
+        """Perform pre-dispense steps, dispense and post-dispense steps.
+
+        Sequence:
+            1. Submerge
+            2. Delay (optional)
+            3. Dispense (with optional push-out)
+            4. Mix (optional)
+            5. Push out (optional)
+            6. Delay (optional)
+            7. Retract
+            8. Delay (optional)
+            9. Blow out (optional)
+            10. Touch tip (optional)
+            11. Air gap (optional)
+        """
+        dispense_props = liquid_class.singleDispenseProperties
+        for transfer in transfers:
+            # Submerge
+            # ------------
+            # Drawback of using the existing move-to command is that there's no good way
+            # to differentiate between the different move-to's to have the run log show
+            # that it's a submerge step or retract step
+            self._engine_client.execute_command(
+                cmd.MoveToWellParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=transfer.dest_well.labware_id,
+                    wellName=transfer.dest_well.get_name(),
+                    wellLocation="<get well location from dest well core + submerge params>",
+                    speed=dispense_props.submerge.speed,
+                    liquidClassId=liquid_class.id,
+                )
+            )
+            # Post-submerge delay
+            if dispense_props.submerge.delay.enable:
+                self._engine_client.execute_command(
+                    cmd.WaitForDurationParams(
+                        seconds=dispense_props.submerge.delay.params.duration,
+                        liquidClassId=liquid_class.id,
+                        # hmm.. adding a liquid class id to a wait for feels kinda weird
+                    )
+                )
+            # Dispense
+            self._engine_client.execute_command(
+                cmd.DispenseParams(
+                    pipetteId=self._pipette_id,
+                    volume=volume,
+                    flowRate=dispense_props.flowRateByVolume.get(
+                        volume
+                    ),  # This will need to provide interpolated/ extrapolated value for the volume in question
+                    labwareId=transfer.source_well.labware_id,
+                    wellName=transfer.source_well.get_name(),
+                    wellLocation="<get well location from well core + dispense well offset >",
+                    pushOut=dispense_props.pushOutByVolume.get(
+                        volume
+                    ),  # This will need to provide interpolated/ extrapolated value for the volume in question
+                    liquidClassId=liquid_class.id,
+                )
+            )
+            # Mix
+            # -----
+            # Similar drawback as noted in 'submerge' - can't show that this
+            # aspirate-dispense combo step is a part of a mix
+            if dispense_props.mix.enable:
+                for _ in range(dispense_props.mix.params.repetitions):
+                    self._engine_client.execute_command(
+                        cmd.AspirateParams(
+                            pipetteId=self._pipette_id,
+                            volume=dispense_props.mix.params.volume,
+                            flowRate=liquid_class.aspirateProperties.flowRateByVolume.get(
+                                volume
+                            ),
+                            # This will need to provide interpolated/ extrapolated value for the volume in question
+                            labwareId=transfer.dest_well.labware_id,
+                            wellName=transfer.dest_well.get_name(),
+                            wellLocation="<get well location from well core + aspirate well offset? >",
+                            # find out which well location to use for mix
+                            liquidClassId=liquid_class.id,
+                        )
+                    )
+                    self._engine_client.execute_command(
+                        cmd.DispenseParams(
+                            pipetteId=self._pipette_id,
+                            volume=dispense_props.mix.params.volume,
+                            flowRate=dispense_props.flowRateByVolume.get(volume),
+                            # This will need to provide interpolated/ extrapolated value for the volume in question
+                            labwareId=transfer.dest_well.labware_id,
+                            wellName=transfer.dest_well.get_name(),
+                            wellLocation="<get well location from well core + dispense well offset? >",
+                            pushOut=dispense_props.pushOutByVolume.get(
+                                volume
+                            ),  # This will need to provide interpolated/ extrapolated value for the volume in question
+                            # find out which well location to use for mix
+                            liquidClassId=liquid_class.id,
+                        )
+                    )
+
+            # Post-dispense delay
+            if dispense_props.delay.enable:
+                self._engine_client.execute_command(
+                    cmd.WaitForDurationParams(
+                        seconds=dispense_props.delay.params.duration,
+                        liquidClassId=liquid_class.id,
+                    )
+                )
+            # Post-dispense retract
+            self._engine_client.execute_command(
+                cmd.MoveToWellParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=transfer.dest_well.labware_id,
+                    wellName=transfer.dest_well.get_name(),
+                    wellLocation="<get well location from well core + retract params>",
+                    speed=dispense_props.retract.speed,
+                    liquidClassId=liquid_class.id,
+                )
+            )
+            # Post-retract delay
+            if dispense_props.retract.delay.enable:
+                self._engine_client.execute_command(
+                    cmd.WaitForDurationParams(
+                        seconds=dispense_props.retract.delay.params.duration,
+                        liquidClassId=liquid_class.id,
+                    )
+                )
+
+            # Blow out
+            if dispense_props.retract.blowout.enable:
+                blow_out_loc_enum = dispense_props.retract.blowout.params.location
+                match blow_out_loc_enum:
+                    case BlowoutLocation.SOURCE:
+                        blow_out_loc = transfer.source_well
+                    case BlowoutLocation.DESTINATION:
+                        blow_out_loc = transfer.dest_well
+                    case BlowoutLocation.TRASH:
+                        blow_out_loc = "<get the disposal location from somewhere>"
+                if blow_out_loc_enum == BlowoutLocation.TRASH:
+                    # <do a move to addressable area>
+                    # <do a blowout in place>
+                    pass
+
+                else:
+                    self._engine_client.execute_command(
+                        cmd.BlowOutParams(
+                            pipetteId=self._pipette_id,
+                            flowRate=dispense_props.retract.blowout.params.flowRate,
+                            labwareId=blow_out_loc.labware_id,
+                            wellName=blow_out_loc.get_name(),
+                            wellLocation="<get well location from well core + dispense well offset? >",
+                            # find out which well location to use for mix
+                            liquidClassId=liquid_class.id,
+                        )
+                    )
+
+            # Post-dispense touch tip
+            if dispense_props.retract.touchTip.enable:
+                self._engine_client.execute_command(
+                    cmd.TouchTipParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=transfer.dest_well.labware_id,
+                        wellName=transfer.dest_well.get_name(),
+                        wellLocation=transfer.dest_well.get_top(
+                            z_offset=dispense_props.retract.touchTip.params.zOffset
+                        ),
+                        mmToEdge=dispense_props.retract.touchTip.params.mmToEdge,  # anticipated new param to touch tip command
+                        speed=dispense_props.retract.touchTip.params.speed,
+                        liquidClassId=liquid_class.id,
+                    )
+                )
+
+            # Air gap
+            # Post-retract air gap
+            self._engine_client.execute_command(
+                cmd.AspirateInPlaceParams(
+                    pipetteId=self._pipette_id,
+                    volume=dispense_props.retract.airGapByVolume(volume),
+                    flowRate=liquid_class.aspirateProperties.flowRateByVolume.get(
+                        volume
+                    ),
+                    # This will need to provide interpolated/ extrapolated value for the volume in question
+                    liquidClassId=liquid_class.id,
+                )
+            )
+
+
+@dataclasses.dataclass
+class PickUpTipInfo:
+    tip_location: WellCore
+    pick_up_new: bool
+
+
+@dataclasses.dataclass
+class DropTipInfo:
+    drop_tip: bool
+    location: Union[Location, _DisposalLocation]
+
+
+@dataclasses.dataclass
+class SingleTransfer:
+    pick_up_tip: PickUpTipInfo
+    source_well: WellCore
+    dest_well: WellCore
+    drop_tip: DropTipInfo
