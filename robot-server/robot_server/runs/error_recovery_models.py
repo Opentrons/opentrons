@@ -24,17 +24,40 @@ from pydantic import BaseModel, Field
 
 
 class ReactionIfMatch(Enum):
-    """How to handle a given error.
+    """How to handle a matching error.
 
-    * `"ignoreAndContinue"`: Ignore this error and continue with the next command.
     * `"failRun"`: Fail the run.
-    * `"waitForRecovery"`: Enter interactive error recovery mode.
 
+    * `"waitForRecovery"`: Enter interactive error recovery mode. You can then
+      perform error recovery with `POST /runs/{id}/commands` and exit error
+      recovery mode with `POST /runs/{id}/actions`.
+
+    * `"assumeFalsePositiveAndContinue"`: Continue the run without interruption, acting
+      as if the error was a false positive.
+
+      This is equivalent to doing `"waitForRecovery"`
+      and then sending `actionType: "resume-from-recovery-assuming-false-positive"`
+      to `POST /runs/{id}/actions`, except this requires no ongoing intervention from
+      the client.
+
+    * `"ignoreAndContinue"`: Continue the run without interruption, accepting whatever
+      state the error left the robot in.
+
+      This is equivalent to doing `"waitForRecovery"`
+      and then sending `actionType: "resume-from-recovery"` to `POST /runs/{id}/actions`,
+      except this requires no ongoing intervention from the client.
+
+      This is probably not useful very often because it's likely to cause downstream
+      errors—imagine trying an `aspirate` command after a failed `pickUpTip` command.
+      This is provided for symmetry.
     """
 
-    IGNORE_AND_CONTINUE = "ignoreAndContinue"
     FAIL_RUN = "failRun"
     WAIT_FOR_RECOVERY = "waitForRecovery"
+    ASSUME_FALSE_POSITIVE_AND_CONTINUE = "assumeFalsePositiveAndContinue"
+    # todo(mm, 2024-10-22): "ignoreAndContinue" may be a misnomer now: is
+    # "assumeFalsePositiveAndContinue" not also a way to "ignore"? Consider renaming.
+    IGNORE_AND_CONTINUE = "ignoreAndContinue"
 
 
 class ErrorMatcher(BaseModel):
@@ -69,10 +92,7 @@ class ErrorRecoveryRule(BaseModel):
         ...,
         description="The criteria that must be met for this rule to be applied.",
     )
-    ifMatch: ReactionIfMatch = Field(
-        ...,
-        description="How to handle errors matched by this rule.",
-    )
+    ifMatch: ReactionIfMatch
 
 
 class ErrorRecoveryPolicy(BaseModel):
