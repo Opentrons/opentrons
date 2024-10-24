@@ -3,7 +3,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  DropdownField,
   Flex,
   InputField,
   JUSTIFY_CENTER,
@@ -11,14 +10,17 @@ import {
   LargeButton,
   StyledText,
   Link as LinkComponent,
+  DropdownMenu,
 } from '@opentrons/components'
+import type { DropdownOption } from '@opentrons/components'
 import { UploadInput } from '../../molecules/UploadInput'
 import { HeaderWithMeter } from '../../molecules/HeaderWithMeter'
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { FileUpload } from '../../molecules/FileUpload'
 
-const updateOptions = [
+const updateOptions: DropdownOption[] = [
   {
     name: 'Adapt Python protocol from OT-2 to Flex',
     value: 'adapt_python_protocol',
@@ -47,11 +49,6 @@ const ContentBox = styled(Flex)`
   width: 60%;
 `
 
-const ContentFlex = styled(Flex)`
-  flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_CENTER};
-`
-
 const HeadingText = styled(StyledText).attrs({
   desktopStyle: 'headingSmallBold',
 })``
@@ -67,15 +64,19 @@ const isValidProtocolFileName = (protocolFileName: string): boolean => {
 }
 
 export function UpdateProtocol(): JSX.Element {
-  const { t } = useTranslation('protocol_generator')
+  const { t }: { t: (key: string) => string } = useTranslation(
+    'protocol_generator'
+  )
   const [progressPercentage, setProgressPercentage] = useState<number>(0.0)
-  const [updateType, setUpdateType] = useState<string>('')
+  const [updateType, setUpdateType] = useState<DropdownOption | null>(null)
   const [detailsValue, setDetailsValue] = useState<string>('')
+  const [fileValue, setFile] = useState<File | null>(null)
   const [pythonText, setPythonTextValue] = useState<string>('')
+  const [errorText, setErrorText] = useState<string | null>(null)
 
   useEffect(() => {
     let progress = 0.0
-    if (updateType !== '') {
+    if (updateType !== null) {
       progress += 0.33
     }
 
@@ -83,45 +84,38 @@ export function UpdateProtocol(): JSX.Element {
       progress += 0.33
     }
 
-    if (pythonText !== '') {
+    if (pythonText !== '' && fileValue !== null && errorText === null) {
       progress += 0.34
     }
 
     setProgressPercentage(progress)
-  }, [updateType, detailsValue, pythonText])
+  }, [updateType, detailsValue, pythonText, errorText, fileValue])
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setDetailsValue(event.target.value)
   }
 
-  const handleUpload = async (
-    file: File2 & { name: string }
+  const handleFileUpload = async (
+    file: File & { name: string }
   ): Promise<void> => {
-    if (file.path === null) {
-      // logger.warn('Failed to upload file, path not found')
-    }
     if (isValidProtocolFileName(file.name)) {
-      // todo convert to text
-
-      console.log('compatible_file_type')
-      console.log(file.name)
-      // const text = await new Response(new Blob([await file.text()])).text()
       const text = await file.text().catch(error => {
         console.error('Error reading file:', error)
+        setErrorText(t('python_file_read_error'))
       })
 
-      console.log(text)
-      if (text) {
+      if (typeof text === 'string' && text !== '') {
+        setErrorText(null)
         setPythonTextValue(text)
+      } else {
+        setErrorText(t('file_length_error'))
       }
+
+      setFile(file)
     } else {
-      console.log('incompatible_file_type')
+      setErrorText(t('python_file_type_error'))
+      setFile(file)
     }
-    // props.onUpload?.()
-    // trackEvent({
-    //   name: ANALYTICS_IMPORT_PROTOCOL_TO_APP,
-    //   properties: { protocolFileName: file.name },
-    // })
   }
 
   return (
@@ -131,17 +125,28 @@ export function UpdateProtocol(): JSX.Element {
       ></HeaderWithMeter>
       <Spacer />
       <ContentBox>
-        <ContentFlex>
-          <HeadingText>{t('update_existing_protocol')}</HeadingText>
-          <BodyText>{t('protocol_file')}</BodyText>
-          <Flex
-            paddingTop="40px"
-            width="auto"
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_CENTER}
-          >
+        <HeadingText>{t('update_existing_protocol')}</HeadingText>
+        <BodyText>{t('protocol_file')}</BodyText>
+        <Flex
+          paddingTop={fileValue !== null ? '8px' : '40px'}
+          width="auto"
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_CENTER}
+        >
+          {fileValue !== null ? (
+            <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
+              <FileUpload
+                file={fileValue}
+                fileError={errorText}
+                handleClick={function (): void {
+                  setFile(null)
+                  setErrorText(null)
+                }}
+              ></FileUpload>
+            </Flex>
+          ) : (
             <UploadInput
-              uploadButtonText="Choose file"
+              uploadButtonText={t('choose_file')}
               dragAndDropText={
                 <StyledText as="p">
                   <Trans
@@ -161,58 +166,55 @@ export function UpdateProtocol(): JSX.Element {
               }
               onUpload={async function (file: File) {
                 try {
-                  await handleUpload(file)
+                  await handleFileUpload(file)
                 } catch (error) {
+                  // todo perhaps make this a toast?
                   console.error('Error uploading file:', error)
                 }
               }}
-            ></UploadInput>
-          </Flex>
+            />
+          )}
+        </Flex>
 
-          <BodyText>{t('type_of_update')}</BodyText>
-          <DropdownField
-            value={updateType}
-            options={updateOptions}
-            onChange={function (event: ChangeEvent<HTMLSelectElement>): void {
-              setUpdateType(event.target.value)
+        <BodyText>{t('type_of_update')}</BodyText>
+        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+          <DropdownMenu
+            // value={updateType}
+            width="100%"
+            dropdownType="neutral"
+            filterOptions={updateOptions}
+            currentOption={
+              updateType ?? {
+                value: '',
+                name: 'Select an option',
+              }
+            }
+            onClick={value => {
+              const selectedOption = updateOptions.find(v => v.value === value)
+              if (selectedOption != null) {
+                setUpdateType(selectedOption)
+              }
             }}
           />
-          <BodyText>{t('provide_details_of_changes')}</BodyText>
-          <InputField
-            value={detailsValue}
-            onChange={handleInputChange}
-            size="medium"
+        </Flex>
+        <BodyText>{t('provide_details_of_changes')}</BodyText>
+        <InputField
+          value={detailsValue}
+          onChange={handleInputChange}
+          size="medium"
+        />
+        <Flex
+          paddingTop="40px"
+          width="auto"
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_END}
+        >
+          <LargeButton
+            disabled={progressPercentage !== 1.0}
+            buttonText={t('submit_prompt')}
           />
-          <Flex
-            paddingTop="40px"
-            width="auto"
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_END}
-          >
-            <LargeButton
-              disabled={progressPercentage !== 1.0}
-              buttonText={t('submit_prompt')}
-            />
-          </Flex>
-        </ContentFlex>
+        </Flex>
       </ContentBox>
     </Container>
   )
-}
-
-interface File2 {
-  /**
-   * The real path to the file on the users filesystem
-   */
-  path?: string
-  /**
-   * The name of the file
-   */
-  name: string
-
-  /**
-   * The contents of the file
-   */
-  // contents: string
-  text: () => Promise<string>
 }
