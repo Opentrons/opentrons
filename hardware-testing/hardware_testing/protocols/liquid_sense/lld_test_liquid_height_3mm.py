@@ -35,7 +35,7 @@ VOLUMES_3MM_TOP_BOTTOM = {
     "thermoscientificnunc_96_wellplate_1300ul": [1155.1, 73.5, 0.0],
     "thermoscientificnunc_96_wellplate_2000ul": [1768.0, 73.5, 0.0],
     "biorad_96_wellplate_200ul_pcr": [161.2, 71.32, 17.9, 0.0],
-    "nest_1_reservoir_290ml": [271690.5, 16570.4, 0.0],
+    "nest_1_reservoir_290ml": [16570.4, 0.0],
     "corning_12_wellplate_6.9ml_flat": [5654.8, 1156.3, 0.0],
     "corning_24_wellplate_3.4ml_flat": [2853.4, 1701.37, 579.0, 0.0],
     "corning_6_wellplate_16.8ml_flat": [13901.9, 2862.1, 0.0],
@@ -45,8 +45,9 @@ VOLUMES_3MM_TOP_BOTTOM = {
     "opentrons_24_tuberack_nest_1.5ml_snapcap": [1650.6, 619.18, 27.7, 0.0],
     "opentrons_24_tuberack_nest_2ml_screwcap": [2104.9, 66.6, 0.0],
     "opentrons_24_tuberack_nest_2ml_snapcap": [2148.5, 69.6, 0.0],
-    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [56267.2, 158.1, 0.0],
-    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": [57720.5, 163.9, 0.0],
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [ 158.1, 0.0],
+    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": [163.9,57720.5, 0.0],
+    "nest_1_reservoir_195ml": [14034.2, 0.0]
 }
 
 SAME_TIP = True  # this is fine when using Ethanol (b/c it evaporates)
@@ -74,7 +75,7 @@ SLOT_DIAL = "B3"
 ###########################################
 
 
-metadata = {"protocolName": "lld-test-liquid-height-3mm"}
+metadata = {"protocolName": "lld-test-liquid-height-3mm-LOW-VOL"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 
