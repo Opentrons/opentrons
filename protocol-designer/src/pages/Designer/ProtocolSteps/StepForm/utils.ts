@@ -324,4 +324,4 @@ export const getSaveStepSnackbarText = (
 }
 
 export const capitalizeFirstLetter = (stepName: string): string =>
-  stepName.charAt(0).toUpperCase() + stepName.slice(1)
+  `${stepName.charAt(0).toUpperCase()}${stepName.slice(1)}`
