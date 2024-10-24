@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocalizationProvider } from '../../LocalizationProvider'
+import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
 import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
@@ -48,6 +49,7 @@ vi.mock('@opentrons/react-api-client', async () => {
 vi.mock('../../LocalizationProvider')
 vi.mock('/app/pages/ODD/Welcome')
 vi.mock('/app/pages/ODD/NetworkSetupMenu')
+vi.mock('/app/pages/ODD/ChooseLanguage')
 vi.mock('/app/pages/ODD/ConnectViaEthernet')
 vi.mock('/app/pages/ODD/ConnectViaUSB')
 vi.mock('/app/pages/ODD/ConnectViaWifi')
@@ -109,6 +111,10 @@ describe('OnDeviceDisplayApp', () => {
     vi.resetAllMocks()
   })
 
+  it('renders ChooseLanguage component from /choose-language', () => {
+    render('/choose-language')
+    expect(vi.mocked(ChooseLanguage)).toHaveBeenCalled()
+  })
   it('renders Welcome component from /welcome', () => {
     render('/welcome')
     expect(vi.mocked(Welcome)).toHaveBeenCalled()

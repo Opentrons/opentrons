@@ -99,7 +99,7 @@ describe('SystemLanguagePreferenceModal', () => {
 
   it('should set a supported app language when system language is an unsupported locale of the same language', () => {
     vi.mocked(getAppLanguage).mockReturnValue(null)
-    vi.mocked(getSystemLanguage).mockReturnValue('en-UK')
+    vi.mocked(getSystemLanguage).mockReturnValue('en-GB')
 
     render()
 
@@ -116,7 +116,7 @@ describe('SystemLanguagePreferenceModal', () => {
       'language.appLanguage',
       MOCK_DEFAULT_LANGUAGE
     )
-    expect(updateConfigValue).toBeCalledWith('language.systemLanguage', 'en-UK')
+    expect(updateConfigValue).toBeCalledWith('language.systemLanguage', 'en-GB')
   })
 
   it('should render the correct header, description, and buttons when system language changes', () => {

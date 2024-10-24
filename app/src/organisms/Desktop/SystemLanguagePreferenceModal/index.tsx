@@ -15,6 +15,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { LANGUAGES } from '/app/i18n'
 import {
   getAppLanguage,
   getStoredSystemLanguage,
@@ -26,18 +27,12 @@ import { getSystemLanguage } from '/app/redux/shell'
 import type { DropdownOption } from '@opentrons/components'
 import type { Dispatch } from '/app/redux/types'
 
-// these strings will not be translated so should not be localized
-const languageOptions: DropdownOption[] = [
-  { name: 'English (US)', value: 'en-US' },
-  { name: '中文', value: 'zh-CN' },
-]
-
 export function SystemLanguagePreferenceModal(): JSX.Element | null {
   const { i18n, t } = useTranslation(['app_settings', 'shared', 'branded'])
   const enableLocalization = useFeatureFlag('enableLocalization')
 
   const [currentOption, setCurrentOption] = useState<DropdownOption>(
-    languageOptions[0]
+    LANGUAGES[0]
   )
 
   const dispatch = useDispatch<Dispatch>()
@@ -76,7 +71,7 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
   }
 
   const handleDropdownClick = (value: string): void => {
-    const selectedOption = languageOptions.find(lng => lng.value === value)
+    const selectedOption = LANGUAGES.find(lng => lng.value === value)
 
     if (selectedOption != null) {
       setCurrentOption(selectedOption)
@@ -89,8 +84,8 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
     if (systemLanguage != null) {
       // prefer match entire locale, then match just language e.g. zh-Hant and zh-CN
       const matchedSystemLanguageOption =
-        languageOptions.find(lng => lng.value === systemLanguage) ??
-        languageOptions.find(
+        LANGUAGES.find(lng => lng.value === systemLanguage) ??
+        LANGUAGES.find(
           lng =>
             new Intl.Locale(lng.value).language ===
             new Intl.Locale(systemLanguage).language
@@ -115,7 +110,7 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
           </StyledText>
           {showBootModal ? (
             <DropdownMenu
-              filterOptions={languageOptions}
+              filterOptions={LANGUAGES}
               currentOption={currentOption}
               onClick={handleDropdownClick}
               title={t('select_language')}

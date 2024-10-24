@@ -1,6 +1,5 @@
-import { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { I18nContext, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import {
@@ -21,18 +20,19 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { LANGUAGES } from '/app/i18n'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import {
   DEV_INTERNAL_FLAGS,
+  getAppLanguage,
   getApplyHistoricOffsets,
   getDevtoolsEnabled,
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
   toggleHistoricOffsets,
-  updateConfigValue,
   useFeatureFlag,
 } from '/app/redux/config'
 import { InlineNotification } from '/app/atoms/InlineNotification'
@@ -88,6 +88,10 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
 
+  const appLanguage = useSelector(getAppLanguage)
+  const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
+  const enableLocalization = useFeatureFlag('enableLocalization')
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation />
@@ -139,6 +143,18 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
             </Flex>
           }
         />
+        {enableLocalization ? (
+          <RobotSettingButton
+            settingName={t('app_settings:language')}
+            settingInfo={
+              currentLanguageOption != null ? currentLanguageOption.name : ''
+            }
+            onClick={() => {
+              setCurrentOption('LanguageSetting')
+            }}
+            iconName="language"
+          />
+        ) : null}
         <RobotSettingButton
           settingName={t('display_led_lights')}
           dataTestId="RobotSettingButton_display_led_lights"
@@ -225,8 +241,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => dispatch(toggleDevtools())}
         />
         {devToolsOn ? <FeatureFlags /> : null}
-        {/* TODO(bh, 2024-09-23): remove when localization setting designs implemented */}
-        <LanguageToggle />
       </Flex>
     </Flex>
   )
@@ -281,23 +295,4 @@ function FeatureFlags(): JSX.Element {
       ))}
     </>
   )
-}
-
-function LanguageToggle(): JSX.Element | null {
-  const enableLocalization = useFeatureFlag('enableLocalization')
-  const dispatch = useDispatch<Dispatch>()
-
-  const { i18n } = useContext(I18nContext)
-
-  return enableLocalization ? (
-    <RobotSettingButton
-      settingName={`Change Language: ${i18n.language}`}
-      onClick={() => {
-        i18n.language === 'en'
-          ? dispatch(updateConfigValue('language.appLanguage', 'zh'))
-          : dispatch(updateConfigValue('language.appLanguage', 'en'))
-      }}
-      rightElement={<></>}
-    />
-  ) : null
 }

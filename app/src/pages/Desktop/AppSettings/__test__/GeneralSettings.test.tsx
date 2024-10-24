@@ -1,11 +1,23 @@
 import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '/app/i18n'
+import {
+  i18n,
+  SIMPLIFIED_CHINESE,
+  SIMPLIFIED_CHINESE_DISPLAY_NAME,
+  US_ENGLISH,
+  US_ENGLISH_DISPLAY_NAME,
+} from '/app/i18n'
 import { getAlertIsPermanentlyIgnored } from '/app/redux/alerts'
+import {
+  getAppLanguage,
+  updateConfigValue,
+  useFeatureFlag,
+} from '/app/redux/config'
 import * as Shell from '/app/redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
 
@@ -29,34 +41,38 @@ describe('GeneralSettings', () => {
   beforeEach(() => {
     vi.mocked(Shell.getAvailableShellUpdate).mockReturnValue(null)
     vi.mocked(getAlertIsPermanentlyIgnored).mockReturnValue(false)
+    vi.mocked(getAppLanguage).mockReturnValue(US_ENGLISH)
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableLocalization')
+      .thenReturn(true)
   })
   afterEach(() => {
     vi.resetAllMocks()
   })
 
   it('renders correct titles', () => {
-    const [{ getByText }] = render()
-    getByText('App Software Version')
-    getByText('Software Update Alerts')
-    getByText('Connect to a Robot via IP Address')
+    render()
+    screen.getByText('App Software Version')
+    screen.getByText('Software Update Alerts')
+    screen.getByText('Connect to a Robot via IP Address')
   })
 
   it('renders software version section with no update available', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Up to date')
-    getByText('View latest release notes on')
-    expect(getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+    render()
+    screen.getByText('Up to date')
+    screen.getByText('View latest release notes on')
+    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
       'href',
       'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
     )
-    getByRole('button', {
+    screen.getByRole('button', {
       name: 'See how to restore a previous software version',
     })
     expect(
       'It is very important for the robot and app software to be on the same version. Manage the robot software versions via Robot Settings &gt; Advanced.'
     ).toBeTruthy()
     expect(
-      getByRole('link', {
+      screen.getByRole('link', {
         name:
           'Learn more about keeping the Opentrons App and robot software in sync',
       })
@@ -65,8 +81,8 @@ describe('GeneralSettings', () => {
 
   it('renders correct info if there is update available', () => {
     vi.mocked(Shell.getAvailableShellUpdate).mockReturnValue('5.0.0-beta.8')
-    const [{ getByRole }] = render()
-    getByRole('button', { name: 'View software update' })
+    render()
+    screen.getByRole('button', { name: 'View software update' })
   })
 
   it('renders correct info if there is no update available', () => {
@@ -80,17 +96,35 @@ describe('GeneralSettings', () => {
   })
 
   it('renders the text and toggle for update alert section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
+    render()
+    screen.getByText(
       'Receive an alert when an Opentrons software update is available.'
     )
-    getByRole('switch', {
+    screen.getByRole('switch', {
       name: 'Enable app update notifications',
     })
   })
 
   it('renders the ip address button', () => {
-    const [{ getByRole }] = render()
-    getByRole('button', { name: 'Set up connection' })
+    render()
+    screen.getByRole('button', { name: 'Set up connection' })
+  })
+
+  it('renders the text and dropdown for the app language preferences section', () => {
+    render()
+    screen.getByText('App Language Preferences')
+    screen.getByText(
+      'All app features use this language. Protocols and other user content will not change language.'
+    )
+    fireEvent.click(screen.getByText(US_ENGLISH_DISPLAY_NAME))
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: SIMPLIFIED_CHINESE_DISPLAY_NAME,
+      })
+    )
+    expect(updateConfigValue).toBeCalledWith(
+      'language.appLanguage',
+      SIMPLIFIED_CHINESE
+    )
   })
 })

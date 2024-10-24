@@ -22,6 +22,7 @@ import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
+import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
 import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
@@ -66,6 +67,7 @@ import type { Dispatch } from '/app/redux/types'
 hackWindowNavigatorOnLine()
 
 export const ON_DEVICE_DISPLAY_PATHS = [
+  '/choose-language',
   '/dashboard',
   '/deck-configuration',
   '/emergency-stop',
@@ -94,6 +96,8 @@ function getPathComponent(
   path: typeof ON_DEVICE_DISPLAY_PATHS[number]
 ): JSX.Element {
   switch (path) {
+    case '/choose-language':
+      return <ChooseLanguage />
     case '/dashboard':
       return <RobotDashboard />
     case '/deck-configuration':

@@ -8,6 +8,7 @@ import {
   DeviceReset,
   TouchscreenBrightness,
   TouchScreenSleep,
+  LanguageSetting,
   NetworkSettings,
   Privacy,
   RobotName,
@@ -199,6 +200,9 @@ export function RobotSettingsDashboard(): JSX.Element {
           }}
         />
       )
+
+    case 'LanguageSetting':
+      return <LanguageSetting setCurrentOption={setCurrentOption} />
 
     // fallthrough option: render the robot settings list of buttons
     default:

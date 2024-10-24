@@ -12,6 +12,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DropdownMenu,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   Link,
@@ -25,6 +26,7 @@ import {
 import { TertiaryButton, ToggleButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
+import { LANGUAGES } from '/app/i18n'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
@@ -40,6 +42,11 @@ import {
   useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
 } from '/app/redux/analytics'
+import {
+  getAppLanguage,
+  updateConfigValue,
+  useFeatureFlag,
+} from '/app/redux/config'
 import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
 import { PreviousVersionModal } from '/app/organisms/Desktop/AppSettings/PreviousVersionModal'
 import { ConnectRobotSlideout } from '/app/organisms/Desktop/AppSettings/ConnectRobotSlideout'
@@ -62,6 +69,15 @@ export function GeneralSettings(): JSX.Element {
     setShowPreviousVersionModal,
   ] = useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
+
+  const enableLocalization = useFeatureFlag('enableLocalization')
+  const appLanguage = useSelector(getAppLanguage)
+  const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
+
+  const handleDropdownClick = (value: string): void => {
+    dispatch(updateConfigValue('language.appLanguage', value))
+  }
+
   const [showUpdateBanner, setShowUpdateBanner] = useState<boolean>(
     updateAvailable
   )
@@ -260,6 +276,35 @@ export function GeneralSettings(): JSX.Element {
             {t('setup_connection')}
           </TertiaryButton>
         </Flex>
+        <Divider marginY={SPACING.spacing24} />
+        {enableLocalization && currentLanguageOption != null ? (
+          <>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+                <LegacyStyledText
+                  css={TYPOGRAPHY.h3SemiBold}
+                  paddingBottom={SPACING.spacing8}
+                >
+                  {t('app_language_preferences')}
+                </LegacyStyledText>
+                <LegacyStyledText as="p">
+                  {t('app_language_description')}
+                </LegacyStyledText>
+              </Flex>
+              <DropdownMenu
+                filterOptions={LANGUAGES}
+                currentOption={currentLanguageOption}
+                onClick={handleDropdownClick}
+                title={t('language')}
+                width="9.5rem"
+              />
+            </Flex>
+            <Divider marginY={SPACING.spacing24} />
+          </>
+        ) : null}
       </Box>
       {showUpdateModal
         ? createPortal(
