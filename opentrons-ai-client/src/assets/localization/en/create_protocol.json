@@ -1,0 +1,17 @@
+{
+  "application_title": "Application",
+  "application_scientific_dropdown_title": "What's your scientific application?",
+  "application_scientific_dropdown_placeholder": "Select an option",
+  "basic_aliquoting": "Basic aliquoting",
+  "pcr": "PCR",
+  "other": "Other",
+  "application_other_title": "Other application",
+  "application_other_caption": "Example: “cherrypicking” or “serial dilution”",
+  "application_describe_title": "Describe what you are trying to do",
+  "application_describe_caption": "Example: “The protocol performs automated liquid handling for Pierce BCA Protein Assay Kit to determine protein concentrations in various sample types, such as cell lysates and eluates of purification process.",
+  "section_confirm_button": "Confirm",
+  "instruments_title": "Instruments",
+  "modules_title": "Modules",
+  "labware_liquids_title": "Labware & Liquids",
+  "steps_title": "Steps"
+}

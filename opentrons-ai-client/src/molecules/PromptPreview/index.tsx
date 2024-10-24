@@ -30,6 +30,7 @@ const PromptPreviewContainer = styled(Flex)`
 `
 
 const PromptPreviewHeading = styled(Flex)`
+  width: 100%;
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   align-items: ${ALIGN_CENTER};
