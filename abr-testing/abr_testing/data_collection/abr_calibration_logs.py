@@ -131,7 +131,6 @@ def deck_helper(
         unique_hash = create_hash(
             robot, deck_slot, pipette_calibrated_with, deck_modified
         )
-        print(unique_hash)
         if unique_hash in deck_sheet_hashes:
             continue
         coords = deck["data"]["matrix"][i]
