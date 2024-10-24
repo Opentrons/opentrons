@@ -5,7 +5,7 @@ import { i18n } from '../../../i18n'
 import { ProtocolSectionsContainer } from '..'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Provider } from 'jotai'
-import { fillApplicationSectionAndClickConfirm } from '../../../resources/utils/__tests__/createProtocolTestUtils.test'
+import { fillApplicationSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
 
 const TestFormProviderComponent = () => {
   const methods = useForm({

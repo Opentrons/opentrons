@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { expect } from 'vitest'
 
-export async function fillApplicationSectionAndClickConfirm() {
+export async function fillApplicationSectionAndClickConfirm(): Promise<void> {
   const applicationDropdown = screen.getByText('Select an option')
   fireEvent.click(applicationDropdown)
 

@@ -4,7 +4,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CreateProtocol } from '..'
 import { Provider } from 'jotai'
-import { fillApplicationSectionAndClickConfirm } from '../../../resources/utils/__tests__/createProtocolTestUtils.test'
+import { fillApplicationSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
