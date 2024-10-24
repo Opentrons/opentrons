@@ -23,6 +23,8 @@ class GCODE(str, Enum):
     SET_PEAK_CURRENT = 'M906'
     SET_IHOLD_CURRENT = 'M907'
     SET_MICROSTEPPING = 'M909'
+    STALLGUARD = 'M910'
+    GET_STALLGUARD_VAL = 'M911'
 
 class DIR(str, Enum):
     POSITIVE = '',
@@ -51,7 +53,7 @@ class LABWARE_Z_OFFSET(float, Enum):
     ARMADILLO_384_PLATE = 11.7
 
 FS_BAUDRATE = 115200
-DEFAULT_FS_TIMEOUT = 1
+DEFAULT_FS_TIMEOUT = 0.1
 FS_COMMAND_TERMINATOR = "\r\n"
 FS_ACK = "OK"+ FS_COMMAND_TERMINATOR.strip("\r")
 DEFAULT_COMMAND_RETRIES = 1
@@ -148,7 +150,8 @@ class FlexStacker():
         start = time.time()
         while True:
             # print(response)
-            response = self._stacker_connection.read_until(expected = f'{x} OK\n')
+            #response = self._stacker_connection.read_until(expected = f'{x} OK\n')
+            response = self._stacker_connection.readline()
             print(response)
             if (self._ack in response):
                 # Remove ack from response
@@ -409,13 +412,13 @@ class FlexStacker():
         ).add_element(axis + f'{current}')
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
-    def close_latch(self, velocity: Optional[float] = None, acceleration: Optional[float]):
+    def close_latch(self, velocity: Optional[float] = None, acceleration: Optional[float] = None):
         velocity = set_default(velocity, MOVE_SPEED_L)
         acceleration = set_default(acceleration, MOVE_ACCELERATION_L)
         self.home(AXIS.L, DIR.NEGATIVE_HOME, velocity, acceleration)
 
     def open_latch(self, distance: Optional[float] = None,
-                    velocity: Optional[float] = None, acceleration: Optional[float],
+                    velocity: Optional[float] = None, acceleration: Optional[float] = None,
                     max_speed_discontinuity: Optional[float] = None):
         distance = set_default(distance, LATCH_DISTANCE_MM)
         velocity = set_default(velocity, MOVE_SPEED_L)
@@ -486,6 +489,36 @@ class FlexStacker():
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.WRITE_TO_REGISTER
         ).add_element(axis.upper()).add_element(register)
+        print(c)
+
+        response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
+
+    def enable_SG(self, axis: AXIS, sg_value: int):
+        """
+        Enable StallGuard and set SGT
+
+        *T: StallGuard Threshold (SGT), (-64-63)
+
+        *: optional params, default/previously set values will be used if
+        unspecified. You can query the current SGT value with M911 Z
+        M910 Z[enable: 0|1] T2
+        """
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.STALLGUARD
+        ).add_element(axis.upper()).add_element(f'T{sg_value}')
+        print(c)
+
+        response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
+
+    def read_SG_value(self, axis: AXIS):
+        """
+        Get the StallGuard (SGT) value
+
+        M911 Z1 T2
+        """
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.GET_STALLGUARD_VAL
+        ).add_element(axis.upper())
         print(c)
 
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
