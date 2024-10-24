@@ -19,6 +19,10 @@ import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { FileUpload } from '../../molecules/FileUpload'
+import { useNavigate } from 'react-router-dom'
+import { chatDataAtom } from '../../resources/atoms'
+import type { ChatData } from '../../resources/types'
+import { useAtom } from 'jotai'
 
 const updateOptions: DropdownOption[] = [
   {
@@ -65,9 +69,11 @@ const isValidProtocolFileName = (protocolFileName: string): boolean => {
 }
 
 export function UpdateProtocol(): JSX.Element {
+  const navigate = useNavigate()
   const { t }: { t: (key: string) => string } = useTranslation(
     'protocol_generator'
   )
+  const [, setChatData] = useAtom(chatDataAtom)
   const [progressPercentage, setProgressPercentage] = useState<number>(0.0)
   const [updateType, setUpdateType] = useState<DropdownOption | null>(null)
   const [detailsValue, setDetailsValue] = useState<string>('')
@@ -107,6 +113,7 @@ export function UpdateProtocol(): JSX.Element {
 
       if (typeof text === 'string' && text !== '') {
         setErrorText(null)
+        console.log('File read successfully:\n', text)
         setPythonTextValue(text)
       } else {
         setErrorText(t('file_length_error'))
@@ -117,6 +124,32 @@ export function UpdateProtocol(): JSX.Element {
       setErrorText(t('python_file_type_error'))
       setFile(file)
     }
+  }
+
+  function processDataAndNavigateToChat(): void {
+    const userPrompt = `
+    Modify the following Python code using the Opentrons Python Protocol API v2. Ensure that the new labware and pipettes are compatible with the Flex robot. Ensure that you perform the correct Type of Update use the Details of Changes.
+
+    Original Python Code:
+    \`\`\`python
+    ${pythonText}
+    \`\`\`
+
+    Type of update:
+    - ${updateType?.value}
+
+    Details of Changes:
+    - ${detailsValue}
+  `
+    console.log(userPrompt)
+
+    const userInput: ChatData = {
+      role: 'user',
+      reply: userPrompt,
+    }
+
+    setChatData(chatData => [...chatData, userInput])
+    navigate('/chat')
   }
 
   return (
@@ -211,6 +244,7 @@ export function UpdateProtocol(): JSX.Element {
           <LargeButton
             disabled={progressPercentage !== 1.0}
             buttonText={t('submit_prompt')}
+            onClick={processDataAndNavigateToChat}
           />
         </Flex>
       </ContentBox>

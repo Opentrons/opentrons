@@ -3,9 +3,16 @@ import { Landing } from './pages/Landing'
 import { UpdateProtocol } from './organisms/UpdateProtocol'
 
 import type { RouteProps } from './resources/types'
+import { Chat } from './pages/Chat'
 
 const opentronsAIRoutes: RouteProps[] = [
   // replace Landing with the correct component
+  {
+    Component: Chat,
+    name: 'Chat',
+    navLinkTo: '/chat',
+    path: '/chat',
+  },
   {
     Component: Landing,
     name: 'Create A New Protocol',
