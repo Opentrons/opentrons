@@ -1,4 +1,5 @@
 """Common test fixtures for runs route tests."""
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 import pytest
 from decoy import Decoy
 
@@ -80,3 +81,9 @@ def mock_file_provider(
 ) -> FileProvider:
     """Return a mock FileProvider."""
     return decoy.mock(cls=FileProvider)
+
+
+@pytest.fixture
+def mock_hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mock HardwareControlAPI."""
+    return decoy.mock(cls=OT3HardwareControlAPI)

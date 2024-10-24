@@ -51,6 +51,8 @@ class PublisherNotifier:
                         LOG.exception(
                             f'PublisherNotifier: exception in callback {getattr(callback, "__name__", "<unknown>")}'
                         )
+        except asyncio.exceptions.CancelledError:
+            LOG.warning("PublisherNotifuer task cancelled.")
         except BaseException:
             LOG.exception("PublisherNotifer notify task failed")
 

@@ -12,7 +12,13 @@ from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons.protocol_engine.types import CSVRuntimeParamPaths
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
+from opentrons.hardware_control.types import EstopState
+from opentrons.protocol_engine.commands.absorbance_reader import CloseLid, OpenLid
+from opentrons.protocol_engine.commands.move_labware import MoveLabware
+from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons.protocol_engine import (
     errors as pe_errors,
 )
@@ -27,6 +33,7 @@ from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
+from robot_server.hardware import get_hardware, get_robot_type_enum
 
 from robot_server.service.json_api import (
     RequestModel,
@@ -48,6 +55,7 @@ from robot_server.protocols.protocol_store import (
 from robot_server.protocols.router import ProtocolNotFound
 
 from ..run_models import (
+    PlaceLabwareState,
     RunNotFoundError,
     ActiveNozzleLayout,
     RunCurrentState,
@@ -567,17 +575,22 @@ async def get_run_commands_error(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
-async def get_current_state(
+async def get_current_state(  # noqa: C901
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> PydanticResponse[Body[RunCurrentState, CurrentStateLinks]]:
     """Get current state associated with a run if the run is current.
 
     Arguments:
         runId: Run ID pulled from URL.
         run_data_manager: Run data retrieval interface.
+        hardware: Hardware control interface.
+        robot_type: The type of robot.
     """
     try:
+        run = run_data_manager.get(run_id=runId)
         active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
 
         nozzle_layouts = {
@@ -589,6 +602,7 @@ async def get_current_state(
             for pipetteId, nozzle_map in active_nozzle_maps.items()
         }
 
+        current_command = run_data_manager.get_current_command(run_id=runId)
         last_completed_command = run_data_manager.get_last_completed_command(
             run_id=runId
         )
@@ -604,9 +618,60 @@ async def get_current_state(
         else None
     )
 
+    estop_engaged = False
+    place_labware = None
+    if robot_type == RobotTypeEnum.FLEX:
+        estop_engaged = hardware.get_estop_state() in [
+            EstopState.PHYSICALLY_ENGAGED,
+            EstopState.LOGICALLY_ENGAGED,
+        ]
+
+        command = (
+            run_data_manager.get_command(runId, current_command.command_id)
+            if current_command
+            else None
+        )
+
+        # Labware state when estop is engaged
+        if isinstance(command, MoveLabware):
+            location = command.params.newLocation
+            if isinstance(location, DeckSlotLocation):
+                place_labware = PlaceLabwareState(
+                    location=location,
+                    labwareId=command.params.labwareId,
+                    shouldPlaceDown=False,
+                )
+        # Handle absorbance reader lid
+        elif isinstance(command, (OpenLid, CloseLid)):
+            for mod in run.modules:
+                if (
+                    not isinstance(mod, AbsorbanceReader)
+                    and mod.id != command.params.moduleId
+                ):
+                    continue
+                for hw_mod in hardware.attached_modules:
+                    if (
+                        mod.location is not None
+                        and hw_mod.serial_number == mod.serialNumber
+                    ):
+                        location = mod.location
+                        labware_id = f"{mod.model}Lid{location.slotName}"
+                        place_labware = PlaceLabwareState(
+                            location=location,
+                            labwareId=labware_id,
+                            shouldPlaceDown=estop_engaged,
+                        )
+                        break
+                if place_labware:
+                    break
+
     return await PydanticResponse.create(
         content=Body.construct(
-            data=RunCurrentState.construct(activeNozzleLayouts=nozzle_layouts),
+            data=RunCurrentState.construct(
+                estopEngaged=estop_engaged,
+                activeNozzleLayouts=nozzle_layouts,
+                placeLabwareState=place_labware,
+            ),
             links=links,
         ),
         status_code=status.HTTP_200_OK,

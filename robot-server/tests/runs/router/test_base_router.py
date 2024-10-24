@@ -1,6 +1,8 @@
 """Tests for base /runs routes."""
 from typing import Dict
 
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.robot.types import RobotTypeEnum
 import pytest
 from datetime import datetime
 from decoy import Decoy
@@ -868,44 +870,54 @@ async def test_get_run_commands_errors_defualt_cursor(
 async def test_get_current_state_success(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_hardware_api: HardwareControlAPI,
     mock_nozzle_maps: Dict[str, NozzleMap],
 ) -> None:
-    """It should return the active nozzle layout for a specific pipette."""
+    """It should return different state from the current run.
+
+    - the active nozzle layout for a specific pipette.
+    - place plate reader state for absorbance reader.
+    """
     run_id = "test-run-id"
 
     decoy.when(mock_run_data_manager.get_nozzle_maps(run_id=run_id)).then_return(
         mock_nozzle_maps
     )
+    command_pointer = CommandPointer(
+        command_id="command-id",
+        command_key="command-key",
+        created_at=datetime(year=2024, month=4, day=4),
+        index=101,
+    )
     decoy.when(
         mock_run_data_manager.get_last_completed_command(run_id=run_id)
-    ).then_return(
-        CommandPointer(
-            command_id="last-command-id",
-            command_key="last-command-key",
-            created_at=datetime(year=2024, month=4, day=4),
-            index=101,
-        )
+    ).then_return(command_pointer)
+    decoy.when(mock_run_data_manager.get_current_command(run_id=run_id)).then_return(
+        command_pointer
     )
 
     result = await get_current_state(
         runId=run_id,
         run_data_manager=mock_run_data_manager,
+        hardware=mock_hardware_api,
+        robot_type=RobotTypeEnum.FLEX,
     )
 
     assert result.status_code == 200
     assert result.content.data == RunCurrentState.construct(
+        estopEngaged=False,
         activeNozzleLayouts={
             "mock-pipette-id": ActiveNozzleLayout(
                 startingNozzle="A1",
                 activeNozzles=["A1"],
                 config=NozzleLayoutConfig.FULL,
             )
-        }
+        },
     )
     assert result.content.links == CurrentStateLinks(
         lastCompleted=CommandLinkNoMeta(
-            href="/runs/test-run-id/commands/last-command-id",
-            id="last-command-id",
+            href="/runs/test-run-id/commands/command-id",
+            id="command-id",
         )
     )
 
@@ -913,6 +925,7 @@ async def test_get_current_state_success(
 async def test_get_current_state_run_not_current(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_hardware_api: HardwareControlAPI,
 ) -> None:
     """It should raise RunStopped when the run is not current."""
     run_id = "non-current-run-id"
@@ -925,6 +938,8 @@ async def test_get_current_state_run_not_current(
         await get_current_state(
             runId=run_id,
             run_data_manager=mock_run_data_manager,
+            hardware=mock_hardware_api,
+            robot_type=RobotTypeEnum.FLEX,
         )
 
     assert exc_info.value.status_code == 409

@@ -6,6 +6,7 @@ from .waypoints import (
     MINIMUM_Z_MARGIN,
     get_waypoints,
     get_gripper_labware_movement_waypoints,
+    get_gripper_labware_placement_waypoints,
 )
 
 from .types import Waypoint, MoveType
@@ -27,4 +28,5 @@ __all__ = [
     "ArcOutOfBoundsError",
     "get_waypoints",
     "get_gripper_labware_movement_waypoints",
+    "get_gripper_labware_placement_waypoints",
 ]

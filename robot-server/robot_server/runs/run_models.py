@@ -21,6 +21,7 @@ from opentrons.protocol_engine import (
     CommandNote,
 )
 from opentrons.protocol_engine.types import (
+    OnDeckLabwareLocation,
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
     CSVRunTimeParamFilesType,
@@ -315,10 +316,24 @@ class ActiveNozzleLayout(BaseModel):
     )
 
 
+class PlaceLabwareState(BaseModel):
+    """Details the labware being placed by the gripper."""
+
+    labwareId: str = Field(..., description="The ID of the labware to place.")
+    location: OnDeckLabwareLocation = Field(
+        ..., description="The location the Plate Reade lid should be in."
+    )
+    shouldPlaceDown: bool = Field(
+        ..., description="Whether the gripper should place down the labware."
+    )
+
+
 class RunCurrentState(BaseModel):
     """Current details about a run."""
 
+    estopEngaged: bool = Field(..., description="")
     activeNozzleLayouts: Dict[str, ActiveNozzleLayout] = Field(..., description="")
+    placeLabwareState: Optional[PlaceLabwareState] = Field(None, description="")
 
 
 class CommandLinkNoMeta(BaseModel):

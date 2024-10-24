@@ -187,9 +187,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 <SleepScreen />
               ) : (
                 <>
-                  <EstopTakeover />
                   <IncompatibleModuleTakeover isOnDevice={true} />
                   <MaintenanceRunTakeover>
+                    <EstopTakeover />
                     <FirmwareUpdateTakeover />
                     <NiceModal.Provider>
                       <ToasterOven>
