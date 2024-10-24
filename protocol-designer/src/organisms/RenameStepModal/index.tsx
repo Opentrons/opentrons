@@ -43,7 +43,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
       renameStep({
         stepId,
         update: {
-          stepName: stepName != '' ? stepName : initialName,
+          stepName: stepName !== '' ? stepName : initialName,
           stepDetails: stepDetails,
         },
       })
