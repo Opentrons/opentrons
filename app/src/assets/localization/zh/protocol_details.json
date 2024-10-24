@@ -4,7 +4,7 @@
   "both_mounts": "两个移液器支架",
   "choices": "{{count}}个选择",
   "choose_file": "选择文件",
-  "choose_robot_to_run": "选择要运行的工作站\n{{protocol_name}}",
+  "choose_robot_to_run": "选择要运行{{protocol_name}}的工作站",
   "clear_and_proceed_to_setup": "清除并继续设置",
   "connect_modules_to_see_controls": "连接模块以查看控制",
   "connected": "已连接",

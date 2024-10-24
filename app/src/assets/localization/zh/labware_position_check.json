@@ -95,7 +95,7 @@
   "return_tip_section": "放回吸头",
   "returning_tip_title": "正在板位{{slot}}放回吸头",
   "reveal_jog_controls": "显示调整面板",
-  "robot_has_no_offsets_from_previous_runs": "<block>耗材校准数据引用自之前运行的协议，以节省您的时间。如果本协议中的所有耗材已在之前的运行中检查过，这些数据将应用于本次运行。</block> <block>您可以使用耗材位置校准程序的后续步骤来添加耗材校准数据。</block>",
+  "robot_has_no_offsets_from_previous_runs": "<block>耗材校准数据引用自之前运行的协议，以节省您的时间。如果本协议中的所有耗材已在之前的运行中检查过，这些数据将应用于本次运行。</block> <block>您可以在后面的步骤中使用耗材位置校准添加新的偏移量。</block>",
   "robot_has_offsets_from_previous_runs": "此工作站具有本协议中所用耗材的校准数据。如果您应用了这些校准数据，仍可通过耗材位置校准程序进行调整。",
   "robot_in_motion": "工作站正在运行，请远离。",
   "run_labware_position_check": "运行耗材位置校准程序",
