@@ -48,3 +48,7 @@ export interface HeaderWithMeterAtomProps {
   displayHeaderWithMeter: boolean
   progress: number
 }
+
+export interface createProtocolAtomProps {
+  currentStep: number
+}

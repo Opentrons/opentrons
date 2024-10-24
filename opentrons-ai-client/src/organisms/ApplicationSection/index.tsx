@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
 import { ControlledInputField } from '../../atoms/ControlledInputField'
+import { useAtom } from 'jotai'
+import { createProtocolAtom } from '../../resources/atoms'
 
 export const BASIC_ALIQUOTING = 'basic_aliquoting'
 export const PCR = 'pcr'
@@ -26,6 +28,7 @@ export function ApplicationSection(): JSX.Element | null {
     watch,
     formState: { isValid },
   } = useFormContext()
+  const [, setCreateProtocolAtom] = useAtom(createProtocolAtom)
 
   const options = [
     { name: t(BASIC_ALIQUOTING), value: BASIC_ALIQUOTING },
@@ -34,6 +37,10 @@ export function ApplicationSection(): JSX.Element | null {
   ]
 
   const isOtherSelected = watch(APPLICATION_SCIENTIFIC_APPLICATION) === OTHER
+
+  function handleConfirmButtonClick(): void {
+    setCreateProtocolAtom({ currentStep: 1 })
+  }
 
   return (
     <Flex
@@ -69,6 +76,7 @@ export function ApplicationSection(): JSX.Element | null {
 
       <ButtonContainer>
         <LargeButton
+          onClick={handleConfirmButtonClick}
           disabled={!isValid}
           buttonText={t('section_confirm_button')}
         ></LargeButton>

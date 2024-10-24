@@ -7,12 +7,12 @@ import {
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Accordion } from '../../molecules/Accordion'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
 import { PromptPreview } from '../../molecules/PromptPreview'
 import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { useForm, FormProvider } from 'react-hook-form'
-import { headerWithMeterAtom } from '../../resources/atoms'
+import { createProtocolAtom, headerWithMeterAtom } from '../../resources/atoms'
 import { useAtom } from 'jotai'
 
 interface CreateProtocolFormData {
@@ -26,10 +26,7 @@ interface CreateProtocolFormData {
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const [, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
-  const [applicationAccordionIsOpen, setApplicationAccordionIsOpen] = useState(
-    true
-  )
-  const [activeSection, setActiveSection] = useState(0)
+  const [{ currentStep }, setCreateProtocolAtom] = useAtom(createProtocolAtom)
 
   const methods = useForm<CreateProtocolFormData>({
     defaultValues: {
@@ -60,9 +57,9 @@ export function CreateProtocol(): JSX.Element | null {
         <ProtocolSections>
           <Accordion
             heading={t('application_title')}
-            isOpen={activeSection === 0}
+            isOpen={currentStep === 0}
             handleClick={function (): void {
-              setActiveSection(0)
+              setCreateProtocolAtom({ currentStep: 0 })
             }}
           >
             <ApplicationSection />
@@ -70,9 +67,39 @@ export function CreateProtocol(): JSX.Element | null {
 
           <Accordion
             heading={t('instruments_title')}
-            isOpen={activeSection === 1}
+            isOpen={currentStep === 1}
             handleClick={function (): void {
-              setActiveSection(1)
+              setCreateProtocolAtom({ currentStep: 1 })
+            }}
+          >
+            <Flex>Content</Flex>
+          </Accordion>
+
+          <Accordion
+            heading={'Modules'}
+            isOpen={currentStep === 2}
+            handleClick={function (): void {
+              setCreateProtocolAtom({ currentStep: 1 })
+            }}
+          >
+            <Flex>Content</Flex>
+          </Accordion>
+
+          <Accordion
+            heading={'Labware & Liquids'}
+            isOpen={currentStep === 3}
+            handleClick={function (): void {
+              setCreateProtocolAtom({ currentStep: 1 })
+            }}
+          >
+            <Flex>Content</Flex>
+          </Accordion>
+
+          <Accordion
+            heading={'Steps'}
+            isOpen={currentStep === 4}
+            handleClick={function (): void {
+              setCreateProtocolAtom({ currentStep: 1 })
             }}
           >
             <Flex>Content</Flex>

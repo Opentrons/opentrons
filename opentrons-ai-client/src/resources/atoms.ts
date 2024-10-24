@@ -3,6 +3,7 @@ import { atom } from 'jotai'
 import type {
   Chat,
   ChatData,
+  createProtocolAtomProps,
   HeaderWithMeterAtomProps,
   Mixpanel,
 } from './types'
@@ -22,4 +23,8 @@ export const mixpanelAtom = atom<Mixpanel | null>({
 export const headerWithMeterAtom = atom<HeaderWithMeterAtomProps>({
   displayHeaderWithMeter: false,
   progress: 0,
+})
+
+export const createProtocolAtom = atom<createProtocolAtomProps>({
+  currentStep: 0,
 })
