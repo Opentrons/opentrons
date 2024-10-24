@@ -1035,7 +1035,9 @@ class AbsorbanceReaderContext(ModuleContext):
         )
 
     @requires_version(2, 21)
-    def read(self, export_filename: Optional[str]) -> Dict[int, Dict[str, float]]:
+    def read(
+        self, export_filename: Optional[str] = None
+    ) -> Dict[int, Dict[str, float]]:
         """Initiate read on the Absorbance Reader.
 
         Returns a dictionary of wavelengths to dictionary of values ordered by well name.

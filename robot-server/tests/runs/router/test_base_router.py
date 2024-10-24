@@ -58,7 +58,6 @@ from robot_server.runs.run_data_manager import (
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
-    PlaceLabwareState,
     create_run,
     get_run_data_from_url,
     get_run,
@@ -885,17 +884,17 @@ async def test_get_current_state_success(
         mock_nozzle_maps
     )
     command_pointer = CommandPointer(
-            command_id="command-id",
-            command_key="command-key",
-            created_at=datetime(year=2024, month=4, day=4),
-            index=101,
-        )
+        command_id="command-id",
+        command_key="command-key",
+        created_at=datetime(year=2024, month=4, day=4),
+        index=101,
+    )
     decoy.when(
         mock_run_data_manager.get_last_completed_command(run_id=run_id)
     ).then_return(command_pointer)
-    decoy.when(
-        mock_run_data_manager.get_current_command(run_id=run_id)
-    ).then_return(command_pointer)
+    decoy.when(mock_run_data_manager.get_current_command(run_id=run_id)).then_return(
+        command_pointer
+    )
 
     result = await get_current_state(
         runId=run_id,

@@ -575,7 +575,7 @@ async def get_run_commands_error(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
-async def get_current_state(
+async def get_current_state(  # noqa: C901
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
@@ -586,6 +586,8 @@ async def get_current_state(
     Arguments:
         runId: Run ID pulled from URL.
         run_data_manager: Run data retrieval interface.
+        hardware: Hardware control interface.
+        robot_type: The type of robot.
     """
     try:
         run = run_data_manager.get(run_id=runId)
