@@ -35,6 +35,8 @@ export interface ModalShellProps extends StyleProps {
   position?: Position
   /** Optional visible overlay */
   showOverlay?: boolean
+  /** Optional remove padding */
+  noPadding?: boolean
 }
 
 /**
@@ -58,6 +60,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     zIndexOverlay = 1,
     position = 'center',
     showOverlay = true,
+    noPadding = false,
     ...styleProps
   } = props
 
@@ -71,7 +74,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
         if (onOutsideClick != null) onOutsideClick(e)
       }}
     >
-      <ContentArea zIndex={zIndex} position={position}>
+      <ContentArea zIndex={zIndex} position={position} noPadding={noPadding}>
         <ModalArea
           aria-label="ModalShell_ModalArea"
           isFullPage={fullPage}
@@ -102,7 +105,11 @@ const Overlay = styled.div<{ zIndex: string | number; showOverlay: boolean }>`
   cursor: ${CURSOR_DEFAULT};
 `
 
-const ContentArea = styled.div<{ zIndex: string | number; position: Position }>`
+const ContentArea = styled.div<{
+  zIndex: string | number
+  position: Position
+  noPadding: boolean
+}>`
   display: flex;
   position: ${POSITION_ABSOLUTE};
   align-items: ${({ position }) =>
@@ -116,7 +123,7 @@ const ContentArea = styled.div<{ zIndex: string | number; position: Position }>`
   width: 100%;
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
-  padding: ${SPACING.spacing16};
+  padding: ${({ noPadding }) => (noPadding ? 0 : SPACING.spacing16)};
 `
 
 const ModalArea = styled.div<

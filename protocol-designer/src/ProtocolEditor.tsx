@@ -20,6 +20,8 @@ import { GateModal } from './organisms/GateModal'
 import { CreateFileWizard } from './components/modals/CreateFileWizard'
 import { AnnouncementModal } from './organisms'
 import { ProtocolRoutes } from './ProtocolRoutes'
+import { useScreenSizeCheck } from './resources/useScreenSizeCheck'
+import { DisabledScreen } from './organisms/DisabledScreen'
 
 import styles from './components/ProtocolEditor.module.css'
 import './css/reset.module.css'
@@ -29,6 +31,7 @@ const showGateModal =
 
 function ProtocolEditorComponent(): JSX.Element {
   const enableRedesign = useSelector(getEnableRedesign)
+  const isValidSize = useScreenSizeCheck()
 
   return (
     <div
@@ -38,6 +41,7 @@ function ProtocolEditorComponent(): JSX.Element {
       <TopPortalRoot />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
+          {!isValidSize && <DisabledScreen />}
           <HashRouter>
             <ProtocolRoutes />
           </HashRouter>
