@@ -11,7 +11,7 @@ import {
   Kitchen,
   FileUploadMessagesModal,
   LabwareUploadModal,
-  AnnouncementModal,
+  GateModal,
 } from './organisms'
 
 import type { RouteProps } from './types'
@@ -57,13 +57,15 @@ export function ProtocolRoutes(): JSX.Element {
     path: '/',
   }
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
+  const showGateModal =
+    process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
   return (
     <>
       <NavigationBar />
       <Kitchen>
         <Box width="100%">
-          <AnnouncementModal />
+          {showGateModal ? <GateModal /> : null}
           <LabwareUploadModal />
           <FileUploadMessagesModal />
           <Routes>

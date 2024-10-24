@@ -17,6 +17,9 @@ import {
   blockTemperatureHoldRequired,
   lidTemperatureHoldRequired,
   volumeTooHigh,
+  shakeSpeedRequired,
+  temperatureRequired,
+  shakeTimeRequired,
 } from './errors'
 
 import {
@@ -51,6 +54,13 @@ interface FormHelpers {
   getWarnings?: (arg: unknown) => FormWarning[]
 }
 const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
+  heaterShaker: {
+    getErrors: composeErrors(
+      shakeSpeedRequired,
+      shakeTimeRequired,
+      temperatureRequired
+    ),
+  },
   mix: {
     getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
     getWarnings: composeWarnings(

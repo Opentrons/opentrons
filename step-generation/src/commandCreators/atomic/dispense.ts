@@ -61,7 +61,6 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
   if (!pipetteSpec) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName,
         pipette,
       })
     )

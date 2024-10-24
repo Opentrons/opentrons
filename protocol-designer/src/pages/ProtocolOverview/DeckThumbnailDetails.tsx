@@ -10,7 +10,6 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
-  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { LabwareOnDeck } from '../../components/DeckSetup/LabwareOnDeck'
 import { getStagingAreaAddressableAreas } from '../../utils'
@@ -67,11 +66,7 @@ export const DeckThumbnailDetails = (
     <>
       {/* all modules */}
       {allModules.map(({ id, slot, model, type, moduleState }) => {
-        const slotId =
-          slot === SPAN7_8_10_11_SLOT && type === THERMOCYCLER_MODULE_TYPE
-            ? '7'
-            : slot
-
+        const slotId = slot
         const slotPosition = getPositionFromSlotId(slotId, deckDef)
         if (slotPosition == null) {
           console.warn(`no slot ${slotId} for module ${id}`)

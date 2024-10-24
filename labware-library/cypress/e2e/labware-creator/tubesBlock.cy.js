@@ -1,12 +1,13 @@
-// Scrolling seems wonky, so I disabled checking to see if
-// an element is in view before clicking or checking with
-// { force: true }
+import {
+  navigateToUrl,
+  fileHelper,
+  wellBottomImageLocator,
+} from '../../support/e2e'
+const fileHolder = fileHelper('testpro_24_aluminumblock_10ul')
 
 context('Tubes and Block', () => {
   beforeEach(() => {
-    cy.visit('/#/create')
-    cy.viewport('macbook-15')
-
+    navigateToUrl('/#/create')
     cy.get('label')
       .contains('What type of labware are you creating?')
       .children()
@@ -106,21 +107,21 @@ context('Tubes and Block', () => {
           cy.get("input[name='wellBottomShape'][value='flat']").check({
             force: true,
           })
-          cy.get("img[src*='_flat.']").should('exist')
-          cy.get("img[src*='_round.']").should('not.exist')
-          cy.get("img[src*='_v.']").should('not.exist')
+          cy.get(wellBottomImageLocator.flat).should('exist')
+          cy.get(wellBottomImageLocator.round).should('not.exist')
+          cy.get(wellBottomImageLocator.v).should('not.exist')
           cy.get("input[name='wellBottomShape'][value='u']").check({
             force: true,
           })
-          cy.get("img[src*='_flat.']").should('not.exist')
-          cy.get("img[src*='_round.']").should('exist')
-          cy.get("img[src*='_v.']").should('not.exist')
+          cy.get(wellBottomImageLocator.flat).should('not.exist')
+          cy.get(wellBottomImageLocator.round).should('exist')
+          cy.get(wellBottomImageLocator.v).should('not.exist')
           cy.get("input[name='wellBottomShape'][value='v']").check({
             force: true,
           })
-          cy.get("img[src*='_flat.']").should('not.exist')
-          cy.get("img[src*='_round.']").should('not.exist')
-          cy.get("img[src*='_v.']").should('exist')
+          cy.get(wellBottomImageLocator.flat).should('not.exist')
+          cy.get(wellBottomImageLocator.round).should('not.exist')
+          cy.get(wellBottomImageLocator.v).should('exist')
           cy.get("input[name='wellDepth']").focus().blur()
           cy.contains('Depth is a required field').should('exist')
           cy.get("input[name='wellDepth']").type('10').blur()
@@ -232,21 +233,21 @@ context('Tubes and Block', () => {
         cy.get("input[name='wellBottomShape'][value='flat']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('not.exist')
+        cy.get(wellBottomImageLocator.flat).should('exist')
+        cy.get(wellBottomImageLocator.round).should('not.exist')
+        cy.get(wellBottomImageLocator.v).should('not.exist')
         cy.get("input[name='wellBottomShape'][value='u']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('exist')
-        cy.get("img[src*='_v.']").should('not.exist')
+        cy.get(wellBottomImageLocator.flat).should('not.exist')
+        cy.get(wellBottomImageLocator.round).should('exist')
+        cy.get(wellBottomImageLocator.v).should('not.exist')
         cy.get("input[name='wellBottomShape'][value='v']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('exist')
+        cy.get(wellBottomImageLocator.flat).should('not.exist')
+        cy.get(wellBottomImageLocator.round).should('not.exist')
+        cy.get(wellBottomImageLocator.v).should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
         cy.contains('Depth is a required field').should('exist')
         cy.get("input[name='wellDepth']").type('10').blur()
@@ -383,21 +384,21 @@ context('Tubes and Block', () => {
         cy.get("input[name='wellBottomShape'][value='flat']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('not.exist')
+        cy.get(wellBottomImageLocator.flat).should('exist')
+        cy.get(wellBottomImageLocator.round).should('not.exist')
+        cy.get(wellBottomImageLocator.v).should('not.exist')
         cy.get("input[name='wellBottomShape'][value='u']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('exist')
-        cy.get("img[src*='_v.']").should('not.exist')
+        cy.get(wellBottomImageLocator.flat).should('not.exist')
+        cy.get(wellBottomImageLocator.round).should('exist')
+        cy.get(wellBottomImageLocator.v).should('not.exist')
         cy.get("input[name='wellBottomShape'][value='v']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('exist')
+        cy.get(wellBottomImageLocator.flat).should('not.exist')
+        cy.get(wellBottomImageLocator.round).should('not.exist')
+        cy.get(wellBottomImageLocator.v).should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
         cy.contains('Depth is a required field').should('exist')
         cy.get("input[name='wellDepth']").type('10').blur()
@@ -445,8 +446,7 @@ context('Tubes and Block', () => {
       })
 
       it('tests the whole form and file export', () => {
-        cy.visit('/#/create')
-        cy.viewport('macbook-15')
+        navigateToUrl('/#/create')
         cy.get('label')
           .contains('What type of labware are you creating?')
           .children()
@@ -533,21 +533,21 @@ context('Tubes and Block', () => {
         cy.get("input[name='wellBottomShape'][value='flat']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('not.exist')
+        cy.get(wellBottomImageLocator.flat).should('exist')
+        cy.get(wellBottomImageLocator.round).should('not.exist')
+        cy.get(wellBottomImageLocator.v).should('not.exist')
         cy.get("input[name='wellBottomShape'][value='u']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('exist')
-        cy.get("img[src*='_v.']").should('not.exist')
+        cy.get(wellBottomImageLocator.flat).should('not.exist')
+        cy.get(wellBottomImageLocator.round).should('exist')
+        cy.get(wellBottomImageLocator.v).should('not.exist')
         cy.get("input[name='wellBottomShape'][value='v']").check({
           force: true,
         })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('exist')
+        cy.get(wellBottomImageLocator.flat).should('not.exist')
+        cy.get(wellBottomImageLocator.round).should('not.exist')
+        cy.get(wellBottomImageLocator.v).should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
         cy.contains('Depth is a required field').should('exist')
         cy.get("input[name='wellDepth']").type('10').blur()
@@ -575,7 +575,7 @@ context('Tubes and Block', () => {
         cy.get("input[placeholder='TestPro 24 Aluminum Block 10 µL']").should(
           'exist'
         )
-        cy.get("input[placeholder='testpro_24_aluminumblock_10ul']").should(
+        cy.get(`input[placeholder='${fileHolder.downloadFileStem}']`).should(
           'exist'
         )
 
@@ -584,6 +584,18 @@ context('Tubes and Block', () => {
         cy.contains(
           'Please resolve all invalid fields in order to export the labware definition'
         ).should('not.exist')
+
+        cy.fixture(fileHolder.expectedExportFixture).then(
+          expectedExportLabwareDef => {
+            cy.readFile(fileHolder.downloadPath).then(
+              actualExportLabwareDef => {
+                expect(actualExportLabwareDef).to.deep.equal(
+                  expectedExportLabwareDef
+                )
+              }
+            )
+          }
+        )
       })
     })
   })

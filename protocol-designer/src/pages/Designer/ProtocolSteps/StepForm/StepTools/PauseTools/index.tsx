@@ -139,10 +139,11 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                 >
                   <InputStepFormField
                     {...propsForFields.pauseTime}
-                    title={t('application:time')}
+                    title={t('form:step_edit_form.field.pauseAction.duration')}
                     value={propsForFields.pauseTime.value as string}
                     updateValue={propsForFields.pauseTime.updateValue}
                     errorToShow={propsForFields.pauseTime.errorToShow}
+                    units={t('application:units.time_hms')}
                     padding="0"
                     showTooltip={false}
                   />
@@ -193,7 +194,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
             gridGap={SPACING.spacing4}
             paddingX={SPACING.spacing16}
           >
-            <StyledText desktopStyle="captionRegular">
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
               {i18n.format(
                 t('form:step_edit_form.field.pauseMessage.label'),
                 'capitalize'

@@ -62,7 +62,6 @@ export function useRunHeaderModalContainer({
   runStatus,
   runRecord,
   attachedModules,
-  missingSetupSteps,
   protocolRunControls,
   runErrors,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
@@ -102,7 +101,7 @@ export function useRunHeaderModalContainer({
   const missingStepsModalUtils = useMissingStepsModal({
     attachedModules,
     runStatus,
-    missingSetupSteps,
+    runId,
     handleProceedToRunClick,
   })
 

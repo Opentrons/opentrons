@@ -93,6 +93,7 @@
   "select_volume": "Select a volume",
   "shake": "Shake",
   "single": "Single path",
+  "speed": "Speed",
   "starting_deck_state": "Starting deck state",
   "step_substeps": "{{stepType}} details",
   "temperature": "Temperature",
@@ -105,6 +106,8 @@
       "closed": "closed",
       "open": "open"
     },
+    "repeat": "Repeat {{repetitions}} times",
+    "substep_settings": "<text>Set block temperature to</text><tagTemperature/><text>for</text><tagDuration/>",
     "thermocycler_profile": {
       "end_hold": {
         "block": "<text>End at thermocycler block</text><tag/>",

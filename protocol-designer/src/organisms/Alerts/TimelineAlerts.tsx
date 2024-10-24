@@ -3,7 +3,6 @@ import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
-  ALIGN_CENTER,
   Banner,
   DIRECTION_COLUMN,
   Flex,
@@ -31,13 +30,9 @@ function TimelineAlertsComponent(): JSX.Element {
     <Banner
       type={alertType === 'error' ? 'error' : 'warning'}
       key={`${alertType}:${key}`}
-      width="50%"
+      width="100%"
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        alignItems={ALIGN_CENTER}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText desktopStyle="bodyDefaultSemiBold">{data.title}</StyledText>
         <StyledText desktopStyle="bodyDefaultRegular">
           {data.description}

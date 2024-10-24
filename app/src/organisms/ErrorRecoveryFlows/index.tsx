@@ -13,11 +13,13 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  getLoadedLabwareDefinitionsByUri,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getIsOnDevice } from '/app/redux/config'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
 import { RecoveryTakeover } from './RecoveryTakeover'
@@ -127,13 +129,19 @@ export function ErrorRecoveryFlows(
   const robotName = useHost()?.robotName ?? 'robot'
 
   const isValidRobotSideAnalysis = protocolAnalysis != null
-  const allRunDefs = useMemo(
+
+  // TODO(jh, 10-22-24): EXEC-769.
+  const labwareDefinitionsByUri = useMemo(
     () =>
       protocolAnalysis != null
-        ? getLabwareDefinitionsFromCommands(protocolAnalysis.commands)
-        : [],
+        ? getLoadedLabwareDefinitionsByUri(protocolAnalysis?.commands)
+        : null,
     [isValidRobotSideAnalysis]
   )
+  const allRunDefs =
+    labwareDefinitionsByUri != null
+      ? Object.values(labwareDefinitionsByUri)
+      : []
 
   const {
     showTakeover,
@@ -151,6 +159,7 @@ export function ErrorRecoveryFlows(
     showTakeover,
     failedCommand: failedCommandBySource,
     allRunDefs,
+    labwareDefinitionsByUri,
   })
 
   const renderWizard =

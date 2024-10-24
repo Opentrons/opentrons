@@ -46,7 +46,7 @@ describe('waitForTemperature', () => {
     invariantContext = stateAndContext.invariantContext
     robotState = stateAndContext.robotState
   })
-  it('temperature module id exists and temp status is approaching temp', () => {
+  it('temperature module id exists and temp status is approaching temp with a warning that the temp might not be hit', () => {
     const temperature = 20
     const args: WaitForTemperatureArgs = {
       module: temperatureModuleId,
@@ -68,6 +68,12 @@ describe('waitForTemperature', () => {
             moduleId: temperatureModuleId,
             celsius: 20,
           },
+        },
+      ],
+      warnings: [
+        {
+          type: 'TEMPERATURE_IS_POTENTIALLY_UNREACHABLE',
+          message: expect.any(String),
         },
       ],
     }

@@ -26,6 +26,7 @@ import type {
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
   MoveLabwareRunTimeCommand,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type { LabwareDisplayLocationSlotOnly } from '/app/local-resources/labware'
 import type { ErrorRecoveryFlowsProps } from '..'
@@ -40,8 +41,10 @@ interface UseFailedLabwareUtilsProps {
 }
 
 interface RelevantFailedLabwareLocations {
-  currentLoc: string
-  newLoc: string | null
+  displayNameCurrentLoc: string
+  displayNameNewLoc: string | null
+  currentLoc: LabwareLocation | null
+  newLoc: LabwareLocation | null
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
@@ -53,6 +56,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   relevantWellName: string | null
   /* The user-content nickname of the failed labware, if any */
   failedLabwareNickname: string | null
+  /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
 }
 
@@ -103,7 +107,7 @@ export function useFailedLabwareUtils({
   const failedLabwareLocations = useRelevantFailedLwLocations({
     failedLabware,
     failedCommandByRunRecord,
-    protocolAnalysis,
+    runRecord,
   })
 
   return {
@@ -336,7 +340,7 @@ export function getRelevantWellName(
 
 export type GetRelevantLwLocationsParams = Pick<
   UseFailedLabwareUtilsProps,
-  'protocolAnalysis' | 'failedCommandByRunRecord'
+  'runRecord' | 'failedCommandByRunRecord'
 > & {
   failedLabware: UseFailedLabwareUtilsResult['failedLabware']
 }
@@ -344,7 +348,7 @@ export type GetRelevantLwLocationsParams = Pick<
 export function useRelevantFailedLwLocations({
   failedLabware,
   failedCommandByRunRecord,
-  protocolAnalysis,
+  runRecord,
 }: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
   const { t } = useTranslation('protocol_command_text')
 
@@ -352,33 +356,43 @@ export function useRelevantFailedLwLocations({
     LabwareDisplayLocationSlotOnly,
     'location'
   > = {
-    loadedLabwares: protocolAnalysis?.labware ?? [],
-    loadedModules: protocolAnalysis?.modules ?? [],
+    loadedLabwares: runRecord?.data?.labware ?? [],
+    loadedModules: runRecord?.data?.modules ?? [],
     robotType: FLEX_ROBOT_TYPE,
     t,
     detailLevel: 'slot-only',
     isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.
   }
 
-  const currentLocation = getLabwareDisplayLocation({
+  const displayNameCurrentLoc = getLabwareDisplayLocation({
     ...BASE_DISPLAY_PARAMS,
     location: failedLabware?.location ?? null,
   })
 
-  const getNewLocation = (): string | null => {
+  const getNewLocation = (): Pick<
+    RelevantFailedLabwareLocations,
+    'displayNameNewLoc' | 'newLoc'
+  > => {
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
-        return getLabwareDisplayLocation({
-          ...BASE_DISPLAY_PARAMS,
-          location: failedCommandByRunRecord.params.newLocation,
-        })
+        return {
+          displayNameNewLoc: getLabwareDisplayLocation({
+            ...BASE_DISPLAY_PARAMS,
+            location: failedCommandByRunRecord.params.newLocation,
+          }),
+          newLoc: failedCommandByRunRecord.params.newLocation,
+        }
       default:
-        return null
+        return {
+          displayNameNewLoc: null,
+          newLoc: null,
+        }
     }
   }
 
   return {
-    currentLoc: currentLocation,
-    newLoc: getNewLocation(),
+    displayNameCurrentLoc,
+    currentLoc: failedLabware?.location ?? null,
+    ...getNewLocation(),
   }
 }

@@ -1,4 +1,4 @@
-import { getTimeFromPauseForm } from '../../utils/getTimeFromPauseForm'
+import { getTimeFromForm } from '../../utils/getTimeFromForm'
 import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
@@ -13,8 +13,14 @@ import type {
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
-  const { hours, minutes, seconds } = getTimeFromPauseForm(formData)
-  const totalSeconds = hours * 3600 + minutes * 60 + seconds
+  const { hours, minutes, seconds } = getTimeFromForm(
+    formData,
+    'pauseTime',
+    'pauseSecond',
+    'pauseMinute',
+    'pauseHour'
+  )
+  const totalSeconds = (hours ?? 0) * 3600 + minutes * 60 + seconds
   const temperature = parseFloat(formData.pauseTemperature as string)
   const message = formData.pauseMessage ?? ''
 

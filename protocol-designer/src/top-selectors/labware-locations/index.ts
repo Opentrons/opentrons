@@ -235,7 +235,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
         )
       })
       .map(slotId => ({ name: slotId, value: slotId }))
-    const offDeck = { name: 'Off-deck', value: 'offDeck' }
+    const offDeck = { name: 'Off-Deck', value: 'offDeck' }
     const wasteChuteSlot = {
       name: 'Waste Chute in D3',
       value: WASTE_CHUTE_CUTOUT,
