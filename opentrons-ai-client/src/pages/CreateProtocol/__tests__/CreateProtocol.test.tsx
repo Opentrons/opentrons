@@ -3,25 +3,17 @@ import { describe, it, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CreateProtocol } from '..'
-import { FormProvider, useForm } from 'react-hook-form'
-
-// TODO move to __testing-utils__
-const TestFormProviderComponent = () => {
-  const methods = useForm({
-    defaultValues: {},
-  })
-
-  return (
-    <FormProvider {...methods}>
-      <CreateProtocol />
-    </FormProvider>
-  )
-}
+import { Provider } from 'jotai'
 
 const render = (): ReturnType<typeof renderWithProviders> => {
-  return renderWithProviders(<TestFormProviderComponent />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <Provider>
+      <CreateProtocol />
+    </Provider>,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('CreateProtocol', () => {
@@ -31,46 +23,20 @@ describe('CreateProtocol', () => {
     const buttonsAndAccordions = screen.getAllByRole('button')
     expect(buttonsAndAccordions[0]).toHaveAttribute('aria-expanded', 'true')
 
-    const applicationDropdown = screen.getByText('Select an option')
-    fireEvent.click(applicationDropdown)
-
-    const basicAliquotingOption = screen.getByText('Basic aliquoting')
-    fireEvent.click(basicAliquotingOption)
-
-    const describeInput = screen.getByRole('textbox')
-    fireEvent.change(describeInput, { target: { value: 'Test description' } })
-
-    const confirmButton = buttonsAndAccordions[1]
-    await waitFor(() => {
-      expect(confirmButton).toBeEnabled()
-    })
-
-    confirmButton.click()
+    await fillApplicationSectionAndClickConfirm()
 
     await waitFor(() => {
       expect(buttonsAndAccordions[0]).toHaveAttribute('aria-expanded', 'false')
     })
   })
 
-  it('should display the Prompt preview correctly for Application section', () => {
+  it('should display the Prompt preview correctly for Application section', async () => {
     render()
 
-    const applicationDropdown = screen.getByText('Select an option')
-    fireEvent.click(applicationDropdown)
-
-    const basicAliquotingOption = screen.getByText('Basic aliquoting')
-    fireEvent.click(basicAliquotingOption)
-
-    const describeInput = screen.getByRole('textbox')
-    fireEvent.change(describeInput, { target: { value: 'Test description' } })
-
-    const confirmButton = screen.getByText('Confirm')
-    confirmButton.click()
-
-    const promptPreview = screen.getByText('Prompt')
-    expect(promptPreview).toBeInTheDocument()
+    await fillApplicationSectionAndClickConfirm()
 
     const previewItems = screen.getAllByTestId('Tag_default')
+
     expect(previewItems).toHaveLength(2)
     expect(previewItems[0]).toHaveTextContent('Basic aliquoting')
     expect(previewItems[1]).toHaveTextContent('Test description')
@@ -91,7 +57,7 @@ describe('CreateProtocol', () => {
     fireEvent.change(describeInput, { target: { value: 'Test description' } })
 
     const confirmButton = screen.getByText('Confirm')
-    confirmButton.click()
+    fireEvent.click(confirmButton)
 
     const promptPreview = screen.getByText('Prompt')
     expect(promptPreview).toBeInTheDocument()
@@ -102,3 +68,20 @@ describe('CreateProtocol', () => {
     expect(previewItems[1]).toHaveTextContent('Test description')
   })
 })
+
+async function fillApplicationSectionAndClickConfirm() {
+  const applicationDropdown = screen.getByText('Select an option')
+  fireEvent.click(applicationDropdown)
+
+  const basicAliquotingOption = screen.getByText('Basic aliquoting')
+  fireEvent.click(basicAliquotingOption)
+
+  const describeInput = screen.getByRole('textbox')
+  fireEvent.change(describeInput, { target: { value: 'Test description' } })
+
+  const confirmButton = screen.getByText('Confirm')
+  await waitFor(() => {
+    expect(confirmButton).toBeEnabled()
+  })
+  fireEvent.click(confirmButton)
+}

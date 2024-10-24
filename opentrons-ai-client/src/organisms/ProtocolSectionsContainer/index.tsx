@@ -31,62 +31,51 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
       })
   }
 
+  function displayCheckmark(stepNumber: number): boolean {
+    return currentStep > stepNumber && focusStep !== stepNumber
+  }
+
   return (
     <ProtocolSections>
-      <Accordion
-        heading={t('application_title')}
-        isOpen={focusStep === APPLICATION_STEP}
-        handleClick={() => {
-          handleSectionClick(APPLICATION_STEP)
-        }}
-        isCompleted={currentStep > APPLICATION_STEP}
-      >
-        <ApplicationSection />
-      </Accordion>
-
-      <Accordion
-        heading={t('instruments_title')}
-        isOpen={focusStep === INSTRUMENTS_STEP}
-        handleClick={() => {
-          handleSectionClick(INSTRUMENTS_STEP)
-        }}
-        isCompleted={currentStep > INSTRUMENTS_STEP}
-      >
-        <Flex>Content</Flex>
-      </Accordion>
-
-      <Accordion
-        heading={'Modules'}
-        isOpen={focusStep === MODULES_STEP}
-        handleClick={() => {
-          handleSectionClick(MODULES_STEP)
-        }}
-        isCompleted={currentStep > MODULES_STEP}
-      >
-        <Flex>Content</Flex>
-      </Accordion>
-
-      <Accordion
-        heading={'Labware & Liquids'}
-        isOpen={focusStep === LABWARE_LIQUIDS_STEP}
-        handleClick={() => {
-          handleSectionClick(LABWARE_LIQUIDS_STEP)
-        }}
-        isCompleted={currentStep > LABWARE_LIQUIDS_STEP}
-      >
-        <Flex>Content</Flex>
-      </Accordion>
-
-      <Accordion
-        heading={'Steps'}
-        isOpen={focusStep === STEPS_STEP}
-        handleClick={() => {
-          handleSectionClick(STEPS_STEP)
-        }}
-        isCompleted={currentStep > STEPS_STEP}
-      >
-        <Flex>Content</Flex>
-      </Accordion>
+      {[
+        {
+          stepNumber: APPLICATION_STEP,
+          title: 'application_title',
+          Component: ApplicationSection,
+        },
+        {
+          stepNumber: INSTRUMENTS_STEP,
+          title: 'instruments_title',
+          Component: () => <Flex>Content</Flex>,
+        },
+        {
+          stepNumber: MODULES_STEP,
+          title: 'modules_title',
+          Component: () => <Flex>Content</Flex>,
+        },
+        {
+          stepNumber: LABWARE_LIQUIDS_STEP,
+          title: 'labware_liquids_title',
+          Component: () => <Flex>Content</Flex>,
+        },
+        {
+          stepNumber: STEPS_STEP,
+          title: 'steps_title',
+          Component: () => <Flex>Content</Flex>,
+        },
+      ].map(({ stepNumber, title, Component }) => (
+        <Accordion
+          key={stepNumber}
+          heading={t(title)}
+          isOpen={focusStep === stepNumber}
+          handleClick={() => {
+            handleSectionClick(stepNumber)
+          }}
+          isCompleted={displayCheckmark(stepNumber)}
+        >
+          <Component />
+        </Accordion>
+      ))}
     </ProtocolSections>
   )
 }
