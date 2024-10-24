@@ -1,4 +1,5 @@
 export * from './DeviceReset'
+export * from './LanguageSetting'
 export * from './NetworkSettings/RobotSettingsJoinOtherNetwork'
 export * from './NetworkSettings/RobotSettingsSelectAuthenticationType'
 export * from './NetworkSettings/RobotSettingsSetWifiCred'

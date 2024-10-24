@@ -1,19 +1,26 @@
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { i18n } from '/app/i18n'
 import { getRobotSettings } from '/app/redux/robot-settings'
 import { getLocalRobot } from '/app/redux/discovery'
-import { toggleDevtools, toggleHistoricOffsets } from '/app/redux/config'
+import {
+  getAppLanguage,
+  toggleDevtools,
+  toggleHistoricOffsets,
+  useFeatureFlag,
+} from '/app/redux/config'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
   TouchscreenBrightness,
+  LanguageSetting,
   NetworkSettings,
   Privacy,
   RobotSystemVersion,
@@ -44,6 +51,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/RobotSystemVersion')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchscreenBrightness')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
@@ -58,6 +66,8 @@ const render = () => {
     }
   )
 }
+
+const MOCK_DEFAULT_LANGUAGE = 'en-US'
 
 // Note kj 01/25/2023 Currently test cases only check text since this PR is bare-bones for RobotSettings Dashboard
 describe('RobotSettingsDashboard', () => {
@@ -81,6 +91,10 @@ describe('RobotSettingsDashboard', () => {
       isEREnabled: true,
       toggleERSettings: mockToggleER,
     })
+    vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableLocalization')
+      .thenReturn(true)
   })
 
   afterEach(() => {
@@ -248,5 +262,14 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(getRobotUpdateAvailable).mockReturnValue('upgrade')
     render()
     screen.getByText('Update available')
+  })
+
+  it('should render component when tapping Language', () => {
+    render()
+
+    screen.getByText('English (US)')
+    const button = screen.getByText('Language')
+    fireEvent.click(button)
+    expect(vi.mocked(LanguageSetting)).toHaveBeenCalled()
   })
 })

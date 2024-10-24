@@ -72,7 +72,7 @@ export function GeneralSettings(): JSX.Element {
 
   const enableLocalization = useFeatureFlag('enableLocalization')
   const appLanguage = useSelector(getAppLanguage)
-  const currentOption = LANGUAGES.find(lng => lng.value === appLanguage)
+  const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
   const handleDropdownClick = (value: string): void => {
     dispatch(updateConfigValue('language.appLanguage', value))
@@ -277,7 +277,7 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        {enableLocalization && currentOption != null ? (
+        {enableLocalization && currentLanguageOption != null ? (
           <>
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -296,7 +296,7 @@ export function GeneralSettings(): JSX.Element {
               </Flex>
               <DropdownMenu
                 filterOptions={LANGUAGES}
-                currentOption={currentOption}
+                currentOption={currentLanguageOption}
                 onClick={handleDropdownClick}
                 title={t('language')}
                 width="9.5rem"
