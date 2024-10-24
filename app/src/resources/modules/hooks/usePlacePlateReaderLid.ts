@@ -10,7 +10,8 @@ import { useRobotControlCommands } from '/app/resources/maintenance_runs'
 
 interface UsePlacePlateReaderLidResult {
   handlePlaceReaderLid: () => Promise<void>
-  isPlacing: boolean
+  isExecuting: boolean
+  isValidPlateReaderMove: boolean
 }
 
 type UsePlacePlateReaderLidProps = Pick<
@@ -55,7 +56,11 @@ export function usePlacePlateReaderLid(
     }
   }
 
-  return { handlePlaceReaderLid, isPlacing: isExecuting }
+  return {
+    handlePlaceReaderLid,
+    isExecuting: isExecuting,
+    isValidPlateReaderMove,
+  }
 }
 
 const buildLoadModuleCommand = (location: ModuleLocation): CreateCommand => {

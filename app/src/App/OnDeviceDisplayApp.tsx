@@ -189,7 +189,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
                   <MaintenanceRunTakeover>
-                  <EstopTakeover />
+                    <EstopTakeover />
                     <FirmwareUpdateTakeover />
                     <NiceModal.Provider>
                       <ToasterOven>
