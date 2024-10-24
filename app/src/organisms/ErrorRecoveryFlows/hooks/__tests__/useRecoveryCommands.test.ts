@@ -15,6 +15,7 @@ import {
   buildPickUpTips,
   buildIgnorePolicyRules,
   UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
+  HOME_GRIPPER_Z,
 } from '../useRecoveryCommands'
 import { RECOVERY_MAP } from '../../constants'
 
@@ -272,7 +273,7 @@ describe('useRecoveryCommands', () => {
     })
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
-      [UPDATE_ESTIMATORS_EXCEPT_PLUNGERS],
+      [UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, HOME_GRIPPER_Z],
       false
     )
   })
