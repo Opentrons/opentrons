@@ -4,7 +4,6 @@ import {
   Flex,
   OVERFLOW_AUTO,
   COLORS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
@@ -20,6 +19,7 @@ import { Header } from './molecules/Header'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
 import { Footer } from './molecules/Footer'
 import { HeaderWithMeter } from './molecules/HeaderWithMeter'
+import styled from 'styled-components'
 
 export function OpentronsAI(): JSX.Element | null {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
@@ -67,35 +67,44 @@ export function OpentronsAI(): JSX.Element | null {
   }
 
   return (
-    <div
+    <Flex
       id="opentrons-ai"
-      style={{ width: '100%', height: '100vh', overflow: OVERFLOW_AUTO }}
+      width={'100%'}
+      height={'100vh'}
+      flexDirection={DIRECTION_COLUMN}
     >
-      <Flex
-        height="100%"
-        justifyContent={JUSTIFY_CENTER}
-        flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.grey10}
-      >
+      <StickyHeader>
         {displayHeaderWithMeter ? (
           <HeaderWithMeter progressPercentage={progress} />
         ) : (
           <Header />
         )}
+      </StickyHeader>
 
+      <Flex
+        flex={1}
+        flexDirection={DIRECTION_COLUMN}
+        backgroundColor={COLORS.grey10}
+        overflow={OVERFLOW_AUTO}
+      >
         <Flex
           width="100%"
-          height="100%"
           maxWidth={CLIENT_MAX_WIDTH}
           alignSelf={ALIGN_CENTER}
+          flex={1}
         >
           <HashRouter>
             <OpentronsAIRoutes />
           </HashRouter>
         </Flex>
-
         <Footer />
       </Flex>
-    </div>
+    </Flex>
   )
 }
+
+const StickyHeader = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 100;
+`
