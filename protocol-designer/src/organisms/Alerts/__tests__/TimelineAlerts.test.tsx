@@ -4,11 +4,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getRobotStateTimeline } from '../../../file-data/selectors'
-import { selectTerminalItem } from '../../../ui/steps/actions/actions'
+import { selectDesignerTab } from '../../../file-data/actions'
 import { TimelineAlerts } from '../TimelineAlerts'
 
 vi.mock('../../../file-data/selectors')
-vi.mock('../../../ui/steps/actions/actions')
+vi.mock('../../../file-data/actions')
 
 const render = () => {
   return renderWithProviders(<TimelineAlerts />, {
@@ -27,9 +27,11 @@ describe('TimelineAlerts', () => {
   it('renders the insufficient tips timeline error and clicking on the button turns it into the starting deck state terminal id ', () => {
     render()
     screen.getByText('Not enough tips to complete action')
-    screen.getByText('Add another tip rack to an empty slot in')
-    fireEvent.click(screen.getByText('Starting Deck State'))
-    expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()
+    screen.getByText(
+      'Add another tip rack to your deck or change your tip management during transfer and mix steps.'
+    )
+    fireEvent.click(screen.getByText('Edit starting deck'))
+    expect(vi.mocked(selectDesignerTab)).toHaveBeenCalled()
   })
   it('renders the no tip on pipette timeline error and the knowledge link', () => {
     vi.mocked(getRobotStateTimeline).mockReturnValue({
@@ -37,7 +39,6 @@ describe('TimelineAlerts', () => {
       errors: [{ message: 'mockMessage', type: 'NO_TIP_ON_PIPETTE' }],
     })
     render()
-    screen.getByText('No tip on pipette at the start of step')
-    screen.getByText('Air gap dispense setting')
+    screen.getByText('No tip on pipette at start of step')
   })
 })

@@ -10,6 +10,7 @@ import {
   ALIGN_CENTER,
   Btn,
   DIRECTION_COLUMN,
+  EndUserAgreementFooter,
   Flex,
   JUSTIFY_END,
   JUSTIFY_FLEX_END,
@@ -414,6 +415,7 @@ export function ProtocolOverview(): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
+      <EndUserAgreementFooter />
     </Fragment>
   )
 }

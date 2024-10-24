@@ -64,7 +64,6 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
   if (!pipetteSpec) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName,
         pipette,
       })
     )

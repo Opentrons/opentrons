@@ -6,6 +6,7 @@ import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
 import type { IconProps } from '../icons'
 import type { StyleProps } from '../primitives'
+import type { Position } from './ModalShell'
 
 type ModalType = 'info' | 'warning' | 'error'
 
@@ -21,6 +22,8 @@ export interface ModalProps extends StyleProps {
   children?: React.ReactNode
   footer?: React.ReactNode
   zIndexOverlay?: number
+  showOverlay?: boolean
+  position?: Position
 }
 
 /**
@@ -38,6 +41,8 @@ export const Modal = (props: ModalProps): JSX.Element => {
     titleElement1,
     titleElement2,
     zIndexOverlay,
+    position,
+    showOverlay,
     ...styleProps
   } = props
 
@@ -72,9 +77,10 @@ export const Modal = (props: ModalProps): JSX.Element => {
       backgroundColor={COLORS.white}
     />
   )
-
   return (
     <ModalShell
+      position={position}
+      showOverlay={showOverlay}
       zIndexOverlay={zIndexOverlay}
       width={styleProps.width ?? '31.25rem'}
       header={modalHeader}

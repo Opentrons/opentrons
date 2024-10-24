@@ -11,6 +11,7 @@ from opentrons_shared_data.labware.labware_definition import (
     SphericalSegment,
     ConicalFrustum,
     CuboidalFrustum,
+    SquaredConeSegment,
 )
 
 
@@ -127,6 +128,15 @@ def _volume_from_height_spherical(
     return volume
 
 
+def _volume_from_height_squared_cone(
+    target_height: float, segment: SquaredConeSegment
+) -> float:
+    """Find the volume given a height within a squared cone segment."""
+    heights = segment.height_to_volume_table.keys()
+    best_fit_height = min(heights, key=lambda x: abs(x - target_height))
+    return segment.height_to_volume_table[best_fit_height]
+
+
 def _height_from_volume_circular(
     volume: float,
     total_frustum_height: float,
@@ -197,7 +207,17 @@ def _height_from_volume_spherical(
     return height
 
 
+def _height_from_volume_squared_cone(
+    target_volume: float, segment: SquaredConeSegment
+) -> float:
+    """Find the height given a volume within a squared cone segment."""
+    volumes = segment.volume_to_height_table.keys()
+    best_fit_volume = min(volumes, key=lambda x: abs(x - target_volume))
+    return segment.volume_to_height_table[best_fit_volume]
+
+
 def _get_segment_capacity(segment: WellSegment) -> float:
+    section_height = segment.topHeight - segment.bottomHeight
     match segment:
         case SphericalSegment():
             return _volume_from_height_spherical(
@@ -205,7 +225,6 @@ def _get_segment_capacity(segment: WellSegment) -> float:
                 radius_of_curvature=segment.radiusOfCurvature,
             )
         case CuboidalFrustum():
-            section_height = segment.topHeight - segment.bottomHeight
             return _volume_from_height_rectangular(
                 target_height=section_height,
                 bottom_length=segment.bottomYDimension,
@@ -215,13 +234,14 @@ def _get_segment_capacity(segment: WellSegment) -> float:
                 total_frustum_height=section_height,
             )
         case ConicalFrustum():
-            section_height = segment.topHeight - segment.bottomHeight
             return _volume_from_height_circular(
                 target_height=section_height,
                 total_frustum_height=section_height,
                 bottom_radius=(segment.bottomDiameter / 2),
                 top_radius=(segment.topDiameter / 2),
             )
+        case SquaredConeSegment():
+            return _volume_from_height_squared_cone(section_height, segment)
         case _:
             # TODO: implement volume calculations for truncated circular and rounded rectangular segments
             raise NotImplementedError(
@@ -275,6 +295,8 @@ def height_at_volume_within_section(
                 top_width=section.topXDimension,
                 top_length=section.topYDimension,
             )
+        case SquaredConeSegment():
+            return _height_from_volume_squared_cone(target_volume_relative, section)
         case _:
             raise NotImplementedError(
                 "Height from volume calculation not yet implemented for this well shape."
@@ -309,6 +331,8 @@ def volume_at_height_within_section(
                 top_width=section.topXDimension,
                 top_length=section.topYDimension,
             )
+        case SquaredConeSegment():
+            return _volume_from_height_squared_cone(target_height_relative, section)
         case _:
             # TODO(cm): this would be the NEST-96 2uL wells referenced in EXEC-712
             # we need to input the math attached to that issue

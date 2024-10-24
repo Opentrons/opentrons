@@ -2,6 +2,7 @@
 import logging
 from datetime import datetime
 from typing import Optional
+from typing_extensions import assert_never
 from opentrons.protocol_engine import ProtocolEngineError
 from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
@@ -95,6 +96,17 @@ class RunController:
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
                 self._run_orchestrator_store.resume_from_recovery()
+
+            elif (
+                action_type
+                == RunActionType.RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE
+            ):
+                # todo(mm, 2024-10-23): Connect to work in
+                # https://github.com/Opentrons/opentrons/pull/16556.
+                self._run_orchestrator_store.resume_from_recovery()
+
+            else:
+                assert_never(action_type)
 
         except ProtocolEngineError as e:
             raise RunActionNotAllowedError(message=e.message, wrapping=[e]) from e

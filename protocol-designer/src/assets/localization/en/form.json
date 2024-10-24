@@ -72,23 +72,24 @@
         "range": "between {{min}} and {{max}}"
       },
       "heaterShaker": {
+        "duration": "Duration",
         "latch": {
-          "setLatch": "Labware Latch",
-          "toggleOff": "Closed & Locked",
+          "setLatch": "Labware latch",
+          "toggleOff": "Close",
           "toggleOn": "Open"
         },
         "shaker": {
-          "setShake": "Set shake speed",
-          "toggleOff": "Deactivated",
+          "setShake": "Shake speed",
+          "toggleOff": "Deactivate",
           "toggleOn": "Active"
         },
         "temperature": {
-          "setTemperature": "Set temperature",
-          "toggleOff": "Deactivated",
+          "setTemperature": "Temperature",
+          "toggleOff": "Deactivate",
           "toggleOn": "Active"
         },
         "timer": {
-          "heaterShakerSetTimer": "Set timer"
+          "heaterShakerSetTimer": "Timer"
         }
       },
       "location": {
@@ -144,6 +145,7 @@
         }
       },
       "pauseAction": {
+        "duration": "Delay duration",
         "options": {
           "untilResume": "Pause until told to resume",
           "untilTemperature": "Pause until temperature reached",

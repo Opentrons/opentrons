@@ -1,7 +1,14 @@
 import { useTranslation } from 'react-i18next'
-import { START_TERMINAL_ITEM_ID } from '../../steplist'
-import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
-import { TerminalItemLink } from './TerminalItemLink'
+import { useDispatch } from 'react-redux'
+import {
+  Btn,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { BUTTON_LINK_STYLE } from '../../atoms'
+import { selectDesignerTab } from '../../file-data/actions'
 
 import type { AlertLevel } from './types'
 
@@ -14,6 +21,7 @@ export const ErrorContents = (
 ): JSX.Element | null => {
   const { errorType, level } = props
   const { t } = useTranslation(['alert', 'shared'])
+  const dispatch = useDispatch()
 
   if (level === 'timeline') {
     const bodyText = t(`timeline.error.${errorType}.body`, {
@@ -22,29 +30,42 @@ export const ErrorContents = (
     switch (errorType) {
       case 'INSUFFICIENT_TIPS':
         return (
-          <>
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacing8}
+          >
             {bodyText}
-            <TerminalItemLink terminalId={START_TERMINAL_ITEM_ID} />
-          </>
-        )
-      case 'MODULE_PIPETTE_COLLISION_DANGER':
-        return (
-          <>
-            {bodyText}
-            <KnowledgeBaseLink to="pipetteGen1MultiModuleCollision">
-              {t('shared:here')}
-            </KnowledgeBaseLink>
-          </>
-        )
-      case 'NO_TIP_ON_PIPETTE':
-        return (
-          <>
-            {t(`timeline.error.${errorType}.body1`)}
-            <KnowledgeBaseLink to="airGap">
+            <Btn
+              width="7.25rem"
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              css={BUTTON_LINK_STYLE}
+              onClick={() => {
+                dispatch(selectDesignerTab({ tab: 'startingDeck' }))
+              }}
+            >
               {t(`timeline.error.${errorType}.link`)}
-            </KnowledgeBaseLink>
-            {t(`timeline.error.${errorType}.body2`)}
-          </>
+            </Btn>
+          </Flex>
+        )
+      case 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER':
+      case 'MISSING_96_CHANNEL_TIPRACK_ADAPTER':
+        return (
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacing8}
+          >
+            {t(`timeline.error.${errorType}.body`)}
+            <Btn
+              width="7.25rem"
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              css={BUTTON_LINK_STYLE}
+              onClick={() => {
+                dispatch(selectDesignerTab({ tab: 'startingDeck' }))
+              }}
+            >
+              {t(`timeline.error.${errorType}.link`)}
+            </Btn>
+          </Flex>
         )
       default:
         return bodyText

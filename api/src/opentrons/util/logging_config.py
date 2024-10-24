@@ -125,7 +125,7 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
             },
             "sensor": {
                 "class": "logging.handlers.RotatingFileHandler",
-                "formatter": "basic",
+                "formatter": "message_only",
                 "filename": sensor_log_filename,
                 "maxBytes": 1000000,
                 "level": logging.DEBUG,

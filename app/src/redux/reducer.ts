@@ -48,6 +48,9 @@ import { calibrationReducer } from './calibration/reducer'
 // local protocol storage from file system state
 import { protocolStorageReducer } from './protocol-storage/reducer'
 
+// local protocol run state
+import { protocolRunReducer } from './protocol-runs/reducer'
+
 import type { Reducer } from 'redux'
 import type { State, Action } from './types'
 
@@ -68,4 +71,5 @@ export const rootReducer: Reducer<State, Action> = combineReducers({
   sessions: sessionReducer,
   calibration: calibrationReducer,
   protocolStorage: protocolStorageReducer,
+  protocolRuns: protocolRunReducer,
 })

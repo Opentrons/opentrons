@@ -11,6 +11,7 @@ import {
   getSelectedStepId,
   getSelectedSubstep,
 } from '../../../../ui/steps/selectors'
+import { getDesignerTab } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
 import { DeckSetupContainer } from '../../DeckSetup'
 import { OffDeck } from '../../Offdeck'
@@ -27,7 +28,8 @@ vi.mock('../../DeckSetup')
 vi.mock('../StepSummary.tsx')
 vi.mock('../Timeline')
 vi.mock('../../../../feature-flags/selectors')
-
+vi.mock('../../../../file-data/selectors')
+vi.mock('../../../../organisms/Alerts')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,
@@ -53,6 +55,7 @@ const MOCK_STEP_FORMS = {
 
 describe('ProtocolSteps', () => {
   beforeEach(() => {
+    vi.mocked(getDesignerTab).mockReturnValue('protocolSteps')
     vi.mocked(TimelineToolbox).mockReturnValue(<div>mock TimelineToolbox</div>)
     vi.mocked(DeckSetupContainer).mockReturnValue(
       <div>mock DeckSetupContainer</div>

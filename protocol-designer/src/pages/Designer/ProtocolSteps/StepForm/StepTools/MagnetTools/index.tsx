@@ -83,7 +83,6 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         <ListItem type="noActive">
           <ListItemDescriptor
             type="large"
-            isInSlideout
             content={
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 <StyledText
@@ -123,7 +122,6 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
             'form:step_edit_form.field.magnetAction.options.disengage'
           )}
           caption={engageHeightCaption}
-          islabel={true}
         />
       </Flex>
     </Flex>

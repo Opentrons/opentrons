@@ -158,7 +158,7 @@ async def test_hardware_stopping_sequence_no_tip_drop(
     decoy.verify(await hardware_api.stop(home_after=False), times=1)
 
     decoy.verify(
-        await mock_tip_handler.add_tip(
+        await mock_tip_handler.cache_tip(
             pipette_id="pipette-id",
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
@@ -181,7 +181,7 @@ async def test_hardware_stopping_sequence_no_pipette(
     )
 
     decoy.when(
-        await mock_tip_handler.add_tip(
+        await mock_tip_handler.cache_tip(
             pipette_id="pipette-id",
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
@@ -271,7 +271,7 @@ async def test_hardware_stopping_sequence_with_fixed_trash(
         await movement.home(
             axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
         ),
-        await mock_tip_handler.add_tip(
+        await mock_tip_handler.cache_tip(
             pipette_id="pipette-id",
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
@@ -320,7 +320,7 @@ async def test_hardware_stopping_sequence_with_OT2_addressable_area(
         await movement.home(
             axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
         ),
-        await mock_tip_handler.add_tip(
+        await mock_tip_handler.cache_tip(
             pipette_id="pipette-id",
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
