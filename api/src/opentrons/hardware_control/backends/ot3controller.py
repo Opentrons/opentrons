@@ -926,11 +926,11 @@ class OT3Controller(FlexBackend):
     def _build_tip_action_group(
         self, origin: float, targets: List[Tuple[float, float]]
     ) -> MoveGroup:
-        if origin > targets[0][0]:
-            # If the origin is larger than the first target move, assume it's a 'home' move.
-            pipette_action_type = "home"
-        else:
-            pipette_action_type = "clamp"
+        # if origin > targets[0][0]:
+        #     # If the origin is larger than the first target move, assume it's a 'home' move.
+        #     pipette_action_type = "home"
+        # else:
+        #     pipette_action_type = "clamp"
         move_targets = [
             MoveTarget.build({Axis.Q: target_pos}, speed)
             for target_pos, speed in targets
@@ -940,7 +940,7 @@ class OT3Controller(FlexBackend):
         )
 
         return create_tip_action_group(
-            moves[0], [NodeId.pipette_left], pipette_action_type
+            moves[0], [NodeId.pipette_left], "clamp"
         )
 
     async def tip_action(
