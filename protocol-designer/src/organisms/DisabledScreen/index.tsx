@@ -22,6 +22,7 @@ export function DisabledScreen(): JSX.Element {
     <ModalShell
       backgroundColor={`${COLORS.black90}${COLORS.opacity40HexCode}`}
       overflow={OVERFLOW_HIDDEN}
+      noPadding
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
