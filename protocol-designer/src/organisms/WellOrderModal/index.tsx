@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Modal,
@@ -77,12 +77,12 @@ export const WellOrderModal = (
   }
   const { initialFirstValue, initialSecondValue } = getInitialFirstValues()
 
-  const [wellOrder, setWellOrder] = React.useState<State>({
+  const [wellOrder, setWellOrder] = useState<State>({
     firstValue: initialFirstValue,
     secondValue: initialSecondValue,
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     setWellOrder({
       firstValue: initialFirstValue,
       secondValue: initialSecondValue,
@@ -114,9 +114,8 @@ export const WellOrderModal = (
   }
 
   const makeOnChange = (ordinality: 'first' | 'second') => (
-    event: React.ChangeEvent<HTMLSelectElement>
+    value: string
   ): void => {
-    const { value } = event.currentTarget
     let nextState: State = { ...wellOrder, [`${ordinality}Value`]: value }
 
     if (ordinality === 'first') {
@@ -189,9 +188,7 @@ export const WellOrderModal = (
               ),
               value: wellOrder.firstValue,
             }}
-            onClick={() => {
-              makeOnChange('first')
-            }}
+            onClick={makeOnChange('first')}
             filterOptions={WELL_ORDER_VALUES.map(value => ({
               value,
               name: t(`step_edit_form.field.well_order.option.${value}`),
@@ -210,9 +207,7 @@ export const WellOrderModal = (
               ),
               value: wellOrder.secondValue,
             }}
-            onClick={() => {
-              makeOnChange('second')
-            }}
+            onClick={makeOnChange('second')}
             filterOptions={WELL_ORDER_VALUES.map(value => ({
               value,
               name: t(`step_edit_form.field.well_order.option.${value}`),

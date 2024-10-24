@@ -1,31 +1,42 @@
-import WELLS_IMAGE from '../../../../assets/images/well_order_wells.svg'
-import PATH_IMAGE from '../../../../assets/images/well_order_path.svg'
+import b2t_l2r from '../../assets/images/well-order_b2t-l2r.jpg'
+import b2t_r2l from '../../assets/images/well-order_b2t-r2l.jpg'
+import l2r_b2t from '../../assets/images/well-order_l2r-b2t.jpg'
+import l2r_t2b from '../../assets/images/well-order_l2r-t2b.jpg'
+import r2l_b2t from '../../assets/images/well-order_r2l-b2t.jpg'
+import r2l_t2b from '../../assets/images/well-order_r2l-t2b.jpg'
+import t2b_l2r from '../../assets/images/well-order_t2b-l2r.jpg'
+import t2b_r2l from '../../assets/images/well-order_t2b-r2l.jpg'
 
-import styles from './WellOrderInput.module.css'
-import { WellOrderOption } from '../../form-types'
+import type { WellOrderOption } from '../../form-types'
 
 interface WellOrderVisualizationProps {
   firstValue: WellOrderOption
   secondValue: WellOrderOption
 }
 
+const imageMap: Record<string, string> = {
+  b2t_l2r,
+  b2t_r2l,
+  l2r_b2t,
+  l2r_t2b,
+  r2l_b2t,
+  r2l_t2b,
+  t2b_l2r,
+  t2b_r2l,
+}
+
 export const WellOrderVisualization = (
   props: WellOrderVisualizationProps
 ): JSX.Element => {
   const { firstValue, secondValue } = props
+  const imageKey = `${firstValue}_${secondValue}`
 
   return (
-    <div></div>
-    // <div className={styles.viz_wrapper}>
-    //   <img src={WELLS_IMAGE} className={styles.wells_image} />
-    //   <img
-    //     src={PATH_IMAGE}
-    //     className={cx(
-    //       styles.path_image,
-    //       styles[`${firstValue || ''}_first`],
-    //       styles[`${secondValue || ''}_second`]
-    //     )}
-    //   />
-    // </div>
+    <img
+      height="253px"
+      width="274px"
+      src={imageMap[imageKey]}
+      alt={`${firstValue} ${secondValue}`}
+    />
   )
 }
