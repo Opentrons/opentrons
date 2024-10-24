@@ -41,8 +41,7 @@ export function RobotDashboard(): JSX.Element {
   )
 
   const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
-    .reverse() // newest runs first
-    .reduce<RunData[]>((acc, run) => {
+    .reduceRight<RunData[]>((acc, run) => {
       if (
         acc.some(collectedRun => collectedRun.protocolId === run.protocolId)
       ) {

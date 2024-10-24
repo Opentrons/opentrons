@@ -4,28 +4,33 @@ import type { HydratedFormData } from '../formLevel/errors'
 const TIME_DELIMITER = ':'
 
 interface TimeData {
-  hours: number
   minutes: number
   seconds: number
+  hours: number
 }
 
-export const getTimeFromPauseForm = (
-  formData: FormData | HydratedFormData
+export const getTimeFromForm = (
+  formData: FormData | HydratedFormData,
+  timeField: string,
+  secondsField: string,
+  minutesField: string,
+  hoursField?: string
 ): TimeData => {
   let hoursFromForm
   let minutesFromForm
   let secondsFromForm
 
   // importing results in stringified "null" value
-  if (formData.pauseTime != null && formData.pauseTime !== 'null') {
-    const timeSplit = formData.pauseTime.split(TIME_DELIMITER)
-    ;[hoursFromForm, minutesFromForm, secondsFromForm] = timeSplit
+  if (formData[timeField] != null && formData[timeField] !== 'null') {
+    const timeSplit = formData[timeField].split(TIME_DELIMITER)
+    ;[hoursFromForm, minutesFromForm, secondsFromForm] =
+      timeSplit.length === 3 ? timeSplit : [0, ...timeSplit]
   } else {
     // TODO (nd 09/23/2024): remove individual time units after redesign FF is removed
     ;[hoursFromForm, minutesFromForm, secondsFromForm] = [
-      formData.pauseHour,
-      formData.pauseMinute,
-      formData.pauseSecond,
+      hoursField != null ? formData[hoursField] : null,
+      formData[minutesField],
+      formData[secondsField],
     ]
   }
   const hours = isNaN(parseFloat(hoursFromForm as string))

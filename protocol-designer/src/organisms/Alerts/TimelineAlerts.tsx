@@ -11,10 +11,12 @@ import {
 } from '@opentrons/components'
 import { getRobotStateTimeline } from '../../file-data/selectors'
 import { ErrorContents } from './ErrorContents'
+
+import type { StyleProps } from '@opentrons/components'
 import type { CommandCreatorError } from '@opentrons/step-generation'
 import type { MakeAlert } from './types'
 
-function TimelineAlertsComponent(): JSX.Element {
+function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
   const { t } = useTranslation('alert')
 
   const timeline = useSelector(getRobotStateTimeline)
@@ -25,6 +27,10 @@ function TimelineAlertsComponent(): JSX.Element {
       description: <ErrorContents level="timeline" errorType={error.type} />,
     })
   )
+
+  if (timelineErrors.length === 0) {
+    return null
+  }
 
   const makeAlert: MakeAlert = (alertType, data, key) => (
     <Banner
@@ -42,7 +48,9 @@ function TimelineAlertsComponent(): JSX.Element {
   )
 
   return (
-    <>{timelineErrors.map((error, key) => makeAlert('error', error, key))}</>
+    <Flex {...props}>
+      {timelineErrors.map((error, key) => makeAlert('error', error, key))}
+    </Flex>
   )
 }
 

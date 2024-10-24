@@ -6,11 +6,13 @@ export function useHistoricRunDetails(
   hostOverride?: HostConfig | null
 ): RunData[] {
   const { data: allHistoricRuns } = useNotifyAllRunsQuery({}, {}, hostOverride)
-
   return allHistoricRuns == null
     ? []
-    : allHistoricRuns.data.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
+    : // TODO(sf): figure out why .toSorted() doesn't work in vitest
+      allHistoricRuns.data
+        .map(t => t)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
 }

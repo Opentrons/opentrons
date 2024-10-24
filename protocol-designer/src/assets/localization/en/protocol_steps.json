@@ -93,6 +93,7 @@
   "select_volume": "Select a volume",
   "shake": "Shake",
   "single": "Single path",
+  "speed": "Speed",
   "starting_deck_state": "Starting deck state",
   "step_substeps": "{{stepType}} details",
   "temperature": "Temperature",

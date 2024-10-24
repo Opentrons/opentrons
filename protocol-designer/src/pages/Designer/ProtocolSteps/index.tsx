@@ -37,6 +37,8 @@ import { BatchEditToolbox } from './BatchEditToolbox'
 import { getDesignerTab } from '../../../file-data/selectors'
 import { TimelineAlerts } from '../../../organisms'
 
+const CONTENT_MAX_WIDTH = '46.9375rem'
+
 export function ProtocolSteps(): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
@@ -79,16 +81,13 @@ export function ProtocolSteps(): JSX.Element {
         width="100%"
         justifyContent={JUSTIFY_FLEX_START}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+          maxWidth={CONTENT_MAX_WIDTH}
+        >
           {tab === 'protocolSteps' ? (
-            <Flex
-              justifyContent={JUSTIFY_CENTER}
-              width="100%"
-              paddingTop="2.34375rem"
-              paddingBottom="1.34375rem"
-            >
-              <TimelineAlerts />
-            </Flex>
+            <TimelineAlerts justifyContent={JUSTIFY_CENTER} width="100%" />
           ) : null}
           <Flex
             justifyContent={
@@ -112,11 +111,7 @@ export function ProtocolSteps(): JSX.Element {
               }}
             />
           </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing16}
-            maxWidth="46.9375rem"
-          >
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             {deckView === leftString ? (
               <DeckSetupContainer tab="protocolSteps" />
             ) : (

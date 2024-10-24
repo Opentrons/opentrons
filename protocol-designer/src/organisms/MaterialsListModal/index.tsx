@@ -11,7 +11,6 @@ import {
   DIRECTION_ROW,
   Flex,
   InfoScreen,
-  JUSTIFY_SPACE_BETWEEN,
   LiquidIcon,
   ListItem,
   ListItemDescriptor,
@@ -32,13 +31,14 @@ import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { HandleEnter } from '../../atoms/HandleEnter'
+import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
 import type { OrderedLiquids } from '../../labware-ingred/types'
 
 // ToDo (kk:09/04/2024) this should be removed when break-point is set up
-const MODAL_MIN_WIDTH = '36.1875rem'
+const MODAL_MIN_WIDTH = '37.125rem'
 
 export interface FixtureInList {
   name: AdditionalEquipmentName
@@ -82,6 +82,7 @@ export function MaterialsListModal({
         title={t('materials_list')}
         marginLeft="0rem"
         minWidth={MODAL_MIN_WIDTH}
+        childrenPadding={SPACING.spacing24}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -95,13 +96,18 @@ export function MaterialsListModal({
                       <ListItemDescriptor
                         type="large"
                         description={
-                          fixture.location != null ? (
-                            <DeckInfoLabel
-                              deckLabel={fixture.location.replace('cutout', '')}
-                            />
-                          ) : (
-                            ''
-                          )
+                          <Flex minWidth="13.75rem">
+                            {fixture.location != null ? (
+                              <DeckInfoLabel
+                                deckLabel={fixture.location.replace(
+                                  'cutout',
+                                  ''
+                                )}
+                              />
+                            ) : (
+                              ''
+                            )}
+                          </Flex>
                         }
                         content={
                           <Flex
@@ -130,7 +136,11 @@ export function MaterialsListModal({
                       <ListItemDescriptor
                         type="large"
                         description={
-                          <DeckInfoLabel deckLabel={formatLocation(hw.slot)} />
+                          <Flex minWidth="13.75rem">
+                            <DeckInfoLabel
+                              deckLabel={formatLocation(hw.slot)}
+                            />
+                          </Flex>
                         }
                         content={
                           <Flex
@@ -189,9 +199,15 @@ export function MaterialsListModal({
                       <ListItemDescriptor
                         type="large"
                         description={
-                          <DeckInfoLabel deckLabel={deckLabelSlot} />
+                          <Flex minWidth="13.75rem">
+                            <DeckInfoLabel deckLabel={deckLabelSlot} />
+                          </Flex>
                         }
-                        content={lw.def.metadata.displayName}
+                        content={
+                          <StyledText desktopStyle="bodyDefaultRegular">
+                            {lw.def.metadata.displayName}
+                          </StyledText>
+                        }
                       />
                     </ListItem>
                   )
@@ -246,29 +262,31 @@ export function MaterialsListModal({
                     } else {
                       return (
                         <ListItem type="noActive" key={`liquid_${id}`}>
-                          <Flex
-                            justifyContent={JUSTIFY_SPACE_BETWEEN}
-                            width="100%"
-                            padding={SPACING.spacing12}
-                          >
-                            <Flex
-                              alignItems={ALIGN_CENTER}
-                              gridGap={SPACING.spacing8}
-                              flex="1"
-                            >
-                              <LiquidIcon color={liquid.displayColor ?? ''} />
-                              <StyledText desktopStyle="bodyDefaultRegular">
-                                {liquid.name ?? t('n/a')}
-                              </StyledText>
-                            </Flex>
-
-                            <Flex flex="1.27">
+                          <ListItemDescriptor
+                            type="large"
+                            description={
+                              <Flex
+                                minWidth="13.75rem"
+                                alignItems={ALIGN_CENTER}
+                                gridGap={SPACING.spacing8}
+                                width="13.75rem"
+                              >
+                                <LiquidIcon color={liquid.displayColor ?? ''} />
+                                <StyledText
+                                  desktopStyle="bodyDefaultRegular"
+                                  css={LINE_CLAMP_TEXT_STYLE(3)}
+                                >
+                                  {liquid.name ?? t('n/a')}
+                                </StyledText>
+                              </Flex>
+                            }
+                            content={
                               <Tag
                                 text={`${totalVolume.toString()} uL`}
                                 type="default"
                               />
-                            </Flex>
-                          </Flex>
+                            }
+                          />
                         </ListItem>
                       )
                     }

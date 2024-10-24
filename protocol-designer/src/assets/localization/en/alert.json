@@ -219,6 +219,10 @@
       "TIPRACK_IN_WASTE_CHUTE_HAS_TIPS": {
         "title": "Disposing unused tips",
         "body": "This step moves a tip rack that contains unused tips to the waste chute. There is no way to retrieve the tips after disposal."
+      },
+      "TEMPERATURE_IS_POTENTIALLY_UNREACHABLE": {
+        "title": "The pause temperature is potentially unreachable",
+        "body": "This step tries to set the module temperature but it can possibly not be reached, resulting in your protocol running forever."
       }
     }
   },

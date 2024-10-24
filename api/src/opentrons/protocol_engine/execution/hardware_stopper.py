@@ -78,7 +78,9 @@ class HardwareStopper:
                 try:
                     if self._state_store.labware.get_fixed_trash_id() == FIXED_TRASH_ID:
                         # OT-2 and Flex 2.15 protocols will default to the Fixed Trash Labware
-                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
+                        await self._tip_handler.cache_tip(
+                            pipette_id=pipette_id, tip=tip
+                        )
                         await self._movement_handler.move_to_well(
                             pipette_id=pipette_id,
                             labware_id=FIXED_TRASH_ID,
@@ -90,7 +92,9 @@ class HardwareStopper:
                         )
                     elif self._state_store.config.robot_type == "OT-2 Standard":
                         # API 2.16 and above OT2 protocols use addressable areas
-                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
+                        await self._tip_handler.cache_tip(
+                            pipette_id=pipette_id, tip=tip
+                        )
                         await self._movement_handler.move_to_addressable_area(
                             pipette_id=pipette_id,
                             addressable_area_name="fixedTrash",

@@ -8,6 +8,7 @@ import {
   COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
+  EndUserAgreementFooter,
   Flex,
   INFO_TOAST,
   JUSTIFY_CENTER,
@@ -22,6 +23,7 @@ import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../navigation/actions'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { getHasOptedIn } from '../../analytics/selectors'
 import { useAnnouncements } from '../../organisms/AnnouncementModal/announcements'
 import { getLocalStorageItem, localStorageAnnouncementKey } from '../../persist'
 import welcomeImage from '../../assets/images/welcome_page.png'
@@ -36,17 +38,17 @@ export function Landing(): JSX.Element {
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     false
   )
+  const hasOptedIn = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()
   const announcements = useAnnouncements()
   const lastAnnouncement = announcements[announcements.length - 1]
   const announcementKey = lastAnnouncement
     ? lastAnnouncement.announcementKey
     : null
-  const showGateModal =
-    process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
-    !showGateModal
+    hasOptedIn != null
 
   useEffect(() => {
     if (userHasNotSeenAnnouncement) {
@@ -96,7 +98,7 @@ export function Landing(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        height="calc(100vh - 3.5rem)"
+        height="calc(100vh - 9rem)"
         width="100%"
         gridGap={SPACING.spacing32}
       >
@@ -142,6 +144,7 @@ export function Landing(): JSX.Element {
           <input type="file" onChange={loadFile}></input>
         </StyledLabel>
       </Flex>
+      <EndUserAgreementFooter />
     </>
   )
 }
