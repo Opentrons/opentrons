@@ -86,7 +86,7 @@ class TipHandler(TypingProtocol):
             TipAttachedError
         """
 
-    def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
 
     def remove_tip(self, pipette_id: str) -> None:
@@ -260,22 +260,9 @@ class HardwareTipHandler(TipHandler):
         except TipNotAttachedError as e:
             raise PickUpTipTipNotAttachedError(tip_geometry=tip_geometry) from e
 
-        # todo(mm, 2024-10-21): This sequence of cache_tip(), set_current_tiprack_diameter(),
-        # and set_working_volume() is almost the same as self.add_tip(), except one uses
-        # hwapi.cache_tip() and the other uses hwapi.add_tip(). Unify them and
-        # deduplicate if possible.
-        self._hardware_api.cache_tip(hw_mount, actual_tip_length)
+        self.cache_tip(pipette_id, tip_geometry)
+
         await self._hardware_api.prepare_for_aspirate(hw_mount)
-
-        self._hardware_api.set_current_tiprack_diameter(
-            mount=hw_mount,
-            tiprack_diameter=nominal_tip_geometry.diameter,
-        )
-
-        self._hardware_api.set_working_volume(
-            mount=hw_mount,
-            tip_volume=nominal_tip_geometry.volume,
-        )
 
         return tip_geometry
 
@@ -297,11 +284,11 @@ class HardwareTipHandler(TipHandler):
 
         self.remove_tip(pipette_id)
 
-    def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """See documentation on abstract base class."""
         hw_mount = self._get_hw_mount(pipette_id)
 
-        self._hardware_api.add_tip(mount=hw_mount, tip_length=tip.length)
+        self._hardware_api.cache_tip(mount=hw_mount, tip_length=tip.length)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
@@ -449,12 +436,12 @@ class VirtualTipHandler(TipHandler):
             expected_has_tip=True,
         )
 
-    def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+    def cache_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """See documentation on abstract base class.
 
         This should not be called when using virtual pipettes.
         """
-        assert False, "TipHandler.add_tip should not be used with virtual pipettes"
+        assert False, "TipHandler.cache_tip should not be used with virtual pipettes"
 
     def remove_tip(self, pipette_id: str) -> None:
         """See documentation on abstract base class.

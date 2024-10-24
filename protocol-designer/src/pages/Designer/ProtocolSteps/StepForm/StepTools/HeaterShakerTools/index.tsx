@@ -12,9 +12,7 @@ import {
 } from '@opentrons/components'
 import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
 import {
-  CheckboxExpandStepFormField,
   DropdownStepFormField,
-  InputStepFormField,
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '../../../../../../molecules'
@@ -90,7 +88,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           toggleValue={propsForFields.setShake.value}
           toggleUpdateValue={propsForFields.setShake.updateValue}
           title={t('form:step_edit_form.field.heaterShaker.shaker.setShake')}
-          fieldTitle={t('protocol_steps:shake')}
+          fieldTitle={t('protocol_steps:speed')}
           isSelected={formData.setShake === true}
           units={t('units.rpm')}
           onLabel={t('form:step_edit_form.field.heaterShaker.shaker.toggleOn')}
@@ -112,25 +110,17 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
               : null
           }
         />
-        <CheckboxExpandStepFormField
+        <ToggleExpandStepFormField
+          {...propsForFields.heaterShakerTimer}
+          toggleValue={propsForFields.heaterShakerSetTimer.value}
+          toggleUpdateValue={propsForFields.heaterShakerSetTimer.updateValue}
           title={t(
             'form:step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
           )}
-          checkboxValue={propsForFields.heaterShakerSetTimer.value}
-          isChecked={propsForFields.heaterShakerSetTimer.value === true}
-          checkboxUpdateValue={propsForFields.heaterShakerSetTimer.updateValue}
-        >
-          {/* TODO: wire up the new timer with the combined field */}
-          {formData.heaterShakerSetTimer === true ? (
-            <InputStepFormField
-              showTooltip={false}
-              padding="0"
-              title={t('protocol_steps:time')}
-              {...propsForFields.heaterShakerTimerMinutes}
-              units="HH:MM:SS"
-            />
-          ) : null}
-        </CheckboxExpandStepFormField>
+          fieldTitle={t('form:step_edit_form.field.heaterShaker.duration')}
+          isSelected={formData.heaterShakerSetTimer === true}
+          units={t('application:units.time')}
+        />
       </Flex>
     </Flex>
   )

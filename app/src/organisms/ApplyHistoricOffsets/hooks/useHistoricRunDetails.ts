@@ -9,7 +9,7 @@ export function useHistoricRunDetails(
 
   return allHistoricRuns == null
     ? []
-    : allHistoricRuns.data.sort(
+    : allHistoricRuns.data.toSorted(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )

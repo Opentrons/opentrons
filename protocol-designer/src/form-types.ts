@@ -366,6 +366,7 @@ export interface HydratedHeaterShakerFormData {
   heaterShakerSetTimer: 'true' | 'false' | null
   heaterShakerTimerMinutes: string | null
   heaterShakerTimerSeconds: string | null
+  heaterShakerTimer?: string | null
   id: string
   latchOpen: boolean
   moduleId: string

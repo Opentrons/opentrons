@@ -327,8 +327,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     case 'heaterShaker':
       const {
         latchOpen,
-        heaterShakerTimerMinutes,
-        heaterShakerTimerSeconds,
+        heaterShakerTimer,
         moduleId: heaterShakerModuleId,
         targetHeaterShakerTemperature,
         targetSpeed,
@@ -343,14 +342,14 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
               i18nKey="protocol_steps:heater_shaker.active.temperature"
               values={{ module: moduleDisplayName }}
               tagText={
-                targetHeaterShakerTemperature != null
+                targetHeaterShakerTemperature
                   ? `${targetHeaterShakerTemperature}${t(
                       'application:units.degrees'
                     )}`
                   : t('protocol_steps:heater_shaker.active.ambient')
               }
             />
-            {targetSpeed != null ? (
+            {targetSpeed ? (
               <StyledTrans
                 i18nKey="protocol_steps:heater_shaker.active.shake"
                 tagText={`${targetSpeed}${t('application:units.rpm')}`}
@@ -358,11 +357,10 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             ) : null}
           </Flex>
           <Flex gridGap={SPACING.spacing20}>
-            {heaterShakerTimerMinutes != null &&
-            heaterShakerTimerSeconds != null ? (
+            {heaterShakerTimer ? (
               <StyledTrans
                 i18nKey="protocol_steps:heater_shaker.active.time"
-                tagText={`${heaterShakerTimerMinutes}:${heaterShakerTimerSeconds}`}
+                tagText={heaterShakerTimer}
               />
             ) : null}
             <StyledTrans

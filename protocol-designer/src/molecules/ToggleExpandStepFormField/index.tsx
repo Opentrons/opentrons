@@ -18,12 +18,11 @@ interface ToggleExpandStepFormFieldProps extends FieldProps {
   fieldTitle: string
   isSelected: boolean
   units: string
-  onLabel: string
-  offLabel: string
   toggleUpdateValue: (value: unknown) => void
   toggleValue: unknown
+  onLabel?: string
+  offLabel?: string
   caption?: string
-  islabel?: boolean
 }
 export function ToggleExpandStepFormField(
   props: ToggleExpandStepFormFieldProps
@@ -38,16 +37,24 @@ export function ToggleExpandStepFormField(
     toggleUpdateValue,
     toggleValue,
     caption,
-    islabel,
     ...restProps
   } = props
+
+  const resetFieldValue = (): void => {
+    restProps.updateValue('null')
+  }
 
   const onToggleUpdateValue = (): void => {
     if (typeof toggleValue === 'boolean') {
       toggleUpdateValue(!toggleValue)
+      if (toggleValue) {
+        resetFieldValue()
+      }
     } else if (toggleValue === 'engage' || toggleValue === 'disengage') {
       const newToggleValue = toggleValue === 'engage' ? 'disengage' : 'engage'
       toggleUpdateValue(newToggleValue)
+    } else if (toggleValue == null) {
+      toggleUpdateValue(true)
     }
   }
 
@@ -60,16 +67,10 @@ export function ToggleExpandStepFormField(
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
-            {islabel ? (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-              >
-                {isSelected ? onLabel : offLabel}
-              </StyledText>
-            ) : null}
-
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+              {isSelected ? onLabel : offLabel ?? null}
+            </StyledText>
             <ToggleButton
               onClick={() => {
                 onToggleUpdateValue()

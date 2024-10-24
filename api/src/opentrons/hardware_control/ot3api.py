@@ -2236,15 +2236,6 @@ class OT3API(
             )
             await self.home_gear_motors()
 
-    def cache_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
-    ) -> None:
-        realmount = OT3Mount.from_mount(mount)
-        instrument = self._pipette_handler.get_pipette(realmount)
-
-        instrument.add_tip(tip_length=tip_length)
-        instrument.set_current_volume(0)
-
     async def pick_up_tip(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -2612,6 +2603,11 @@ class OT3API(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
     ) -> None:
         self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
+
+    def cache_tip(
+        self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
+    ) -> None:
+        self._pipette_handler.cache_tip(OT3Mount.from_mount(mount), tip_length)
 
     def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
