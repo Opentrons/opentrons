@@ -28,6 +28,7 @@
   "modules": "模块",
   "no_robots_found": "未找到工作站",
   "not_available": "不可用（{{count}}）",
+  "ot2_quickstart_guide": "OT-2 快速入门指南",
   "refresh": "刷新",
   "restart_the_app": "重启应用程序",
   "restart_the_robot": "重启工作站",

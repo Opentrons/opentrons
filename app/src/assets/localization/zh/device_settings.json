@@ -319,6 +319,7 @@
   "wpa2_personal": "WPA2个人",
   "wpa2_personal_description": "大多数实验室都使用此方法",
   "yes_clear_data_and_restart_robot": "是，清除数据并重新启动工作站",
+  "you_should_not_downgrade": "您不应降级到工作站制造日期之前的软件版本。",
   "your_mac_address_is": "您的MAC地址是{{macAddress}}",
   "your_robot_is_ready_to_go": "您的工作站已准备就绪。"
 }

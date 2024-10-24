@@ -53,6 +53,8 @@
   "download_calibration_data_unavailable": "无校准数据可用。",
   "download_calibration_title": "下载校准数据",
   "download_details": "下载详情JSON校准文件查看摘要",
+  "error": "错误",
+  "exit": "退出",
   "finish": "完成",
   "get_started": "开始",
   "good_calibration": "良好校准",
