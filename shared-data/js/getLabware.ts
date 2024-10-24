@@ -57,6 +57,8 @@ export const PD_DO_NOT_LIST = [
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
   'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
   'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
+  //  temporarily blocking TC lid adapter until it is supported in PD
+  'opentrons_tough_pcr_auto_sealing_lid',
 ]
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
