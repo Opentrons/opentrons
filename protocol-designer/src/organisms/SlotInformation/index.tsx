@@ -11,8 +11,8 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { FC } from 'react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface SlotInformationProps {
