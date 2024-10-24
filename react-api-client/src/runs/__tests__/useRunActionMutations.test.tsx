@@ -10,18 +10,21 @@ import {
   usePauseRunMutation,
   useStopRunMutation,
   useResumeRunFromRecoveryMutation,
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '..'
 import type {
   UsePlayRunMutationResult,
   UsePauseRunMutationResult,
   UseStopRunMutationResult,
   UseResumeRunFromRecoveryMutationResult,
+  UseResumeRunFromRecoveryAssumingFalsePositiveMutationResult,
 } from '..'
 
 vi.mock('../usePlayRunMutation')
 vi.mock('../usePauseRunMutation')
 vi.mock('../useStopRunMutation')
 vi.mock('../useResumeRunFromRecoveryMutation')
+vi.mock('../useResumeFromRecoveryAssumingFalsePositiveMutation')
 
 describe('useRunActionMutations hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
@@ -44,6 +47,7 @@ describe('useRunActionMutations hook', () => {
     const mockPauseRun = vi.fn()
     const mockStopRun = vi.fn()
     const mockResumeRunFromRecovery = vi.fn()
+    const mockResumeRunFromRecoveryAssumingFalsePositive = vi.fn()
 
     vi.mocked(usePlayRunMutation).mockReturnValue(({
       playRun: mockPlayRun,
@@ -61,6 +65,12 @@ describe('useRunActionMutations hook', () => {
       resumeRunFromRecovery: mockResumeRunFromRecovery,
     } as unknown) as UseResumeRunFromRecoveryMutationResult)
 
+    vi.mocked(
+      useResumeRunFromRecoveryAssumingFalsePositiveMutation
+    ).mockReturnValue(({
+      resumeRunFromRecoveryAssumingFalsePositive: mockResumeRunFromRecoveryAssumingFalsePositive,
+    } as unknown) as UseResumeRunFromRecoveryAssumingFalsePositiveMutationResult)
+
     const { result } = renderHook(() => useRunActionMutations(RUN_ID_1), {
       wrapper,
     })
@@ -77,5 +87,12 @@ describe('useRunActionMutations hook', () => {
     act(() => result.current.resumeRunFromRecovery())
     expect(mockResumeRunFromRecovery).toHaveBeenCalledTimes(1)
     expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(RUN_ID_1)
+    act(() => result.current.resumeRunFromRecoveryAssumingFalsePositive())
+    expect(
+      mockResumeRunFromRecoveryAssumingFalsePositive
+    ).toHaveBeenCalledTimes(1)
+    expect(mockResumeRunFromRecoveryAssumingFalsePositive).toHaveBeenCalledWith(
+      RUN_ID_1
+    )
   })
 })

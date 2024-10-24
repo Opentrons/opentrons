@@ -76,6 +76,7 @@ const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()
 const mockStopRun = vi.fn()
 const mockResumeRunFromRecovery = vi.fn()
+const mockResumeRunFromRecoveryAssumingFalsePositive = vi.fn()
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -133,10 +134,12 @@ describe('RunningProtocol', () => {
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
       resumeRunFromRecovery: mockResumeRunFromRecovery,
+      resumeRunFromRecoveryAssumingFalsePositive: mockResumeRunFromRecoveryAssumingFalsePositive,
       isPlayRunActionLoading: false,
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
       isResumeRunFromRecoveryActionLoading: false,
+      isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: false,
     })
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
