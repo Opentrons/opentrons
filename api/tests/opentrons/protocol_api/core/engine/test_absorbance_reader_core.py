@@ -11,6 +11,7 @@ from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import AbsorbanceReaderCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_engine.errors.exceptions import CannotPerformModuleAction
 from opentrons.protocol_engine.state.module_substates import AbsorbanceReaderSubState
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
     AbsorbanceReaderId,
@@ -67,6 +68,7 @@ def test_initialize(
     decoy: Decoy, mock_engine_client: EngineClient, subject: AbsorbanceReaderCore
 ) -> None:
     """It should set the sample wavelength with the engine client."""
+    subject._ready_to_initialize = True
     subject.initialize("single", [123])
 
     decoy.verify(
@@ -115,10 +117,20 @@ def test_initialize(
     assert subject._initialized_value == [124, 125, 126]
 
 
+def test_initialize_not_ready(
+    subject: AbsorbanceReaderCore
+) -> None:
+    """It should raise CannotPerformModuleAction if you dont call .close_lid() command."""
+    subject._ready_to_initialize = False
+    with pytest.raises(CannotPerformModuleAction):
+        subject.initialize("single", [123])
+
+
 def test_read(
     decoy: Decoy, mock_engine_client: EngineClient, subject: AbsorbanceReaderCore
 ) -> None:
     """It should call absorbance reader to read with the engine client."""
+    subject._ready_to_initialize = True
     subject._initialized_value = [123]
     substate = AbsorbanceReaderSubState(
         module_id=AbsorbanceReaderId(subject.module_id),
