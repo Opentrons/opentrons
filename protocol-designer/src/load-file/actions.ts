@@ -3,6 +3,7 @@ import { CUSTOM_LABWARE_DICT_NAME } from '@opentrons/step-generation'
 import { selectors as fileDataSelectors } from '../file-data'
 import { migration } from './migration'
 import { saveFile, savePythonFile } from './utils'
+import { pythonProtoParserDemo } from './pythondemo'
 
 import type { SyntheticEvent } from 'react'
 import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
@@ -67,7 +68,11 @@ export const loadProtocolFile = (
       let parsedProtocol: PDProtocolFile | null | undefined
 
       try {
-        parsedProtocol = JSON.parse((result as any) as string)
+        if (file.name.endsWith('.py')) {
+          pythonProtoParserDemo(result, file.name)
+        } else {
+          parsedProtocol = JSON.parse((result as any) as string)
+        }
         // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
         parsedProtocol && dispatch(loadFileAction(parsedProtocol))
       } catch (error) {

@@ -72,7 +72,7 @@ const invalidJsonModal = (props: InvalidModalProps): ModalContents => {
             {t('invalid_file_error')}
           </StyledText>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
-            {errorMessage}
+            <span style={{whiteSpace: 'pre-line'}}>{errorMessage}</span>
           </StyledText>
         </Flex>
       </Flex>
