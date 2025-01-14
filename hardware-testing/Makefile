@@ -223,6 +223,11 @@ open-dev-app:
 	cd .. && $(MAKE) -C app dev
 
 
+.PHONE: open-dev-app
+open-dev-app:
+	cd .. && $(MAKE) -C app dev
+
+
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage-ot3
 
