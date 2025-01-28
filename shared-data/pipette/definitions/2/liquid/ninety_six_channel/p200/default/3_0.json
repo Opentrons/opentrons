@@ -53,12 +53,12 @@
     "t50": {
       "uiMaxFlowRate": 23,
       "defaultAspirateFlowRate": {
-        "default": 6,
-        "valuesByApiLevel": { "2.14": 6 }
+        "default": 6.5,
+        "valuesByApiLevel": { "2.14": 6.5 }
       },
       "defaultDispenseFlowRate": {
-        "default": 6,
-        "valuesByApiLevel": { "2.14": 6 }
+        "default": 6.5,
+        "valuesByApiLevel": { "2.14": 6.5 }
       },
       "defaultBlowOutFlowRate": {
         "default": 10,
