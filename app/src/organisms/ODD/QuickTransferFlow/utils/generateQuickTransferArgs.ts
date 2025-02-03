@@ -221,6 +221,7 @@ function getInvariantContextAndRobotState(
     moduleEntities: {},
     pipetteEntities,
     additionalEquipmentEntities,
+    liquidEntities: {},
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
   const moduleLocations = {}

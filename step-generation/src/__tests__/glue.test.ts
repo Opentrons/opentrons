@@ -155,6 +155,7 @@ beforeEach(() => {
     moduleEntities: {},
     pipetteEntities: {},
     additionalEquipmentEntities: {},
+    liquidEntities: {},
     config: DEFAULT_CONFIG,
   }
 })
