@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 
 import {
@@ -37,6 +37,7 @@ import type {
 } from '../../step-forms'
 import type { ThunkDispatch } from '../../types'
 import type { PipetteConfig } from './usePipetteConfig'
+import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 
 interface Gripper {
   name: AdditionalEquipmentName
@@ -67,6 +68,12 @@ export function PipetteOverview({
 }: PipetteOverviewProps): JSX.Element {
   const { t } = useTranslation(['create_new_protocol', 'protocol_overview'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
+  const gripperId = Object.values(additionalEquipmentEntities).find(
+    ae => ae.name === 'gripper'
+  )?.id
 
   const swapPipetteUpdate = mapValues(pipettes, pipette => {
     if (!pipette.mount) return pipette.mount
@@ -231,7 +238,7 @@ export function PipetteOverview({
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     padding={SPACING.spacing4}
                     onClick={() => {
-                      dispatch(toggleIsGripperRequired())
+                      dispatch(toggleIsGripperRequired(gripperId))
                     }}
                   >
                     <StyledText desktopStyle="bodyDefaultRegular">

@@ -5,12 +5,13 @@ import type { ProtocolFile as ProtocolFileV3 } from '@opentrons/shared-data/prot
 import type { ProtocolFile as ProtocolFileV4 } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { ProtocolFile as ProtocolFileV5 } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { ProtocolFile as ProtocolFileV6 } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { LiquidEntities } from '@opentrons/step-generation'
 
 export interface PDMetadata {
   // pipetteId to tiprackModel
   pipetteTiprackAssignments: Record<string, string[]>
   dismissedWarnings: DismissRoot['dismissedWarnings']
-  ingredients: IngredRoot['ingredients']
+  ingredients: LiquidEntities
   ingredLocations: IngredRoot['ingredLocations']
   savedStepForms: StepformRoot['savedStepForms']
   orderedStepIds: StepformRoot['orderedStepIds']

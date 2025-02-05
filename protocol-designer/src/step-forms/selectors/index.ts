@@ -270,11 +270,7 @@ const _getInitialDeckSetup = (
   const additionalEquipmentEntitiesOnDeck = Object.values(
     additionalEquipmentEntities
   ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
-    if (
-      ae.name === 'wasteChute' ||
-      ae.name === 'stagingArea' ||
-      ae.name === 'trashBin'
-    ) {
+    if (ae.name !== 'gripper') {
       aeEntities[ae.id] = ae
     }
     return aeEntities

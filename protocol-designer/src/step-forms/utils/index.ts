@@ -17,6 +17,7 @@ import { getCutoutIdByAddressableArea } from '../../utils'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
   AddressableAreaName,
+  CreateCommand,
   CutoutId,
   DeckSlotId,
   LoadLabwareCreateCommand,
@@ -34,7 +35,6 @@ import type {
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../../types'
 import type { FormData, HydratedFormData } from '../../form-types'
-import type { PDProtocolFile } from '../../file-types'
 import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
@@ -302,7 +302,7 @@ export function getHydratedForm(
 }
 
 export const getUnoccupiedSlotForTrash = (
-  file: PDProtocolFile,
+  commands: CreateCommand[],
   hasWasteChuteCommands: boolean,
   stagingAreaSlotNames: AddressableAreaName[]
 ): string => {
@@ -314,7 +314,7 @@ export const getUnoccupiedSlotForTrash = (
       FLEX_ROBOT_TYPE
     )
   )
-  const allLoadLabwareSlotNames = Object.values(file.commands)
+  const allLoadLabwareSlotNames = Object.values(commands)
     .filter(
       (command): command is LoadLabwareCreateCommand =>
         command.commandType === 'loadLabware'
@@ -332,7 +332,7 @@ export const getUnoccupiedSlotForTrash = (
       return acc
     }, [])
 
-  const allLoadModuleSlotNames = Object.values(file.commands)
+  const allLoadModuleSlotNames = Object.values(commands)
     .filter(
       (command): command is LoadModuleCreateCommand =>
         command.commandType === 'loadModule'
@@ -346,7 +346,7 @@ export const getUnoccupiedSlotForTrash = (
       }
     })
 
-  const allMoveLabwareLocations = Object.values(file.commands)
+  const allMoveLabwareLocations = Object.values(commands)
     .filter(
       (command): command is MoveLabwareCreateCommand =>
         command.commandType === 'moveLabware'

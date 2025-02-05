@@ -36,6 +36,9 @@
           },
           "pipetteLocationUpdate": { "pipetteId": "left" },
           "moduleLocationUpdate": {},
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {},
           "stepType": "manualIntervention",
           "id": "__INITIAL_DECK_SETUP_STEP__"
         },

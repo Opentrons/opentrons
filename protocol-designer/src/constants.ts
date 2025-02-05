@@ -195,3 +195,4 @@ export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
 }
 
 export const OFFDECK: 'offDeck' = 'offDeck'
+export const GRIPPER_LOCATION: 'mounted' = 'mounted'
