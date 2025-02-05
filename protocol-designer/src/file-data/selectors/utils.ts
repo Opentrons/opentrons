@@ -3,7 +3,6 @@ import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
-
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -21,9 +20,13 @@ import type {
   ModuleEntities,
   TimelineFrame,
   LiquidEntities,
+  PipetteEntity,
+  ModuleEntity,
+  LabwareEntity,
 } from '@opentrons/step-generation'
+import type { Labware, Modules, Pipettes } from '../../file-types'
 
-interface Pipettes {
+interface MappedPipettes {
   [pipetteId: string]: { name: PipetteName }
 }
 
@@ -36,7 +39,7 @@ export const getLoadCommands = (
   liquidEntities: LiquidEntities,
   ingredLocations: LabwareLiquidState
 ): CreateCommand[] => {
-  const pipettes: Pipettes = mapValues(
+  const pipettes: MappedPipettes = mapValues(
     initialRobotState.pipettes,
     (
       pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
@@ -195,4 +198,42 @@ export const getLoadCommands = (
     ...loadLabwareCommands,
     ...loadLiquidCommands,
   ]
+}
+
+export const getPipettesLoadInfo = (
+  pipetteEntities: PipetteEntities
+): Pipettes => {
+  return Object.values(pipetteEntities).reduce<Pipettes>(
+    (acc, pipetteEntity: PipetteEntity) => ({
+      ...acc,
+      [pipetteEntity.id]: { pipetteName: pipetteEntity.name },
+    }),
+    {}
+  )
+}
+
+export const getModulesLoadInfo = (moduleEntities: ModuleEntities): Modules => {
+  return Object.values(moduleEntities).reduce<Modules>(
+    (acc, moduleEntity: ModuleEntity) => ({
+      ...acc,
+      [moduleEntity.id]: { model: moduleEntity.model },
+    }),
+    {}
+  )
+}
+
+export const getLabwareLoadInfo = (
+  labwareEntities: LabwareEntities,
+  labwareNicknamesById: Record<string, string>
+): Labware => {
+  return Object.values(labwareEntities).reduce<Labware>(
+    (acc, labwareEntity: LabwareEntity) => ({
+      ...acc,
+      [labwareEntity.id]: {
+        displayName: labwareNicknamesById[labwareEntity.id],
+        labwareDefURI: labwareEntity.labwareDefURI,
+      },
+    }),
+    {}
+  )
 }

@@ -45,12 +45,7 @@ import type {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
-import type {
-  LoadLabwareCreateCommand,
-  LoadModuleCreateCommand,
-  LoadPipetteCreateCommand,
-  PipetteName,
-} from '@opentrons/shared-data'
+import type { PipetteName } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import type { LoadFileAction } from '../../load-file'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
@@ -100,6 +95,7 @@ import type {
   SelectMultipleStepsAction,
 } from '../../ui/steps/actions/types'
 import type { Action } from '../../types'
+import type { ModuleLoadInfo, PipetteLoadInfo } from '../../file-types'
 import type {
   AdditionalEquipmentLocationUpdate,
   LocationUpdate,
@@ -995,41 +991,8 @@ export const labwareInvariantProperties: Reducer<
       action: LoadFileAction
     ): NormalizedLabwareById => {
       const { file } = action.payload
-      const loadLabwareCommands = Object.values(file.commands).filter(
-        (command): command is LoadLabwareCreateCommand =>
-          command.commandType === 'loadLabware'
-      )
-      const labware = {
-        ...loadLabwareCommands.reduce(
-          (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
-            const { labwareId, loadName, namespace, version } = command.params
-            const labwareDefinitionMatch = Object.entries(
-              file.labwareDefinitions
-            ).find(
-              ([definitionUri, labwareDef]) =>
-                labwareDef.parameters.loadName === loadName &&
-                labwareDef.namespace === namespace &&
-                labwareDef.version === version
-            )
-            if (labwareDefinitionMatch == null) {
-              console.error(
-                `expected to find labware definition match with loadname ${loadName} but could not`
-              )
-            }
-            const labwareDefURI =
-              labwareDefinitionMatch != null ? labwareDefinitionMatch[0] : ''
-            const id = labwareId ?? ''
-            return {
-              ...acc,
-              [id]: {
-                labwareDefURI,
-              },
-            }
-          },
-          {}
-        ),
-      }
-      return { ...labware, ...state }
+      const metadata = getPDMetadata(file)
+      return { ...metadata.labware, ...state }
     },
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,
@@ -1085,30 +1048,22 @@ export const moduleInvariantProperties: Reducer<
       action: LoadFileAction
     ): ModuleEntities => {
       const { file } = action.payload
-      const loadModuleCommands = Object.values(file.commands).filter(
-        (command): command is LoadModuleCreateCommand =>
-          command.commandType === 'loadModule'
-      )
-      const modules = loadModuleCommands.reduce(
-        (acc: ModuleEntities, command: LoadModuleCreateCommand) => {
-          const { moduleId, model, location } = command.params
-          if (moduleId == null) {
-            console.error(
-              `expected module ${model} in location ${location.slotName} to have an id, but id does not`
-            )
-            return acc
+      const metadata = getPDMetadata(file)
+      const modules: ModuleEntities = Object.entries(metadata.modules).reduce(
+        (
+          acc: ModuleEntities,
+          [id, moduleLoadInfo]: [string, ModuleLoadInfo]
+        ) => {
+          acc[id] = {
+            id: id,
+            type: getModuleType(moduleLoadInfo.model),
+            model: moduleLoadInfo.model,
           }
-          return {
-            ...acc,
-            [moduleId]: {
-              id: moduleId,
-              type: getModuleType(model),
-              model,
-            },
-          }
+          return acc
         },
         {}
       )
+
       return Object.keys(modules).length > 0 ? modules : state
     },
   },
@@ -1119,7 +1074,6 @@ export const pipetteInvariantProperties: Reducer<
   NormalizedPipetteById,
   any
   // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
-  // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 > = handleActions(
   {
     LOAD_FILE: (
@@ -1128,20 +1082,18 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const loadPipetteCommands = Object.values(file.commands).filter(
-        (command): command is LoadPipetteCreateCommand =>
-          command.commandType === 'loadPipette'
-      )
-      const pipettes = loadPipetteCommands.reduce(
-        (acc: NormalizedPipetteById, command) => {
-          const { pipetteName, pipetteId } = command.params
-          const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
+      const pipettes = Object.entries(metadata.pipettes).reduce(
+        (
+          acc: NormalizedPipetteById,
+          [id, pipetteLoadInfo]: [string, PipetteLoadInfo]
+        ) => {
+          const tiprackDefURI = metadata.pipetteTiprackAssignments[id]
 
           return {
             ...acc,
-            [pipetteId]: {
-              id: pipetteId,
-              name: pipetteName as PipetteName,
+            [id]: {
+              id,
+              name: pipetteLoadInfo.pipetteName as PipetteName,
               tiprackDefURI,
             },
           }
