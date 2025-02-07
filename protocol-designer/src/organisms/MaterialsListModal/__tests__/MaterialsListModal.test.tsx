@@ -60,6 +60,7 @@ const mockLabware = [
     id: 'mockLabware',
     labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
     slot: 'D3',
+    pythonName: 'mockPythonName',
   },
 ] as LabwareOnDeck[]
 
@@ -139,6 +140,7 @@ describe('MaterialsListModal', () => {
         },
         slot: '7',
         type: 'thermocyclerModuleType',
+        pythonName: 'mockPythonName',
       },
     ] as ModuleOnDeck[]
     props = {

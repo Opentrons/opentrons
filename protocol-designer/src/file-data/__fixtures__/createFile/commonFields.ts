@@ -40,16 +40,19 @@ export const labwareEntities: LabwareEntities = {
     labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
     id: 'fixedTrash',
     def: fixtureTrash,
+    pythonName: 'mockPythonName',
   },
   tiprackId: {
     labwareDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
     id: 'tiprackId',
     def: fixtureTiprack10ul,
+    pythonName: 'mockPythonName',
   },
   plateId: {
     labwareDefURI: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
     id: 'plateId',
     def: fixture96Plate,
+    pythonName: 'mockPythonName',
   },
 }
 export const pipetteEntities: PipetteEntities = {
@@ -59,6 +62,7 @@ export const pipetteEntities: PipetteEntities = {
     spec: fixtureP10SingleV2Specs,
     tiprackDefURI: ['opentrons/opentrons_96_tiprack_10ul/1'],
     tiprackLabwareDef: [fixtureTiprack10ul],
+    pythonName: 'mockPythonName',
   },
 }
 export const labwareNicknamesById: Record<string, string> = {

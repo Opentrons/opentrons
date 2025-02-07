@@ -40,7 +40,7 @@ import { swatchColors } from './swatchColors'
 import type { ColorResult, RGBColor } from 'react-color'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../types'
-import type { LiquidEntity } from '@opentrons/step-generation'
+import type { Ingredient } from '@opentrons/step-generation'
 
 const liquidEditFormSchema: any = Yup.object().shape({
   displayName: Yup.string().required('liquid name is required'),
@@ -90,7 +90,7 @@ export function DefineLiquidsModal(
     onClose()
   }
 
-  const saveForm = (formData: LiquidEntity): void => {
+  const saveForm = (formData: Ingredient): void => {
     dispatch(
       labwareIngredActions.editLiquidGroup({
         ...formData,
@@ -103,12 +103,11 @@ export function DefineLiquidsModal(
     liquidGroupId != null ? allIngredientGroupFields[liquidGroupId] : null
   const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
 
-  const initialValues: LiquidEntity = {
+  const initialValues: Ingredient = {
     displayName: selectedIngredFields?.displayName ?? '',
     displayColor: selectedIngredFields?.displayColor ?? swatchColors(liquidId),
     liquidClass: selectedIngredFields?.liquidClass ?? '',
     description: selectedIngredFields?.description ?? '',
-    pythonName: `liquid_${parseInt(liquidGroupId ?? nextGroupId) + 1}`,
     liquidGroupId: liquidGroupId ?? nextGroupId,
   }
 
@@ -119,7 +118,7 @@ export function DefineLiquidsModal(
     watch,
     setValue,
     register,
-  } = useForm<LiquidEntity>({
+  } = useForm<Ingredient>({
     defaultValues: initialValues,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(liquidEditFormSchema),
@@ -129,14 +128,13 @@ export function DefineLiquidsModal(
   const liquidClass = watch('liquidClass')
   const { errors, touchedFields } = formState
 
-  const handleLiquidEdits = (values: LiquidEntity): void => {
+  const handleLiquidEdits = (values: Ingredient): void => {
     saveForm({
       displayName: values.displayName,
       displayColor: values.displayColor,
       liquidClass:
         values.liquidClass !== '' ? values.liquidClass ?? undefined : undefined,
       description: values.description !== '' ? values.description : null,
-      pythonName: values.pythonName,
       liquidGroupId: values.liquidGroupId,
     })
   }

@@ -26,6 +26,7 @@ describe('getPipettesLoadInfo', () => {
           name: fixtureP1000SingleV2Specs.displayName as PipetteName,
           id: pipId,
           tiprackDefURI: [],
+          pythonName: 'mockPythonName',
         },
       })
     ).toEqual(results)
@@ -46,6 +47,7 @@ describe('getModuleLoadInfo', () => {
           id: moduleId,
           model: 'magneticModuleV2',
           type: 'magneticModuleType',
+          pythonName: 'mockPythonName',
         },
       })
     ).toEqual(results)
@@ -73,6 +75,7 @@ describe('getLabwareLoadInfo', () => {
             id: labwareId,
             labwareDefURI: uri,
             def: fixture96Plate as LabwareDefinition2,
+            pythonName: 'mockPythonName',
           },
         },
         labwareNicknamesById

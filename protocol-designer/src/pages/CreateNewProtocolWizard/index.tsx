@@ -90,7 +90,7 @@ const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 type PipetteFieldsData = Omit<
   PipetteOnDeck,
-  'id' | 'spec' | 'tiprackLabwareDef'
+  'id' | 'spec' | 'tiprackLabwareDef' | 'pythonName'
 >
 
 interface ModuleCreationArgs {

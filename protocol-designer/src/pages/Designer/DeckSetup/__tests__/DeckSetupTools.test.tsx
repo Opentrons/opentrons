@@ -11,7 +11,7 @@ import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { deleteContainer } from '../../../../labware-ingred/actions'
 import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { deleteModule } from '../../../../step-forms/actions'
+import { deleteModule } from '../../../../modules'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
@@ -32,7 +32,7 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../modules')
 vi.mock('../../../../step-forms/actions/additionalItems')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
@@ -126,12 +126,14 @@ describe('DeckSetupTools', () => {
           id: 'labId',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
         lab2: {
           slot: 'labId',
           id: 'labId2',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
       },
       pipettes: {},
@@ -142,6 +144,7 @@ describe('DeckSetupTools', () => {
           id: 'modId',
           slot: 'D3',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       additionalEquipmentOnDeck: {

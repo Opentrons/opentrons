@@ -33,13 +33,11 @@
           "displayName": "samples",
           "description": null,
           "displayColor": "#b925ff",
-          "pythonName": "liquid_1",
           "liquidGroupId": "0"
         },
         "1": {
           "displayName": "dna",
           "description": null,
-          "pythonName": "liquid_2",
           "displayColor": "#ffd600",
           "liquidGroupId": "1"
         }

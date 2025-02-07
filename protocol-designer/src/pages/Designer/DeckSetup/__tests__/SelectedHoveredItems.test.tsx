@@ -62,6 +62,7 @@ describe('SelectedHoveredItems', () => {
           def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',
           slot: 'D3',
+          pythonName: 'mockPythonName',
         },
       },
     })
@@ -134,12 +135,14 @@ describe('SelectedHoveredItems', () => {
           def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',
           slot: 'D3',
+          pythonName: 'mockPythonName',
         },
         labware2: {
           id: 'mockId2',
           def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',
           slot: 'mockId',
+          pythonName: 'mockPythonName',
         },
       },
     })

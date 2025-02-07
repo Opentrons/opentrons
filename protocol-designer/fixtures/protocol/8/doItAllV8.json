@@ -30,14 +30,12 @@
           "displayName": "h20",
           "description": null,
           "liquidGroupId": "0",
-          "pythonName": "liquid_1",
           "displayColor": "#b925ff"
         },
         "1": {
           "displayName": "sample",
           "description": null,
           "liquidGroupId": "1",
-          "pythonName": "liquid_2",
           "displayColor": "#ffd600"
         }
       },

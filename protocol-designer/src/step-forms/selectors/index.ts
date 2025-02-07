@@ -100,6 +100,10 @@ const rootSelector = (state: BaseState): RootState => state.stepForms
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
   state.labwareIngred
 
+const _getInitialDeckSetupStepFormRootState: (
+  arg: RootState
+) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
 export const getCurrentFormIsPresaved: Selector<
@@ -181,8 +185,15 @@ export const _getPipetteEntitiesRootState: (
 ) => PipetteEntities = createSelector(
   rs => rs.pipetteInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
-  denormalizePipetteEntities
+  _getInitialDeckSetupStepFormRootState,
+  (pipetteInvariantProperties, labwareDefs, initialDeckSetupStepForm) =>
+    denormalizePipetteEntities(
+      pipetteInvariantProperties,
+      labwareDefs,
+      initialDeckSetupStepForm.pipetteLocationUpdate as Record<string, string>
+    )
 )
+
 // Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
 export const _getAdditionalEquipmentEntitiesRootState: (
   arg: RootState
@@ -207,10 +218,6 @@ export const getAdditionalEquipment: Selector<
   BaseState,
   NormalizedAdditionalEquipmentById
 > = createSelector(rootSelector, _getAdditionalEquipmentRootState)
-
-const _getInitialDeckSetupStepFormRootState: (
-  arg: RootState
-) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
 export const getInitialDeckSetupStepForm: Selector<
   BaseState,
@@ -300,6 +307,7 @@ const _getInitialDeckSetup = (
               type: MAGNETIC_MODULE_TYPE,
               slot,
               moduleState: MAGNETIC_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case TEMPERATURE_MODULE_TYPE:
             return {
@@ -308,6 +316,7 @@ const _getInitialDeckSetup = (
               type: TEMPERATURE_MODULE_TYPE,
               slot,
               moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case THERMOCYCLER_MODULE_TYPE:
             return {
@@ -316,6 +325,7 @@ const _getInitialDeckSetup = (
               type: THERMOCYCLER_MODULE_TYPE,
               slot,
               moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case HEATERSHAKER_MODULE_TYPE:
             return {
@@ -324,6 +334,7 @@ const _getInitialDeckSetup = (
               type: HEATERSHAKER_MODULE_TYPE,
               slot,
               moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case MAGNETIC_BLOCK_TYPE:
             return {
@@ -332,6 +343,7 @@ const _getInitialDeckSetup = (
               type: MAGNETIC_BLOCK_TYPE,
               slot,
               moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case ABSORBANCE_READER_TYPE:
             return {
@@ -340,6 +352,7 @@ const _getInitialDeckSetup = (
               type: ABSORBANCE_READER_TYPE,
               slot,
               moduleState: ABSORBANCE_READER_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
         }
       }

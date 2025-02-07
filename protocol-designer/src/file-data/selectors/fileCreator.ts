@@ -31,6 +31,7 @@ import type {
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
+  Ingredients,
 } from '@opentrons/step-generation'
 import type {
   CommandAnnotationV1Mixin,
@@ -139,6 +140,29 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const savedOrderedStepIds = orderedStepIds.filter(
       stepId => savedStepForms[stepId]
     )
+
+    const ingredients: Ingredients = Object.entries(liquidEntities).reduce(
+      (acc: Ingredients, [liquidId, liquidData]) => {
+        const {
+          displayName,
+          description,
+          displayColor,
+          liquidGroupId,
+          liquidClass,
+        } = liquidData
+
+        acc[liquidId] = {
+          displayName,
+          description,
+          displayColor,
+          liquidGroupId,
+          liquidClass,
+        }
+        return acc
+      },
+      {}
+    )
+
     const designerApplication = {
       name: 'opentrons/protocol-designer',
       version: applicationVersion,
@@ -150,7 +174,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             p.tiprackDefURI
         ),
         dismissedWarnings,
-        ingredients: liquidEntities,
+        ingredients,
         ingredLocations,
         savedStepForms,
         orderedStepIds: savedOrderedStepIds,

@@ -39,6 +39,7 @@ describe('heaterShaker compound command creator', () => {
           id: HEATER_SHAKER_ID,
           type: HEATERSHAKER_MODULE_TYPE,
           model: HEATERSHAKER_MODULE_V1,
+          pythonName: 'mockPythonName',
         },
       },
     }

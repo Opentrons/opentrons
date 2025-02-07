@@ -3,7 +3,7 @@ import type {
   PipetteName,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { LiquidEntities } from '@opentrons/step-generation'
+import type { Ingredients } from '@opentrons/step-generation'
 import type { RootState as IngredRoot } from './labware-ingred/reducers'
 import type { RootState as StepformRoot } from './step-forms'
 import type { RootState as DismissRoot } from './dismiss'
@@ -25,7 +25,7 @@ export interface PDMetadata {
   // pipetteId to tiprackModel
   pipetteTiprackAssignments: Record<string, string[]>
   dismissedWarnings: DismissRoot['dismissedWarnings']
-  ingredients: LiquidEntities
+  ingredients: Ingredients
   ingredLocations: IngredRoot['ingredLocations']
   savedStepForms: StepformRoot['savedStepForms']
   orderedStepIds: StepformRoot['orderedStepIds']

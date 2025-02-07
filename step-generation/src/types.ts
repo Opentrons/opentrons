@@ -97,6 +97,7 @@ export interface LabwareEntity {
   id: string
   labwareDefURI: string
   def: LabwareDefinition2
+  pythonName: string
 }
 export interface LabwareEntities {
   [labwareId: string]: LabwareEntity
@@ -106,6 +107,7 @@ export interface ModuleEntity {
   id: string
   type: ModuleType
   model: ModuleModel
+  pythonName: string
 }
 
 export interface ModuleEntities {
@@ -131,6 +133,11 @@ export interface LiquidEntity {
 
 export interface LiquidEntities {
   [liquidId: string]: LiquidEntity
+}
+
+export type Ingredient = Omit<LiquidEntity, 'pythonName'>
+export interface Ingredients {
+  [liquidId: string]: Ingredient
 }
 
 export type AdditionalEquipmentName =
@@ -159,6 +166,7 @@ export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteByI
 export type PipetteEntity = NormalizedPipette & {
   tiprackLabwareDef: LabwareDefinition2[]
   spec: PipetteV2Specs
+  pythonName: string
 }
 
 export interface PipetteEntities {

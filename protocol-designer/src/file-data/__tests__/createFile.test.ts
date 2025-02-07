@@ -106,11 +106,13 @@ describe('getLabwareDefinitionsInUse util', () => {
         id: 'someLabwareId',
         def: assignedTiprackOnDeckDef as LabwareDefinition2,
         labwareDefURI: 'assignedTiprackOnDeckURI',
+        pythonName: 'mockPythonName',
       },
       otherLabwareId: {
         id: 'otherLabwareId',
         def: nonTiprackLabwareOnDeckDef as LabwareDefinition2,
         labwareDefURI: 'nonTiprackLabwareOnDeckURI',
+        pythonName: 'mockPythonName',
       },
     }
     const allLabwareDefsByURI: LabwareDefByDefURI = {

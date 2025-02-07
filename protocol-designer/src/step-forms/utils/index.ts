@@ -132,14 +132,14 @@ export function getDeckItemIdInSlot(
 }
 export function denormalizePipetteEntities(
   pipetteInvariantProperties: NormalizedPipetteById,
-  labwareDefs: LabwareDefByDefURI
+  labwareDefs: LabwareDefByDefURI,
+  pipetteLocationUpdate: Record<string, string>
 ): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
       const spec = getPipetteSpecsV2(pipette.name)
-
       if (!spec) {
         throw new Error(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
@@ -149,6 +149,7 @@ export function denormalizePipetteEntities(
         ...pipette,
         spec,
         tiprackLabwareDef: pipette.tiprackDefURI.map(def => labwareDefs[def]),
+        pythonName: `pipette_${pipetteLocationUpdate[pipetteId]}`,
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },

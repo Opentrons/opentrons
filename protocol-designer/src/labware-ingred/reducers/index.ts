@@ -225,7 +225,20 @@ export const ingredients: Reducer<IngredientsState, any> = handleActions(
     LOAD_FILE: (
       state: IngredientsState,
       action: LoadFileAction
-    ): IngredientsState => getPDMetadata(action.payload.file).ingredients,
+    ): IngredientsState => {
+      const ingredients = getPDMetadata(action.payload.file).ingredients
+
+      return Object.entries(ingredients).reduce<Record<string, LiquidEntity>>(
+        (acc, [key, ingredient]) => {
+          acc[key] = {
+            ...ingredient,
+            pythonName: `liquid_${parseInt(key) + 1}`,
+          }
+          return acc
+        },
+        {}
+      )
+    },
   },
   {}
 )

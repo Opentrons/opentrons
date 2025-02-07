@@ -5,10 +5,7 @@ import max from 'lodash/max'
 import reduce from 'lodash/reduce'
 import type { Selector } from 'reselect'
 import type { DropdownOption } from '@opentrons/components'
-import type {
-  LabwareLiquidState,
-  LiquidEntity,
-} from '@opentrons/step-generation'
+import type { Ingredient, LabwareLiquidState } from '@opentrons/step-generation'
 import type { CutoutId } from '@opentrons/shared-data'
 import type {
   RootState,
@@ -57,7 +54,7 @@ const getLiquidNamesById: Selector<
   ingredGroups =>
     mapValues(
       ingredGroups,
-      (ingred: LiquidEntity) => ingred.displayName
+      (ingred: Ingredient) => ingred.displayName
     ) as Record<string, string>
 )
 const getLiquidSelectionOptions: Selector<

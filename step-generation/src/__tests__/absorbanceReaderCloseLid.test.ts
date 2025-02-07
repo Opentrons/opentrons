@@ -28,6 +28,7 @@ describe('absorbanceReaderCloseLid', () => {
       id: moduleId,
       type: ABSORBANCE_READER_TYPE,
       model: ABSORBANCE_READER_V1,
+      pythonName: 'mockPythonName',
     }
     invariantContext.additionalEquipmentEntities = {
       gripperId: {

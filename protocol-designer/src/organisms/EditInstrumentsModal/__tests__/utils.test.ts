@@ -5,11 +5,13 @@ const mockLeftPipette = {
   mount: 'left',
   id: 'mockLeft',
   name: 'p50_single_flex',
+  pythonName: 'mockPythonName',
 } as any
 const mockRightPiette = {
   mount: 'right',
   id: 'mockRight',
   name: 'p50_multi_flex',
+  pythonName: 'mockPythonName',
 } as any
 
 describe('getShouldShowPipetteType', () => {

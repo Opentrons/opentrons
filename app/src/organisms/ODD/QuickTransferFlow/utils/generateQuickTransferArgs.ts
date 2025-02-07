@@ -68,6 +68,7 @@ function getInvariantContextAndRobotState(
       tiprackDefURI: [tipRackDefURI],
       tiprackLabwareDef: [quickTransferState.tipRack],
       spec: quickTransferState.pipette,
+      pythonName: 'pipette_left',
     },
   }
   const pipetteLocations: RobotState['pipettes'] = {
@@ -89,6 +90,7 @@ function getInvariantContextAndRobotState(
         id: adapterId,
         labwareDefURI: adapter96ChannelDefUri,
         def: getAllDefinitions()[adapter96ChannelDefUri],
+        pythonName: 'adapter_1',
       },
     }
     labwareLocations = {
@@ -97,6 +99,14 @@ function getInvariantContextAndRobotState(
       },
     }
   }
+  const sourceDisplayCategory =
+    quickTransferState.source.metadata.displayCategory
+  const destDisplayCategory =
+    quickTransferState.destination !== 'source'
+      ? quickTransferState.destination.metadata.displayCategory
+      : sourceDisplayCategory
+
+  const isSameDisplayCategory = sourceDisplayCategory === destDisplayCategory
 
   labwareEntities = {
     ...labwareEntities,
@@ -104,11 +114,13 @@ function getInvariantContextAndRobotState(
       id: tipRackId,
       labwareDefURI: tipRackDefURI,
       def: quickTransferState.tipRack,
+      pythonName: 'tip_rack_1',
     },
     [sourceLabwareId]: {
       id: sourceLabwareId,
       labwareDefURI: sourceLabwareURI,
       def: quickTransferState.source,
+      pythonName: `${sourceDisplayCategory}_1`,
     },
   }
   labwareLocations = {
@@ -130,6 +142,9 @@ function getInvariantContextAndRobotState(
         id: destLabwareId,
         labwareDefURI: destLabwareURI,
         def: quickTransferState.destination,
+        pythonName: isSameDisplayCategory
+          ? `${destDisplayCategory}_2`
+          : `${destDisplayCategory}_1`,
       },
     }
     labwareLocations = {

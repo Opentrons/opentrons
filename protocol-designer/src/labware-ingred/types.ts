@@ -1,7 +1,7 @@
 import type { CutoutId, ModuleModel } from '@opentrons/shared-data'
 import type {
   DeckSlot,
-  LiquidEntity,
+  Ingredient,
   LocationLiquidState,
 } from '@opentrons/step-generation'
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
@@ -25,10 +25,10 @@ export interface WellContents {
 }
 export type ContentsByWell = Record<string, WellContents> | null
 export type WellContentsByLabware = Record<string, ContentsByWell>
-export type IngredInputs = LiquidEntity & {
+export type IngredInputs = Ingredient & {
   volume?: number | null
 }
-export type LiquidGroupsById = Record<string, LiquidEntity>
+export type LiquidGroupsById = Record<string, Ingredient>
 export type AllIngredGroupFields = Record<string, IngredInputs>
 
 export type Fixture =
