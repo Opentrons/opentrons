@@ -127,6 +127,7 @@ def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
     num_dispenses = ceil(volume / 250)
     volume_to_dispense = volume / num_dispenses
     target_volume = min(max(volume_to_dispense, 200), 250)
+    print("target_volume, volume_to_dispense, num_dispenses:",target_volume, volume_to_dispense, num_dispenses)
     return target_volume, volume_to_dispense, num_dispenses
 
 
@@ -233,10 +234,20 @@ def _display_dye_information(
 ) -> None:
     ui.print_header("PREPARE")
     dye_types_req: Dict[str, float] = {dye: 0 for dye in _DYE_MAP.keys()}
+    print("dye_types_req:",dye_types_req)
+    print("resources.test_volumes:",resources.test_volumes)
+    
+    print("")
+    print("")
     for vol in resources.test_volumes:
         _, volume_to_dispense, num_dispenses = _dispense_volumes(vol)
-        dye_per_vol = vol * 96 * cfg.trials
+        if cfg.pipette_channels == 8:
+            dye_per_vol = vol * 8 * cfg.trials
+        else:
+            dye_per_vol = vol * 96 * cfg.trials
+        print("dye_per_vol:",dye_per_vol)
         dye_types_req[_get_dye_type(volume_to_dispense)] += dye_per_vol
+        print("dye_types_req:",dye_types_req)
 
     include_hv = not [
         v
