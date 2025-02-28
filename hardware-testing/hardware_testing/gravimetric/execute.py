@@ -596,53 +596,80 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
     hw_api = resources.ctx._core.get_hardware()
+
+    average_aspirate_evaporation_ul = None
+    average_dispense_evaporation_ul = None
+
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
     try:
-        ui.print_title("FIND LIQUID HEIGHT")
-        first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
-        setup_channel_offset = _get_channel_offset(cfg, channel=0)
-        first_tip_location = first_tip.top().move(setup_channel_offset)
-        _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
-        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-        resources.ctx._core.get_hardware().retract(mnt)
-        ui.print_info("moving to scale")
-        well = labware_on_scale["A1"]
-        _liquid_height = _get_liquid_height(resources, cfg, well)
-        height_below_top = well.depth - _liquid_height
-        ui.print_info(f"liquid is {height_below_top} mm below top of vial")
-        liquid_tracker.set_start_volume_from_liquid_height(
-            well, _liquid_height, name="Water"
-        )
-        vial_volume = liquid_tracker.get_volume(well)
-        ui.print_info(
-            f"software thinks there is {vial_volume} uL of liquid in the vial"
-        )
-        if not cfg.blank:
-            average_aspirate_evaporation_ul = 0.0
-            average_dispense_evaporation_ul = 0.0
-        else:
-            hw_api.set_status_bar_state(StatusBarState.SOFTWARE_ERROR)
-            (
-                average_aspirate_evaporation_ul,
-                average_dispense_evaporation_ul,
-            ) = _calculate_evaporation(
-                cfg,
-                resources,
-                recorder,
-                liquid_tracker,
-                resources.test_report,
-                labware_on_scale,
+        _tip_racks = resources.tipracks
+        well = None
+        def get_tip_pos_by_number(nubmer:int):
+            col_list = ["A", "B", "C", "D", "E", "F", "G", "H"]
+            col = col_list[nubmer%8 - 1]
+            row = int(nubmer/8)+1 if nubmer%8 !=0 else int(nubmer/8)
+            return f"{col}{row}"
+        
+        def get_next_tip(tip_numbers):
+            tip_number = tip_numbers%96 if tip_numbers%96 != 0 else 96
+            tip_pos = get_tip_pos_by_number(tip_number)
+            tip_rack_counter = int(tip_numbers/96) if (tip_numbers%96) != 0 else int(tip_numbers/96) -1
+            next_tip = _tip_racks[tip_rack_counter][tip_pos]
+            return next_tip
+
+        def find_liquid_height(first_tip:Well):
+            nonlocal average_aspirate_evaporation_ul
+            nonlocal average_dispense_evaporation_ul
+            nonlocal well
+            ui.print_title("FIND LIQUID HEIGHT")
+            # first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
+            setup_channel_offset = _get_channel_offset(cfg, channel=0)
+            first_tip_location = first_tip.top().move(setup_channel_offset)
+            _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
+            mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+            resources.ctx._core.get_hardware().retract(mnt)
+            ui.print_info("moving to scale")
+            well = labware_on_scale["A1"]
+            _liquid_height = _get_liquid_height(resources, cfg, well)
+            height_below_top = well.depth - _liquid_height
+            ui.print_info(f"liquid is {height_below_top} mm below top of vial")
+            liquid_tracker.set_start_volume_from_liquid_height(
+                well, _liquid_height, name="Water"
             )
-        hw_api.set_status_bar_state(StatusBarState.IDLE)
-        ui.print_info("dropping tip")
-        if not cfg.same_tip:
-            _drop_tip(
-                resources.pipette,
-                return_tip=False,
-                minimum_z_height=_minimum_z_height(cfg),
-            )  # always trash calibration tips
+            vial_volume = liquid_tracker.get_volume(well)
+            ui.print_info(
+                f"software thinks there is {vial_volume} uL of liquid in the vial"
+            )
+
+            if not cfg.blank and average_aspirate_evaporation_ul is None and average_dispense_evaporation_ul is None:
+                average_aspirate_evaporation_ul = 0.0
+                average_dispense_evaporation_ul = 0.0
+            else:
+                if average_dispense_evaporation_ul is not None and average_aspirate_evaporation_ul is not None:
+                    pass
+                else:
+                    hw_api.set_status_bar_state(StatusBarState.SOFTWARE_ERROR)
+                    (
+                        average_aspirate_evaporation_ul,
+                        average_dispense_evaporation_ul,
+                    ) = _calculate_evaporation(
+                        cfg,
+                        resources,
+                        recorder,
+                        liquid_tracker,
+                        resources.test_report,
+                        labware_on_scale,
+                    )
+            hw_api.set_status_bar_state(StatusBarState.IDLE)
+            ui.print_info("dropping tip")
+            if not cfg.same_tip:
+                _drop_tip(
+                    resources.pipette,
+                    return_tip=False,
+                    minimum_z_height=_minimum_z_height(cfg),
+                )  # always trash calibration tips
         calibration_tip_in_use = False
         trial_count = 0
         trials = build_gravimetric_trials(
@@ -659,6 +686,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             resources.env_sensor,
         )
         for volume in trials.keys():
+            if volume > 1.0:
+                continue
             actual_asp_list_all = []
             actual_disp_list_all = []
             ui.print_title(f"{volume} uL")
@@ -675,17 +704,27 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 actual_disp_list_channel = []
                 aspirate_data_list = []
                 dispense_data_list = []
+                tip_numbers = 0
                 for run_trial in trials[volume][channel]:
                     trial_count += 1
+                    tip_numbers += 1
+                    if trial_count%15 == 1:
+                        next_tip = get_next_tip(tip_numbers)
+                        find_liquid_height(next_tip)
+                        run_trial.liquid_tracker = liquid_tracker
+                        tip_numbers += 1
                     ui.print_header(
                         f"{volume} uL channel {channel + 1} ({run_trial.trial + 1}/{cfg.trials})"
                     )
                     ui.print_info(f"trial total {trial_count}/{trial_total}")
                     # NOTE: always pick-up new tip for each trial
                     #       b/c it seems tips heatup
-                    next_tip: Well = _next_tip_for_channel(
-                        cfg, resources, channel, total_tips
-                    )
+
+
+                    # next_tip: Well = _next_tip_for_channel(
+                    #     cfg, resources, channel, total_tips
+                    # )
+                    next_tip = get_next_tip(tip_numbers)
                     next_tip_location = next_tip.top().move(channel_offset)
                     if not cfg.same_tip:
                         _pick_up_tip(

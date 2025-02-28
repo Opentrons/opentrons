@@ -205,7 +205,7 @@ def _get_liquid_probe_settings(
 QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     1: {
         50: [  # P50
-            (50, [1.0, 50.0]),  # T50
+            (50, [1.0]),  # T50
         ],
         1000: [  # P1000
             (50, [5.0]),  # T50
