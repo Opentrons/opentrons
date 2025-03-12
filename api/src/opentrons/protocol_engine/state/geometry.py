@@ -551,6 +551,7 @@ class GeometryView:
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
         )
+
     def _get_relative_liquid_handling_well_location(
         self,
         labware_id: str,
