@@ -8,9 +8,11 @@ from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
 if ARCHITECTURE is SystemArchitecture.YOCTO:
     from opentrons_hardware.sensors import SENSOR_LOG_NAME
+    from opentrons_hardware.hardware_control import MOVE_PROFILE_LOG_NAME
 else:
     # we don't use the sensor log on ot2 or host
     SENSOR_LOG_NAME = "unused"
+    MOVE_PROFILE_LOG_NAME = "unused"
 
 
 # We want this big enough to smooth over any temporary stalls in journald's ability
@@ -39,6 +41,7 @@ def _config_for_host(level_value: int) -> None:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
     sensor_log_filename = CONFIG["sensor_log_file"]
+    move_profile_log_filename = CONFIG["move_profile_log_file"]
     config = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -79,6 +82,14 @@ def _config_for_host(level_value: int) -> None:
                 "level": logging.DEBUG,
                 "backupCount": 5,
             },
+            "move_profile": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "basic",
+                "filename": move_profile_log_filename,
+                "maxBytes": 1000000,
+                "level": logging.DEBUG,
+                "backupCount": 5,
+            },
         },
         "loggers": {
             "opentrons": {
@@ -109,6 +120,11 @@ def _config_for_host(level_value: int) -> None:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
+            MOVE_PROFILE_LOG_NAME: {
+                "handlers": ["move_profile"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
             "__main__": {"handlers": ["api"], "level": level_value},
         },
     }
@@ -123,6 +139,7 @@ def _config_for_robot(level_value: int) -> None:
     from systemd.journal import JournalHandler  # type: ignore
 
     sensor_log_filename = CONFIG["sensor_log_file"]
+    move_profile_log_filename = CONFIG["move_profile_log_file"]
 
     sensor_log_queue = Queue[logging.LogRecord](maxsize=_LOG_QUEUE_SIZE)
 
@@ -167,6 +184,14 @@ def _config_for_robot(level_value: int) -> None:
                 "formatter": "message_only",
                 "queue": sensor_log_queue,
             },
+            "move_profile": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "message_only",
+                "filename": move_profile_log_filename,
+                "maxBytes": 1000000,
+                "level": logging.DEBUG,
+                "backupCount": 3,
+            },
         },
         "loggers": {
             "opentrons.drivers.asyncio.communication.serial_connection": {
@@ -194,6 +219,11 @@ def _config_for_robot(level_value: int) -> None:
             },
             SENSOR_LOG_NAME: {
                 "handlers": ["sensor"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
+            MOVE_PROFILE_LOG_NAME: {
+                "handlers": ["move_profile"],
                 "level": logging.DEBUG,
                 "propagate": False,
             },
