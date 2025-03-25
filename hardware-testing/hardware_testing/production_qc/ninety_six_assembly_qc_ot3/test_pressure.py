@@ -26,16 +26,16 @@ PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
 
 THRESHOLDS = {
     "open-pa": (
-        -10,
-        10,
+        0,
+        20,
     ),
     "sealed-pa": (
-        -30,
-        30,
+        5,
+        50,
     ),
     "aspirate-pa": (
-        -600,
-        -400,
+        -900,
+        -500,
     ),
     "dispense-pa": (
         2500,
