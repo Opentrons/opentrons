@@ -226,15 +226,10 @@ class ConicalFrustum(BaseModel):
         total_height = self.topHeight - self.bottomHeight
         
         y = prev_y = total_height / 2
-        volume_at_y = self._volume_from_height_circular(
+        volume_at_y = volume_at_prev_y = self._volume_from_height_circular(
             top_radius=self.topDiameter / 2,
             bottom_radius=self.bottomDiameter / 2,
             target_height=y
-        )
-        volume_at_prev_y = self.volume_from_height_circular(
-            top_radius=self.topDiameter/2,
-            bottom_radius=self.bottomDiameter/2,
-            target_height=prev_y
         )
         while abs(volume_at_y - target_volume) > 0.005:
             target_above_last_two_guesses = volume_at_y > target_volume and volume_at_y > volume_at_prev_y
@@ -254,7 +249,7 @@ class ConicalFrustum(BaseModel):
                 y = round(
                     (y / 2), 3
                 )     
-
+            volume_at_prev_y = volume_at_y
             volume_at_y = self.volume_from_height_circular(
             top_radius=self.topDiameter / 2,
             bottom_radius=self.bottomDiameter / 2,
