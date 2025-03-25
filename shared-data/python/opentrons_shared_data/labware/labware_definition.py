@@ -222,6 +222,63 @@ class ConicalFrustum(BaseModel):
         return table
 
     @cached_property
+    def height_from_volume_binary_search(self, target_volume: float) -> float:
+        total_height = self.topHeight - self.bottomHeight
+        
+        y = prev_y = total_height / 2
+        volume_at_y = self._volume_from_height_circular(
+            top_radius=self.topDiameter / 2,
+            bottom_radius=self.bottomDiameter / 2,
+            target_height=y
+        )
+        volume_at_prev_y = self.volume_from_height_circular(
+            top_radius=self.topDiameter/2,
+            bottom_radius=self.bottomDiameter/2,
+            target_height=prev_y
+        )
+        while abs(volume_at_y - target_volume) > 0.005:
+            target_above_last_two_guesses = volume_at_y > target_volume and volume_at_y > volume_at_prev_y
+            if target_above_last_two_guesses:
+                y = round(
+                    (total_height + y) / 2, 3
+                )
+            
+            target_between_last_two_guesses = (volume_at_y < target_volume and volume_at_y > volume_at_prev_y) or \
+            (volume_at_y > target_volume and volume_at_y < volume_at_prev_y)
+            elif target_between_last_two_guesses:
+                y = round(
+                   (y + prev_y) / 2, 3
+                )
+            target_below_last_two_guesses = volume_at_y < target_volume and volume_at_y < volume_at_prev_y
+            elif target_below_last_two_guesses:
+                y = round(
+                    (y / 2), 3
+                )     
+
+            volume_at_y = self.volume_from_height_circular(
+            top_radius=self.topDiameter / 2,
+            bottom_radius=self.bottomDiameter / 2,
+            target_height=y
+            ) 
+            prev_y = y
+        return volume_at_y
+
+
+    @cached_property
+    def volume_from_height_circular(
+        self, 
+        top_radius: float,
+        bottom_radius: float,
+        target_height: float
+    ) -> float:
+        # return volume at the target height.
+        r_y = (y / total_height) * (a - b) + b
+        return (pi * y / 3) * (b**2 + b * r_y + r_y**2)
+
+
+
+
+    @cached_property
     def volume_to_height_table(self) -> dict[float, float]:
         return dict((v, k) for k, v in self.height_to_volume_table.items())
 
