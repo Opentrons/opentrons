@@ -314,6 +314,22 @@ def aspirate_with_liquid_class(
     return contents
 
 
+def _get_well_height_at_volume(
+    labware: protocol_api.Labware,
+    volume: float,
+) -> float:
+    well_core = labware._core.get_well_core("A1")
+    geometry = well_core._engine_client.state.geometry  # type: ignore [attr-defined]
+    labware_id = well_core.labware_id  # type: ignore [attr-defined]
+    well_name = well_core._name  # type: ignore [attr-defined]
+
+    return geometry.get_well_height_at_volume(
+        labware_id=labware_id,
+        well_name=well_name,
+        volume=volume,
+    )
+
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Run."""
     ctx.load_trash_bin("A3")
