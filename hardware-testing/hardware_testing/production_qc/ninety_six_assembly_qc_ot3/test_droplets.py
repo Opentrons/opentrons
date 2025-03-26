@@ -201,7 +201,7 @@ async def run(
         reservoir_a1_actual = await api.gantry_position(OT3Mount.LEFT)
 
     # PICK-UP 96 TIPS
-    droplets_result = False
+    droplets_result = True
     for trial in range(2):
         ui.print_header("JOG to 96-Tip RACK")
         if trial == 0:
