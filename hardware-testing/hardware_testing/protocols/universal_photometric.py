@@ -28,6 +28,8 @@ TIPRACK_LOCATIONS = ["D1", "C1", "C2", "C3", "B1"]
 
 DYE_RESERVOIR_DEAD_VOLUME = 10000  # 10k uL
 
+TIPRACK_LOCATIONS = ["D1", "C1", "C2", "C3", "B1"]
+
 
 def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     """Add test parameters."""
@@ -89,6 +91,26 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         default=1.5,
         minimum=0.0,
         maximum=20.0,
+    )
+
+    parameters.add_bool(
+        variable_name="use_pip_motion_defaults",
+        display_name="Use pipette motion defaults",
+        description="Use default values for pipette motion.",
+        default=True,
+    )
+
+    parameters.add_bool(
+        variable_name="lld",
+        display_name="enable lld",
+        description=("Use LLD to detect liquid height."),
+        default=True,
+    )
+    parameters.add_int(
+        variable_name="number_of_tipracks",
+        display_name="Number of tipracks",
+        description="Choose 1 or 5 tipracks to load at the start.",
+        default=1,
     )
 
     parameters.add_bool(
@@ -256,6 +278,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "None", "value": "none"},
         ],
         default="corning_96_wellplate_360ul_flat",
+        # note: add new plate here
     )
     parameters.add_bool(
         variable_name="lld",
