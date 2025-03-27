@@ -780,7 +780,7 @@ class Labware:
                 - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
             * - 2.23 and newer
               -
-                - Offsets can apply to any labware of the same type, in any Flex on-deck location.
+                On Flex, offsets can apply to all labware of the same type, regardless of their on-deck location.
 
         .. note::
 
