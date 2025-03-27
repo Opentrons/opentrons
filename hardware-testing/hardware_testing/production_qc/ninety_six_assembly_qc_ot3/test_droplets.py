@@ -234,7 +234,7 @@ async def run(
         result, duration = await aspirate_and_wait(
             api,
             reservoir_a1_actual,
-            pipette=test_volume,
+            test_volume,
             seconds=NUM_SECONDS_TO_WAIT,
         )
         droplets_result = droplets_result & result
