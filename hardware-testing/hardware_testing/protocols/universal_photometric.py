@@ -26,6 +26,8 @@ DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
 
 TIPRACK_LOCATIONS = ["D1", "C1", "C2", "C3", "B1"]
 
+DYE_RESERVOIR_DEAD_VOLUME = 10000  # 10k uL
+
 
 def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     """Add test parameters."""
@@ -384,6 +386,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         description="Food Coloring",
         display_color="#FE0000",
     )
+    diluent = ctx.define_liquid(
+        name="Diluent",
+        description="Food Coloring",
+        display_color="#FE0000",
+    )
+    diluent_volume = plate.max_volume - ctx.params.target_volume  # type: ignore [attr-defined]
+    dye_source["A1"].load_liquid(diluent, diluent_volume)  # type: ignore [attr-defined]
 
     def _validate_dye_liquid_height(trial: int) -> None:
 
