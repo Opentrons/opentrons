@@ -111,6 +111,10 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         display_name="Number of tipracks",
         description="Choose 1 or 5 tipracks to load at the start.",
         default=1,
+        choices=[
+            {"display_name": "1", "value": 1},
+            {"display_name": "5", "value": 5},
+        ],
     )
 
     parameters.add_bool(
@@ -278,7 +282,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "None", "value": "none"},
         ],
         default="corning_96_wellplate_360ul_flat",
-        # note: add new plate here
     )
     parameters.add_bool(
         variable_name="lld",
