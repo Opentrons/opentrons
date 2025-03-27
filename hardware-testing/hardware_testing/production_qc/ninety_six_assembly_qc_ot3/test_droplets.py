@@ -238,23 +238,6 @@ async def run(
         droplets_result = droplets_result & result
         await _drop_tip(api, trash_nominal, pipette)
         await api.home_z(OT3Mount.LEFT)
-    report(
-        section, "droplets-96-tips", [duration, CSVResult.from_bool(droplets_result)]
-    )
-
-            # TEST DROPLETS for 96 TIPS
-            ui.print_header("96 Tips: ASPIRATE and WAIT")
-            await _find_reservoir_pos()
-        assert reservoir_a1_actual
-        result, duration = await aspirate_and_wait(
-            api,
-            reservoir_a1_actual,
-            pipette=test_volume,
-            seconds=NUM_SECONDS_TO_WAIT,
-        )
-        droplets_result = droplets_result & result
-        await _drop_tip(api, trash_nominal, pipette)
-        await api.home_z(OT3Mount.LEFT)
     report(section, "droplets-96-tips", [duration, CSVResult.from_bool(droplets_result)])
 
     # if not api.is_simulator:
