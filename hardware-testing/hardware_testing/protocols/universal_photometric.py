@@ -330,6 +330,14 @@ def _get_well_height_at_volume(
     )
 
 
+def _get_current_liquid_height(labware: protocol_api.Labware) -> float:
+    source_core = labware._core.get_well_core("A1")
+    source_core_geometry = source_core._engine_client.state.geometry  # type: ignore [attr-defined]
+    source_labware_id = source_core._labware_id  # type: ignore [attr-defined]
+    source_well_name = source_core._name  # type: ignore [attr-defined]
+    return source_core_geometry.get_meniscus_height(source_labware_id, source_well_name)
+
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Run."""
     ctx.load_trash_bin("A3")
