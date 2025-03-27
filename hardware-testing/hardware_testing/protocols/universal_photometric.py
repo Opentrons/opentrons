@@ -391,7 +391,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         description="Food Coloring",
         display_color="#FE0000",
     )
-    diluent_volume = plate.max_volume - ctx.params.target_volume  # type: ignore [attr-defined]
+    diluent_volume = 200 - ctx.params.target_volume  # type: ignore [attr-defined]
     dye_source["A1"].load_liquid(diluent, diluent_volume)  # type: ignore [attr-defined]
 
     def _validate_dye_liquid_height(trial: int) -> None:
