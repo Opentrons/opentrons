@@ -230,12 +230,16 @@ export const MixSteps = {
         .click()
       cy.contains(MixContent.DelayDuration).should('exist').should('be.visible')
       cy.get(MixLocators.Checkbox)
-        .find('[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]' )
+        .find(
+          '[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]'
+        )
         .should('exist')
         .should('be.visible')
         .should('have.prop', 'value')
       cy.get(MixLocators.Checkbox)
-        .find('[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]')
+        .find(
+          '[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]'
+        )
         .type('{selectAll}{backspace}5')
     },
   }),
@@ -271,7 +275,9 @@ export const MixSteps = {
         .should('exist')
         .should('be.visible')
         .click()
-      cy.contains(MixContent.ChooseOption).should('exist').should('be.visible')
+      cy.contains(MixContent.ChooseOption)
+        .should('exist')
+        .should('be.visible')
         .closest('div[tabindex="0"]')
         .should('exist')
         .should('be.visible')
