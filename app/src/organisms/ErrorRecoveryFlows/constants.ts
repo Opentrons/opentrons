@@ -23,6 +23,7 @@ export const DEFINED_ERROR_TYPES = {
   STALL_OR_COLLISION: 'stallOrCollision',
   STACKER_STALL: 'flexStackerStallOrCollision',
   HOPPER_LABWARE_MISSING: 'flexStackerHopperLabwareFailed',
+  SHUTTLE_MISSING: 'FlexStackerShuttleError',
 }
 
 // Client-defined error-handling flows.
