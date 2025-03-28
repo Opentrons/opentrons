@@ -75,7 +75,7 @@ export enum SetupLocators {
   LiquidNameInput = 'input[name="displayName"]',
   ModalShellArea = 'div[aria-label="ModalShell_ModalArea"]',
   SaveButton = 'button[type="submit"]',
-  LiquidsDropdown = 'div[tabindex="0"].sc-ksBlkl', // NOTE: locator
+  LiquidsDropdown = 'div[tabindex="0"].sc-ksBlkl', // NOTE: locator 
   Div = 'div',
   Button = 'button',
   TempdeckTempInput = 'input[name="targetTemperature"]',
@@ -327,7 +327,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Choose deck slot A2.
+   * Choose deck slot A2. Please
    */
   ChoseDeckSlotA2: (): StepThunk => ({
     call: () => {
