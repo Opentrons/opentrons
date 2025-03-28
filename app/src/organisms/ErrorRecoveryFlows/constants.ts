@@ -38,6 +38,7 @@ export const ERROR_KINDS = {
   STALL_OR_COLLISION: 'STALL_OR_COLLISION',
   STALL_WHILE_STACKING: 'STALL_WHILE_STACKING',
   LABWARE_MISSING_IN_HOPPER: 'LABWARE_MISSING_IN_HOPPER',
+  SHUTTE_MISSING: 'SHUTTE_MISSING',
 } as const
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
@@ -201,6 +202,16 @@ export const RECOVERY_MAP = {
       SKIP: 'skip',
     },
   },
+  LOAD_LABWARE_SHUTTLE_AND_RETRY: {
+    ROUTE: 'load-shuttle-and-retry',
+    STEPS: {
+      PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
+      CLOSE_DOOR_AND_HOME: 'close-door-and-home',
+      MANUAL_REPLACE: 'manual-replace',
+      CONFIRM_RETRY: 'confirm-retry',
+      RETRY: 'retry',
+    },
+  },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_STEP: {
     ROUTE: 'retry-step',
@@ -265,6 +276,7 @@ const {
   SKIP_STEP_WITH_NEW_TIPS,
   SKIP_STEP_WITH_SAME_TIPS,
   HOME_AND_RETRY,
+  LOAD_LABWARE_SHUTTLE_AND_RETRY,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -338,6 +350,13 @@ export const STEP_ORDER: StepOrder = {
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP,
+  ],
+  [LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE]: [
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CONFIRM_RETRY,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.RETRY,
   ],
   [ERROR_WHILE_RECOVERING.ROUTE]: [
     ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,
@@ -492,6 +511,21 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: false,
     },
     [MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: false },
+  },
+  [LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE]: {
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING]: {
+      allowDoorOpen: true,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME]: {
+      allowDoorOpen: true,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE]: {
+      allowDoorOpen: false,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CONFIRM_RETRY]: {
+      allowDoorOpen: false,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
   },
   [REFILL_AND_RESUME.ROUTE]: {},
   [RETRY_STEP.ROUTE]: {

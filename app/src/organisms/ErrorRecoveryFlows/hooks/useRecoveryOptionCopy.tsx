@@ -55,6 +55,8 @@ export function useRecoveryOptionCopy(): (
       case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
       case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return t('manually_load_labware_into_labware_shuttle_and_skip_step')
+      case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+        return t('load_labware_shuttle_and_retry_step')
       default:
         return 'Unknown action'
     }
