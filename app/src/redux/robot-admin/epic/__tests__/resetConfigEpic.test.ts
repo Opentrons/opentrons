@@ -9,7 +9,7 @@ import type { Action } from '../../../types'
 
 const makeResetConfigAction = (robotName: string) =>
   Actions.resetConfig(robotName, {
-    resetLabwareOffsets: false,
+    resetLabwareOffsets: true,
     settingsResets: {
       foo: true,
       bar: false,
@@ -31,6 +31,11 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
       expectObservable(output$)
       flush()
 
+      expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
+        method: 'DELETE',
+        path: '/labwareOffsets',
+        body: {},
+      })
       expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
         method: 'POST',
         path: '/settings/reset',
