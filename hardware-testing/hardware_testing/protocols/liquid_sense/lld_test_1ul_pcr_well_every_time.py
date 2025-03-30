@@ -15,36 +15,39 @@ from opentrons_shared_data.load import get_shared_data_root
 
 
 class Strategy(Enum, str):
-    M = "M"
-    M_LLD = "M_LLD"
-    M_LLD_TIP = "M_LLD_TIP"
-    B = "B"
-    T = "T"
+    M = "MENISCUS"
+    LLD_M = "LLD-MENISCUS"
+    LLD_TIP_M = "LLD-TIP-MENISCUS"
+    B = "BOTTOM"
+    T = "TOP"
+
+    def _includes(self, sub_string: str) -> bool:
+        return bool(sub_string in self.value)
 
     def includes_lld(self) -> bool:
-        return bool("lld" in self.value.lower())
+        return self._includes("LLD")
 
     def includes_meniscus(self) -> bool:
-        return bool("m" in self.value.lower())
+        return self._includes("MENISCUS")
 
     def includes_new_tip(self) -> bool:
-        return bool("tip" in self.value.lower())
+        return self._includes("TIP")
 
     def includes_bottom(self) -> bool:
-        return bool("b" in self.value.lower())
+        return self._includes("BOTTOM")
 
     def includes_top(self) -> bool:
-        return bool("t" in self.value.lower())
+        return self._includes("TOP")
 
 
 TEST_MATRIX: Dict[str, Dict[str, Strategy]] = {
-    "A": {"aspirate": Strategy.M_LLD_TIP, "dispense": Strategy.M},
+    "A": {"aspirate": Strategy.LLD_TIP_M, "dispense": Strategy.M},
     "B": {"aspirate": Strategy.M, "dispense": Strategy.M},
-    "C": {"aspirate": Strategy.M_LLD, "dispense": Strategy.M},
+    "C": {"aspirate": Strategy.LLD_M, "dispense": Strategy.M},
     "D": {"aspirate": Strategy.B, "DSP": Strategy.T},
-    "E": {"aspirate": Strategy.M_LLD_TIP, "dispense": Strategy.M},
+    "E": {"aspirate": Strategy.LLD_TIP_M, "dispense": Strategy.M},
     "F": {"aspirate": Strategy.M, "dispense": Strategy.M},
-    "G": {"aspirate": Strategy.M_LLD, "dispense": Strategy.M},
+    "G": {"aspirate": Strategy.LLD_M, "dispense": Strategy.M},
     "H": {"aspirate": Strategy.B, "dispense": Strategy.B},
 }
 
@@ -174,8 +177,8 @@ DYE_INFO: Dict[str, DyeInfo] = {
     ),
 }
 
-_tip_counter = 0
-
+_tip_counter: int = 0
+_already_rearranged_tips: bool = False
 _diluent_wells_used: List[Well] = []
 
 
@@ -189,7 +192,7 @@ def get_latest_version(load_name: str) -> int:
 
 def _pick_up_tip(pipette: InstrumentContext) -> None:
     global _tip_counter
-    _pick_up_tip(pipette)
+    pipette.pick_up_tip()
     _tip_counter += 1
 
 
@@ -198,7 +201,9 @@ def _do_tip_racks_need_rearranging() -> bool:
 
 
 def _rearrange_tip_racks(ctx: ProtocolContext, tip_racks) -> None:
-    global _tip_counter
+    global _tip_counter, _already_rearranged_tips
+    assert not _already_rearranged_tips
+    _tip_counter = 0
     # if 4 tip racks have been used, switch out two of them
     # tip rack a3 goes to d3
     ctx.move_labware(tip_racks[0], SLOTS["dst"], use_gripper=True)
@@ -216,7 +221,7 @@ def _rearrange_tip_racks(ctx: ProtocolContext, tip_racks) -> None:
     ctx.move_labware(tip_racks[2], SLOTS["dst"], use_gripper=True)
     ctx.move_labware(tip_racks[6], SLOTS["tips"][2], use_gripper=True)
     ctx.move_labware(tip_racks[2], SLOTS["tips"][6], use_gripper=True)
-    _tip_counter = 0
+    _already_rearranged_tips = True
 
 
 def _spread_diluent_or_baseline(
@@ -229,6 +234,7 @@ def _spread_diluent_or_baseline(
 ) -> None:
     if not multi.has_tip:
         multi.pick_up_tip()
+    assert len(_diluent_wells_used) > 0
     diluent_well = _diluent_wells_used[0]
     for i, col in enumerate(labware.columns()[:num_cols]):
         if is_init:
@@ -283,6 +289,7 @@ def _load_liquid_diluent(
     total_diluent_per_well = (
         total_diluent_needed / number_of_wells_needed
     ) + dead_vol_diluent
+    assert len(_diluent_wells_used) == 0
     _diluent_wells_used = diluent_reservoir.wells()[:number_of_wells_needed]
     diluent = ctx.define_liquid("diluent", display_color="#0000FF")
     diluent_reservoir.load_liquid(_diluent_wells_used, total_diluent_per_well, diluent)
@@ -364,18 +371,7 @@ def _run_trial(
 ) -> None:
     strategy = TEST_MATRIX[dst.well_name[0]]
 
-    # PICK-UP TIP
-    pipette.configure_for_volume(trial_ul)
-    _pick_up_tip(pipette)
-
-    # LLD
-    if strategy["aspirate"].includes_lld():
-        pipette.require_liquid_presence(src)
-        if strategy["aspirate"].includes_new_tip():
-            pipette.drop_tip()
-            _pick_up_tip(pipette)
-
-    # ASPIRATE
+    # ASPIRATE + DISPENSE locations
     if strategy["aspirate"].includes_meniscus():
         src_loc = src.meniscus(z=submerge_mm)
     elif strategy["aspirate"].includes_bottom():
@@ -383,10 +379,6 @@ def _run_trial(
     else:
         mode_name = str(strategy["aspirate"].name)
         raise ValueError(f"unexpected mode: {mode_name}")
-    pipette.aspirate(trial_ul, src_loc)
-    pipette.touch_tip(speed=30)
-
-    # DISPENSE
     if strategy["dispense"].includes_meniscus():
         dst_loc = dst.meniscus(z=submerge_mm)
     elif strategy["dispense"].includes_bottom():
@@ -396,15 +388,30 @@ def _run_trial(
     else:
         mode_name = str(strategy["dispense"].name)
         raise ValueError(f"unexpected mode: {mode_name}")
+
+    # LLD (optional)
+    if strategy["aspirate"].includes_lld():
+        pipette.require_liquid_presence(src)
+        # NOTE: (sigler) we've found that "wet" tips (eg: post-LLD) are
+        #       far less reliable at aspirating ~1uL of aqueous solution.
+        #       Therefore, we should test both dry and "wet" tips under
+        #       identical conditions to gain more insight into what is happening.
+        if strategy["aspirate"].includes_new_tip():
+            pipette.drop_tip()
+            _pick_up_tip(pipette)
+
+    # RUN
+    pipette.configure_for_volume(trial_ul)
+    _pick_up_tip(pipette)
+    pipette.aspirate(trial_ul, src_loc)
+    pipette.touch_tip(speed=30)
     push_out = 3.9 if trial_ul >= 5 else 11.7
     pipette.dispense(trial_ul, dst_loc, push_out=push_out)
-
-    # DROP-TIP
     pipette.drop_tip()
 
 
 def run(ctx: ProtocolContext) -> None:
-    global _tip_counter, _diluent_wells_used
+    global _tip_counter
 
     # RUNTIME PARAMETERS
     is_baseline = ctx.params.is_baseline  # type: ignore[attr-defined]
