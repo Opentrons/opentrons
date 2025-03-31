@@ -81,16 +81,20 @@ export const loadProtocolFile = (
       const result = (readEvent.currentTarget as FileReader).result as string
 
       try {
-        // Extract secret blob from a comment line
-        const secretMatch = result.match(/# DESIGNER_APPLICATION: (.+)/)
-        if (secretMatch && secretMatch[1]) {
-          const base64EncodedBlob = secretMatch[1].trim()
+        // Extract designer application blob
+        const designerApplicationComment = result.match(
+          /# DESIGNER_APPLICATION: (.+)/
+        )
+        if (designerApplicationComment && designerApplicationComment[1]) {
+          const base64EncodedBlob = designerApplicationComment[1].trim()
           const decodedBlob = atob(base64EncodedBlob) // Decode Base64
-          const secretJson = JSON.parse(decodedBlob) // Convert back to JSON
+          const designerApplicationJson = JSON.parse(decodedBlob) // Convert to JSON
 
-          console.log('Extracted JSON:', secretJson)
+          // TODO: remove this when uploading python is fully working for phase 1
+          // still need to add in labware definitions and robotType
+          console.log('Designer application JSON:', designerApplicationJson)
 
-          dispatch(loadFileAction(secretJson as PDPythonFile))
+          dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
         } else {
           console.warn('No secret blob found in file.')
         }
