@@ -291,7 +291,11 @@ export function getFailedLabwareQuantity(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
 ): string | null {
-  if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING && runCommands != null) {
+  const stackerErrorKinds = [
+    ERROR_KINDS.STALL_WHILE_STACKING,
+    ERROR_KINDS.SHUTTE_MISSING,
+  ]
+  if (stackerErrorKinds.includes(errorKind) && runCommands != null) {
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
@@ -342,6 +346,7 @@ export function getFailedCmdRelevantLabware(
   let labwareNickname, failedLWURI
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTE_MISSING:
       for (const key in lwDefsByURI) {
         if (lwDefsByURI.hasOwnProperty(key)) {
           labwareNickname = getLabwareDisplayName(lwDefsByURI[key])
@@ -446,6 +451,7 @@ export function useRelevantFailedLwLocations({
   let location
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTE_MISSING:
       if (
         failedCommandByRunRecord?.params != null &&
         'moduleId' in failedCommandByRunRecord?.params

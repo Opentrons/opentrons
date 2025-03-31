@@ -75,16 +75,7 @@ export function ManualReplaceLwAndRetry(
       case MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME:
         return <RecoveryDoorOpenSpecial {...props} />
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
-        console.log('help!')
-        return (
-          <TwoColTextAndImage
-            {...props}
-            leftColTitle={t('prepare_track_for_homing')}
-            leftColBodyText={buildBodyText()}
-            primaryBtnCopy={t('continue')}
-            primaryBtnOnClick={primaryBtnOnClick}
-          />
-        )
+        return <TwoColTextAndImage {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
         console.log('why')

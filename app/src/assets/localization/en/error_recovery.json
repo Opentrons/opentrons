@@ -137,5 +137,6 @@
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
-  "load_labware_shuttle_onto_track": "Load labware shuttle onto track"
+  "load_labware_shuttle_onto_track": "Load labware shuttle onto track",
+  "take_any_necessary_precautions_before_loading_shuttle": "Take any necessary precautions before loading the labware shuttle onto the track."
 }
