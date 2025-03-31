@@ -322,13 +322,6 @@ sync-fw-ot3:
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3
 
-.PHONY: push-ot3-gravimetric
-push-ot3-gravimetric:
-	$(MAKE) push-ot3
-	$(MAKE) apply-patches-gravimetric
-	cd ../ && $(MAKE) -C shared-data push-ot3
-	$(MAKE) remove-patches-gravimetric
-
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty || true
