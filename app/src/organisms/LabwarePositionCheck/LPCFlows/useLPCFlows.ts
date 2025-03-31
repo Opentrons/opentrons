@@ -21,6 +21,7 @@ import {
   useUpdateDeckConfig,
   useHandleClientAppliedOffsets,
   useOffsetConflictTimestamp,
+  useUpdateLabwareInfo,
 } from './hooks'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -97,6 +98,7 @@ export function useLPCFlows({
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
   useUpdateDeckConfig(runId, deckConfig)
+  useUpdateLabwareInfo(runId, maintenanceRunId, labwareInfo)
   useHandleClientAppliedOffsets(runId)
   useInitLPCStore({
     runId,
@@ -119,7 +121,10 @@ export function useLPCFlows({
   const {
     createLabwareDefinition,
   } = useCreateMaintenanceRunLabwareDefinitionMutation()
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const {
+    deleteMaintenanceRun,
+    isLoading: isClosing,
+  } = useDeleteMaintenanceRunMutation()
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(() => {
@@ -192,6 +197,7 @@ export function useLPCFlows({
         showLPC,
         lpcProps: {
           onCloseClick: handleCloseLPC,
+          isClosing,
           runId,
           robotType,
           deckConfig,
