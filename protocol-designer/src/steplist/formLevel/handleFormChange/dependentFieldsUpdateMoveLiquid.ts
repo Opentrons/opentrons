@@ -166,17 +166,7 @@ export function updatePatchPathField(
     return { ...patch, path: 'single' }
   }
 
-  const conditioningPatch =
-    path === 'multiDispense'
-      ? {}
-      : {
-          ...getDefaultFields('conditioning_checkbox', 'conditioning_volume'),
-        }
-
-  return {
-    ...patch,
-    ...conditioningPatch,
-  }
+  return patch
 }
 
 const updatePatchOnLabwareChange = (
