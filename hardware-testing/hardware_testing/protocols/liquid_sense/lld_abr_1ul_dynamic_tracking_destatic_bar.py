@@ -118,7 +118,7 @@ TEST_MATRIX: Dict[str, Dict[str, _Strategy]] = {
 DEAD_VOL_PER_LABWARE = {
     "nest_12_reservoir_15ml": 3000,
     "nest_96_wellplate_2ml_deep": 30,
-    # TODO: (sigler) reduce this to find actual dead-vol
+    # TODO: (sigler) reduce this to find actual dead-vol of our system
     "opentrons_96_wellplate_200ul_pcr_full_skirt": 50,
 }
 
@@ -174,7 +174,7 @@ def _pick_up_tip_for_dye(
     try:
         pipette.pick_up_tip()
     except OutOfTipsError:
-        _rearrange_tip_racks(ctx, pipette, inaccessible_tip_racks)
+        _gripper_rearrange_tip_racks(ctx, pipette, inaccessible_tip_racks)
         pipette.tip_racks = [tr for tr in inaccessible_tip_racks]
         # NOTE: clearing and returning the list of "inaccessible" tip-racks
         #       to prevent accidentally rearranging twice during run
@@ -186,7 +186,7 @@ def _pick_up_tip_for_dye(
     return inaccessible_tip_racks
 
 
-def _rearrange_tip_racks(
+def _gripper_rearrange_tip_racks(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     inaccessible_tip_racks: List[Labware],
@@ -367,13 +367,13 @@ def _fill_pcr_column_with_dye(
 def _run_trial(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
-    trial_ul: float,
     src: Well,
     dst: Well,
-    submerge_mm: float,
-    well_bottom_mm: float,
     inaccessible_tip_racks: List[Labware],
+    params: _ProtocolParams,
 ) -> None:
+    # lookup plate volume based on which column is the dye source
+    trial_ul: float = params.volumes[int(src.well_name[1:]) - 1]
     assert (
         dst.current_liquid_volume() > 0.0
     ), f"(dst={dst.well_name}) must have diluent already added before adding red dye"
@@ -386,18 +386,22 @@ def _run_trial(
 
     # ASPIRATE location
     if strategy["aspirate"].includes_meniscus():
-        src_loc = src.meniscus(target=DEFAULT_TIP_MENISCUS_TARGET, z=submerge_mm)
+        src_loc = src.meniscus(
+            target=DEFAULT_TIP_MENISCUS_TARGET, z=params.submerge_depth
+        )
     elif strategy["aspirate"].includes_bottom():
-        src_loc = src.bottom(well_bottom_mm)
+        src_loc = src.bottom(params.well_bottom_mm)
     else:
         mode_name = str(strategy["aspirate"].name)
         raise ValueError(f"unexpected mode: {mode_name}")
 
     # DISPENSE location
     if strategy["dispense"].includes_meniscus():
-        dst_loc = dst.meniscus(target=DEFAULT_TIP_MENISCUS_TARGET, z=submerge_mm)
+        dst_loc = dst.meniscus(
+            target=DEFAULT_TIP_MENISCUS_TARGET, z=params.submerge_depth
+        )
     elif strategy["dispense"].includes_bottom():
-        dst_loc = dst.bottom(well_bottom_mm)
+        dst_loc = dst.bottom(params.well_bottom_mm)
     elif strategy["dispense"].includes_top():
         dst_loc = dst.top()
     else:
@@ -428,10 +432,10 @@ def _run_trial(
 
 
 def _load_liquid_diluent(
-    ctx: ProtocolContext, diluent_reservoir: Labware, num_plates: int, num_cols: int
+    ctx: ProtocolContext, diluent_reservoir: Labware, params: _ProtocolParams
 ) -> List[Well]:
     # DILUENT (or BASELINE)
-    total_photo_wells = num_plates * num_cols * 8
+    total_photo_wells = len(params.volumes) * params.columns * 8
     total_diluent_needed = MVS_TARGET_UL * total_photo_wells  # worst case is 200uL
     dead_vol_diluent = DEAD_VOL_PER_LABWARE[diluent_reservoir.load_name]
     diluent_well_capacity = (
@@ -448,7 +452,7 @@ def _load_liquid_diluent(
 
 
 def _load_liquid_red_dye(
-    ctx: ProtocolContext, dye_holder: Labware, volumes: List[float], num_cols: int
+    ctx: ProtocolContext, dye_holder: Labware, params: _ProtocolParams
 ) -> None:
     dead_vol_dye = DEAD_VOL_PER_LABWARE[dye_holder.load_name]
 
@@ -459,9 +463,9 @@ def _load_liquid_red_dye(
 
     # NOTE: there could be just 1x dye used for all volumes,
     #       or 5x different dyes. Also, volumes could repeat
-    for v in volumes:
+    for v in params.volumes:
         dye = _get_dye_for_volume(v)
-        dye.ul += v * num_cols * 8
+        dye.ul += v * params.columns * 8
         dye.use += 1
 
     # load the dye
@@ -477,41 +481,35 @@ def _load_all_liquids(
     dye: Optional[Labware],
     res: Labware,
     stack: List[Labware],
-    volumes: List[float],
-    num_columns: int,
+    params: _ProtocolParams,
 ) -> List[Well]:
     if pcr:
         pcr.load_empty(pcr.wells())
     if dye:
         dye.load_empty(dye.wells())
-        _load_liquid_red_dye(ctx, dye, volumes, num_cols=num_columns)
+        _load_liquid_red_dye(ctx, dye, params)
     res.load_empty(res.wells())
-    diluent_wells_in_use = _load_liquid_diluent(
-        ctx,
-        res,
-        num_plates=len(volumes),
-        num_cols=num_columns,
-    )
+    diluent_wells_in_use = _load_liquid_diluent(ctx, res, params)
     for labware in stack:
         if labware.load_name == DST_LABWARE:
             labware.load_empty(labware.wells())
     return diluent_wells_in_use
 
 
-def _load_plate_stack(ctx: ProtocolContext, volumes: List[float]) -> List[Labware]:
+def _load_plate_stack(ctx: ProtocolContext, params: _ProtocolParams) -> List[Labware]:
     stack: List[Labware] = []
-    for i in range(len(volumes)):
+    for i in range(len(params.volumes)):
         if not len(stack):
             stack.append(ctx.load_labware(PLATE_LID_LOAD_NAME, location=SLOTS["lids"]))
         else:
             stack.append(stack[-1].load_labware(PLATE_LID_LOAD_NAME))
         stack.append(stack[-1].load_labware(DST_LABWARE))
-    assert max(volumes) < min(stack[-1]["A1"].max_volume, MVS_MAX_UL)
+    assert max(params.volumes) < min(stack[-1]["A1"].max_volume, MVS_MAX_UL)
     return stack
 
 
 def _load_pipettes(
-    ctx: ProtocolContext, racks: List[Labware], just_baseline: bool
+    ctx: ProtocolContext, racks: List[Labware], params: _ProtocolParams
 ) -> Tuple[InstrumentContext, Optional[InstrumentContext]]:
     diluent_pipette = ctx.load_instrument(
         instrument_name="flex_8channel_1000",
@@ -524,7 +522,7 @@ def _load_pipettes(
         ],
     )
     pipette: Optional[InstrumentContext] = None
-    if not just_baseline:
+    if not params.just_baseline:
         pipette = ctx.load_instrument(
             instrument_name=f"flex_1channel_{PIP_VOLUME}",
             mount="left",
@@ -558,11 +556,11 @@ def _load_tip_racks(ctx: ProtocolContext) -> Tuple[List[Labware], List[Labware]]
 
 
 def _load_all_non_stacked_labware(
-    ctx: ProtocolContext, volumes: List[float], just_baseline: bool
+    ctx: ProtocolContext, params: _ProtocolParams
 ) -> Tuple[Labware, Optional[Labware], Optional[Labware]]:
     dye_holder: Optional[Labware] = None
     src_labware: Optional[Labware] = None
-    if not just_baseline:
+    if not params.just_baseline:
         dye_holder = ctx.load_labware(
             load_name=DYE_LABWARE,
             location=SLOTS["dye"],
@@ -571,7 +569,7 @@ def _load_all_non_stacked_labware(
             load_name=SRC_LABWARE,
             location=SLOTS["src"],
         )
-        assert max(volumes) < min(src_labware["A1"].max_volume, MVS_MAX_UL)
+        assert max(params.volumes) < min(src_labware["A1"].max_volume, MVS_MAX_UL)
     diluent_reservoir = ctx.load_labware(
         load_name=DILUENT_LABWARE,
         location=SLOTS["res"],
@@ -614,7 +612,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             ],
         )
     parameters.add_float(
-        variable_name="submerge_depth",
+        variable_name="submerge_depth",  # NOTE: (sigler) please keep this NEGATIVE (-)
         display_name="submerge_depth",
         default=DEFAULT_SUBMERGE_MM,
         maximum=0.0,
@@ -657,21 +655,15 @@ def run(ctx: ProtocolContext) -> None:
     ctx.load_trash_bin(SLOTS["trash"])
     accessible_tip_racks, inaccessible_tip_racks = _load_tip_racks(ctx)
     diluent_pipette, pipette = _load_pipettes(
-        ctx, accessible_tip_racks, params.just_baseline  # NOTE: accessible tip-racks
+        ctx, accessible_tip_racks, params  # NOTE: accessible tip-racks
     )
     diluent_reservoir, dye_holder, src_labware = _load_all_non_stacked_labware(
-        ctx, params.volumes, params.just_baseline
+        ctx, params
     )
-    stack: List[Labware] = _load_plate_stack(ctx, params.volumes)
+    stack: List[Labware] = _load_plate_stack(ctx, params)
     stack_done: List[Labware] = []
     wells_with_diluent = _load_all_liquids(
-        ctx,
-        src_labware,
-        dye_holder,
-        diluent_reservoir,
-        stack,
-        volumes=params.volumes,
-        num_columns=params.columns,
+        ctx, src_labware, dye_holder, diluent_reservoir, stack, params
     )
     if params.just_baseline:
         _spread_baseline(diluent_pipette, stack[-1], wells_with_diluent)
@@ -697,12 +689,10 @@ def run(ctx: ProtocolContext) -> None:
                 _run_trial(
                     ctx,
                     pipette,
-                    target_ul,
                     src=pcr_well,
                     dst=photo_well,
-                    submerge_mm=params.submerge_depth,
-                    well_bottom_mm=params.well_bottom_mm,
                     inaccessible_tip_racks=inaccessible_tip_racks,
+                    params=params,
                 )
         wells_with_diluent = _spread_final_diluent(
             diluent_pipette, plate, wells_with_diluent
