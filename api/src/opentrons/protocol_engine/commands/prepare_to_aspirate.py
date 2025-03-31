@@ -9,7 +9,6 @@ from .pipetting_common import (
     OverpressureError,
     PipetteIdMixin,
     prepare_for_aspirate,
-    EmptyResult,
 )
 from .command import (
     AbstractCommandImpl,
@@ -113,9 +112,9 @@ class PrepareToAspirate(
     params: PrepareToAspirateParams
     result: Optional[PrepareToAspirateResult] = None
 
-    _ImplementationCls: Type[PrepareToAspirateImplementation] = (
+    _ImplementationCls: Type[
         PrepareToAspirateImplementation
-    )
+    ] = PrepareToAspirateImplementation
 
 
 class PrepareToAspirateCreate(BaseCommandCreate[PrepareToAspirateParams]):
