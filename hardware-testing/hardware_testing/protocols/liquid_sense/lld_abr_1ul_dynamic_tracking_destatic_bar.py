@@ -25,43 +25,8 @@ assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
 # FIXME: (sigler) fix bug in API where "dynamic" tracking doesn't track liquid
 DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "end"
 
-
-class Strategy(str, Enum):
-    M = "MENISCUS"
-    LLD_M = "LLD-MENISCUS"
-    LLD_TIP_M = "LLD-TIP-MENISCUS"
-    B = "BOTTOM"
-    T = "TOP"
-
-    def _includes(self, sub_string: str) -> bool:
-        return bool(sub_string in self.value)
-
-    def includes_lld(self) -> bool:
-        return self._includes("LLD")
-
-    def includes_meniscus(self) -> bool:
-        return self._includes("MENISCUS")
-
-    def includes_new_tip(self) -> bool:
-        return self._includes("TIP")
-
-    def includes_bottom(self) -> bool:
-        return self._includes("BOTTOM")
-
-    def includes_top(self) -> bool:
-        return self._includes("TOP")
-
-
-TEST_MATRIX: Dict[str, Dict[str, Strategy]] = {
-    "A": {"aspirate": Strategy.LLD_TIP_M, "dispense": Strategy.M},
-    "B": {"aspirate": Strategy.M, "dispense": Strategy.M},
-    "C": {"aspirate": Strategy.LLD_M, "dispense": Strategy.M},
-    "D": {"aspirate": Strategy.B, "dispense": Strategy.T},
-    "E": {"aspirate": Strategy.LLD_TIP_M, "dispense": Strategy.M},
-    "F": {"aspirate": Strategy.M, "dispense": Strategy.M},
-    "G": {"aspirate": Strategy.LLD_M, "dispense": Strategy.M},
-    "H": {"aspirate": Strategy.B, "dispense": Strategy.B},
-}
+TIP_VOLUME = 50
+PIP_VOLUME = 50
 
 MAX_NUMBER_OF_PLATES = 5
 DEFAULT_SUBMERGE_MM = -1.5
@@ -89,8 +54,44 @@ SLOTS = {
     "lids": "D4",  # inaccessible to pipette
 }
 
-TIP_VOLUME = 50
-PIP_VOLUME = 50
+
+class Strategy(str, Enum):
+    M = "MENISCUS"
+    LLD_M = "LLD-MENISCUS"
+    LLD_TIP_M = "LLD-TIP-MENISCUS"
+    B = "BOTTOM"
+    T = "TOP"
+
+    def _includes(self, sub_string: str) -> bool:
+        return bool(sub_string in self.value)
+
+    def includes_lld(self) -> bool:
+        return self._includes("LLD")
+
+    def includes_meniscus(self) -> bool:
+        return self._includes("MENISCUS")
+
+    def includes_new_tip(self) -> bool:
+        return self._includes("TIP")
+
+    def includes_bottom(self) -> bool:
+        return self._includes("BOTTOM")
+
+    def includes_top(self) -> bool:
+        return self._includes("TOP")
+
+
+DILUENT_UL_BY_COLUMN = [200, 100] * 6  # alternates (200,100,200,etc.) every column
+TEST_MATRIX: Dict[str, Dict[str, Strategy]] = {
+    "A": {"aspirate": Strategy.LLD_TIP_M, "dispense": Strategy.M},
+    "B": {"aspirate": Strategy.M, "dispense": Strategy.M},
+    "C": {"aspirate": Strategy.LLD_M, "dispense": Strategy.M},
+    "D": {"aspirate": Strategy.B, "dispense": Strategy.T},
+    "E": {"aspirate": Strategy.LLD_TIP_M, "dispense": Strategy.M},
+    "F": {"aspirate": Strategy.M, "dispense": Strategy.M},
+    "G": {"aspirate": Strategy.LLD_M, "dispense": Strategy.M},
+    "H": {"aspirate": Strategy.B, "dispense": Strategy.B},
+}
 
 DEAD_VOL_PER_LABWARE = {
     "nest_12_reservoir_15ml": 3000,
@@ -103,9 +104,9 @@ SRC_LABWARE = "opentrons_96_wellplate_200ul_pcr_full_skirt"
 DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
 DILUENT_LABWARE = "nest_12_reservoir_15ml"
 
-PLATE_LID_LOAD_NAME = "plate_lid"  # custom labware?
-
-DILUENT_SUMMED_UL_PER_COLUMN = [200, 100] * 6
+# NOTE: (sigler) keep this as a custom labware
+#       until we have a suitable 
+PLATE_LID_LOAD_NAME = "plate_lid"
 
 
 @dataclass
@@ -130,6 +131,7 @@ DYE_INFO: List[Dye] = [
     Dye("E", 0.1, 0.99, 0.0, 0, "#880000", "A1", None, None),
 ]
 
+# global variables
 _diluent_wells_used: List[Well] = []
 _inaccessible_tip_racks: List[Labware] = []
 
@@ -193,7 +195,7 @@ def _spread_diluent_or_baseline(
     for i, col in enumerate(labware.columns()[:num_cols]):
         if is_init:
             if alternate_ul:
-                diluent_ul = DILUENT_SUMMED_UL_PER_COLUMN[i] - red_dye_ul
+                diluent_ul = DILUENT_UL_BY_COLUMN[i] - red_dye_ul
             else:
                 diluent_ul = 200 - red_dye_ul  # baseline
         else:
