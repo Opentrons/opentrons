@@ -104,17 +104,20 @@ describe('createFile selector', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createPythonFile.resultFunc(
       fileMetadata,
-      OT2_ROBOT_TYPE,
-      entities,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
+      OT2_ROBOT_TYPE,
+      dismissedWarnings,
       ingredLocations,
-      labwareNicknamesById
+      v7Fixture.savedStepForms,
+      v7Fixture.orderedStepIds,
+      labwareNicknamesById,
+      entities
     )
     // This is just a quick smoke test to make sure createPythonFile() produces
     // something that looks like a Python file. The individual sections of the
     // generated Python will be tested in separate unit tests.
-    expect(result).toBe(
+    expect(result.python).toBe(
       `
 from contextlib import nullcontext as pd_step
 from opentrons import protocol_api, types
@@ -166,6 +169,104 @@ def run(protocol: protocol_api.ProtocolContext):
     pass
 `.trimStart()
     )
+
+    expect(result.designerApplication).toEqual({
+      designerApplication: {
+        data: {
+          dismissedWarnings: {
+            form: [],
+            timeline: [],
+          },
+          ingredLocations: {},
+          ingredients: {},
+          labware: {
+            fixedTrash: {
+              displayName: 'Trash',
+              labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+            },
+            plateId: {
+              displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+              labwareDefURI:
+                'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+            },
+            tiprackId: {
+              displayName: 'Opentrons 96 Tip Rack 10 µL',
+              labwareDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
+            },
+          },
+          modules: {},
+          orderedStepIds: ['moveLiquidStepId'],
+          pipetteTiprackAssignments: {
+            pipetteId: ['opentrons/opentrons_96_tiprack_10ul/1'],
+          },
+          pipettes: {
+            pipetteId: {
+              pipetteName: 'p10_single',
+            },
+          },
+          savedStepForms: {
+            __INITIAL_DECK_SETUP_STEP__: {
+              id: '__INITIAL_DECK_SETUP_STEP__',
+              labwareLocationUpdate: {
+                fixedTrash: '12',
+                plateId: '1',
+                tiprackId: '2',
+              },
+              moduleLocationUpdate: {},
+              pipetteLocationUpdate: {
+                pipetteId: 'left',
+              },
+              stepType: 'manualIntervention',
+            },
+            moveLiquidStepId: {
+              aspirate_airGap_checkbox: true,
+              aspirate_airGap_volume: '1',
+              aspirate_delay_checkbox: true,
+              aspirate_delay_mmFromBottom: '1',
+              aspirate_delay_seconds: '1',
+              aspirate_flowRate: null,
+              aspirate_labwareId: 'plateId',
+              aspirate_mix_checkbox: false,
+              aspirate_mix_times: null,
+              aspirate_mix_volume: null,
+              aspirate_mmFromBottom: '1',
+              aspirate_touchTip_checkbox: false,
+              aspirate_wellOrder_first: 't2b',
+              aspirate_wellOrder_second: 'l2r',
+              aspirate_wells: ['A1', 'B1'],
+              aspirate_wells_grouped: false,
+              blowout_checkbox: false,
+              blowout_location: 'fixedTrash',
+              changeTip: 'always',
+              dispense_delay_checkbox: false,
+              dispense_delay_mmFromBottom: '0.5',
+              dispense_delay_seconds: '1',
+              dispense_flowRate: null,
+              dispense_labwareId: 'plateId',
+              dispense_mix_checkbox: false,
+              dispense_mix_times: null,
+              dispense_mix_volume: null,
+              dispense_mmFromBottom: '0.5',
+              dispense_touchTip_checkbox: false,
+              dispense_wellOrder_first: 't2b',
+              dispense_wellOrder_second: 'l2r',
+              dispense_wells: ['A12', 'B12'],
+              disposalVolume_checkbox: true,
+              disposalVolume_volume: '1',
+              id: 'moveLiquidStepId',
+              path: 'single',
+              pipetteId: 'pipetteId',
+              preWetTip: false,
+              stepDetails: '',
+              stepName: 'transfer',
+              stepType: 'moveLiquid',
+              volume: '5',
+            },
+          },
+        },
+        version: '8.5.0',
+      },
+    })
   })
 })
 
