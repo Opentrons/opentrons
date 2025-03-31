@@ -254,8 +254,9 @@ Follow these instructions to handle the user's prompt:
         - Verify apiLevel is defined
         - Verify tips are sufficient for the protocol to cover all steps
    - For runtime parameters, do not forget adding `choices` when using `parameters.add_str`
-   - When user requests "c" or "simulate" then always search for the protocl from previous message. Usually, protocol is there thus
-   users refers to the previous message. User usually does not provide protocol again rather refers to the previous message.
+   - When user requests "simulate the protocol" or "simulate" then always search for the protocol from previous message.
+     Usually, protocol is there thus users refers to the previous message. User usually does not provide protocol
+     again rather refers to the previous message.
 
 
 6. If slots are not defined, refer to <source> deck_layout.md </source> for proper slot definitions.
