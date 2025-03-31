@@ -2,7 +2,9 @@
 
 Summary of changes from schema 9:
 
-- Adds a new `labware_offset_sequence_components` table.
+- Change the way we represent locations in the `labware_offset` table:
+  replace its `location_*` columns with a separate
+  `labware_offset_sequence_components` table.
 """
 
 from pathlib import Path
@@ -34,17 +36,21 @@ class Migration9to10(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 9 to 10."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        # First we create the new version of our labware offsets table and sequence table
         with sql_engine_ctx(
             dest_dir / DB_FILE
         ) as engine, engine.begin() as transaction:
+            assert (
+                schema_09.labware_offset_table.name
+                != schema_10.labware_offset_table.name
+            )
+            # First we create the new version of our labware offsets table and sequence table
             schema_10.labware_offset_table.create(transaction)
             schema_10.labware_offset_location_sequence_components_table.create(
                 transaction
             )
             # Then we upmigrate the data to the new tables
             _upmigrate_stored_offsets(transaction)
-            # Then, we drop the table with we don't care about anymore
+            # Then, we drop the old table which we don't care about anymore
             schema_09.labware_offset_table.drop(transaction)
 
 
