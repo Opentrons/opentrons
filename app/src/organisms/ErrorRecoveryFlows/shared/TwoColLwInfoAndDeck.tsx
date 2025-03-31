@@ -56,9 +56,6 @@ export function TwoColLwInfoAndDeck(
   } = failedLabwareUtils.failedLabwareLocations
 
   const buildTitle = (): string => {
-    console.log('title!!!')
-    console.log('selectedRecoveryOption!!!', selectedRecoveryOption)
-    console.log('step!!!', step)
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         return t('manually_move_lw_on_deck')
@@ -89,7 +86,7 @@ export function TwoColLwInfoAndDeck(
           return t('ensure_stacker_has_labware')
         }
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-        return t('load_labware_shuttle_onto_track')
+        return t('ensure_stacker_has_labware')
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -118,6 +115,8 @@ export function TwoColLwInfoAndDeck(
         } else {
           return t('make_sure_loaded_correct_number_of_labware_stacker')
         }
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+        return t('make_sure_loaded_correct_number_of_labware_stacker')
       default:
         console.error(
           `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -133,8 +132,6 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         return 'location-arrow-location'
       default:
-      case MANUAL_REPLACE_AND_RETRY.ROUTE:
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return 'location'
     }
   }
@@ -145,6 +142,7 @@ export function TwoColLwInfoAndDeck(
     switch (selectedRecoveryOption) {
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return 'stacked'
       default:
         return 'default'
