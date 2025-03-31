@@ -656,18 +656,14 @@ export function getIsEntityOnSlotInUse(
         //  moving a labware from the module location
         ('labware' in step && step.labware === createdModuleForSlot.id)
     ) != null
-  const isCurrentLabwareInUse = getIsLabwareInUse(
-    savedSteps,
-    createdLabwareForSlot
-  )
-  const isCurrentNestedLabwareInUse = getIsLabwareInUse(
-    savedSteps,
-    createdNestedLabwareForSlot
-  )
-  const isCurrentLabwareIn4thColumnInUse = getIsLabwareInUse(
-    savedSteps,
-    matchingLabwareFor4thColumn
-  )
+  const isCurrentLabwareInUse = [
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+    matchingLabwareFor4thColumn,
+  ]
+    .map(lw => getIsLabwareInUse(savedSteps, lw))
+    .includes(true)
+
   const isCurrentFixtureInUse =
     createdFixtureForSlots != null &&
     createdFixtureForSlots.length > 0 &&
@@ -690,11 +686,5 @@ export function getIsEntityOnSlotInUse(
           ) != null)
     ) != null
 
-  return (
-    isCurrentModuleInUse ||
-    isCurrentLabwareInUse ||
-    isCurrentNestedLabwareInUse ||
-    isCurrentLabwareIn4thColumnInUse ||
-    isCurrentFixtureInUse
-  )
+  return isCurrentModuleInUse || isCurrentLabwareInUse || isCurrentFixtureInUse
 }
