@@ -42,7 +42,7 @@ export function TwoColLwInfoAndDeck(
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { relevantWellName, failedLabware } = failedLabwareUtils
-  const { proceedNextStep } = routeUpdateActions
+  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
@@ -231,7 +231,10 @@ export function TwoColLwInfoAndDeck(
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
       </TwoColumn>
-      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+      <RecoveryFooterButtons
+        primaryBtnOnClick={primaryOnClick}
+        secondaryBtnOnClick={goBackPrevStep}
+      />
     </RecoverySingleColumnContentWrapper>
   )
 }

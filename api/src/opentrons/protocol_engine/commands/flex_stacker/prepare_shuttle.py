@@ -8,9 +8,9 @@ from typing_extensions import Type
 
 from pydantic import BaseModel, Field
 
-from .common import FlexStackerStallOrCollisionError
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
+from .common import FlexStackerStallOrCollisionError
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,
