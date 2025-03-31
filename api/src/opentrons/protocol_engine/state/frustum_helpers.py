@@ -402,7 +402,7 @@ def _find_height_in_partial_frustum(
         section_top_height, section_volume = capacity
         if (
             bottom_section_volume
-            < target_volume
+            <= target_volume
             <= (bottom_section_volume + section_volume)
         ):
             relative_target_volume = target_volume - bottom_section_volume
