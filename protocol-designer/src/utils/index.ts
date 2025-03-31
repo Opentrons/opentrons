@@ -13,7 +13,6 @@ import {
 } from '@opentrons/shared-data'
 import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 import type {
-  AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
   PipetteEntity,
@@ -140,14 +139,6 @@ export const getIsAdapter = (
 
 export const getIsAdapterFromDef = (labwareDef: LabwareDefinition2): boolean =>
   labwareDef.allowedRoles?.includes('adapter') ?? false
-
-export const getStagingAreaSlots = (
-  stagingAreas?: AdditionalEquipmentEntity[]
-): string[] | null => {
-  if (stagingAreas == null) return null
-  //  we can assume that the location is always a string
-  return stagingAreas.map(area => area.location as string)
-}
 
 export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
   return Object.values(pipettes).some(pip => pip.spec.channels === 96)

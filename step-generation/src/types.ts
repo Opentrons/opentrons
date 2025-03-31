@@ -140,27 +140,6 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
-export type AdditionalEquipmentName =
-  | 'gripper'
-  | 'wasteChute'
-  | 'stagingArea'
-  | 'trashBin'
-export interface NormalizedAdditionalEquipmentById {
-  [additionalEquipmentId: string]: {
-    name: AdditionalEquipmentName
-    id: string
-    location: string
-    //  Note: leaving as optional since gripper and stagingArea
-    //  will never need a pythonName
-    pythonName?: string
-  }
-}
-
-export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
-export interface AdditionalEquipmentEntities {
-  [additionalEquipmentId: string]: AdditionalEquipmentEntity
-}
-
 interface TrashEntity {
   id: string
   location: string
@@ -190,6 +169,32 @@ export interface GripperEntity {
 }
 export interface GripperEntities {
   [gripperId: string]: GripperEntity
+}
+
+export interface AdditionalTrashBinEntity extends TrashBinEntity {
+  name: 'trashBin'
+}
+export interface AdditionalWasteChuteEntity extends WasteChuteEntity {
+  name: 'wasteChute'
+}
+export interface AdditionalStagingAreaEntity extends StagingAreaEntity {
+  name: 'stagingArea'
+}
+export interface AdditionalGripperEntity extends GripperEntity {
+  name: 'gripper'
+}
+export type AdditionalEquipmentEntity =
+  | AdditionalTrashBinEntity
+  | AdditionalWasteChuteEntity
+  | AdditionalStagingAreaEntity
+  | AdditionalGripperEntity
+
+export type AdditionalEquipmentName = AdditionalEquipmentEntity['name']
+export interface AdditionalEquipmentEntities {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
+}
+export interface NormalizedAdditionalEquipmentById {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
