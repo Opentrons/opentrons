@@ -163,7 +163,9 @@ const stepFormHelperMap: {
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
-      mixTipPositionInTube
+      mixTipPositionInTube,
+      incompatibleLowVolume,
+      incompatiblePipetteTiprack
     ),
   },
   pause: {

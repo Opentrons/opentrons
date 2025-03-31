@@ -70,6 +70,7 @@ export function MixTools(
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}
             type="mix"
+            formData={formData}
           />
         ) : (
           <SecondStepMixTools

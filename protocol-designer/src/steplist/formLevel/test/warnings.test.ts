@@ -11,7 +11,7 @@ import {
   incompatiblePipettePath,
   incompatiblePipetteTiprack,
 } from '../warnings'
-import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
+import type { LabwareEntity } from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { PathOption } from '../../../form-types'
 
@@ -342,6 +342,7 @@ describe('Max dispense well volume', () => {
 
 describe('Incompatible liquid classes', () => {
   let fields: {
+    stepType: string
     path: PathOption
     pipette: {
       name: string
@@ -352,6 +353,7 @@ describe('Incompatible liquid classes', () => {
   }
   beforeEach(() => {
     fields = {
+      stepType: 'moveLiquid',
       pipette: {
         name: 'p50_single_flex',
         spec: { channels: 1, liquids: { default: { maxVolume: 50 } } },
@@ -361,7 +363,10 @@ describe('Incompatible liquid classes', () => {
       volume: 10,
     }
   })
-  it('should return a warning when volume is equal to 10', () => {
+  it('should return a warning when volume is equal to 10 in Transfer step', () => {
+    expect(incompatibleLowVolume(fields as any)?.title).toBe(
+      'Transfer volumes of 10 µL or less are incompatible with liquid classes.'
+    )
     expect(incompatibleLowVolume(fields as any)?.type).toBe(
       'LOW_VOLUME_TRANSFER'
     )
@@ -370,8 +375,12 @@ describe('Incompatible liquid classes', () => {
     fields.volume = 50
     expect(incompatibleLowVolume(fields as any)).toBe(null)
   })
-  it('should return a warning when volume is less than 10', () => {
+  it('should return a warning when volume is less than 10 in Mix step', () => {
+    fields.stepType = 'mix'
     fields.volume = 5
+    expect(incompatibleLowVolume(fields as any)?.title).toBe(
+      'Mix volumes of 10 µL or less are incompatible with liquid classes.'
+    )
     expect(incompatibleLowVolume(fields as any)?.type).toBe(
       'LOW_VOLUME_TRANSFER'
     )

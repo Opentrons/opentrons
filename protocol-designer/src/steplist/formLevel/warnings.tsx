@@ -81,10 +81,9 @@ const mixTipPositionedLowInTube = (): FormWarning => ({
   dependentFields: ['labware'],
 })
 
-const lowVolumeTransferWarning = (): FormWarning => ({
+const lowVolumeTransferWarning = (type: string): FormWarning => ({
   type: 'LOW_VOLUME_TRANSFER',
-  title:
-    'Transfer volumes of 10 µL or less are incompatible with liquid classes.',
+  title: `${type} volumes of 10 µL or less are incompatible with liquid classes.`,
   dependentFields: ['volume'],
 })
 
@@ -190,10 +189,12 @@ export const maxDispenseWellVolume = (
 export const incompatibleLowVolume = (
   fields: HydratedMixFormData | HydratedMoveLiquidFormData
 ): FormWarning | null => {
-  const { volume } = fields
+  const { volume, stepType } = fields
+
+  const stepName = stepType === 'mix' ? 'Mix' : 'Transfer'
 
   return volume <= MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME
-    ? lowVolumeTransferWarning()
+    ? lowVolumeTransferWarning(stepName)
     : null
 }
 
@@ -240,7 +241,6 @@ export const incompatiblePipetteTiprack = (
   )
 
   const liquidClassesCount = Object.keys(liquidClassDefs).length
-  console.log(liquidClassesCount)
   const incompatiblePipetteCount = incompatiblePipette.length
   const incompatibleTiprackCount = incompatibleTiprack.length
   if (incompatiblePipetteCount > 0) {
