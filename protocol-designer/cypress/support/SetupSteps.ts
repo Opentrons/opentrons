@@ -513,6 +513,7 @@ export const SetupSteps = {
       cy.get(SetupLocators.LiquidsDropdown).should('be.visible').click()
     },
   }),
+  // cy.contains('p', 'Choose option').closest('div[tabindex="0"]').click()
 
   /**
    * Select "My liquid!" from the dropdown.
@@ -777,9 +778,9 @@ export const SetupSteps = {
     },
   }),
 
-  DeleteSteps: (): StepThunk => ({
+  DeleteSteps: (stepNumStepType: string): StepThunk => ({
     call: () => {
-      cy.get(SetupLocators.StepOptionsTestIDThreeDots).click()
+      cy.contains(stepNumStepType).parent().next('button').click()
       cy.contains('Delete step').click()
       cy.contains('button', 'Delete step').click()
     },
