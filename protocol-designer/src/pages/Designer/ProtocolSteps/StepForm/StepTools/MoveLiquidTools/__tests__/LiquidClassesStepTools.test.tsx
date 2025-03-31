@@ -66,4 +66,10 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
     render(props)
     screen.getByText('Assigned to mockname')
   })
+
+  it('renders subtext for mix when mix is true', () => {
+    props.mix = true
+    render(props)
+    screen.getByText('Apply liquid class settings for this mix')
+  })
 })

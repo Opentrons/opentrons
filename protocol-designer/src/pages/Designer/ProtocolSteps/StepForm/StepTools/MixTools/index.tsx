@@ -69,6 +69,7 @@ export function MixTools(
           <LiquidClassesStepTools
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}
+            mix
           />
         ) : (
           <SecondStepMixTools

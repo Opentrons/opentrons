@@ -8,12 +8,14 @@ import {
   getPipetteEntities,
 } from '../../../../../../../step-forms/selectors'
 import {
+  getEnableLiquidClasses,
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../../feature-flags/selectors'
 import { getFormErrorsMappedToField } from '../../../utils'
 import { FirstStepMixTools } from '../FirstStepMixTools'
 import { SecondStepMixTools } from '../SecondStepMixTools'
+import { LiquidClassesStepTools } from '../../MoveLiquidTools/LiquidClassesStepTools'
 import { MixTools } from '..'
 
 import type { ComponentProps } from 'react'
@@ -27,6 +29,7 @@ vi.mock('../../../../../../../feature-flags/selectors')
 vi.mock('../../../utils')
 vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
+vi.mock('../../MoveLiquidTools/LiquidClassesStepTools')
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
@@ -46,6 +49,7 @@ describe('MixToolFirstStep', () => {
       visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',
       setTab: vi.fn(),
+      setShowFormErrors: vi.fn(),
     }
     vi.mocked(getLabwareEntities).mockReturnValue({
       labwareId: {
@@ -74,6 +78,10 @@ describe('MixToolFirstStep', () => {
     vi.mocked(SecondStepMixTools).mockReturnValue(
       <div>mock SecondStepMixTools</div>
     )
+    vi.mocked(getEnableLiquidClasses).mockReturnValue(false)
+    vi.mocked(LiquidClassesStepTools).mockReturnValue(
+      <div>mock LiquidClassesStepTools</div>
+    )
   })
 
   it('renders FirstStepMixTools when toolboxStep is 0', () => {
@@ -84,5 +92,19 @@ describe('MixToolFirstStep', () => {
     props.toolboxStep = 1
     render(props)
     screen.getByText('mock SecondStepMixTools')
+  })
+
+  it('renders LiquidClassesStepTools when toolboxStep is 2 and enableLiquidClasses is true', () => {
+    props.toolboxStep = 2
+    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
+    render(props)
+    screen.getByText('mock SecondStepMixTools')
+  })
+
+  it('renders LiquidClassesStepTools when toolboxStep is 1 and enableLiquidClasses is true', () => {
+    props.toolboxStep = 1
+    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
+    render(props)
+    screen.getByText('mock LiquidClassesStepTools')
   })
 })
