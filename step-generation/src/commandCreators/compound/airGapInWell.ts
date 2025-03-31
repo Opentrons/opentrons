@@ -1,10 +1,13 @@
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { curryWithoutPython, reduceCommandCreators } from '../../utils'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import { airGapInPlace, moveToWell, prepareToAspirate } from '../atomic'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
+export type AirGapInWellType = 'aspirate' | 'dispense'
+
 interface AirGapInWellArgs {
+  type: AirGapInWellType
   flowRate: number
-  offsetFromBottomMm: number
   pipetteId: string
   volume: number
   labwareId: string
@@ -16,37 +19,45 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const {
-    labwareId,
-    wellName,
-    flowRate,
-    offsetFromBottomMm,
-    pipetteId,
-    volume,
-  } = args
+  const { labwareId, wellName, flowRate, pipetteId, volume, type } = args
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
 
-  const commandCreators: CurriedCommandCreator[] = [
-    curryCommandCreator(moveToWell, {
+  const prepareToAspirateCommand =
+    type === 'aspirate'
+      ? []
+      : [
+          curryWithoutPython(prepareToAspirate, {
+            pipetteId,
+          }),
+        ]
+
+  const pythonCommandCreator: CurriedCommandCreator = () => ({
+    commands: [],
+    python: `${pipettePythonName}.air_gap(volume=${volume}, height=${AIR_GAP_OFFSET_FROM_TOP})`,
+  })
+
+  const commandCreators = [
+    curryWithoutPython(moveToWell, {
       pipetteId,
       labwareId,
       wellName,
       wellLocation: {
-        origin: 'bottom',
+        origin: 'top',
         offset: {
-          z: offsetFromBottomMm,
+          z: AIR_GAP_OFFSET_FROM_TOP,
           x: 0,
           y: 0,
         },
       },
     }),
-    curryCommandCreator(prepareToAspirate, {
-      pipetteId,
-    }),
-    curryCommandCreator(airGapInPlace, {
+    ...prepareToAspirateCommand,
+    curryWithoutPython(airGapInPlace, {
       pipetteId,
       volume,
       flowRate,
     }),
+    pythonCommandCreator,
   ]
 
   return reduceCommandCreators(
