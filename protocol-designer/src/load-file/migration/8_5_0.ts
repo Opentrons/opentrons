@@ -61,6 +61,7 @@ export const migrateFile = (
         aspirate_labware,
         dispense_labware,
         liquidClassesSupported,
+        liquidClass,
         ...rest
       } = form
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
@@ -138,7 +139,7 @@ export const migrateFile = (
           dispense_submerge_y_position: null,
           dispense_submerge_position_reference: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
-          liquidClass: null,
+          liquidClass: liquidClass ?? null,
           pushOut_checkbox:
             defaultPushOutVolume != null && defaultPushOutVolume > 0,
           pushOut_volume: defaultPushOutVolume,
