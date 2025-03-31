@@ -1,4 +1,5 @@
 """Test unsafe drop tip in place commands."""
+
 from opentrons.protocol_engine.state.update_types import (
     PipetteTipStateUpdate,
     PipetteUnknownFluidUpdate,
@@ -61,6 +62,8 @@ async def test_drop_tip_implementation(
 
     decoy.verify(
         await ot3_hardware_api.update_axis_position_estimations([Axis.P_L]),
-        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False),
+        await mock_tip_handler.drop_tip(
+            pipette_id="abc", home_after=False, ignore_plunger=True
+        ),
         times=1,
     )
