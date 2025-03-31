@@ -20,7 +20,7 @@ export function TwoColTextAndImage(
   const { routeUpdateActions, currentRecoveryOptionUtils } = props
   const { LOAD_LABWARE_SHUTTLE_AND_RETRY } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { proceedNextStep } = routeUpdateActions
+  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
@@ -61,7 +61,7 @@ export function TwoColTextAndImage(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           css={`
-            gap: ${SPACING.spacing16};
+            gap: ${SPACING.spacing8};
             width: 100%;
             @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
               gap: ${SPACING.spacing8};
@@ -104,7 +104,10 @@ export function TwoColTextAndImage(
         </Flex>
         <Flex marginTop="0.7rem">{buildImage()}</Flex>
       </TwoColumn>
-      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+      <RecoveryFooterButtons
+        primaryBtnOnClick={primaryOnClick}
+        secondaryBtnOnClick={goBackPrevStep}
+      ></RecoveryFooterButtons>
     </RecoverySingleColumnContentWrapper>
   )
 }

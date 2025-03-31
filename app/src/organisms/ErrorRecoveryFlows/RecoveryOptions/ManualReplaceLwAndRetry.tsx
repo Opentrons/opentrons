@@ -33,7 +33,6 @@ export function ManualReplaceLwAndRetry(
   const primaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(route, buildNextStep())
 
-  console.log('route: ', route)
   const buildNextStep = (): RouteStep => {
     if (doorStatusUtils.isDoorOpen) {
       switch (route) {
