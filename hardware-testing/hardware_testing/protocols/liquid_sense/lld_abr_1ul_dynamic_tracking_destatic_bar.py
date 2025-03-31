@@ -45,14 +45,13 @@ NON_CONTACT_DISPENSE_MM = float(LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z)
 # NOTE: diluent should always be used with a P1000 (max push-out is 79.9)
 DILUENT_PUSH_OUT = 20.0
 
-# NOTE: (sigler) disabling formatter here,
-#       b/c I like configuring the deck spatially like this
+# NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
 SLOTS: Dict[str, str] = {
-    "trash": "A1",  "tip_dil": "A2",    "tip_50_0": "A3",   "tip_50_4": "A4",
-    "dye": "B1",    "tip_50_3": "B2",   "tip_50_1": "B3",   "tip_50_5": "B4",
-    "res": "C1",    "empty": "C2",      "tip_50_2": "C3",   "tip_50_6": "C4",
-    "done": "D1",   "src": "D2",        "dst": "D3",        "lids": "D4",
+    "lids":     "A1",   "tip_dil":  "A2",   "tip_50_3": "A3",   "trash":    "A4",
+    "dst":      "B1",   "src":      "B2",   "tip_50_0": "B3",   "tip_50_4": "B4",
+    "done":     "C1",   "empty":    "C2",   "tip_50_1": "C3",   "tip_50_5": "C4",
+    "res":      "D1",   "dye":      "D2",   "tip_50_2": "D3",   "tip_50_6": "D4",
 }
 # fmt: on
 
