@@ -3,6 +3,8 @@ import {
   getLabwareDefURI,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
+import { uuid } from '.'
+import { GRIPPER_LOCATION } from '../constants'
 import type {
   LoadLabwareRunTimeCommand,
   RunTimeCommand,
@@ -16,8 +18,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import { uuid } from '.'
-import { GRIPPER_LOCATION } from '../constants'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
@@ -33,7 +33,7 @@ export function constructInvariantContextFromRunCommands(
             labwareDefURI: getLabwareDefURI(result.definition),
             def: result.definition,
             //  ProtocolTimelineScrubber won't need access to pythonNames
-            pythonName: 'n/a',
+            pythonName: `${result.definition.metadata.displayCategory}_1`,
           },
         }
         return {
@@ -87,7 +87,7 @@ export function constructInvariantContextFromRunCommands(
           ...acc.pipetteEntities,
           [result.pipetteId]: {
             name: command.params.pipetteName,
-            id: command.params.pipetteId,
+            id: result.pipetteId,
             tiprackLabwareDef:
               tiprackLabwareDef != null ? [tiprackLabwareDef] : [],
             tiprackDefURI:
@@ -95,7 +95,7 @@ export function constructInvariantContextFromRunCommands(
                 ? [getLabwareDefURI(tiprackLabwareDef)]
                 : [],
             spec: specs,
-            pythonName: 'n/a',
+            pythonName: `pipette_${command.params.mount}`,
           },
         }
         return {

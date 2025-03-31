@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { Flex } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 import { SPACING } from '../../ui-style-constants'
 import { ALIGN_FLEX_END, DIRECTION_COLUMN, OVERFLOW_SCROLL } from '../../styles'
-import { LegacyStyledText } from '../../atoms'
+import { Check, Checkbox, LegacyStyledText } from '../../atoms'
 import { COMMAND_WIDTH_PX } from './index'
 import { CommandText } from '../CommandText'
 import { getCommandTextData } from './utils'
@@ -23,6 +23,8 @@ interface CommandItemProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   robotType: RobotType
   allRunDefs: LabwareDefinition2[]
+  setSelected: Dispatch<SetStateAction<string[]>>
+  selected: string[]
 }
 export function CommandItem({
   index,
@@ -32,6 +34,8 @@ export function CommandItem({
   analysis,
   robotType,
   allRunDefs,
+  setSelected,
+  selected,
 }: CommandItemProps): JSX.Element {
   const [showDetails, setShowDetails] = useState(false)
   const params: RunTimeCommand['params'] = command.params ?? {}
@@ -62,6 +66,17 @@ export function CommandItem({
         setCurrentCommandIndex(index)
       }}
     >
+      <Flex
+        onClick={() => {
+          setSelected(prev =>
+            prev.includes(command.id)
+              ? prev.filter(i => i !== command.id)
+              : [...prev, command.id]
+          )
+        }}
+      >
+        <Check isChecked={selected.includes(command.id)} />
+      </Flex>
       <LegacyStyledText
         onClick={() => {
           setShowDetails(!showDetails)

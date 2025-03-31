@@ -18,8 +18,15 @@ export const dropTipInTrash: CommandCreator<DropTipInTrashParams> = (
 ) => {
   const { pipetteId, trashLocation } = args
   let commandCreators: CurriedCommandCreator[] = []
-  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+  console.log(
+    'pip and trash 2',
+    pipetteId,
+    trashLocation,
+    pipetteId,
+    prevRobotState
+  )
 
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
   if (prevRobotState.tipState.pipettes[pipetteId]) {
     const pipettePythonName =
       invariantContext.pipetteEntities[pipetteId].pythonName
@@ -38,6 +45,7 @@ export const dropTipInTrash: CommandCreator<DropTipInTrashParams> = (
       // so this works for now, but it's very brittle.
       python: `${pipettePythonName}.drop_tip()`,
     })
+    console.log('pip and trash', pipetteId, trashLocation)
 
     commandCreators = [
       curryWithoutPython(moveToAddressableAreaForDropTip, {
@@ -50,7 +58,6 @@ export const dropTipInTrash: CommandCreator<DropTipInTrashParams> = (
       pythonCommandCreator,
     ]
   }
-
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
