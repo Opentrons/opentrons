@@ -31,6 +31,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
           value: null,
         },
       },
+      type: 'transfer',
     }
     vi.mocked(getLiquidEntities).mockReturnValue({})
   })
@@ -68,7 +69,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
   })
 
   it('renders subtext for mix when mix is true', () => {
-    props.mix = true
+    props.type = 'mix'
     render(props)
     screen.getByText('Apply liquid class settings for this mix')
   })

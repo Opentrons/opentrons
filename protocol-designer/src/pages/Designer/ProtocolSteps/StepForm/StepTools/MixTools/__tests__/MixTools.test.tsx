@@ -13,9 +13,9 @@ import {
   getEnableReturnTip,
 } from '../../../../../../../feature-flags/selectors'
 import { getFormErrorsMappedToField } from '../../../utils'
+import { LiquidClassesStepTools } from '../../MoveLiquidTools/LiquidClassesStepTools'
 import { FirstStepMixTools } from '../FirstStepMixTools'
 import { SecondStepMixTools } from '../SecondStepMixTools'
-import { LiquidClassesStepTools } from '../../MoveLiquidTools/LiquidClassesStepTools'
 import { MixTools } from '..'
 
 import type { ComponentProps } from 'react'

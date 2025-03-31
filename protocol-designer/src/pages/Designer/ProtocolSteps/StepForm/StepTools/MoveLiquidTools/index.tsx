@@ -33,6 +33,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           <LiquidClassesStepTools
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}
+            type="transfer"
           />
         ) : (
           <SecondStepsMoveLiquidTools
