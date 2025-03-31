@@ -23,7 +23,7 @@ from opentrons.protocol_engine.labware_offset_standardization import (
 
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
-from robot_server.persistence.tables import schema_10, schema_9
+from robot_server.persistence.tables import schema_10, schema_09
 
 from ._util import copy_contents
 from .._folder_migrator import Migration
@@ -45,7 +45,7 @@ class Migration9to10(Migration):  # noqa: D101
             # Then we upmigrate the data to the new tables
             _upmigrate_stored_offsets(transaction)
             # Then, we drop the table with we don't care about anymore
-            schema_9.labware_offset_table.drop(transaction)
+            schema_09.labware_offset_table.drop(transaction)
 
 
 def _upmigrate_stored_offsets(connection: sqlalchemy.engine.Connection) -> None:
@@ -54,7 +54,7 @@ def _upmigrate_stored_offsets(connection: sqlalchemy.engine.Connection) -> None:
         DeckType(guess_deck_type_from_global_config()), version=5
     )
 
-    offsets = connection.execute(sqlalchemy.select(schema_9.labware_offset_table))
+    offsets = connection.execute(sqlalchemy.select(schema_09.labware_offset_table))
 
     for offset in offsets:
         new_row = connection.execute(

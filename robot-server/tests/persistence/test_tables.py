@@ -11,14 +11,14 @@ from robot_server.persistence.file_and_directory_names import DB_FILE
 from robot_server.persistence.persistence_directory import make_migration_orchestrator
 from robot_server.persistence.tables import (
     metadata as latest_metadata,
-    schema_3,
-    schema_2,
-    schema_4,
-    schema_5,
-    schema_6,
-    schema_7,
-    schema_8,
-    schema_9,
+    schema_02,
+    schema_03,
+    schema_04,
+    schema_05,
+    schema_06,
+    schema_07,
+    schema_08,
+    schema_09,
     schema_10,
 )
 
@@ -990,14 +990,14 @@ def _normalize_statement(statement: str) -> str:
     [
         (latest_metadata, EXPECTED_STATEMENTS_LATEST),
         (schema_10.metadata, EXPECTED_STATEMENTS_V10),
-        (schema_9.metadata, EXPECTED_STATEMENTS_V9),
-        (schema_8.metadata, EXPECTED_STATEMENTS_V8),
-        (schema_7.metadata, EXPECTED_STATEMENTS_V7),
-        (schema_6.metadata, EXPECTED_STATEMENTS_V6),
-        (schema_5.metadata, EXPECTED_STATEMENTS_V5),
-        (schema_4.metadata, EXPECTED_STATEMENTS_V4),
-        (schema_3.metadata, EXPECTED_STATEMENTS_V3),
-        (schema_2.metadata, EXPECTED_STATEMENTS_V2),
+        (schema_09.metadata, EXPECTED_STATEMENTS_V9),
+        (schema_08.metadata, EXPECTED_STATEMENTS_V8),
+        (schema_07.metadata, EXPECTED_STATEMENTS_V7),
+        (schema_06.metadata, EXPECTED_STATEMENTS_V6),
+        (schema_05.metadata, EXPECTED_STATEMENTS_V5),
+        (schema_04.metadata, EXPECTED_STATEMENTS_V4),
+        (schema_03.metadata, EXPECTED_STATEMENTS_V3),
+        (schema_02.metadata, EXPECTED_STATEMENTS_V2),
     ],
 )
 def test_creating_from_metadata_emits_expected_statements(
