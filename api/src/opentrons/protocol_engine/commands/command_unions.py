@@ -14,7 +14,10 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
-from .flex_stacker.common import FlexStackerStallOrCollisionError
+from .flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+)
 
 from . import absorbance_reader
 from . import flex_stacker
@@ -482,6 +485,9 @@ Command = Annotated[
         flex_stacker.SetStoredLabware,
         flex_stacker.Fill,
         flex_stacker.Empty,
+        flex_stacker.CloseLatch,
+        flex_stacker.OpenLatch,
+        flex_stacker.PrepareShuttle,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -492,6 +498,7 @@ Command = Annotated[
         unsafe.UnsafeEngageAxes,
         unsafe.UnsafeUngripLabware,
         unsafe.UnsafePlaceLabware,
+        unsafe.UnsafeManualRetrieve,
         robot.MoveTo,
         robot.MoveAxesRelative,
         robot.MoveAxesTo,
@@ -580,6 +587,9 @@ CommandParams = Union[
     flex_stacker.SetStoredLabwareParams,
     flex_stacker.FillParams,
     flex_stacker.EmptyParams,
+    flex_stacker.CloseLatchParams,
+    flex_stacker.OpenLatchParams,
+    flex_stacker.PrepareShuttleParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -590,6 +600,7 @@ CommandParams = Union[
     unsafe.UnsafeEngageAxesParams,
     unsafe.UnsafeUngripLabwareParams,
     unsafe.UnsafePlaceLabwareParams,
+    unsafe.UnsafeManualRetrieveParams,
     robot.MoveAxesRelativeParams,
     robot.MoveAxesToParams,
     robot.MoveToParams,
@@ -676,6 +687,9 @@ CommandType = Union[
     flex_stacker.SetStoredLabwareCommandType,
     flex_stacker.FillCommandType,
     flex_stacker.EmptyCommandType,
+    flex_stacker.CloseLatchCommandType,
+    flex_stacker.OpenLatchCommandType,
+    flex_stacker.PrepareShuttleCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -686,6 +700,7 @@ CommandType = Union[
     unsafe.UnsafeEngageAxesCommandType,
     unsafe.UnsafeUngripLabwareCommandType,
     unsafe.UnsafePlaceLabwareCommandType,
+    unsafe.UnsafeManualRetrieveCommandType,
     robot.MoveAxesRelativeCommandType,
     robot.MoveAxesToCommandType,
     robot.MoveToCommandType,
@@ -773,6 +788,9 @@ CommandCreate = Annotated[
         flex_stacker.SetStoredLabwareCreate,
         flex_stacker.FillCreate,
         flex_stacker.EmptyCreate,
+        flex_stacker.CloseLatchCreate,
+        flex_stacker.OpenLatchCreate,
+        flex_stacker.PrepareShuttleCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -783,6 +801,7 @@ CommandCreate = Annotated[
         unsafe.UnsafeEngageAxesCreate,
         unsafe.UnsafeUngripLabwareCreate,
         unsafe.UnsafePlaceLabwareCreate,
+        unsafe.UnsafeManualRetrieveCreate,
         robot.MoveAxesRelativeCreate,
         robot.MoveAxesToCreate,
         robot.MoveToCreate,
@@ -878,6 +897,9 @@ CommandResult = Union[
     flex_stacker.SetStoredLabwareResult,
     flex_stacker.FillResult,
     flex_stacker.EmptyResult,
+    flex_stacker.CloseLatchResult,
+    flex_stacker.OpenLatchResult,
+    flex_stacker.PrepareShuttleResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -888,6 +910,7 @@ CommandResult = Union[
     unsafe.UnsafeEngageAxesResult,
     unsafe.UnsafeUngripLabwareResult,
     unsafe.UnsafePlaceLabwareResult,
+    unsafe.UnsafeManualRetrieveResult,
     robot.MoveAxesRelativeResult,
     robot.MoveAxesToResult,
     robot.MoveToResult,
@@ -905,6 +928,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerShuttleError],
 ]
 
 

@@ -217,6 +217,10 @@ describe('createPresavedStepForm', () => {
       disposalVolume_volume: '1',
       path: 'single',
       preWetTip: false,
+      pushOut_checkbox: null,
+      pushOut_volume: null,
+      conditioning_checkbox: false,
+      conditioning_volume: null,
       stepDetails: '',
       stepName: 'transfer',
       volume: null,
@@ -269,6 +273,7 @@ describe('createPresavedStepForm', () => {
         tipRack: null,
         blowout_flowRate: null,
         liquidClassesSupported: true,
+        liquidClass: null,
       })
     })
   })

@@ -11,11 +11,12 @@ import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 
 // Inject the props specific to the legacy LPC flows, too.
 export interface LegacySupportLPCFlowsProps extends LPCFlowsProps {
-  runRecordExistingOffsets: LabwareOffset[]
+  ot2Offsets: LabwareOffset[]
 }
 
 export interface LPCFlowsProps {
   onCloseClick: () => void
+  isClosing: boolean
   runId: string
   robotType: RobotType
   deckConfig: DeckConfiguration

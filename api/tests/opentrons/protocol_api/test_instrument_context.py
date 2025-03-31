@@ -17,6 +17,9 @@ from opentrons.protocol_engine.errors.error_occurrence import (
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as mock_tx_liquid_utils,
+)
 
 from tests.opentrons.protocol_api.partial_tip_configurations import (
     PipetteReliantNozzleConfigSpec,
@@ -53,7 +56,7 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.types import Location, Mount, Point
+from opentrons.types import Location, Mount, Point, NozzleMapInterface
 
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.errors.exceptions import (
@@ -84,6 +87,12 @@ def _mock_instrument_support_module(
 def _mock_labware_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(labware, inspect.isfunction):
         monkeypatch.setattr(labware, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def _mock_transfer_liquid_utils(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(mock_tx_liquid_utils, inspect.isfunction):
+        monkeypatch.setattr(mock_tx_liquid_utils, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -1621,6 +1630,7 @@ def test_mix_with_lpd(
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_has_clean_tip()).then_return(True)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
     decoy.when(mock_instrument_core.nozzle_configuration_valid_for_lld()).then_return(
         True
@@ -1669,6 +1679,65 @@ def test_mix_with_lpd(
     decoy.verify(
         mock_instrument_core.liquid_probe_with_recovery(mock_well._core, top_location),
         times=1,
+    )
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize("clean,expected", [(True, 1), (False, 0)])
+def test_aspirate_with_lpd(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+    clean: bool,
+    expected: int,
+) -> None:
+    """It should aspirate/dispense to a well several times and do 1 lpd."""
+    mock_well = decoy.mock(cls=Well)
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    top_location = Location(point=Point(3, 2, 1), labware=None)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=last_location)
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
+    decoy.when(mock_well.top()).then_return(top_location)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_has_clean_tip()).then_return(clean)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+    decoy.when(mock_instrument_core.nozzle_configuration_valid_for_lld()).then_return(
+        True
+    )
+
+    subject.liquid_presence_detection = True
+    subject.aspirate(volume=10.0, location=input_location, rate=1.23)
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            bottom_location,
+            mock_well._core,
+            10.0,
+            1.23,
+            5.67,
+            False,
+            None,
+        ),
+        times=1,
+    )
+    decoy.verify(
+        mock_instrument_core.liquid_probe_with_recovery(mock_well._core, top_location),
+        times=expected,
     )
 
 
@@ -1726,6 +1795,7 @@ def test_air_gap_uses_air_gap(
     subject.air_gap(volume=10, height=5)
 
     decoy.verify(mock_move_to(top_location, publish=False))
+    decoy.verify(mock_instrument_core.prepare_to_aspirate())
     decoy.verify(mock_instrument_core.air_gap_in_place(10, 11))
 
 
@@ -1767,6 +1837,9 @@ def test_transfer_liquid_raises_for_unequal_source_and_dest(
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(mock_well)
     ).then_return([mock_well, mock_well])
@@ -1793,6 +1866,7 @@ def test_transfer_liquid_raises_for_unequal_source_and_dest(
 def test_transfer_liquid_raises_for_non_liquid_handling_locations(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -1801,6 +1875,9 @@ def test_transfer_liquid_raises_for_non_liquid_handling_locations(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -1819,6 +1896,7 @@ def test_transfer_liquid_raises_for_non_liquid_handling_locations(
 def test_transfer_liquid_raises_for_bad_tip_policy(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -1827,6 +1905,9 @@ def test_transfer_liquid_raises_for_bad_tip_policy(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -1847,6 +1928,7 @@ def test_transfer_liquid_raises_for_bad_tip_policy(
 def test_transfer_liquid_raises_for_no_tip(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -1855,6 +1937,9 @@ def test_transfer_liquid_raises_for_no_tip(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -1973,40 +2058,76 @@ def test_transfer_liquid_delegates_to_engine_core(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-def test_distribute_liquid_raises_for_invalid_locations(
+def test_transfer_liquid_multi_channel_delegates_to_engine_core(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if source or destination is invalid."""
+    """It should delegate the transfer execution to core for a multi-channel pipette."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
+    tip_racks = [decoy.mock(cls=Labware)]
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    next_tiprack = decoy.mock(cls=Labware)
+    subject.starting_tip = None
+    subject._tip_racks = tip_racks
+
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
     decoy.when(
-        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([[mock_well]])
-    ).then_raise(ValueError("Oh no"))
-    with pytest.raises(ValueError):
-        subject.distribute_liquid(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [[mock_well, mock_well]]
+        )
+    ).then_return([mock_well, mock_well])
+    decoy.when(mock_validation.ensure_new_tip_policy("never")).then_return(
+        TransferTipPolicyV2.ONCE
+    )
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(2)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well], mock_nozzle_map
+        )
+    ).then_return([mock_well])
+
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(
+        mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
+    ).then_return(trash_location.move(Point(1, 2, 3)))
+    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
+    subject.transfer_liquid(
+        liquid_class=test_liq_class,
+        volume=10,
+        source=[[mock_well, mock_well]],
+        dest=[[mock_well, mock_well]],
+        new_tip="never",
+        trash_location=trash_location,
+        return_tip=True,
+    )
+    decoy.verify(
+        mock_instrument_core.transfer_liquid(
             liquid_class=test_liq_class,
             volume=10,
-            source=mock_well,
-            dest=[[mock_well]],
+            source=[(Location(Point(), labware=mock_well), mock_well._core)],
+            dest=[(Location(Point(), labware=mock_well), mock_well._core)],
+            new_tip=TransferTipPolicyV2.ONCE,
+            tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
+            trash_location=trash_location.move(Point(1, 2, 3)),
+            return_tip=True,
         )
-    with pytest.raises(ValueError, match="Source should be a single Well"):
-        subject.distribute_liquid(
-            liquid_class=test_liq_class,
-            volume=10,
-            source="abc",  # type: ignore
-            dest=[mock_well],
-        )
+    )
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_distribute_liquid_raises_if_more_than_one_source(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2014,10 +2135,32 @@ def test_distribute_liquid_raises_if_more_than_one_source(
     """It should raise error if source is more than one well."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
-    with pytest.raises(ValueError, match="Source should be a single Well"):
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [mock_well, mock_well]
+        )
+    ).then_return([mock_well, mock_well])
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
+    ).then_return([mock_well])
+    decoy.when(mock_validation.ensure_new_tip_policy("once")).then_return(
+        TransferTipPolicyV2.ONCE
+    )
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(
+        mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
+    ).then_return(trash_location)
+    with pytest.raises(ValueError, match="Source should be a single well"):
         subject.distribute_liquid(
-            liquid_class=test_liq_class, volume=10, source=[mock_well, mock_well], dest=[mock_well]  # type: ignore
+            liquid_class=test_liq_class,
+            volume=10,
+            source=[mock_well, mock_well],
+            dest=[mock_well],
+            trash_location=trash_location,
         )
 
 
@@ -2025,6 +2168,7 @@ def test_distribute_liquid_raises_if_more_than_one_source(
 def test_distribute_liquid_raises_for_non_liquid_handling_locations(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2033,6 +2177,9 @@ def test_distribute_liquid_raises_for_non_liquid_handling_locations(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2054,6 +2201,7 @@ def test_distribute_liquid_raises_for_non_liquid_handling_locations(
 def test_distribute_liquid_raises_for_bad_tip_policy(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2062,6 +2210,9 @@ def test_distribute_liquid_raises_for_bad_tip_policy(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2085,6 +2236,7 @@ def test_distribute_liquid_raises_for_bad_tip_policy(
 def test_distribute_liquid_raises_for_no_tip(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2093,6 +2245,9 @@ def test_distribute_liquid_raises_for_no_tip(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2173,6 +2328,9 @@ def test_distribute_liquid_raises_if_tip_policy_per_source(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2208,7 +2366,7 @@ def test_distribute_liquid_delegates_to_engine_core(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should delegate the execution to core."""
+    """It should delegate the distribute execution to core."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
@@ -2259,40 +2417,89 @@ def test_distribute_liquid_delegates_to_engine_core(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-def test_consolidate_liquid_raises_for_invalid_locations(
+def test_distribute_liquid_multi_channel_delegates_to_engine_core(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if source or destination is invalid."""
+    """It should delegate the distribute execution to core for a multi-channel pipette."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
+    tip_racks = [decoy.mock(cls=Labware)]
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    next_tiprack = decoy.mock(cls=Labware)
+    subject.starting_tip = None
+    subject._tip_racks = tip_racks
+
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
     decoy.when(
-        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([[mock_well]])
-    ).then_raise(ValueError("Oh no"))
-    with pytest.raises(ValueError):
-        subject.consolidate_liquid(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [mock_well, mock_well, mock_well]
+        )
+    ).then_return([mock_well, mock_well, mock_well])
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [[mock_well, mock_well]]
+        )
+    ).then_return([mock_well, mock_well])
+    decoy.when(mock_validation.ensure_new_tip_policy("never")).then_return(
+        TransferTipPolicyV2.ONCE
+    )
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(2)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well, mock_well], mock_nozzle_map
+        )
+    ).then_return([mock_well])
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well], mock_nozzle_map
+        )
+    ).then_return([mock_well, mock_well])
+
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(
+        mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
+    ).then_return(trash_location.move(Point(1, 2, 3)))
+    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
+    subject.distribute_liquid(
+        liquid_class=test_liq_class,
+        volume=10,
+        source=[mock_well, mock_well, mock_well],
+        dest=[[mock_well, mock_well]],
+        new_tip="never",
+        trash_location=trash_location,
+        return_tip=True,
+    )
+    decoy.verify(
+        mock_instrument_core.distribute_liquid(
             liquid_class=test_liq_class,
             volume=10,
-            source=[[mock_well]],
-            dest=mock_well,
+            source=(Location(Point(), labware=mock_well), mock_well._core),
+            dest=[
+                (Location(Point(), labware=mock_well), mock_well._core),
+                (Location(Point(), labware=mock_well), mock_well._core),
+            ],
+            new_tip=TransferTipPolicyV2.ONCE,
+            tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
+            trash_location=trash_location.move(Point(1, 2, 3)),
+            return_tip=True,
         )
-    with pytest.raises(ValueError, match="Destination should be a single Well"):
-        subject.consolidate_liquid(
-            liquid_class=test_liq_class,
-            volume=10,
-            source=[mock_well],
-            dest="abc",  # type: ignore
-        )
+    )
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_consolidate_liquid_raises_if_more_than_one_destination(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2300,13 +2507,29 @@ def test_consolidate_liquid_raises_if_more_than_one_destination(
     """It should raise error if destination is more than one well."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
-    with pytest.raises(ValueError, match="Destination should be a single Well"):
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [mock_well, mock_well]
+        )
+    ).then_return([mock_well, mock_well])
+    decoy.when(mock_validation.ensure_new_tip_policy("once")).then_return(
+        TransferTipPolicyV2.ONCE
+    )
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(
+        mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
+    ).then_return(trash_location)
+    with pytest.raises(ValueError, match="Destination should be a single well"):
         subject.consolidate_liquid(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well, mock_well],
-            dest=[mock_well, mock_well],  # type: ignore
+            dest=[mock_well, mock_well],
+            trash_location=trash_location,
         )
 
 
@@ -2314,6 +2537,7 @@ def test_consolidate_liquid_raises_if_more_than_one_destination(
 def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2322,6 +2546,9 @@ def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2343,6 +2570,7 @@ def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
 def test_consolidate_liquid_raises_for_bad_tip_policy(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2351,6 +2579,9 @@ def test_consolidate_liquid_raises_for_bad_tip_policy(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2374,6 +2605,7 @@ def test_consolidate_liquid_raises_for_bad_tip_policy(
 def test_consolidate_liquid_raises_for_no_tip(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2382,6 +2614,9 @@ def test_consolidate_liquid_raises_for_no_tip(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2419,6 +2654,9 @@ def test_consolidate_liquid_raises_if_tip_has_liquid(
     subject.tip_racks = tip_racks
 
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2452,6 +2690,9 @@ def test_consolidate_liquid_raises_if_tip_policy_per_source(
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
     ).then_return([mock_well])
@@ -2487,7 +2728,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should delegate the execution to core."""
+    """It should delegate the consolidate execution to core."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
@@ -2529,6 +2770,86 @@ def test_consolidate_liquid_delegates_to_engine_core(
             liquid_class=test_liq_class,
             volume=10,
             source=[(Location(Point(), labware=mock_well), mock_well._core)],
+            dest=(Location(Point(), labware=mock_well), mock_well._core),
+            new_tip=TransferTipPolicyV2.ONCE,
+            tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
+            trash_location=trash_location.move(Point(1, 2, 3)),
+            return_tip=True,
+        )
+    )
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    robot_type: RobotType,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+) -> None:
+    """It should delegate the consolidate execution to core for a multi-channel pipette."""
+    test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
+    mock_well = decoy.mock(cls=Well)
+    tip_racks = [decoy.mock(cls=Labware)]
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    next_tiprack = decoy.mock(cls=Labware)
+    subject.starting_tip = None
+    subject._tip_racks = tip_racks
+
+    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [mock_well, mock_well, mock_well]
+        )
+    ).then_return([mock_well, mock_well, mock_well])
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [[mock_well, mock_well]]
+        )
+    ).then_return([mock_well, mock_well])
+    decoy.when(mock_validation.ensure_new_tip_policy("never")).then_return(
+        TransferTipPolicyV2.ONCE
+    )
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(2)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well, mock_well], mock_nozzle_map
+        )
+    ).then_return([mock_well])
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well], mock_nozzle_map
+        )
+    ).then_return([mock_well, mock_well])
+
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(
+        mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
+    ).then_return(trash_location.move(Point(1, 2, 3)))
+    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
+
+    subject.consolidate_liquid(
+        liquid_class=test_liq_class,
+        volume=10,
+        source=[[mock_well, mock_well]],
+        dest=[mock_well, mock_well, mock_well],
+        new_tip="never",
+        trash_location=trash_location,
+        return_tip=True,
+    )
+    decoy.verify(
+        mock_instrument_core.consolidate_liquid(
+            liquid_class=test_liq_class,
+            volume=10,
+            source=[
+                (Location(Point(), labware=mock_well), mock_well._core),
+                (Location(Point(), labware=mock_well), mock_well._core),
+            ],
             dest=(Location(Point(), labware=mock_well), mock_well._core),
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],

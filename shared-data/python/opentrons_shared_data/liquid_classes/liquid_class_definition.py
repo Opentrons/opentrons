@@ -139,15 +139,18 @@ class MixParams(BaseModel):
     """Parameters for mix."""
 
     repetitions: _StrictNonNegativeInt = Field(
-        ..., description="Number of mixing repetitions."
+        ...,
+        description="Number of mixing repetitions. 0 is valid, but no mixing will occur.",
     )
-    volume: _Number = Field(..., description="Volume used for mixing, in microliters.")
+    volume: _GreaterThanZeroNumber = Field(
+        ..., description="Volume used for mixing, in microliters."
+    )
 
 
 class MixProperties(BaseModel):
     """Mixing properties."""
 
-    enable: bool = Field(..., description="Whether mix is enabled.")
+    enable: StrictBool = Field(..., description="Whether mix is enabled.")
     params: MixParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the mix function.",
@@ -170,7 +173,7 @@ class BlowoutParams(BaseModel):
     location: BlowoutLocation = Field(
         ..., description="Location well or trash entity for blow out."
     )
-    flowRate: _NonNegativeNumber = Field(
+    flowRate: _GreaterThanZeroNumber = Field(
         ..., description="Flow rate for blow out, in microliters per second."
     )
 
@@ -178,7 +181,7 @@ class BlowoutParams(BaseModel):
 class BlowoutProperties(BaseModel):
     """Blowout properties."""
 
-    enable: bool = Field(..., description="Whether blow-out is enabled.")
+    enable: StrictBool = Field(..., description="Whether blow-out is enabled.")
     params: BlowoutParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the blowout function.",

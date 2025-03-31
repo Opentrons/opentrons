@@ -13,10 +13,10 @@ import {
   getSortedLiquidClassDefs,
   isFlexPipette,
 } from '@opentrons/shared-data'
+import { getFlexNameConversion } from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../../../../../../step-forms'
 import { getLiquidEntities } from '../../../../../../step-forms/selectors'
 import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
-import { getFlexNameConversion } from '../../../../../../file-data/selectors/utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { LiquidClassesOption } from '@opentrons/shared-data'
 import type { FieldPropsByName } from '../../types'
@@ -26,13 +26,16 @@ interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
+  type?: 'mix' | 'transfer'
 }
+
 export const LiquidClassesStepTools = ({
   propsForFields,
   formData,
   setShowFormErrors,
+  type,
 }: LiquidClassesStepToolsProps): JSX.Element => {
-  const { t } = useTranslation(['liquids'])
+  const { t } = useTranslation('liquids')
   const liquids = useSelector(getLiquidEntities)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
@@ -117,7 +120,7 @@ export const LiquidClassesStepTools = ({
     >
       <Flex padding={`0 ${SPACING.spacing16}`}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('apply_liquid_classes')}
+          {t('apply_liquid_classes', { command: t(type) })}
         </StyledText>
       </Flex>
       <Flex

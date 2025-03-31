@@ -323,6 +323,7 @@ class PipetteEmptyFluidUpdate:
     """Sets the pipette to be valid and empty."""
 
     pipette_id: str
+    clean_tip: bool
     type: typing.Literal["empty"] = "empty"
 
 
@@ -366,6 +367,7 @@ class FlexStackerPoolConstraint:
     """The labware definitions that are contained in the pool."""
 
     max_pool_count: int
+    pool_overlap: float
     primary_definition: LabwareDefinition
     lid_definition: LabwareDefinition | None
     adapter_definition: LabwareDefinition | None
@@ -776,10 +778,10 @@ class StateUpdate:
         )
         return self
 
-    def set_fluid_empty(self: Self, pipette_id: str) -> Self:
-        """Update record fo fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
+    def set_fluid_empty(self: Self, pipette_id: str, clean_tip: bool = False) -> Self:
+        """Update record of fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
         self.pipette_aspirated_fluid = PipetteEmptyFluidUpdate(
-            type="empty", pipette_id=pipette_id
+            type="empty", pipette_id=pipette_id, clean_tip=clean_tip
         )
         return self
 
@@ -833,6 +835,7 @@ class StateUpdate:
         self,
         module_id: str,
         max_count: int,
+        pool_overlap: float,
         primary_definition: LabwareDefinition,
         adapter_definition: LabwareDefinition | None,
         lid_definition: LabwareDefinition | None,
@@ -844,6 +847,7 @@ class StateUpdate:
             ),
             pool_constraint=FlexStackerPoolConstraint(
                 max_pool_count=max_count,
+                pool_overlap=pool_overlap,
                 primary_definition=primary_definition,
                 lid_definition=lid_definition,
                 adapter_definition=adapter_definition,

@@ -104,6 +104,9 @@ class PipettingHandler(TypingProtocol):
     ) -> LiquidTrackingType:
         """Detect liquid level."""
 
+    async def increase_evo_disp_count(self, pipette_id: str) -> None:
+        """Increase evo tip dispense action count."""
+
 
 class HardwarePipettingHandler(PipettingHandler):
     """Liquid handling, using the Hardware API."""
@@ -366,6 +369,14 @@ class HardwarePipettingHandler(PipettingHandler):
                 blow_out=original_blow_out_rate,
             )
 
+    async def increase_evo_disp_count(self, pipette_id: str) -> None:
+        """Increase evo tip dispense action count."""
+        hw_pipette = self._state_view.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+        await self._hardware_api.increase_evo_disp_count(mount=hw_pipette.mount)
+
 
 class VirtualPipettingHandler(PipettingHandler):
     """Liquid handling, using the virtual pipettes.""" ""
@@ -385,7 +396,9 @@ class VirtualPipettingHandler(PipettingHandler):
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
-        return self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
+        return self._state_view.pipettes.get_aspirated_volume(
+            pipette_id
+        ) is not None and self._state_view.pipettes.get_ready_to_aspirate(pipette_id)
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""
@@ -492,6 +505,10 @@ class VirtualPipettingHandler(PipettingHandler):
         return _validate_dispense_volume(
             state_view=self._state_view, pipette_id=pipette_id, dispense_volume=volume
         )
+
+    async def increase_evo_disp_count(self, pipette_id: str) -> None:
+        """Increase evo tip dispense action count."""
+        pass
 
 
 def create_pipetting_handler(

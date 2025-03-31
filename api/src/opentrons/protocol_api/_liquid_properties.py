@@ -226,7 +226,7 @@ class MixProperties:
 
     @volume.setter
     def volume(self, new_volume: float) -> None:
-        validated_volume = validation.ensure_positive_float(new_volume)
+        validated_volume = validation.ensure_greater_than_zero_float(new_volume)
         self._volume = validated_volume
 
     def _get_shared_data_params(self) -> Optional[SharedDataMixParams]:
@@ -280,7 +280,7 @@ class BlowoutProperties:
 
     @flow_rate.setter
     def flow_rate(self, new_flow_rate: float) -> None:
-        validated_flow_rate = validation.ensure_positive_float(new_flow_rate)
+        validated_flow_rate = validation.ensure_greater_than_zero_float(new_flow_rate)
         self._flow_rate = validated_flow_rate
 
     def _get_shared_data_params(self) -> Optional[SharedDataBlowoutParams]:

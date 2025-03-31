@@ -15,8 +15,9 @@ export function LPCWizardContainer(
       return (
         <LegacyLabwarePositionCheck
           {...props}
-          existingOffsets={props.runRecordExistingOffsets}
+          existingOffsets={props.ot2Offsets}
           mostRecentAnalysis={props.analysis}
+          isDeletingMaintenanceRun={props.isClosing}
         />
       )
     default: {

@@ -90,7 +90,7 @@ enum MixLocators {
   AspWellOrder = '[data-testid="WellsOrderField_ListButton_aspirate"]',
   ResetToDefault = 'button:contains("Reset to default")',
   PrimaryOrderDropdown = 'div[tabindex="0"].sc-bqWxrE jKLbYH iFjNDq',
-  CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]',
+  CancelAspSettings = 'button:contains("Done")',
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
   YpositionInput = '[id="TipPositionModal_y_custom_input"]',
@@ -131,7 +131,7 @@ export const MixSteps = {
   SelectLabware: (): StepThunk => ({
     call: () => {
       cy.contains(MixContent.ChooseOption).should('be.visible').click()
-      cy.contains(MixContent.Reservoir).should('be.visible').click()
+      cy.contains(MixContent.WellPlate).should('be.visible').click()
     },
   }),
 
@@ -212,10 +212,10 @@ export const MixSteps = {
         .should('be.visible')
       cy.get(MixLocators.MixTipPos).click()
       cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
-      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}4')
       cy.get(MixLocators.ResetToDefault).click()
-      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}5')
       cy.contains(MixContent.Cancel).should('exist').should('be.visible')

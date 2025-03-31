@@ -7,7 +7,7 @@ import {
   maxDispenseWellVolume,
   tipPositionInTube,
   mixTipPositionInTube,
-  lowVolumeTransfer,
+  incompatibleLowVolume,
   incompatiblePipettePath,
   incompatiblePipetteTiprack,
 } from '../warnings'
@@ -43,7 +43,7 @@ describe('Min air gap volume', () => {
           [checkboxField]: false,
           [volumeField]: null,
           ...{ pipette },
-        }
+        } as any
         expect(minAirGapVolume({ ...fields })).toBe(null)
       })
       it('should NOT return a warning when there is no air gap volume specified', () => {
@@ -51,7 +51,7 @@ describe('Min air gap volume', () => {
           [checkboxField]: true,
           [volumeField]: null,
           ...{ pipette },
-        }
+        } as any
         expect(minAirGapVolume({ ...fields })).toBe(null)
       })
       it('should NOT return a warning when the air gap volume is greater than the pipette min volume', () => {
@@ -59,7 +59,7 @@ describe('Min air gap volume', () => {
           [checkboxField]: true,
           [volumeField]: '150',
           ...{ pipette },
-        }
+        } as any
         expect(minAirGapVolume(fields)).toBe(null)
       })
 
@@ -68,7 +68,7 @@ describe('Min air gap volume', () => {
           [checkboxField]: true,
           [volumeField]: '100',
           ...{ pipette },
-        }
+        } as any
         expect(minAirGapVolume(fields)).toBe(null)
       })
       it('should return a warning when the air gap volume is less than the pipette min volume', () => {
@@ -113,14 +113,14 @@ describe('Below pipette minimum volume', () => {
     const fields = {
       ...fieldsWithPipette,
       volume: 100,
-    }
+    } as any
     expect(belowPipetteMinimumVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
     const fields = {
       ...fieldsWithPipette,
       volume: 101,
-    }
+    } as any
     expect(belowPipetteMinimumVolume(fields)).toBe(null)
   })
   it('should return a warning when the volume is less than the min pipette volume', () => {
@@ -161,35 +161,35 @@ describe('Below min disposal volume', () => {
     const fields = {
       ...fieldsWithPipette,
       pipette: undefined,
-    }
+    } as any
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when there is no pipette spec', () => {
     const fields = {
       ...fieldsWithPipette,
       pipette: { spec: undefined },
-    }
+    } as any
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the path is NOT multi dispense', () => {
     const fields = {
       ...fieldsWithPipette,
       path: 'another_path',
-    }
+    } as any
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the volume is equal to the min pipette volume', () => {
     const fields = {
       ...fieldsWithPipette,
       disposalVolume_volume: 100,
-    }
+    } as any
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
     const fields = {
       ...fieldsWithPipette,
       disposalVolume_volume: 100,
-    }
+    } as any
     expect(minDisposalVolume(fields)).toBe(null)
   })
 
@@ -300,8 +300,10 @@ describe('Max dispense well volume', () => {
       }
     })
     it('renders the errors for all 2', () => {
-      expect(tipPositionInTube(fields)?.type).toBe('TIP_POSITIONED_LOW_IN_TUBE')
-      expect(mixTipPositionInTube(fields)?.type).toBe(
+      expect(tipPositionInTube(fields as any)?.type).toBe(
+        'TIP_POSITIONED_LOW_IN_TUBE'
+      )
+      expect(mixTipPositionInTube(fields as any)?.type).toBe(
         'MIX_TIP_POSITIONED_LOW_IN_TUBE'
       )
     })
@@ -309,8 +311,8 @@ describe('Max dispense well volume', () => {
       fields.aspirate_mmFromBottom = 3
       fields.dispense_mmFromBottom = 3
       fields.mix_mmFromBottom = 3
-      expect(tipPositionInTube(fields)).toBe(null)
-      expect(mixTipPositionInTube(fields)).toBe(null)
+      expect(tipPositionInTube(fields as any)).toBe(null)
+      expect(mixTipPositionInTube(fields as any)).toBe(null)
     })
     it('renders null for both when the labware is not a tube rack', () => {
       fields.aspirate_labware = {
@@ -331,8 +333,8 @@ describe('Max dispense well volume', () => {
         labwareDefURI: 'mockURI',
         pythonName: 'mockPythonName',
       }
-      expect(tipPositionInTube(fields)).toBe(null)
-      expect(mixTipPositionInTube(fields)).toBe(null)
+      expect(tipPositionInTube(fields as any)).toBe(null)
+      expect(mixTipPositionInTube(fields as any)).toBe(null)
     })
   })
 })
@@ -361,21 +363,21 @@ describe('Incompatible liquid classes', () => {
       ...fieldsWithPipette,
       volume: 10,
     }
-    expect(lowVolumeTransfer(fields)?.type).toBe('LOW_VOLUME_TRANSFER')
+    expect(incompatibleLowVolume(fields)?.type).toBe('LOW_VOLUME_TRANSFER')
   })
   it('should NOT return a warning when volume is greater than 10', () => {
     const fields = {
       ...fieldsWithPipette,
       volume: 50,
     }
-    expect(lowVolumeTransfer(fields)).toBe(null)
+    expect(incompatibleLowVolume(fields)).toBe(null)
   })
   it('should return a warning when volume is less than 10', () => {
     const fields = {
       ...fieldsWithPipette,
       volume: 5,
     }
-    expect(lowVolumeTransfer(fields)?.type).toBe('LOW_VOLUME_TRANSFER')
+    expect(incompatibleLowVolume(fields)?.type).toBe('LOW_VOLUME_TRANSFER')
   })
   it('should NOT return a warning when path is compatible', () => {
     const fields = {

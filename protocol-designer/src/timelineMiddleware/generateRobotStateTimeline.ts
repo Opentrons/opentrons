@@ -1,14 +1,11 @@
 import {
-  dropTipInPlace,
-  moveToAddressableArea,
-  getWasteChuteAddressableAreaNamePip,
   dropTipInTrash,
+  dropTipInWasteChute,
   curryCommandCreator,
   dropTip,
   reduceCommandCreators,
   commandCreatorsTimeline,
   getPipetteIdFromCCArgs,
-  ZERO_OFFSET,
 } from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'
@@ -70,16 +67,10 @@ export const generateRobotStateTimeline = (
           'changeTip' in nextStepArgsForPipette &&
           nextStepArgsForPipette.changeTip === 'never'
 
-        const dropTipEntity =
-          invariantContext.additionalEquipmentEntities[dropTipLocation]
-        const isWasteChute = dropTipEntity?.name === 'wasteChute'
-        const isTrashBin = dropTipEntity?.name === 'trashBin'
-
-        const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-        const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-          pipetteSpec.channels
-        )
-
+        const isWasteChute =
+          invariantContext.wasteChuteEntities[dropTipLocation] != null
+        const isTrashBin =
+          invariantContext.trashBinEntities[dropTipLocation] != null
         let dropTipCommands = [
           curryCommandCreator(dropTip, {
             pipette: pipetteId,
@@ -88,18 +79,17 @@ export const generateRobotStateTimeline = (
         ]
         if (isWasteChute) {
           dropTipCommands = [
-            curryCommandCreator(moveToAddressableArea, {
+            curryCommandCreator(dropTipInWasteChute, {
               pipetteId,
-              addressableAreaName: addressableAreaNameWasteChute,
-              offset: ZERO_OFFSET,
-            }),
-            curryCommandCreator(dropTipInPlace, {
-              pipetteId,
+              wasteChuteId:
+                invariantContext.wasteChuteEntities[dropTipLocation].id,
             }),
           ]
         }
+
         if (isTrashBin) {
-          const trashLocation = dropTipEntity.location
+          const trashLocation =
+            invariantContext.trashBinEntities[dropTipLocation].location
           dropTipCommands = [
             curryCommandCreator(dropTipInTrash, {
               pipetteId,
@@ -107,6 +97,7 @@ export const generateRobotStateTimeline = (
             }),
           ]
         }
+
         if (!willReuseTip) {
           return [
             ...acc,
@@ -129,5 +120,6 @@ export const generateRobotStateTimeline = (
     invariantContext,
     initialRobotState
   )
+
   return timeline
 }

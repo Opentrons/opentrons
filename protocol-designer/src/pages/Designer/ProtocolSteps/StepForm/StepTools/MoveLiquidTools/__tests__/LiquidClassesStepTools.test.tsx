@@ -14,7 +14,7 @@ import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../../step-forms/selectors')
 
-const pipetteId = 'af1e518a-0e00-4270-a22a-ca5b43daff30'
+const pipetteId = 'mockPipetteId'
 
 const render = (props: ComponentProps<typeof LiquidClassesStepTools>) => {
   return renderWithProviders(<LiquidClassesStepTools {...props} />, {
@@ -39,6 +39,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
         },
       },
       formData: formDataForSingleStep as any,
+      type: 'transfer',
     }
     vi.mocked(getLiquidEntities).mockReturnValue({})
     vi.mocked(getPipetteEntities).mockReturnValue({
@@ -54,6 +55,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
   })
 
   it('renders fields and buttons', () => {
+    props.formData.pipette = pipetteId
     props.formData.volume = 11
     render(props)
     screen.getByText('Apply liquid class settings for this transfer')
@@ -98,5 +100,11 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
     expect(water).toHaveStyle(`background-color: ${COLORS.grey35}`)
     fireEvent.click(water)
     expect(props.propsForFields.liquidClass.updateValue).not.toHaveBeenCalled()
+  })
+
+  it('renders subtext for mix when mix is true', () => {
+    props.type = 'mix'
+    render(props)
+    screen.getByText('Apply liquid class settings for this mix')
   })
 })

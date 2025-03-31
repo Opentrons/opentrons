@@ -1,5 +1,7 @@
 """Pipetting execution handler."""
+
 from typing import cast
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy
@@ -453,6 +455,10 @@ def test_virtual_get_is_ready_to_aspirate(
         mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
     ).then_raise(TipNotAttachedError())
 
+    decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate(pipette_id="pipette-id")
+    ).then_return(True)
+
     with pytest.raises(TipNotAttachedError):
         subject.get_is_ready_to_aspirate(pipette_id="pipette-id")
 
@@ -460,7 +466,17 @@ def test_virtual_get_is_ready_to_aspirate(
         mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id-123")
     ).then_return(0)
 
+    decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate(pipette_id="pipette-id-123")
+    ).then_return(True)
+
     assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
+
+    decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate(pipette_id="pipette-id-123")
+    ).then_return(False)
+
+    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is False
 
 
 async def test_virtual_aspirate_in_place(
@@ -738,3 +754,31 @@ async def test_dispense_volume_validation(
                 push_out=7,
                 is_full_dispense=True,
             )
+
+
+async def test_hw_increase_evo_disp_count(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+) -> None:
+    """Should set flow_rate and call hardware_api aspirate."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return(
+        sentinel.attached_instruments
+    )
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id", attached_pipettes=sentinel.attached_instruments
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=cast(
+                PipetteDict,
+                {},
+            ),
+        )
+    )
+    await hardware_subject.increase_evo_disp_count(pipette_id="pipette-id")
+
+    decoy.verify(await mock_hardware_api.increase_evo_disp_count(mount=Mount.LEFT))

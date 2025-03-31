@@ -2,7 +2,7 @@ import {
   PROCEED_STEP,
   SET_INITIAL_POSITION,
   SET_FINAL_POSITION,
-  START_LPC,
+  UPDATE_LPC,
   FINISH_LPC,
   GO_BACK_LAST_STEP,
   SET_SELECTED_LABWARE,
@@ -12,12 +12,18 @@ import {
   GO_BACK_HANDLE_LW_SUBSTEP,
   RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
+  APPLIED_OFFSETS_TO_RUN,
+  SOURCE_OFFSETS_FROM_RUN,
+  SOURCE_OFFSETS_FROM_DATABASE,
+  UPDATE_CONFLICT_TIMESTAMP,
+  UPDATE_LPC_DECK,
+  UPDATE_LPC_LABWARE,
 } from '../constants'
 
 import type {
   FinalPositionAction,
   InitialPositionAction,
-  StartLPCAction,
+  UpdateLPCAction,
   LPCWizardState,
   PositionParams,
   ProceedStepAction,
@@ -33,8 +39,17 @@ import type {
   LocationSpecificOffsetLocationDetails,
   ResetLocationSpecificOffsetToDefaultAction,
   ClearSelectedLabwareWorkingOffsetsAction,
+  AppliedOffsetsToRunAction,
+  SourceOffsetsFromRunAction,
+  SourceOffsetsFromDatabaseAction,
+  UpdateConflictTimestampAction,
+  ConflictTimestampInfo,
+  UpdateLPCDeckAction,
+  LPCLabwareInfo,
+  UpdateLPCLabwareAction,
 } from '../types'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export const proceedStep = (
   runId: string,
@@ -114,12 +129,28 @@ export const applyWorkingOffsets = (
   payload: { runId, saveResult },
 })
 
-export const startLPC = (
+export const updateLPC = (
   runId: string,
   state: LPCWizardState
-): StartLPCAction => ({
-  type: START_LPC,
+): UpdateLPCAction => ({
+  type: UPDATE_LPC,
   payload: { runId, state },
+})
+
+export const updateLPCDeck = (
+  runId: string,
+  deck: DeckConfiguration
+): UpdateLPCDeckAction => ({
+  type: UPDATE_LPC_DECK,
+  payload: { runId, deck },
+})
+
+export const updateLPCLabware = (
+  runId: string,
+  labware: LPCLabwareInfo
+): UpdateLPCLabwareAction => ({
+  type: UPDATE_LPC_LABWARE,
+  payload: { runId, labware },
 })
 
 export const closeLPC = (runId: string): FinishLPCAction => ({
@@ -140,4 +171,33 @@ export const goBackEditOffsetSubstep = (
 ): GoBackHandleLwSubstepAction => ({
   type: GO_BACK_HANDLE_LW_SUBSTEP,
   payload: { runId },
+})
+
+export const appliedOffsetsToRun = (
+  runId: string
+): AppliedOffsetsToRunAction => ({
+  type: APPLIED_OFFSETS_TO_RUN,
+  payload: { runId },
+})
+
+export const sourceOffsetsFromRun = (
+  runId: string
+): SourceOffsetsFromRunAction => ({
+  type: SOURCE_OFFSETS_FROM_RUN,
+  payload: { runId },
+})
+
+export const sourceOffsetsFromDatabase = (
+  runId: string
+): SourceOffsetsFromDatabaseAction => ({
+  type: SOURCE_OFFSETS_FROM_DATABASE,
+  payload: { runId },
+})
+
+export const updateConflictTimestamp = (
+  runId: string,
+  info: ConflictTimestampInfo
+): UpdateConflictTimestampAction => ({
+  type: UPDATE_CONFLICT_TIMESTAMP,
+  payload: { runId, info },
 })

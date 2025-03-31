@@ -4,6 +4,8 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  COLORS,
+  CURSOR_DEFAULT,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_GRID,
@@ -27,6 +29,7 @@ export interface MultiDeckLabelTagBtn {
   buttonText: string
   onClick: () => void
   disabled?: boolean
+  ariaDisabled?: boolean
   buttonType?: SmallButtonTypes
 }
 
@@ -68,7 +71,14 @@ export function MultiDeckLabelTagBtns({
               {...colThreeSecondaryBtn}
             />
             <Btn css={DESKTOP_ONLY_BUTTON} {...colThreeSecondaryBtn}>
-              <StyledText desktopStyle="captionSemiBold">
+              <StyledText
+                desktopStyle="captionSemiBold"
+                css={
+                  colThreeSecondaryBtn.ariaDisabled
+                    ? DESKTOP_SECONDARY_ARIA_DISABLED
+                    : undefined
+                }
+              >
                 {colThreeSecondaryBtn.buttonText}
               </StyledText>
             </Btn>
@@ -76,7 +86,11 @@ export function MultiDeckLabelTagBtns({
         )}
         <>
           <SmallButton {...colThreePrimaryBtn} css={ODD_ONLY_BUTTON} />
-          <SecondaryButton {...colThreePrimaryBtn} css={DESKTOP_ONLY_BUTTON}>
+          <SecondaryButton
+            {...colThreePrimaryBtn}
+            css={DESKTOP_ONLY_BUTTON}
+            aria-disabled={colThreePrimaryBtn.ariaDisabled}
+          >
             <StyledText desktopStyle="captionSemiBold">
               {colThreePrimaryBtn.buttonText}
             </StyledText>
@@ -180,4 +194,9 @@ const DESKTOP_ONLY_BUTTON = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     display: none;
   }
+`
+
+const DESKTOP_SECONDARY_ARIA_DISABLED = css`
+  color: ${COLORS.grey40};
+  cursor: ${CURSOR_DEFAULT};
 `
