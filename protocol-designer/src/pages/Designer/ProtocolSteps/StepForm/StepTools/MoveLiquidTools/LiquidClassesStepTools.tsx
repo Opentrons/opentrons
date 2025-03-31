@@ -18,12 +18,15 @@ import type { FieldPropsByName } from '../../types'
 interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
+  type?: 'mix' | 'transfer'
 }
+
 export const LiquidClassesStepTools = ({
   propsForFields,
   setShowFormErrors,
+  type,
 }: LiquidClassesStepToolsProps): JSX.Element => {
-  const { t } = useTranslation(['liquids'])
+  const { t } = useTranslation('liquids')
   const liquids = useSelector(getLiquidEntities)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
@@ -91,7 +94,7 @@ export const LiquidClassesStepTools = ({
     >
       <Flex padding={`0 ${SPACING.spacing16}`}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('apply_liquid_classes')}
+          {t('apply_liquid_classes', { command: t(type) })}
         </StyledText>
       </Flex>
       <Flex
