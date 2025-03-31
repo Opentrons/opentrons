@@ -81,7 +81,7 @@ SLOTS = {
     "tips_50_5": "B4",  # inaccessible to pipette
     "tips_50_6": "C4",  # inaccessible to pipette
     "dye_holder": "B1",
-    "empty": "C2",
+    "empty": "C2",  # used for bot rearranging racks and calibrating tip-overlap
     "diluent_reservoir": "C1",
     "done": "D1",
     "src": "D2",
@@ -105,109 +105,36 @@ DILUENT_LABWARE = "nest_12_reservoir_15ml"
 
 PLATE_LID_LOAD_NAME = "plate_lid"  # custom labware?
 
-DILUENT_SUMMED_UL_PER_COLUMN = [
-    200,
-    100,
-    200,
-    100,
-    200,
-    100,
-    200,
-    100,
-    200,
-    100,
-    200,
-    100,
-]
+DILUENT_SUMMED_UL_PER_COLUMN = [200, 100] * 6
 
 
 @dataclass
-class DyeInfo:
+class Dye:
     name: str
     min: float
     max: float
     ul: float
-    use_count: int
+    use: int
     c: str
     src: str
     liq: Optional[Liquid]
     w: Optional[Well]
 
 
-DYE_INFO: List[DyeInfo] = [
-    DyeInfo(
-        name="HV",
-        min=200.1,
-        max=250.0,
-        ul=0.0,
-        use_count=0,
-        c="#9999FF",
-        src="A6",
-        liq=None,
-        w=None,
-    ),
-    DyeInfo(
-        name="A",
-        min=50.0,
-        max=200.0,
-        ul=0.0,
-        use_count=0,
-        c="#6666FF",
-        src="A5",
-        liq=None,
-        w=None,
-    ),
-    DyeInfo(
-        name="B",
-        min=10.0,
-        max=49.99,
-        ul=0.0,
-        use_count=0,
-        c="#3333FF",
-        src="A4",
-        liq=None,
-        w=None,
-    ),
-    DyeInfo(
-        name="C",
-        min=2.0,
-        max=9.99,
-        ul=0.0,
-        use_count=0,
-        c="#0000FF",
-        src="A3",
-        liq=None,
-        w=None,
-    ),
-    DyeInfo(
-        name="D",
-        min=1.0,
-        max=1.99,
-        ul=0.0,
-        use_count=0,
-        c="#0000CC",
-        src="A2",
-        liq=None,
-        w=None,
-    ),
-    DyeInfo(
-        name="E",
-        min=0.1,
-        max=0.99,
-        ul=0.0,
-        use_count=0,
-        c="#000088",
-        src="A1",
-        liq=None,
-        w=None,
-    ),
+DYE_INFO: List[Dye] = [
+    Dye("HV", 200.1, 250.0, 0.0, 0, "#FF9999", "A6", None, None),
+    Dye("A", 50.0, 200.0, 0.0, 0, "#FF6666", "A5", None, None),
+    Dye("B", 10.0, 49.99, 0.0, 0, "#FF3333", "A4", None, None),
+    Dye("C", 2.0, 9.99, 0.0, 0, "#FF0000", "A3", None, None),
+    Dye("D", 1.0, 1.99, 0.0, 0, "#CC0000", "A2", None, None),
+    Dye("E", 0.1, 0.99, 0.0, 0, "#880000", "A1", None, None),
 ]
 
 _diluent_wells_used: List[Well] = []
 _inaccessible_tip_racks: List[Labware] = []
 
 
-def get_latest_version(load_name: str) -> int:
+def _get_latest_version(load_name: str) -> int:
     labware_def_location = (
         f"{get_shared_data_root()}/labware/definitions/2/{load_name}/"
     )
@@ -227,6 +154,8 @@ def _pick_up_tip(ctx: ProtocolContext, pipette: InstrumentContext) -> None:
         _inaccessible_tip_racks = []
         pipette.reset_tipracks()
         pipette.pick_up_tip()
+    # TODO: (sigler) add tip-overlap calibration here
+    #       start with every time for now
 
 
 def _rearrange_tip_racks(
@@ -245,8 +174,8 @@ def _rearrange_tip_racks(
         ctx.move_labware(old_rack, inaccessible_slot, use_gripper=True)
 
     racks_to_remove = pipette.tip_racks[: len(_inaccessible_tip_racks)]
-    for remove, add in zip(racks_to_remove, _inaccessible_tip_racks):
-        _rotate_tip_rack_out(remove, add, empty_slot=SLOTS["empty"])
+    for old, new in zip(racks_to_remove, _inaccessible_tip_racks):
+        _rotate_tip_rack_out(old, new, empty_slot=SLOTS["empty"])
 
 
 def _spread_diluent_or_baseline(
@@ -322,10 +251,10 @@ def _load_liquid_diluent(
     diluent_reservoir.load_liquid(_diluent_wells_used, total_diluent_per_well, diluent)
 
 
-def _get_dye_info_for_volume(volume: float) -> DyeInfo:
-    for info in DYE_INFO:
-        if info.min <= volume <= info.max:
-            return info
+def _get_dye_for_volume(volume: float) -> Dye:
+    for dye in DYE_INFO:
+        if dye.min <= volume <= dye.max:
+            return dye
     raise ValueError(f"unexpected volume: {volume}")
 
 
@@ -335,21 +264,21 @@ def _load_liquid_red_dye(
     dead_vol_dye = DEAD_VOL_PER_LABWARE[dye_holder.load_name]
 
     # initialize defined liquid and well location
-    for info in DYE_INFO:
-        info.liq = ctx.define_liquid(info.name, info.name, info.c)
-        info.w = dye_holder[info.src]
+    for dye in DYE_INFO:
+        dye.liq = ctx.define_liquid(dye.name, dye.name, dye.c)
+        dye.w = dye_holder[dye.src]
 
     # NOTE: there could be just 1x dye used for all volumes,
     #       or 5x different dyes. Also, volumes could repeat
     for v in volumes:
-        info = _get_dye_info_for_volume(v)
-        info.ul += v * num_cols * 8
-        info.use_count += 1
+        dye = _get_dye_for_volume(v)
+        dye.ul += v * num_cols * 8
+        dye.use += 1
 
     # load the dye
-    for info in DYE_INFO:
-        if info.ul > 0:
-            info.w.load_liquid(info.liq, info.ul + dead_vol_dye)
+    for dye in DYE_INFO:
+        if dye.ul > 0:
+            dye.w.load_liquid(dye.liq, dye.ul + dead_vol_dye)
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -372,11 +301,11 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_bool(
         variable_name="is_baseline", display_name="is_baseline", default=False
     )
-    for info in DYE_INFO:
+    for dye in DYE_INFO:
         parameters.add_str(
-            variable_name=f"dye_{info.name.lower()}_well",
-            display_name=f"dye_{info.name.lower()}_well",
-            default=info.src,
+            variable_name=f"dye_{dye.name.lower()}_well",
+            display_name=f"dye_{dye.name.lower()}_well",
+            default=dye.src,
             choices=[
                 {
                     "display_name": row + str(col),
@@ -463,8 +392,8 @@ def run(ctx: ProtocolContext) -> None:
             for i in range(MAX_NUMBER_OF_PLATES)
             if getattr(ctx.params, f"volume_{i}") > 0
         ]
-    for info in DYE_INFO:
-        info.src = getattr(ctx.params, f"dye_{info.name.lower()}_well")
+    for dye in DYE_INFO:
+        dye.src = getattr(ctx.params, f"dye_{dye.name.lower()}_well")
     columns_to_test = ctx.params.columns_to_test  # type: ignore[attr-defined]
     submerge_depth = ctx.params.submerge_depth  # type: ignore[attr-defined]
 
@@ -517,17 +446,17 @@ def run(ctx: ProtocolContext) -> None:
         dye_holder = ctx.load_labware(
             load_name=DYE_LABWARE,
             location=SLOTS["dye_holder"],
-            version=get_latest_version(DYE_LABWARE),
+            version=_get_latest_version(DYE_LABWARE),
         )
         src_labware = ctx.load_labware(
             load_name=SRC_LABWARE,
             location=SLOTS["src"],
-            version=get_latest_version(SRC_LABWARE),
+            version=_get_latest_version(SRC_LABWARE),
         )
     diluent_reservoir = ctx.load_labware(
         load_name=DILUENT_LABWARE,
         location=SLOTS["diluent_reservoir"],
-        version=get_latest_version(DILUENT_LABWARE),
+        version=_get_latest_version(DILUENT_LABWARE),
     )
 
     # STACK of EMPTY PLATES
@@ -587,7 +516,7 @@ def run(ctx: ProtocolContext) -> None:
             ul_needed_in_pcr_well / pipette.max_volume
         )
         dye_transfer_vols += [ul_needed_in_pcr_well % pipette.max_volume]
-        dye_info = _get_dye_info_for_volume(target_ul)
+        dye = _get_dye_for_volume(target_ul)
         _pick_up_tip(ctx, pipette)
         for ul in dye_transfer_vols:
             push_out = 3.9 if ul >= 5 else 11.7
@@ -595,7 +524,7 @@ def run(ctx: ProtocolContext) -> None:
                 # TODO: (sigler) use multi-channel for this step?
                 #       since all uL are the same in this column
                 pcr_well = src_labware[f"{row}{pcr_col_idx + 1}"]
-                pipette.aspirate(ul, dye_info.w.bottom(BOTTOM_MM))
+                pipette.aspirate(ul, dye.w.bottom(BOTTOM_MM))
                 pipette.dispense(
                     volume=ul,
                     location=pcr_well.meniscus(
