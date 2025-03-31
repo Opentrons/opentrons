@@ -25,13 +25,26 @@ export function ManualReplaceLwAndRetry(
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    ROBOT_IN_MOTION,
   } = RECOVERY_MAP
 
   const { t } = useTranslation('error_recovery')
-  const { routeUpdateActions } = props
-  const { proceedToRouteAndStep } = routeUpdateActions
-  const primaryBtnOnClick = (): Promise<void> =>
-    proceedToRouteAndStep(route, buildNextStep())
+  const { routeUpdateActions, recoveryCommands } = props
+  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
+  const { homeShuttle } = recoveryCommands
+
+  const primaryBtnOnClick = (): Promise<void> => {
+    console.log('hello: ', route)
+    return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
+      if (route === MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE) {
+        void homeShuttle().then(() => {
+          proceedToRouteAndStep(route, buildNextStep())
+        })
+      } else {
+        proceedToRouteAndStep(route, buildNextStep())
+      }
+    })
+  }
 
   const buildNextStep = (): RouteStep => {
     if (doorStatusUtils.isDoorOpen) {
