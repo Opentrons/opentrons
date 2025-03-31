@@ -466,11 +466,19 @@ class FlexStacker(mod_abc.AbstractModule):
 
     async def verify_shuttle_location(self, expected: PlatformState) -> None:
         """Verify the shuttle is present and in the expected location."""
-        await self._reader.read()
-        if self.platform_state != expected:
-            raise FlexStackerShuttleMissingError(
-                self.device_info["serial"], expected, self.platform_state
-            )
+        # TODO: (AA 2025-03-31) - The EVT Flex Stacker hardware has issues
+        # reading the platform sensor on the extended side. This is a temporary
+        # workaround to avoid the sensor check on the extended side and should be
+        # removed once dvt hardware is available.
+        if self.platform_state == expected:
+            await self.home_axis(StackerAxis.X, Direction.RETRACT)
+            await self.verify_shuttle_location(PlatformState.RETRACTED)
+        else:
+            await self._reader.read()
+            if self.platform_state != expected:
+                raise FlexStackerShuttleMissingError(
+                    self.device_info["serial"], expected, self.platform_state
+                )
 
     async def verify_shuttle_labware_presence(
         self, direction: Direction, labware_expected: bool
