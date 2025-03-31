@@ -203,8 +203,6 @@ DYE_INFO: List[DyeInfo] = [
     ),
 ]
 
-_last_tip: Optional[Well] = None
-_already_rearranged_tips: bool = False
 _diluent_wells_used: List[Well] = []
 _inaccessible_tip_racks: List[Labware] = []
 
@@ -218,62 +216,24 @@ def get_latest_version(load_name: str) -> int:
 
 
 def _pick_up_tip(ctx: ProtocolContext, pipette: InstrumentContext) -> None:
-    global _last_tip
+    global _inaccessible_tip_racks
     try:
         pipette.pick_up_tip()
     except OutOfTipsError:
-        pipette._retract()  # TODO: make this public?
         _rearrange_tip_racks(ctx, pipette)
-        pipette.tip_racks = _inaccessible_tip_racks
+        pipette.tip_racks = [tr for tr in _inaccessible_tip_racks]
+        # NOTE: clearing the global list of "inaccessible" tip-racks
+        #       to prevent accidentally rearranging twice during run
+        _inaccessible_tip_racks = []
         pipette.reset_tipracks()
         pipette.pick_up_tip()
-    _last_tip = (
-        pipette._last_tip_picked_up_from
-    )  # keep track of last tip picked up by API
-
-
-def _do_tip_racks_need_rearranging(pipette: InstrumentContext) -> bool:
-    # assume there aren't MORE inaccessible racks than accessible ones
-    assert len(pipette.tip_racks) >= len(_inaccessible_tip_racks)
-
-    # haven't picked up a tip yet
-    if not _last_tip:
-        return False
-
-    # if the previous tip is NOT in the last tip-rack,
-    # then there's no rearrangement needed
-    # FIXME: (sigler) is this true? doesn't seem like solid logic...
-    last_rack = pipette.tip_racks[-1]
-    if _last_tip not in pipette.tip_racks[-1].wells():
-        return False
-
-    # if empty racks are SAME QUANTITY as inaccessible racks
-    # then we can SAFELY rearrange the deck
-    # (this only happens either by chance or if MORE accessible
-    #  than inaccessible racks are on deck)
-    empty_racks: List[Labware] = []
-    for rack in pipette.tip_racks:
-        if _last_tip not in rack.wells():
-            empty_racks.append(rack)
-        else:
-            break
-    if len(empty_racks) == len(_inaccessible_tip_racks):
-        return True
-
-    # are we >= HALF-WAY through the LAST accessible rack?
-    # (assuming default behavior of iterating through tips down rows)
-    last_tip_column = int(_last_tip.well_name[1:])
-    return bool(last_tip_column > (len(last_rack.columns()) / 2))
 
 
 def _rearrange_tip_racks(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
 ) -> None:
-    global _already_rearranged_tips
-    assert not _already_rearranged_tips, f"empty tip-racks have already be rotated out"
     assert len(pipette.tip_racks) >= len(_inaccessible_tip_racks)
-    _already_rearranged_tips = True
 
     def _rotate_tip_rack_out(
         old_rack: Labware, new_rack: Labware, empty_slot: str
@@ -343,7 +303,7 @@ def _spread_baseline(multi: InstrumentContext, labware: Labware) -> None:
 
 def _load_liquid_diluent(
     ctx: ProtocolContext, diluent_reservoir: Labware, num_plates: int, num_cols: int
-) -> Liquid:
+) -> None:
     global _diluent_wells_used
     # DILUENT (or BASELINE)
     total_photo_wells = num_plates * num_cols * 8
@@ -360,7 +320,6 @@ def _load_liquid_diluent(
     _diluent_wells_used = diluent_reservoir.wells()[:number_of_wells_needed]
     diluent = ctx.define_liquid("diluent", display_color="#0000FF")
     diluent_reservoir.load_liquid(_diluent_wells_used, total_diluent_per_well, diluent)
-    return diluent
 
 
 def _get_dye_info_for_volume(volume: float) -> DyeInfo:
@@ -511,6 +470,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # TIP-RACKS
     ctx.load_trash_bin(SLOTS["trash"])
+    # NOTE: "accessible" racks will be used by the pipette first
     accessible_tip_racks = [
         ctx.load_labware(
             load_name=f"opentrons_flex_96_tiprack_{TIP_VOLUME}ul",
@@ -519,6 +479,9 @@ def run(ctx: ProtocolContext) -> None:
         for name, location in SLOTS.items()
         if f"tips_{TIP_VOLUME}_" in name and "4" not in location
     ]
+    # NOTE: keeping "inaccessible" tip-racks in a global list
+    #       so that they can be swapped in by the pick-up-tip function
+    #       at any time.
     for name, location in SLOTS.items():
         if f"tips_{TIP_VOLUME}_" in name and "4" in location:
             _inaccessible_tip_racks.append(
@@ -539,7 +502,6 @@ def run(ctx: ProtocolContext) -> None:
             )
         ],
     )
-    # only need this pipette if we're testing it
     pipette: Optional[InstrumentContext] = None
     if not is_baseline:
         pipette = ctx.load_instrument(
@@ -579,6 +541,7 @@ def run(ctx: ProtocolContext) -> None:
         stack.append(stack[-1].load_labware(DST_LABWARE))
 
     def _move_to_done_slot(lw: Labware) -> None:
+        """Move labware to the done slot, regardless of what is already there."""
         done_dst = stack_done[-1] if len(stack_done) else SLOTS["done"]
         ctx.move_labware(lw, done_dst, use_gripper=True)
         stack_done.append(lw)
@@ -591,7 +554,7 @@ def run(ctx: ProtocolContext) -> None:
             ctx, dye_holder, volumes=volume_list, num_cols=columns_to_test
         )
     diluent_reservoir.load_empty(diluent_reservoir.wells())
-    diluent = _load_liquid_diluent(
+    _load_liquid_diluent(
         ctx,
         diluent_reservoir,
         num_plates=len(volume_list),
