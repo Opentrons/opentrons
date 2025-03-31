@@ -31,6 +31,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
           value: null,
         },
       },
+      type: 'transfer',
     }
     vi.mocked(getLiquidEntities).mockReturnValue({})
   })
@@ -65,5 +66,11 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
     })
     render(props)
     screen.getByText('Assigned to mockname')
+  })
+
+  it('renders subtext for mix when mix is true', () => {
+    props.type = 'mix'
+    render(props)
+    screen.getByText('Apply liquid class settings for this mix')
   })
 })
