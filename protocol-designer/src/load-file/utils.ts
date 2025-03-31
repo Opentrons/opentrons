@@ -11,8 +11,8 @@ export const saveFile = (fileData: ProtocolFile, fileName: string): void => {
 export const savePythonFile = (file: PDPythonFile, fileName: string): void => {
   const fileData = file.python
   const stringifiedBlob = JSON.stringify(file.designerApplication)
-  const hiddenBlob = `\n# DESIGNER_APPLICATION: ${stringifiedBlob}\n`
-  const blob = new Blob([fileData, hiddenBlob], {
+  const designerApplicationBlob = `\n# DESIGNER_APPLICATION: """${stringifiedBlob}"""\n`
+  const blob = new Blob([fileData, designerApplicationBlob], {
     type: 'text/x-python;charset=UTF-8',
   })
   // For now, show the generated Python in a new window instead of saving it to a file.

@@ -83,13 +83,13 @@ export const loadProtocolFile = (
       try {
         // Extract designer application blob
         const designerApplicationComment = result.match(
-          /# DESIGNER_APPLICATION: (.+)/
+          /# DESIGNER_APPLICATION: """([\s\S]+?)"""/
         )
         if (
           designerApplicationComment != null &&
           designerApplicationComment[1]
         ) {
-          const designerApplicationString = designerApplicationComment[1].trim()
+          const designerApplicationString = designerApplicationComment[1]
           const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
 
           // TODO: remove this when uploading python is fully working for phase 1
@@ -98,10 +98,10 @@ export const loadProtocolFile = (
 
           dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
         } else {
-          console.warn('No secret blob found in file.')
+          console.warn('No blob found in file.')
         }
       } catch (error) {
-        console.error('Error extracting secret blob:', error)
+        console.error('Error extracting blob:', error)
         if (error instanceof Error) {
           fileError('INVALID_FILE_TYPE', error.message)
         }
