@@ -34,12 +34,12 @@ export interface PDMetadata {
   labware: Labware
 }
 
-export interface PythonMetadata {
-  designerApplication: { version: string; data: PDMetadata }
+export interface DesignerApplication {
+  designerApplication: { version: string; name: string; data: PDMetadata }
 }
 export interface PDPythonFile {
   python: string
-  designerApplication: PythonMetadata
+  designerApplication: DesignerApplication
 }
 
 export type PDProtocolFile = ProtocolFile<PDMetadata>

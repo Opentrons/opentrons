@@ -265,6 +265,7 @@ def run(protocol: protocol_api.ProtocolContext):
           },
         },
         version: '8.5.0',
+        name: 'opentrons/protocol-designer',
       },
     })
   })

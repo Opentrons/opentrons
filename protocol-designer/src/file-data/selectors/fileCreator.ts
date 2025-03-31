@@ -52,7 +52,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
-import type { PDMetadata, PDPythonFile, PythonMetadata } from '../../file-types'
+import type {
+  PDMetadata,
+  PDPythonFile,
+  DesignerApplication,
+} from '../../file-types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -345,8 +349,9 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
       ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
     )
 
-    const designerApplication: PythonMetadata = {
+    const designerApplication: DesignerApplication = {
       designerApplication: {
+        name: 'opentrons/protocol-designer',
         //  hardcoding this version in to avoid unnecessary migrating
         //  TODO: remember to update to the applicationVersion const
         version: '8.5.0',
