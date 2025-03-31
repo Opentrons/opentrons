@@ -65,16 +65,19 @@ def _upmigrate_labware_offsets_in_runs(
         sqlalchemy.select(schema_10.run_table.c.id, schema_10.run_table.c.state_summary)
     ).all():
         try:
-            state_summary = json_to_pydantic(StateSummary, raw_state_summary)
+            if raw_state_summary is None:
+                new_raw_state_summary = raw_state_summary
+            else:
+                parsed_state_summary = json_to_pydantic(StateSummary, raw_state_summary)
 
-            for labware_offset in state_summary.labwareOffsets:
-                labware_offset.locationSequence = (
-                    legacy_offset_location_to_offset_location_sequence(
-                        labware_offset.location, deck_definition
+                for labware_offset in parsed_state_summary.labwareOffsets:
+                    labware_offset.locationSequence = (
+                        legacy_offset_location_to_offset_location_sequence(
+                            labware_offset.location, deck_definition
+                        )
                     )
-                )
 
-            new_raw_state_summary = pydantic_to_json(state_summary)
+                new_raw_state_summary = pydantic_to_json(parsed_state_summary)
 
             connection.execute(
                 sqlalchemy.update(schema_10.run_table)
@@ -84,5 +87,6 @@ def _upmigrate_labware_offsets_in_runs(
 
         except Exception:
             _log.error(
-                f"Error migrating run {run_id}. It will be dropped.", exc_info=True
+                f'Could not migrate labware offset locations in run "{run_id}".',
+                exc_info=True,
             )
