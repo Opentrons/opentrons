@@ -46,6 +46,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.errors import CannotPerformModuleAction
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.execution import LoadedLabwareData
+from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -117,6 +118,7 @@ async def test_retrieve_raises_when_empty(
         pool_lid_definition=None,
         pool_count=0,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -141,6 +143,16 @@ async def test_retrieve_primary_only(
     """It should be able to retrieve a labware."""
     data = flex_stacker.RetrieveParams(moduleId=stacker_id)
 
+    loaded_labware = LoadedLabware(
+        id="labware-id",
+        loadName="opentrons_flex_96_filtertiprack_50ul",
+        definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex 96 Filter Tip Rack 50 µL",
+        location=ModuleLocation(moduleId=stacker_id),
+    )
+
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
         pool_primary_definition=flex_50uL_tiprack,
@@ -148,34 +160,32 @@ async def test_retrieve_primary_only(
         pool_lid_definition=None,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
     ).then_return(fs_module_substate)
 
     decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=flex_50uL_tiprack,
+        await equipment.load_labware_pool_from_definitions(
+            pool_primary_definition=flex_50uL_tiprack,
+            pool_adapter_definition=None,
+            pool_lid_definition=None,
             location=ModuleLocation(moduleId=stacker_id),
-            labware_id=None,
-            labware_pending_load={},
+            primary_id=None,
+            adapter_id=None,
+            lid_id=None,
         )
-    ).then_return(LoadedLabwareData("labware-id", flex_50uL_tiprack, None))
+    ).then_return(
+        LoadedLabwarePoolData(
+            primary_labware=loaded_labware, adapter_labware=None, lid_labware=None
+        )
+    )
 
     decoy.when(
         state_view.geometry.get_predicted_location_sequence(
             ModuleLocation(moduleId=stacker_id),
-            {
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-            },
+            {loaded_labware.id: loaded_labware},
         )
     ).then_return(_stacker_base_loc_seq(stacker_id))
 
@@ -228,6 +238,26 @@ async def test_retrieve_primary_and_lid(
     """It should be able to retrieve a labware with a lid on it."""
     data = flex_stacker.RetrieveParams(moduleId=stacker_id)
 
+    loaded_labware = LoadedLabware(
+        id="labware-id",
+        loadName="opentrons_flex_96_filtertiprack_50ul",
+        definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex 96 Filter Tip Rack 50 µL",
+        location=ModuleLocation(moduleId=stacker_id),
+    )
+
+    loaded_lid = LoadedLabware(
+        id="lid-id",
+        loadName="opentrons_flex_tiprack_lid",
+        definitionUri="opentrons/opentrons_flex_tiprack_lid/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex Tiprack Lid",
+        location=OnLabwareLocation(labwareId="labware-id"),
+    )
+
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
         pool_primary_definition=flex_50uL_tiprack,
@@ -235,60 +265,34 @@ async def test_retrieve_primary_and_lid(
         pool_lid_definition=tiprack_lid_def,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
     ).then_return(fs_module_substate)
 
     decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=flex_50uL_tiprack,
+        await equipment.load_labware_pool_from_definitions(
+            pool_primary_definition=flex_50uL_tiprack,
+            pool_adapter_definition=None,
+            pool_lid_definition=tiprack_lid_def,
             location=ModuleLocation(moduleId=stacker_id),
-            labware_id=None,
-            labware_pending_load={},
+            primary_id=None,
+            adapter_id=None,
+            lid_id=None,
         )
-    ).then_return(LoadedLabwareData("labware-id", flex_50uL_tiprack, None))
-    decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=tiprack_lid_def,
-            location=OnLabwareLocation(labwareId="labware-id"),
-            labware_id=None,
-            labware_pending_load={
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-            },
+    ).then_return(
+        LoadedLabwarePoolData(
+            primary_labware=loaded_labware, adapter_labware=None, lid_labware=loaded_lid
         )
-    ).then_return(LoadedLabwareData("lid-id", tiprack_lid_def, None))
+    )
 
     decoy.when(
         state_view.geometry.get_predicted_location_sequence(
             ModuleLocation(moduleId=stacker_id),
             {
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "lid-id": LoadedLabware(
-                    id="lid-id",
-                    loadName="opentrons_flex_tiprack_lid",
-                    definitionUri="opentrons/opentrons_flex_tiprack_lid/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="labware-id"),
-                ),
+                "labware-id": loaded_labware,
+                "lid-id": loaded_lid,
             },
         )
     ).then_return(_stacker_base_loc_seq(stacker_id))
@@ -296,24 +300,8 @@ async def test_retrieve_primary_and_lid(
         state_view.geometry.get_predicted_location_sequence(
             OnLabwareLocation(labwareId="labware-id"),
             {
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "lid-id": LoadedLabware(
-                    id="lid-id",
-                    loadName="opentrons_flex_tiprack_lid",
-                    definitionUri="opentrons/opentrons_flex_tiprack_lid/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="labware-id"),
-                ),
+                "labware-id": loaded_labware,
+                "lid-id": loaded_lid,
             },
         )
     ).then_return(
@@ -391,6 +379,26 @@ async def test_retrieve_primary_and_adapter(
     """It should be able to retrieve a labware on an adapter."""
     data = flex_stacker.RetrieveParams(moduleId=stacker_id)
 
+    loaded_adapter = LoadedLabware(
+        id="adapter-id",
+        loadName="opentrons_flex_96_tiprack_adapter",
+        definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex 96 Tip Rack Adapter",
+        location=ModuleLocation(moduleId=stacker_id),
+    )
+
+    loaded_labware = LoadedLabware(
+        id="labware-id",
+        loadName="opentrons_flex_96_filtertiprack_50ul",
+        definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex 96 Filter Tip Rack 50 µL",
+        location=OnLabwareLocation(labwareId=loaded_adapter.id),
+    )
+
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
         pool_primary_definition=flex_50uL_tiprack,
@@ -398,6 +406,7 @@ async def test_retrieve_primary_and_adapter(
         pool_lid_definition=None,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -410,47 +419,31 @@ async def test_retrieve_primary_and_adapter(
             labware_pending_load={},
         )
     ).then_return(LoadedLabwareData("adapter-id", tiprack_adapter_def, None))
+
     decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=flex_50uL_tiprack,
-            location=OnLabwareLocation(labwareId="adapter-id"),
-            labware_id=None,
-            labware_pending_load={
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                )
-            },
+        await equipment.load_labware_pool_from_definitions(
+            pool_primary_definition=flex_50uL_tiprack,
+            pool_adapter_definition=tiprack_adapter_def,
+            pool_lid_definition=None,
+            location=ModuleLocation(moduleId=stacker_id),
+            primary_id=None,
+            adapter_id=None,
+            lid_id=None,
         )
-    ).then_return(LoadedLabwareData("labware-id", flex_50uL_tiprack, None))
+    ).then_return(
+        LoadedLabwarePoolData(
+            primary_labware=loaded_labware,
+            adapter_labware=loaded_adapter,
+            lid_labware=None,
+        )
+    )
 
     decoy.when(
         state_view.geometry.get_predicted_location_sequence(
             ModuleLocation(moduleId=stacker_id),
             {
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="adapter-id"),
-                ),
+                "adapter-id": loaded_adapter,
+                "labware-id": loaded_labware,
             },
         )
     ).then_return(_stacker_base_loc_seq(stacker_id))
@@ -458,24 +451,8 @@ async def test_retrieve_primary_and_adapter(
         state_view.geometry.get_predicted_location_sequence(
             OnLabwareLocation(labwareId="adapter-id"),
             {
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="adapter-id"),
-                ),
+                "adapter-id": loaded_adapter,
+                "labware-id": loaded_labware,
             },
         )
     ).then_return(
@@ -547,6 +524,36 @@ async def test_retrieve_primary_adapter_and_lid(
     """It should be able to retrieve a labware on an adapter."""
     data = flex_stacker.RetrieveParams(moduleId=stacker_id)
 
+    loaded_adapter = LoadedLabware(
+        id="adapter-id",
+        loadName="opentrons_flex_96_tiprack_adapter",
+        definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex 96 Tip Rack Adapter",
+        location=ModuleLocation(moduleId=stacker_id),
+    )
+
+    loaded_labware = LoadedLabware(
+        id="labware-id",
+        loadName="opentrons_flex_96_filtertiprack_50ul",
+        definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex 96 Filter Tip Rack 50 µL",
+        location=OnLabwareLocation(labwareId=loaded_adapter.id),
+    )
+
+    loaded_lid = LoadedLabware(
+        id="lid-id",
+        loadName="opentrons_flex_tiprack_lid",
+        definitionUri="opentrons/opentrons_flex_tiprack_lid/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex Tiprack Lid",
+        location=OnLabwareLocation(labwareId="labware-id"),
+    )
+
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
         pool_primary_definition=flex_50uL_tiprack,
@@ -554,96 +561,37 @@ async def test_retrieve_primary_adapter_and_lid(
         pool_lid_definition=tiprack_lid_def,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
     ).then_return(fs_module_substate)
-    decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=tiprack_adapter_def,
-            location=ModuleLocation(moduleId=stacker_id),
-            labware_id=None,
-            labware_pending_load={},
-        )
-    ).then_return(LoadedLabwareData("adapter-id", tiprack_adapter_def, None))
-    decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=flex_50uL_tiprack,
-            location=OnLabwareLocation(labwareId="adapter-id"),
-            labware_id=None,
-            labware_pending_load={
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                )
-            },
-        )
-    ).then_return(LoadedLabwareData("labware-id", flex_50uL_tiprack, None))
 
     decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=tiprack_lid_def,
-            location=OnLabwareLocation(labwareId="labware-id"),
-            labware_id=None,
-            labware_pending_load={
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="adapter-id"),
-                ),
-            },
+        await equipment.load_labware_pool_from_definitions(
+            pool_primary_definition=flex_50uL_tiprack,
+            pool_adapter_definition=tiprack_adapter_def,
+            pool_lid_definition=tiprack_lid_def,
+            location=ModuleLocation(moduleId=stacker_id),
+            primary_id=None,
+            adapter_id=None,
+            lid_id=None,
         )
-    ).then_return(LoadedLabwareData("lid-id", tiprack_lid_def, None))
+    ).then_return(
+        LoadedLabwarePoolData(
+            primary_labware=loaded_labware,
+            adapter_labware=loaded_adapter,
+            lid_labware=loaded_lid,
+        )
+    )
 
     decoy.when(
         state_view.geometry.get_predicted_location_sequence(
             ModuleLocation(moduleId=stacker_id),
             {
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="adapter-id"),
-                ),
-                "lid-id": LoadedLabware(
-                    id="lid-id",
-                    loadName="opentrons_flex_tiprack_lid",
-                    definitionUri="opentrons/opentrons_flex_tiprack_lid/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="labware-id"),
-                ),
+                "adapter-id": loaded_adapter,
+                "labware-id": loaded_labware,
+                "lid-id": loaded_lid,
             },
         )
     ).then_return(_stacker_base_loc_seq(stacker_id))
@@ -651,33 +599,9 @@ async def test_retrieve_primary_adapter_and_lid(
         state_view.geometry.get_predicted_location_sequence(
             OnLabwareLocation(labwareId="adapter-id"),
             {
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="adapter-id"),
-                ),
-                "lid-id": LoadedLabware(
-                    id="lid-id",
-                    loadName="opentrons_flex_tiprack_lid",
-                    definitionUri="opentrons/opentrons_flex_tiprack_lid/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="labware-id"),
-                ),
+                "adapter-id": loaded_adapter,
+                "labware-id": loaded_labware,
+                "lid-id": loaded_lid,
             },
         )
     ).then_return(
@@ -688,33 +612,9 @@ async def test_retrieve_primary_adapter_and_lid(
         state_view.geometry.get_predicted_location_sequence(
             OnLabwareLocation(labwareId="labware-id"),
             {
-                "adapter-id": LoadedLabware(
-                    id="adapter-id",
-                    loadName="opentrons_flex_96_tiprack_adapter",
-                    definitionUri="opentrons/opentrons_flex_96_tiprack_adapter/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                ),
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="adapter-id"),
-                ),
-                "lid-id": LoadedLabware(
-                    id="lid-id",
-                    loadName="opentrons_flex_tiprack_lid",
-                    definitionUri="opentrons/opentrons_flex_tiprack_lid/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=OnLabwareLocation(labwareId="labware-id"),
-                ),
+                "adapter-id": loaded_adapter,
+                "labware-id": loaded_labware,
+                "lid-id": loaded_lid,
             },
         )
     ).then_return(
@@ -815,7 +715,7 @@ async def test_retrieve_primary_adapter_and_lid(
         ),
     ],
 )
-async def test_retrieve_raises_if_stall(
+async def test_retrieve_raises_recoverable_error(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
@@ -834,6 +734,15 @@ async def test_retrieve_raises_if_stall(
     error_timestamp = datetime(year=2020, month=1, day=2)
 
     data = flex_stacker.RetrieveParams(moduleId=stacker_id)
+    loaded_labware = LoadedLabware(
+        id="labware-id",
+        loadName="opentrons_flex_96_filtertiprack_50ul",
+        definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+        lid_id=None,
+        offsetId=None,
+        displayName="Opentrons Flex 96 Filter Tip Rack 50 µL",
+        location=ModuleLocation(moduleId=stacker_id),
+    )
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -842,33 +751,31 @@ async def test_retrieve_raises_if_stall(
         pool_lid_definition=None,
         pool_count=1,
         max_pool_count=999,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
     ).then_return(fs_module_substate)
     decoy.when(
-        await equipment.load_labware_from_definition(
-            definition=flex_50uL_tiprack,
+        await equipment.load_labware_pool_from_definitions(
+            pool_primary_definition=flex_50uL_tiprack,
+            pool_adapter_definition=None,
+            pool_lid_definition=None,
             location=ModuleLocation(moduleId=stacker_id),
-            labware_id=None,
-            labware_pending_load={},
+            primary_id=None,
+            adapter_id=None,
+            lid_id=None,
         )
-    ).then_return(LoadedLabwareData("labware-id", flex_50uL_tiprack, None))
+    ).then_return(
+        LoadedLabwarePoolData(
+            primary_labware=loaded_labware, adapter_labware=None, lid_labware=None
+        )
+    )
 
     decoy.when(
         state_view.geometry.get_predicted_location_sequence(
             ModuleLocation(moduleId=stacker_id),
-            labware_pending_load={
-                "labware-id": LoadedLabware(
-                    id="labware-id",
-                    loadName="opentrons_flex_96_filtertiprack_50ul",
-                    definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-                    lid_id=None,
-                    offsetId=None,
-                    displayName=None,
-                    location=ModuleLocation(moduleId=stacker_id),
-                )
-            },
+            labware_pending_load={"labware-id": loaded_labware},
         )
     ).then_return(_stacker_base_loc_seq(stacker_id))
 

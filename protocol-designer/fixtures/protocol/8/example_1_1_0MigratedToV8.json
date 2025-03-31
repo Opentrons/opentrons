@@ -208,7 +208,9 @@
           "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
           "dispense_touchTip_mmfromTop": null,
           "pushOut_checkbox": false,
-          "pushOut_volume": 0
+          "pushOut_volume": 0,
+          "conditioning_checkbox": false,
+          "conditioning_volume": null
         },
         "18113c80-92a6-11e9-ac62-1b173f839d9e": {
           "aspirate_delay_checkbox": false,
@@ -225,6 +227,7 @@
           "dropTip_location": "b7445d51-0002-47a7-adee-2746539ccf9f:trashBin",
           "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "mix_mmFromBottom": 0.5,
           "mix_touchTip_checkbox": true,
           "mix_touchTip_mmFromTop": -10.8,
