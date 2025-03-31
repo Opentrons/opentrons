@@ -85,10 +85,12 @@ export const loadProtocolFile = (
         const designerApplicationComment = result.match(
           /# DESIGNER_APPLICATION: (.+)/
         )
-        if (designerApplicationComment && designerApplicationComment[1]) {
-          const base64EncodedBlob = designerApplicationComment[1].trim()
-          const decodedBlob = atob(base64EncodedBlob) // Decode Base64
-          const designerApplicationJson = JSON.parse(decodedBlob) // Convert to JSON
+        if (
+          designerApplicationComment != null &&
+          designerApplicationComment[1]
+        ) {
+          const designerApplicationString = designerApplicationComment[1].trim()
+          const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
 
           // TODO: remove this when uploading python is fully working for phase 1
           // still need to add in labware definitions and robotType

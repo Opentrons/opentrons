@@ -10,8 +10,8 @@ export const saveFile = (fileData: ProtocolFile, fileName: string): void => {
 }
 export const savePythonFile = (file: PDPythonFile, fileName: string): void => {
   const fileData = file.python
-  const secretBlob = btoa(JSON.stringify(file.designerApplication))
-  const hiddenBlob = `\n# DESIGNER_APPLICATION: ${secretBlob}\n`
+  const stringifiedBlob = JSON.stringify(file.designerApplication)
+  const hiddenBlob = `\n# DESIGNER_APPLICATION: ${stringifiedBlob}\n`
   const blob = new Blob([fileData, hiddenBlob], {
     type: 'text/x-python;charset=UTF-8',
   })
