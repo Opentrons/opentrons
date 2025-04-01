@@ -9,7 +9,7 @@ from opentrons_shared_data.load import get_shared_data_root
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
-DYE_RESERVOIR_DEAD_VOLUME = 10000  # 10k uL
+DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
 
 TIPRACK_LOCATIONS = ["D1", "C1", "C2", "C3", "B1"]
 
@@ -396,7 +396,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 )
                 retrying = True
         pip._retract()
-        if ctx.params.lld:
+        if ctx.params.lld:  # type: ignore [attr-defined]
             pip.return_tip()
             pip._retract()
             ctx.pause("Replace tip rack.")
@@ -461,17 +461,22 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             source_liquid_height = _get_well_height_at_volume(
                 labware=dye_source, volume=current_src_volume
             )
-        before_dye_volume = _get_well_volume_at_height(
+        current_src_volume = _get_well_volume_at_height(
             labware=dye_source, height=source_liquid_height
         )
-        after_dye_volume = before_dye_volume - 96 * ctx.params.target_volume
-        aspirate_pos = (
-            _get_well_height_at_volume(labware=dye_source, volume=after_dye_volume)
-            - ctx.params.asp_sub_depth  # type: ignore [attr-defined]
+        src_volume_after_aspirate = (
+            current_src_volume
+            - 96 * ctx.params.target_volume  # type: ignore [attr-defined]
         )
         aspirate_volume = (
             ctx.params.target_volume  # type: ignore [attr-defined]
             + ctx.params.conditioning_volume  # type: ignore [attr-defined]
+        )
+        aspirate_pos = (
+            _get_well_height_at_volume(
+                labware=dye_source, volume=src_volume_after_aspirate
+            )
+            - ctx.params.asp_sub_depth  # type: ignore [attr-defined]
         )
         # Move above reservoir
         pip.move_to(location=dye_source["A1"].top())
@@ -487,7 +492,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             volume=aspirate_volume,
             location=None,
         )
-        current_src_volume = after_dye_volume
+        current_src_volume = src_volume_after_aspirate
         # Dispense conditioning volume, if any, while submerged
         if ctx.params.conditioning_volume:  # type: ignore [attr-defined]
             pip.dispense(
