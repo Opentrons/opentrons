@@ -68,7 +68,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         variable_name="number_of_tipracks",
         display_name="Number of tipracks",
         description="Choose 1 or 5 tipracks to load at the start.",
-        default=1,
+        default=5,
         choices=[
             {"display_name": "1", "value": 1},
             {"display_name": "5", "value": 5},
@@ -396,6 +396,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                      Only {round(actual_starting_dye_volume, 2)} uL detected. Refill and try again."
                 )
                 retrying = True
+        pip._retract()
+        ctx.pause("Replace tip rack.")
         return src_liquid_height
 
     def _set_pipettte_motion_settings() -> Tuple[float, float, float, float, float]:
@@ -404,7 +406,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             dispense_submerge_speed = 50
             aspirate_exit_speed = 50
             dispense_exit_speed = 50
-            if not ctx.is_simulating:
+            if not ctx.is_simulating:  # type: ignore [truthy-function]
                 from hardware_testing.gravimetric.liquid_class.defaults import (
                     get_liquid_class,
                 )
