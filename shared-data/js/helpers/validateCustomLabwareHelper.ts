@@ -17,7 +17,6 @@ export const validateCustomLabwareHelper = (
   const wellKeys = Object.keys(definition.wells)
 
   return (
-    definition != null &&
     wellKeys.length === wellSet.size &&
     wellKeys.every(well => wellSet.has(well))
   )
