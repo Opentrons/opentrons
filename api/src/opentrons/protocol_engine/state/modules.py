@@ -387,7 +387,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 pool_primary_definition=None,
                 pool_adapter_definition=None,
                 pool_lid_definition=None,
-                pool_count=0,
+                contained_primary_labware_bottom_first=[],
                 max_pool_count=0,
                 pool_overlap=0,
             )

@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     LiquidClassRecord,
     ABSMeasureMode,
     LiquidTrackingType,
+    StackerStoredLabwareGroup,
 )
 from opentrons.types import MountType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -379,7 +380,9 @@ class FlexStackerStateUpdate:
 
     module_id: str
     pool_constraint: FlexStackerPoolConstraint | NoChangeType = NO_CHANGE
-    pool_count: int | NoChangeType = NO_CHANGE
+    contained_labware_bottom_first: list[
+        StackerStoredLabwareGroup
+    ] | NoChangeType = NO_CHANGE
 
     @classmethod
     def create_or_override(
@@ -855,15 +858,17 @@ class StateUpdate:
         )
         return self
 
-    def update_flex_stacker_labware_pool_count(
-        self, module_id: str, count: int
+    def update_flex_stacker_contained_labware(
+        self,
+        module_id: str,
+        contained_labware_bottom_first: list[StackerStoredLabwareGroup],
     ) -> Self:
         """Set the labware pool to a specific count."""
         self.flex_stacker_state_update = dataclasses.replace(
             FlexStackerStateUpdate.create_or_override(
                 self.flex_stacker_state_update, module_id
             ),
-            pool_count=count,
+            contained_labware_bottom_first=contained_labware_bottom_first,
         )
         return self
 

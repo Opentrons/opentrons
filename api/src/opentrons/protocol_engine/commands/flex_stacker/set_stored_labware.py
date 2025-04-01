@@ -1,6 +1,7 @@
 """Command models to configure the stored labware pool of a Flex Stacker.."""
 
 from __future__ import annotations
+from textwrap import dedent
 from typing import Optional, Literal, TYPE_CHECKING, Annotated
 from typing_extensions import Type
 
@@ -15,6 +16,7 @@ from ...errors import (
 )
 from ...errors.exceptions import FlexStackerNotLogicallyEmptyError
 from ...state import update_types
+from ...types import StackerStoredLabwareGroup
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
@@ -61,6 +63,28 @@ class SetStoredLabwareParams(BaseModel):
             "the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker."
         ),
     )
+    initialStoredLabware: list[StackerStoredLabwareGroup] | None = Field(
+        None,
+        description=dedent(
+            """\
+        A list of IDs that should be initially stored in the stacker.
+
+        This is a complex field. The following must be true for the field to be valid:
+        - If this field is specified, then either initialCount must not be specified, or this field must have exactly initalCount elements
+        - Each element must contain an id for each corresponding labware details field (i.e. if lidLabware is specified, each element must have
+          a lidLabwareId) and must not contain an id for a corresponding labware details field that is not specified (i.e., if adapterLabware
+          is not specified, each element must not have an adapterLabwareId).
+
+        The behavior of the command depends on the values of both this field and initialCount.
+        - If this field is not specified and initialCount is not specified, the command will create 0 labware objects and the stacker will be empty.
+        - If this field is not specified and initialCount is specified to be 0, the command will create 0 labware objects and the stacker will be empty.
+        - If this field is not specified and initialCount is specified to be non-0, the command will create initialCount labware objects of
+          each specified labware type (primary, lid, and adapter), with appropriate positions, and arbitrary IDs, loaded into the stacker
+        - If this field is specified (and therefore initialCount is not specified or is specified to be the length of this field) then the
+          command will create labware objects with the IDs specified in this field and appropriate positions, loaded into the stacker.
+        """
+        ),
+    )
 
 
 class SetStoredLabwareResult(BaseModel):
@@ -76,8 +100,8 @@ class SetStoredLabwareResult(BaseModel):
         None,
         description="The definition of the adapter under the primary labware, if any.",
     )
-    count: int = Field(
-        ..., description="The number of labware loaded into the stacker labware pool."
+    storedLabware: list[StackerStoredLabwareGroup] = Field(
+        ..., description="The primary labware loaded into the stacker labware pool."
     )
 
 
