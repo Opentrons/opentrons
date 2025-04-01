@@ -398,6 +398,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 retrying = True
         pip._retract()
         pip.return_tip()
+        pip._retract()
         ctx.pause("Replace tip rack.")
         pip.pick_up_tip(tips["A1"])
         return src_liquid_height
