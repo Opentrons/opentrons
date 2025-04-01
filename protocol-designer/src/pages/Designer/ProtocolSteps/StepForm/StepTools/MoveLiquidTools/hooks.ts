@@ -12,14 +12,15 @@ import type { FormData } from '../../../../../../form-types'
 
 export function useAssignLiquidClass(
   formData: FormData,
+  labwareField: string,
+  wellsField: string,
   updateValue: (_: string) => void
 ): string {
-  const { aspirate_wells, aspirate_labware } = formData
   const allWellContentsForActiveItem = useSelector(
     getAllWellContentsForActiveItem
   )
   const aspirateLabwareLiquids =
-    allWellContentsForActiveItem?.[aspirate_labware]
+    allWellContentsForActiveItem?.[formData[labwareField]]
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const labwareEntities = useSelector(getLabwareEntities)
   const pipetteEntities = useSelector(getPipetteEntities)
@@ -28,12 +29,12 @@ export function useAssignLiquidClass(
   const allWellsAdjustedForPipette =
     channels !== 1
       ? getAllWellsFromPrimaryWells(
-          aspirate_wells as string[],
-          labwareEntities[aspirate_labware].def,
+          formData[wellsField] as string[],
+          labwareEntities[formData[labwareField]]?.def,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           channels
         )
-      : aspirate_wells
+      : formData[wellsField]
 
   const [assignedLiquidClass, setAssignedLiquidClass] = useState<string | null>(
     null
@@ -77,6 +78,6 @@ export function useAssignLiquidClass(
         updateValue(runningLiquidClass ?? 'none')
       }
     }
-  }, [formData.aspirate_wells, formData.aspirate_labware])
+  }, [formData[wellsField], formData[labwareField]])
   return assignedLiquidClass ?? 'none'
 }

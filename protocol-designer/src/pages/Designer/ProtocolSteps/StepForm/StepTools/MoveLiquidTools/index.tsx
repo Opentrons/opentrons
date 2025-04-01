@@ -21,6 +21,8 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
 
   const assignedLiquidClass = useAssignLiquidClass(
     formData,
+    'aspirate_labware',
+    'aspirate_wells',
     propsForFields.liquidClass.updateValue
   )
 

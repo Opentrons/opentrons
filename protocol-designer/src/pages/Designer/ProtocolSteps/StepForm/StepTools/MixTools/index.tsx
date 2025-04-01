@@ -52,6 +52,8 @@ export function MixTools(
 
   const assignedLiquidClass = useAssignLiquidClass(
     formData,
+    'labware',
+    'wells',
     propsForFields.liquidClass.updateValue
   )
 
