@@ -11,6 +11,7 @@ from opentrons.hardware_control.modules import FlexStacker, PlatformState
 from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerHopperError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -54,6 +55,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerHopperLabwareError,
 )
 
 
@@ -712,6 +714,13 @@ async def test_retrieve_primary_adapter_and_lid(
                 shuttle_state=PlatformState.UNKNOWN,
             ),
             FlexStackerShuttleError,
+        ),
+        (
+            FlexStackerHopperLabwareError(
+                serial="123",
+                labware_expected=True,
+            ),
+            FlexStackerHopperError,
         ),
     ],
 )
