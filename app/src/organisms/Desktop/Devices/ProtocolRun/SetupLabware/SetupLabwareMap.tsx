@@ -195,11 +195,11 @@ export function SetupLabwareMap({
                   setHoverLabwareId(null)
                 }}
               >
-                {topLabwareDefinition != null ? (
+                {topLabwareDisplayName != null ? (
                   <LabwareInfoOverlay
                     definition={topLabwareDefinition}
                     labwareId={topLabwareId}
-                    displayName={topLabwareDisplayName ?? null}
+                    displayName={topLabwareDisplayName}
                     runId={runId}
                   />
                 ) : null}
