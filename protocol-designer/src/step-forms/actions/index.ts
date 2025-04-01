@@ -45,3 +45,19 @@ export const saveStepFormsMulti: (
   }
   dispatch(saveStepFormsMultiAction)
 }
+
+
+export interface ResetSettingsFieldsAction {
+  type: 'RESET_SETTINGS_FIELDS'
+  payload: {
+    stepId?: string
+    update: Partial<Record<StepFieldName, unknown | null>>
+  }
+}
+
+export const resetSettingsFields: (
+  payload: ResetSettingsFieldsAction['payload']
+) => ResetSettingsFieldsAction = payload => ({
+  type: 'RESET_SETTINGS_FIELDS',
+  payload,
+})

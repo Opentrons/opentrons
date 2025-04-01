@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { round } from 'lodash'
+import { pick, round } from 'lodash'
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -32,10 +32,12 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
+import { resetSettingsFields } from '../../../../../../step-forms/actions'
 import {
   getMaxConditioningVolume,
   getMaxPushOutVolume,
 } from '../../../../../../utils'
+import { getDefaultsForStepType } from '../../../../../../steplist'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
@@ -44,7 +46,6 @@ import {
 } from '../../utils'
 import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
-
 import type { Dispatch, SetStateAction } from 'react'
 import type { StepInputFieldProps } from './MultiInputField'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
@@ -72,6 +73,7 @@ export const SecondStepsMoveLiquidTools = ({
   visibleFormErrors,
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
+  const dispatch = useDispatch()
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const labwares = useSelector(getLabwareEntities)
   const { trashBinEntities, wasteChuteEntities } = useSelector(
@@ -188,6 +190,70 @@ export const SecondStepsMoveLiquidTools = ({
         behavior: 'smooth',
         block: 'start',
       })
+    }
+  }
+
+  const fieldKeys = [
+    'airGap_checkbox',
+    'airGap_volume',
+    'delay_checkbox',
+    'delay_mmFromBottom',
+    'delay_seconds',
+    'flowRate',
+    'mix_checkbox',
+    'mix_times',
+    'mix_volume',
+    'mmFromBottom',
+    'position_reference',
+    'retract_delay_seconds',
+    'retract_mmFromBottom',
+    'retract_speed',
+    'retract_x_position',
+    'retract_y_position',
+    'retract_position_reference',
+    'submerge_delay_seconds',
+    'submerge_speed',
+    'submerge_mmFromBottom',
+    'submerge_x_position',
+    'submerge_y_position',
+    'submerge_position_reference',
+    'touchTip_checkbox',
+    'touchTip_mmFromTop',
+    'touchTip_speed',
+    'touchTip_mmFromEdge',
+    'wellOrder_first',
+    'wellOrder_second',
+    'x_position',
+    'y_position',
+  ]
+
+  const defaultFields = fieldKeys.map(field => `${tab}_${field}`)
+  const aspirateFields = ['preWetTip']
+  const dispenseFields = [
+    'blowout_checkbox',
+    'blowout_flowRate',
+    'blowout_location',
+    'blowout_z_offset',
+    'pushOut_checkbox',
+    'pushOut_volume',
+  ]
+
+  const getDefaultfields = pick(
+    getDefaultsForStepType('moveLiquid'),
+    tab === 'aspirate'
+      ? [...aspirateFields, ...defaultFields]
+      : [...dispenseFields, ...defaultFields]
+  )
+
+  const handleReset = (): void => {
+    const { stepId } = formData
+    if (formData.liquidClass === '') {
+      dispatch(
+        resetSettingsFields({
+          stepId,
+          update: getDefaultfields,
+        })
+      )
     }
   }
 
@@ -560,6 +626,7 @@ export const SecondStepsMoveLiquidTools = ({
         <ResetSettingsField
           tab={tab}
           onClick={() => {
+            handleReset()
             console.log('TODO: wire up onClick handler')
             handleScrollToTop()
           }}

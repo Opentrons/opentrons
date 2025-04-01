@@ -67,6 +67,7 @@ import type {
   ChangeBatchEditFieldAction,
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
+  ResetSettingsFieldsAction,
 } from '../actions'
 
 import type {
@@ -131,6 +132,7 @@ export type UnsavedFormActions =
   | CreateDeckFixtureAction
   | DeleteDeckFixtureAction
   | RenameStepAction
+  | ResetSettingsFieldsAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -156,18 +158,9 @@ export const unsavedForm = (
       })
     }
 
+    case 'RESET_SETTINGS_FIELDS':
+    case 'CHANGE_STEP_DETAILS':
     case 'CHANGE_FORM_INPUT': {
-      const fieldUpdate = handleFormChange(
-        action.payload.update,
-        unsavedFormState,
-        _getPipetteEntitiesRootState(rootState),
-        _getLabwareEntitiesRootState(rootState)
-      )
-      // @ts-expect-error (IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-      return { ...unsavedFormState, ...fieldUpdate }
-    }
-
-    case 'CHANGE_STEP_DETAILS': {
       const fieldUpdate = handleFormChange(
         action.payload.update,
         unsavedFormState,
