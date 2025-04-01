@@ -41,7 +41,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     evotips_adapter = protocol.load_adapter(
-        "evotips_flex_96_tiprack_adapter", "C1"
+        "evotip_flex_96_tiprack_adapter", "C1"
     )
     evosep_tips_labware = evotips_adapter.load_labware(
         "evotips_opentrons_96_labware",
