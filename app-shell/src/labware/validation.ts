@@ -17,7 +17,6 @@ import {
   OPENTRONS_LABWARE_FILE,
   VALID_LABWARE_FILE,
 } from '../constants'
-import { flatten } from 'lodash'
 
 const ajv = new Ajv()
 const validateDefinition = ajv.compile(labwareSchema)

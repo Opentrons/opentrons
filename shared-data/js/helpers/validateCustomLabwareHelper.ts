@@ -1,4 +1,3 @@
-import flatten from 'lodash/flatten'
 import type { LabwareDefinition2 } from '..'
 
 /**
@@ -11,12 +10,15 @@ import type { LabwareDefinition2 } from '..'
 export const validateCustomLabwareHelper = (
   definition: LabwareDefinition2 | null
 ): boolean => {
+  if (definition == null) {
+    return false
+  }
+  const wellSet = new Set(definition.ordering.flat())
+  const wellKeys = Object.keys(definition.wells)
+
   return (
     definition != null &&
-    Object.keys(definition.wells).length ===
-      flatten(definition.ordering).length &&
-    Object.keys(definition.wells).every(well =>
-      flatten(definition.ordering).includes(well)
-    )
+    wellKeys.length === wellSet.size &&
+    wellKeys.every(well => wellSet.has(well))
   )
 }
