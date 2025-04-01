@@ -288,7 +288,7 @@ endef
 .PHONY: push-ot3-factory
 push-ot3-factory: push-ot3
 	cd ../ && $(MAKE) push-ot3 host=$(host)
-	$(MAKE) -C hardware-testing push-ot3
+	$(MAKE) push-ot3
 
 .PHONY: push-ot3-scripts
 push-ot3-scripts: push-ot3

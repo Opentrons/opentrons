@@ -205,7 +205,7 @@ async def run(
     for trial in range(2):
         ui.print_header("JOG to 96-Tip RACK")
         if trial == 0:
-            tip_rack = str(pipette)+"ul"
+            tip_rack = str(pipette) + "ul"
             test_volume = pipette
         else:
             tip_rack = "50ul"
@@ -217,7 +217,9 @@ async def run(
         )
         await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
         print("picking up tips")
-        await api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(pipette))
+        await api.pick_up_tip(
+            OT3Mount.LEFT, helpers_ot3.get_default_tip_length(pipette)
+        )
         await api.home_z(OT3Mount.LEFT)
         if reservoir_a1_actual is None:
             if not api.is_simulator:
@@ -236,8 +238,10 @@ async def run(
         droplets_result = droplets_result & result
         await _drop_tip(api, trash_nominal, pipette)
         await api.home_z(OT3Mount.LEFT)
-    report(section, "droplets-96-tips", [duration, CSVResult.from_bool(droplets_result)])
-    
+    report(
+        section, "droplets-96-tips", [duration, CSVResult.from_bool(droplets_result)]
+    )
+
     # if not api.is_simulator:
     #     ui.get_user_ready(f"REMOVE 96 tip-rack from slot #{TIP_RACK_96_SLOT}")
     #     ui.get_user_ready(f"ADD partial tip-rack to slot #{TIP_RACK_PARTIAL_SLOT}")
