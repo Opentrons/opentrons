@@ -162,7 +162,6 @@ def run(protocol: ProtocolContext) -> None:
             labware=evosep_tips_labware,
             new_location=soak_plate,
             use_gripper=True,
-            drop_offset={"x": 0, "y": 0, "z": 0},
         )
         protocol.move_labware(
             labware=evosep_tips_labware,
