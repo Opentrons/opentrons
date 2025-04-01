@@ -133,15 +133,22 @@ const _createCustomLabwareDef: (
 
     const valid: boolean | PromiseLike<any> =
       parsedLabwareDef === null ? false : validate(parsedLabwareDef)
-    const hasWellA1 = flatten(parsedLabwareDef?.ordering || []).includes('A1')
+    const hasWellMatching =
+      parsedLabwareDef != null
+        ? Object.keys(parsedLabwareDef.wells).every(well =>
+            flatten(parsedLabwareDef?.ordering || []).includes(well)
+          )
+        : true
     const loadName = parsedLabwareDef?.parameters?.loadName || ''
     const displayName = parsedLabwareDef?.metadata?.displayName || ''
 
-    if (!hasWellA1) {
-      console.warn('uploaded labware conforms to schema, but has no well A1!')
+    if (!hasWellMatching) {
+      console.warn(
+        'uploaded labware conforms to schema, but wells do not match!'
+      )
     }
 
-    if (!valid || !hasWellA1) {
+    if (!valid || !hasWellMatching) {
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
