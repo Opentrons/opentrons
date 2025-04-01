@@ -83,7 +83,7 @@ export const loadProtocolFile = (
       try {
         // Extract designer application blob
         const designerApplicationComment = result.match(
-          /# DESIGNER_APPLICATION: """([\s\S]+?)"""/
+          /DESIGNER_APPLICATION: """([\s\S]+?)"""/
         )
         if (
           designerApplicationComment != null &&
