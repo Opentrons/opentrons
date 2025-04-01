@@ -234,3 +234,7 @@ class AbstractModule(abc.ABC):
     def event_listener(self, event: Any) -> None:
         """Listen for events and update the module state."""
         pass
+
+    async def identify(self) -> None:
+        """Identify the module."""
+        pass
