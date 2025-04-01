@@ -53,9 +53,10 @@ import type {
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
 import type {
+  DesignerApplication,
   PDMetadata,
   PDPythonFile,
-  DesignerApplication,
+  PythonDesignerApplication,
 } from '../../file-types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
@@ -373,6 +374,10 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
         },
       },
     }
+    const pythonDesignerApplication: PythonDesignerApplication = {
+      ...designerApplication,
+      robotType,
+    }
     const python =
       [
         // Here are the sections of the Python file:
@@ -391,6 +396,6 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
         .filter(section => section) // skip any blank sections
         .join('\n\n') + '\n'
 
-    return { python, designerApplication }
+    return { python, pythonDesignerApplication }
   }
 )

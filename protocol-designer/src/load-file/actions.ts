@@ -94,7 +94,10 @@ export const loadProtocolFile = (
 
           // TODO: remove this when uploading python is fully working for phase 1
           // still need to add in labware definitions and robotType
-          console.log('Designer application JSON:', designerApplicationJson)
+          console.log(
+            'Python designer application JSON:',
+            designerApplicationJson
+          )
 
           dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
         } else {

@@ -10,7 +10,7 @@ export const saveFile = (fileData: ProtocolFile, fileName: string): void => {
 }
 export const savePythonFile = (file: PDPythonFile, fileName: string): void => {
   const fileData = file.python
-  const stringifiedBlob = JSON.stringify(file.designerApplication)
+  const stringifiedBlob = JSON.stringify(file.pythonDesignerApplication)
   const designerApplicationBlob = `\n# DESIGNER_APPLICATION: """${stringifiedBlob}"""\n`
   const blob = new Blob([fileData, designerApplicationBlob], {
     type: 'text/x-python;charset=UTF-8',

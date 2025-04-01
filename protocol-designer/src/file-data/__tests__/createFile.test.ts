@@ -170,7 +170,7 @@ def run(protocol: protocol_api.ProtocolContext):
 `.trimStart()
     )
 
-    expect(result.designerApplication).toEqual({
+    expect(result.pythonDesignerApplication).toEqual({
       designerApplication: {
         data: {
           dismissedWarnings: {
@@ -267,6 +267,7 @@ def run(protocol: protocol_api.ProtocolContext):
         version: '8.5.0',
         name: 'opentrons/protocol-designer',
       },
+      robotType: OT2_ROBOT_TYPE,
     })
   })
 })
