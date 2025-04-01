@@ -71,11 +71,16 @@ def _upmigrate_labware_offsets_in_runs(
                 parsed_state_summary = json_to_pydantic(StateSummary, raw_state_summary)
 
                 for labware_offset in parsed_state_summary.labwareOffsets:
-                    labware_offset.locationSequence = (
-                        legacy_offset_location_to_offset_location_sequence(
-                            labware_offset.location, deck_definition
+                    if labware_offset.locationSequence is None:
+                        labware_offset.locationSequence = (
+                            legacy_offset_location_to_offset_location_sequence(
+                                labware_offset.location, deck_definition
+                            )
                         )
-                    )
+                    else:
+                        # .locationSequence should always be None in this old data as far
+                        # as I know, but just to be safe, preserve it if it's not.
+                        pass
 
                 new_raw_state_summary = pydantic_to_json(parsed_state_summary)
 
