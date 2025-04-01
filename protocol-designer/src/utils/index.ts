@@ -310,7 +310,8 @@ export const getMaxPushOutVolume = (
     ? plungerPositionsConfigurations.lowVolumeDefault ??
       plungerPositionsConfigurations.default
     : plungerPositionsConfigurations.default
-  return round((blowout - bottom) * shaftULperMM, 1)
+  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
+  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
 }
 
 export const getDefaultPushOutVolume = (
