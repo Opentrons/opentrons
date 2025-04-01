@@ -160,6 +160,7 @@ export function getRelevantFailedLabwareCmdFrom({
 }: RelevantFailedLabwareCmd): FailedCommandRelevantLabware {
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
   const errorKind = getErrorKind(failedCommand)
+  console.log("errorKind: ", errorKind)
 
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:

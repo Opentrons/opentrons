@@ -97,6 +97,7 @@ describe('ManualReplaceLwAndRetry', () => {
   it(`renders TwoColTextAndImage for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE} step`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
+    console.log('WTF???')
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_IMAGE')
   })
