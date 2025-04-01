@@ -70,6 +70,9 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
             # internal robots.
             v06_to_v07.Migration6to7(subdirectory="7.1"),
             v07_to_v08.Migration7to8(subdirectory="8"),
+            # Subdirectories "9" and "10" were used during robot software v8.4.0
+            # development and were not released to the public. They may be present on
+            # internal robots.
             v08_to_v09.Migration8to9(subdirectory="9"),
             v09_to_v10.Migration9to10(subdirectory="10"),
             v10_to_v11.Migration10to11(subdirectory=LATEST_VERSION_DIRECTORY),
