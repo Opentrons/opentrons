@@ -106,8 +106,8 @@ def run(protocol_context):
     pipette_96.transfer_liquid(
         liquid_class=water_class,
         volume=volume,
-        source=water_source.wells_by_name()[SOURCE_WELL],
-        dest=target.wells_by_name()[TARGET_WELL],
+        source=water_source.wells(),
+        dest=target.wells(),
         new_tip=new_tip,
         trash_location=trash,
     )
@@ -115,8 +115,8 @@ def run(protocol_context):
     pipette_96.transfer_liquid(
         liquid_class=ethanol_class,
         volume=volume,
-        source=ethanol_source.wells_by_name()[SOURCE_WELL],
-        dest=target.wells_by_name()[TARGET_WELL],
+        source=ethanol_source.wells(),
+        dest=target.wells(),
         new_tip=new_tip,
         trash_location=trash,
     )
@@ -124,8 +124,8 @@ def run(protocol_context):
     pipette_96.transfer_liquid(
         liquid_class=glycerol_class,
         volume=volume,
-        source=ethanol_source.wells_by_name()[SOURCE_WELL],
-        dest=target.wells_by_name()[TARGET_WELL],
+        source=ethanol_source.wells(),
+        dest=target.wells(),
         new_tip=new_tip,
         trash_location=trash,
     )

@@ -197,9 +197,9 @@ def run(ctx: protocol_api.ProtocolContext):
     # new_tip = "always"
 
     source = [
-        water_source_1.wells_by_name()[SOURCE_WELL],
-        water_source_2.wells_by_name()[SOURCE_WELL],
-        water_source_3.wells_by_name()[SOURCE_WELL],
+        water_source_1.wells(),
+        water_source_2.wells(),
+        water_source_3.wells(),
     ]
 
     if "1000" in test.key:
@@ -210,7 +210,7 @@ def run(ctx: protocol_api.ProtocolContext):
         liquid_class=water_class,
         volume=volume,
         source=source,
-        dest=target.wells_by_name()[TARGET_WELL],
+        dest=target.wells(),
         new_tip=new_tip,
         trash_location=waste_chute,
     )
@@ -263,7 +263,7 @@ def run(ctx: protocol_api.ProtocolContext):
         liquid_class=ethanol_class,
         volume=volume,
         source=source,
-        dest=target.wells_by_name()[TARGET_WELL],
+        dest=target.wells(),
         new_tip=new_tip,
         trash_location=waste_chute,
     )
@@ -317,7 +317,7 @@ def run(ctx: protocol_api.ProtocolContext):
         liquid_class=glycerol_class,
         volume=volume,
         source=source,
-        dest=target.wells_by_name()[TARGET_WELL],
+        dest=target.wells(),
         new_tip=new_tip,
         trash_location=waste_chute,
     )

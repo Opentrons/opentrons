@@ -79,6 +79,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.transfer_liquid(
@@ -88,6 +89,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.transfer_liquid(
@@ -97,6 +99,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.transfer_liquid(
@@ -106,6 +109,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.transfer_liquid(
@@ -115,6 +119,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.transfer_liquid(
@@ -124,6 +129,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     # Distribute with tiprack_50
@@ -135,6 +141,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.distribute_liquid(
@@ -144,6 +151,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.distribute_liquid(
@@ -153,6 +161,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.distribute_liquid(
@@ -162,6 +171,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.distribute_liquid(
@@ -171,6 +181,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.distribute_liquid(
@@ -180,6 +191,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     # Consolidate with tiprack_50
@@ -192,6 +204,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.consolidate_liquid(
@@ -201,6 +214,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.consolidate_liquid(
@@ -210,6 +224,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.consolidate_liquid(
@@ -219,6 +234,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.consolidate_liquid(
@@ -228,6 +244,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.consolidate_liquid(
@@ -237,6 +254,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     # Now with filter tips !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -254,6 +272,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.transfer_liquid(
@@ -263,6 +282,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.transfer_liquid(
@@ -272,6 +292,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.transfer_liquid(
@@ -281,6 +302,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.transfer_liquid(
@@ -290,6 +312,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.transfer_liquid(
@@ -299,6 +322,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     # Distribute with filter_tiprack_50
@@ -310,6 +334,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.distribute_liquid(
@@ -319,6 +344,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.distribute_liquid(
@@ -328,6 +354,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.distribute_liquid(
@@ -337,6 +364,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.distribute_liquid(
@@ -346,6 +374,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.distribute_liquid(
@@ -355,6 +384,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     # Consolidate with filter_tiprack_50
@@ -367,6 +397,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.consolidate_liquid(
@@ -376,6 +407,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_50.consolidate_liquid(
@@ -385,6 +417,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.consolidate_liquid(
@@ -394,6 +427,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.consolidate_liquid(
@@ -403,6 +437,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     pipette_1000.consolidate_liquid(
@@ -412,6 +447,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
+        visit_every_well=True,
     )
 
     #### Now all the other tipracks for the p1000
@@ -442,6 +478,7 @@ def run(ctx):
             dest=target.wells_by_name()[WATER_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.transfer_liquid(
@@ -451,6 +488,7 @@ def run(ctx):
             dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.transfer_liquid(
@@ -460,6 +498,7 @@ def run(ctx):
             dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.distribute_liquid(
@@ -469,6 +508,7 @@ def run(ctx):
             dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.distribute_liquid(
@@ -478,6 +518,7 @@ def run(ctx):
             dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.distribute_liquid(
@@ -487,6 +528,7 @@ def run(ctx):
             dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.consolidate_liquid(
@@ -496,6 +538,7 @@ def run(ctx):
             dest=target.wells_by_name()[WATER_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.consolidate_liquid(
@@ -505,6 +548,7 @@ def run(ctx):
             dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
 
         pipette_1000.consolidate_liquid(
@@ -514,4 +558,5 @@ def run(ctx):
             dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
+            visit_every_well=True,
         )
