@@ -167,7 +167,6 @@ def run(protocol: ProtocolContext) -> None:
             labware=evosep_tips_labware,
             new_location=evotips_adapter,
             use_gripper=True,
-            pick_up_offset={"x": 0, "y": 0, "z": 0},
         )
 
     protocol.delay(seconds=soak_seconds)
