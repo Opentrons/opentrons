@@ -48,9 +48,10 @@ async def read_sensor(self, sensor: EnvironmentSensor) -> float:
 
     s_driver = SensorDriver()
     sensor_data = await s_driver.read(
-            can_messenger=self._backend._messenger,
-            sensor=sensor, offset=False,
-        )
+        can_messenger=self._backend._messenger,
+        sensor=sensor,
+        offset=False,
+    )
     assert sensor_data.temperature is not None
     return sensor_data.temperature.to_float()
 
@@ -72,7 +73,7 @@ def run(ctx: ProtocolContext) -> None:
         sensor_id=SensorId.S0,
         node_id=NodeId.pipette_left,
     )
-    secondary =  EnvironmentSensor.build(
+    secondary = EnvironmentSensor.build(
         sensor_id=SensorId.S1,
         node_id=NodeId.pipette_left,
     )
