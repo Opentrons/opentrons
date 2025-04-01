@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -133,6 +133,13 @@ export function ProtocolRunSetup({
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
 
+  // A separate app can apply offsets. We need to update the missing steps as a side effect.
+  useEffect(() => {
+    if (flexOffsetsApplied) {
+      dispatch(updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: true }))
+    }
+  }, [flexOffsetsApplied])
+
   const offsetsConfirmed = isFlex
     ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
     : !missingSteps.includes(LPC_STEP_KEY)
@@ -266,9 +273,6 @@ export function ProtocolRunSetup({
         <SetupLabwarePositionCheck
           {...{ runId, robotName, robotType }}
           setOffsetsConfirmed={confirmed => {
-            dispatch(
-              updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: confirmed })
-            )
             if (confirmed) {
               dispatch(appliedOffsetsToRun(runId))
 

@@ -509,11 +509,12 @@ def _parse_can_device_info_response(
     return None
 
 
-async def log_motor_usage_data(
+async def log_motor_usage_data(  # noqa: C901
     can_messenger: CanMessenger, nodes: List[NodeId]
 ) -> None:
     """Broadcasts a message to get motor usage request and waits for a list of expected nodes."""
     event = asyncio.Event()
+    log.info(f"Getting usage data from {nodes}")
 
     def _filter(arb_id: ArbitrationId) -> bool:
         return MessageId(arb_id.parts.message_id) == MessageId.get_motor_usage_response
@@ -522,12 +523,18 @@ async def log_motor_usage_data(
         if isinstance(message, GetMotorUsageResponse):
             usage_elements = message.payload.usage_elements
             node = arb_id.parts.originating_node_id
-            log.info(f"Usage from {node}: ")
+            logline = f"Usage from {node}: "
             for m in usage_elements:
                 data_name = MotorUsageValueType(m.key).name
                 data_value = m.usage_value
-                log.info(f"    {data_name}: {data_value}")
-            nodes.remove(node)
+                logline += f"\n    {data_name}: {data_value}"
+            log.info(logline)
+            try:
+                nodes.remove(node)
+            except ValueError:
+                log.warning(
+                    f"Usage response from {node} which was not passed in as expected originally"
+                )
             if len(nodes) == 0:
                 event.set()
 
