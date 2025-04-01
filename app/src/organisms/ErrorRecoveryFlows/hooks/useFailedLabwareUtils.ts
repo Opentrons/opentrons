@@ -173,6 +173,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.GRIPPER_ERROR:
       return failedCommandByRunRecord as MoveLabwareRunTimeCommand
     case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTE_MISSING:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
