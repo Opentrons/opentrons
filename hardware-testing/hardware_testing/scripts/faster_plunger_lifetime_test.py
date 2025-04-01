@@ -60,7 +60,7 @@ async def _is_plunger_still_aligned_with_encoder(
 
 async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
     """Run."""
-    pipette_string = "p1000_96_v3.4" if cfg.pipette == 1000 else "p200_96_v3.0"
+    pipette_string = "p1000_96_v3.4" if cfg.pipette == 1000 else "p200_96_v3.1"
 
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=cfg.simulate,
