@@ -50,7 +50,7 @@ def run(protocol: ProtocolContext) -> None:
     gripper_repeats = protocol.params.gripper_repeats  # type: ignore[attr-defined]
     soak_seconds = protocol.params.soak_seconds  # type: ignore[attr-defined]
     gripper_only = protocol.params.gripper_only  # type: ignore[attr-defined]
-    soak_plate = protocol.load_adapter("evotips_reservoir_adapter", "B2")
+    soak_plate = protocol.load_adapter("evotip_flex_short_adapter", "B2")
 
     sol_a_plate = protocol.load_labware("nest_1_reservoir_195ml", "C2","Solvent A")
     sol_a = sol_a_plate.wells()[0]
