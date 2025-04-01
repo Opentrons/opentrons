@@ -318,7 +318,7 @@ describe('useRecoveryCommands', () => {
         {
           commandType: 'flexStacker/prepareShuttle',
           params: {
-            moduleId: '123',
+            moduleId: undefined,
           },
           intent: 'fixit',
         },

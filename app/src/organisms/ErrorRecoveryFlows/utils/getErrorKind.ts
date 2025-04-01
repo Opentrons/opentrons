@@ -60,6 +60,8 @@ export function getErrorKind(
       return ERROR_KINDS.STALL_WHILE_STACKING
     } else if (errorType === DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING) {
       return ERROR_KINDS.LABWARE_MISSING_IN_HOPPER
+    } else if (errorType === DEFINED_ERROR_TYPES.SHUTTLE_MISSING) {
+      return ERROR_KINDS.SHUTTE_MISSING
     }
   }
 
