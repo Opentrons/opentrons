@@ -133,6 +133,7 @@ export function SetupLabwareMap({
               labwareId={topLabwareId}
               displayName={topLabwareDisplayName}
               runId={runId}
+              labwareHasLiquid={Object.values(wellFill).length > 0}
             />
           ) : null}
         </g>
@@ -201,6 +202,7 @@ export function SetupLabwareMap({
                     labwareId={topLabwareId}
                     displayName={topLabwareDisplayName}
                     runId={runId}
+                    labwareHasLiquid={Object.values(wellFill).length > 0}
                   />
                 ) : null}
               </g>
