@@ -57,13 +57,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         maximum=1000,
         description="Set target aspirate volume.",
     )
-
-    parameters.add_bool(
-        variable_name="lld",
-        display_name="enable lld",
-        description=("Use LLD to detect liquid height."),
-        default=True,
-    )
     parameters.add_int(
         variable_name="number_of_tipracks",
         display_name="Number of tipracks",
@@ -233,6 +226,12 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         ],
         default="corning_96_wellplate_360ul_flat",
     )
+    parameters.add_bool(
+        variable_name="lld",
+        display_name="enable lld",
+        description=("Use LLD to detect liquid height."),
+        default=True,
+    )
 
 
 def _find_latest_labware_version(loadname: str) -> int:
@@ -397,10 +396,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 )
                 retrying = True
         pip._retract()
-        pip.return_tip()
-        pip._retract()
-        ctx.pause("Replace tip rack.")
-        pip.pick_up_tip(tips["A1"])
+        if ctx.params.lld:
+            pip.return_tip()
+            pip._retract()
+            ctx.pause("Replace tip rack.")
+            pip.pick_up_tip(tips["A1"])
         return src_liquid_height
 
     def _set_pipettte_motion_settings() -> Tuple[float, float, float, float, float]:
