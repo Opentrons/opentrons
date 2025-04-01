@@ -25,7 +25,7 @@ router = LightRouter()
 Key = Annotated[
     str,
     fastapi.Path(
-        pattern="^[a-zA-Z0-9-_]*$",
+        pattern="^[a-zA-Z0-9-_]+$",
         description=(
             "A key for storing and retrieving the piece of data."
             " This should be chosen to avoid colliding with other clients,"
