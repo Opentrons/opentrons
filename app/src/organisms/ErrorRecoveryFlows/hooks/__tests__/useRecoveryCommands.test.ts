@@ -307,6 +307,42 @@ describe('useRecoveryCommands', () => {
   })
 
   it('should call flexStacker/perpareShuttle and resolve the promise', async () => {
+    const mockFailedCommandWithError = {
+      ...mockFailedCommand,
+      commandType: 'flexStacker/prepareShuttle',
+      params: {
+        moduleId: '123',
+      },
+      error: {
+        errorType: 'mockErrorType',
+      },
+    }
+
+    const testProps = {
+      ...props,
+      unvalidatedFailedCommand: mockFailedCommandWithError,
+    }
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
+
+    await act(async () => {
+      await result.current.homeShuttle()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'flexStacker/prepareShuttle',
+          params: {
+            moduleId: '123',
+          },
+          intent: 'fixit',
+        },
+      ],
+      false
+    )
+  })
+
+  it('should call flexStacker/perpareShuttle without moduleId', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
     await act(async () => {
@@ -318,7 +354,7 @@ describe('useRecoveryCommands', () => {
         {
           commandType: 'flexStacker/prepareShuttle',
           params: {
-            moduleId: undefined,
+            moduleId: '',
           },
           intent: 'fixit',
         },

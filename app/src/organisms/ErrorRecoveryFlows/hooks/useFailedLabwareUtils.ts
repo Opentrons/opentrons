@@ -292,7 +292,7 @@ export function getFailedLabwareQuantity(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
 ): string | null {
-  const stackerErrorKinds = [
+  const stackerErrorKinds: ErrorKind[] = [
     ERROR_KINDS.STALL_WHILE_STACKING,
     ERROR_KINDS.SHUTTE_MISSING,
   ]
