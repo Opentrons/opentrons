@@ -11,10 +11,10 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
@@ -221,13 +221,10 @@ export function QuickTransferDashboard(): JSX.Element {
           {pinnedTransfers.length > 0 ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              marginBottom={SPACING.spacing32}
+              gap={SPACING.spacing8}
+              paddingBottom={SPACING.spacing32}
             >
-              <LegacyStyledText
-                as="p"
-                marginBottom={SPACING.spacing8}
-                color={COLORS.grey60}
-              >
+              <LegacyStyledText as="p" color={COLORS.grey60}>
                 {t('pinned_transfers')}
               </LegacyStyledText>
               <PinnedTransferCarousel
