@@ -238,7 +238,9 @@ async def run(
         droplets_result = droplets_result & result
         await _drop_tip(api, trash_nominal, pipette)
         await api.home_z(OT3Mount.LEFT)
-    report(section, "droplets-96-tips", [duration, CSVResult.from_bool(droplets_result)])
+    report(
+        section, "droplets-96-tips", [duration, CSVResult.from_bool(droplets_result)]
+    )
 
     # if not api.is_simulator:
     #     ui.get_user_ready(f"REMOVE 96 tip-rack from slot #{TIP_RACK_96_SLOT}")
