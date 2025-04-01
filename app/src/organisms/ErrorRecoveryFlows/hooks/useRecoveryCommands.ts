@@ -403,10 +403,11 @@ const buildHomeShuttle = (
     return null
   }
   const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId = 'moduleId' in storeOrRetriveFailedCommandParams ? storeOrRetriveFailedCommandParams.moduleId : ''
   return {
     commandType: 'flexStacker/prepareShuttle',
     params: {
-      moduleId: storeOrRetriveFailedCommandParams.moduleId,
+      moduleId: moduleId,
     },
     intent: 'fixit',
   }

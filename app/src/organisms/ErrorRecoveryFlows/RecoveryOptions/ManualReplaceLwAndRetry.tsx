@@ -76,8 +76,6 @@ export function ManualReplaceLwAndRetry(
     />
   )
   const buildContent = (): JSX.Element => {
-    console.log('content step: ', step)
-    console.log('content route: ', route)
     switch (step) {
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE:
         return <GripperIsHoldingLabware {...props} />
