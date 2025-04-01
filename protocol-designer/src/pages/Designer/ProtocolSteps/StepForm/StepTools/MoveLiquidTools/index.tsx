@@ -1,8 +1,9 @@
 import { useSelector } from 'react-redux'
 import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import { useAssignLiquidClass } from './hooks'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
-import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
+import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 
 import type { StepFormProps } from '../../types'
 
@@ -18,6 +19,11 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   } = props
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
 
+  const assignedLiquidClass = useAssignLiquidClass(
+    formData,
+    propsForFields.liquidClass.updateValue
+  )
+
   // Object mapping step numbers to functions returning the correct JSX
   const stepComponents: Record<number, () => JSX.Element> = {
     0: () => (
@@ -32,8 +38,10 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         {enableLiquidClasses ? (
           <LiquidClassesStepTools
             propsForFields={propsForFields}
+            formData={formData}
             setShowFormErrors={setShowFormErrors}
             type="transfer"
+            assignedLiquidClass={assignedLiquidClass}
           />
         ) : (
           <SecondStepsMoveLiquidTools

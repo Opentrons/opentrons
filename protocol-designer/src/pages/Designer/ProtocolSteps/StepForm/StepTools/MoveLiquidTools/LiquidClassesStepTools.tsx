@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -10,20 +9,24 @@ import {
 } from '@opentrons/components'
 import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
 import { getLiquidEntities } from '../../../../../../step-forms/selectors'
-import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
+  formData: FormData
+  assignedLiquidClass: string
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
-  type?: 'mix' | 'transfer'
+  type: 'mix' | 'transfer'
 }
 
 export const LiquidClassesStepTools = ({
   propsForFields,
+  formData,
   setShowFormErrors,
+  assignedLiquidClass,
   type,
 }: LiquidClassesStepToolsProps): JSX.Element => {
   const { t } = useTranslation('liquids')
@@ -40,22 +43,11 @@ export const LiquidClassesStepTools = ({
     }
   })
 
-  const assignedLiquidClasses = Object.values(liquids)
-    .map(liquid => liquid.liquidClass)
-    .filter(Boolean)
-  const hasAssignedLiquidClasses = assignedLiquidClasses.length > 0
-
-  const defaultSelectedLiquidClass = hasAssignedLiquidClasses
-    ? getLiquidClassDisplayName(assignedLiquidClasses[0] ?? null)
-    : t('dont_use_liquid_class')
-
-  const [selectedLiquidClass, setSelectedLiquidClass] = useState(
-    defaultSelectedLiquidClass
-  )
-
-  useMemo(() => {
-    setSelectedLiquidClass(defaultSelectedLiquidClass)
-  }, [defaultSelectedLiquidClass])
+  const noLiquidClass = {
+    name: t('dont_use_liquid_class') as string,
+    value: 'none',
+    subButtonLabel: t('default'),
+  }
 
   const liquidClassOptions = [
     ...Object.entries(sortedLiquidClassDefs).map(
@@ -72,18 +64,13 @@ export const LiquidClassesStepTools = ({
             : description,
       })
     ),
-    {
-      name: t('dont_use_liquid_class'),
-      value: '',
-      subButtonLabel: '',
-    },
+    noLiquidClass,
   ]
-  if (!hasAssignedLiquidClasses) {
-    const poppedOption = liquidClassOptions.pop()
-    if (poppedOption !== undefined) {
-      liquidClassOptions.unshift(poppedOption)
-    }
-  }
+
+  // order by assigned liquid class first
+  const liquidClassOptionsOrdered = liquidClassOptions.sort((a, _) =>
+    a.value === assignedLiquidClass ? -1 : 1
+  )
 
   return (
     <Flex
@@ -103,19 +90,18 @@ export const LiquidClassesStepTools = ({
         width="100%"
         padding={`0 ${SPACING.spacing16}`}
       >
-        {liquidClassOptions.map(options => {
+        {liquidClassOptionsOrdered.map(options => {
           const { name, subButtonLabel, value } = options
           return (
             <RadioButton
               key={name}
               onChange={(e: ChangeEvent<any>) => {
-                propsForFields.liquidClass.updateValue(e.currentTarget.value)
-                setSelectedLiquidClass(name)
+                propsForFields.liquidClass.updateValue(e.target.value)
                 setShowFormErrors?.(false)
               }}
               buttonLabel={name}
               buttonValue={value}
-              isSelected={selectedLiquidClass === name}
+              isSelected={formData.liquidClass === value}
               buttonSubLabel={{
                 label: subButtonLabel ?? undefined,
                 align: 'vertical',

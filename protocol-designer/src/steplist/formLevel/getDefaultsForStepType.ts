@@ -131,7 +131,7 @@ export function getDefaultsForStepType(
         dropTip_location: null,
         dropTip_wellNames: undefined,
         liquidClassesSupported: true,
-        liquidClass: null,
+        liquidClass: 'none',
         nozzles: null,
         path: 'single',
         pickUpTip_location: undefined,

@@ -12,6 +12,7 @@ import {
 import { getFormErrorsMappedToField } from '../../utils'
 import { FirstStepMixTools } from './FirstStepMixTools'
 import { SecondStepMixTools } from './SecondStepMixTools'
+import { useAssignLiquidClass } from '../MoveLiquidTools/hooks'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
 
 import type { StepFormProps } from '../../types'
@@ -49,6 +50,11 @@ export function MixTools(
 
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
+  const assignedLiquidClass = useAssignLiquidClass(
+    formData,
+    propsForFields.liquidClass.updateValue
+  )
+
   const stepComponents: Record<number, () => JSX.Element> = {
     0: () => (
       <FirstStepMixTools
@@ -69,6 +75,8 @@ export function MixTools(
           <LiquidClassesStepTools
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}
+            formData={formData}
+            assignedLiquidClass={assignedLiquidClass}
             type="mix"
           />
         ) : (

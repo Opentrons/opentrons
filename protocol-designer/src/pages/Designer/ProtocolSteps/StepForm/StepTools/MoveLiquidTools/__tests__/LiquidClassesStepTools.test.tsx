@@ -31,6 +31,8 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
           value: null,
         },
       },
+      formData: { liquidClass: 'none' } as any,
+      assignedLiquidClass: 'none',
       type: 'transfer',
     }
     vi.mocked(getLiquidEntities).mockReturnValue({})
