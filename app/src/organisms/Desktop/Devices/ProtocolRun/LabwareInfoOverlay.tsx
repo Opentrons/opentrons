@@ -7,7 +7,6 @@ import {
   DIRECTION_ROW,
   DISPLAY_FLEX,
   Flex,
-  Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   RobotCoordsForeignDiv,
@@ -21,7 +20,6 @@ interface LabwareInfoProps {
   displayName: string
   labwareId: string
   runId: string
-  labwareHasLiquid?: boolean
   hover?: boolean
 }
 
@@ -59,9 +57,6 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
         >
           {displayName}
         </LegacyStyledText>
-        {props.labwareHasLiquid && (
-          <Icon name="water" color={COLORS.white} width="0" minWidth="1rem" />
-        )}
       </Flex>
     </Box>
   )
