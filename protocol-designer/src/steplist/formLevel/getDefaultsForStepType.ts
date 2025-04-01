@@ -32,7 +32,7 @@ export function getDefaultsForStepType(
         dropTip_wellNames: undefined,
         labware: null,
         liquidClassesSupported: true,
-        liquidClass: null,
+        liquidClass: 'none',
         mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
         mix_touchTip_checkbox: false,
         mix_touchTip_mmFromTop: null,
