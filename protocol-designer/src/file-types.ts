@@ -40,12 +40,14 @@ export interface DesignerApplication {
 }
 
 export interface PythonDesignerApplication extends DesignerApplication {
-  robotType: RobotType
+  robot: {
+    model: RobotType
+  }
 }
 
 export interface PDPythonFile {
-  python: string
-  pythonDesignerApplication: PythonDesignerApplication
+  pythonProtocol: string
+  designerApplication: PythonDesignerApplication
 }
 
 export type PDProtocolFile = ProtocolFile<PDMetadata>

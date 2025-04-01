@@ -117,7 +117,7 @@ describe('createFile selector', () => {
     // This is just a quick smoke test to make sure createPythonFile() produces
     // something that looks like a Python file. The individual sections of the
     // generated Python will be tested in separate unit tests.
-    expect(result.python).toBe(
+    expect(result.pythonProtocol).toBe(
       `
 from contextlib import nullcontext as pd_step
 from opentrons import protocol_api, types
@@ -170,7 +170,7 @@ def run(protocol: protocol_api.ProtocolContext):
 `.trimStart()
     )
 
-    expect(result.pythonDesignerApplication).toEqual({
+    expect(result.designerApplication).toEqual({
       designerApplication: {
         data: {
           dismissedWarnings: {
@@ -267,7 +267,7 @@ def run(protocol: protocol_api.ProtocolContext):
         version: '8.5.0',
         name: 'opentrons/protocol-designer',
       },
-      robotType: OT2_ROBOT_TYPE,
+      robot: { model: OT2_ROBOT_TYPE },
     })
   })
 })

@@ -82,22 +82,12 @@ export const loadProtocolFile = (
 
       try {
         // Extract designer application blob
-        const designerApplicationComment = result.match(
-          /DESIGNER_APPLICATION: """([\s\S]+?)"""/
+        const designerApplication = result.match(
+          /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/
         )
-        if (
-          designerApplicationComment != null &&
-          designerApplicationComment[1]
-        ) {
-          const designerApplicationString = designerApplicationComment[1]
+        if (designerApplication != null && designerApplication[1]) {
+          const designerApplicationString = designerApplication[1]
           const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
-
-          // TODO: remove this when uploading python is fully working for phase 1
-          // still need to add in labware definitions and robotType
-          console.log(
-            'Python designer application JSON:',
-            designerApplicationJson
-          )
 
           dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
         } else {

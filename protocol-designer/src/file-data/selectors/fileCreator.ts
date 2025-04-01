@@ -350,7 +350,10 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
       ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
     )
 
-    const designerApplication: DesignerApplication = {
+    const designerApplication: PythonDesignerApplication = {
+      robot: {
+        model: robotType,
+      },
       designerApplication: {
         name: 'opentrons/protocol-designer',
         //  hardcoding this version in to avoid unnecessary migrating
@@ -374,11 +377,8 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
         },
       },
     }
-    const pythonDesignerApplication: PythonDesignerApplication = {
-      ...designerApplication,
-      robotType,
-    }
-    const python =
+
+    const pythonProtocol =
       [
         // Here are the sections of the Python file:
         pythonImports(),
@@ -396,6 +396,6 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
         .filter(section => section) // skip any blank sections
         .join('\n\n') + '\n'
 
-    return { python, pythonDesignerApplication }
+    return { pythonProtocol, designerApplication }
   }
 )
