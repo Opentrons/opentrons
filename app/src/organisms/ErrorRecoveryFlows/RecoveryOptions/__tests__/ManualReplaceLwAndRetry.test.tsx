@@ -16,6 +16,7 @@ vi.mock('../../shared', () => ({
   TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
   RetryStepInfo: vi.fn(() => <div>MOCK_RETRY_STEP_INFO</div>),
   RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
+  TwoColTextAndImage: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_IMAGE</div>),
 }))
 
 vi.mock('../SelectRecoveryOption', () => ({
@@ -34,6 +35,9 @@ describe('ManualReplaceLwAndRetry', () => {
       },
       routeUpdateActions: {
         proceedToRouteAndStep: vi.fn(),
+      },
+      recoveryCommands: {
+        homeShuttle: vi.fn(),
       },
     } as any
   })
@@ -88,6 +92,13 @@ describe('ManualReplaceLwAndRetry', () => {
       RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
+  })
+
+  it(`renders TwoColTextAndImage for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE} step`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
+    render(props)
+    screen.getByText('MOCK_TWO_COL_LW_INFO_AND_IMAGE')
   })
 
   it('renders SelectRecoveryOption for unknown step', () => {

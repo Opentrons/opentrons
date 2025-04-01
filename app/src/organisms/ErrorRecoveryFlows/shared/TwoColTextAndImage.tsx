@@ -17,9 +17,9 @@ import type { RecoveryContentProps } from '../types'
 export function TwoColTextAndImage(
   props: RecoveryContentProps
 ): JSX.Element | null {
-  const { routeUpdateActions, currentRecoveryOptionUtils } = props
+  const { routeUpdateActions, recoveryMap } = props
   const { LOAD_LABWARE_SHUTTLE_AND_RETRY } = RECOVERY_MAP
-  const { selectedRecoveryOption } = currentRecoveryOptionUtils
+  const { route } = recoveryMap
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
@@ -28,24 +28,24 @@ export function TwoColTextAndImage(
   }
 
   const buildTitle = (): string => {
-    switch (selectedRecoveryOption) {
+    switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('load_labware_shuttle_onto_track')
       default:
         console.error(
-          `TwoColTextAndImage: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
+          `TwoColTextAndImage: Unexpected recovery option: ${route}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
     }
   }
 
   const buildBody = (): string | null => {
-    switch (selectedRecoveryOption) {
+    switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('take_any_necessary_precautions_before_loading_shuttle')
       default:
         console.error(
-          `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
+          `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
     }
