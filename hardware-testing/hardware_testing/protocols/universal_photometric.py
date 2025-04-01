@@ -535,8 +535,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         )
         current_plate_volume += ctx.params.target_volume  # type: ignore [attr-defined]
         # Exit liquid from dispense position at dispense exit speed
+        blow_out_pos = plate["A1"].bottom(
+            dispense_pos + ctx.params.disp_sub_depth + 5  # type: ignore [attr-defined]
+        )
         pip.move_to(
-            location=plate["A1"].top(),
+            location=blow_out_pos,
             speed=dispense_exit_speed,
         )
         # Perform blow out
