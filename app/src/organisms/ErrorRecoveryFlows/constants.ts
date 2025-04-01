@@ -208,7 +208,7 @@ export const RECOVERY_MAP = {
     STEPS: {
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       CLOSE_DOOR_AND_HOME: 'close-door-and-home',
-      MANUAL_REPLACE: 'manual-replace',
+      MANUAL_REPLACE: 'load-shuttle',
       CONFIRM_RETRY: 'confirm-retry',
       RETRY: 'retry',
     },

@@ -34,7 +34,6 @@ export function ManualReplaceLwAndRetry(
   const { homeShuttle } = recoveryCommands
 
   const primaryBtnOnClick = (): Promise<void> => {
-    console.log('hello: ', route)
     return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
       if (route === LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE) {
         void homeShuttle().then(() => {
@@ -86,12 +85,12 @@ export function ManualReplaceLwAndRetry(
         return <GripperReleaseLabware {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME:
         return <RecoveryDoorOpenSpecial {...props} />
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
-        return <TwoColTextAndImage {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
         return <TwoColLwInfoAndDeck {...props} />
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
+        return <TwoColTextAndImage {...props} />
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
         return (
