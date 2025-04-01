@@ -44,7 +44,7 @@ def run(protocol: ProtocolContext) -> None:
         "evotip_flex_96_tiprack_adapter", "C1"
     )
     evosep_tips_labware = evotips_adapter.load_labware(
-        "evotips_opentrons_96_labware",
+        "evotip_flex_96_labware",
     )
     evotip = evosep_tips_labware.wells()[0]
     gripper_repeats = protocol.params.gripper_repeats  # type: ignore[attr-defined]
