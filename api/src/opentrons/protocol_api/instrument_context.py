@@ -650,7 +650,7 @@ class InstrumentContext(publisher.CommandPublisher):
         radius: float = 1.0,
         v_offset: float = -1.0,
         speed: float = 60.0,
-        mm_from_edge: float = 0,
+        mm_from_edge: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
@@ -720,7 +720,7 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             raise TypeError(f"location should be a Well, but it is {location}")
 
-        if mm_from_edge:
+        if mm_from_edge is not None:
             if self.api_version < APIVersion(2, 24):
                 raise APIVersionError(
                     api_element="mm_from_edge",
@@ -751,9 +751,7 @@ class InstrumentContext(publisher.CommandPublisher):
             radius=radius,
             z_offset=v_offset,
             speed=checked_speed,
-            mm_from_edge=mm_from_edge
-            if self.api_version >= APIVersion(2, 24)
-            else None,
+            mm_from_edge=mm_from_edge,
         )
         return self
 

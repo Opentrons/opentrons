@@ -1125,7 +1125,7 @@ def test_touch_tip(
             radius=0.123,
             z_offset=4.56,
             speed=42.0,
-            mm_from_edge=0,
+            mm_from_edge=None,
         )
     )
 
