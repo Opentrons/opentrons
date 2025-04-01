@@ -70,18 +70,22 @@ export const LiquidClassesStepTools = ({
     .map(liquid => liquid.liquidClass)
     .filter(Boolean)
   const hasAssignedLiquidClasses = assignedLiquidClasses.length > 0
-
   const defaultSelectedLiquidClass = hasAssignedLiquidClasses
     ? getLiquidClassDisplayName(assignedLiquidClasses[0] ?? null)
     : t('dont_use_liquid_class')
+
+  const hasLiquidClassSaved = formData.liquidClass != null
+  const preSelectedLiquidClass = hasLiquidClassSaved
+    ? getLiquidClassDisplayName(formData.liquidClass)
+    : defaultSelectedLiquidClass
 
   const [selectedLiquidClass, setSelectedLiquidClass] = useState(
     defaultSelectedLiquidClass
   )
 
   useMemo(() => {
-    setSelectedLiquidClass(defaultSelectedLiquidClass)
-  }, [defaultSelectedLiquidClass])
+    setSelectedLiquidClass(preSelectedLiquidClass)
+  }, [preSelectedLiquidClass])
 
   const liquidClassOptions = [
     ...Object.entries(sortedLiquidClassDefs).map(
