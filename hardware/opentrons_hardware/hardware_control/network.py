@@ -4,7 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from itertools import chain
 import logging
-from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple, List
+from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple
 from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -509,40 +509,31 @@ def _parse_can_device_info_response(
     return None
 
 
-async def log_motor_usage_data(  # noqa: C901
-    can_messenger: CanMessenger, nodes: List[NodeId]
-) -> None:
-    """Broadcasts a message to get motor usage request and waits for a list of expected nodes."""
-    event = asyncio.Event()
-    log.info(f"Getting usage data from {nodes}")
+def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
+    if isinstance(message, GetMotorUsageResponse):
+        usage_elements = message.payload.usage_elements
+        node = arb_id.parts.originating_node_id
+        logline = f"Usage from {node}: "
+        for m in usage_elements:
+            data_name = MotorUsageValueType(m.key).name
+            data_value = m.usage_value
+            logline += f"\n    {data_name}: {data_value}"
+        log.info(logline)
+
+
+async def log_motor_usage_data(can_messenger: CanMessenger) -> None:
+    """Broadcasts a message to get motor usage request and installs a listener to log responses.
+
+    This is really only intended to make sure that usage data gets logged; it will return before
+    responses get sent and shouldn't be relied upon beyond logging.
+    """
+    log.info(f"Getting usage data using listener {_listener}")
 
     def _filter(arb_id: ArbitrationId) -> bool:
         return MessageId(arb_id.parts.message_id) == MessageId.get_motor_usage_response
 
-    def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
-        if isinstance(message, GetMotorUsageResponse):
-            usage_elements = message.payload.usage_elements
-            node = arb_id.parts.originating_node_id
-            logline = f"Usage from {node}: "
-            for m in usage_elements:
-                data_name = MotorUsageValueType(m.key).name
-                data_value = m.usage_value
-                logline += f"\n    {data_name}: {data_value}"
-            log.info(logline)
-            try:
-                nodes.remove(node)
-            except ValueError:
-                log.warning(
-                    f"Usage response from {node} which was not passed in as expected originally"
-                )
-            if len(nodes) == 0:
-                event.set()
-
+    # Note: this adds but does not remove a listener. this is safe asl ong as add_listener
+    # is implemented with a dictionary keyed on function object identity, because this
+    # function should be stable. It will not be okay if we ever change that.
     can_messenger.add_listener(_listener, _filter)
     await can_messenger.send(node_id=NodeId.broadcast, message=GetMotorUsageRequest())
-    try:
-        await asyncio.wait_for(event.wait(), 1.0)
-    except TimeoutError:
-        log.error(f"Receiving usage data failed with {nodes} remaining")
-    finally:
-        can_messenger.remove_listener(_listener)
