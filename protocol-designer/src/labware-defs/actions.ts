@@ -133,9 +133,7 @@ const _createCustomLabwareDef: (
 
     const valid: boolean | PromiseLike<any> =
       parsedLabwareDef === null ? false : validate(parsedLabwareDef)
-    const hasWellMatching = validateCustomLabwareHelper(
-      parsedLabwareDef ?? null
-    )
+    const hasWellMatching = validateCustomLabwareHelper(parsedLabwareDef)
     const loadName = parsedLabwareDef?.parameters?.loadName || ''
     const displayName = parsedLabwareDef?.metadata?.displayName || ''
 

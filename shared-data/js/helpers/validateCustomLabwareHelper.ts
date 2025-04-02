@@ -8,7 +8,7 @@ import type { LabwareDefinition2 } from '..'
  * @returns A boolean for if they exist
  */
 export const validateCustomLabwareHelper = (
-  definition: LabwareDefinition2 | null
+  definition?: LabwareDefinition2 | null
 ): boolean => {
   if (definition == null) {
     return false
