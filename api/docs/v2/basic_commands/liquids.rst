@@ -48,6 +48,17 @@ You can also aspirate from a location along the center vertical axis within a we
     depth = plate["A1"].bottom(z=2) # tip is 2 mm above well bottom
     pipette.aspirate(200, depth)
 
+
+Use the :py:meth:`.Well.meniscus` method to aspirate from the meniscus of liquid in a well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
+- Specify your starting liquid volume with :py:meth:`~Labware.load_liquid_by_well`, or
+- Use :py:meth:`.measure_liquid_height` to define liquid height in a well before aspirating, or earlier in the protocol. 
+
+    pipette.pick_up_tip()
+    pipette.measure_liquid_height(plate["A2"])
+    pipette.aspirate(200, location=plate["A2"].meniscus(z=-1)) # aspirates at 1 mm below the liquid meniscus
+
+.. versionadded:: 2.23
+
 See also:
 
 - :ref:`new-default-op-positions` for information about controlling pipette height for a particular pipette.
@@ -104,6 +115,18 @@ You can also dispense from a location along the center vertical axis within a we
 
     depth = plate["B1"].bottom(z=2) # tip is 2 mm above well bottom
     pipette.dispense(200, depth)
+
+
+Use the :py:meth:`.Well.meniscus` method to dispense at the meniscus of liquid in your well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
+- Specify your starting liquid volume with :py:meth:`~Labware.load_liquid_by_well`, or
+- Use :py:meth:`.measure_liquid_height` to define liquid height in a well before aspirating, or earlier in the protocol. 
+
+    pipette.measure_liquid_height(plate["B1"])
+    pipette.dispense(200, location=plate["B1"].meniscus(z=-1)) #dispenses 1 mm below the liquid meniscus
+
+The API will raise an error if no liquid is present in the well. 
+
+.. versionadded:: 2.23
 
 See also:
 
@@ -323,3 +346,18 @@ The :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pi
 You can also require liquid presence for all aspirations performed with a given pipette. See :ref:`lpd`.
 
 .. versionadded:: 2.20
+
+Measure Liquids
+===============
+
+The :py:meth:`.measure_liquid_height` method tells a Flex pipette to measure the height of liquid in a well. It returns the height of liquid in the well in mm. When ``measure_liquid_height()`` finds an empty well, it raises and error and pauses the protocol to let you resove the problem. 
+
+``measure_liquid_height`` is a standalone method to record the height of liquid in a well. You can use the liquid height to aspirate or dispense from the liquid meniscus, either immediately after or later in your protocol.
+
+.. code-block:: python
+
+    pipette.pick_up_tip()
+    pipette.measure_liquid_height(plate["A1"])
+    pipette.aspirate(200, location=plate["A1"].meniscus(z=-1)) #aspirates from 1 mm below the liquid meniscus
+
+You don't have to aspirate after measuring liquid height, but you should always pick up a tip immediately prior to measuring the liquid height, and either aspirate or drop the tip immediately after. This ensures that the pipette uses a clean, dry tip to check for liquid, and prevents cross-contamination. 
