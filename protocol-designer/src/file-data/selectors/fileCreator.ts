@@ -53,7 +53,6 @@ import type {
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
 import type {
-  DesignerApplication,
   PDMetadata,
   PDPythonFile,
   PythonDesignerApplication,
