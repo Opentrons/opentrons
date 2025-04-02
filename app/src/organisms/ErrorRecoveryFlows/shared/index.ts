@@ -7,6 +7,7 @@ export {
 export { TwoColLwInfoAndDeck } from './TwoColLwInfoAndDeck'
 export { SelectTips } from './SelectTips'
 export { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
+export { TwoColTextAndImage } from './TwoColTextAndImage'
 export { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 export { TipSelection } from './TipSelection'
 export { TipSelectionModal } from './TipSelectionModal'
