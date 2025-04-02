@@ -37,7 +37,7 @@ export const ERROR_KINDS = {
   GRIPPER_ERROR: 'GRIPPER_ERROR',
   STALL_OR_COLLISION: 'STALL_OR_COLLISION',
   STALL_WHILE_STACKING: 'STALL_WHILE_STACKING',
-  SHUTTE_MISSING: 'SHUTTE_MISSING',
+  SHUTTLE_MISSING: 'SHUTTLE_MISSING',
 } as const
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
