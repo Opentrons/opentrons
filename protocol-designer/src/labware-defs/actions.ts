@@ -1,6 +1,5 @@
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
-import flatten from 'lodash/flatten'
 import values from 'lodash/values'
 import uniqBy from 'lodash/uniqBy'
 import {
@@ -8,6 +7,7 @@ import {
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
   labwareSchemaV2,
+  validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
@@ -133,12 +133,9 @@ const _createCustomLabwareDef: (
 
     const valid: boolean | PromiseLike<any> =
       parsedLabwareDef === null ? false : validate(parsedLabwareDef)
-    const hasWellMatching =
-      parsedLabwareDef != null
-        ? Object.keys(parsedLabwareDef.wells).every(well =>
-            flatten(parsedLabwareDef?.ordering || []).includes(well)
-          )
-        : true
+    const hasWellMatching = validateCustomLabwareHelper(
+      parsedLabwareDef ?? null
+    )
     const loadName = parsedLabwareDef?.parameters?.loadName || ''
     const displayName = parsedLabwareDef?.metadata?.displayName || ''
 
