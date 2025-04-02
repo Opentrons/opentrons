@@ -1,8 +1,11 @@
 """Main FastAPI application."""
 import logging
+from typing import List, Any
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Any
+
+from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from system_server._version import version
 from system_server.settings import get_settings
@@ -22,7 +25,6 @@ app = FastAPI(
     redoc_url="/system/redoc",
 )
 
-# cors
 app.add_middleware(
     CORSMiddleware,
     allow_origins=("*"),
@@ -30,6 +32,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.middleware("http")(server_timing_middleware())
 
 # main router
 app.include_router(router=router)
