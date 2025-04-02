@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocol_api.labware import Well
     from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+    from opentrons.protocol_api._liquid import LiquidClass
 
 from opentrons.types import Location
 
@@ -43,6 +44,9 @@ TOUCH_TIP: Final = "command.TOUCH_TIP"
 RETURN_TIP: Final = "command.RETURN_TIP"
 MOVE_TO: Final = "command.MOVE_TO"
 MOVE_TO_DISPOSAL_LOCATION: Final = "command.MOVE_TO_DISPOSAL_LOCATION"
+TRANSFER_LIQUID: Final = "command.TRANSFER_LIQUID"
+DISTRIBUTE_LIQUID: Final = "command.DISTRIBUTE_LIQUID"
+CONSOLIDATE_LIQUID: Final = "command.CONSOLIDATE_LIQUID"
 SEAL: Final = "command.SEAL"
 UNSEAL: Final = "command.UNSEAL"
 PRESSURIZE: Final = "command.PRESSURIZE"
@@ -540,6 +544,28 @@ class MoveLabwareCommandPayload(TextOnlyPayload):
     pass
 
 
+class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    liquid_class: LiquidClass
+    volume: float
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+
+
+class TransferLiquidCommand(TypedDict):
+    name: Literal["command.TRANSFER_LIQUID"]
+    payload: LiquidClassCommandPayload
+
+
+class DistributeLiquidCommand(TypedDict):
+    name: Literal["command.DISTRIBUTE_LIQUID"]
+    payload: LiquidClassCommandPayload
+
+
+class ConsolidateLiquidCommand(TypedDict):
+    name: Literal["command.CONSOLIDATE_LIQUID"]
+    payload: LiquidClassCommandPayload
+
+
 class SealCommandPayload(TextOnlyPayload):
     instrument: InstrumentContext
     location: Union[None, Location, Well]
@@ -622,6 +648,9 @@ Command = Union[
     MoveToCommand,
     MoveToDisposalLocationCommand,
     MoveLabwareCommand,
+    TransferLiquidCommand,
+    DistributeLiquidCommand,
+    ConsolidateLiquidCommand,
     SealCommand,
     UnsealCommand,
     PressurizeCommand,
@@ -674,6 +703,7 @@ CommandPayload = Union[
     MoveToCommandPayload,
     MoveToDisposalLocationCommandPayload,
     MoveLabwareCommandPayload,
+    LiquidClassCommandPayload,
     SealCommandPayload,
     UnsealCommandPayload,
     PressurizeCommandPayload,

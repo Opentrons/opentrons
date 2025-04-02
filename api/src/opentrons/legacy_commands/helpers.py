@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Sequence
 
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api.module_contexts import ModuleContext
@@ -46,6 +46,55 @@ def stringify_disposal_location(location: Union[TrashBin, WasteChute]) -> str:
         return f"Trash Bin on slot {location.location.id}"
     elif isinstance(location, WasteChute):
         return "Waste Chute"
+
+
+def _group_wells_by_labware(wells: List[Well]) -> List[List[Well]]:
+    wells_by_labware: List[List[Well]] = []
+    sub_list = []
+    active_parent_labware = None
+    for well in wells:
+        if well.parent == active_parent_labware:
+            sub_list.append(well)
+        else:
+            active_parent_labware = well.parent
+            if sub_list:
+                wells_by_labware.append(sub_list)
+            sub_list = [well]
+    if sub_list:
+        wells_by_labware.append(sub_list)
+
+    return wells_by_labware
+
+
+def _stringify_multiple_wells_for_labware(wells: List[Well]) -> str:
+    if len(wells) == 0:
+        return ""
+    elif len(wells) == 1:
+        return str(wells[0])
+    else:
+        return ", ".join([well.well_name for well in wells[:-1]]) + f", {wells[-1]}"
+
+
+def stringify_well_list(
+    wells: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+) -> str:
+    if isinstance(wells, Well):
+        well_list = [wells]
+    elif len(wells) == 0:
+        well_list = []
+    elif isinstance(wells, list) and isinstance(wells[0], list):
+        well_list = [well for sub_well_list in wells for well in sub_well_list]
+    elif isinstance(wells, list):
+        well_list = wells
+    else:
+        return ""
+
+    return "; ".join(
+        [
+            _stringify_multiple_wells_for_labware(wells_by_labware)
+            for wells_by_labware in _group_wells_by_labware(well_list)
+        ]
+    )
 
 
 def _stringify_labware_movement_location(
