@@ -9,11 +9,12 @@ import {
 import { selectPendingOffsetOperations } from '/app/redux/protocol-runs'
 
 import type { StoredLabwareOffset } from '@opentrons/api-client'
+import type { SavedOffsets } from '/app/redux/protocol-runs'
 import type { UseLPCCommandChildProps } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/types'
 
 export interface UseBuildOffsetsToApplyResult {
   // Update the server with the current working offsets, returning the updated offsets.
-  saveWorkingOffsets: () => Promise<StoredLabwareOffset[]>
+  saveWorkingOffsets: () => Promise<SavedOffsets>
   isSavingWorkingOffsetsLoading: boolean
 }
 
@@ -40,32 +41,30 @@ export function useSaveWorkingOffsets({
 
   const createNecessaryLabwareOffsets = (): Promise<StoredLabwareOffset[]> => {
     if (toUpdate.length > 0) {
-      return createLabwareOffsets(toUpdate) as Promise<StoredLabwareOffset[]>
+      return createLabwareOffsets(toUpdate).then(res => {
+        return Array.isArray(res) ? res : [res]
+      })
     } else {
       return Promise.resolve([])
     }
   }
 
-  const saveWorkingOffsets = (): Promise<StoredLabwareOffset[]> => {
+  const saveWorkingOffsets = (): Promise<SavedOffsets> => {
     setIsLoading(true)
 
     return Promise.all([
       createNecessaryLabwareOffsets(),
       deleteLabwareOffsets(),
     ])
-      .then(([createRes, deleteRes]) => {
+      .then(res => {
         setIsLoading(false)
 
-        if (Array.isArray(createRes)) {
-          return [...createRes, ...deleteRes]
-        } else {
-          return [createRes, ...deleteRes]
-        }
+        return res
       })
       .catch(() => {
         setIsLoading(false)
 
-        return []
+        return [[], []]
       })
   }
 

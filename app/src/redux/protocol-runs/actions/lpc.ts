@@ -47,8 +47,8 @@ import type {
   UpdateLPCDeckAction,
   LPCLabwareInfo,
   UpdateLPCLabwareAction,
+  SavedOffsets,
 } from '../types'
-import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export const proceedStep = (
@@ -123,7 +123,7 @@ export const clearSelectedLabwareWorkingOffsets = (
 
 export const applyWorkingOffsets = (
   runId: string,
-  saveResult: StoredLabwareOffset[]
+  saveResult: SavedOffsets
 ): ApplyWorkingOffsetsAction => ({
   type: APPLY_WORKING_OFFSETS,
   payload: { runId, saveResult },

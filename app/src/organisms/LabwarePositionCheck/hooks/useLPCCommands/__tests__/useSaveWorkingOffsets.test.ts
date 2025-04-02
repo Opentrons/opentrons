@@ -48,6 +48,11 @@ describe('useSaveWorkingOffsets', () => {
     { id: 'offset-2', labwareId: 'labware-2', vector: { x: 2, y: 2, z: 2 } },
   ]
 
+  const mockDeletedOffsets = [
+    { id: '', labwareId: '', vector: { x: 0, y: 0, z: 0 } },
+    { id: '', labwareId: '', vector: { x: 0, y: 0, z: 0 } },
+  ]
+
   beforeEach(() => {
     vi.clearAllMocks()
 
@@ -100,11 +105,7 @@ describe('useSaveWorkingOffsets', () => {
     expect(mockDeleteLabwareOffset).toHaveBeenCalledWith('offset-3')
     expect(mockDeleteLabwareOffset).toHaveBeenCalledWith('offset-4')
     expect(mockDeleteLabwareOffset).toHaveBeenCalledTimes(2)
-    expect(returnValue).toEqual([
-      ...mockStoredOffsets,
-      { id: '', labwareId: '', vector: { x: 0, y: 0, z: 0 } },
-      { id: '', labwareId: '', vector: { x: 0, y: 0, z: 0 } },
-    ])
+    expect(returnValue).toEqual([mockStoredOffsets, mockDeletedOffsets])
   })
 
   it('should set isLoading to true during operation and false afterwards', async () => {
@@ -148,11 +149,7 @@ describe('useSaveWorkingOffsets', () => {
       returnValue = await result.current.saveWorkingOffsets()
     })
 
-    expect(returnValue).toEqual([
-      singleOffset,
-      { id: '', labwareId: '', vector: { x: 0, y: 0, z: 0 } },
-      { id: '', labwareId: '', vector: { x: 0, y: 0, z: 0 } },
-    ])
+    expect(returnValue).toEqual([[singleOffset], mockDeletedOffsets])
   })
 
   it('should handle errors during save operation', async () => {
@@ -167,7 +164,7 @@ describe('useSaveWorkingOffsets', () => {
     })
 
     expect(result.current.isSavingWorkingOffsetsLoading).toBe(false)
-    expect(returnValue).toEqual([])
+    expect(returnValue).toEqual([[], []])
   })
 
   it('should handle empty toUpdate and toDelete arrays', async () => {
@@ -177,8 +174,6 @@ describe('useSaveWorkingOffsets', () => {
       }
     })
 
-    mockCreateLabwareOffsets.mockResolvedValueOnce([])
-
     const { result } = renderHook(() => useSaveWorkingOffsets(mockProps))
 
     let returnValue: any
@@ -187,8 +182,8 @@ describe('useSaveWorkingOffsets', () => {
       returnValue = await result.current.saveWorkingOffsets()
     })
 
-    expect(mockCreateLabwareOffsets).toHaveBeenCalledWith([])
+    expect(mockCreateLabwareOffsets).not.toHaveBeenCalled()
     expect(mockDeleteLabwareOffset).not.toHaveBeenCalled()
-    expect(returnValue).toEqual([])
+    expect(returnValue).toEqual([[], []])
   })
 })
