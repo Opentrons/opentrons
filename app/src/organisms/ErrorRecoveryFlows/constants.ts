@@ -42,6 +42,11 @@ export const ERROR_KINDS = {
   SHUTTE_MISSING: 'SHUTTE_MISSING',
 } as const
 
+export const STACKER_ERROR_KINDS: ErrorKind[] = [
+  ERROR_KINDS.STALL_WHILE_STACKING,
+  ERROR_KINDS.SHUTTE_MISSING,
+]
+
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.
 export const RECOVERY_MAP = {

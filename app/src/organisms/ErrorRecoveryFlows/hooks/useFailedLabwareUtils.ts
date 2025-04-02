@@ -30,7 +30,7 @@ import {
   getLoadedLabware,
   getLabwareDisplayLocation,
 } from '@opentrons/components'
-import { ERROR_KINDS } from '../constants'
+import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
@@ -292,11 +292,7 @@ export function getFailedLabwareQuantity(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
 ): string | null {
-  const stackerErrorKinds: ErrorKind[] = [
-    ERROR_KINDS.STALL_WHILE_STACKING,
-    ERROR_KINDS.SHUTTE_MISSING,
-  ]
-  if (stackerErrorKinds.includes(errorKind) && runCommands != null) {
+  if (STACKER_ERROR_KINDS.includes(errorKind) && runCommands != null) {
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
