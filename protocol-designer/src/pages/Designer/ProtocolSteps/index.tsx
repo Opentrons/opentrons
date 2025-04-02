@@ -10,11 +10,9 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
-  Tag,
   ToggleGroup,
 } from '@opentrons/components'
 import {
@@ -43,7 +41,6 @@ import {
 import { HotKeyDisplay } from '../../../components/molecules'
 import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
-import { getUserOS } from './Timeline/utils'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 
@@ -56,8 +53,6 @@ export function ProtocolSteps(): JSX.Element {
   const selectedSubstep = useSelector(getSelectedSubstep)
   const enableHotKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const tab = useSelector(getDesignerTab)
-  const userOs = getUserOS()
-  const isMac = userOs === 'Mac OS'
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
