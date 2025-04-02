@@ -12,6 +12,11 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         """The current state of the machine's door."""
         ...
 
+    @property
+    def module_door_serial(self) -> str | None:
+        """The serial number of a module with an open door."""
+        ...
+
     async def set_lights(
         self,
         button: Optional[bool] = None,

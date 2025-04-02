@@ -217,6 +217,8 @@ from .flex_protocol import FlexBackend
 from .status_bar_state import StatusBarStateController
 from opentrons_hardware.sensors.types import SensorDataType
 
+from .. import modules
+
 log = logging.getLogger(__name__)
 
 MapPayload = TypeVar("MapPayload")
@@ -1644,14 +1646,34 @@ class OT3Controller(FlexBackend):
         door_open = await get_door_state(self._usb_messenger)
         return DoorState.OPEN if door_open else DoorState.CLOSED
 
-    def add_door_state_listener(self, callback: Callable[[DoorState], None]) -> None:
+    def add_door_state_listener(
+        self, callback: Callable[[DoorState, str | None], None]
+    ) -> None:
         def _door_listener(msg: BinaryMessageDefinition) -> None:
             door_state = (
                 DoorState.OPEN
                 if cast(DoorSwitchStateInfo, msg).door_open.value
                 else DoorState.CLOSED
             )
-            callback(door_state)
+            callback(door_state, None)
+
+        def _module_door_listener() -> None:
+            door_state = DoorState.CLOSED
+            module_serial: str | None = None
+            for module in self.module_controls.available_modules:
+                # Systematically handle doored modules
+                if module.MODULE_TYPE == modules.types.ModuleType.FLEX_STACKER:
+                    module_data = module.live_data.get("data")
+                    door_state = (
+                        DoorState.OPEN
+                        if module_data is not None
+                        and module_data.get("hopperDoorState")
+                        == modules.types.HopperDoorState.OPENED
+                        else DoorState.CLOSED
+                    )
+                    if door_state == DoorState.OPEN:
+                        module_serial = module.serial_number
+            callback(door_state, module_serial)
 
         if self._usb_messenger is not None:
             self._usb_messenger.add_listener(
@@ -1660,6 +1682,7 @@ class OT3Controller(FlexBackend):
                     message_id == BinaryMessageId.door_switch_state_info
                 ),
             )
+        _module_door_listener()
 
     async def build_estop_detector(self) -> bool:
         """Must be called to set up the estop detector & state machine."""
