@@ -50,7 +50,7 @@ export function MixTools(
 
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
-  const assignedLiquidClass = useAssignLiquidClass(
+  const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'labware',
     'wells',
@@ -78,7 +78,7 @@ export function MixTools(
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}
             formData={formData}
-            assignedLiquidClass={assignedLiquidClass}
+            orderedLiquidClassOptions={orderedLiquidClassOptions}
             type="mix"
           />
         ) : (

@@ -19,7 +19,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   } = props
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
 
-  const assignedLiquidClass = useAssignLiquidClass(
+  const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'aspirate_labware',
     'aspirate_wells',
@@ -43,7 +43,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             formData={formData}
             setShowFormErrors={setShowFormErrors}
             type="transfer"
-            assignedLiquidClass={assignedLiquidClass}
+            orderedLiquidClassOptions={orderedLiquidClassOptions}
           />
         ) : (
           <SecondStepsMoveLiquidTools

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 import { getAllWellsFromPrimaryWells } from '../../../../../../steplist/formLevel/handleFormChange/utils'
 import {
-  getCurrentFormIsPresaved,
   getLabwareEntities,
   getLiquidEntities,
   getPipetteEntities,
@@ -10,18 +11,54 @@ import {
 import { getAllWellContentsForActiveItem } from '../../../../../../top-selectors/well-contents'
 import type { FormData } from '../../../../../../form-types'
 
+export interface LiquidClassOption {
+  name: string
+  value: string
+  subButtonLabel: string
+}
+
 export function useAssignLiquidClass(
   formData: FormData,
   labwareField: string,
   wellsField: string,
   updateValue: (_: string) => void
-): string {
+): LiquidClassOption[] {
   const allWellContentsForActiveItem = useSelector(
     getAllWellContentsForActiveItem
   )
+  const { t } = useTranslation('liquids')
+  const liquids = useSelector(getLiquidEntities)
+  const liquidClasses = getAllLiquidClassDefs()
+  const liquidClassToLiquidsMap: Record<string, string[]> = {}
+  Object.values(liquids).forEach(({ displayName, liquidClass }) => {
+    if (liquidClass !== undefined) {
+      if (!liquidClassToLiquidsMap[liquidClass]) {
+        liquidClassToLiquidsMap[liquidClass] = []
+      }
+      liquidClassToLiquidsMap[liquidClass].push(displayName)
+    }
+  })
+
+  const noLiquidClass: LiquidClassOption = {
+    name: t('dont_use_liquid_class') as string,
+    value: 'none',
+    subButtonLabel: t('default') as string,
+  }
+  const liquidClassOptions = [
+    ...Object.entries(liquidClasses).map(([liquidClassName, def]) => ({
+      name: def.displayName,
+      value: liquidClassName,
+      subButtonLabel: (liquidClassToLiquidsMap[liquidClassName] != null
+        ? t('assigned_liquid', {
+            liquidName: liquidClassToLiquidsMap[liquidClassName].join(', '),
+          })
+        : def.description) as string,
+    })),
+    noLiquidClass,
+  ]
+
   const aspirateLabwareLiquids =
-    allWellContentsForActiveItem?.[formData[labwareField]]
-  const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
+    allWellContentsForActiveItem?.[formData[labwareField]] ?? {}
   const labwareEntities = useSelector(getLabwareEntities)
   const pipetteEntities = useSelector(getPipetteEntities)
   const liquidEntities = useSelector(getLiquidEntities)
@@ -36,9 +73,9 @@ export function useAssignLiquidClass(
         )
       : formData[wellsField]
 
-  const [assignedLiquidClass, setAssignedLiquidClass] = useState<string | null>(
-    null
-  )
+  const [orderedLiquidClassOptions, setOrderedLiquidClassOptions] = useState<
+    LiquidClassOption[]
+  >(liquidClassOptions)
 
   useEffect(() => {
     if (aspirateLabwareLiquids != null) {
@@ -73,11 +110,14 @@ export function useAssignLiquidClass(
           }
         }
       }
-      setAssignedLiquidClass(runningLiquidClass)
-      if (currentFormIsPresaved) {
-        updateValue(runningLiquidClass ?? 'none')
-      }
+      setOrderedLiquidClassOptions(
+        liquidClassOptions.sort((a, _) =>
+          a.value === (runningLiquidClass ?? 'none') ? -1 : 1
+        )
+      )
+      updateValue(runningLiquidClass ?? 'none')
     }
   }, [formData[wellsField], formData[labwareField]])
-  return assignedLiquidClass ?? 'none'
+
+  return orderedLiquidClassOptions
 }
