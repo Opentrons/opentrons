@@ -81,8 +81,8 @@ DEFAULT_DYE_WELLS = ["A1", "B1", "C1", "D1", "E1", "F1"]
 # FIXME: (sigler) figure out where this -1.5 should be defined in production
 #        software, and then import it into this protocol
 DEFAULT_SUBMERGE_MM = -1.5  # NOTE: defined in hardware-testing + liquid-classes
-DEFAULT_WELL_BOTTOM_MM = float(_DEFAULT_ASPIRATE_CLEARANCE)
-NON_CONTACT_DISPENSE_MM = float(LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z)
+DEFAULT_WELL_BOTTOM_MM = float(_DEFAULT_ASPIRATE_CLEARANCE)  # 1mm
+NON_CONTACT_DISPENSE_MM = float(LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z)  # 2mm
 
 # hardcoded distances for when pressure-probing the calibration square
 PROBE_START_HEIGHT_ABOVE_EXPECTED_MM = 10.0
