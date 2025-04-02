@@ -172,7 +172,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.GRIPPER_ERROR:
       return failedCommandByRunRecord as MoveLabwareRunTimeCommand
     case ERROR_KINDS.STALL_WHILE_STACKING:
-    case ERROR_KINDS.SHUTTE_MISSING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -343,7 +343,7 @@ export function getFailedCmdRelevantLabware(
   let labwareNickname, failedLWURI
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
-    case ERROR_KINDS.SHUTTE_MISSING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
       for (const key in lwDefsByURI) {
         if (lwDefsByURI.hasOwnProperty(key)) {
           labwareNickname = getLabwareDisplayName(lwDefsByURI[key])
@@ -448,7 +448,7 @@ export function useRelevantFailedLwLocations({
   let location
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
-    case ERROR_KINDS.SHUTTE_MISSING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
       if (
         failedCommandByRunRecord?.params != null &&
         'moduleId' in failedCommandByRunRecord?.params
