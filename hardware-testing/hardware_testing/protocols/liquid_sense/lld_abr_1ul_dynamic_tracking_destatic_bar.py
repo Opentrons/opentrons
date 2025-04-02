@@ -347,22 +347,20 @@ def _load_all_non_stacked_labware(
 def _pick_up_and_manage_dye_tips(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
+    params: _ProtocolParams,
 ) -> None:
     """Pick up tips, but only after swapping in new tips if needed."""
-    pipette.pick_up_tip()
-    # TODO: (sigler) add tip-overlap calibration here
-    #       start with EVERY tip for now, make it configurable later
-    tip = pipette._last_tip_picked_up_from
-    assert tip
-    if tip.well_name == "H12" and len(_inaccessible_tip_racks):
-        _gripper_rotate_tip_rack_out(ctx, tip.parent, _inaccessible_tip_racks[0])
-        pipette.tip_racks = [
-            _inaccessible_tip_racks[0] if rack == tip.parent else rack
-            for rack in pipette.tip_racks
-        ]
-        pipette.reset_tipracks()
+    first_rack = pipette.tip_racks[0]
+    if not first_rack.next_tip() and len(_inaccessible_tip_racks):
         # NOTE: removing rack from global list of still available
-        _inaccessible_tip_racks.pop(0)
+        replacement_rack = _inaccessible_tip_racks.pop(0)
+        _gripper_rotate_tip_rack_out(ctx, first_rack, replacement_rack)
+        pipette.tip_racks = [replacement_rack] + pipette.tip_racks[1:]
+        pipette.reset_tipracks()
+    pipette.pick_up_tip()
+    # NOTE: (sigler) calibrating every low-volume tip, because their alignment
+    #        is critical for us to interpret the results of this test
+    _calibrate_tip_overlap(ctx, pipette, artificial_error=params.overlap_error)
 
 
 def _gripper_rotate_tip_rack_out(
@@ -636,7 +634,7 @@ def _dye_move_to_pcr_column(
         target_ul * params.columns
     )
 
-    _pick_up_and_manage_dye_tips(ctx, pipette)
+    _pick_up_and_manage_dye_tips(ctx, pipette, params)
     if not ctx.is_simulating():
         pipette.require_liquid_presence(dye_well)
     pipette.transfer_liquid(
@@ -671,7 +669,7 @@ def _run_trial(
     # NEW TIP
     if pipette.has_tip:
         pipette.drop_tip()
-    _pick_up_and_manage_dye_tips(ctx, pipette)
+    _pick_up_and_manage_dye_tips(ctx, pipette, params)
 
     # LLD (optional)
     if strategy["aspirate"].includes_lld():
@@ -683,13 +681,7 @@ def _run_trial(
         #       identical conditions to gain more insight into what is happening.
         if strategy["aspirate"].includes_new_tip():
             pipette.drop_tip()
-            _pick_up_and_manage_dye_tips(ctx, pipette)
-
-    # TIP-OVERLAP CALIBRATION
-    # NOTE: test non-zero tip-overlap errors
-    #       using runtime parameter "overlap_error"
-    if strategy["aspirate"].includes_meniscus():
-        _calibrate_tip_overlap(ctx, pipette, artificial_error=params.overlap_error)
+            _pick_up_and_manage_dye_tips(ctx, pipette, params)
 
     # RUN
     t_cls = _get_transfer_class_for_strategies(
