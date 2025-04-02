@@ -9,7 +9,6 @@ from opentrons.protocol_api import (
     InstrumentContext,
     Labware,
     Well,
-    Liquid,
     LiquidClass as TransferClass,
 )
 from opentrons.protocol_api._liquid_properties import TransferProperties
@@ -46,9 +45,6 @@ DEFAULT_TARGET_BY_PLATE = [1.0, 1.2, 1.5, 2.0, 5.0]
 DEFAULT_SUBMERGE_MM = -1.5  # NOTE: defined in hardware-testing + liquid-classes
 DEFAULT_WELL_BOTTOM_MM = float(_DEFAULT_ASPIRATE_CLEARANCE)
 NON_CONTACT_DISPENSE_MM = float(LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z)
-
-# NOTE: diluent should always be used with a P1000 (max push-out is 79.9)
-DILUENT_PUSH_OUT = 20.0
 
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
@@ -156,23 +152,19 @@ class _Dye:
     name: str
     min: float
     max: float
-    ul: float
-    use: int
     c: str
-    src: str
-    liq: Optional[Liquid]
-    w: Optional[Well]
+    well_name: str
+    ul: float
 
 
 # NOTE: (sigler) do not edit, values are from Artel
-# FIXME: (sigler) I think the color display is wrong on the ODD (???)
 DYES: List[_Dye] = [
-    _Dye("HV", 200.1, 250.0, 0.0, 0, "#FF9999", "A6", None, None),
-    _Dye("A", 50.0, 200.0, 0.0, 0, "#FF6666", "A5", None, None),
-    _Dye("B", 10.0, 49.99, 0.0, 0, "#FF3333", "A4", None, None),
-    _Dye("C", 2.0, 9.99, 0.0, 0, "#FF0000", "A3", None, None),
-    _Dye("D", 1.0, 1.99, 0.0, 0, "#CC0000", "A2", None, None),
-    _Dye("E", 0.1, 0.99, 0.0, 0, "#880000", "A1", None, None),
+    _Dye("HV", 200.1, 250.0, "#FF9999", "A6", 0),
+    _Dye("A", 50.0, 200.0, "#FF6666", "A5", 0),
+    _Dye("B", 10.0, 49.99, "#FF3333", "A4", 0),
+    _Dye("C", 2.0, 9.99, "#FF0000", "A3", 0),
+    _Dye("D", 1.0, 1.99, "#CC0000", "A2", 0),
+    _Dye("E", 0.1, 0.99, "#880000", "A1", 0),
 ]
 
 
@@ -207,44 +199,41 @@ def _load_liquid_diluent(
 def _load_liquid_red_dye(
     ctx: ProtocolContext, dye_holder: Labware, params: _ProtocolParams
 ) -> None:
-    dead_ul = DEAD_VOL_PER_LABWARE[dye_holder.load_name]
-
-    # initialize defined liquid and well location
-    for dye in DYES:
-        dye.liq = ctx.define_liquid(dye.name, dye.name, dye.c)
-        dye.w = dye_holder[dye.src]
-
     # NOTE: there could be just 1x dye used for all volumes,
     #       or 5x different dyes. Also, volumes could repeat
+    pcr_dead_ul = DEAD_VOL_PER_LABWARE[SRC_LABWARE]
     num_photo_wells = params.columns * 8
     for ul in params.volumes:
         dye = _get_dye_for_volume(ul)
-        column_ul = (num_photo_wells * ul) + (8 * dead_ul)
+        column_ul = (num_photo_wells * ul) + (8 * pcr_dead_ul)
         dye.ul += column_ul
 
     # load the dye
+    deep_well_dead_ul = DEAD_VOL_PER_LABWARE[dye_holder.load_name]
     for dye in DYES:
         if dye.ul > 0:
-            assert dye.w and dye.liq
-            dye.w.load_liquid(dye.liq, dye.ul + dead_ul)
+            dye_holder[dye.well_name].load_liquid(
+                liquid=ctx.define_liquid(dye.name, dye.name, dye.c),
+                volume=dye.ul + deep_well_dead_ul,
+            )
 
 
 def _load_all_liquids(
     ctx: ProtocolContext,
-    pcr: Optional[Labware],
-    dye: Optional[Labware],
-    res: Labware,
+    pcr_labware: Optional[Labware],
+    dye_labware: Optional[Labware],
+    res_labware: Labware,
     stack: List[Labware],
     params: _ProtocolParams,
 ) -> List[Well]:
     """Load starting liquid volumes and/or set wells as empty."""
-    if pcr:
-        pcr.load_empty(pcr.wells())
-    if dye:
-        dye.load_empty(dye.wells())
-        _load_liquid_red_dye(ctx, dye, params)
-    res.load_empty(res.wells())
-    diluent_wells_in_use = _load_liquid_diluent(ctx, res, params)
+    if pcr_labware:
+        pcr_labware.load_empty(pcr_labware.wells())
+    if dye_labware:
+        dye_labware.load_empty(dye_labware.wells())
+        _load_liquid_red_dye(ctx, dye_labware, params)
+    res_labware.load_empty(res_labware.wells())
+    diluent_wells_in_use = _load_liquid_diluent(ctx, res_labware, params)
     for labware in stack:
         if labware.load_name == DST_LABWARE:
             labware.load_empty(labware.wells())
@@ -623,8 +612,11 @@ def _dye_move_to_pcr_column(
         ctx, pipette, params, strategies=(_Strategy.DYE_SRC, _Strategy.DYE_SRC)
     )
     target_ul = params.volumes[column_idx]
+
     dye = _get_dye_for_volume(target_ul)
-    assert dye.w
+    dye_labware = cast(Labware, ctx.deck[SLOTS["dye"]])
+    dye_well = dye_labware[dye.well_name]
+
     src_labware = cast(Labware, ctx.deck[SLOTS["pcr"]])
     column = src_labware.columns()[column_idx]
     column_ul_per_well = DEAD_VOL_PER_LABWARE[SRC_LABWARE] + (
@@ -633,11 +625,11 @@ def _dye_move_to_pcr_column(
 
     _pick_up_and_manage_dye_tips(ctx, pipette)
     if not ctx.is_simulating():
-        pipette.require_liquid_presence(dye.w)
+        pipette.require_liquid_presence(dye_well)
     pipette.transfer_liquid(
         transfer_class,
         column_ul_per_well,
-        source=[dye.w] * len(column),
+        source=[dye_well] * len(column),
         dest=column,
         new_tip="never",
     )
@@ -713,7 +705,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         parameters.add_str(
             variable_name=f"dye_{dye.name.lower()}_well",
             display_name=f"dye_{dye.name.lower()}_well",
-            default=dye.src,
+            default=dye.well_name,
             choices=[
                 {
                     "display_name": row + str(col),
@@ -742,7 +734,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 def _gather_parameters(ctx: ProtocolContext) -> _ProtocolParams:
     # NOTE: storing dye source locations in the globally stored DYE dict
     for dye in DYES:
-        dye.src = getattr(ctx.params, f"dye_{dye.name.lower()}_well")
+        dye.well_name = getattr(ctx.params, f"dye_{dye.name.lower()}_well")
     just_baseline = ctx.params.just_baseline  # type: ignore[attr-defined]
     if just_baseline:
         volumes = [0.0]
