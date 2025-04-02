@@ -5,9 +5,6 @@ This is a data-only migration and does not affect the SQL schema.
 We update the values of the `state_summary` column in the `run` table. Each value is a
 JSON document. In that JSON document, we migrate the `.labwareOffsets[*].location` field
 to the newer `.labwareOffsets[*].locationSequence` field.
-
-We should theoretically do a similar migration for stored analyses. We currently don't;
-it's instead the client's responsibility to trigger a reanalysis when it needs `.locationSequence`.
 """
 
 import logging
