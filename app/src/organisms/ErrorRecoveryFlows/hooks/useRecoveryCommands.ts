@@ -317,7 +317,6 @@ export function useRecoveryCommands({
 
   const homeShuttle = useCallback((): Promise<CommandData[]> => {
     const homeShuttleCommand = buildHomeShuttle(unvalidatedFailedCommand)
-    console.log('homeShuttleCommand: ', homeShuttleCommand)
     if (homeShuttleCommand == null) {
       return Promise.reject(new Error('Invalid use of home shuttle command'))
     } else {
