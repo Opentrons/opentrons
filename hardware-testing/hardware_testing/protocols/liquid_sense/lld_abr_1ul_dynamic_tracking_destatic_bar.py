@@ -131,9 +131,9 @@ TEST_MATRIX: Dict[str, Dict[str, _Strategy]] = {
 
 DEAD_VOL_PER_LABWARE = {
     "nest_12_reservoir_15ml": 3000,
-    "nest_96_wellplate_2ml_deep": 30,
+    "nest_96_wellplate_2ml_deep": 50,
     # TODO: (sigler) reduce this to find actual dead-vol of our system
-    "opentrons_96_wellplate_200ul_pcr_full_skirt": 50,
+    "opentrons_96_wellplate_200ul_pcr_full_skirt": 20,
 }
 
 DYE_LABWARE = "nest_96_wellplate_2ml_deep"
@@ -207,7 +207,7 @@ def _load_liquid_diluent(
 def _load_liquid_red_dye(
     ctx: ProtocolContext, dye_holder: Labware, params: _ProtocolParams
 ) -> None:
-    dead_vol_dye = DEAD_VOL_PER_LABWARE[dye_holder.load_name]
+    dead_ul = DEAD_VOL_PER_LABWARE[dye_holder.load_name]
 
     # initialize defined liquid and well location
     for dye in DYES:
@@ -216,16 +216,17 @@ def _load_liquid_red_dye(
 
     # NOTE: there could be just 1x dye used for all volumes,
     #       or 5x different dyes. Also, volumes could repeat
-    for v in params.volumes:
-        dye = _get_dye_for_volume(v)
-        dye.ul += v * params.columns * 8
-        dye.use += 1
+    num_photo_wells = params.columns * 8
+    for ul in params.volumes:
+        dye = _get_dye_for_volume(ul)
+        column_ul = (num_photo_wells * ul) + (8 * dead_ul)
+        dye.ul += column_ul
 
     # load the dye
     for dye in DYES:
         if dye.ul > 0:
             assert dye.w and dye.liq
-            dye.w.load_liquid(dye.liq, dye.ul + dead_vol_dye)
+            dye.w.load_liquid(dye.liq, dye.ul + dead_ul)
 
 
 def _load_all_liquids(
