@@ -2,19 +2,20 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  JUSTIFY_FLEX_START,
   LabwareRender,
   OVERFLOW_SCROLL,
   RobotWorkSpace,
   SPACING,
   StyledText,
-  WRAP,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
@@ -88,12 +89,12 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
             padding={`0 ${SPACING.spacing40} ${SPACING.spacing16}`}
             overflowY={OVERFLOW_SCROLL}
           >
-            <Flex
+            <Box
+              display={DISPLAY_GRID}
+              gridTemplateColumns="repeat(4, 6.875rem)"
               gridGap={SPACING.spacing24}
-              flexWrap={WRAP}
-              justifyContent={JUSTIFY_FLEX_START}
-              alignItems={ALIGN_CENTER}
-              width="32rem"
+              alignContent={ALIGN_FLEX_START}
+              height="3.75rem"
             >
               {offDeckLabware.map(lw => {
                 const wellContents =
@@ -132,7 +133,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
                   </Flex>
                 )
               })}
-            </Flex>
+            </Box>
           </Flex>
         </>
       )}
