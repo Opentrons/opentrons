@@ -11,7 +11,8 @@ import {
   getRunTimeParameterFilesForRun,
 } from '/app/transformations/runs'
 
-import type { Run } from '@opentrons/api-client'
+import type { LabwareOffset, Run } from '@opentrons/api-client'
+import isEqual from 'lodash/isEqual'
 
 interface UseCloneRunResult {
   cloneRun: () => void
@@ -70,7 +71,7 @@ export function useCloneRun(
       }
       createRun({
         protocolId,
-        labwareOffsets,
+        labwareOffsets: mostRecentUniqueLabwareOffsets(labwareOffsets),
         runTimeParameterValues,
         runTimeParameterFiles,
       })
@@ -80,4 +81,20 @@ export function useCloneRun(
   }
 
   return { cloneRun, isLoadingRun, isCloning }
+}
+
+// Returns the most recent, unique offsets for each labware uri + location pair.
+// Assumes the most recent labware offsets are appended to the end of the list.
+function mostRecentUniqueLabwareOffsets(
+  offsets: LabwareOffset[] | undefined
+): LabwareOffset[] | undefined {
+  return offsets?.filter((offset, index, array) => {
+    return (
+      array.findLastIndex(
+        firstOffset =>
+          isEqual(firstOffset.locationSequence, offset.locationSequence) &&
+          isEqual(firstOffset.definitionUri, offset.definitionUri)
+      ) === index
+    )
+  })
 }
