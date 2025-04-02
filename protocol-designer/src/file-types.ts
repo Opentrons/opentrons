@@ -2,6 +2,7 @@ import type {
   ModuleModel,
   PipetteName,
   ProtocolFile,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
 import type { RootState as IngredRoot } from './labware-ingred/reducers'
@@ -32,6 +33,21 @@ export interface PDMetadata {
   pipettes: Pipettes
   modules: Modules
   labware: Labware
+}
+
+export interface DesignerApplication {
+  designerApplication: { version: string; name: string; data: PDMetadata }
+}
+
+export interface PythonDesignerApplication extends DesignerApplication {
+  robot: {
+    model: RobotType
+  }
+}
+
+export interface PDPythonFile {
+  pythonProtocol: string
+  designerApplication: PythonDesignerApplication
 }
 
 export type PDProtocolFile = ProtocolFile<PDMetadata>
