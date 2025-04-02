@@ -29,15 +29,30 @@ export function useSaveWorkingOffsets({
   const { deleteLabwareOffset } = useDeleteLabwareOffsetMutation()
 
   const deleteLabwareOffsets = (): Promise<StoredLabwareOffset[]> => {
-    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    const deletePromises = toDelete.map(id => deleteLabwareOffset(id))
-    return Promise.all(deletePromises)
+    if (toDelete.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+      const deletePromises = toDelete.map(id => deleteLabwareOffset(id))
+      return Promise.all(deletePromises)
+    } else {
+      return Promise.resolve([])
+    }
+  }
+
+  const createNecessaryLabwareOffsets = (): Promise<StoredLabwareOffset[]> => {
+    if (toUpdate.length > 0) {
+      return createLabwareOffsets(toUpdate) as Promise<StoredLabwareOffset[]>
+    } else {
+      return Promise.resolve([])
+    }
   }
 
   const saveWorkingOffsets = (): Promise<StoredLabwareOffset[]> => {
     setIsLoading(true)
 
-    return Promise.all([createLabwareOffsets(toUpdate), deleteLabwareOffsets()])
+    return Promise.all([
+      createNecessaryLabwareOffsets(),
+      deleteLabwareOffsets(),
+    ])
       .then(([createRes, deleteRes]) => {
         setIsLoading(false)
 
