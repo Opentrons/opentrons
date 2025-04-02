@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Dict, Optional, Literal, Tuple, cast, Union
 
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
@@ -14,7 +16,12 @@ from opentrons.protocol_api import (
 from opentrons.protocol_api._liquid_properties import TransferProperties
 from opentrons.protocol_api.instrument_context import _DEFAULT_ASPIRATE_CLEARANCE
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.types import Point, DeckSlotName
 
+from opentrons_shared_data.deck import (
+    Z_PREP_OFFSET,
+    get_calibration_square_position_in_slot,
+)
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
 )
@@ -46,6 +53,11 @@ DEFAULT_SUBMERGE_MM = -1.5  # NOTE: defined in hardware-testing + liquid-classes
 DEFAULT_WELL_BOTTOM_MM = float(_DEFAULT_ASPIRATE_CLEARANCE)
 NON_CONTACT_DISPENSE_MM = float(LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z)
 
+# hardcoded distances for when pressure-probing the calibration square
+PROBE_START_HEIGHT_ABOVE_EXPECTED_MM = 10.0
+PROBE_OVERSHOOT_BELOW_EXPECTED_MM = 5.0
+EXPECTED_PROBE_Z_POSITION_MM = 0.0  # NOTE: the calibration square in "empty" slot
+
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
 SLOTS: Dict[str, str] = {
@@ -64,6 +76,7 @@ class _ProtocolParams:
     columns: int
     submerge_depth: float
     well_bottom_mm: float
+    overlap_error: float
 
 
 class _Strategy(str, Enum):
@@ -672,6 +685,12 @@ def _run_trial(
             pipette.drop_tip()
             _pick_up_and_manage_dye_tips(ctx, pipette)
 
+    # TIP-OVERLAP CALIBRATION
+    # NOTE: test non-zero tip-overlap errors
+    #       using runtime parameter "overlap_error"
+    if strategy["aspirate"].includes_meniscus():
+        _calibrate_tip_overlap(ctx, pipette, artificial_error=params.overlap_error)
+
     # RUN
     t_cls = _get_transfer_class_for_strategies(
         ctx, pipette, params, strategies=(strategy["aspirate"], strategy["dispense"])
@@ -729,6 +748,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=10.0,
         minimum=0.0,
     )
+    parameters.add_float(
+        variable_name="overlap_error",
+        display_name="overlap_error",
+        default=0.0,
+        maximum=1.5,
+        minimum=-1.5,
+    )
 
 
 def _gather_parameters(ctx: ProtocolContext) -> _ProtocolParams:
@@ -750,7 +776,48 @@ def _gather_parameters(ctx: ProtocolContext) -> _ProtocolParams:
         columns=ctx.params.columns_to_test,  # type: ignore[attr-defined]
         submerge_depth=ctx.params.submerge_depth,  # type: ignore[attr-defined]
         well_bottom_mm=ctx.params.well_bottom_mm,  # type: ignore[attr-defined]
+        overlap_error=ctx.params.overlap_error,  # type: ignore[attr-defined]
     )
+
+
+def _calibrate_tip_overlap(
+    ctx: ProtocolContext, pipette: InstrumentContext, artificial_error: float
+) -> None:
+    if ctx.is_simulating():
+        return
+    api: SyncHardwareAPI = ctx._core.get_hardware()
+    pip_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+    empty_slot_int = DeckSlotName.from_primitive(SLOTS["empty"]).as_int()
+    deck_probe_position = Point(
+        *get_calibration_square_position_in_slot(slot=empty_slot_int)
+    ) + Point(x=Z_PREP_OFFSET.x, y=Z_PREP_OFFSET.y, z=Z_PREP_OFFSET.z)
+
+    # RETRACT and move to above the deck slot
+    api.retract(pip_mount)
+    current_pos = api.gantry_position(pip_mount)
+    api.move_to(
+        pip_mount,
+        Point(x=deck_probe_position.x, y=deck_probe_position.y, z=current_pos.z),
+    )
+    api.move_to(
+        pip_mount, deck_probe_position + Point(z=PROBE_START_HEIGHT_ABOVE_EXPECTED_MM)
+    )
+
+    # PROBE
+    probed_deck_z = api.liquid_probe(
+        pip_mount,
+        PROBE_START_HEIGHT_ABOVE_EXPECTED_MM + PROBE_OVERSHOOT_BELOW_EXPECTED_MM,
+    )
+    api.retract(pip_mount)
+
+    # MODIFY current tip length
+    old_tip_length = api.hardware_pipettes[pip_mount.to_mount()].current_tip_length
+    tip_overlap_error_mm = probed_deck_z - EXPECTED_PROBE_Z_POSITION_MM
+    # NOTE: (sigler) the artificial error is subtracted from the tip "length"
+    #       because a more positive (+) overlap would create a shorter tip
+    new_tip_length = old_tip_length + tip_overlap_error_mm + -artificial_error
+    api.remove_tip(pip_mount)
+    api.add_tip(pip_mount, tip_length=new_tip_length)
 
 
 def run(ctx: ProtocolContext) -> None:
