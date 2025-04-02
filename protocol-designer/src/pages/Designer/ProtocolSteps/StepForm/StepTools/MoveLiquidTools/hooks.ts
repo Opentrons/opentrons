@@ -4,11 +4,14 @@ import { useSelector } from 'react-redux'
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 import { getAllWellsFromPrimaryWells } from '../../../../../../steplist/formLevel/handleFormChange/utils'
 import {
+  getCurrentFormIsPresaved,
+  getCurrentFormUnsavedChangedFields,
   getLabwareEntities,
   getLiquidEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { getAllWellContentsForActiveItem } from '../../../../../../top-selectors/well-contents'
+import { getShouldUpdateForLiquidClass } from '../../utils'
 import type { FormData } from '../../../../../../form-types'
 
 export interface LiquidClassOption {
@@ -28,6 +31,7 @@ export function useAssignLiquidClass(
   )
   const { t } = useTranslation('liquids')
   const liquids = useSelector(getLiquidEntities)
+  const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const liquidClasses = getAllLiquidClassDefs()
   const liquidClassToLiquidsMap: Record<string, string[]> = {}
   Object.values(liquids).forEach(({ displayName, liquidClass }) => {
@@ -38,7 +42,6 @@ export function useAssignLiquidClass(
       liquidClassToLiquidsMap[liquidClass].push(displayName)
     }
   })
-
   const noLiquidClass: LiquidClassOption = {
     name: t('dont_use_liquid_class') as string,
     value: 'none',
@@ -56,9 +59,13 @@ export function useAssignLiquidClass(
     })),
     noLiquidClass,
   ]
-
+  const changedFields = useSelector(getCurrentFormUnsavedChangedFields)
+  const shouldUpdate = getShouldUpdateForLiquidClass(
+    changedFields,
+    formData.stepType
+  )
   const aspirateLabwareLiquids =
-    allWellContentsForActiveItem?.[formData[labwareField]] ?? {}
+    allWellContentsForActiveItem?.[formData[labwareField]]
   const labwareEntities = useSelector(getLabwareEntities)
   const pipetteEntities = useSelector(getPipetteEntities)
   const liquidEntities = useSelector(getLiquidEntities)
@@ -115,7 +122,9 @@ export function useAssignLiquidClass(
           a.value === (runningLiquidClass ?? 'none') ? -1 : 1
         )
       )
-      updateValue(runningLiquidClass ?? 'none')
+      if (currentFormIsPresaved || shouldUpdate) {
+        updateValue(runningLiquidClass ?? 'none')
+      }
     }
   }, [formData[wellsField], formData[labwareField]])
 
