@@ -1018,7 +1018,7 @@ export const labwareInvariantProperties: Reducer<
       const { file } = action.payload
       const metadata = getPDMetadata(file)
       const labwareDefinitions = file?.labwareDefinitions
-
+      const allLabware = getAllDefinitions()
       let labware: NormalizedLabwareById = {}
       if (labwareDefinitions != null) {
         labware = Object.entries(metadata.labware).reduce(
@@ -1054,7 +1054,6 @@ export const labwareInvariantProperties: Reducer<
       } else {
         labware = Object.entries(metadata.labware).reduce(
           (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
-            const allLabware = getAllDefinitions()
             const labwareDefinition = allLabware[labwareLoadInfo.labwareDefURI]
 
             if (labwareDefinition == null) {
