@@ -6,10 +6,7 @@ import {
   useClientDataLPC,
   useUpdateClientLPC,
 } from '/app/resources/client_data/'
-import {
-  appliedOffsetsToRun,
-  selectAreOffsetsApplied,
-} from '/app/redux/protocol-runs'
+import { appliedOffsetsToRun } from '/app/redux/protocol-runs'
 import { useIsRunCurrent } from '/app/resources/runs'
 
 vi.mock('react-redux')
@@ -24,7 +21,6 @@ describe('useHandleClientAppliedOffsets', () => {
 
   const mockDispatch = vi.fn()
   const mockClearClientData = vi.fn()
-  const mockUpdateWithRunId = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -40,10 +36,6 @@ describe('useHandleClientAppliedOffsets', () => {
       (runId: string | null) => false
     )
 
-    vi.mocked(
-      selectAreOffsetsApplied
-    ).mockImplementation((runId: string) => (state: any) => false)
-
     vi.mocked(useClientDataLPC).mockReturnValue({
       runId: null,
       userId: null,
@@ -51,7 +43,6 @@ describe('useHandleClientAppliedOffsets', () => {
 
     vi.mocked(useUpdateClientLPC).mockReturnValue({
       clearClientData: mockClearClientData,
-      updateWithRunId: mockUpdateWithRunId,
     } as any)
 
     vi.mocked(useSelector).mockImplementation(selector => {
@@ -74,7 +65,6 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
-    expect(mockUpdateWithRunId).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -90,7 +80,6 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
-    expect(mockUpdateWithRunId).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -106,15 +95,11 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
-    expect(mockUpdateWithRunId).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('should update client data when offsets are applied locally but not by another user', () => {
+  it('should not take any action when run IDs match but no user ID is present', () => {
     vi.mocked(useIsRunCurrent).mockReturnValue(true)
-    vi.mocked(
-      selectAreOffsetsApplied
-    ).mockImplementation((runId: string) => (state: any) => true)
     vi.mocked(useClientDataLPC).mockReturnValue({
       runId: RUN_ID,
       userId: null,
@@ -125,15 +110,11 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
-    expect(mockUpdateWithRunId).toHaveBeenCalledWith(RUN_ID)
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('should dispatch applied offsets when offsets are applied by another user but not locally', () => {
+  it('should dispatch applied offsets when run IDs match and user ID is present', () => {
     vi.mocked(useIsRunCurrent).mockReturnValue(true)
-    vi.mocked(
-      selectAreOffsetsApplied
-    ).mockImplementation((runId: string) => (state: any) => false)
     vi.mocked(useClientDataLPC).mockReturnValue({
       runId: RUN_ID,
       userId: USER_ID,
@@ -144,15 +125,26 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
-    expect(mockUpdateWithRunId).not.toHaveBeenCalled()
     expect(mockDispatch).toHaveBeenCalledWith(appliedOffsetsToRun(RUN_ID))
   })
 
-  it('should do nothing when run is current, client data has the same run ID, and offsets are already applied', () => {
+  it('should not dispatch applied offsets when run IDs do not match, even if user ID is present', () => {
     vi.mocked(useIsRunCurrent).mockReturnValue(true)
-    vi.mocked(
-      selectAreOffsetsApplied
-    ).mockImplementation((runId: string) => (state: any) => true)
+    vi.mocked(useClientDataLPC).mockReturnValue({
+      runId: OTHER_RUN_ID,
+      userId: USER_ID,
+    })
+
+    renderHook(() => {
+      useHandleClientAppliedOffsets(RUN_ID)
+    })
+
+    expect(mockClearClientData).toHaveBeenCalledTimes(1)
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
+
+  it('should do nothing when run is current, client data has the same run ID and user ID, and offsets are already applied', () => {
+    vi.mocked(useIsRunCurrent).mockReturnValue(true)
     vi.mocked(useClientDataLPC).mockReturnValue({
       runId: RUN_ID,
       userId: USER_ID,
@@ -163,11 +155,10 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
-    expect(mockUpdateWithRunId).not.toHaveBeenCalled()
-    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockDispatch).toHaveBeenCalledWith(appliedOffsetsToRun(RUN_ID))
   })
 
-  it('should call clearClientData with null thisRunId when not current', () => {
+  it('should call clearClientData when not current with null thisRunId', () => {
     vi.mocked(useIsRunCurrent).mockReturnValue(false)
     vi.mocked(useClientDataLPC).mockReturnValue({
       runId: null,
@@ -178,19 +169,15 @@ describe('useHandleClientAppliedOffsets', () => {
       useHandleClientAppliedOffsets(null)
     })
 
-    expect(mockClearClientData).toHaveBeenCalledTimes(1)
-    expect(mockUpdateWithRunId).not.toHaveBeenCalled()
+    expect(mockClearClientData).toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('should call updateWithRunId with null thisRunId when current and offsets applied', () => {
+  it('should dispatch when run is current with null thisRunId and user ID is present', () => {
     vi.mocked(useIsRunCurrent).mockReturnValue(true)
-    vi.mocked(
-      selectAreOffsetsApplied
-    ).mockImplementation((runId: string) => (state: any) => true)
     vi.mocked(useClientDataLPC).mockReturnValue({
       runId: null,
-      userId: null,
+      userId: USER_ID,
     })
 
     renderHook(() => {
@@ -198,7 +185,6 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
-    expect(mockUpdateWithRunId).toHaveBeenCalledWith(null)
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })
