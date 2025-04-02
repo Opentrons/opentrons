@@ -10,7 +10,12 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import type { RecoveryRouteStepMetadata, RouteStep, StepOrder } from './types'
+import type {
+  ErrorKind,
+  RecoveryRouteStepMetadata,
+  RouteStep,
+  StepOrder,
+} from './types'
 
 // Server-defined error types.
 // (Values for the .error.errorType property of a run command.)
@@ -42,7 +47,7 @@ export const ERROR_KINDS = {
   SHUTTE_MISSING: 'SHUTTE_MISSING',
 } as const
 
-export const STACKER_ERROR_KINDS = [
+export const STACKER_ERROR_KINDS: ErrorKind[] = [
   ERROR_KINDS.STALL_WHILE_STACKING,
   ERROR_KINDS.SHUTTLE_MISSING,
 ]
