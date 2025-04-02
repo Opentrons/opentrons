@@ -317,10 +317,12 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
 
 
 @pytest.mark.parametrize("well", fake_frusta())
-def test_height_at_volume_within_section(well: List[Any]) -> None:
-    """Test that finding the height when volume ~= capacity  works."""
+def test_height_at_volume_at_section_boundaries(well: List[Any]) -> None:
+    """Test that finding the height when volume 0 or ~= capacity  works."""
     for segment in well:
         segment_height = segment.topHeight - segment.bottomHeight
+        height = height_at_volume_within_section(segment, 0.0, segment_height)
+        assert isclose(height, 0.0)
         height = height_at_volume_within_section(
             segment, _get_segment_capacity(segment), segment_height
         )
