@@ -40,6 +40,7 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
+import { HotKeyDisplay } from '../../../components/molecules'
 import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
 import { getUserOS } from './Timeline/utils'
@@ -170,33 +171,7 @@ export function ProtocolSteps(): JSX.Element {
           </Flex>
         </Flex>
         {enableHotKeyDisplay ? (
-          <Flex
-            position={POSITION_FIXED}
-            left={`calc(1.5rem + ${targetWidth}px)`}
-            bottom="0.75rem"
-            gridGap={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Tag
-              text={t('double_click_to_edit')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={t('shift_click_to_select_range')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={
-                isMac
-                  ? t('command_click_to_multi_select_mac')
-                  : t('command_click_to_multi_select_windows')
-              }
-              type="default"
-              shrinkToContent
-            />
-          </Flex>
+          <HotKeyDisplay targetWidth={targetWidth} />
         ) : null}
       </Flex>
       {formData == null && selectedSubstep ? (
