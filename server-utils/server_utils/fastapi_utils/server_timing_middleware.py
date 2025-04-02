@@ -6,6 +6,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Server-Timin
 """
 
 
+import logging
 import time
 from typing import Awaitable, Callable
 
@@ -16,6 +17,9 @@ from fastapi import Request, Response
 # so they should be short and avoid special characters.
 _METRIC_NAME = "opentrons-asgi"
 _METRIC_DESC = "Roughly, wall-clock milliseconds spent in Python."
+
+
+_log = logging.getLogger(__name__)
 
 
 _CallNextType = Callable[[Request], Awaitable[Response]]
@@ -44,6 +48,8 @@ def server_timing_middleware(
         response = await call_next(request)
         time_after = clock()
         duration_ms = round((time_after - time_before) * 1000)
+
+        _log.debug(f"{request.url}: {duration_ms} ms")
 
         response.headers["Server-Timing"] = _update_server_timing_header(
             preexisting_header_value=response.headers.get("Server-Timing", None),
