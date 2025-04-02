@@ -1,10 +1,12 @@
 """Migrate the persistence directory from schema 10 to schema 11.
 
-This is a data-only migration and does not affect the SQL schema.
+Summary of changes from schema 10:
 
-We update the values of the `state_summary` column in the `run` table. Each value is a
-JSON document. In that JSON document, we migrate the `.labwareOffsets[*].location` field
-to the newer `.labwareOffsets[*].locationSequence` field.
+- Update the values of the `state_summary` column in the `run` table. Each value is a
+  JSON document. In that JSON document, we migrate the `.labwareOffsets[*].location` field
+  to the newer `.labwareOffsets[*].locationSequence` field.
+
+- Add an index to labware_offset_with_sequence: (active, row_id).
 """
 
 import logging
@@ -31,9 +33,7 @@ from robot_server.persistence.pydantic import (
     json_to_pydantic,
     pydantic_to_json,
 )
-from robot_server.persistence.tables import (
-    schema_10,
-)
+from robot_server.persistence.tables import schema_11
 
 from ._util import copy_contents
 from .._folder_migrator import Migration
@@ -50,7 +50,17 @@ class Migration10to11(Migration):  # noqa: D101
         with sql_engine_ctx(
             dest_dir / DB_FILE
         ) as engine, engine.begin() as transaction:
+            _add_new_index(transaction)
             _upmigrate_labware_offsets_in_runs(transaction)
+
+
+def _add_new_index(connection: sqlalchemy.engine.Connection) -> None:
+    index = next(
+        index
+        for index in schema_11.labware_offset_table.indexes
+        if index.name == "ix__labware_offset_with_sequence__active__row_id"
+    )
+    index.create(connection)
 
 
 def _upmigrate_labware_offsets_in_runs(
@@ -62,7 +72,7 @@ def _upmigrate_labware_offsets_in_runs(
     )
 
     for run_id, raw_state_summary in connection.execute(
-        sqlalchemy.select(schema_10.run_table.c.id, schema_10.run_table.c.state_summary)
+        sqlalchemy.select(schema_11.run_table.c.id, schema_11.run_table.c.state_summary)
     ).all():
         try:
             if raw_state_summary is None:
@@ -85,8 +95,8 @@ def _upmigrate_labware_offsets_in_runs(
                 new_raw_state_summary = pydantic_to_json(parsed_state_summary)
 
             connection.execute(
-                sqlalchemy.update(schema_10.run_table)
-                .where(schema_10.run_table.c.id == run_id)
+                sqlalchemy.update(schema_11.run_table)
+                .where(schema_11.run_table.c.id == run_id)
                 .values(state_summary=new_raw_state_summary)
             )
 
