@@ -59,7 +59,7 @@ export function getErrorKind(
     } else if (errorType === DEFINED_ERROR_TYPES.STACKER_STALL) {
       return ERROR_KINDS.STALL_WHILE_STACKING
     } else if (errorType === DEFINED_ERROR_TYPES.SHUTTLE_MISSING) {
-      return ERROR_KINDS.SHUTTE_MISSING
+      return ERROR_KINDS.SHUTTLE_MISSING
     }
   }
 
