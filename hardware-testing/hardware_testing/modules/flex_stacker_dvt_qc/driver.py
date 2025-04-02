@@ -184,3 +184,10 @@ class FlexStackerInterface:
         assert isinstance(self._driver, FlexStackerDriver)
         res = await self._driver.get_platform_status()
         return PlatformState.from_status(res)
+
+    async def home_and_reset(self) -> None:
+        """Home and reset all the stacker axis."""
+        await self.home_axis(StackerAxis.X, Direction.EXTEND)
+        await self.home_axis(StackerAxis.Z, Direction.RETRACT)
+        await self.home_axis(StackerAxis.L, Direction.RETRACT)
+

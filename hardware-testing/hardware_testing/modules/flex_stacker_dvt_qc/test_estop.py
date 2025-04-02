@@ -47,6 +47,9 @@ async def axis_at_limit(stacker: FlexStacker, axis: StackerAxis) -> Direction:
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
+    # Home all the axis
+    await stacker.home_and_reset()
+
     x_limit = await axis_at_limit(stacker, StackerAxis.X)
     z_limit = await axis_at_limit(stacker, StackerAxis.Z)
     l_limit = await axis_at_limit(stacker, StackerAxis.L)
@@ -97,11 +100,15 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         [CSVResult.from_bool(triggered)],
     )
 
+    print("LIMIT: ", x_limit, z_limit, l_limit)
+
     print("Check L limit switch...")
     limit_switch_triggered = await stacker._driver.get_limit_switch(
         StackerAxis.L, l_limit
     )
-    if limit_switch_triggered:
+    print("TRIGGUERED: ", limit_switch_triggered)
+
+    if not limit_switch_triggered:
         report(
             section,
             "l-move-disabled",
@@ -120,7 +127,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         report(
             section,
             "l-move-disabled",
-            [CSVResult.from_bool(not triggered)],
+            [CSVResult.from_bool(triggered)],
         )
 
     if not stacker._simulating:
