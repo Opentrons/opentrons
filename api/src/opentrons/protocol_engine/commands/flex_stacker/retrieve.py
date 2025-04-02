@@ -17,6 +17,7 @@ from ..command import (
 from ..flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerHopperError,
 )
 from ...errors import (
     ErrorOccurrence,
@@ -36,6 +37,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerHopperLabwareError,
 )
 
 if TYPE_CHECKING:
@@ -44,6 +46,12 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 RetrieveCommandType = Literal["flexStacker/retrieve"]
+
+RecoverableExceptions = Union[
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+    FlexStackerHopperLabwareError,
+]
 
 
 def _remove_default(s: dict[str, Any]) -> None:
@@ -125,7 +133,8 @@ class RetrieveResult(BaseModel):
 _ExecuteReturn = Union[
     SuccessData[RetrieveResult],
     DefinedErrorData[FlexStackerStallOrCollisionError]
-    | DefinedErrorData[FlexStackerShuttleError],
+    | DefinedErrorData[FlexStackerShuttleError]
+    | DefinedErrorData[FlexStackerHopperError],
 ]
 
 
@@ -264,6 +273,31 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             state_update,
         )
 
+    def handle_recoverable_error(
+        self, error: RecoverableExceptions
+    ) -> DefinedErrorData[FlexStackerStallOrCollisionError] | DefinedErrorData[
+        FlexStackerShuttleError
+    ] | DefinedErrorData[FlexStackerHopperError]:
+        """Handle a recoverable error raised during command execution."""
+        error_map = {
+            FlexStackerStallError: FlexStackerStallOrCollisionError,
+            FlexStackerShuttleMissingError: FlexStackerShuttleError,
+            FlexStackerHopperLabwareError: FlexStackerHopperError,
+        }
+        return DefinedErrorData(
+            public=error_map[type(error)](
+                id=self._model_utils.generate_id(),
+                createdAt=self._model_utils.get_timestamp(),
+                wrappedErrors=[
+                    ErrorOccurrence.from_failed(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        error=error,
+                    )
+                ],
+            )
+        )
+
     async def execute(self, params: RetrieveParams) -> _ExecuteReturn:
         """Execute the labware retrieval command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
@@ -283,8 +317,6 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             )
 
         stacker_loc = ModuleLocation(moduleId=params.moduleId)
-        # Allow propagation of ModuleNotAttachedError.
-        stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
         try:
             self._state_view.labware.raise_if_labware_in_location(stacker_loc)
@@ -293,45 +325,25 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 "Cannot retrieve a labware from Flex Stacker if the carriage is occupied"
             )
 
-        retrieve_result, state_update = await self._load_labware_from_pool(
-            params, stacker_state
-        )
-
         labware_height = self._state_view.geometry.get_height_of_labware_stack(
             definitions=pool_definitions
         )
 
-        try:
-            if stacker_hw is not None:
+        # Allow propagation of ModuleNotAttachedError.
+        stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
+        if stacker_hw is not None:
+            try:
                 await stacker_hw.dispense_labware(labware_height=labware_height)
-        except FlexStackerStallError as e:
-            return DefinedErrorData(
-                public=FlexStackerStallOrCollisionError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                ),
-            )
-        except FlexStackerShuttleMissingError as e:
-            return DefinedErrorData(
-                public=FlexStackerShuttleError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                ),
-            )
+            except (
+                FlexStackerStallError,
+                FlexStackerShuttleMissingError,
+                FlexStackerHopperLabwareError,
+            ) as e:
+                return self.handle_recoverable_error(e)
+
+        retrieve_result, state_update = await self._load_labware_from_pool(
+            params, stacker_state
+        )
 
         # Update the state to reflect the labware is now in the Flex Stacker slot
         # todo(chb, 2025-02-19): This ModuleLocation piece should probably instead be an AddressableAreaLocation
