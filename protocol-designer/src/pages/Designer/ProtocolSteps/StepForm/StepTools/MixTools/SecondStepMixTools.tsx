@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -7,7 +9,11 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
-
+import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import {
+  CheckboxExpandStepFormField,
+  InputStepFormField,
+} from '../../../../../../components/molecules'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -15,17 +21,12 @@ import {
   PositionField,
   WellsOrderField,
 } from '../../PipetteFields'
-
-import {
-  CheckboxExpandStepFormField,
-  InputStepFormField,
-} from '../../../../../../components/molecules'
 import {
   getBlowoutLocationOptionsForForm,
   getFormLevelError,
   getLabwareFieldForPositioningField,
 } from '../../utils'
-
+import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 import type { Dispatch, SetStateAction } from 'react'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { ErrorMappedToField } from '../../utils'
@@ -48,7 +49,8 @@ export function SecondStepMixTools({
   setTab,
 }: SecondStepMixToolsProps): JSX.Element {
   const { t, i18n } = useTranslation(['application', 'form'])
-
+  const toolsComponentRef = useRef<HTMLDivElement | null>(null)
+  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const aspirateTab = {
     text: i18n.format(t('aspirate'), 'capitalize'),
     isActive: tab === 'aspirate',
@@ -65,8 +67,18 @@ export function SecondStepMixTools({
     },
   }
 
+  const handleScrollToTop = (): void => {
+    if (toolsComponentRef.current != null) {
+      toolsComponentRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
+
   return (
     <Flex
+      ref={toolsComponentRef}
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       paddingY={SPACING.spacing16}
@@ -213,6 +225,15 @@ export function SecondStepMixTools({
           </>
         ) : null}
       </Flex>
+      {enableLiquidClasses ? (
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            console.log('TODO: wire up onClick handler')
+            handleScrollToTop()
+          }}
+        />
+      ) : null}
     </Flex>
   )
 }

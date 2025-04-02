@@ -88,7 +88,11 @@ export function DropdownStepFormField(
 
   return (
     <Flex padding={padding ?? SPACING.spacing16}>
-      {options.length > 1 || options.length === 0 ? (
+      {/* NOTE: we should not run into value == null when length === 1, but this
+      just some extra error protection so users can't stuck where they can't select a value */}
+      {options.length > 1 ||
+      options.length === 0 ||
+      (value == null && options.length === 1) ? (
         <DropdownMenu
           tooltipText={tooltipContent != null ? t(`${tooltipContent}`) : null}
           width={width}
