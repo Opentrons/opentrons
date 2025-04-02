@@ -42,12 +42,12 @@ def test_server_timing_middleware() -> None:
     assert response.status_code == 200
     assert (
         response.headers["Server-Timing"]
-        == 'opentrons-asgi;dur=1000;desc="Roughly, wall-clock milliseconds spent in Python."'
+        == 'opentrons-asgi;dur=1000;desc="Time in Python (roughly)"'
     )
 
     response = test_client.get("/testEndpointWithPreexistingHeader")
     assert response.status_code == 200
     assert (
         response.headers["Server-Timing"]
-        == 'something-preexisting,opentrons-asgi;dur=1000;desc="Roughly, wall-clock milliseconds spent in Python."'
+        == 'something-preexisting,opentrons-asgi;dur=1000;desc="Time in Python (roughly)"'
     )

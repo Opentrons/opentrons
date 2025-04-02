@@ -13,10 +13,13 @@ from typing import Awaitable, Callable
 from fastapi import Request, Response
 
 
-# These are inserted into the HTTP response header raw,
-# so they should be short and avoid special characters.
+# These are inserted into the HTTP response header raw, so they should be short and
+# avoid special characters.
+#
+# Chrome devtools uses the description as a label in the timing bar graph,
+# adjacent to things like "Waiting for server response" and "Content download".
 _METRIC_NAME = "opentrons-asgi"
-_METRIC_DESC = "Roughly, wall-clock milliseconds spent in Python."
+_METRIC_DESC = "Time in Python (roughly)"
 
 
 _log = logging.getLogger(__name__)
