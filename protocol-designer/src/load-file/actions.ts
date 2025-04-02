@@ -83,7 +83,7 @@ export const loadProtocolFile = (
       try {
         // Extract designer application blob
         const designerApplication = result.match(
-          /DESIGNER_APPLICATION\s?=\s?"""(.*)"""/
+          /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/
         )
         if (designerApplication != null && designerApplication[1]) {
           const designerApplicationString = designerApplication[1]
