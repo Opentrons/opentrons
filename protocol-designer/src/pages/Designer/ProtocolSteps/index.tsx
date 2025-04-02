@@ -10,6 +10,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
@@ -43,6 +44,7 @@ import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
+const STEP_SUMMARY_HEIGHT = '5.5rem'
 
 export function ProtocolSteps(): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
@@ -83,25 +85,24 @@ export function ProtocolSteps(): JSX.Element {
       height="calc(100vh - 4rem)"
       width="100%"
       minHeight={FLEX_MAX_CONTENT}
-      id="container"
     >
       <Flex height="100%" padding={SPACING.spacing12}>
         <DraggableSidebar setTargetWidth={setTargetWidth} />
       </Flex>
       <Flex
+        flex="2.85"
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        flex="2.85"
         paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
         height="100%"
         position={POSITION_RELATIVE}
+        overflowY={OVERFLOW_AUTO}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing24}
           width={CONTENT_MAX_WIDTH}
-          height="100%"
           justifyContent={JUSTIFY_CENTER}
           paddingY={SPACING.spacing120}
         >
@@ -154,9 +155,8 @@ export function ProtocolSteps(): JSX.Element {
             )}
             {/* avoid shifting the deck view container */}
             <Flex
-              height="5.5rem"
+              height={STEP_SUMMARY_HEIGHT}
               opacity={formData == null ? 1 : 0}
-              id="summary container"
             >
               <StepSummary
                 currentStep={currentStep}
