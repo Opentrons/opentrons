@@ -723,8 +723,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="overlap_error",
         display_name="overlap_error",
         default=0.0,
-        maximum=1.5,
-        minimum=-1.5,
+        maximum=2.0,
+        minimum=-2.0,
     )
 
 
