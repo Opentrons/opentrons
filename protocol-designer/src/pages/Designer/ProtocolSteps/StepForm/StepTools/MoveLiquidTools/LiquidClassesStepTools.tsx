@@ -29,6 +29,7 @@ export const LiquidClassesStepTools = ({
 }: LiquidClassesStepToolsProps): JSX.Element => {
   const { t } = useTranslation('liquids')
 
+  console.log(orderedLiquidClassOptions)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
