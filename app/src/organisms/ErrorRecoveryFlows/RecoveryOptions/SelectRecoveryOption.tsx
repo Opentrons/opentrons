@@ -173,7 +173,7 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
     case ERROR_KINDS.STALL_WHILE_STACKING:
       return STALL_WHILE_STACKING_OPTIONS
     case ERROR_KINDS.SHUTTE_MISSING:
-      return SHUTTE_MISSING_OPTIONS
+      return SHUTTLE_MISSING_OPTIONS
   }
 }
 
