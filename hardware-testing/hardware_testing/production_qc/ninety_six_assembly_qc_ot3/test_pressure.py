@@ -24,7 +24,7 @@ TIP_VOLUME = 50
 ASPIRATE_VOLUME = 2
 PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
 
-THRESHOLDS = {
+THRESHOLDS_1000 = {
     "open-pa": (
         0,
         20,
@@ -40,6 +40,25 @@ THRESHOLDS = {
     "dispense-pa": (
         2500,
         3500,
+    ),
+}
+
+THRESHOLDS_200 = {
+    "open-pa": (
+        -50,
+        50,
+    ),
+    "sealed-pa": (
+        -100,
+        100,
+    ),
+    "aspirate-pa": (
+        -2000,
+        -500,
+    ),
+    "dispense-pa": (
+        1000,
+        2500,
     ),
 }
 
@@ -85,8 +104,14 @@ async def _read_from_sensor(
     return sum(readings) / num_readings
 
 
-def check_value(test_value: float, test_name: str) -> CSVResult:
+def check_value(
+    test_value: float, test_name: str, pipette: Literal[1000, 200]
+) -> CSVResult:
     """Determine if value is within pass limits."""
+    if pipette == 1000:
+        THRESHOLDS = THRESHOLDS_1000
+    if pipette == 200:
+        THRESHOLDS = THRESHOLDS_200
     low_limit = THRESHOLDS[test_name][0]
     high_limit = THRESHOLDS[test_name][1]
 
@@ -118,7 +143,7 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 continue
         print(f"open-pa: {open_pa}")
-        open_result = check_value(open_pa, "open-pa")
+        open_result = check_value(open_pa, "open-pa", pipette)
         report(section, _get_test_tag(probe, "open-pa"), [open_pa, open_result])
 
         # SEALED-Pa
@@ -136,7 +161,7 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"sealed-pa: {sealed_pa}")
-        sealed_result = check_value(sealed_pa, "sealed-pa")
+        sealed_result = check_value(sealed_pa, "sealed-pa", pipette)
         report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, sealed_result])
 
         # ASPIRATE-Pa
@@ -151,7 +176,7 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"aspirate-pa: {aspirate_pa}")
-        aspirate_result = check_value(aspirate_pa, "aspirate-pa")
+        aspirate_result = check_value(aspirate_pa, "aspirate-pa", pipette)
         report(
             section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, aspirate_result]
         )
@@ -168,7 +193,7 @@ async def run(
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"dispense-pa: {dispense_pa}")
-        dispense_result = check_value(dispense_pa, "dispense-pa")
+        dispense_result = check_value(dispense_pa, "dispense-pa", pipette)
         report(
             section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, dispense_result]
         )
