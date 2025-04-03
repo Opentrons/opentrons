@@ -2069,6 +2069,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
     """It should delegate the transfer execution to core for a multi-channel pipette."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
     next_tiprack = decoy.mock(cls=Labware)
@@ -2428,6 +2429,7 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
     """It should delegate the distribute execution to core for a multi-channel pipette."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
     next_tiprack = decoy.mock(cls=Labware)
@@ -2791,6 +2793,7 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
     """It should delegate the consolidate execution to core for a multi-channel pipette."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
     next_tiprack = decoy.mock(cls=Labware)
