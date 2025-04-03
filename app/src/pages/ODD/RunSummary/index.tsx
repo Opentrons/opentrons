@@ -245,7 +245,10 @@ export function RunSummary(): JSX.Element {
 
   useEffect(() => {
     // Only run tip checking if it wasn't *just* handled during Error Recovery.
-    if (!lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)) {
+    if (
+      runSummaryNoFixit != null &&
+      !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
+    ) {
       void determineTipStatus()
     }
   }, [isRunCurrent, runSummaryNoFixit, isEREnabled])
