@@ -5,6 +5,7 @@ import {
   BORDERS,
   COLORS,
   ListItem,
+  ListItemCustomize,
 } from '@opentrons/components'
 import type { DropdownBorder } from '@opentrons/components'
 import {
@@ -24,7 +25,6 @@ import type { DisplayModules } from '../../organisms/ModulesSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
-import { ModuleListItemResponsive } from './ResponsiveListItem'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
@@ -97,15 +97,14 @@ export function ModuleListItemGroup(): JSX.Element | null {
 
               return (
                 <ListItem type="default" key={module.type}>
-                  <ModuleListItemResponsive
-                    header={getModuleDisplayName(module.model)}
+                  <ListItemCustomize
                     label={
                       adapters != null && adapters.length > 0
                         ? t('modules_adapter_label')
                         : undefined
                     }
                     linkText={t('modules_remove_label')}
-                    dropdownProps={
+                    dropdown={
                       adapters != null && adapters.length > 0
                         ? {
                             title: (null as unknown) as string,
@@ -146,6 +145,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                         { shouldValidate: true }
                       )
                     }}
+                    header={getModuleDisplayName(module.model)}
                     leftHeaderItem={
                       <Flex
                         padding={SPACING.spacing2}

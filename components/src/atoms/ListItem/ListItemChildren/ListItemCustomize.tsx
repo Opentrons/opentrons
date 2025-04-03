@@ -42,7 +42,7 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
         <StyledText desktopStyle="bodyDefaultSemiBold">{header}</StyledText>
       </Flex>
       <Flex
-        width={onClick != null && linkText != null ? '40%' : '50%'}
+        width={onClick != null && linkText != null ? '45%' : '60%'}
         gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
@@ -62,7 +62,8 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
           role="button"
           onClick={onClick}
           css={css`
-            width: 10%;
+            width: 11%;
+            text-align: right;
             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             color: ${COLORS.grey60};
             &:hover {

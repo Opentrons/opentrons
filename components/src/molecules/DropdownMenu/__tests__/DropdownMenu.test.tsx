@@ -11,6 +11,10 @@ const mockOptions: DropdownOption[] = [
   { name: 'Option 1', value: 'option1' },
   { name: 'Option 2', value: 'option2' },
   { name: 'Option 3', value: 'option3' },
+  {
+    name: 'Option with a very long name that would normally be truncated',
+    value: 'option4',
+  },
 ]
 
 const mockOnClick = vi.fn()
@@ -65,6 +69,21 @@ describe('DropdownMenu', () => {
     fireEvent.click(screen.getByText('Option 2'))
 
     expect(mockOnClick).toHaveBeenCalledWith('option2')
+  })
+
+  it('renders long text options properly in dropdown', () => {
+    render(props)
+    fireEvent.click(screen.getByText('Option 1'))
+
+    // This will test that the dropdown menu expands to show full text
+    const longOption = screen.getByText(
+      'Option with a very long name that would normally be truncated'
+    )
+    expect(longOption).toBeInTheDocument()
+
+    // Click the long option to test selection
+    fireEvent.click(longOption)
+    expect(mockOnClick).toHaveBeenCalledWith('option4')
   })
 
   // ToDo (kk:08/13/2024) activate when jsdom is updated

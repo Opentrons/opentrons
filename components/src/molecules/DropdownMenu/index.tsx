@@ -84,7 +84,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     filterOptions,
     onClick,
     currentOption,
-    width = '9.125rem',
+    width = '13.125rem',
     dropdownType = 'rounded',
     title,
     caption,
@@ -294,6 +294,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
             overflowY={OVERFLOW_AUTO}
             maxHeight="20rem" // Set the maximum display number to 10.
+            style={{ minWidth: width, maxWidth: 'max-content', width: 'auto' }}
           >
             {filterOptions.map((option, index) => (
               <Fragment key={`${option.name}-${index}`}>
@@ -330,7 +331,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                     >
                       <StyledText
                         desktopStyle="captionRegular"
-                        css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                        style={{ whiteSpace: 'nowrap' }}
                       >
                         {option.name}
                       </StyledText>
@@ -371,10 +372,10 @@ export const LINE_CLAMP_TEXT_STYLE = (
   lineClamp?: number,
   wordBreak?: boolean
 ): FlattenSimpleInterpolation => css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: ${OVERFLOW_HIDDEN};
-  text-overflow: ellipsis;
+  display: ${lineClamp ? '-webkit-box' : 'inline'};
+  -webkit-box-orient: ${lineClamp ? 'vertical' : 'unset'};
+  overflow: ${lineClamp ? OVERFLOW_HIDDEN : 'visible'};
+  text-overflow: ${lineClamp ? 'ellipsis' : 'unset'};
   word-wrap: break-word;
   -webkit-line-clamp: ${lineClamp ?? 1};
   word-break: ${wordBreak === true
