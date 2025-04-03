@@ -32,6 +32,8 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
+
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
@@ -46,6 +48,7 @@ interface LatchControls {
   toggleLatch: () => void
   isLatchClosed: boolean
 }
+const { reportModuleCommand } = useModuleCommandAnalytics()
 
 export function useLatchControls(module: AttachedModule): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
@@ -68,11 +71,27 @@ export function useLatchControls(module: AttachedModule): LatchControls {
   const toggleLatch = (): void => {
     createLiveCommand({
       command: latchCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-      )
+    }).then((result) => {
+      reportModuleCommand({
+        moduleType: module.moduleModel,
+        action: latchCommand.commandType,
+        result: { status: "succeeded", data: result },
+        serialNumber: module.serialNumber,
+        firmwareVersion: module.firmwareVersion,
+      });
     })
+      .catch((e: Error) => {
+        reportModuleCommand({
+          moduleType: module.moduleModel,
+          action: latchCommand.commandType,
+          errorDetails: e.message,
+          serialNumber: module.serialNumber,
+          firmwareVersion: module.firmwareVersion,
+        });
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+        );
+      });
   }
 
   return { toggleLatch, isLatchClosed }
@@ -168,7 +187,7 @@ export function useModuleOverflowMenu(
   )
   const testShakeBtn =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-    module.data.speedStatus !== 'idle' ? (
+      module.data.speedStatus !== 'idle' ? (
       <MenuItem
         key={`test_shake_${String(module.moduleModel)}`}
         id={`test_shake_${String(module.moduleModel)}`}
@@ -209,17 +228,33 @@ export function useModuleOverflowMenu(
     }
     createLiveCommand({
       command: deactivateCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
-      )
+    }).then((result) => {
+      reportModuleCommand({
+        moduleType: module.moduleType,
+        action: deactivateCommand.commandType,
+        result: { status: 'succeeded', data: result },
+        serialNumber: module.serialNumber,
+        firmwareVersion: module.firmwareVersion
+      });
     })
+      .catch((e: Error) => {
+        reportModuleCommand({
+          moduleType: module.moduleModel,
+          action: deactivateCommand.commandType,
+          errorDetails: e.message,
+          serialNumber: module.serialNumber,
+          firmwareVersion: module.firmwareVersion
+        });
+        console.error(
+          `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
+        );
+      });
   }
 
   const lidCommand: TCOpenLidCreateCommand | TCCloseLidCreateCommand = {
     commandType:
       module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-      module.data.lidStatus === 'open'
+        module.data.lidStatus === 'open'
         ? 'thermocycler/closeLid'
         : 'thermocycler/openLid',
     params: {
@@ -230,22 +265,38 @@ export function useModuleOverflowMenu(
   const controlTCLid = (): void => {
     createLiveCommand({
       command: lidCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
-      )
+    }).then((result) => {
+      reportModuleCommand({
+        moduleType: module.moduleModel,
+        action: lidCommand.commandType,
+        result: { status: 'succeeded', data: result },
+        serialNumber: module.serialNumber,
+        firmwareVersion: module.firmwareVersion
+      });
     })
+      .catch((e: Error) => {
+        reportModuleCommand({
+          moduleType: module.moduleModel,
+          action: lidCommand.commandType,
+          errorDetails: e.message,
+          serialNumber: module.serialNumber,
+          firmwareVersion: module.firmwareVersion,
+        });
+        console.error(
+          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
+        )
+      })
   }
 
   const sendBlockTempCommand =
     module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-    module.data.targetTemperature != null
+      module.data.targetTemperature != null
       ? () => {
-          handleDeactivationCommand('thermocycler/deactivateBlock')
-        }
+        handleDeactivationCommand('thermocycler/deactivateBlock')
+      }
       : () => {
-          handleSlideoutClick(false)
-        }
+        handleSlideoutClick(false)
+      }
 
   const thermoSetBlockTempBtn = (
     <MenuItem
@@ -265,7 +316,7 @@ export function useModuleOverflowMenu(
       {
         setSetting:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-          module.data.lidTargetTemperature != null
+            module.data.lidTargetTemperature != null
             ? t('overflow_menu_deactivate_lid')
             : t('overflow_menu_lid_temp'),
         isSettingDisabled: isDisabled,
@@ -273,18 +324,18 @@ export function useModuleOverflowMenu(
         menuButtons: null,
         onClick:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-          module.data.lidTargetTemperature != null
+            module.data.lidTargetTemperature != null
             ? () => {
-                handleDeactivationCommand('thermocycler/deactivateLid')
-              }
+              handleDeactivationCommand('thermocycler/deactivateLid')
+            }
             : () => {
-                handleSlideoutClick(true)
-              },
+              handleSlideoutClick(true)
+            },
       },
       {
         setSetting:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-          module.data.lidStatus === 'open'
+            module.data.lidStatus === 'open'
             ? t('close_lid')
             : t('open_lid'),
         isSettingDisabled: isDisabled,
@@ -297,7 +348,7 @@ export function useModuleOverflowMenu(
       {
         setSetting:
           module.moduleType === TEMPERATURE_MODULE_TYPE &&
-          module.data.status !== 'idle'
+            module.data.status !== 'idle'
             ? t('overflow_menu_deactivate_temp')
             : t('overflow_menu_mod_temp'),
         isSecondary: false,
@@ -306,18 +357,18 @@ export function useModuleOverflowMenu(
         onClick:
           module.data.status !== 'idle'
             ? () => {
-                handleDeactivationCommand('temperatureModule/deactivate')
-              }
+              handleDeactivationCommand('temperatureModule/deactivate')
+            }
             : () => {
-                handleSlideoutClick(false)
-              },
+              handleSlideoutClick(false)
+            },
       },
     ],
     magneticModuleType: [
       {
         setSetting:
           module.moduleType === MAGNETIC_MODULE_TYPE &&
-          module.data.status !== 'disengaged'
+            module.data.status !== 'disengaged'
             ? t('overflow_menu_disengage')
             : t('overflow_menu_engage'),
         isSecondary: false,
@@ -326,18 +377,18 @@ export function useModuleOverflowMenu(
         onClick:
           module.data.status !== 'disengaged'
             ? () => {
-                handleDeactivationCommand('magneticModule/disengage')
-              }
+              handleDeactivationCommand('magneticModule/disengage')
+            }
             : () => {
-                handleSlideoutClick(false)
-              },
+              handleSlideoutClick(false)
+            },
       },
     ],
     heaterShakerModuleType: [
       {
         setSetting:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-          module.data.temperatureStatus !== 'idle'
+            module.data.temperatureStatus !== 'idle'
             ? t('heater_shaker:deactivate_heater')
             : t('heater_shaker:set_temperature'),
         isSecondary: false,
@@ -350,14 +401,14 @@ export function useModuleOverflowMenu(
         ],
         onClick:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-          module.data.temperatureStatus !== 'idle' &&
-          module.data.status !== 'idle'
+            module.data.temperatureStatus !== 'idle' &&
+            module.data.status !== 'idle'
             ? () => {
-                handleDeactivationCommand('heaterShaker/deactivateHeater')
-              }
+              handleDeactivationCommand('heaterShaker/deactivateHeater')
+            }
             : () => {
-                handleSlideoutClick(false)
-              },
+              handleSlideoutClick(false)
+            },
       },
     ],
     absorbanceReaderType: [

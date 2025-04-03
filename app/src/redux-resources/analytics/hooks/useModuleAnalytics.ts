@@ -45,10 +45,10 @@ export interface ReportModuleActionParams {
     firmwareVersion?: string | null;
     action?: string;
     result?: { status: string| undefined; data: any  }; 
-    errorDetails?: string; 
+    errorDetails?: string ; 
     serialNumber?: string | Dict | null;
     temperature?: number | null | Dict | string ;
-    params?: Dict | null;
+    params?: Dict | null| undefined;
 }
 
 export interface UseModuleCommandAnalyticsResult {

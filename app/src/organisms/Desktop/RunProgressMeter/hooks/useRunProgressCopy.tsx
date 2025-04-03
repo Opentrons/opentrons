@@ -20,6 +20,8 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
+
 
 interface UseRunProgressResult {
   currentStepContents: ReactNode
@@ -28,6 +30,7 @@ interface UseRunProgressResult {
 }
 
 interface UseRunProgressProps {
+  runId: string | null
   runStatus: RunStatus | null
   currentStepNumber: number | null
   totalStepCount: number | null
@@ -41,6 +44,7 @@ interface UseRunProgressProps {
 // TODO(jh, 08-05-24): Testing is sufficiently covered by RunProgressMeter, but we should migrate relevant tests to this
 // hook after devising a better way to test i18n outside of a component.
 export function useRunProgressCopy({
+  runId,
   runStatus,
   currentStepNumber,
   totalStepCount,
@@ -127,6 +131,23 @@ export function useRunProgressCopy({
       }
     }
   })()
+  const {reportModuleCommand} = useModuleCommandAnalytics()
+  // Check if error occurred, then determine type
+  let error; 
+  if (typeof runCommandDetails?.data?.error === 'object') {
+    error = runCommandDetails?.data?.error?.errorType;
+  }
+
+  reportModuleCommand({
+    runId: runId,
+    action: runCommandDetails?.data?.commandType,
+    result: {
+      status: runCommandDetails?.data?.status,
+      data: runCommandDetails?.data?.result
+    },
+    params: runCommandDetails?.data?.params,
+    errorDetails: error ?? "" 
+  });
 
   return {
     currentStepContents,

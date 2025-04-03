@@ -64,9 +64,11 @@ import type {
 } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
+const {reportModuleCommand} = useModuleCommandAnalytics()
 
 export interface ProtocolSetupLabwareProps {
   runId: string
@@ -275,7 +277,14 @@ function LabwareLatch({
       command: latchCommand,
       waitUntilComplete: true,
     })
-      .then(() => {
+      .then((result) => {
+        reportModuleCommand({
+          moduleType: matchedHeaterShaker.moduleModel,
+          action: latchCommand.commandType,
+          result: {status: 'succeeded', data: result},
+          serialNumber: matchedHeaterShaker.serialNumber,
+          firmwareVersion: matchedHeaterShaker.firmwareVersion
+        })
         setIsRefetchingModules(true)
         refetchModules()
           .then(() => {
@@ -289,6 +298,13 @@ function LabwareLatch({
           })
       })
       .catch((e: Error) => {
+        reportModuleCommand({
+          moduleType: matchedHeaterShaker.moduleModel,
+          action: latchCommand.commandType,
+          serialNumber: matchedHeaterShaker.serialNumber,
+          errorDetails: e.message,
+          firmwareVersion: matchedHeaterShaker.firmwareVersion
+        })
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
         )

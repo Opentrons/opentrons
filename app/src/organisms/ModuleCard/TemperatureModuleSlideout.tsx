@@ -23,12 +23,15 @@ import { SubmitPrimaryButton } from '/app/atoms/buttons'
 
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { TemperatureModule } from '/app/redux/modules/types'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
 }
+
+const { reportModuleCommand } = useModuleCommandAnalytics()
 
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
@@ -49,11 +52,29 @@ export const TemperatureModuleSlideout = (
       }
       createLiveCommand({
         command: saveTempCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
-        )
+      }).then((result) => {
+        reportModuleCommand({
+          moduleType: module.moduleModel,
+          action: saveTempCommand.commandType,
+          result: { status: 'succeeded', data: result },
+          serialNumber: module.serialNumber,
+          temperature: temperatureValue,
+          firmwareVersion: module.firmwareVersion
+        });
       })
+        .catch((e: Error) => {
+          reportModuleCommand({
+            moduleType: module.moduleModel,
+            action: saveTempCommand.commandType,
+            errorDetails: e.message,
+            serialNumber: module.serialNumber,
+            temperature: temperatureValue,
+            firmwareVersion: module.firmwareVersion
+          });
+          console.error(
+            `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
+          )
+        })
     }
     setTemperatureValue(null)
     onCloseClick()

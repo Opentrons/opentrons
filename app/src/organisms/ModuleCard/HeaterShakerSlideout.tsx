@@ -24,12 +24,16 @@ import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import type { MouseEventHandler } from 'react'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
+
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
 }
+const { reportModuleCommand } = useModuleCommandAnalytics()
+
 
 export const HeaterShakerSlideout = (
   props: HeaterShakerSlideoutProps
@@ -55,16 +59,35 @@ export const HeaterShakerSlideout = (
       }
       createLiveCommand({
         command: setTempCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
-        )
+      }).then((result) => {
+        reportModuleCommand({
+          moduleType: module.moduleModel,
+          action: setTempCommand.commandType,
+          result: { status: 'succeeded', data: result },
+          serialNumber: module.serialNumber,
+          temperature: hsValue,
+          firmwareVersion: module.firmwareVersion
+        });
       })
-    }
-    setHsValue(null)
-    onCloseClick()
-  }
+        .catch((e: Error) => {
+          reportModuleCommand({
+            moduleType: module.moduleModel,
+            action: setTempCommand.commandType,
+            errorDetails: e.message,
+            serialNumber: module.serialNumber,
+            temperature: hsValue,
+            firmwareVersion: module.firmwareVersion
+          });
 
+          console.error(
+            `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
+          );
+        });
+
+      setHsValue(null)
+      onCloseClick()
+    }
+  }
   const errorMessage =
     hsValue != null && (hsValue < HS_TEMP_MIN || hsValue > HS_TEMP_MAX)
       ? t('input_out_of_range')
