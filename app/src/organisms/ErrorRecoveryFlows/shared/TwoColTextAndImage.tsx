@@ -45,7 +45,7 @@ export function TwoColTextAndImage(
         return t('take_any_necessary_precautions_before_loading_shuttle')
       default:
         console.error(
-          `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${selrouteectedRecoveryOption}. Handle retry step copy explicitly.`
+          `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
     }
