@@ -3,9 +3,7 @@ import {
   Flex,
   SPACING,
   ALIGN_CENTER,
-  BORDERS,
   COLORS,
-  ListItem,
   StyledText,
 } from '@opentrons/components'
 import type { DropdownOption, DropdownBorder } from '@opentrons/components'

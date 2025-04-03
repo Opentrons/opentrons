@@ -21,15 +21,15 @@ interface CustomDropdownProps {
 
 // Custom dropdown implementation that doesn't rely on the DropdownMenu component
 export function ModuleDropdownWrapper(props: CustomDropdownProps): JSX.Element {
-  const { filterOptions, onClick, currentOption, width = '100%' } = props
+  const { filterOptions, onClick, currentOption } = props
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Handle clicking outside to close dropdown
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: MouseEvent): void {
       if (
-        dropdownRef.current &&
+        dropdownRef.current !== null &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false)
@@ -54,7 +54,9 @@ export function ModuleDropdownWrapper(props: CustomDropdownProps): JSX.Element {
     >
       {/* Custom dropdown trigger */}
       <Flex
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
         css={css`
           cursor: pointer;
           min-height: 2.75rem;
@@ -120,7 +122,7 @@ export function ModuleDropdownWrapper(props: CustomDropdownProps): JSX.Element {
             border: 1px solid ${COLORS.grey40};
             border-radius: ${BORDERS.borderRadius8};
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 4px;
+            padding-top: 4px;
           `}
         >
           {filterOptions.map((option, index) => (
@@ -176,7 +178,7 @@ export function ModuleDropdownWithLabel(
         color={COLORS.grey60}
         css={css`
           white-space: nowrap;
-          margin-right: ${SPACING.spacing4};
+          padding-right: ${SPACING.spacing4};
         `}
       >
         {label}
