@@ -271,7 +271,6 @@ class Well:
         :param target: The relative position inside the well to target when performing a liquid handling operation.
         :return: A :py:class:`~opentrons.types.Location` that indicates location is meniscus and that holds the ``z`` offset in its point.z field.
 
-        :meta private:
         """
         return Location(
             point=Point(x=0, y=0, z=z),

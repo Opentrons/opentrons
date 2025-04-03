@@ -2523,7 +2523,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: The height, in mm, of the liquid from the deck.
 
-        :meta private:
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """

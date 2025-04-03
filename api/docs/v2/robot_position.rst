@@ -86,7 +86,7 @@ Let's look at the :py:meth:`.Well.center` method. It returns a position centered
 Meniscus
 ^^^^^^^^
 
-Let's look at the :py:meth:`.Well.meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Like the `.Well.top` and `.Well.bottom` methods, you can adjust the height of the meniscus with the optional argument ``z``, which is measured in mm. Positive numbers move the position up, negative ``z`` numbers move it down. 
+Let's look at the :py:meth:`~.Labware.well-meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Like the `.Well.top` and `.Well.bottom` methods, you can adjust the height of the meniscus with the optional argument ``z``, which is measured in mm. Positive numbers move the position up, negative ``z`` numbers move it down. 
 
 .. code-block:: python
 
@@ -98,9 +98,9 @@ The liquid meniscus in a well changes during aspirating or dispensing, so you'll
 - Set ``target= "start"`` or ``end`` to choose where the pipette begins dispensing. 
 
 .. note::
-    To use the :py:meth: `.Well.meniscus` method, you'll first need to determine the volume of liquid inside the well. You can do this at any time in your protocol by:
-    - Specifying your starting liquid volume with :py:meth:`~Labware.load_liquid`, or
-    - Using :py:meth:`~InstrumentContext.measure_liquid_height` to define liquid volume in the well. 
+    To use the :py:meth: `~.Labware.well-meniscus` method, you'll first need to determine the volume of liquid inside the well. You can do this at any time in your protocol by:
+    - Specifying your starting liquid volume with :py:meth:`~.Labware.load_liquid`, or
+    - Using :py:meth:`~.InstrumentContext.measure_liquid_height` to define liquid volume in the well. 
 
 Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette. 
 
@@ -137,7 +137,7 @@ Modifying these attributes will affect all subsequent aspirate and dispense acti
 
 .. versionadded:: 2.0
 
-Alternatively, use the :py:meth:`.Well.meniscus` method with a Flex pipette to change the aspiration or dispensing height. First, you'll need to define the amount of liquid in your well, either by loading a volume of liquid in your protocol or using :py:meth:`~.InstrumentContext.measure_liquid_height`.
+Alternatively, use the :py:meth:`~.Labware.well-meniscus` method with a Flex pipette to change the aspiration or dispensing height. First, you'll need to define the amount of liquid in your well, either by loading a volume of liquid in your protocol or using :py:meth:`~.InstrumentContext.measure_liquid_height`.
 
 .. code-block:: python
 
