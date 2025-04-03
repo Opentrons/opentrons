@@ -348,6 +348,56 @@ def transfer_liquid(
     }
 
 
+def distribute_liquid(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+) -> command_types.DistributeLiquidCommand:
+    text = (
+        "Distributing "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+    )
+    return {
+        "name": command_types.DISTRIBUTE_LIQUID,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
+    }
+
+
+def consolidate_liquid(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+) -> command_types.ConsolidateLiquidCommand:
+    text = (
+        "Consolidating "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+    )
+    return {
+        "name": command_types.CONSOLIDATE_LIQUID,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
+    }
+
+
 def seal(
     instrument: InstrumentContext,
     location: Well,

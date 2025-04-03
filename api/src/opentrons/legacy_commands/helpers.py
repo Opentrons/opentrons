@@ -78,6 +78,7 @@ def _stringify_multiple_wells_for_labware(wells: List[Well]) -> str:
 def stringify_well_list(
     wells: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
 ) -> str:
+    """Takes an arbitrary sequence of wells and returns a string representation of each well, associated by labware."""
     if isinstance(wells, Well):
         well_list = [wells]
     elif len(wells) == 0:
