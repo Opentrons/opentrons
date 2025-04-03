@@ -13,6 +13,7 @@ import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RECOVERY_MAP } from '../constants'
 
 import type { RecoveryContentProps } from '../types'
+import { css } from 'styled-components'
 
 export function TwoColTextAndImage(
   props: RecoveryContentProps
@@ -55,54 +56,42 @@ export function TwoColTextAndImage(
     return <Flex>image place holder</Flex>
   }
 
+  const HEADING_STYLE = css`
+    gap: ${SPACING.spacing8};
+    width: 100%;
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      gap: ${SPACING.spacing8};
+      width: 27rem;
+    }
+  `
+
+  const DESCRIPTION_STYLE = css`
+    gap: ${SPACING.spacing16};
+    width: 100%;
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      gap: ${SPACING.spacing24};
+    }
+  `
+
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          css={`
-            gap: ${SPACING.spacing8};
-            width: 100%;
-            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              gap: ${SPACING.spacing8};
-              width: 27rem;
-            }
-          `}
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} css={HEADING_STYLE}>
           <StyledText
             oddStyle="level4HeaderSemiBold"
             desktopStyle="headingSmallBold"
           >
             {buildTitle()}
           </StyledText>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            css={`
-              gap: ${SPACING.spacing16};
-              width: 100%;
-              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                gap: ${SPACING.spacing24};
-              }
-            `}
-          ></Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} css={DESCRIPTION_STYLE}></Flex>
           <StyledText
             oddStyle="level4HeaderRegular"
             desktopStyle="bodyDefaultRegular"
           >
             {buildBody()}
           </StyledText>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            css={`
-              gap: ${SPACING.spacing16};
-              width: 100%;
-              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                gap: ${SPACING.spacing24};
-              }
-            `}
-          ></Flex>
         </Flex>
-        <Flex marginTop="0.7rem">{buildImage()}</Flex>
+        <Flex>{buildImage()}</Flex>
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
