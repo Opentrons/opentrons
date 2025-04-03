@@ -9,11 +9,8 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
-  SIZE_2,
   SPACING,
   StyledText,
-  TEXT_ALIGN_LEFT,
-  TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -353,12 +350,12 @@ export function QuickTransferAdvancedSettings(
                       color={
                         displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                       }
-                      textAlign={TEXT_ALIGN_RIGHT}
+                      textAlign={TYPOGRAPHY.textAlignRight}
                     >
                       {displayItem.value}
                     </StyledText>
                     {displayItem.enabled ? (
-                      <Icon name="more" size={SIZE_2} />
+                      <Icon name="more" size="2rem" />
                     ) : null}
                   </Flex>
                 </Flex>
@@ -402,7 +399,7 @@ export function QuickTransferAdvancedSettings(
           <StyledText
             css={TYPOGRAPHY.level4HeaderSemiBold}
             color={COLORS.grey60}
-            textAlign={TEXT_ALIGN_LEFT}
+            textAlign={TYPOGRAPHY.textAlignLeft}
           >
             {t('aspirate_settings')}
           </StyledText>
@@ -427,11 +424,12 @@ export function QuickTransferAdvancedSettings(
                     </StyledText>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                       <StyledText
-                        css={TYPOGRAPHY.level4HeaderRegular}
+                        // css={TYPOGRAPHY.level4HeaderRegular}
+                        oddStyle="level4HeaderRegular"
                         color={
                           displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                         }
-                        textAlign={TEXT_ALIGN_RIGHT}
+                        textAlign={TYPOGRAPHY.textAlignRight}
                       >
                         {displayItem.value !== ''
                           ? displayItem.value
@@ -441,7 +439,7 @@ export function QuickTransferAdvancedSettings(
                       {displayItem.option !== 'pre_wet_tip' ? (
                         <Icon
                           name="more"
-                          size={SIZE_2}
+                          size="2rem"
                           color={
                             displayItem.enabled ? COLORS.black90 : COLORS.grey50
                           }
@@ -511,7 +509,7 @@ export function QuickTransferAdvancedSettings(
           <StyledText
             css={TYPOGRAPHY.level4HeaderSemiBold}
             color={COLORS.grey60}
-            textAlign={TEXT_ALIGN_LEFT}
+            textAlign={TYPOGRAPHY.textAlignLeft}
           >
             {t('dispense_settings')}
           </StyledText>
@@ -540,7 +538,7 @@ export function QuickTransferAdvancedSettings(
                         color={
                           displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                         }
-                        textAlign={TEXT_ALIGN_RIGHT}
+                        textAlign={TYPOGRAPHY.textAlignRight}
                       >
                         {displayItem.value !== ''
                           ? displayItem.value
@@ -548,7 +546,7 @@ export function QuickTransferAdvancedSettings(
                       </StyledText>
                       <Icon
                         name="more"
-                        size={SIZE_2}
+                        size="2rem"
                         color={
                           displayItem.enabled ? COLORS.black90 : COLORS.grey50
                         }

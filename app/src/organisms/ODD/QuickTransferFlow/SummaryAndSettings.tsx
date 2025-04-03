@@ -6,7 +6,6 @@ import {
   Flex,
   SPACING,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   COLORS,
   POSITION_FIXED,
   ALIGN_CENTER,
@@ -28,6 +27,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useFeatureFlag } from '/app/redux/config'
 import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
+import { Aspirate } from './Aspirate'
+import { Dispense } from './Dispense'
 import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { SaveOrRunModal } from './SaveOrRunModal'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
@@ -55,12 +56,14 @@ export function SummaryAndSettings(
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
   const enableExportPython = useFeatureFlag('quickTransferExportPython')
+  const enableLiquidClassesForQT = useFeatureFlag(
+    'liquidClassesForQuickTransfer'
+  )
 
-  const displayCategory: string[] = [
-    'overview',
-    'advanced_settings',
-    'tip_management',
-  ]
+  const displayCategory: string[] = enableLiquidClassesForQT
+    ? ['overview', 'aspirate', 'dispense']
+    : ['overview', 'advanced_settings', 'tip_management']
+
   const [selectedCategory, setSelectedCategory] = useState<string>('overview')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -138,6 +141,8 @@ export function SummaryAndSettings(
     })
   }
 
+  console.log('QuickTransfer', selectedCategory)
+
   return showSaveOrRunModal ? (
     <SaveOrRunModal onSave={handleClickSave} onRun={handleClickRun} />
   ) : (
@@ -150,18 +155,14 @@ export function SummaryAndSettings(
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing40}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing40}`} // TODO Ian 2023-05-02: remove this padding
         width="100%"
       >
         <Flex
-          gridGap={SPACING.spacing8}
-          height={SPACING.spacing80}
           backgroundColor={COLORS.white}
           width="100%"
-          flexDirection={DIRECTION_ROW}
           position={POSITION_FIXED}
-          top={SPACING.spacing120}
-          marginBottom={SPACING.spacing24}
+          top="7.5rem"
           alignItems={ALIGN_CENTER}
         >
           <Tabs
@@ -176,12 +177,28 @@ export function SummaryAndSettings(
           />
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
-        {selectedCategory === 'advanced_settings' ? (
-          <QuickTransferAdvancedSettings state={state} dispatch={dispatch} />
-        ) : null}
-        {selectedCategory === 'tip_management' ? (
-          <TipManagement state={state} dispatch={dispatch} />
-        ) : null}
+        {enableLiquidClassesForQT ? (
+          <>
+            {selectedCategory === 'aspirate' ? (
+              <Aspirate state={state} dispatch={dispatch} />
+            ) : null}
+            {selectedCategory === 'dispense' ? (
+              <Dispense state={state} dispatch={dispatch} />
+            ) : null}
+          </>
+        ) : (
+          <>
+            {selectedCategory === 'advanced_settings' ? (
+              <QuickTransferAdvancedSettings
+                state={state}
+                dispatch={dispatch}
+              />
+            ) : null}
+            {selectedCategory === 'tip_management' ? (
+              <TipManagement state={state} dispatch={dispatch} />
+            ) : null}
+          </>
+        )}
       </Flex>
     </Flex>
   )

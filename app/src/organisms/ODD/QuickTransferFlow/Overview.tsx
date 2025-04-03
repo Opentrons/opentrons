@@ -10,6 +10,11 @@ import {
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  TRASH_BIN_ADAPTER_FIXTURE,
+} from '@opentrons/shared-data'
+
 import { useToaster } from '/app/organisms/ToasterOven'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
@@ -55,8 +60,34 @@ export function Overview(props: OverviewProps): JSX.Element | null {
           : state.destination.metadata.displayName,
     },
     {
+      option: t('pipette_path'),
+      value: state.path,
+    },
+    {
+      option: t('tip_change_frequency'),
+      value: state.changeTip,
+    },
+    {
       option: transferCopy,
       value: `${state.volume}µL`,
+    },
+    {
+      option: t('tip_drop_location'),
+      value: t(
+        `${
+          state.dropTipLocation.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+            ? 'trashBin'
+            : 'wasteChute'
+        }_location`,
+        {
+          slotName:
+            FLEX_SINGLE_SLOT_BY_CUTOUT_ID[state.dropTipLocation.cutoutId],
+        }
+      ),
+    },
+    {
+      option: t('liquid_class'),
+      value: 'Dummy liquid class',
     },
   ]
 
