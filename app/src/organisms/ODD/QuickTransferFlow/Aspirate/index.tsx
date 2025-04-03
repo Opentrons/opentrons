@@ -28,7 +28,6 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [selectedSetting, setSelectedSetting] = useState<string | null>(null)
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
-  // const { makeSnackbar } = useToaster()
 
   useEffect(() => {
     trackEventWithRobotSerial({

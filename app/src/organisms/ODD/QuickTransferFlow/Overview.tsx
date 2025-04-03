@@ -65,6 +65,10 @@ export function Overview(props: OverviewProps): JSX.Element | null {
               : state.destination.metadata.displayName,
         },
         {
+          option: transferCopy,
+          value: `${state.volume}µL`,
+        },
+        {
           option: t('pipette_path'),
           value: state.path,
         },
@@ -73,21 +77,17 @@ export function Overview(props: OverviewProps): JSX.Element | null {
           value: state.changeTip,
         },
         {
-          option: transferCopy,
-          value: `${state.volume}µL`,
-        },
-        {
           option: t('tip_drop_location'),
           value: t(
             `${
-              state.dropTipLocation.cutoutFixtureId ===
+              state.dropTipLocation?.cutoutFixtureId ===
               TRASH_BIN_ADAPTER_FIXTURE
                 ? 'trashBin'
                 : 'wasteChute'
             }_location`,
             {
               slotName:
-                FLEX_SINGLE_SLOT_BY_CUTOUT_ID[state.dropTipLocation.cutoutId],
+                FLEX_SINGLE_SLOT_BY_CUTOUT_ID[state.dropTipLocation?.cutoutId],
             }
           ),
         },
