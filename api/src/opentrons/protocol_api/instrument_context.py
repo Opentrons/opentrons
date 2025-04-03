@@ -2521,11 +2521,9 @@ class InstrumentContext(publisher.CommandPublisher):
     def measure_liquid_height(self, well: labware.Well) -> LiquidTrackingType:
         """Check the height of the liquid within a well.
 
-        :returns: The height, in mm, of the liquid from the deck.
+        The return value of this object is a token representing the measurement during simulation and analysis. This token supports math operations but does not hold a value (it just returns itself).
 
-        :meta private:
-
-        This is intended for Opentrons internal use only and is not a guaranteed API.
+        :returns: The height, in mm, of the liquid from the deck (during execution) or a stand-in object (during simulation).
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
