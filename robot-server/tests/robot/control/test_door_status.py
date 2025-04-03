@@ -19,6 +19,7 @@ async def test_door_status(
     assert response.content.data.status.name.lower() == state.name.lower()
     assert response.content.data.doorRequiredClosedForProtocol == required
 
+
 @pytest.mark.parametrize("state", [DoorState.OPEN, DoorState.CLOSED])
 @pytest.mark.parametrize("required", [True, False])
 async def test_module_door_status(
