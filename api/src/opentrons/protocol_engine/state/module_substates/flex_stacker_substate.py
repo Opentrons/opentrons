@@ -27,7 +27,7 @@ class FlexStackerSubState:
     pool_lid_definition: LabwareDefinition | None
     max_pool_count: int
     pool_overlap: float
-    contained_labware_bottom_first: list[StackerStoredLabwareGroup] = []
+    contained_labware_bottom_first: list[StackerStoredLabwareGroup]
 
     def new_from_state_change(
         self, update: FlexStackerStateUpdate
@@ -74,4 +74,5 @@ class FlexStackerSubState:
         return defs
 
     def get_contained_labware(self) -> list[StackerStoredLabwareGroup]:
+        """Get the labware inside the hopper."""
         return self.contained_labware_bottom_first

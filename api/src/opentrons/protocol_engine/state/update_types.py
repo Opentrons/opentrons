@@ -585,13 +585,13 @@ class StateUpdate:
     def set_batch_labware_location(
         self: Self,
         *,
-        new_locations_by_id: typing.Dict[str, LabwareLocation],
-        new_offset_ids_by_id: typing.Dict[str, str | None],
+        new_locations_by_id: typing.Mapping[str, LabwareLocation],
+        new_offset_ids_by_id: typing.Mapping[str, str | None],
     ) -> Self:
         """Update the location of multiple labware objects."""
         self.batch_labware_location = BatchLabwareLocationUpdate(
-            new_locations_by_id=new_locations_by_id,
-            new_offset_ids_by_id=new_offset_ids_by_id,
+            new_locations_by_id=dict(new_locations_by_id),
+            new_offset_ids_by_id=dict(new_offset_ids_by_id),
         )
         return self
 
@@ -615,17 +615,17 @@ class StateUpdate:
 
     def set_batch_loaded_labware(
         self: Self,
-        definitions_by_id: typing.Dict[str, LabwareDefinition],
-        offset_ids_by_id: typing.Dict[str, str | None],
-        display_names_by_id: typing.Dict[str, str | None],
-        new_locations_by_id: typing.Dict[str, LabwareLocation],
+        definitions_by_id: typing.Mapping[str, LabwareDefinition],
+        offset_ids_by_id: typing.Mapping[str, str | None],
+        display_names_by_id: typing.Mapping[str, str | None],
+        new_locations_by_id: typing.Mapping[str, LabwareLocation],
     ) -> Self:
         """Add a set of new labwares to state. See `BatchLoadedLabwareUpdate`."""
         self.batch_loaded_labware = BatchLoadedLabwareUpdate(
-            new_locations_by_id=new_locations_by_id,
-            offset_ids_by_id=offset_ids_by_id,
-            display_names_by_id=display_names_by_id,
-            definitions_by_id=definitions_by_id,
+            new_locations_by_id=dict(new_locations_by_id),
+            offset_ids_by_id=dict(offset_ids_by_id),
+            display_names_by_id=dict(display_names_by_id),
+            definitions_by_id=dict(definitions_by_id),
         )
         return self
 
@@ -649,13 +649,13 @@ class StateUpdate:
 
     def set_lids(
         self: Self,
-        parent_labware_ids: typing.List[str],
-        lid_ids: typing.List[str | None],
+        parent_labware_ids: typing.Sequence[str],
+        lid_ids: typing.Sequence[str | None],
     ) -> Self:
         """Update the labware parent of a loaded or moved lid. See `LabwareLidUpdate`."""
         self.labware_lid = LabwareLidUpdate(
-            parent_labware_ids=parent_labware_ids,
-            lid_ids=lid_ids,
+            parent_labware_ids=list(parent_labware_ids),
+            lid_ids=list(lid_ids),
         )
         return self
 

@@ -122,7 +122,7 @@ def test_add_module_action(
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        contained_primary_labware_bottom_first=[],
+        contained_labware_bottom_first=[],
         max_pool_count=0,
         pool_overlap=0,
     )
@@ -170,7 +170,7 @@ def test_get_labware_definition_list(
         pool_primary_definition=primary_def,
         pool_adapter_definition=adapter_def,
         pool_lid_definition=lid_def,
-        contained_primary_labware_bottom_first=[],
+        contained_labware_bottom_first=[],
         max_pool_count=5,
         pool_overlap=0,
     )
@@ -181,30 +181,37 @@ def test_get_contained_labware() -> None:
     """It should present a list of contained labware."""
     subject = FlexStackerSubState(
         module_id=FlexStackerId("someModuleId"),
-        pool_primary_definition=primary_def,
-        pool_adapter_definition=adapter_def,
-        pool_lid_definition=lid_def,
-        contained_primary_labware_bottom_first=[
+        pool_primary_definition=sentinel.primary_def,
+        pool_adapter_definition=sentinel.adapter_def,
+        pool_lid_definition=sentinel.lid_def,
+        contained_labware_bottom_first=[
             StackerStoredLabwareGroup(
                 primaryLabwareId="labware-1",
                 lidLabwareId="lid-1",
+                adapterLabwareId=None,
             ),
             StackerStoredLabwareGroup(
-                primaryLabwareId="labware-2", lidLabwareId="lid-2"
+                primaryLabwareId="labware-2",
+                lidLabwareId="lid-2",
+                adapterLabwareId=None,
             ),
             StackerStoredLabwareGroup(
-                primaryLabwareId="labware-3", lidLabwareId="lid-3"
+                primaryLabwareId="labware-3",
+                lidLabwareId="lid-3",
+                adapterLabwareId=None,
             ),
         ],
         max_pool_count=5,
         pool_overlap=0,
     )
-    assert subject.get_contained_primary_labware() == [
+    assert subject.get_contained_labware() == [
         StackerStoredLabwareGroup(
-            primaryLabwareId="labware-1",
-            lidLabwareId="lid-1",
+            primaryLabwareId="labware-1", lidLabwareId="lid-1", adapterLabwareId=None
         ),
-        StackerStoredLabwareGroup(primaryLabwareId="labware-2", lidLabwareId="lid-2"),
-        StackerStoredLabwareGroup(primaryLabwareId="labware-3", lidLabwareId="lid-3"),
-        "labware-1",
+        StackerStoredLabwareGroup(
+            primaryLabwareId="labware-2", lidLabwareId="lid-2", adapterLabwareId=None
+        ),
+        StackerStoredLabwareGroup(
+            primaryLabwareId="labware-3", lidLabwareId="lid-3", adapterLabwareId=None
+        ),
     ]

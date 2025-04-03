@@ -270,6 +270,8 @@ class StackerFillEmptyStrategy(str, Enum):
 
 
 class StackerStoredLabwareGroup(BaseModel):
+    """Represents one group of labware stored in a stacker hopper."""
+
     primaryLabwareId: str
     adapterLabwareId: str | None
     lidLabwareId: str | None
