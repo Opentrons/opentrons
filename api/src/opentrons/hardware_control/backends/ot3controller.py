@@ -1651,19 +1651,21 @@ class OT3Controller(FlexBackend):
     ) -> None:
         def _module_door_listener(door_state: DoorState) -> None:
             module_serial: str | None = None
-            for module in self.module_controls.available_modules:
-                # Systematically handle doored modules
-                if module.MODULE_TYPE == modules.types.ModuleType.FLEX_STACKER:
-                    module_data = module.live_data.get("data")
-                    door_state = (
-                        DoorState.OPEN
-                        if module_data is not None
-                        and module_data.get("hopperDoorState")
-                        == modules.types.HopperDoorState.OPENED
-                        else DoorState.CLOSED
-                    )
-                    if door_state == DoorState.OPEN:
-                        module_serial = module.serial_number
+            if door_state == DoorState.CLOSED:
+                for module in self.module_controls.available_modules:
+                    # Systematically handle doored modules
+                    if module.MODULE_TYPE == modules.types.ModuleType.FLEX_STACKER:
+                        module_data = module.live_data.get("data")
+                        door_state = (
+                            DoorState.OPEN
+                            if module_data is not None
+                            and module_data.get("hopperDoorState")
+                            == modules.types.HopperDoorState.OPENED
+                            else DoorState.CLOSED
+                        )
+                        if door_state == DoorState.OPEN:
+                            module_serial = module.serial_number
+                            break
             callback(door_state, module_serial)
 
         def _door_listener(msg: BinaryMessageDefinition) -> None:
