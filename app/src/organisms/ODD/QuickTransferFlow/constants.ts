@@ -1,5 +1,3 @@
-import e from 'express'
-
 export const ACTIONS = {
   SELECT_PIPETTE: 'SELECT_PIPETTE',
   SELECT_TIP_RACK: 'SELECT_TIP_RACK',
