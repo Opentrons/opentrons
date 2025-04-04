@@ -276,7 +276,6 @@ async def _main() -> None:
         await move_to_point(hw_api, mount, initial_dial_loc, cp)
         current_position = await hw_api.current_position_ot3(mount, cp)
         nozzle_loc = await jog(hw_api, current_position, cp)
-        x_offset = 0
         y_offset = 0
         measurements = []
         measurement_map = {}
@@ -294,7 +293,7 @@ async def _main() -> None:
             # Iterate each nozzle onto the dial indicator to measure the flatness
             for nozzle_count in range(1, PIPETTE_CHANNELS + 1):
                 cp = CriticalPoint.NOZZLE
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                nozzle_position = Point(nozzle_loc[Axis.X],
                                         nozzle_loc[Axis.Y] + y_offset,
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
@@ -304,25 +303,7 @@ async def _main() -> None:
                 print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
                 print("\r", end="")
                 measurements.append(nozzle_measurement)
-                if nozzle_count % NOZZLE_COLUMNS == 0:
-                    d_str = ''
-                    noz_count = 0
-                    for m in measurements:
-                        noz_count += 1
-                        d_str += str(m) + ','
-                        dial_data[f'Column_{noz_count}'] = m
-                    log_file.writerow(dial_data)
-                    csvfile.flush()
-                    d_str = d_str[:-1] + '\n'
-                    print(f"{d_str}")
-                    # Reset Measurements list
-                    measurements = []
-                    print("\r\n")
-                x_offset -= NOZZLE_TO_NOZZLE_MM
-                if nozzle_count % NOZZLE_COLUMNS == 0:
-                    y_offset += NOZZLE_TO_NOZZLE_MM
-                if nozzle_count % NOZZLE_COLUMNS == 0:
-                    x_offset = 0
+                y_offset += NOZZLE_TO_NOZZLE_MM
             print(f'Nozzle Measurements: {measurement_map}')
             csvfile.close()
     # Calibrate to tiprack
@@ -360,48 +341,34 @@ async def _main() -> None:
         log_file = csv.DictWriter(pu_csvfile, dial_data)
         log_file.writeheader()
         try:
-            x_offset, y_offset = 0, 0
+            y_offset = 0
             while True:
                 measurements = []
                 cp = CriticalPoint.TIP
                 for i in range(12):
                     for tip_count in range(1, PIPETTE_CHANNELS + 1):
                         cp = CriticalPoint.TIP
-                        x_offset -= 9
-                        if tip_count % NOZZLE_COLUMNS == 0:
-                            y_offset += 9
-                        if tip_count % NOZZLE_COLUMNS == 0:
-                            x_offset = 0
+                        y_offset += 9
                         await asyncio.sleep(2)
                         tip_measurement = gauge.read()
                         print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
                         print("\r", end="")
-                        tip_position = Point(dial_loc[0] + x_offset,
+                        tip_position = Point(dial_loc[0],
                                                 dial_loc[1] + y_offset,
                                                 dial_loc[2])
                         measurements.append(tip_measurement)
-                        if tip_count % NOZZLE_COLUMNS == 0:
-                            d_str = ''
-                            noz_count = 0
-                            for m in measurements:
-                                noz_count += 1
-                                d_str += str(m) + ','
-                                dial_data[f'Column_{noz_count}'] = m
-                            log_file.writerow(dial_data)
-                            pu_csvfile.flush()
-                            d_str = d_str[:-1] + '\n'
-                            print(f"{d_str}")
-                            # Reset Measurements list
-                            measurements = []
-                            print("\r\n")
                         await move_to_point(hw_api, mount, tip_position, cp)
                         tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
                         print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
                     # drop_tip_location =  Point(30 , 60 , 110.5)
                     # await move_to_point(hw_api, mount, drop_tip_location, cp)
-                    await hw_api.return_tip(mount) # await hw_api.drop_tip(mount)
+                    tiprack_loc = Point(pickup_loc[0] + (NOZZLE_TO_NOZZLE_MM * (i + 1)),
+                                        pickup_loc[1],
+                                        pickup_loc[2] + 10)
+                    await move_to_point(hw_api, mount, tiprack_loc, cp)
+                    await hw_api.drop_tip(mount)
                     cp = CriticalPoint.NOZZLE
-                    tiprack_loc = Point(pickup_loc[0]+ (NOZZLE_TO_NOZZLE_MM * (i + 1)),
+                    tiprack_loc = Point(pickup_loc[0]+ (NOZZLE_TO_NOZZLE_MM * (i + 2)),
                                         pickup_loc[1],
                                         pickup_loc[2])
                     await move_to_point(hw_api, mount, tiprack_loc, cp)
