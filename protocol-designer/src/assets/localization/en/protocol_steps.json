@@ -13,6 +13,10 @@
   "blowout_position": "Blowout position from top",
   "change_tips": "Change tips",
   "column": "Column",
+  "comfirm_reset_settings": {
+    "no_liquid_class": "Continuing will undo any changes and restore the settings to the default values.",
+    "liquid_class_selected": "Continuing will undo any changes and restore the settings to the values associated with the {{liquidClass}} liquid class."
+  },
   "default_flow_rate": "The default flow rate is {{flowRate}}",
   "default_tip_option": "Default - get next tip",
   "delay_duration": "Delay duration",
