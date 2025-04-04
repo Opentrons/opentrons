@@ -106,7 +106,7 @@ describe('ListItemCustomize', () => {
     expect(removeLink).toBeInTheDocument()
 
     // Test the button width and alignment
-    expect(removeLink).toHaveStyle('width: 11%')
+    expect(removeLink).toHaveStyle('width: 12%')
     expect(removeLink).toHaveStyle('text-align: right')
   })
 
