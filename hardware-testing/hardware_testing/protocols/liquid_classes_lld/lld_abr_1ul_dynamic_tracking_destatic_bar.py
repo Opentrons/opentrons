@@ -139,6 +139,7 @@ class _ProtocolParams:
     submerge_depth: float
     well_bottom_mm: float
     overlap_error: float
+    test_gripper: bool
 
 
 class _ProtocolContext(TheRealProtocolContext):
@@ -339,11 +340,15 @@ def _pick_up_tip_and_manage_racks(
 ) -> None:
     """Replace the 1st tip-rack if it's empty and a spare is available, then pick-up-tip."""
     assert not pipette.has_tip
-    if len(_inaccessible_tip_racks) and not pipette.tip_racks[0].next_tip():
+    is_first_rack_empty = not pipette.tip_racks[0].next_tip()
+    should_swap_rack_if_available = params.test_gripper or is_first_rack_empty
+    if should_swap_rack_if_available and len(_inaccessible_tip_racks):
         replacement_rack = _inaccessible_tip_racks.pop(0)  # NOTE: pop! (global)
         _gripper_rotate_tip_rack_out(ctx, pipette.tip_racks[0], replacement_rack)
         pipette.tip_racks = [replacement_rack] + pipette.tip_racks[1:]
         pipette.reset_tipracks()
+    if params.test_gripper:
+        return
     pipette.pick_up_tip()
     # NOTE: (sigler) calibrating every low-volume tip, because their alignment
     #        is critical for us to interpret the results of this test
@@ -672,17 +677,6 @@ def _transfer_dye_to_photo_plate(
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
-    parameters.add_bool(
-        variable_name="just_baseline", display_name="just_baseline", default=False
-    )
-    assert "96" in DST_LABWARE
-    parameters.add_int(
-        variable_name="columns_to_test",
-        display_name="columns_to_test",
-        minimum=1,
-        maximum=12,
-        default=12,  # default to a full plate
-    )
     for i in range(MAX_NUMBER_OF_PLATES):
         parameters.add_float(
             variable_name=f"volume_{i}",
@@ -726,6 +720,19 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=2.0,
         minimum=-2.0,
     )
+    parameters.add_bool(
+        variable_name="just_baseline", display_name="just_baseline", default=False
+    )
+    parameters.add_int(
+        variable_name="columns_to_test",
+        display_name="columns_to_test",
+        minimum=1,
+        maximum=12,
+        default=12,  # default to a full plate
+    )
+    parameters.add_bool(
+        variable_name="test_gripper", display_name="test_gripper", default=False
+    )
 
 
 def _gather_parameters(ctx: TheRealProtocolContext) -> _ProtocolContext:
@@ -750,6 +757,7 @@ def _gather_parameters(ctx: TheRealProtocolContext) -> _ProtocolContext:
         submerge_depth=ctx.params.submerge_depth,  # type: ignore[attr-defined]
         well_bottom_mm=ctx.params.well_bottom_mm,  # type: ignore[attr-defined]
         overlap_error=ctx.params.overlap_error,  # type: ignore[attr-defined]
+        test_gripper=ctx.params.test_gripper,  # type: ignore[attr-defined]
     )
     setattr(ctx, "my_params", params)
     return cast(_ProtocolContext, ctx)
@@ -823,40 +831,52 @@ def run(real_ctx: TheRealProtocolContext) -> None:
 
     # JUST BASELINE
     if ctx.my_params.just_baseline:
+        plate = stack.pop()
+        lid = stack.pop()
+        ctx.move_labware(plate, SLOTS["empty_dst"], use_gripper=True)
         _transfer_just_baseline(
             ctx,
             diluent_pipette,
-            stack[-1],
+            plate,
             diluent_src_wells,
         )
+        _gripper_move_labware_to_done_slot(ctx, plate, stack_done)
+        _gripper_move_labware_to_done_slot(ctx, lid, stack_done)
         return  # exit
 
     # FILL EACH PLATES in STACK
     assert test_pipette and labware_pcr and labware_dye
     for i, ul in enumerate(ctx.my_params.volumes):
 
-        # MOVE PLATE and ADD DILUENT
+        # MOVE PLATE
         plate = stack.pop()
         lid = stack.pop()
         ctx.move_labware(plate, SLOTS["empty_dst"], use_gripper=True)
-        if ul < MVS_TARGET_UL:
-            diluent_src_wells = _transfer_diluent_for_empty_plate(
-                ctx, diluent_pipette, plate, diluent_src_wells, test_ul=ul
+
+        if not ctx.my_params.test_gripper:
+            # ADD DILUENT
+            if ul < MVS_TARGET_UL:
+                diluent_src_wells = _transfer_diluent_for_empty_plate(
+                    ctx, diluent_pipette, plate, diluent_src_wells, test_ul=ul
+                )
+
+            # TRANSFER RED-DYE
+            _transfer_dye_to_pcr_column(ctx, test_pipette, i)
+            pcr_column = labware_pcr.columns()[i]
+            for pcr_well in pcr_column:
+                row_letter = pcr_well.well_name[0]
+                photo_row = plate.rows_by_name()[row_letter]
+                for photo_well in photo_row[: ctx.my_params.columns]:
+                    _transfer_dye_to_photo_plate(
+                        ctx, test_pipette, pcr_well, photo_well
+                    )
+
+            # ADD MORE DILUENT
+            diluent_src_wells = _transfer_diluent_for_full_plate(
+                ctx, diluent_pipette, plate, diluent_src_wells
             )
 
-        # TRANSFER RED-DYE
-        _transfer_dye_to_pcr_column(ctx, test_pipette, i)
-        pcr_column = labware_pcr.columns()[i]
-        for pcr_well in pcr_column:
-            row_letter = pcr_well.well_name[0]
-            photo_row = plate.rows_by_name()[row_letter]
-            for photo_well in photo_row[: ctx.my_params.columns]:
-                _transfer_dye_to_photo_plate(ctx, test_pipette, pcr_well, photo_well)
-
-        # ADD MORE DILUENT and RE-STACK
-        diluent_src_wells = _transfer_diluent_for_full_plate(
-            ctx, diluent_pipette, plate, diluent_src_wells
-        )
+        # RE-STACK
         _gripper_move_labware_to_done_slot(ctx, plate, stack_done)
         _gripper_move_labware_to_done_slot(ctx, lid, stack_done)
 
