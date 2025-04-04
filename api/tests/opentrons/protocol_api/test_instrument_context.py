@@ -47,7 +47,6 @@ from opentrons.protocol_api import (
     labware,
     LiquidClass,
 )
-from opentrons.protocol_api.validation import WellTarget, PointTarget
 from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
