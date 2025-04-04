@@ -75,7 +75,7 @@ describe('DropdownMenu', () => {
     )
     expect(longOption).toBeInTheDocument()
     // Explicitly check the style applied by line 334
-    expect(longOption).toHaveStyle({ whiteSpace: 'nowrap' })
+    expect(longOption).toHaveStyle({ whiteSpace: 'wrap' })
 
     // Click the long option to test selection and interaction with styled element
     fireEvent.click(longOption)

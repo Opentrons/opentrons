@@ -84,7 +84,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     filterOptions,
     onClick,
     currentOption,
-    width = '13.125rem',
+    width = '13rem',
     dropdownType = 'rounded',
     title,
     caption,
@@ -331,7 +331,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                     >
                       <StyledText
                         desktopStyle="captionRegular"
-                        style={{ whiteSpace: 'nowrap' }}
+                        style={{ whiteSpace: 'wrap' }}
                       >
                         {option.name}
                       </StyledText>
