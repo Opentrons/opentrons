@@ -364,41 +364,50 @@ async def _main() -> None:
             while True:
                 measurements = []
                 cp = CriticalPoint.TIP
-                for tip_count in range(1, PIPETTE_CHANNELS + 1):
-                    cp = CriticalPoint.TIP
-                    x_offset -= 9
-                    if tip_count % NOZZLE_COLUMNS == 0:
-                        y_offset += 9
-                    if tip_count % NOZZLE_COLUMNS == 0:
-                        x_offset = 0
-                    await asyncio.sleep(2)
-                    tip_measurement = gauge.read()
-                    print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
-                    print("\r", end="")
-                    tip_position = Point(dial_loc[0] + x_offset,
-                                            dial_loc[1] + y_offset,
-                                            dial_loc[2])
-                    measurements.append(tip_measurement)
-                    if tip_count % NOZZLE_COLUMNS == 0:
-                        d_str = ''
-                        noz_count = 0
-                        for m in measurements:
-                            noz_count += 1
-                            d_str += str(m) + ','
-                            dial_data[f'Column_{noz_count}'] = m
-                        log_file.writerow(dial_data)
-                        pu_csvfile.flush()
-                        d_str = d_str[:-1] + '\n'
-                        print(f"{d_str}")
-                        # Reset Measurements list
-                        measurements = []
-                        print("\r\n")
-                    await move_to_point(hw_api, mount, tip_position, cp)
-                    tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
-                    print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
-                drop_tip_location =  Point(30 , 60 , 110.5)
-                await move_to_point(hw_api, mount, drop_tip_location, cp)
-                await hw_api.drop_tip(mount)
+                for i in range(12):
+                    for tip_count in range(1, PIPETTE_CHANNELS + 1):
+                        cp = CriticalPoint.TIP
+                        x_offset -= 9
+                        if tip_count % NOZZLE_COLUMNS == 0:
+                            y_offset += 9
+                        if tip_count % NOZZLE_COLUMNS == 0:
+                            x_offset = 0
+                        await asyncio.sleep(2)
+                        tip_measurement = gauge.read()
+                        print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
+                        print("\r", end="")
+                        tip_position = Point(dial_loc[0] + x_offset,
+                                                dial_loc[1] + y_offset,
+                                                dial_loc[2])
+                        measurements.append(tip_measurement)
+                        if tip_count % NOZZLE_COLUMNS == 0:
+                            d_str = ''
+                            noz_count = 0
+                            for m in measurements:
+                                noz_count += 1
+                                d_str += str(m) + ','
+                                dial_data[f'Column_{noz_count}'] = m
+                            log_file.writerow(dial_data)
+                            pu_csvfile.flush()
+                            d_str = d_str[:-1] + '\n'
+                            print(f"{d_str}")
+                            # Reset Measurements list
+                            measurements = []
+                            print("\r\n")
+                        await move_to_point(hw_api, mount, tip_position, cp)
+                        tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
+                        print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
+                    # drop_tip_location =  Point(30 , 60 , 110.5)
+                    # await move_to_point(hw_api, mount, drop_tip_location, cp)
+                    await hw_api.return_tip(mount) # await hw_api.drop_tip(mount)
+                    cp = CriticalPoint.NOZZLE
+                    tiprack_loc = Point(pickup_loc[0]+ (NOZZLE_TO_NOZZLE_MM * (i + 1)),
+                                        pickup_loc[1],
+                                        pickup_loc[2])
+                    await move_to_point(hw_api, mount, tiprack_loc, cp)
+                    await hw_api.pick_up_tip(
+                        mount, tip_length=(tip_length[args.tip_size] - tip_overlap))
+
                 keyboard_input = input("Press Enter or Press 'q' to quit")
                 if keyboard_input == 'q':
                     break
