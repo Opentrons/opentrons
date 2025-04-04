@@ -20,11 +20,29 @@ const SETTING_OPTIONS = {
   ASPIRATE_AIR_GAP: 'aspirate_air_gap',
 } as const
 
-interface AspirateSettingDetailProps {
-  selectedSetting: string | null
+type SettingOption = typeof SETTING_OPTIONS[keyof typeof SETTING_OPTIONS]
+
+interface CommonSettingProps {
+  kind: 'aspirate'
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
   onBack: () => void
+}
+
+const SettingComponentMap: Partial<
+  Record<SettingOption, React.ComponentType<CommonSettingProps>>
+> = {
+  [SETTING_OPTIONS.ASPIRATE_FLOW_RATE]: FlowRateEntry,
+  [SETTING_OPTIONS.ASPIRATE_TIP_POSITION]: TipPositionEntry,
+  [SETTING_OPTIONS.ASPIRATE_MIX]: Mix,
+  [SETTING_OPTIONS.ASPIRATE_DELAY]: Delay,
+  [SETTING_OPTIONS.ASPIRATE_TOUCH_TIP]: TouchTip,
+  [SETTING_OPTIONS.ASPIRATE_AIR_GAP]: AirGap,
+  // ToDo(kk:04/03/2025) add pre-wet tip
+  // [SETTING_OPTIONS.PRE_WET_TIP]: PreWetTip,
+}
+interface AspirateSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {
+  selectedSetting: SettingOption | null
 }
 
 export function AspirateSettingDetail({
@@ -33,60 +51,17 @@ export function AspirateSettingDetail({
   dispatch,
   onBack,
 }: AspirateSettingDetailProps): JSX.Element | null {
-  if (selectedSetting === SETTING_OPTIONS.ASPIRATE_FLOW_RATE) {
-    return (
-      <FlowRateEntry
-        kind="aspirate"
-        state={state}
-        dispatch={dispatch}
-        onBack={onBack}
-      />
-    )
+  if (selectedSetting === null || !(selectedSetting in SettingComponentMap)) {
+    return null
   }
-  if (selectedSetting === SETTING_OPTIONS.ASPIRATE_TIP_POSITION) {
-    return (
-      <TipPositionEntry
-        kind="aspirate"
-        state={state}
-        dispatch={dispatch}
-        onBack={onBack}
-      />
-    )
-  }
-  if (selectedSetting === SETTING_OPTIONS.ASPIRATE_MIX) {
-    return (
-      <Mix kind="aspirate" state={state} dispatch={dispatch} onBack={onBack} />
-    )
-  }
-  if (selectedSetting === SETTING_OPTIONS.ASPIRATE_DELAY) {
-    return (
-      <Delay
-        kind="aspirate"
-        state={state}
-        dispatch={dispatch}
-        onBack={onBack}
-      />
-    )
-  }
-  if (selectedSetting === SETTING_OPTIONS.ASPIRATE_TOUCH_TIP) {
-    return (
-      <TouchTip
-        kind="aspirate"
-        state={state}
-        dispatch={dispatch}
-        onBack={onBack}
-      />
-    )
-  }
-  if (selectedSetting === SETTING_OPTIONS.ASPIRATE_AIR_GAP) {
-    return (
-      <AirGap
-        kind="aspirate"
-        state={state}
-        dispatch={dispatch}
-        onBack={onBack}
-      />
-    )
+  const SelectedComponent = SettingComponentMap[selectedSetting]
+  if (SelectedComponent !== undefined) {
+    ;<SelectedComponent
+      kind="aspirate"
+      state={state}
+      dispatch={dispatch}
+      onBack={onBack}
+    />
   }
   return null
 }
