@@ -49,7 +49,11 @@ export function useRecoveryOptionCopy(): (
       case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
         return t('manually_replace_lw_and_retry')
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-        return t('clear_obstruction_in_stacker_and_retry_step')
+        if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
+          return t('clear_obstruction_in_stacker_and_retry_step')
+        } else {
+          return t('load_labware_into_stacker_and_retry_step')
+        }
       case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
         return t('manually_load_labware_into_labware_shuttle_and_skip_step')
       default:

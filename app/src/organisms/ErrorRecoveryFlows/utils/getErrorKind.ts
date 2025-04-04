@@ -58,6 +58,8 @@ export function getErrorKind(
       return ERROR_KINDS.STALL_OR_COLLISION
     } else if (errorType === DEFINED_ERROR_TYPES.STACKER_STALL) {
       return ERROR_KINDS.STALL_WHILE_STACKING
+    } else if (errorType === DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING) {
+      return ERROR_KINDS.LABWARE_MISSING_IN_HOPPER
     }
   }
 
