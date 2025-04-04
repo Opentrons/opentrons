@@ -111,7 +111,7 @@ describe('DropdownMenu', () => {
     // Open the dropdown
     fireEvent.click(screen.getByText('Option 1'))
 
-    // Directly test the style on line 335 by getting the long option text
+    // Directly test the style by getting the long option text
     const longOption = screen.getByText(
       'Option with a very long name that would normally be truncated'
     )
