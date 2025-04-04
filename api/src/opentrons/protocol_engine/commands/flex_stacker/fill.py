@@ -5,6 +5,7 @@ from typing import Optional, Literal, TYPE_CHECKING
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors import (
@@ -37,12 +38,12 @@ class FillParams(BaseModel):
         ),
     )
 
-    message: str | None = Field(
+    message: str | SkipJsonSchema[None] = Field(
         None,
         description="The message to display on connected clients during a manualWithPause strategy fill.",
     )
 
-    count: int | None = Field(
+    count: int | SkipJsonSchema[None] = Field(
         None,
         description=(
             "How full the labware pool should now be. If None, default to the maximum amount "
@@ -66,11 +67,11 @@ class FillResult(BaseModel):
         ...,
         description="The labware definition URI of the primary labware.",
     )
-    adapterLabwareURI: str | None = Field(
+    adapterLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the adapter labware.",
     )
-    lidLabwareURI: str | None = Field(
+    lidLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the lid labware.",
     )

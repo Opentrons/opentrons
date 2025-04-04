@@ -5,6 +5,7 @@ from typing import Optional, Literal, TYPE_CHECKING
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -45,15 +46,15 @@ class SetStoredLabwareParams(BaseModel):
         ...,
         description="The details of the primary labware (i.e. not the lid or adapter, if any) stored in the stacker.",
     )
-    lidLabware: StackerStoredLabwareDetails | None = Field(
+    lidLabware: StackerStoredLabwareDetails | SkipJsonSchema[None] = Field(
         default=None,
         description="The details of the lid on the primary labware, if any.",
     )
-    adapterLabware: StackerStoredLabwareDetails | None = Field(
+    adapterLabware: StackerStoredLabwareDetails | SkipJsonSchema[None] = Field(
         default=None,
         description="The details of the adapter under the primary labware, if any.",
     )
-    initialCount: int | None = Field(
+    initialCount: int | SkipJsonSchema[None] = Field(
         None,
         description=(
             "The number of labware that should be initially stored in the stacker. This number will be silently clamped to "
@@ -69,11 +70,11 @@ class SetStoredLabwareResult(BaseModel):
     primaryLabwareDefinition: LabwareDefinition = Field(
         ..., description="The definition of the primary labware."
     )
-    lidLabwareDefinition: LabwareDefinition | None = Field(
-        ..., description="The definition of the lid on the primary labware, if any."
+    lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = Field(
+        None, description="The definition of the lid on the primary labware, if any."
     )
-    adapterLabwareDefinition: LabwareDefinition | None = Field(
-        ...,
+    adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = Field(
+        None,
         description="The definition of the adapter under the primary labware, if any.",
     )
     count: int = Field(
