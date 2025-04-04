@@ -24,7 +24,6 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
 
 import {
   getMaxConditioningVolume,

@@ -11,7 +11,6 @@ import {
 } from '@opentrons/components'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
 import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
-import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,

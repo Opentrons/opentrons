@@ -13,9 +13,8 @@ import {
   StyledText,
   Icon,
 } from '@opentrons/components'
-
-import { getMainPagePortalEl } from './Portal'
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
+import { getMainPagePortalEl } from './Portal'
 
 interface ResetSettingsModalProps {
   tab: 'aspirate' | 'dispense'
