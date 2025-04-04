@@ -27,12 +27,12 @@ interface AspirateSettingDetailProps {
   onBack: () => void
 }
 
-export function AspirateSettingDetail(
-  props: AspirateSettingDetailProps
-): JSX.Element | null {
-  const { selectedSetting, state, dispatch, onBack } = props
-
-  // Consider using a switch statement for better readability if many cases
+export function AspirateSettingDetail({
+  selectedSetting,
+  state,
+  dispatch,
+  onBack,
+}: AspirateSettingDetailProps): JSX.Element | null {
   if (selectedSetting === SETTING_OPTIONS.ASPIRATE_FLOW_RATE) {
     return (
       <FlowRateEntry
