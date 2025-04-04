@@ -1364,7 +1364,6 @@ class ProtocolContext(CommandPublisher):
         """
         Define a liquid class for use in the protocol.
 
-        :meta private:
         """
         return self._core.define_liquid_class(name=name)
 
