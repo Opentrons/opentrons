@@ -27,6 +27,7 @@ describe('DropdownMenu', () => {
   let props: ComponentProps<typeof DropdownMenu>
 
   beforeEach(() => {
+    vi.resetAllMocks()
     props = {
       filterOptions: mockOptions,
       onClick: mockOnClick,
@@ -56,11 +57,31 @@ describe('DropdownMenu', () => {
     expect(screen.getByText('Option 1')).toBeInTheDocument()
   })
 
-  it('opens dropdown menu on click', () => {
+  it('renders default, opens, displays options (including long text), and handles selection', () => {
     render(props)
-    fireEvent.click(screen.getByText('Option 1'))
+    const trigger = screen.getByText('Option 1')
+    expect(trigger).toBeInTheDocument()
+
+    // Click to open dropdown
+    fireEvent.click(trigger)
+
+    // --- Assert multiple options are present (implies container at line 297 rendered) ---
     expect(screen.getByText('Option 2')).toBeInTheDocument()
     expect(screen.getByText('Option 3')).toBeInTheDocument()
+
+    // --- Assert long option text is present and check its style (covers line 334) ---
+    const longOption = screen.getByText(
+      'Option with a very long name that would normally be truncated'
+    )
+    expect(longOption).toBeInTheDocument()
+    // Explicitly check the style applied by line 334
+    expect(longOption).toHaveStyle({ whiteSpace: 'nowrap' })
+
+    // Click the long option to test selection and interaction with styled element
+    fireEvent.click(longOption)
+
+    // Verify correct option was clicked
+    expect(mockOnClick).toHaveBeenCalledWith('option4')
   })
 
   it('calls onClick when an option is selected', () => {
@@ -69,21 +90,6 @@ describe('DropdownMenu', () => {
     fireEvent.click(screen.getByText('Option 2'))
 
     expect(mockOnClick).toHaveBeenCalledWith('option2')
-  })
-
-  it('renders long text options properly in dropdown', () => {
-    render(props)
-    fireEvent.click(screen.getByText('Option 1'))
-
-    // This will test that the dropdown menu expands to show full text
-    const longOption = screen.getByText(
-      'Option with a very long name that would normally be truncated'
-    )
-    expect(longOption).toBeInTheDocument()
-
-    // Click the long option to test selection
-    fireEvent.click(longOption)
-    expect(mockOnClick).toHaveBeenCalledWith('option4')
   })
 
   // ToDo (kk:08/13/2024) activate when jsdom is updated
