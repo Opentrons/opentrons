@@ -294,7 +294,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
             overflowY={OVERFLOW_AUTO}
             maxHeight="20rem" // Set the maximum display number to 10.
-            style={{ minWidth: width, maxWidth: 'max-content', width: 'auto' }}
           >
             {filterOptions.map((option, index) => (
               <Fragment key={`${option.name}-${index}`}>

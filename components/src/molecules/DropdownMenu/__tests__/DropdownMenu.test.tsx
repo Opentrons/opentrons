@@ -65,19 +65,20 @@ describe('DropdownMenu', () => {
     // Click to open dropdown
     fireEvent.click(trigger)
 
-    // --- Assert multiple options are present (implies container at line 297 rendered) ---
+    // Assert multiple options are present
     expect(screen.getByText('Option 2')).toBeInTheDocument()
     expect(screen.getByText('Option 3')).toBeInTheDocument()
 
-    // --- Assert long option text is present and check its style (covers line 334) ---
+    // Find the long option text element
     const longOption = screen.getByText(
       'Option with a very long name that would normally be truncated'
     )
     expect(longOption).toBeInTheDocument()
-    // Explicitly check the style applied by line 334
-    expect(longOption).toHaveStyle({ whiteSpace: 'wrap' })
 
-    // Click the long option to test selection and interaction with styled element
+    // Test the style
+    expect(longOption).toHaveStyle('white-space: wrap')
+
+    // Click the long option to test selection
     fireEvent.click(longOption)
 
     // Verify correct option was clicked
