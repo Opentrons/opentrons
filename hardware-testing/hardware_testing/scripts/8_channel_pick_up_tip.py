@@ -359,6 +359,7 @@ async def _main() -> None:
             measurement_map = {}
             cp = CriticalPoint.TIP
             for i in range(args.cycles):
+                print(f"=== CYCLE: {i + 1} ===\n")
                 for tip_count in range(1, PIPETTE_CHANNELS + 1):
                     cp = CriticalPoint.TIP
                     tip_position = Point(dial_loc[0],
@@ -368,7 +369,7 @@ async def _main() -> None:
                     await asyncio.sleep(2)
                     tip_measurement = gauge.read()
                     measurement_map.update({tip_count: tip_measurement})
-                    print(f"Cycle: {i+1}\ntip-{tip_count} (mm): {tip_measurement}\n")
+                    print(f"tip-{tip_count} (mm): {tip_measurement}\n")
                     measurements.append(tip_measurement)
                     if tip_count % NOZZLE_COLUMNS == 0:
                         d_str = ''
@@ -389,7 +390,7 @@ async def _main() -> None:
                 print(f'Tip Measurements: {measurement_map}\n')
                 tiprack_loc = Point(pickup_loc[0] + (NOZZLE_TO_NOZZLE_MM * i),
                                     pickup_loc[1],
-                                    pickup_loc[2] - (tip_length[args.tip_size] - 10))
+                                    pickup_loc[2] - (tip_length[args.tip_size] - 20))
                 await move_to_point(hw_api, mount, tiprack_loc, cp)
                 await hw_api.drop_tip(mount)
                 cp = CriticalPoint.NOZZLE
