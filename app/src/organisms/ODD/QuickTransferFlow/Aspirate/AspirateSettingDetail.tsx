@@ -4,7 +4,7 @@ import { Mix } from '../QuickTransferAdvancedSettings/Mix'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
-import type { Dispatch } from 'react'
+import type { ComponentType, Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
@@ -30,7 +30,7 @@ interface CommonSettingProps {
 }
 
 const SettingComponentMap: Partial<
-  Record<SettingOption, React.ComponentType<CommonSettingProps>>
+  Record<SettingOption, ComponentType<CommonSettingProps>>
 > = {
   [SETTING_OPTIONS.ASPIRATE_FLOW_RATE]: FlowRateEntry,
   [SETTING_OPTIONS.ASPIRATE_TIP_POSITION]: TipPositionEntry,
