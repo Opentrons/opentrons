@@ -10,11 +10,10 @@ import type {
   QuickTransferSummaryState,
 } from '../types'
 
-// Re-use or redefine setting option constants here or import from a shared file
+// ToDo(kk:04/03/2025) add pre-wet tip
 const SETTING_OPTIONS = {
   ASPIRATE_FLOW_RATE: 'aspirate_flow_rate',
   ASPIRATE_TIP_POSITION: 'aspirate_tip_position',
-  // PRE_WET_TIP is handled directly by dispatch, not a detail view
   ASPIRATE_MIX: 'aspirate_mix',
   ASPIRATE_DELAY: 'aspirate_delay',
   ASPIRATE_TOUCH_TIP: 'aspirate_touch_tip',
