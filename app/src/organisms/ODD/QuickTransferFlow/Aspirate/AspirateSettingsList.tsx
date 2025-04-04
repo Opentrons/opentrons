@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { SettingItem } from './hooks/useAspirateSettingsConfig' // Import the type
+import type { SettingItem } from './hooks/useAspirateSettingsConfig'
 
 interface AspirateSettingsListProps {
   items: SettingItem[]

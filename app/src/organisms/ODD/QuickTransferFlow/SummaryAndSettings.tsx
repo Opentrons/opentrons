@@ -28,7 +28,7 @@ import { useFeatureFlag } from '/app/redux/config'
 import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
 import { Aspirate } from './Aspirate'
-// import { Dispense } from './Dispense'
+import { Dispense } from './Dispense'
 import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { SaveOrRunModal } from './SaveOrRunModal'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
@@ -182,9 +182,9 @@ export function SummaryAndSettings(
             {selectedCategory === 'aspirate' ? (
               <Aspirate state={state} dispatch={dispatch} />
             ) : null}
-            {/* {selectedCategory === 'dispense' ? (
+            {selectedCategory === 'dispense' ? (
               <Dispense state={state} dispatch={dispatch} />
-            ) : null} */}
+            ) : null}
           </>
         ) : (
           <>

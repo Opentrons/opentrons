@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { ACTIONS } from '../../constants'
-import { SETTING_OPTIONS } from '../constants'
+import {
+  ACTIONS,
+  ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS,
+} from '../../constants'
 
 import type { Dispatch } from 'react'
 import type {
+  AspirateSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../../types'
-import type { SettingOption } from '../types'
 
 export interface SettingItem {
   option: string
@@ -21,7 +23,7 @@ export interface SettingItem {
 interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
-  setSelectedSetting: (setting: SettingOption | null) => void
+  setSelectedSetting: (setting: AspirateSettingOption | null) => void
 }
 
 export function useAspirateSettingsConfig(

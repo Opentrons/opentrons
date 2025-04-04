@@ -12,10 +12,10 @@ import { useAspirateSettingsConfig } from './hooks/useAspirateSettingsConfig'
 
 import type { Dispatch } from 'react'
 import type {
+  AspirateSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { SettingOption } from './types'
 
 const PADDING_TOP_FOR_NAV = '12rem'
 interface AspirateProps {
@@ -26,9 +26,10 @@ interface AspirateProps {
 export function Aspirate(props: AspirateProps): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
-  const [selectedSetting, setSelectedSetting] = useState<SettingOption | null>(
-    null
-  )
+  const [
+    selectedSetting,
+    setSelectedSetting,
+  ] = useState<AspirateSettingOption | null>(null)
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   useEffect(() => {
