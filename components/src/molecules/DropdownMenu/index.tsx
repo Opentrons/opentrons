@@ -332,8 +332,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                     >
                       <StyledText
                         desktopStyle="captionRegular"
-                        style={{ whiteSpace: 'wrap' }}
-                        data-testid="dropdown-option-text"
+                        css={LINE_CLAMP_TEXT_STYLE(3, true)}
                       >
                         {option.name}
                       </StyledText>
