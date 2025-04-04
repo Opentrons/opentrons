@@ -345,6 +345,7 @@ async def _main() -> None:
         deck_slot['deck_slot'][args.dial_slot][Axis.Y.name] = dial_loc.y
         deck_slot['deck_slot'][args.dial_slot]['Z'] = dial_loc.z
         save_config_(path+cal_fn, deck_slot)
+        await hw_api.home_z(mount)
     # Start recording pick up tip overlaps
     with open(file_name, 'w', newline='') as pu_csvfile:
         test_details = csv.writer(pu_csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -361,15 +362,13 @@ async def _main() -> None:
                 for i in range(12):
                     for tip_count in range(1, PIPETTE_CHANNELS + 1):
                         cp = CriticalPoint.TIP
-                        y_offset += 9
-                        if i > 0 and tip_count == 1:
-                            y_offset = 0
+                        tip_position = Point(dial_loc[0],
+                                             dial_loc[1] + y_offset,
+                                             dial_loc[2])
+                        await move_to_point(hw_api, mount, tip_position, cp)
                         await asyncio.sleep(2)
                         tip_measurement = gauge.read()
                         print(f"tip-{tip_count} (mm): {tip_measurement}\n")
-                        tip_position = Point(dial_loc[0],
-                                                dial_loc[1] + y_offset,
-                                                dial_loc[2])
                         measurements.append(tip_measurement)
                         if tip_count % NOZZLE_COLUMNS == 0:
                             d_str = ''
@@ -385,14 +384,15 @@ async def _main() -> None:
                             # Reset Measurements list
                             measurements = []
                             print("\r\n")
-                        await move_to_point(hw_api, mount, tip_position, cp)
+                        # await move_to_point(hw_api, mount, tip_position, cp)
                         tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
                         print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
+                        y_offset += 9
                     # drop_tip_location =  Point(30 , 60 , 110.5)
                     # await move_to_point(hw_api, mount, drop_tip_location, cp)
                     tiprack_loc = Point(pickup_loc[0] + (NOZZLE_TO_NOZZLE_MM * i),
                                         pickup_loc[1],
-                                        pickup_loc[2] - 10)
+                                        pickup_loc[2] - 25)
                     await move_to_point(hw_api, mount, tiprack_loc, cp)
                     await hw_api.drop_tip(mount)
                     cp = CriticalPoint.NOZZLE
