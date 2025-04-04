@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { ACTIONS } from '../../constants'
-import { SETTING_OPTIONS } from '../../Aspirate'
+import { SETTING_OPTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../../types'
-import type { SettingOption } from '../../Aspirate'
+import type { SettingOption } from '../types'
 
 export interface SettingItem {
   option: string

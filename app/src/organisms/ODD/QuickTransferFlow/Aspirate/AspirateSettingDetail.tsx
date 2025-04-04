@@ -4,13 +4,13 @@ import { Mix } from '../QuickTransferAdvancedSettings/Mix'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
-import { SETTING_OPTIONS } from '../Aspirate'
+import { SETTING_OPTIONS } from './constants'
 import type { ComponentType, Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { SettingOption } from '../Aspirate'
+import type { SettingOption } from './types'
 
 interface CommonSettingProps {
   kind: 'aspirate'
