@@ -53,7 +53,7 @@ export function SecondStepMixTools({
   const { t, i18n } = useTranslation(['application', 'form'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-  const [isResetModal, setIsResetModal] = useState<boolean>(false)
+  const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const aspirateTab = {
     text: i18n.format(t('aspirate'), 'capitalize'),
     isActive: tab === 'aspirate',
@@ -86,13 +86,13 @@ export function SecondStepMixTools({
 
   return (
     <>
-      {isResetModal ? (
+      {showResetModal ? (
         <ResetSettingsModal
           tab={tab}
           onClose={() => {
-            setIsResetModal(false)
+            setShowResetModal(false)
           }}
-          onScoll={() => {
+          onScroll={() => {
             handleScrollToTop()
           }}
           liquidClass={liquidClassName}
@@ -251,7 +251,7 @@ export function SecondStepMixTools({
             tab={tab}
             onClick={() => {
               console.log('TODO: wire up onClick handler')
-              setIsResetModal(true)
+              setShowResetModal(true)
             }}
           />
         ) : null}

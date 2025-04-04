@@ -81,7 +81,7 @@ export const SecondStepsMoveLiquidTools = ({
   )
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
-  const [isResetModal, setIsResetModal] = useState<boolean>(false)
+  const [showResetModal, setShowResetModal] = useState<boolean>(false)
 
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
@@ -202,13 +202,13 @@ export const SecondStepsMoveLiquidTools = ({
 
   return (
     <>
-      {isResetModal ? (
+      {showResetModal ? (
         <ResetSettingsModal
           tab={tab}
           onClose={() => {
-            setIsResetModal(false)
+            setShowResetModal(false)
           }}
-          onScoll={() => {
+          onScroll={() => {
             handleScrollToTop()
           }}
           liquidClass={liquidClassName}
@@ -588,7 +588,7 @@ export const SecondStepsMoveLiquidTools = ({
             tab={tab}
             onClick={() => {
               console.log('TODO: wire up onClick handler')
-              setIsResetModal(true)
+              setShowResetModal(true)
             }}
           />
         ) : null}
