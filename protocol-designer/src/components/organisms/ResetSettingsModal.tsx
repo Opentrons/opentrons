@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { getMainPagePortalEl } from './Portal'
+import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 
 interface ResetSettingsModalProps {
   tab: 'aspirate' | 'dispense'
@@ -27,6 +28,10 @@ export function ResetSettingsModal(
 ): JSX.Element {
   const { tab, liquidClass, onClose, onScroll } = props
   const { t, i18n } = useTranslation('protocol_steps')
+
+  // TODO: Update to check liquidClass !== 'none' for Don't use a liquid class
+  const isLiquidClassSelected = liquidClass !== null && liquidClass !== ''
+  const liquidClassName = getLiquidClassDisplayName(String(liquidClass))
 
   const handleContinue = (): void => {
     console.log('TODO: Wire up reset settings modal.')
@@ -68,11 +73,11 @@ export function ResetSettingsModal(
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
-            {liquidClass !== null && liquidClass !== ''
+            {isLiquidClassSelected
               ? t(
                   'protocol_steps:comfirm_reset_settings.liquid_class_selected',
                   {
-                    liquidClass,
+                    liquidClassName,
                   }
                 )
               : t('protocol_steps:comfirm_reset_settings.no_liquid_class')}

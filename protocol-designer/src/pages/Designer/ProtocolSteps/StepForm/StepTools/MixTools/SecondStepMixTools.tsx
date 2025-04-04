@@ -79,11 +79,6 @@ export function SecondStepMixTools({
     }
   }
 
-  const liquidClassName =
-    formData.liquidClass !== ''
-      ? getLiquidClassDisplayName(String(formData.liquidClass))
-      : ''
-
   return (
     <>
       {showResetModal ? (
@@ -95,7 +90,7 @@ export function SecondStepMixTools({
           onScroll={() => {
             handleScrollToTop()
           }}
-          liquidClass={liquidClassName}
+          liquidClass={formData.liquidClass}
         />
       ) : null}
       <Flex

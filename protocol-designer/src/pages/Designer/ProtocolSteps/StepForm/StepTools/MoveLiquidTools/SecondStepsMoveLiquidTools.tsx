@@ -195,11 +195,6 @@ export const SecondStepsMoveLiquidTools = ({
     }
   }
 
-  const liquidClassName =
-    formData.liquidClass !== ''
-      ? getLiquidClassDisplayName(String(formData.liquidClass))
-      : ''
-
   return (
     <>
       {showResetModal ? (
@@ -211,7 +206,7 @@ export const SecondStepsMoveLiquidTools = ({
           onScroll={() => {
             handleScrollToTop()
           }}
-          liquidClass={liquidClassName}
+          liquidClass={formData.liquidClass}
         />
       ) : null}
       <Flex
