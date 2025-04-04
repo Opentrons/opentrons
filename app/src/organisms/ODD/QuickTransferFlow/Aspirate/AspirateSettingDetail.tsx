@@ -56,12 +56,14 @@ export function AspirateSettingDetail({
   }
   const SelectedComponent = SettingComponentMap[selectedSetting]
   if (SelectedComponent !== undefined) {
-    ;<SelectedComponent
-      kind="aspirate"
-      state={state}
-      dispatch={dispatch}
-      onBack={onBack}
-    />
+    return (
+      <SelectedComponent
+        kind="aspirate"
+        state={state}
+        dispatch={dispatch}
+        onBack={onBack}
+      />
+    )
   }
   return null
 }
