@@ -40,6 +40,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
     render(props)
     screen.getByText('Apply liquid class settings for this transfer')
     screen.getByText("Don't use a liquid class")
+    screen.getByText('Default')
     screen.getByText('Aqueous')
     screen.getByText('Deionized water')
     screen.getByText('Viscous')
