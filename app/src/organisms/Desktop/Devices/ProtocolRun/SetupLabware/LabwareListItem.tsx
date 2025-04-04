@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Btn,
   Tag,
+  Box,
   COLORS,
   DeckInfoLabel,
   ListButton,
@@ -35,7 +36,6 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
 import { ToggleButton } from '/app/atoms/buttons'
-import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type { MouseEvent } from 'react'
@@ -223,7 +223,12 @@ export function LabwareListItem(
   }
 
   return (
-    <ListButton onClick={onClick} type="noActive" gridGap={SPACING.spacing24}>
+    <ListButton
+      onClick={onClick}
+      type="noActive"
+      gridGap={SPACING.spacing24}
+      padding={SPACING.spacing12}
+    >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing2}
@@ -312,7 +317,11 @@ export function LabwareListItem(
                   </Flex>
                 </Flex>
                 {index !== labwareLiquidRenderInfo.length - 1 ? (
-                  <Divider marginY="0" width="100%" />
+                  <Box
+                    borderBottom={`1px solid ${String(COLORS.grey40)}`}
+                    marginY="0"
+                    width="100%"
+                  />
                 ) : null}
               </>
             ))}

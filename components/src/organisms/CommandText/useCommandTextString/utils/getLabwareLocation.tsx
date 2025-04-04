@@ -80,7 +80,10 @@ export function getLabwareLocationFromSequence(
           ...acc,
           slotName: sequenceItem.logicalLocationName,
         }
-      } else if (sequenceItem.kind === 'onCutoutFixture') {
+      } else if (
+        sequenceItem.kind === 'onCutoutFixture' &&
+        acc.slotName == null
+      ) {
         return {
           ...acc,
           slotName: getCutoutDisplayName(sequenceItem.cutoutId as CutoutId),
@@ -98,10 +101,7 @@ export function getLabwareLocationFromSequence(
           ...acc,
           slotName: sequenceItem.addressableAreaName,
         }
-      } else if (
-        sequenceItem.kind === 'onAddressableArea' &&
-        index === locationSequence.length - 1
-      ) {
+      } else if (sequenceItem.kind === 'onAddressableArea') {
         const slotName = getSlotFromAddressableAreaName(
           sequenceItem.addressableAreaName as AddressableAreaName
         )

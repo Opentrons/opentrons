@@ -65,7 +65,8 @@ export function LabwareStackContents(
             key={index}
             radioButtonType="small"
             buttonLabel={truncateString(labware.displayName, MAX_CHARS)}
-            buttonValue={index}
+            buttonValue={labware.labwareId}
+            id={labware.labwareId}
             isSelected={isSelected}
             tagText={(labwareInStack.length - index).toString()}
             maxLines={2}
