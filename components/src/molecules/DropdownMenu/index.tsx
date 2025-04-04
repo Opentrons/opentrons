@@ -194,7 +194,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     align-items: ${ALIGN_CENTER};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
     width: ${width};
-    height: 2.25rem;
+    min-height: 2.25rem;
+    height: auto;
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
@@ -251,6 +252,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           onBlur={onBlur}
           css={DROPDOWN_STYLE}
           tabIndex={tabIndex}
+          data-testid="dropdown-container"
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             {currentOption.liquidColor != null ? (
@@ -269,7 +271,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             >
               <StyledText
                 desktopStyle="captionRegular"
-                css={LINE_CLAMP_TEXT_STYLE(1)}
+                css={LINE_CLAMP_TEXT_STYLE(3)}
               >
                 {currentOption.name}
               </StyledText>
@@ -331,6 +333,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                       <StyledText
                         desktopStyle="captionRegular"
                         style={{ whiteSpace: 'wrap' }}
+                        data-testid="dropdown-option-text"
                       >
                         {option.name}
                       </StyledText>

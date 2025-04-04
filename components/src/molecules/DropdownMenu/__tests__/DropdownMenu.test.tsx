@@ -19,10 +19,6 @@ const mockOptions: DropdownOption[] = [
 
 const mockOnClick = vi.fn()
 
-const render = (props: ComponentProps<typeof DropdownMenu>) => {
-  return renderWithProviders(<DropdownMenu {...props} />)
-}
-
 describe('DropdownMenu', () => {
   let props: ComponentProps<typeof DropdownMenu>
 
@@ -36,7 +32,7 @@ describe('DropdownMenu', () => {
   })
 
   it('renders with default props', () => {
-    render(props)
+    renderWithProviders(<DropdownMenu {...props} />)
     expect(screen.getByText('Option 1')).toBeInTheDocument()
   })
 
@@ -50,7 +46,7 @@ describe('DropdownMenu', () => {
       caption: 'Select an option',
       tooltipText: 'This is a tooltip',
     }
-    render(props)
+    renderWithProviders(<DropdownMenu {...props} />)
 
     expect(screen.getByText('Custom Dropdown')).toBeInTheDocument()
     expect(screen.getByText('Select an option')).toBeInTheDocument()
@@ -58,7 +54,7 @@ describe('DropdownMenu', () => {
   })
 
   it('renders default, opens, displays options (including long text), and handles selection', () => {
-    render(props)
+    renderWithProviders(<DropdownMenu {...props} />)
     const trigger = screen.getByText('Option 1')
     expect(trigger).toBeInTheDocument()
 
@@ -86,11 +82,59 @@ describe('DropdownMenu', () => {
   })
 
   it('calls onClick when an option is selected', () => {
-    render(props)
+    renderWithProviders(<DropdownMenu {...props} />)
     fireEvent.click(screen.getByText('Option 1'))
     fireEvent.click(screen.getByText('Option 2'))
 
     expect(mockOnClick).toHaveBeenCalledWith('option2')
+  })
+
+  it('has flexible height to accommodate longer text content', () => {
+    // Use a long option as the current option
+    props.currentOption = mockOptions[3]
+
+    renderWithProviders(<DropdownMenu {...props} />)
+
+    // Get the dropdown container using data-testid
+    const dropdownContainer = screen.getByTestId('dropdown-container')
+
+    // Check that it has the correct height styles
+    expect(dropdownContainer).toHaveStyle({
+      'min-height': '2.25rem',
+      height: 'auto',
+    })
+  })
+
+  it('applies whiteSpace: wrap style to option text in dropdown', () => {
+    renderWithProviders(<DropdownMenu {...props} />)
+
+    // Open the dropdown
+    fireEvent.click(screen.getByText('Option 1'))
+
+    // Directly test the style on line 335 by getting the long option text
+    const longOption = screen.getByText(
+      'Option with a very long name that would normally be truncated'
+    )
+
+    // Verify that it has the white-space: wrap style
+    expect(longOption).toHaveStyle('white-space: wrap')
+  })
+
+  // Specifically target line 335: style={{ whiteSpace: 'wrap' }}
+  it('applies whiteSpace: wrap style to option text', () => {
+    renderWithProviders(<DropdownMenu {...props} />)
+
+    // Open the dropdown
+    fireEvent.click(screen.getByText('Option 1'))
+
+    // Wait for dropdown options to appear
+    const optionTexts = screen.getAllByTestId('dropdown-option-text')
+
+    // Each option text should have the white-space: wrap style
+    optionTexts.forEach(optionText => {
+      // The inline style property we're testing in line 335
+      expect(optionText).toHaveStyle('white-space: wrap')
+    })
   })
 
   // ToDo (kk:08/13/2024) activate when jsdom is updated
