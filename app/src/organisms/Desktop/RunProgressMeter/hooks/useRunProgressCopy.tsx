@@ -139,13 +139,13 @@ export function useRunProgressCopy({
   }
 
   reportModuleCommand({
-    runId: runId,
-    action: runCommandDetails?.data?.commandType,
+    runId: runId!,
+    action: runCommandDetails?.data?.commandType!,
     result: {
-      status: runCommandDetails?.data?.status,
+      status: runCommandDetails?.data?.status!,
       data: runCommandDetails?.data?.result
     },
-    params: runCommandDetails?.data?.params,
+    params: runCommandDetails?.data?.params!,
     errorDetails: error ?? "" 
   });
 

@@ -66,6 +66,7 @@ export const TemperatureModuleSlideout = (
           reportModuleCommand({
             moduleType: module.moduleModel,
             action: saveTempCommand.commandType,
+            result: {status: 'failed', data: null},
             errorDetails: e.message,
             serialNumber: module.serialNumber,
             temperature: temperatureValue,

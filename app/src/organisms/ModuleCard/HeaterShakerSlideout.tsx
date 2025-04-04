@@ -73,6 +73,7 @@ export const HeaterShakerSlideout = (
           reportModuleCommand({
             moduleType: module.moduleModel,
             action: setTempCommand.commandType,
+            result: {status: 'failed', data: null},
             errorDetails: e.message,
             serialNumber: module.serialNumber,
             temperature: hsValue,

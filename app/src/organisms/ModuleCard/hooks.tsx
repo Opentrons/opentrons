@@ -85,6 +85,7 @@ export function useLatchControls(module: AttachedModule): LatchControls {
           moduleType: module.moduleModel,
           action: latchCommand.commandType,
           errorDetails: e.message,
+          result: {status: 'failed', data: null},
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
         });
@@ -241,6 +242,7 @@ export function useModuleOverflowMenu(
         reportModuleCommand({
           moduleType: module.moduleModel,
           action: deactivateCommand.commandType,
+          result: {status: 'failed', data: null},
           errorDetails: e.message,
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion
@@ -279,6 +281,7 @@ export function useModuleOverflowMenu(
           moduleType: module.moduleModel,
           action: lidCommand.commandType,
           errorDetails: e.message,
+          result: {status: 'failed', data: null},
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
         });
