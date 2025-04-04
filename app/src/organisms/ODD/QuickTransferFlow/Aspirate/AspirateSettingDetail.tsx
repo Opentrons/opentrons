@@ -4,23 +4,13 @@ import { Mix } from '../QuickTransferAdvancedSettings/Mix'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
+import { SETTING_OPTIONS } from '../Aspirate'
 import type { ComponentType, Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-
-// ToDo(kk:04/03/2025) add pre-wet tip
-const SETTING_OPTIONS = {
-  ASPIRATE_FLOW_RATE: 'aspirate_flow_rate',
-  ASPIRATE_TIP_POSITION: 'aspirate_tip_position',
-  ASPIRATE_MIX: 'aspirate_mix',
-  ASPIRATE_DELAY: 'aspirate_delay',
-  ASPIRATE_TOUCH_TIP: 'aspirate_touch_tip',
-  ASPIRATE_AIR_GAP: 'aspirate_air_gap',
-} as const
-
-type SettingOption = typeof SETTING_OPTIONS[keyof typeof SETTING_OPTIONS]
+import type { SettingOption } from '../Aspirate'
 
 interface CommonSettingProps {
   kind: 'aspirate'

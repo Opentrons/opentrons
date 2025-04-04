@@ -18,6 +18,20 @@ import type {
 
 const PADDING_TOP_FOR_NAV = '12rem'
 
+export const SETTING_OPTIONS = {
+  ASPIRATE_FLOW_RATE: 'aspirate_flow_rate',
+  ASPIRATE_TIP_POSITION: 'aspirate_tip_position',
+  ASPIRATE_SUBMERGE: 'aspirate_submerge',
+  PRE_WET_TIP: 'pre_wet_tip',
+  ASPIRATE_MIX: 'aspirate_mix',
+  ASPIRATE_DELAY: 'aspirate_delay',
+  ASPIRATE_RETRACT: 'aspirate_retract',
+  ASPIRATE_TOUCH_TIP: 'aspirate_touch_tip',
+  ASPIRATE_AIR_GAP: 'aspirate_air_gap',
+} as const
+
+export type SettingOption = typeof SETTING_OPTIONS[keyof typeof SETTING_OPTIONS]
+
 interface AspirateProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
@@ -26,7 +40,9 @@ interface AspirateProps {
 export function Aspirate(props: AspirateProps): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
-  const [selectedSetting, setSelectedSetting] = useState<string | null>(null)
+  const [selectedSetting, setSelectedSetting] = useState<SettingOption | null>(
+    null
+  )
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   useEffect(() => {

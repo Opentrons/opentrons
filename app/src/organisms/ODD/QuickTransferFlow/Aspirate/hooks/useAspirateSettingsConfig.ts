@@ -1,12 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { ACTIONS } from '../../constants'
+import { SETTING_OPTIONS } from '../../Aspirate'
 
 import type { Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../../types'
+import type { SettingOption } from '../../Aspirate'
 
 export interface SettingItem {
   option: string
@@ -19,7 +21,7 @@ export interface SettingItem {
 interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
-  setSelectedSetting: (setting: string | null) => void
+  setSelectedSetting: (setting: SettingOption | null) => void
 }
 
 export function useAspirateSettingsConfig(
@@ -31,18 +33,6 @@ export function useAspirateSettingsConfig(
 
   const sourceIsReservoir =
     state.source.metadata.displayCategory === 'reservoir'
-
-  const SETTING_OPTIONS = {
-    ASPIRATE_FLOW_RATE: 'aspirate_flow_rate',
-    ASPIRATE_TIP_POSITION: 'aspirate_tip_position',
-    ASPIRATE_SUBMERGE: 'aspirate_submerge',
-    PRE_WET_TIP: 'pre_wet_tip',
-    ASPIRATE_MIX: 'aspirate_mix',
-    ASPIRATE_DELAY: 'aspirate_delay',
-    ASPIRATE_RETRACT: 'aspirate_retract',
-    ASPIRATE_TOUCH_TIP: 'aspirate_touch_tip',
-    ASPIRATE_AIR_GAP: 'aspirate_air_gap',
-  } as const
 
   const aspirateSettingsItems: SettingItem[] = [
     {
