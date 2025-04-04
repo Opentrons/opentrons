@@ -264,6 +264,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       return buildManualMoveLwAndSkip()
     case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
       return buildManualReplaceLwAndRetry()
     case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
       return buildManualReplaceStackerAndRetry()

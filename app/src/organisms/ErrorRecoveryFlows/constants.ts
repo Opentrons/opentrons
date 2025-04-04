@@ -186,6 +186,21 @@ export const RECOVERY_MAP = {
       SKIP: 'skip',
     },
   },
+  HOPPER_MANUAL_LOAD_AND_RETRY: {
+    ROUTE: 'hopper-manual-load-in-stacker-and-retry',
+    STEPS: {
+      CONFIRM_RETRY: 'confirm-retry',
+      RETRY: 'retry',
+    },
+  },
+  HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP: {
+    ROUTE: 'hopper-manual-load-in-shuttle-and-skip',
+    STEPS: {
+      MANUAL_REPLACE: 'manual-replace',
+      CONFIRM_RETRY: 'confirm-retry',
+      SKIP: 'skip',
+    },
+  },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_STEP: {
     ROUTE: 'retry-step',
