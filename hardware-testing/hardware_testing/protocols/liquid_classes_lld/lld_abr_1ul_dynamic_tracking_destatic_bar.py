@@ -7,7 +7,7 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_api import (
     ParameterContext,
-    ProtocolContext as TheRealProtocolContext,
+    ProtocolContext,
     InstrumentContext,
     Labware,
     Well,
@@ -23,7 +23,7 @@ from opentrons_shared_data.deck import (
     get_calibration_square_position_in_slot,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    PositionReference,
+    PositionReference as PosRef,
 )
 from opentrons_shared_data.pipette.types import LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
 
@@ -32,13 +32,10 @@ metadata = {"protocolName": "LLD ABR 1uL Dynamic-Tracking De-Static Bar"}
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 # TODO: (sigler) add this to all other hardware-testing protocols
-#       because it is import we internally stay up-to-date with
-#       the latest behaviors (even when it's a pain...)
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
 
 
-# this protocol's goal is to compare the performance of different
-# pipetting "strategies"
+# NOTE: protocol's goal is to COMPARE the performance of STRATEGIES
 class _Strategy(str, Enum):
     DYE_M = "MENISCUS"
     DYE_LLD_M = "LLD-MENISCUS"
@@ -53,6 +50,8 @@ class _Strategy(str, Enum):
         return key in self.value
 
 
+# NOTE: strategies alternate across destination plate rows, so that during
+#       runtime strategies are not grouped by time (pipette goes down columns)
 TEST_MATRIX: Dict[str, Dict[str, _Strategy]] = {
     "A": {"aspirate": _Strategy.DYE_LLD_TIP_M, "dispense": _Strategy.DYE_M},
     "B": {"aspirate": _Strategy.DYE_M, "dispense": _Strategy.DYE_M},
@@ -124,26 +123,9 @@ DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
 PLATE_LID_LOAD_NAME = "plate_lid"
 
 # global so we don't need to pass it around everywhere
+_test_volumes: List[float] = []
 _inaccessible_tip_racks: List[Labware] = []
 _transfer_class_by_strategy: Dict[Tuple[_Strategy, _Strategy], TransferClass] = {}
-
-
-# NOTE: (sigler) here we duplicate the functionality of ProtocolContext.params.
-#       However, here we create a custom _ProtocolContext.my_params
-#       so that type-checker and auto-complete can be used (nice).
-@dataclass(frozen=True)
-class _ProtocolParams:
-    just_baseline: bool
-    volumes: List[float]
-    columns: int
-    submerge_depth: float
-    well_bottom_mm: float
-    overlap_error: float
-    test_gripper: bool
-
-
-class _ProtocolContext(TheRealProtocolContext):
-    my_params: _ProtocolParams
 
 
 @dataclass
@@ -177,11 +159,11 @@ DYES: Dict[str, _Dye] = {
 
 
 def _load_liquid_diluent(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     diluent_reservoir: Labware,
 ) -> List[Well]:
     # DILUENT (or BASELINE)
-    total_photo_wells = len(ctx.my_params.volumes) * ctx.my_params.columns * 8
+    total_photo_wells = len(_test_volumes) * ctx.params.columns * 8  # type: ignore[attr-defined]
     total_diluent_needed = MVS_TARGET_UL * total_photo_wells  # worst case is 200uL
     dead_vol_diluent = DEAD_VOL_PER_LABWARE[diluent_reservoir.load_name]
     # NOTE: (sigler) avoid the top of the well by using 90% of the well's capacity
@@ -199,14 +181,14 @@ def _load_liquid_diluent(
 
 
 def _load_liquid_red_dye(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     deep_well: Labware,
 ) -> None:
     # NOTE: there could be just 1x dye used for all volumes,
     #       or 5x different dyes. Also, volumes could repeat
     pcr_dead_ul = DEAD_VOL_PER_LABWARE[SRC_LABWARE]
-    num_photo_wells = ctx.my_params.columns * 8
-    for ul in ctx.my_params.volumes:
+    num_photo_wells = ctx.params.columns * 8  # type: ignore[attr-defined]
+    for ul in _test_volumes:
         dye = DYES[_Dye.name_for_ul(ul)]
         column_ul = (num_photo_wells * ul) + (8 * pcr_dead_ul)
         dye.ul += column_ul
@@ -222,7 +204,7 @@ def _load_liquid_red_dye(
 
 
 def _load_all_liquids(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     pcr_labware: Optional[Labware],
     dye_labware: Optional[Labware],
     res_labware: Labware,
@@ -242,24 +224,24 @@ def _load_all_liquids(
     return diluent_wells_in_use
 
 
-def _load_plate_stack(ctx: _ProtocolContext) -> List[Labware]:
+def _load_plate_stack(ctx: ProtocolContext) -> List[Labware]:
     """Load a stack of Corning 96-well flat-bottom plates and lids.
 
     The number of plates is determined by the number of test volumes provided.
     """
     stack: List[Labware] = []
-    for i in range(len(ctx.my_params.volumes)):
+    for i in range(len(_test_volumes)):
         if not len(stack):
             stack.append(ctx.load_labware(PLATE_LID_LOAD_NAME, location=SLOTS["stack"]))
         else:
             stack.append(stack[-1].load_labware(PLATE_LID_LOAD_NAME))
         stack.append(stack[-1].load_labware(DST_LABWARE))
-    assert max(ctx.my_params.volumes) < min(stack[-1]["A1"].max_volume, MVS_MAX_UL)
+    assert max(_test_volumes) < min(stack[-1]["A1"].max_volume, MVS_MAX_UL)
     return stack
 
 
 def _load_pipettes(
-    ctx: _ProtocolContext, racks: List[Labware]
+    ctx: ProtocolContext, racks: List[Labware]
 ) -> Tuple[InstrumentContext, Optional[InstrumentContext]]:
     """Load a P1000M and (optional) P50S."""
     diluent_pipette = ctx.load_instrument(
@@ -273,7 +255,7 @@ def _load_pipettes(
         ],
     )
     pipette: Optional[InstrumentContext] = None
-    if not ctx.my_params.just_baseline:
+    if not ctx.params.just_baseline:  # type: ignore[attr-defined]
         pipette = ctx.load_instrument(
             instrument_name=f"flex_1channel_{PIP_VOLUME}",
             mount="left",
@@ -282,7 +264,7 @@ def _load_pipettes(
     return diluent_pipette, pipette
 
 
-def _load_tip_racks(ctx: _ProtocolContext) -> List[Labware]:
+def _load_tip_racks(ctx: ProtocolContext) -> List[Labware]:
     """Loads all tip-racks on deck, but only returns the accessible ones.
 
     Inaccessible racks are stored globally for use during pick-up-tip.
@@ -311,12 +293,12 @@ def _load_tip_racks(ctx: _ProtocolContext) -> List[Labware]:
 
 
 def _load_all_non_stacked_labware(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
 ) -> Tuple[Labware, Optional[Labware], Optional[Labware]]:
     """This just loads the reservoir, pcr plate, and deep-well."""
     deep_well: Optional[Labware] = None
     pcr_plate: Optional[Labware] = None
-    if not ctx.my_params.just_baseline:
+    if not ctx.params.just_baseline:  # type: ignore[attr-defined]
         deep_well = ctx.load_labware(
             load_name=DYE_LABWARE,
             location=SLOTS["dye"],
@@ -325,7 +307,7 @@ def _load_all_non_stacked_labware(
             load_name=SRC_LABWARE,
             location=SLOTS["pcr"],
         )
-        assert max(ctx.my_params.volumes) < min(pcr_plate["A1"].max_volume, MVS_MAX_UL)
+        assert max(_test_volumes) < min(pcr_plate["A1"].max_volume, MVS_MAX_UL)
     diluent_reservoir = ctx.load_labware(
         load_name=DILUENT_LABWARE,
         location=SLOTS["res"],
@@ -334,29 +316,32 @@ def _load_all_non_stacked_labware(
 
 
 def _pick_up_tip_and_manage_racks(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     pipette: InstrumentContext,
-    params: _ProtocolParams,
 ) -> None:
     """Replace the 1st tip-rack if it's empty and a spare is available, then pick-up-tip."""
     assert not pipette.has_tip
     is_first_rack_empty = not pipette.tip_racks[0].next_tip()
-    should_swap_rack_if_available = params.test_gripper or is_first_rack_empty
-    if should_swap_rack_if_available and len(_inaccessible_tip_racks):
+    should_swap = ctx.params.test_gripper or is_first_rack_empty  # type: ignore[attr-defined]
+    if should_swap and len(_inaccessible_tip_racks):
         replacement_rack = _inaccessible_tip_racks.pop(0)  # NOTE: pop! (global)
         _gripper_rotate_tip_rack_out(ctx, pipette.tip_racks[0], replacement_rack)
         pipette.tip_racks = [replacement_rack] + pipette.tip_racks[1:]
         pipette.reset_tipracks()
-    if params.test_gripper:
+    if ctx.params.test_gripper:  # type: ignore[attr-defined]
         return
     pipette.pick_up_tip()
     # NOTE: (sigler) calibrating every low-volume tip, because their alignment
     #        is critical for us to interpret the results of this test
-    _calibrate_tip_overlap(ctx, pipette, artificial_error=params.overlap_error)
+    _calibrate_tip_overlap(
+        ctx,
+        pipette,
+        artificial_error=ctx.params.overlap_error,  # type: ignore[attr-defined]
+    )
 
 
 def _gripper_rotate_tip_rack_out(
-    ctx: _ProtocolContext, old_rack: Labware, new_rack: Labware
+    ctx: ProtocolContext, old_rack: Labware, new_rack: Labware
 ) -> None:
     accessible_slot = str(old_rack.parent)  # somewhere pick-up-tip can happen
     inaccessible_slot = str(new_rack.parent)  # staging slot
@@ -366,7 +351,7 @@ def _gripper_rotate_tip_rack_out(
 
 
 def _gripper_move_labware_to_done_slot(
-    ctx: _ProtocolContext, lw: Labware, stack_done: List[Labware]
+    ctx: ProtocolContext, lw: Labware, stack_done: List[Labware]
 ) -> None:
     """Move labware to the done slot, regardless of what is already there."""
     done_dst: Union[str, Labware] = (
@@ -393,8 +378,8 @@ def _modify_transfer_class_touch_tip(
 
 def _modify_transfer_class_position(
     tc: TransferProperties,
-    aspirate: Optional[Tuple[PositionReference, float]],
-    dispense: Optional[Tuple[PositionReference, float]],
+    aspirate: Optional[Tuple[PosRef, float]],
+    dispense: Optional[Tuple[PosRef, float]],
 ) -> None:
     if aspirate:
         tc.aspirate.position_reference = aspirate[0]
@@ -409,15 +394,14 @@ def _modify_transfer_class_position_meniscus(
 ) -> None:
     _modify_transfer_class_position(
         tc,
-        aspirate=(PositionReference.LIQUID_MENISCUS, submerge_depth),
-        dispense=(PositionReference.LIQUID_MENISCUS, NON_CONTACT_DISPENSE_MM),
+        aspirate=(PosRef.LIQUID_MENISCUS, submerge_depth),
+        dispense=(PosRef.LIQUID_MENISCUS, NON_CONTACT_DISPENSE_MM),
     )
 
 
 def _get_transfer_class_for_strategies(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     pipette: InstrumentContext,
-    params: _ProtocolParams,
     strategies: Tuple[_Strategy, _Strategy],
 ) -> TransferClass:
     """Retrieve transfer-class, given a pipette, params, and a strategy.
@@ -443,34 +427,40 @@ def _get_transfer_class_for_strategies(
     match strategies:
         # NOTE: (sigler) all dye MENISCI strategies use the same settings
         case (_Strategy.DYE_M, _Strategy.DYE_M):  # noqa: E211
-            _modify_transfer_class_position_meniscus(tc_editable, params.submerge_depth)
+            _modify_transfer_class_position_meniscus(
+                tc_editable, ctx.params.submerge_depth  # type: ignore[attr-defined]
+            )
         case (_Strategy.DYE_LLD_M, _Strategy.DYE_M):  # noqa: E211
-            _modify_transfer_class_position_meniscus(tc_editable, params.submerge_depth)
+            _modify_transfer_class_position_meniscus(
+                tc_editable, ctx.params.submerge_depth  # type: ignore[attr-defined]
+            )
         case (_Strategy.DYE_LLD_TIP_M, _Strategy.DYE_M):  # noqa: E211
-            _modify_transfer_class_position_meniscus(tc_editable, params.submerge_depth)
+            _modify_transfer_class_position_meniscus(
+                tc_editable, ctx.params.submerge_depth  # type: ignore[attr-defined]
+            )
         case (_Strategy.DYE_B, _Strategy.DYE_B):  # noqa: E211
             _modify_transfer_class_position(
                 tc_editable,
-                aspirate=(PositionReference.WELL_BOTTOM, params.well_bottom_mm),
-                dispense=(PositionReference.WELL_BOTTOM, DEFAULT_WELL_BOTTOM_MM),
+                aspirate=(PosRef.WELL_BOTTOM, ctx.params.well_bottom_mm),  # type: ignore[attr-defined]
+                dispense=(PosRef.WELL_BOTTOM, DEFAULT_WELL_BOTTOM_MM),
             )
         case (_Strategy.DYE_B, _Strategy.DYE_T):  # noqa: E211
             _modify_transfer_class_position(
                 tc_editable,
-                aspirate=(PositionReference.WELL_BOTTOM, params.well_bottom_mm),
-                dispense=(PositionReference.WELL_TOP, 0.0),
+                aspirate=(PosRef.WELL_BOTTOM, ctx.params.well_bottom_mm),  # type: ignore[attr-defined]
+                dispense=(PosRef.WELL_TOP, 0.0),
             )
         case (_Strategy.DYE_SRC, _Strategy.DYE_SRC):  # noqa: E211
             _modify_transfer_class_position(
                 tc_editable,
-                aspirate=(PositionReference.LIQUID_MENISCUS, DEFAULT_SUBMERGE_MM),
-                dispense=(PositionReference.LIQUID_MENISCUS, NON_CONTACT_DISPENSE_MM),
+                aspirate=(PosRef.LIQUID_MENISCUS, DEFAULT_SUBMERGE_MM),
+                dispense=(PosRef.LIQUID_MENISCUS, NON_CONTACT_DISPENSE_MM),
             )
         case (_Strategy.DILUENT, _Strategy.DILUENT):  # noqa: E211
             _modify_transfer_class_position(
                 tc_editable,
-                aspirate=(PositionReference.LIQUID_MENISCUS, DEFAULT_SUBMERGE_MM),
-                dispense=(PositionReference.LIQUID_MENISCUS, NON_CONTACT_DISPENSE_MM),
+                aspirate=(PosRef.LIQUID_MENISCUS, DEFAULT_SUBMERGE_MM),
+                dispense=(PosRef.LIQUID_MENISCUS, NON_CONTACT_DISPENSE_MM),
             )
         case _:
             raise ValueError(
@@ -481,7 +471,7 @@ def _get_transfer_class_for_strategies(
 
 
 def _transfer_diluent_or_baseline(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     multi: InstrumentContext,
     labware: Labware,
     diluent_wells_in_use: List[Well],
@@ -500,7 +490,7 @@ def _transfer_diluent_or_baseline(
     assert multi.max_volume >= MVS_TARGET_UL
     assert red_dye_ul < MVS_TARGET_UL
     diluent_well = diluent_wells_in_use[0]
-    cols = columns if columns else ctx.my_params.columns
+    cols = columns if columns else ctx.params.columns  # type: ignore[attr-defined]
     for i, col in enumerate(labware.columns()[:cols]):
         if is_init:
             if alternate_ul:
@@ -517,7 +507,7 @@ def _transfer_diluent_or_baseline(
             if not ctx.is_simulating():
                 multi.require_liquid_presence(diluent_well)  # NOTE: probe!
         t_cls = _get_transfer_class_for_strategies(
-            ctx, multi, ctx.my_params, strategies=(_Strategy.DILUENT, _Strategy.DILUENT)
+            ctx, multi, strategies=(_Strategy.DILUENT, _Strategy.DILUENT)
         )
         multi.transfer_liquid(t_cls, diluent_ul, diluent_well, col, new_tip="never")
         # is this well running low?
@@ -535,7 +525,7 @@ def _transfer_diluent_or_baseline(
 
 
 def _transfer_diluent_for_empty_plate(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     multi: InstrumentContext,
     labware: Labware,
     diluent_wells_in_use: List[Well],
@@ -558,7 +548,7 @@ def _transfer_diluent_for_empty_plate(
 
 
 def _transfer_diluent_for_full_plate(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     multi: InstrumentContext,
     labware: Labware,
     diluent_wells_in_use: List[Well],
@@ -576,7 +566,7 @@ def _transfer_diluent_for_full_plate(
 
 
 def _transfer_just_baseline(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     multi: InstrumentContext,
     labware: Labware,
     diluent_wells_in_use: List[Well],
@@ -597,14 +587,14 @@ def _transfer_just_baseline(
 
 
 def _transfer_dye_to_pcr_column(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     pipette: InstrumentContext,
     column_idx: int,
 ) -> None:
     transfer_class = _get_transfer_class_for_strategies(
-        ctx, pipette, ctx.my_params, strategies=(_Strategy.DYE_SRC, _Strategy.DYE_SRC)
+        ctx, pipette, strategies=(_Strategy.DYE_SRC, _Strategy.DYE_SRC)
     )
-    target_ul = ctx.my_params.volumes[column_idx]
+    target_ul = _test_volumes[column_idx]
 
     dye = DYES[_Dye.name_for_ul(target_ul)]
     dye_labware = cast(Labware, ctx.deck[SLOTS["dye"]])
@@ -613,10 +603,10 @@ def _transfer_dye_to_pcr_column(
     pcr_plate = cast(Labware, ctx.deck[SLOTS["pcr"]])
     column = pcr_plate.columns()[column_idx]
     column_ul_per_well = DEAD_VOL_PER_LABWARE[SRC_LABWARE] + (
-        target_ul * ctx.my_params.columns
+        target_ul * ctx.params.columns  # type: ignore[attr-defined]
     )
 
-    _pick_up_tip_and_manage_racks(ctx, pipette, ctx.my_params)
+    _pick_up_tip_and_manage_racks(ctx, pipette)
     if not ctx.is_simulating():
         pipette.require_liquid_presence(dye_well)
     pipette.transfer_liquid(
@@ -630,13 +620,13 @@ def _transfer_dye_to_pcr_column(
 
 
 def _transfer_dye_to_photo_plate(
-    ctx: _ProtocolContext,
+    ctx: ProtocolContext,
     pipette: InstrumentContext,
     src: Well,
     dst: Well,
 ) -> None:
     # lookup plate volume based on which column is the dye source
-    trial_ul: float = ctx.my_params.volumes[int(src.well_name[1:]) - 1]
+    trial_ul: float = _test_volumes[int(src.well_name[1:]) - 1]
     assert (
         dst.current_liquid_volume() > 0.0
     ), f"(dst={dst.well_name}) must have diluent already added before adding red dye"
@@ -650,7 +640,7 @@ def _transfer_dye_to_photo_plate(
     # NEW TIP
     if pipette.has_tip:
         pipette.drop_tip()
-    _pick_up_tip_and_manage_racks(ctx, pipette, ctx.my_params)
+    _pick_up_tip_and_manage_racks(ctx, pipette)
 
     # LLD (optional)
     if strategy["aspirate"].includes("LLD"):
@@ -662,13 +652,12 @@ def _transfer_dye_to_photo_plate(
         #       identical conditions to gain more insight into what is happening.
         if strategy["aspirate"].includes("TIP"):
             pipette.drop_tip()
-            _pick_up_tip_and_manage_racks(ctx, pipette, ctx.my_params)
+            _pick_up_tip_and_manage_racks(ctx, pipette)
 
     # RUN
     t_cls = _get_transfer_class_for_strategies(
         ctx,
         pipette,
-        ctx.my_params,
         strategies=(strategy["aspirate"], strategy["dispense"]),
     )
     pipette.transfer_liquid(t_cls, trial_ul, src, dst, new_tip="never")
@@ -724,8 +713,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="just_baseline", display_name="just_baseline", default=False
     )
     parameters.add_int(
-        variable_name="columns_to_test",
-        display_name="columns_to_test",
+        variable_name="columns",
+        display_name="columns",
         minimum=1,
         maximum=12,
         default=12,  # default to a full plate
@@ -735,36 +724,21 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-def _gather_parameters(ctx: TheRealProtocolContext) -> _ProtocolContext:
+def _gather_parameters(ctx: ProtocolContext) -> None:
     # NOTE: storing dye source locations in the globally stored DYE dict
     for dye_name, dye in DYES.items():
         dye.well_name = getattr(ctx.params, f"dye_{dye_name.lower()}_well")
-    just_baseline = ctx.params.just_baseline  # type: ignore[attr-defined]
-    if just_baseline:
-        volumes = [0.0]  # NOTE: ignoring volume parameters if just-baseline
+    if ctx.params.just_baseline:  # type: ignore[attr-defined]
+        _test_volumes.append(0.0)  # NOTE: ignoring volume parameters if just-baseline
     else:
-        volumes = [
-            float(getattr(ctx.params, f"volume_{i}"))
-            for i in range(MAX_NUMBER_OF_PLATES)
-            if getattr(ctx.params, f"volume_{i}") > 0
-        ]
-    # FIXME: (sigler) replace with just passing around actual "ctx.params"
-    #        but then using global Enum class as variable names
-    params = _ProtocolParams(
-        just_baseline=just_baseline,
-        volumes=volumes,
-        columns=ctx.params.columns_to_test,  # type: ignore[attr-defined]
-        submerge_depth=ctx.params.submerge_depth,  # type: ignore[attr-defined]
-        well_bottom_mm=ctx.params.well_bottom_mm,  # type: ignore[attr-defined]
-        overlap_error=ctx.params.overlap_error,  # type: ignore[attr-defined]
-        test_gripper=ctx.params.test_gripper,  # type: ignore[attr-defined]
-    )
-    setattr(ctx, "my_params", params)
-    return cast(_ProtocolContext, ctx)
+        for i in range(MAX_NUMBER_OF_PLATES):
+            if getattr(ctx.params, f"volume_{i}") > 0:
+                vol = float(getattr(ctx.params, f"volume_{i}"))
+                _test_volumes.append(vol)
 
 
 def _calibrate_tip_overlap(
-    ctx: _ProtocolContext, pipette: InstrumentContext, artificial_error: float
+    ctx: ProtocolContext, pipette: InstrumentContext, artificial_error: float
 ) -> None:
     """Calibrate the currently attached tip's overlap with the pipette nozzle.
 
@@ -812,9 +786,9 @@ def _calibrate_tip_overlap(
     api.add_tip(pip_mount, tip_length=new_tip_length)
 
 
-def run(real_ctx: TheRealProtocolContext) -> None:
+def run(ctx: ProtocolContext) -> None:
     """Run."""
-    ctx = _gather_parameters(real_ctx)
+    _gather_parameters(ctx)
 
     # LABWARE, LIQUIDS, and PIPETTES
     ctx.load_trash_bin(SLOTS["trash"])
@@ -829,56 +803,59 @@ def run(real_ctx: TheRealProtocolContext) -> None:
         ctx, tip_racks_accessible  # NOTE: accessible tip-racks
     )
 
+    def _get_next_plate_from_stack() -> Labware:
+        _p = stack.pop()  # plate
+        assert _p.load_name == DST_LABWARE
+        ctx.move_labware(_p, SLOTS["empty_dst"], use_gripper=True)
+        return _p
+
+    def _remove_plate_to_other_stack(_p: Labware) -> None:
+        _lid = stack.pop()
+        assert _lid.load_name == PLATE_LID_LOAD_NAME
+        _gripper_move_labware_to_done_slot(ctx, _p, stack_done)
+        _gripper_move_labware_to_done_slot(ctx, _lid, stack_done)
+
     # JUST BASELINE
-    if ctx.my_params.just_baseline:
-        plate = stack.pop()
-        lid = stack.pop()
-        ctx.move_labware(plate, SLOTS["empty_dst"], use_gripper=True)
+    if ctx.params.just_baseline:  # type: ignore[attr-defined]
+        assert not ctx.params.test_gripper, f"test gripper and just baseline?"  # type: ignore[attr-defined]
+        plate = _get_next_plate_from_stack()
         _transfer_just_baseline(
             ctx,
             diluent_pipette,
             plate,
             diluent_src_wells,
         )
-        _gripper_move_labware_to_done_slot(ctx, plate, stack_done)
-        _gripper_move_labware_to_done_slot(ctx, lid, stack_done)
+        _remove_plate_to_other_stack(plate)
         return  # exit
 
     # FILL EACH PLATES in STACK
     assert test_pipette and labware_pcr and labware_dye
-    for i, ul in enumerate(ctx.my_params.volumes):
+    for i, ul in enumerate(_test_volumes):
 
-        # MOVE PLATE
-        plate = stack.pop()
-        lid = stack.pop()
-        ctx.move_labware(plate, SLOTS["empty_dst"], use_gripper=True)
+        plate = _get_next_plate_from_stack()
 
-        if not ctx.my_params.test_gripper:
+        if not ctx.params.test_gripper:  # type: ignore[attr-defined]
             # ADD DILUENT
             if ul < MVS_TARGET_UL:
                 diluent_src_wells = _transfer_diluent_for_empty_plate(
                     ctx, diluent_pipette, plate, diluent_src_wells, test_ul=ul
                 )
-
             # TRANSFER RED-DYE
             _transfer_dye_to_pcr_column(ctx, test_pipette, i)
             pcr_column = labware_pcr.columns()[i]
             for pcr_well in pcr_column:
                 row_letter = pcr_well.well_name[0]
                 photo_row = plate.rows_by_name()[row_letter]
-                for photo_well in photo_row[: ctx.my_params.columns]:
+                for photo_well in photo_row[: ctx.params.columns]:  # type: ignore[attr-defined]
                     _transfer_dye_to_photo_plate(
                         ctx, test_pipette, pcr_well, photo_well
                     )
-
             # ADD MORE DILUENT
             diluent_src_wells = _transfer_diluent_for_full_plate(
                 ctx, diluent_pipette, plate, diluent_src_wells
             )
 
-        # RE-STACK
-        _gripper_move_labware_to_done_slot(ctx, plate, stack_done)
-        _gripper_move_labware_to_done_slot(ctx, lid, stack_done)
+        _remove_plate_to_other_stack(plate)
 
     # DROP TIPS (just in case)
     if diluent_pipette.has_tip:
