@@ -1,7 +1,7 @@
 """LLD ABR 1ul Dynamic Tracking Destatic Bar."""
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Dict, Optional, Literal, Tuple, cast, Union
+from typing import List, Dict, Optional, Literal, Tuple, cast, Union, Any
 
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import OT3Mount
@@ -126,6 +126,7 @@ PLATE_LID_LOAD_NAME = "plate_lid"
 _test_volumes: List[float] = []
 _inaccessible_tip_racks: List[Labware] = []
 _transfer_class_by_strategy: Dict[Tuple[_Strategy, _Strategy], TransferClass] = {}
+_serial_port: Optional[Any] = None
 
 
 @dataclass
@@ -666,6 +667,15 @@ def _transfer_dye_to_photo_plate(
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
+    parameters.add_str(
+        variable_name="de_static_port",
+        display_name="de_static_port",
+        default="/dev/ttyUSB0",
+        choices=[
+            {"display_name": f"/dev/ttyUSB{i}", "value": f"/dev/ttyUSB{i}"}
+            for i in range(10)
+        ]
+    )
     for i in range(MAX_NUMBER_OF_PLATES):
         parameters.add_float(
             variable_name=f"volume_{i}",
@@ -786,9 +796,55 @@ def _calibrate_tip_overlap(
     api.add_tip(pip_mount, tip_length=new_tip_length)
 
 
+def _de_static_connect(ctx: ProtocolContext) -> None:
+    if ctx.is_simulating():
+        return
+    global _serial_port
+    assert _serial_port is None
+    from serial import Serial  # type: ignore[import]
+
+    _serial_port = Serial(
+        port=ctx.params.de_static_port,  # type: ignore[attr-defined]
+        baudrate=115200,
+    )
+    _serial_port.reset_output_buffer()
+    _serial_port.reset_input_buffer()
+    ack, enabled = _de_static_get_status(ctx)
+    assert ack
+    if enabled:
+        ctx.delay(seconds=1)
+        ack, enabled = _de_static_get_status(ctx)
+        assert ack and not enabled
+
+
+def _de_static_get_status(ctx: ProtocolContext) -> Tuple[bool, bool]:
+    if ctx.is_simulating():
+        return True, False
+    assert _serial_port is not None
+    _serial_port.write("?".encode("utf-8"))  # type: ignore[union-attr]
+    res = _serial_port.readline()  # type: ignore[union-attr]
+    status = res.decode("utf-8").strip().lower()
+    ack = bool(status and status in ["on", "off"])
+    enabled = bool(status == "on")
+    return ack, enabled
+
+
+def _de_static_for_1_second(ctx: ProtocolContext, retries: int = 3) -> None:
+    if ctx.is_simulating():
+        return
+    assert _serial_port is not None
+    _serial_port.write("enable".encode("utf-8"))  # type: ignore[union-attr]
+    ctx.delay(0.1)
+    ack, enabled = _de_static_get_status(ctx)
+    if not ack or not enabled and retries:
+        _de_static_for_1_second(ctx, retries - 1)
+    raise RuntimeError(f"unable to enable de-static bar (ack={ack}, enabled={enabled})")
+
+
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     _gather_parameters(ctx)
+    _de_static_connect(ctx)
 
     # LABWARE, LIQUIDS, and PIPETTES
     ctx.load_trash_bin(SLOTS["trash"])
@@ -862,3 +918,5 @@ def run(ctx: ProtocolContext) -> None:
         diluent_pipette.drop_tip()
     if test_pipette.has_tip:
         test_pipette.drop_tip()
+    if _serial_port is not None:
+        _serial_port.close()
