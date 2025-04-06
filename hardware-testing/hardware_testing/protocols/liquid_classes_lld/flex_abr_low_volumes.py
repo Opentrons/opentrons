@@ -1,4 +1,4 @@
-"""LLD ABR 1ul Dynamic Tracking Destatic Bar."""
+"""Flex ABR Low Volumes."""
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Dict, Optional, Literal, Tuple, cast, Union, Any
@@ -28,10 +28,9 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from opentrons_shared_data.pipette.types import LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
 
 
-metadata = {"protocolName": "LLD ABR 1uL Dynamic-Tracking De-Static Bar"}
+metadata = {"protocolName": "Flex ABR Low Volumes"}
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
-# TODO: (sigler) add this to all other hardware-testing protocols
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
 
 
@@ -71,8 +70,7 @@ DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "end"
 TIP_VOLUME = 50
 PIP_VOLUME = 50
 
-MAX_NUMBER_OF_PLATES = 4
-DEFAULT_TARGET_BY_PLATE = [1.0, 1.2, 1.5, 2.0, 5.0]
+DEFAULT_TARGET_BY_PLATE = [0.5, 1.0, 2.0, 5.0]  # maximum 4x plates
 
 DEFAULT_DYE_WELLS = ["A1", "B1", "C1", "D1", "E1", "F1"]
 
@@ -86,7 +84,6 @@ NON_CONTACT_DISPENSE_MM = float(LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z)  # 2m
 # hardcoded distances for when pressure-probing the calibration square
 PROBE_START_HEIGHT_ABOVE_EXPECTED_MM = 10.0
 PROBE_OVERSHOOT_BELOW_EXPECTED_MM = 5.0
-EXPECTED_PROBE_Z_POSITION_MM = 0.0  # NOTE: the calibration square in "empty" slot
 
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
@@ -690,11 +687,11 @@ def add_parameters(parameters: ParameterContext) -> None:
             for i in range(10)
         ],
     )
-    for i in range(MAX_NUMBER_OF_PLATES):
+    for i, ul in enumerate(DEFAULT_TARGET_BY_PLATE):
         parameters.add_float(
             variable_name=f"volume_{i}",
             display_name=f"volume_{i}",
-            default=DEFAULT_TARGET_BY_PLATE[i],
+            default=ul,
             minimum=0.0,
             maximum=50.0,
         )
@@ -756,10 +753,10 @@ def configure_volumes_and_wells_from_parameters(ctx: ProtocolContext) -> None:
     if ctx.params.baseline:  # type: ignore[attr-defined]
         _test_volumes.append(0.0)  # NOTE: ignoring volume parameters if just-baseline
     else:
-        for i in range(MAX_NUMBER_OF_PLATES):
-            if getattr(ctx.params, f"volume_{i}") > 0:
-                vol = float(getattr(ctx.params, f"volume_{i}"))
-                _test_volumes.append(vol)
+        for i in range(len(DEFAULT_TARGET_BY_PLATE)):
+            user_inputted_ul = cast(float, getattr(ctx.params, f"volume_{i}"))
+            if user_inputted_ul > 0:
+                _test_volumes.append(user_inputted_ul)
 
 
 def calibrate_tip_overlap(
@@ -777,10 +774,14 @@ def calibrate_tip_overlap(
         return
     api: SyncHardwareAPI = ctx._core.get_hardware()
     pip_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-    empty_slot_int = DeckSlotName.from_primitive(SLOTS["empty"]).as_int()
-    deck_probe_position = Point(
-        *get_calibration_square_position_in_slot(slot=empty_slot_int)
-    ) + Point(x=Z_PREP_OFFSET.x, y=Z_PREP_OFFSET.y, z=Z_PREP_OFFSET.z)
+    empty_slot_row_idx = "DCBA".index(SLOTS["empty"][0])
+    empty_slot_as_int = (empty_slot_row_idx * 3) + int(SLOTS["empty"][1:])
+    expected_probe_position = Point(
+        *get_calibration_square_position_in_slot(slot=empty_slot_as_int)
+    )
+    deck_probe_position = expected_probe_position + Point(
+        x=Z_PREP_OFFSET.x, y=Z_PREP_OFFSET.y, z=Z_PREP_OFFSET.z
+    )
 
     # RETRACT and move to above the deck slot
     api.retract(pip_mount)
@@ -802,7 +803,7 @@ def calibrate_tip_overlap(
 
     # MODIFY current tip length
     old_tip_length = api.hardware_pipettes[pip_mount.to_mount()].current_tip_length
-    tip_overlap_error_mm = probed_deck_z - EXPECTED_PROBE_Z_POSITION_MM
+    tip_overlap_error_mm = probed_deck_z - expected_probe_position.z
     # NOTE: (sigler) the artificial error is subtracted from the tip "length"
     #       because a more positive (+) overlap would create a shorter tip
     artificial_tip_length_error = artificial_error * -1.0
