@@ -16,7 +16,7 @@ from opentrons.protocol_api import (
 from opentrons.protocol_api._liquid_properties import TransferProperties
 from opentrons.protocol_api.instrument_context import _DEFAULT_ASPIRATE_CLEARANCE
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point
 
 from opentrons_shared_data.deck import (
     Z_PREP_OFFSET,
@@ -398,11 +398,12 @@ def pick_up_tip_and_manage_racks(
     # NOTE: the test pipette only ever interacts with the PCR plate
     #       as either a destination or source labware, and so by default
     #       we should de-static its tips each time it picks up a new one.
-    bar = ctx.deck[SLOTS["de_static"]]
-    pipette.move_to(bar["A1"].top())
+    bar_lw = cast(Labware, ctx.deck[SLOTS["de_static"]])
+    bar = bar_lw.wells()[0]
+    pipette.move_to(bar.top())
     de_static_write_enable_with_retries(ctx)
-    pipette.move_to(bar["A1"].bottom())
-    pipette.move_to(bar["A1"].top())
+    pipette.move_to(bar.bottom())
+    pipette.move_to(bar.top())
 
 
 def gripper_rotate_tip_rack_out(
@@ -779,7 +780,7 @@ def calibrate_tip_overlap(
     expected_probe_position = Point(
         *get_calibration_square_position_in_slot(slot=empty_slot_as_int)
     )
-    deck_probe_position = expected_probe_position + Point(
+    expected_probe_position += expected_probe_position + Point(
         x=Z_PREP_OFFSET.x, y=Z_PREP_OFFSET.y, z=Z_PREP_OFFSET.z
     )
 
@@ -788,10 +789,13 @@ def calibrate_tip_overlap(
     current_pos = api.gantry_position(pip_mount)
     api.move_to(
         pip_mount,
-        Point(x=deck_probe_position.x, y=deck_probe_position.y, z=current_pos.z),
+        Point(
+            x=expected_probe_position.x, y=expected_probe_position.y, z=current_pos.z
+        ),
     )
     api.move_to(
-        pip_mount, deck_probe_position + Point(z=PROBE_START_HEIGHT_ABOVE_EXPECTED_MM)
+        pip_mount,
+        expected_probe_position + Point(z=PROBE_START_HEIGHT_ABOVE_EXPECTED_MM),
     )
 
     # PROBE
