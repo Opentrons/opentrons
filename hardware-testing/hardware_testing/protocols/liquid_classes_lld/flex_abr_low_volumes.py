@@ -71,7 +71,7 @@ DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "end"
 TIP_VOLUME = 50
 PIP_VOLUME = 50
 
-MAX_NUMBER_OF_PLATES = 5
+MAX_NUMBER_OF_PLATES = 4
 DEFAULT_TARGET_BY_PLATE = [1.0, 1.2, 1.5, 2.0, 5.0]
 
 DEFAULT_DYE_WELLS = ["A1", "B1", "C1", "D1", "E1", "F1"]
@@ -91,10 +91,10 @@ EXPECTED_PROBE_Z_POSITION_MM = 0.0  # NOTE: the calibration square in "empty" sl
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
 SLOTS: Dict[str, str] = {
-    "tip_50_2":    "A1", "tip_50_1": "A2", "tip_50_0": "A3", "tip_50_3": "A4",
-    "empty_stack": "B1", "stack":    "B2", "tip_dilu": "B3", "tip_50_4": "B4",
-    "empty_dst":   "C1", "pcr":      "C2", "res":      "C3", "tip_50_5": "C4",
-    "trash":       "D1", "dye":      "D2", "empty":    "D3", "tip_50_6": "D4",
+    "de_static":    "A1",   "tip_50_1":     "A2",   "tip_50_0": "A3",   "tip_50_2": "A4",
+    "trash":        "B1",   "empty":        "B2",   "tip_dilu": "B3",   "tip_50_3": "B4",
+    "empty_stack":  "C1",   "empty_dst":    "C2",   "res":      "C3",   "tip_50_4": "C4",
+    "stack":        "D1",   "pcr":          "D2",   "dye":      "D3",   "tip_50_5": "D4",
 }
 # fmt: on
 
@@ -108,7 +108,7 @@ DILUENT_UL_BY_COLUMN = [MVS_TARGET_UL, MVS_TARGET_UL / 2] * 6
 DEAD_VOL_PER_LABWARE = {
     "nest_12_reservoir_15ml": 3000,
     "nest_96_wellplate_2ml_deep": 50,
-    # TODO: (sigler) reduce this to find actual dead-vol of our system
+    # TODO: (sigler) reduce this to find actual dead-vol of pcr plate
     "opentrons_96_wellplate_200ul_pcr_full_skirt": 20,
 }
 
@@ -121,6 +121,7 @@ DILUENT_LABWARE = "nest_12_reservoir_15ml"
 #        Corning plate to be stackable with it
 DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
 PLATE_LID_LOAD_NAME = "plate_lid"
+DE_STATIC_LOAD_NAME = "de_static_bar"
 
 # global so we don't need to pass it around everywhere
 _test_volumes: List[float] = []
@@ -312,11 +313,69 @@ def load_all_non_stacked_labware(
             location=SLOTS["pcr"],
         )
         assert max(_test_volumes) < min(pcr_plate["A1"].max_volume, MVS_MAX_UL)
+        ctx.load_labware(
+            load_name=DE_STATIC_LOAD_NAME,
+            location=SLOTS["de_static"]
+        )
     diluent_reservoir = ctx.load_labware(
         load_name=DILUENT_LABWARE,
         location=SLOTS["res"],
     )
     return diluent_reservoir, deep_well, pcr_plate
+
+
+def de_static_connect(ctx: ProtocolContext) -> None:
+    """Connect over USB to device that can power on/off the de-static bar."""
+    if ctx.is_simulating():
+        return
+    global _serial_port
+    assert _serial_port is None
+    from serial import Serial  # type: ignore[import]
+
+    _serial_port = Serial(
+        port=ctx.params.de_static_port,  # type: ignore[attr-defined]
+        baudrate=115200,
+    )
+    _serial_port.reset_output_buffer()
+    _serial_port.reset_input_buffer()
+    ack, enabled = de_static_get_status(ctx)
+    assert ack
+    if enabled:
+        ctx.delay(seconds=1)
+        ack, enabled = de_static_get_status(ctx)
+        assert ack and not enabled
+
+
+def de_static_get_status(ctx: ProtocolContext) -> Tuple[bool, bool]:
+    """Read the de-static bar power supply's current status."""
+    if ctx.is_simulating():
+        return True, False
+    assert _serial_port is not None
+    _serial_port.write("?".encode("utf-8"))  # type: ignore[union-attr]
+    res = _serial_port.readline()  # type: ignore[union-attr]
+    status = res.decode("utf-8").strip().lower()
+    ack = bool(status and status in ["on", "off"])
+    enabled = bool(status == "on")
+    return ack, enabled
+
+
+def de_static_write_enable_with_retries(ctx: ProtocolContext, retries: int = 3) -> None:
+    """Send enable command, retrying if we get unexpected response."""
+    if ctx.is_simulating():
+        return
+    assert _serial_port is not None
+    write_delay_seconds = 0.1
+    _serial_port.write("enable".encode("utf-8"))  # type: ignore[union-attr]
+    ctx.delay(write_delay_seconds)
+    ack, enabled = de_static_get_status(ctx)
+    if ack and enabled:
+        ctx.delay(seconds=1.0 - write_delay_seconds)
+    elif not ack or not enabled and retries:
+        de_static_write_enable_with_retries(ctx, retries - 1)
+    else:
+        raise RuntimeError(
+            f"unable to enable de-static bar (ack={ack}, enabled={enabled})"
+        )
 
 
 def pick_up_tip_and_manage_racks(
@@ -342,6 +401,12 @@ def pick_up_tip_and_manage_racks(
         pipette,
         artificial_error=ctx.params.overlap_error,  # type: ignore[attr-defined]
     )
+    # NOTE: the test pipette only ever interacts with the PCR plate
+    #       as either a destination or source labware, and so by default
+    #       we should de-static its tips each time it picks up a new one.
+    bar = ctx.deck[SLOTS["de_static"]]
+    pipette.move_to(bar["A1"].top())
+    de_static_write_enable_with_retries(ctx)
 
 
 def gripper_rotate_tip_rack_out(
@@ -745,54 +810,6 @@ def calibrate_tip_overlap(
     new_tip_length = old_tip_length + tip_overlap_error_mm + artificial_tip_length_error
     api.remove_tip(pip_mount)
     api.add_tip(pip_mount, tip_length=new_tip_length)
-
-
-def de_static_connect(ctx: ProtocolContext) -> None:
-    """Connect over USB to device that can power on/off the de-static bar."""
-    if ctx.is_simulating():
-        return
-    global _serial_port
-    assert _serial_port is None
-    from serial import Serial  # type: ignore[import]
-
-    _serial_port = Serial(
-        port=ctx.params.de_static_port,  # type: ignore[attr-defined]
-        baudrate=115200,
-    )
-    _serial_port.reset_output_buffer()
-    _serial_port.reset_input_buffer()
-    ack, enabled = de_static_get_status(ctx)
-    assert ack
-    if enabled:
-        ctx.delay(seconds=1)
-        ack, enabled = de_static_get_status(ctx)
-        assert ack and not enabled
-
-
-def de_static_get_status(ctx: ProtocolContext) -> Tuple[bool, bool]:
-    """Read the de-static bar power supply's current status."""
-    if ctx.is_simulating():
-        return True, False
-    assert _serial_port is not None
-    _serial_port.write("?".encode("utf-8"))  # type: ignore[union-attr]
-    res = _serial_port.readline()  # type: ignore[union-attr]
-    status = res.decode("utf-8").strip().lower()
-    ack = bool(status and status in ["on", "off"])
-    enabled = bool(status == "on")
-    return ack, enabled
-
-
-def de_static_for_1_second(ctx: ProtocolContext, retries: int = 3) -> None:
-    """Enable the de-static bar for 1 second."""
-    if ctx.is_simulating():
-        return
-    assert _serial_port is not None
-    _serial_port.write("enable".encode("utf-8"))  # type: ignore[union-attr]
-    ctx.delay(0.1)
-    ack, enabled = de_static_get_status(ctx)
-    if not ack or not enabled and retries:
-        de_static_for_1_second(ctx, retries - 1)
-    raise RuntimeError(f"unable to enable de-static bar (ack={ack}, enabled={enabled})")
 
 
 def run(ctx: ProtocolContext) -> None:
