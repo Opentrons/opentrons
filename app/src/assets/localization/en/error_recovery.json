@@ -109,6 +109,7 @@
   "robot_will_retry_with_new_tips": "<block>The robot will retry the failed step with the new tips.</block><block>Close the robot door before proceeding.</block>",
   "robot_will_retry_with_same_tips": "<block>The robot will retry the failed step with the same tips.</block><block>Close the robot door before proceeding.</block>",
   "robot_will_retry_with_tips": "The robot will retry the failed step with new tips.",
+  "robot_will_retry_failed_step": "<block>The robot will attempt to retry the failed retrieve step.</block><block>Close the robot door before proceeding.</block>",
   "run_paused": "Run paused",
   "select_tip_pickup_location": "Select tip pick-up location",
   "shuttle_missing": "Shuttle missing",

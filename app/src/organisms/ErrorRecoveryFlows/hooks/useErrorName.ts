@@ -29,7 +29,7 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('stacker_stall_or_collision_error')
     case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
       return t('stacker_empty')
-    case ERROR_KINDS.SHUTTE_MISSING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
       return t('shuttle_missing')
     default:
       return t('error')
