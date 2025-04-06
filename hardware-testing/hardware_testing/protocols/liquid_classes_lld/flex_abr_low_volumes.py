@@ -313,10 +313,7 @@ def load_all_non_stacked_labware(
             location=SLOTS["pcr"],
         )
         assert max(_test_volumes) < min(pcr_plate["A1"].max_volume, MVS_MAX_UL)
-        ctx.load_labware(
-            load_name=DE_STATIC_LOAD_NAME,
-            location=SLOTS["de_static"]
-        )
+        ctx.load_labware(load_name=DE_STATIC_LOAD_NAME, location=SLOTS["de_static"])
     diluent_reservoir = ctx.load_labware(
         load_name=DILUENT_LABWARE,
         location=SLOTS["res"],
@@ -369,7 +366,7 @@ def de_static_write_enable_with_retries(ctx: ProtocolContext, retries: int = 3) 
     ctx.delay(write_delay_seconds)
     ack, enabled = de_static_get_status(ctx)
     if ack and enabled:
-        ctx.delay(seconds=1.0 - write_delay_seconds)
+        return
     elif not ack or not enabled and retries:
         de_static_write_enable_with_retries(ctx, retries - 1)
     else:
@@ -407,6 +404,8 @@ def pick_up_tip_and_manage_racks(
     bar = ctx.deck[SLOTS["de_static"]]
     pipette.move_to(bar["A1"].top())
     de_static_write_enable_with_retries(ctx)
+    pipette.move_to(bar["A1"].bottom())
+    pipette.move_to(bar["A1"].top())
 
 
 def gripper_rotate_tip_rack_out(
@@ -873,9 +872,7 @@ def run(ctx: ProtocolContext) -> None:
                 row_letter = pcr_well.well_name[0]
                 photo_row = plate.rows_by_name()[row_letter]
                 for photo_well in photo_row[: ctx.params.columns]:  # type: ignore[attr-defined]
-                    transfer_dye_to_photo_plate(
-                        ctx, test_pipette, pcr_well, photo_well
-                    )
+                    transfer_dye_to_photo_plate(ctx, test_pipette, pcr_well, photo_well)
             # ADD MORE DILUENT
             diluent_src_wells = transfer_diluent_or_baseline(
                 ctx, diluent_pipette, plate, diluent_src_wells, ul
