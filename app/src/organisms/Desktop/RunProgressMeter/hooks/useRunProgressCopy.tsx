@@ -20,7 +20,7 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
+import { ModuleAnalyticProtocolCommand, useModuleCommandAnalytics} from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 
 interface UseRunProgressResult {
@@ -139,15 +139,16 @@ export function useRunProgressCopy({
   }
 
   reportModuleCommand({
-    runId: runId!,
-    action: runCommandDetails?.data?.commandType!,
+    kind: 'protocolCommand',
+    analyticCommand: runCommandDetails?.data?.commandType ?? "",
     result: {
-      status: runCommandDetails?.data?.status!,
+      status: runCommandDetails?.data?.status ?? undefined,
       data: runCommandDetails?.data?.result
     },
-    params: runCommandDetails?.data?.params!,
-    errorDetails: error ?? "" 
-  });
+    errorDetails: error ?? "",
+    params: runCommandDetails?.data?.params,
+    runId: runId ?? null,
+  } as ModuleAnalyticProtocolCommand);
 
   return {
     currentStepContents,

@@ -11,6 +11,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  CommandStatus
 } from '@opentrons/shared-data'
 
 import {
@@ -32,7 +33,7 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
+import { useModuleCommandAnalytics, ModuleAnalyticLiveCommand } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 
 export function useIsHeaterShakerInProtocol(): boolean {
@@ -48,10 +49,10 @@ interface LatchControls {
   toggleLatch: () => void
   isLatchClosed: boolean
 }
-const { reportModuleCommand } = useModuleCommandAnalytics()
 
 export function useLatchControls(module: AttachedModule): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { reportModuleCommand } = useModuleCommandAnalytics()
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
     (module.data.labwareLatchStatus === 'idle_closed' ||
@@ -73,22 +74,24 @@ export function useLatchControls(module: AttachedModule): LatchControls {
       command: latchCommand,
     }).then((result) => {
       reportModuleCommand({
-        moduleType: module.moduleModel,
-        action: latchCommand.commandType,
-        result: { status: "succeeded", data: result },
+        kind: 'liveCommand',
+        moduleType: module.moduleType,
+        analyticCommand: latchCommand.commandType,
+        result: { status: 'succeeded' as CommandStatus, data: undefined },
         serialNumber: module.serialNumber,
         firmwareVersion: module.firmwareVersion,
-      });
+      } as ModuleAnalyticLiveCommand);
     })
       .catch((e: Error) => {
         reportModuleCommand({
-          moduleType: module.moduleModel,
-          action: latchCommand.commandType,
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: latchCommand.commandType,
           errorDetails: e.message,
-          result: {status: 'failed', data: null},
+          result: {status: 'failed' as CommandStatus, data: undefined},
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
-        });
+        } as ModuleAnalyticLiveCommand);
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
         );
@@ -227,26 +230,30 @@ export function useModuleOverflowMenu(
         moduleId: module.id,
       },
     }
+    const { reportModuleCommand } = useModuleCommandAnalytics()
+
     createLiveCommand({
       command: deactivateCommand,
     }).then((result) => {
       reportModuleCommand({
+        kind: 'liveCommand',
         moduleType: module.moduleType,
-        action: deactivateCommand.commandType,
-        result: { status: 'succeeded', data: result },
+        analyticCommand: deactivateCommand.commandType,
+        result: { status: 'succeeded' as CommandStatus, data: undefined },
         serialNumber: module.serialNumber,
         firmwareVersion: module.firmwareVersion
-      });
+      } as ModuleAnalyticLiveCommand);
     })
       .catch((e: Error) => {
         reportModuleCommand({
-          moduleType: module.moduleModel,
-          action: deactivateCommand.commandType,
-          result: {status: 'failed', data: null},
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: deactivateCommand.commandType,
+          result: {status: 'failed' as CommandStatus, data: undefined},
           errorDetails: e.message,
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion
-        });
+        }as ModuleAnalyticLiveCommand);
         console.error(
           `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
         );
@@ -263,28 +270,31 @@ export function useModuleOverflowMenu(
       moduleId: module.id,
     },
   }
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   const controlTCLid = (): void => {
     createLiveCommand({
       command: lidCommand,
     }).then((result) => {
       reportModuleCommand({
-        moduleType: module.moduleModel,
-        action: lidCommand.commandType,
-        result: { status: 'succeeded', data: result },
+        kind: 'liveCommand',
+        moduleType: module.moduleType,
+        analyticCommand: lidCommand.commandType,
+        result: { status: 'succeeded' as CommandStatus, data: undefined },
         serialNumber: module.serialNumber,
         firmwareVersion: module.firmwareVersion
-      });
+      }as ModuleAnalyticLiveCommand);
     })
       .catch((e: Error) => {
         reportModuleCommand({
-          moduleType: module.moduleModel,
-          action: lidCommand.commandType,
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: lidCommand.commandType,
           errorDetails: e.message,
-          result: {status: 'failed', data: null},
+          result: {status: 'failed' as CommandStatus, data: undefined},
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
-        });
+        } as ModuleAnalyticLiveCommand);
         console.error(
           `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
         )

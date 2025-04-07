@@ -3,8 +3,8 @@ import {
     useTrackEvent, ANALYTICS_MODULE_COMMAND_ERROR, ANALYTICS_MODULE_COMMAND_COMPLETED
 } from '/app/redux/analytics'
 import { useModulesQuery } from '@opentrons/react-api-client'
-import { ModuleOnlyParams, NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA, TemperatureParams } from '@opentrons/shared-data'
-import { Dict } from 'mixpanel-browser'
+import { CommandStatus, ModuleOnlyParams, ModuleType, TemperatureParams} from '@opentrons/shared-data'
+import type {CommandData} from '@opentrons/api-client'
 import {
     getAttachedProtocolModuleMatches,
     getProtocolModulesInfo,
@@ -34,47 +34,51 @@ const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
     'heaterShaker/closeLabwareLatch' 
 ];
 
-export type ModuleActionDetails = 
-    | moduleProtocolCommand
-    | moduleLiveCommand
-export interface moduleProtocolCommand {
-    runId: string,
-    action: string,
-    result: {status: string, data: any},
-    params: Dict,
+export type ModuleAnalyticKind = 'protocolCommand' | 'liveCommand'
+
+interface BaseModuleAnalytics {
+    kind: ModuleAnalyticKind,
+    analyticCommand: RunTimeCommand | string,
+    result: {status: CommandStatus | undefined; data: CommandData['data'] | undefined},
     errorDetails: string;
 }
+export interface ModuleAnalyticProtocolCommand extends BaseModuleAnalytics {
+    kind: 'protocolCommand'
+    runId: string,
+    params: CommandData['data']['params'],
 
-export interface moduleLiveCommand {
-    moduleType: string,
-    action: string,
-    result: {status: string, data: any},
+}
+
+export interface ModuleAnalyticLiveCommand extends BaseModuleAnalytics {
+    kind: 'liveCommand'
+    moduleType: ModuleType | string,
     serialNumber: string,
     temperature?: number | string,
-    firmwareVersion: string
+    firmwareVersion: string,
+
 }
 
 
 export interface UseModuleCommandAnalyticsResult {
     /* Report when a module command completes. */
-    reportModuleCommand: (params: ModuleActionDetails) => void;
+    reportModuleCommand: (params: BaseModuleAnalytics) => void;
 }
 
 export function useModuleCommandAnalytics(modules?: AttachedModule[]): UseModuleCommandAnalyticsResult {
     const doTrackEvent = useTrackEvent();
     const reportModuleCommand = ({
-        action,
-        result, 
+        kind,
+        analyticCommand, 
         errorDetails,
         ... rest
-    }: ModuleActionDetails & { errorDetails?: string }): void => {
-        if (!isValidCommandType(action)){
+    }: BaseModuleAnalytics): void => {
+        if (!isValidCommandType(analyticCommand)){
             return;
         }
         const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
         const moduleQuery = useModulesQuery()
         const attachedModules = moduleQuery?.data?.data ?? []
-        const mostRecentAnalysis = useMostRecentCompletedAnalysis('runId' in rest ? rest.runId : null);
+        const mostRecentAnalysis = useMostRecentCompletedAnalysis('runId' in rest && typeof rest.runId === 'string' ? rest.runId : null);
         const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
         const protocolModulesInfo =
             mostRecentAnalysis != null
@@ -97,15 +101,15 @@ export function useModuleCommandAnalytics(modules?: AttachedModule[]): UseModule
         const reportedTemperature = 'temperature' in rest ? rest.temperature : celsius ?? null;
         const reportedFirmwareVersion = 'firmwareVersion' in rest ? rest.firmwareVersion : matchedModule?.firmwareVersion ?? null
         const reportedModuleType = 'moduleType' in rest ? rest.moduleType : matchedModule?.moduleType ?? null
-
+        const reportedErrorDetails = 'errorDetails' in rest ? rest.errorDetails : null
         doTrackEvent({
-            name: errorDetails ? ANALYTICS_MODULE_COMMAND_ERROR : ANALYTICS_MODULE_COMMAND_COMPLETED,
+            name: reportedErrorDetails ? ANALYTICS_MODULE_COMMAND_ERROR : ANALYTICS_MODULE_COMMAND_COMPLETED,
             properties: {
                 reportedModuleType,
-                action,
-                ...(errorDetails
-                    ? { errorDetails }
-                    : { resultStatus: result }),
+                analyticCommand,
+                ...(reportedErrorDetails
+                    ? { reportedErrorDetails }
+                    : { resultStatus: 'result' in rest ? rest.result: null}),
                 serialNumber: reportedSerialNumber,
                 reportedTemperature,
                 reportedFirmwareVersion

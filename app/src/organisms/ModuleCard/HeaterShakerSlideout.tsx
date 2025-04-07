@@ -20,11 +20,11 @@ import {
 
 import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
-
+import {CommandStatus} from '@opentrons/shared-data'
 import type { MouseEventHandler } from 'react'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
+import { useModuleCommandAnalytics, ModuleAnalyticLiveCommand } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 
 interface HeaterShakerSlideoutProps {
@@ -61,24 +61,27 @@ export const HeaterShakerSlideout = (
         command: setTempCommand,
       }).then((result) => {
         reportModuleCommand({
-          moduleType: module.moduleModel,
-          action: setTempCommand.commandType,
-          result: { status: 'succeeded', data: result },
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: setTempCommand.commandType,
+          result: { status: 'succeeded' as CommandStatus, data: undefined},
           serialNumber: module.serialNumber,
           temperature: hsValue,
+          errorDetails: "",
           firmwareVersion: module.firmwareVersion
-        });
+        } as ModuleAnalyticLiveCommand);
       })
         .catch((e: Error) => {
           reportModuleCommand({
-            moduleType: module.moduleModel,
-            action: setTempCommand.commandType,
-            result: {status: 'failed', data: null},
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: setTempCommand.commandType,
+            result: {status: 'failed' as CommandStatus, data: undefined},
             errorDetails: e.message,
             serialNumber: module.serialNumber,
             temperature: hsValue,
             firmwareVersion: module.firmwareVersion
-          });
+          } as ModuleAnalyticLiveCommand);
 
           console.error(
             `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`

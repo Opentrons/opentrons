@@ -7,6 +7,7 @@ import {
   TEMP_LID_MIN,
   TEMP_BLOCK_MAX,
   TEMP_MIN,
+  CommandStatus
 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -27,7 +28,7 @@ import type {
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
 import type { ThermocyclerModule } from '/app/redux/modules/types'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
+import { useModuleCommandAnalytics, ModuleAnalyticLiveCommand } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 
 interface ThermocyclerModuleSlideoutProps {
@@ -85,27 +86,29 @@ export const ThermocyclerModuleSlideout = (
         command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
       }).then((result)=> {
         reportModuleCommand({
-          moduleType: module.moduleModel,
-          action: modulePart == 'Lid'
+          kind: "liveCommand",
+          moduleType: module.moduleType,
+          analyticCommand: modulePart == 'Lid'
           ? saveLidCommand.commandType
           : saveBlockCommand.commandType,
-          result: {status: 'succeeded', data: result},
+          result: {status: 'succeeded' as CommandStatus, data: undefined},
           serialNumber: module.serialNumber,
           temperature: tempValue,
           firmwareVersion: module.firmwareVersion
-        });
+        } as ModuleAnalyticLiveCommand);
       }).catch((e: Error) => {
         reportModuleCommand({
-          moduleType: module.moduleModel,
-          action: modulePart == 'Lid'
+          kind: "liveCommand",
+          moduleType: module.moduleType,
+          analyticCommand: modulePart == 'Lid'
           ? saveLidCommand.commandType
           : saveBlockCommand.commandType,
-          result: {status: 'failed', data: null},
+          result: {status: 'failed' as CommandStatus, data: undefined},
           errorDetails: e.message,
           serialNumber: module.serialNumber,
           temperature: tempValue,
           firmwareVersion: module.firmwareVersion
-        })
+        }as ModuleAnalyticLiveCommand)
         console.error(
           `error setting module status with command type ${
             saveLidCommand.commandType ?? saveBlockCommand.commandType
