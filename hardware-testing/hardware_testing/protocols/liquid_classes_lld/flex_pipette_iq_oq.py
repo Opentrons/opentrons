@@ -63,7 +63,7 @@ VOLUMES_BY_TIP_RACK = {
     "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 1000],
     "opentrons_flex_96_tiprack_1000ul": [10, 100, 1000],
 }
-# FIXME: increase 96ch trials by loading off-deck labware somehow
+# TODO: increase 96ch trials by loading off-deck labware somehow
 TRIALS_BY_PIPETTE = {
     "flex_1channel_50": [12, 12, 12],
     "flex_8channel_50": [12, 12, 12],

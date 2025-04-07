@@ -56,7 +56,7 @@ SLOTS: Dict[str, str] = {
 }
 # fmt: on
 
-P1000_MAX_PUSH_OUT_UL = 79.0  # FIXME: (sigler) magic number from hardware limit
+P1000_MAX_PUSH_OUT_UL = 79.0  # NOTE: (sigler) magic number from hardware limit
 DISPENSE_MM_FROM_MENISCUS = 2.0
 
 # operator fills this labware with RED-DYE at protocol start
@@ -68,9 +68,9 @@ LOAD_NAME_SRC_RESERVOIRS: Dict[str, float] = {
     "nest_96_wellplate_2ml_deep": 300,
 }
 
-# FIXME: (sigler) let's add the Artel (aka Corning?) plate
-#        to shared-data in a separate pull-request, and modify the
-#        Corning plate to be stackable with it
+# TODO: (sigler) let's add the Artel (aka Corning?) plate
+#       to shared-data in a separate pull-request, and modify the
+#       Corning plate to be stackable with it
 DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
 DE_STATIC_LOAD_NAME = "de_static_bar"
 
