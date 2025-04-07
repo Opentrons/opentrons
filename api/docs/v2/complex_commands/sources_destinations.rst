@@ -6,9 +6,9 @@
 Sources and Destinations
 ************************
 
-The :py:meth:`.InstrumentContext.transfer`, :py:meth:`.InstrumentContext.distribute`, and :py:meth:`.InstrumentContext.consolidate` methods form the family of complex liquid handling commands. These methods require ``source`` and ``dest`` (destination) arguments to move liquid from one well, or group of wells, to another. In contrast, the :ref:`building block commands <v2-atomic-commands>` :py:meth:`~.InstrumentContext.aspirate` and :py:meth:`~.InstrumentContext.dispense` only operate in a single location.
+The basic and liquid class transfer methods form the family of complex liquid handling commands. These methods require ``source`` and ``dest`` (destination) arguments to move liquid from one well, or group of wells, to another. In contrast, the :ref:`building block commands <v2-atomic-commands>` :py:meth:`~.InstrumentContext.aspirate` and :py:meth:`~.InstrumentContext.dispense` only operate in a single location.
 
-For example, this command performs a simple transfer between two wells on a plate::
+This example uses :py:meth:`.InstrumentContext.transfer()` to perform a basic transfer between two wells on a plate::
 
     pipette.transfer(
         volume=100,
@@ -18,6 +18,20 @@ For example, this command performs a simple transfer between two wells on a plat
 
 .. versionadded:: 2.0
 
+You could use :py:meth:`.InstrumentContext.transfer_with_liquid_class` to perform the transfer. 
+
+    liquid_1 = protocol_context.define_liquid_class("glycerol_50")
+    pipette.transfer_with_liquid_class(
+        liquid_class=liquid_1,
+        volume=100,
+        source=plate["A1"],
+        dest=plate["A2"],
+    )
+
+This time, including the ``glycerol_50`` liquid class definition optimizes transfer behavior on the Flex for your viscous liquid. 
+
+.. versionadded:: 2.23
+
 This page covers the restrictions on sources and destinations for complex commands, their different patterns of aspirating and dispensing, and how to optimize them for different use cases.
 
 
@@ -26,11 +40,11 @@ This page covers the restrictions on sources and destinations for complex comman
 Source and Destination Arguments
 ================================
 
-As noted above, the :py:meth:`~.InstrumentContext.transfer`, :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate` methods require ``source`` and ``dest`` (destination) arguments to aspirate and dispense liquid. However, each method handles liquid sources and destinations differently. Understanding how complex commands work with source and destination wells is essential to using these methods effectively.
+As noted above, each complex liquid handling command requires ``source`` and ``dest`` (destination) arguments to aspirate and dispense liquid. However, each method handles liquid sources and destinations differently. Understanding how complex commands work with source and destination wells is essential to using these methods effectively.
 
 :py:meth:`~.InstrumentContext.transfer` is the most versatile complex liquid handling function, because it has the fewest restrictions on what wells it can operate on. You will likely use transfer commands in many of your protocols.
 
-Certain liquid handling cases focus on moving liquid to or from a single well. :py:meth:`~.InstrumentContext.distribute` limits its source to a single well, while :py:meth:`~.InstrumentContext.consolidate` limits its destination to a single well. Distribute commands also make  changes to liquid-handling behavior to improve the accuracy of dispensing.
+Certain liquid handling cases focus on moving liquid to or from a single well. :py:meth:`~.InstrumentContext.distribute` and :py:meth:`~.InstrumentContext.distribute_with_liquid_class` limit their sourcs to a single well, while :py:meth:`~.InstrumentContext.consolidate` and :py:meth:`~.InstrumentContext.consolidate_with_liquid_class` limit their destinations to a single well. The ``distribute()`` method and all liquid class complex commands also make changes to liquid-handling behavior to improve accuracy.
 
 The following table summarizes the source and destination restrictions for each method.
 
@@ -44,11 +58,16 @@ The following table summarizes the source and destination restrictions for each 
        - **Source:** Any number of wells.
        - **Destination:** Any number of wells.
        - The larger group of wells must be evenly divisible by the smaller group.
-   * - ``distribute()``
+   * - ``transfer_with_liquid_class()``
+     - 
+       - **Source:** Any number of wells.
+       - **Destination:** Any number of wells. 
+       - The total number of source and destination wells must be equal to one another. 
+   * - ``distribute()`` and ``distribute_with_liquid_class()``
      - 
        - **Source:** Exactly one well.
        - **Destination:** Any number of wells.
-   * - ``consolidate()``
+   * - ``consolidate()`` and ``consolidate_with_liquid_class()``
      - 
        - **Source:** Any number of wells.
        - **Destination:** Exactly one well.
@@ -65,7 +84,7 @@ For distributing and consolidating, the API will not raise an error if you use a
         dest=plate.columns()[1],
     )
 
-On the other hand, a transfer command with the same arguments would aspirate from both A1 and A2. The next section examines the exact order of aspiration and dispensing for all three methods.
+On the other hand, a basic ``transfer()`` command with the same arguments would aspirate from both A1 and A2. The next section examines the exact order of aspiration and dispensing for all six methods.
 
 .. _complex-transfer-patterns:
 
@@ -77,7 +96,7 @@ Each complex command uses a different pattern of aspiration and dispensing. In a
 Aspirating and Dispensing
 -------------------------
 
-``transfer()`` always alternates between aspirating and dispensing, regardless of how many wells are in the source and destination. Its default behavior is:
+``transfer()`` and ``transfer_with_liquid_class()`` always alternates between aspirating and dispensing, regardless of how many wells are in the source and destination. Their default behavior is:
 
     1. Pick up a tip.
     2. Aspirate from the first source well.
@@ -92,7 +111,7 @@ Aspirating and Dispensing
     
     This transfer aspirates six times and dispenses six times.
     
-``distribute()`` always fills the tip with as few aspirations as possible, and then dispenses to the destination wells in order. Its default behavior is:
+``distribute()`` and ``distribute_with_liquid_class()`` always fill the tip with as few aspirations as possible, and then dispenses to the destination wells in order. Their default behavior is:
 
     1. Pick up a tip.
     2. Aspirate enough to dispense in all the destination wells. This aspirate includes a disposal volume.
@@ -109,7 +128,7 @@ See :ref:`complex-tip-refilling` below for cases where the total amount to be di
     
     This distribute aspirates one time and dispenses three times.
     
-``consolidate()`` aspirates multiple times in a row, and then dispenses as few times as possible in the destination well. Its default behavior is:
+``consolidate()`` and ``consolidate_with_liquid_class()`` aspirate multiple times in a row, and then dispense as few times as possible in the destination well. Their default behavior is:
 
     1. Pick up a tip.
     2. Aspirate from the first source well.
@@ -127,7 +146,7 @@ See :ref:`complex-tip-refilling` below for cases where the total amount to be as
     This consolidate aspirates three times and dispenses one time.
     
 .. note::
-    By default, all three commands begin by picking up a tip and conclude by dropping a tip. In general, don't call :py:meth:`.pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with the :ref:`tip handling complex parameter <param-tip-handling>`, by setting ``new_tip="never"``.
+    By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call :py:meth:`.pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with the :ref:`tip handling complex parameter <param-tip-handling>`, by setting ``new_tip="never"``.
 
 
 .. _many-to-many:
@@ -175,7 +194,7 @@ When the source and destination both contain the same number of wells, the mappi
       - B11
       - B12
 
-There's no requirement that the source and destination lists be mutually exclusive. In fact, this command adapted from the :ref:`tutorial <tutorial>` deliberately uses slices of the same list, saved to the variable ``row``, with the effect that each aspiration happens in the same location as the previous dispense::
+There's no requirement that the source and destination lists for a basic ``transfer()`` be mutually exclusive. In fact, this command adapted from the :ref:`tutorial <tutorial>` deliberately uses slices of the same list, saved to the variable ``row``, with the effect that each aspiration happens in the same location as the previous dispense::
 
     row = plate.rows()[0]
     pipette.transfer(
@@ -212,7 +231,7 @@ There's no requirement that the source and destination lists be mutually exclusi
       - A11
       - A12
       
-When the source and destination lists contain different numbers of wells, ``transfer()`` will always aspirate and dispense as many times as there are wells in the *longer* list. The shorter list will be "stretched" to cover the length of the longer list. Here is an example of transferring from 3 wells to a full row of 12 wells:: 
+When the source and destination lists contain different numbers of wells, a basic ``transfer()`` will always aspirate and dispense as many times as there are wells in the *longer* list. The shorter list will be "stretched" to cover the length of the longer list. Here is an example of transferring from 3 wells to a full row of 12 wells:: 
 
     pipette.transfer(
         volume=50,
@@ -264,7 +283,10 @@ The API raises this error rather than presuming which wells to aspirate from thr
     pipette.transfer(50, plate["A1"], plate.columns()[3][:3])
     pipette.transfer(50, plate["A2"], plate.columns()[3][3:6])
     pipette.transfer(50, plate["A3"], plate.columns()[3][6:])
-    
+
+
+For a liquid class transfer using ``transfer_with_liquid_class()``, the number of source and destination wells must be equal to each other, or the API will raise an error. 
+  
 Finally, be aware of the ordering of source and destination lists when constructing them with :ref:`well accessor methods <well-accessor-methods>`. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column::
 
     pipette.transfer(

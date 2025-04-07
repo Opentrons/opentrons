@@ -1,6 +1,6 @@
 :og:description: How to select and apply a liquid class definition in Opentrons protocols.
 
-.. _liquid_classes: 
+.. _liquid-classes: 
 
 ***************
 Liquid Classes 
