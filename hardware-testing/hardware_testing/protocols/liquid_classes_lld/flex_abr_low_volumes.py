@@ -494,30 +494,26 @@ def get_transfer_class_for_strategies(
         modify_transfer_class_touch_tip(
             tc_editable, enabled=True, speed=30.0, z_offset=-1.0, mm_to_edge=1.0
         )
+    submerge_depth: float = ctx.params.submerge_depth  # type: ignore[attr-defined]
+    well_bottom_mm: float = ctx.params.well_bottom_mm  # type: ignore[attr-defined]
     match strategies:
         # NOTE: (sigler) all dye MENISCI strategies use the same settings
         case (_Strategy.DYE_M, _Strategy.DYE_M):  # noqa: E211
-            modify_transfer_class_position_meniscus(
-                tc_editable, ctx.params.submerge_depth  # type: ignore[attr-defined]
-            )
+            modify_transfer_class_position_meniscus(tc_editable, submerge_depth)
         case (_Strategy.DYE_LLD_M, _Strategy.DYE_M):  # noqa: E211
-            modify_transfer_class_position_meniscus(
-                tc_editable, ctx.params.submerge_depth  # type: ignore[attr-defined]
-            )
+            modify_transfer_class_position_meniscus(tc_editable, submerge_depth)
         case (_Strategy.DYE_LLD_TIP_M, _Strategy.DYE_M):  # noqa: E211
-            modify_transfer_class_position_meniscus(
-                tc_editable, ctx.params.submerge_depth  # type: ignore[attr-defined]
-            )
+            modify_transfer_class_position_meniscus(tc_editable, submerge_depth)
         case (_Strategy.DYE_B, _Strategy.DYE_B):  # noqa: E211
             modify_transfer_class_position(
                 tc_editable,
-                aspirate=(PosRef.WELL_BOTTOM, ctx.params.well_bottom_mm),  # type: ignore[attr-defined]
+                aspirate=(PosRef.WELL_BOTTOM, well_bottom_mm),
                 dispense=(PosRef.WELL_BOTTOM, DEFAULT_WELL_BOTTOM_MM),
             )
         case (_Strategy.DYE_B, _Strategy.DYE_T):  # noqa: E211
             modify_transfer_class_position(
                 tc_editable,
-                aspirate=(PosRef.WELL_BOTTOM, ctx.params.well_bottom_mm),  # type: ignore[attr-defined]
+                aspirate=(PosRef.WELL_BOTTOM, well_bottom_mm),
                 dispense=(PosRef.WELL_TOP, 0.0),
             )
         case (_Strategy.DYE_SRC, _Strategy.DYE_SRC):  # noqa: E211
@@ -848,7 +844,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # JUST BASELINE
     if ctx.params.baseline:  # type: ignore[attr-defined]
-        assert not ctx.params.test_gripper, f"test gripper and just baseline?"  # type: ignore[attr-defined]
+        assert not ctx.params.test_gripper, "gripper and baseline?"  # type: ignore[attr-defined]
         plate = _get_next_plate_from_stack()
         transfer_diluent_or_baseline(
             ctx, diluent_pipette, plate, diluent_src_wells, 0.0

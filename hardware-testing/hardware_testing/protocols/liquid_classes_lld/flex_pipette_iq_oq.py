@@ -1,6 +1,6 @@
 """Opentrons Flex Pipette IQ/OQ."""
 from math import ceil
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Dict
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -83,6 +83,7 @@ SLOTS = {
 
 
 def add_parameters(params: ParameterContext) -> None:
+    """Add parameters."""
     params.add_str(
         display_name="pipette",
         variable_name="pipette",
@@ -143,30 +144,34 @@ def load_tip_racks(
     pipette: InstrumentContext,
     diluent_pipette: Optional[InstrumentContext],
 ) -> int:
+    """Load tip racks."""
     num_tips_needed = sum(TRIALS_BY_PIPETTE[pipette.name]) * pipette.channels
     if pipette.channels == 96:
+        rack_ln = "opentrons_flex_96_tiprack_adapter"
+        tips_ln = ctx.params.tips  # type: ignore[attr-defined]
         pipette.tip_racks = [
-            ctx.load_adapter(
-                "opentrons_flex_96_tiprack_adapter", SLOTS[f"tips_{i}"]
-            ).load_labware(ctx.params.tips)
+            ctx.load_adapter(rack_ln, SLOTS[f"tips_{i}"]).load_labware(tips_ln)
             for i in range(ceil(num_tips_needed / 96))
         ]
     else:
         pipette.tip_racks = [
-            ctx.load_labware(ctx.params.tips, SLOTS[f"tips_{i}"])
+            ctx.load_labware(ctx.params.tips, SLOTS[f"tips_{i}"])  # type: ignore[attr-defined]
             for i in range(ceil(num_tips_needed / 96))
         ]
-        diluent_pipette.tip_racks = [ctx.load_labware(
-            "opentrons_flex_96_filtertiprack_200ul", SLOTS["tips_diluent"]
-        )]
-    tip_ul = int(ctx.params.tips.split("_")[-1].replace("ul", ""))
+        assert diluent_pipette is not None
+        diluent_pipette.tip_racks = [
+            ctx.load_labware(
+                "opentrons_flex_96_filtertiprack_200ul", SLOTS["tips_diluent"]
+            )
+        ]
+    tip_ul = int(ctx.params.tips.split("_")[-1].replace("ul", ""))  # type: ignore[attr-defined]
     return tip_ul
 
 
 def load_labware(
     ctx: ProtocolContext, pipette: InstrumentContext, volumes: List[float], tip_ul: int
 ) -> Tuple[Labware, List[Labware], List[Labware]]:
-
+    """Load labware."""
     # diluent reservoir
     load_name_diluent_reservoir = DILUENT_RESERVOIR_BY_CHANNELS[pipette.channels]
     reservoir_diluent = ctx.load_labware(load_name_diluent_reservoir, SLOTS["diluent"])
@@ -205,6 +210,7 @@ def load_liquid_diluent(
     reservoir: Labware,
     volumes: List[float],
 ) -> Dict[float, List[Well]]:
+    """Load liquid diluent."""
     dil_wells_by_test_ul: Dict[float, List[Well]] = {v: [] for v in volumes}
     diluent = ctx.define_liquid(
         "diluent", "diluent", display_color=DYE_CONFIGS["diluent"][2]
@@ -216,16 +222,15 @@ def load_liquid_diluent(
     num_aspirates_per_plate = 1 if diluent_pip_ch == 96 else 12
 
     # count how much diluent is needed in each well before loading
-    dil_ul_by_reservoir_well: Dict[Well, float] = {
-        w: 0.0 for w in reservoir_wells
-    }
+    dil_ul_by_reservoir_well: Dict[Well, float] = {w: 0.0 for w in reservoir_wells}
     current_well = reservoir_wells.pop(0)
     for plate_ul in dil_wells_by_test_ul.keys():
         diluent_per_well = max(DYE_READER_IDEAL_UL - plate_ul, 0)
         diluent_per_aspirate = diluent_per_well * diluent_pip_ch
-        assert diluent_per_aspirate <= well_working_ul, \
-            (f"diluent aspirate of {diluent_per_aspirate} ul "
-             f"is greater than well working volume {well_working_ul}")
+        assert diluent_per_aspirate <= well_working_ul, (
+            f"diluent aspirate of {diluent_per_aspirate} ul "
+            f"is greater than well working volume {well_working_ul}"
+        )
         max_ul_in_well = critical_ul["setup_max"] - diluent_per_aspirate
         for _ in range(num_aspirates_per_plate):
             if dil_ul_by_reservoir_well[current_well] > max_ul_in_well:
@@ -244,9 +249,8 @@ def load_liquid_dye(
     reservoirs_dye: List[Labware],
     volumes: List[float],
 ) -> Dict[float, List[Well]]:
-    dye_wells_by_volume: Dict[float, List[Well]] = {
-        v: [] for v in volumes
-    }
+    """Load liquid dye."""
+    dye_wells_by_volume: Dict[float, List[Well]] = {v: [] for v in volumes}
 
     liquid_by_volume = {
         v: ctx.define_liquid(name, name, cfg[2])
@@ -257,73 +261,79 @@ def load_liquid_dye(
     critical_ul = CRITICAL_UL_BY_LABWARE[reservoirs_dye[0].load_name]
     well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
     src_wells: List[Well] = [w for r in reservoirs_dye for w in r.wells()]
-    num_trials_by_volume = {v: TRIALS_BY_PIPETTE[pipette.name][i] for i, v in enumerate(volumes)}
+    num_trials_by_volume = {
+        v: TRIALS_BY_PIPETTE[pipette.name][i] for i, v in enumerate(volumes)
+    }
     for test_ul, liquid in liquid_by_volume.items():
         ul_per_aspirate = test_ul * pipette.channels
         total_ul_aspirated_per_test_ul = 0.0
         current_src_well = src_wells.pop(0)  # pop!
+
+        def _load_liquid_and_pop_to_next_well() -> None:
+            nonlocal total_ul_aspirated_per_test_ul, current_src_well
+            assert total_ul_aspirated_per_test_ul > 0
+            ul_in_well = critical_ul["dead"] + total_ul_aspirated_per_test_ul
+            current_src_well.load_liquid(liquid, ul_in_well)
+            total_ul_aspirated_per_test_ul = 0.0
+            if len(src_wells):
+                current_src_well = src_wells.pop(0)  # pop!
+
         for _ in range(num_trials_by_volume[test_ul]):
             if total_ul_aspirated_per_test_ul + ul_per_aspirate > well_working_ul:
-                assert total_ul_aspirated_per_test_ul > 0
-                ul_in_well = critical_ul["dead"] + total_ul_aspirated_per_test_ul
-                current_src_well.load_liquid(liquid, ul_in_well)
-                total_ul_aspirated_per_test_ul = 0.0
-                current_src_well = src_wells.pop(0)  # pop!
+                _load_liquid_and_pop_to_next_well()
             dye_wells_by_volume[test_ul].append(current_src_well)
             total_ul_aspirated_per_test_ul += ul_per_aspirate
+        _load_liquid_and_pop_to_next_well()
     return dye_wells_by_volume
 
 
 def _transfer_src_to_dst(
-        pipette: InstrumentContext,
-        liq_cls: LiquidClass,
-        source: List[Well],
-        plate: Labware,
-        ul: float,
-        trials: int,
-        new_tip: str,
+    pipette: InstrumentContext,
+    liq_cls: LiquidClass,
+    source: List[Well],
+    plate: Labware,
+    ul: float,
+    trials: int,
+    new_tip: str,
 ) -> None:
-    dest = {
+    dest_by_ch: Dict[int, List[Well]] = {
         1: plate.wells()[:trials],
-        8: plate.columns()[:trials],
-        96: plate["A1"],
-    }[pipette.channels]
+        8: plate.columns()[:trials],  # type: ignore[dict-item]
+        96: [plate["A1"]],
+    }
+    dest: List[Well] = dest_by_ch[pipette.channels]
     assert len(source) == len(dest), f"source={len(source)}, dest={len(dest)}"
-    pipette.transfer_liquid(
-        liq_cls, ul, source, dest, new_tip=new_tip
-    )
+    pipette.transfer_liquid(liq_cls, ul, source, dest, new_tip=new_tip)  # type: ignore[arg-type]
 
 
 def run(ctx: ProtocolContext) -> None:
+    """Run."""
     ctx.load_trash_bin(SLOTS["trash"])
-    test_pipette = ctx.load_instrument(ctx.params.pipette, "left")
+    test_pipette = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
     diluent_pipette: Optional[InstrumentContext] = None
     if test_pipette.channels != 96:
         diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
     tip_ul = load_tip_racks(ctx, test_pipette, diluent_pipette)
     volumes = [
         min(max(v, test_pipette.min_volume), tip_ul)
-        for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]
+        for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
     ]
     reservoir_diluent, reservoirs_dye, plates = load_labware(
         ctx, test_pipette, volumes, tip_ul
     )
-    dye_wells_by_volume = load_liquid_dye(
-        ctx, test_pipette, reservoirs_dye, volumes
-    )
+    dye_wells_by_volume = load_liquid_dye(ctx, test_pipette, reservoirs_dye, volumes)
     diluent_wells_by_volume = load_liquid_diluent(
         ctx, test_pipette, reservoir_diluent, volumes
     )
-    trials_by_ul = {
-        v: t
-        for v, t in zip(volumes, TRIALS_BY_PIPETTE[test_pipette.name])
-    }
+    trials_by_ul = {v: t for v, t in zip(volumes, TRIALS_BY_PIPETTE[test_pipette.name])}
 
     diluent_class = ctx.define_liquid_class("water")
-    test_class = ctx.define_liquid_class(ctx.params.liquid)
+    test_class = ctx.define_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
     # DILUENT
-    pip_for_dil: InstrumentContext = diluent_pipette if diluent_pipette else test_pipette
+    pip_for_dil: InstrumentContext = (
+        diluent_pipette if diluent_pipette else test_pipette
+    )
     pip_for_dil.pick_up_tip()
     for ul, plate in zip(volumes, plates):
         if ul < DYE_READER_IDEAL_UL:
@@ -334,7 +344,7 @@ def run(ctx: ProtocolContext) -> None:
                 plate,
                 DYE_READER_IDEAL_UL - ul,
                 trials_by_ul[ul],
-                new_tip="never"
+                new_tip="never",
             )
     pip_for_dil.drop_tip()
 
@@ -347,5 +357,5 @@ def run(ctx: ProtocolContext) -> None:
             plate,
             ul,
             trials_by_ul[ul],
-            new_tip="always"
+            new_tip="always",
         )
