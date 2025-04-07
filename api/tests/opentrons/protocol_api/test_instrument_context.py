@@ -1589,12 +1589,12 @@ def test_mix_with_delay(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should aspirate/dispense to a well several times."""
+    """It should delay after the aspirate/dispense in a mix."""
     mock_well = decoy.mock(cls=Well)
     input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
         input_location,
-    )
+    )  # last location same as input_location, so in_place should be true
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1)).then_return(4.56)
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1)).then_return(5.67)
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
