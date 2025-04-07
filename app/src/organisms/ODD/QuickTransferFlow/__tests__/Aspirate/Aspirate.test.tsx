@@ -98,7 +98,7 @@ describe('Aspirate', () => {
   let props: ComponentProps<typeof Aspirate>
 
   beforeEach(() => {
-    props = props = {
+    props = {
       state: {
         pipette: {
           channels: 1,
