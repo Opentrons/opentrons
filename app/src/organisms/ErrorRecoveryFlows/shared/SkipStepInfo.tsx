@@ -19,7 +19,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
     MANUAL_MOVE_AND_SKIP,
     IGNORE_AND_SKIP,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
-    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands

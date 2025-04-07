@@ -83,7 +83,11 @@ export function TwoColLwInfoAndDeck(
         return t('ensure_stacker_has_labware')
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE || step === HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.MANUAL_REPLACE) {
+        if (
+          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
+          step ===
+            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE
+        ) {
           return t('load_labware_into_labware_shuttle')
         } else {
           return t('ensure_stacker_has_labware')
@@ -117,7 +121,11 @@ export function TwoColLwInfoAndDeck(
         return t('make_sure_loaded_correct_number_of_labware_stacker')
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE || step === HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.MANUAL_REPLACE) {
+        if (
+          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
+          step ===
+            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE
+        ) {
           return null
         } else {
           return t('make_sure_loaded_correct_number_of_labware_stacker')
