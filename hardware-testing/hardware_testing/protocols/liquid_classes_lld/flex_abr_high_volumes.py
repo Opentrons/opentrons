@@ -529,11 +529,13 @@ def run(ctx: ProtocolContext) -> None:
     #       gripper to re-arrange things
     trials_and_dst_wells: List[Tuple[TestTrial, List[Well]]] = []
     test_well_names = list(test_labware.wells_by_name().keys())
+    test_well_names.reverse()  # reverse b/c plates are loaded bottom-to-top of stack
     lid = ctx.load_labware(PLATE_LID_LOAD_NAME, location=SLOTS["stack"])
     dst_plate = lid.load_labware(DST_LABWARE)
     while len(test_well_names):
         dst_plate.load_liquid(dst_plate.wells(), 0.01, air)  # FIXME
         plate_wells = dst_plate.wells()
+        plate_wells.reverse()  # reverse b/c test wells are also reversed
         while min(len(test_well_names), len(plate_wells)):
             next_well_name = test_well_names.pop(0)  # pop!
             trial = TestTrial.build(ctx, pipette, test_labware, next_well_name)
@@ -568,15 +570,13 @@ def run(ctx: ProtocolContext) -> None:
     # RUN
     done_stack: List[Labware] = []
     while len(trials_and_dst_wells):
+        trial, dst_wells = trials_and_dst_wells.pop()  # pop!
 
         # TOP PLATE from STACK
         if not shaker_adapter.child:
             shaker_module.open_labware_latch()
             ctx.move_labware(dst_plate, new_location=shaker_adapter, use_gripper=True)
             shaker_module.close_labware_latch()
-
-        trial, dst_wells = trials_and_dst_wells.pop()
-        input(len(trials_and_dst_wells))
 
         # SWAP PLATES
         if dst_wells[0] not in dst_plate.wells():
