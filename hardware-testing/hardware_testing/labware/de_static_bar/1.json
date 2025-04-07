@@ -16,7 +16,7 @@
   "dimensions": {
     "xDimension": 128.0,
     "yDimension": 86.0,
-    "zDimension": 100.0
+    "zDimension": 120.0
   },
   "wells": {
     "A1": {
@@ -25,9 +25,9 @@
       "xDimension": 10.0,
       "yDimension": 86.0,
       "totalLiquidVolume": 0.0,
-      "x": 64.0,
+      "x": 25.0,
       "y": 43.0,
-      "z": 50.0
+      "z": 70.0
     }
   },
   "groups": [
