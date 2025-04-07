@@ -1,7 +1,7 @@
 """Command models to configure the stored labware pool of a Flex Stacker.."""
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING
+from typing import Optional, Literal, TYPE_CHECKING, Annotated
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
@@ -54,13 +54,12 @@ class SetStoredLabwareParams(BaseModel):
         default=None,
         description="The details of the adapter under the primary labware, if any.",
     )
-    initialCount: int | SkipJsonSchema[None] = Field(
+    initialCount: Optional[Annotated[int, Field(ge=0)]] = Field(
         None,
         description=(
             "The number of labware that should be initially stored in the stacker. This number will be silently clamped to "
             "the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker."
         ),
-        ge=0,
     )
 
 

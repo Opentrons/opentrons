@@ -1851,11 +1851,18 @@
       "description": "The parameters defining how a stacker should be emptied.",
       "properties": {
         "count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
           "default": null,
           "description": "The new count of labware in the pool. If None, default to an empty pool. If this number is larger than the amount of labware currently in the pool, default to the smaller amount. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
-          "ge": 0,
-          "title": "Count",
-          "type": "integer"
+          "title": "Count"
         },
         "message": {
           "default": null,
@@ -2157,11 +2164,18 @@
       "description": "The parameters defining how a stacker should be filled.",
       "properties": {
         "count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
           "default": null,
           "description": "How full the labware pool should now be. If None, default to the maximum amount of the currently-configured labware the pool can hold. If this number is larger than the maximum the pool can hold, it will be clamped to the maximum. If this number is smaller than the current amount of labware the pool holds, it will be clamped to that minimum. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
-          "ge": 1,
-          "title": "Count",
-          "type": "integer"
+          "title": "Count"
         },
         "message": {
           "default": null,
@@ -5070,11 +5084,18 @@
           "title": "Adapterlabware"
         },
         "initialCount": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
           "default": null,
           "description": "The number of labware that should be initially stored in the stacker. This number will be silently clamped to the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker.",
-          "ge": 0,
-          "title": "Initialcount",
-          "type": "integer"
+          "title": "Initialcount"
         },
         "lidLabware": {
           "$ref": "#/$defs/StackerStoredLabwareDetails",

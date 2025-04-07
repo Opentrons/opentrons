@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING
+from typing import Optional, Literal, TYPE_CHECKING, Annotated
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
@@ -45,7 +45,7 @@ class EmptyParams(BaseModel):
         description="The message to display on connected clients during a manualWithPause strategy empty.",
     )
 
-    count: int | SkipJsonSchema[None] = Field(
+    count: Optional[Annotated[int, Field(ge=0)]] = Field(
         None,
         description=(
             "The new count of labware in the pool. If None, default to an empty pool. If this number is "
@@ -53,7 +53,6 @@ class EmptyParams(BaseModel):
             "Do not use the value in the parameters as an outside observer; instead, use the count value "
             "from the results."
         ),
-        ge=0,
     )
 
 

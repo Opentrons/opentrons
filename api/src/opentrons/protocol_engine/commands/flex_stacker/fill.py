@@ -1,7 +1,7 @@
 """Command models to engage a user to empty a Flex Stacker."""
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING
+from typing import Optional, Literal, TYPE_CHECKING, Annotated
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
@@ -43,7 +43,7 @@ class FillParams(BaseModel):
         description="The message to display on connected clients during a manualWithPause strategy fill.",
     )
 
-    count: int | SkipJsonSchema[None] = Field(
+    count: Optional[Annotated[int, Field(ge=1)]] = Field(
         None,
         description=(
             "How full the labware pool should now be. If None, default to the maximum amount "
@@ -53,7 +53,6 @@ class FillParams(BaseModel):
             "holds, it will be clamped to that minimum. Do not use the value in the parameters as "
             "an outside observer; instead, use the count value from the results."
         ),
-        ge=1,
     )
 
 
