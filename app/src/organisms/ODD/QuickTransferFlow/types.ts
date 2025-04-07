@@ -35,6 +35,13 @@ export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
 export type AspirateSettingOption = typeof ASPIRATE_SETTING_OPTIONS[keyof typeof ASPIRATE_SETTING_OPTIONS]
 export type DispenseSettingOption = typeof DISPENSE_SETTING_OPTIONS[keyof typeof DISPENSE_SETTING_OPTIONS]
+export interface SettingItem {
+  option: string
+  copy: string
+  value: string
+  enabled: boolean
+  onClick: () => void
+}
 
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs

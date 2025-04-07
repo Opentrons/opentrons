@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { SettingItem } from './hooks/useAspirateSettingsConfig'
+import type { SettingItem } from '../types'
 
 interface AspirateSettingsListProps {
   displayItem: SettingItem

@@ -10,15 +10,8 @@ import type {
   AspirateSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
+  SettingItem,
 } from '../../types'
-
-export interface SettingItem {
-  option: string
-  copy: string
-  value: string
-  enabled: boolean
-  onClick: () => void
-}
 
 interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
@@ -26,10 +19,11 @@ interface UseAspirateSettingsConfigProps {
   setSelectedSetting: (setting: AspirateSettingOption | null) => void
 }
 
-export function useAspirateSettingsConfig(
-  props: UseAspirateSettingsConfigProps
-): SettingItem[] {
-  const { state, dispatch, setSelectedSetting } = props
+export function useAspirateSettingsConfig({
+  state,
+  dispatch,
+  setSelectedSetting,
+}: UseAspirateSettingsConfigProps): SettingItem[] {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
 
