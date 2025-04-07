@@ -1165,6 +1165,16 @@
       "x": 0,
       "y": 0,
       "z": 1.1
+    },
+    "stackable_corning_96_wellplate_360ul_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 1.3
+    },
+    "corning_96_wellplate_360ul_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 1.3
     }
   },
   "innerLabwareGeometry": {
