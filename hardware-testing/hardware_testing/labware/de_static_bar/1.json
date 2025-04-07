@@ -1,0 +1,59 @@
+{
+  "ordering": [
+    ["A1"]
+  ],
+  "brand": {
+    "brand": "McMaster-Carr",
+    "brandId": ["2246K32"],
+    "links": ["https://www.mcmaster.com/2246K32/"]
+  },
+  "metadata": {
+    "displayName": "De-Static Bar",
+    "displayCategory": "other",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 128.0,
+    "yDimension": 86.0,
+    "zDimension": 100.0
+  },
+  "wells": {
+    "A1": {
+      "depth": 50.0,
+      "shape": "rectangular",
+      "xDimension": 10.0,
+      "yDimension": 86.0,
+      "totalLiquidVolume": 0.0,
+      "x": 64.0,
+      "y": 43.0,
+      "z": 50.0
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "wellBottomShape": "flat"
+      },
+      "wells": [
+        "A1"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "trough",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "loadName": "de_static_bar"
+  },
+  "namespace": "custom_beta",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "innerLabwareGeometry": {}
+}
