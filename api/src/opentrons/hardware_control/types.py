@@ -2,7 +2,7 @@ from asyncio import Queue
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
+from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type, Awaitable
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.types import PipetteChannelType
@@ -598,6 +598,16 @@ class StatusBarState(enum.Enum):
             StatusBarState.ACTIVATION.value,
             StatusBarState.DISCO.value,
         }
+
+
+@dataclass(frozen=True)
+class StatusBarUpdateEvent:
+    state: StatusBarState
+    enabled: bool
+
+
+StatusBarUpdateListener = Callable[[StatusBarUpdateEvent], None]
+StatusBarUpdateUnsubscriber = Callable[[], None]
 
 
 @dataclass

@@ -1,6 +1,12 @@
 from typing import Dict, Optional
 from typing_extensions import Protocol
-from ..types import DoorState, StatusBarState, EstopState
+from ..types import (
+    DoorState,
+    StatusBarState,
+    EstopState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
+)
 from .event_sourcer import EventSourcer
 
 
@@ -59,6 +65,15 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         """Get the current status bar state.
 
         :returns: The current status bar state enumeration."""
+        ...
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        """Add a listener to the status bar state.
+
+        listener: The listener to add.
+        :returns: A callback function that removes the listener."""
         ...
 
     def get_estop_state(self) -> EstopState:
