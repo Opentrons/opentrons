@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from typing import Any, List, Optional, Sequence, Union, cast
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -480,7 +480,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def mix(
+    def mix(  # noqa: C901
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
@@ -564,7 +564,9 @@ class InstrumentContext(publisher.CommandPublisher):
             ):
                 self._protocol_core.delay(seconds=seconds, msg=None)
 
-        def aspirate_with_delay(location: Optional[types.Location | labware.Well]) -> None:
+        def aspirate_with_delay(
+            location: Optional[types.Location | labware.Well],
+        ) -> None:
             self.aspirate(volume=volume, location=location, rate=rate)
             if aspirate_delay:
                 delay_with_publish(aspirate_delay)
