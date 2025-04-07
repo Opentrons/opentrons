@@ -446,7 +446,7 @@ async def _main(args: argparse.Namespace) -> None:
         cam = await OmronMircoscanCamera.create(port = camera_port, loop=asyncio.get_event_loop())      
     try:
         if args.only_gantry:
-            await run_gantry_motion()
+            await run_gantry_motion(args, api)
         elif args.only_camera:
             await camera_task(cam)
         else:
