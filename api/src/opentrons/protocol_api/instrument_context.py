@@ -231,7 +231,7 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         move_to_location: types.Location
-        well: Optional[labware.Well] = None
+        well: Optional[labware.Well]
         last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
