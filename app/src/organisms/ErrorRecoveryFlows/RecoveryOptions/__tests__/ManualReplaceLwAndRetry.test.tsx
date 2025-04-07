@@ -8,15 +8,20 @@ import { RECOVERY_MAP } from '../../constants'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../shared', () => ({
-  GripperIsHoldingLabware: vi.fn(() => (
-    <div>MOCK_GRIPPER_IS_HOLDING_LABWARE</div>
-  )),
-  GripperReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
-  TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
-  RetryStepInfo: vi.fn(() => <div>MOCK_RETRY_STEP_INFO</div>),
-  RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
-}))
+vi.mock('../../shared', async (importOriginal) => {
+  const mod = await importOriginal() // type is inferred
+  return {
+    ...mod,
+    GripperIsHoldingLabware: vi.fn(() => (
+      <div>MOCK_GRIPPER_IS_HOLDING_LABWARE</div>
+    )),
+    GripperReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
+    TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
+    RetryStepInfo: vi.fn(() => <div>MOCK_RETRY_STEP_INFO</div>),
+    RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
+    // TwoColTextAndFailedStepNextStep: vi.fn()
+  }
+})
 
 vi.mock('../SelectRecoveryOption', () => ({
   SelectRecoveryOption: vi.fn(() => <div>MOCK_SELECT_RECOVERY_OPTION</div>),
@@ -32,12 +37,19 @@ describe('ManualReplaceLwAndRetry', () => {
         step:
           RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
       },
+      doorStatusUtils: {
+        isDoorOpen: false
+      },
       routeUpdateActions: {
         proceedToRouteAndStep: vi.fn(),
+        handleMotionRouting: vi.fn(() => Promise.resolve()),
       },
       recoveryCommands: {
-        homeShuttle: vi.fn(),
+        homeShuttle: vi.fn(() => Promise.resolve()),
       },
+      stepCounts: {
+        hasRunDiverged: false
+      }
     } as any
   })
 
@@ -101,9 +113,20 @@ describe('ManualReplaceLwAndRetry', () => {
     const button = screen.getAllByRole('button')[0];
     expect(button).toBeEnabled();
     screen.getByText('Load labware shuttle onto track')
-    // const handleClick = spyOn(props.recoveryCommands.homeShuttle(), 'handleClick');
+  })
+
+
+  it(`renders TwoColTextAndFailedStepNextStep for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING} step`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING
+    props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
+    render(props)
+    const button = screen.getAllByRole('button')[0];
+    expect(button).toBeEnabled();
+    // screen.getByText('Load labware shuttle onto track')
     fireEvent.click(button)
-    expect(handleClick).toBeCalledTimes(1)
+    const spy =  vi.spyOn(props.recoveryCommands, 'homeShuttle')
+    expect(spy).toBeCalledTimes(1)
   })
 
   it('renders SelectRecoveryOption for unknown step', () => {
