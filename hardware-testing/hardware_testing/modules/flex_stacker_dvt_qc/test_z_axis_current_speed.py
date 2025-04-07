@@ -1,4 +1,4 @@
-"""Test X Axis."""
+"""Test Z Axis."""
 from typing import List, Union, Tuple, Optional
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
@@ -176,6 +176,7 @@ async def test_retract_cycle(
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
     await stacker._driver.set_stallguard_threshold(TEST_AXIS, False, STALLTHRESHOLD)
+    total_failures = 0
     for speed in TEST_SPEEDS:
         for current in TEST_CURRENTS:
             tag = f"speed-{speed}-current-{current}"
@@ -185,6 +186,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             extend_data: List[Optional[float]] = [None] * TEST_TRIALS
             retract_data: List[Optional[float]] = [None] * TEST_TRIALS
             while trial < TEST_TRIALS:
+                ui.print_info(f"> Trials: {trial + 1}")
                 # Test extend direction first
                 extend, dist = await test_extend_cycle(stacker, speed, current)
                 extend_data[trial] = dist
@@ -206,15 +208,18 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                         f"current {current} A, Distance {dist} mm"
                     )
                     failures += 1
-                trial += 1
-
+                trial += 1 
             success_trials = trial - failures
             success_rate = (1 - failures / trial) * 100
-            if current >= CURRENT_THRESHOD:
-                # If current is above threshold, all trials must pass
-                result = CSVResult.from_bool(success_rate == 100.0)
-            else:
-                result = CSVResult.PASS
+            ui.print_info(f"Failures: {failures}, Success Rate: {success_rate}%")
+            # if current >= CURRENT_THRESHOD:
+            #     # If current is above threshold, all trials must pass
+            #     result = CSVResult.from_bool(success_rate == 100.0)
+            # else:
+            #     result = CSVResult.PASS
+            if current >= CURRENT_THRESHOD and success_rate < 100.0:
+                total_failures += 1
+            result = CSVResult.from_bool(success_rate == 100.0)
             report(
                 section,
                 f"speed-{speed}-current-{current}-success-failed-pass%",
@@ -223,12 +228,14 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             report(section, f"{tag}-extend-distance", extend_data)
             report(section, f"{tag}-retract-distance", retract_data)
 
-            # Stop the test if any trial fails
+            # Continue the test if any trial fails
             if result == CSVResult.FAIL:
                 ui.print_error(
                     f"Z Axis failed at speed {speed} mm/s, current {current} A"
                 )
-                return
+                continue
+    ui.print_header("RESULT_Z_AXIS_CURRENT_SPEED")   
+    print("PASS")  if total_failures == 0 else print("FAIL")
     # End test in home position
     await stacker._driver.set_stallguard_threshold(TEST_AXIS, True, STALLTHRESHOLD)
     await stacker.home_axis(TEST_AXIS, Direction.RETRACT)
