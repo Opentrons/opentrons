@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, Optional, Mapping
+from typing import Any, Dict, Optional, Mapping
 
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -35,6 +35,7 @@ from opentrons.hardware_control.modules.types import (
     LiveData,
     FlexStackerData,
 )
+from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
@@ -508,6 +509,36 @@ class FlexStacker(mod_abc.AbstractModule):
                 self.device_info["serial"],
                 labware_expected=labware_expected,
             )
+
+    def event_listener(self, event: Any) -> None:
+        if isinstance(event, StatusBarUpdateEvent):
+            print(f"Received status bar event: {event}")
+            asyncio.run_coroutine_threadsafe(
+                self._handle_status_bar_event(event), self._loop
+            )
+
+    async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:
+        print(f"Received status bar event: {event}")
+        if event.enabled:
+            match event.state:
+                case StatusBarState.RUNNING:
+                    await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
+                case StatusBarState.PAUSED:
+                    await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
+                case StatusBarState.IDLE:
+                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                case StatusBarState.HARDWARE_ERROR:
+                    await self.set_led_state(0.5, LEDColor.RED, LEDPattern.FLASH)
+                case StatusBarState.SOFTWARE_ERROR:
+                    await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.STATIC)
+                case StatusBarState.ERROR_RECOVERY:
+                    await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.PULSE)
+                case StatusBarState.RUN_COMPLETED:
+                    await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.PULSE)
+                case StatusBarState.UPDATING:
+                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
+                case _:
+                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
 
 
 class FlexStackerReader(Reader):
