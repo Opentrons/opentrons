@@ -105,6 +105,7 @@ class AspirateMode(Enum):
 # ASPIRATE-MODES are PRE-CONFIGURED by SOURCE-WELL
 M = AspirateMode.MENISCUS
 M_LLD = AspirateMode.MENISCUS_LLD
+# fmt: off
 ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[AspirateMode]]] = {
     6: {
         "A": [M_LLD, M_LLD, M_LLD],
@@ -125,68 +126,17 @@ ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[AspirateMode]]] = {
         "D": [M, M, M, M, M, M],
     },
     96: {
-        "A": [
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-        ],
+        "A": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
         "B": [M, M, M, M, M, M, M, M, M, M, M, M],
-        "C": [
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-        ],
+        "C": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
         "D": [M, M, M, M, M, M, M, M, M, M, M, M],
-        "E": [
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-        ],
+        "E": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
         "F": [M, M, M, M, M, M, M, M, M, M, M, M],
-        "G": [
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-            M_LLD,
-        ],
+        "G": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
         "H": [M, M, M, M, M, M, M, M, M, M, M, M],
     },
 }
+# fmt: on
 
 
 def _get_aspirate_mode_for_well(well: Well) -> AspirateMode:
@@ -500,11 +450,6 @@ def run(ctx: ProtocolContext) -> None:
         ],
     )
 
-    # NOTE: `InstrumentContext.get_minimum_liquid_sense_height()`
-    #       requires a tip to be currently attached, else it raises an error.
-    #       We call that function when pre-calculating stuff.
-    _pick_up_tip_and_zero_min_height(ctx, pipette)
-
     range_hv = ctx.define_liquid(name="red-dye", display_color="#FF0000")
     # FIXME: get rid of this "air" liquid once the bug is fixed
     #        where we're not able to estimate-height if well is empty
@@ -523,32 +468,34 @@ def run(ctx: ProtocolContext) -> None:
     err_msg = f"{ctx.params.test_labware} and {ctx.params.channels}ch"  # type: ignore[attr-defined]
     assert ctx.params.test_labware in possible_lws, err_msg  # type: ignore[attr-defined]
 
-    # PRE-DETERMINE VOLUME/LOCATIONS
-    # NOTE: storing trials by test-labware instance, so that during
-    #       the test-run loop we can easily know when to use the
-    #       gripper to re-arrange things
+    # PLATE STACK
+    lid: Labware = ctx.load_labware(PLATE_LID_LOAD_NAME, location=SLOTS["stack"])
+    dst_plates: List[Labware] = [lid.load_labware(DST_LABWARE, label="plate_0")]
+    dispenses_per_aspirate = ceil(pipette.max_volume / SHAKER_MAX_UL)
+    total_dsp_wells = len(test_labware.wells()) * dispenses_per_aspirate
+    total_dsp_plates = ceil(total_dsp_wells / len(dst_plates[-1].wells()))
+    while len(dst_plates) < total_dsp_plates:
+        lid = dst_plates[-1].load_labware(PLATE_LID_LOAD_NAME)
+        plate = lid.load_labware(DST_LABWARE, label=f"plate_{len(dst_plates)}")
+        dst_plates.append(plate)
+    for plate in dst_plates:
+        plate.load_liquid(plate.wells(), 0.01, air)  # FIXME
     trials_and_dst_wells: List[Tuple[TestTrial, List[Well]]] = []
-    test_well_names = list(test_labware.wells_by_name().keys())
-    test_well_names.reverse()  # reverse b/c plates are loaded bottom-to-top of stack
-    lid = ctx.load_labware(PLATE_LID_LOAD_NAME, location=SLOTS["stack"])
-    dst_plate = lid.load_labware(DST_LABWARE)
-    while len(test_well_names):
-        dst_plate.load_liquid(dst_plate.wells(), 0.01, air)  # FIXME
-        plate_wells = dst_plate.wells()
-        plate_wells.reverse()  # reverse b/c test wells are also reversed
-        while min(len(test_well_names), len(plate_wells)):
-            next_well_name = test_well_names.pop(0)  # pop!
-            trial = TestTrial.build(ctx, pipette, test_labware, next_well_name)
-            assert len(trial.destination_volumes) in [1, 4], f"unable to support "
-            dst_wells = [
-                plate_wells.pop(0)  # pop!
-                for _ in range(len(trial.destination_volumes))
-            ]
-            trials_and_dst_wells.append((trial, dst_wells))
-        if not test_well_names:
-            break
-        lid = dst_plate.load_labware(PLATE_LID_LOAD_NAME)
-        dst_plate = lid.load_labware(DST_LABWARE)
+    # NOTE: iterating through plates in reverse
+    #       b/c that's how gripper picks them up
+    remaining_dst_wells = [w for p in dst_plates[::-1] for w in p.wells()]
+    for test_well in test_labware.wells():
+        trial = TestTrial.build(ctx, pipette, test_labware, test_well.well_name)
+        assert len(trial.destination_volumes) in [1, 4], (
+            f"unable to support multi-dispense "
+            f"with {len(trial.destination_volumes)}x dispenses"
+        )
+        dst_wells = [
+            remaining_dst_wells.pop(0)  # pop!
+            for _ in range(len(trial.destination_volumes))
+        ]
+        assert len(set([w.parent for w in dst_wells])) == 1
+        trials_and_dst_wells.append((trial, dst_wells))
 
     # LOAD LIQUID
     dye_src_well = src_reservoir["A1"]
@@ -558,7 +505,7 @@ def run(ctx: ProtocolContext) -> None:
     src_reservoir.load_liquid([dye_src_well], min_dye_required_in_reservoir, range_hv)
 
     # DETECT LIQUID
-    # NOTE: pipette should already have tip attached
+    _pick_up_tip_and_zero_min_height(ctx, pipette)
     pipette.require_liquid_presence(dye_src_well)
     if not ctx.is_simulating():
         ul = cast(float, dye_src_well.current_liquid_volume())
@@ -568,32 +515,39 @@ def run(ctx: ProtocolContext) -> None:
         )
 
     # RUN
+    all_disp_vols: List[float] = []
     done_stack: List[Labware] = []
     while len(trials_and_dst_wells):
-        trial, dst_wells = trials_and_dst_wells.pop()  # pop!
+        trial, dst_wells = trials_and_dst_wells.pop(0)  # pop!
 
         # TOP PLATE from STACK
         if not shaker_adapter.child:
             shaker_module.open_labware_latch()
-            ctx.move_labware(dst_plate, new_location=shaker_adapter, use_gripper=True)
+            ctx.move_labware(
+                dst_plates[-1], new_location=shaker_adapter, use_gripper=True
+            )
             shaker_module.close_labware_latch()
 
         # SWAP PLATES
-        if dst_wells[0] not in dst_plate.wells():
-            next_plate = lid.parent
-            assert isinstance(next_plate, Labware)
-            assert dst_wells[0] in next_plate.wells()
-            _shake_then_read_then_stack(ctx, dst_plate, shaker_module, reader_module)
+        if dst_wells[0] not in dst_plates[-1].wells():
+            assert (
+                dst_wells[0] in dst_plates[-2].wells()
+            ), f"{dst_wells[0].parent} wells not in {dst_plates[-1]}, but also not {dst_plates[-2]}"
+            _shake_then_read_then_stack(
+                ctx, dst_plates[-1], shaker_module, reader_module
+            )
             new_location = done_stack[-1] if done_stack else SLOTS["stack_end"]
-            ctx.move_labware(dst_plate, new_location=new_location, use_gripper=True)  # type: ignore[arg-type]
-            done_stack.append(dst_plate)
+            ctx.move_labware(dst_plates[-1], new_location=new_location, use_gripper=True)  # type: ignore[arg-type]
+            done_stack.append(dst_plates[-1])
+            dst_plates.pop()  # pop!
             ctx.move_labware(lid, new_location=done_stack[-1], use_gripper=True)
             done_stack.append(lid)
             # NOTE: new destination plate and cached lid
-            dst_plate = next_plate
-            lid = cast(Labware, next_plate.parent)
+            lid = cast(Labware, dst_plates[-1].parent)
             shaker_module.open_labware_latch()
-            ctx.move_labware(dst_plate, new_location=shaker_adapter, use_gripper=True)
+            ctx.move_labware(
+                dst_plates[-1], new_location=shaker_adapter, use_gripper=True
+            )
             shaker_module.close_labware_latch()
 
         # ADD DYE TO TEST-LABWARE
@@ -637,6 +591,7 @@ def run(ctx: ProtocolContext) -> None:
 
         # MULTI-DISPENSE TO PLATE
         for w, v in zip(dst_wells, trial.destination_volumes):
+            all_disp_vols.append(v)
             push_out = 0 if v < pipette.current_volume else P1000_MAX_PUSH_OUT_UL
             pipette.dispense(
                 volume=v,
@@ -647,3 +602,11 @@ def run(ctx: ProtocolContext) -> None:
             )
             pipette.touch_tip(w)
         pipette.drop_tip()
+
+    assert len(set(all_disp_vols)) == 1, "Every dispense must be of identical volumes"
+    total_wells = len(all_disp_vols)
+    total_plates = ceil(total_wells / 96)
+    ctx.comment(
+        f"all {total_wells}x wells ({total_plates}x plates) "
+        f"hold {all_disp_vols[0]} ul"
+    )
