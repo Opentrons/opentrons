@@ -7,7 +7,6 @@ from packaging.version import InvalidVersion, parse, Version
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
 
-from ..types import StatusBarUpdateListener, StatusBarUpdateEvent
 from ..execution_manager import ExecutionManager
 from .types import (
     BundledFirmware,

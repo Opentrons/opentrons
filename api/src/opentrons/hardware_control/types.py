@@ -2,7 +2,7 @@ from asyncio import Queue
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type, Awaitable
+from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.types import PipetteChannelType
