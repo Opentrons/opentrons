@@ -46,8 +46,18 @@ export const customViewports = {
     name: 'Protocol Designer Base',
     type: 'desktop',
     styles: {
-      width: '14402px',
+      width: '1440px',
       height: '1024px',
+    },
+  },
+  protocolDesignerSmallHeight: {
+    // The small height for Protocol Designer. This is useful for
+    // viewing the app in a smaller window
+    name: 'Protocol Designer Small Height',
+    type: 'desktop',
+    styles: {
+      width: '1440px',
+      height: '664px',
     },
   },
 }
