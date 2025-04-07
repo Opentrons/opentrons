@@ -657,6 +657,23 @@ class CommandView:
             total_length=total_length,
         )
 
+    def get_slice_since_index(
+        self, index: int, include_fixit_commands: bool
+    ) -> CommandSlice:
+        """Get all commands from start up to given index."""
+        current_command = self.get_current()
+        if current_command is None:
+            return CommandSlice(
+                commands=[],
+                cursor=0,
+                total_length=0,
+            )
+        return self.get_slice(
+            cursor=index,
+            length=current_command.index - index + 1,
+            include_fixit_commands=include_fixit_commands,
+        )
+
     def get_errors_slice(
         self,
         cursor: int,

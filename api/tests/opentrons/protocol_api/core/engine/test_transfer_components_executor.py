@@ -27,6 +27,7 @@ from opentrons.protocols.advanced_control.transfers import (
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
 )
+from opentrons.protocol_engine.clients.sync_client import SyncClient as EngineClient
 from opentrons.types import Location, Point
 
 
@@ -34,6 +35,12 @@ from opentrons.types import Location, Point
 def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Return a mocked out instrument core."""
     return decoy.mock(cls=InstrumentCore)
+
+
+@pytest.fixture
+def mock_engine_client(decoy: Decoy) -> EngineClient:
+    """Return a mocked out engine client."""
+    return decoy.mock(cls=EngineClient)
 
 
 @pytest.fixture
@@ -81,6 +88,7 @@ def patch_mock_raise_if_location_inside_liquid(
 def test_submerge_without_lpd(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """Should perform the expected submerge steps."""
@@ -96,6 +104,7 @@ def test_submerge_without_lpd(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -167,6 +176,7 @@ def test_submerge_without_lpd(
 def test_submerge_with_lpd(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """Should perform the expected submerge steps."""
@@ -181,6 +191,7 @@ def test_submerge_with_lpd(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -245,6 +256,7 @@ def test_submerge_with_lpd(
 def test_submerge_raises_when_submerge_point_is_invalid(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """Should raise an error when submerge start point is invalid."""
@@ -253,6 +265,7 @@ def test_submerge_raises_when_submerge_point_is_invalid(
     well_bottom_point = Point(4, 5, 6)
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -295,6 +308,7 @@ def test_submerge_raises_when_submerge_point_is_invalid(
 def test_aspirate_and_wait(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     position_reference: PositionReference,
 ) -> None:
@@ -309,6 +323,7 @@ def test_aspirate_and_wait(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -333,6 +348,7 @@ def test_aspirate_and_wait(
 def test_aspirate_and_wait_skips_delay(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should skip the wait after aspirate."""
@@ -341,6 +357,7 @@ def test_aspirate_and_wait_skips_delay(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -364,6 +381,7 @@ def test_aspirate_and_wait_skips_delay(
 def test_dispense_and_wait(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     position_reference: PositionReference,
 ) -> None:
@@ -378,6 +396,7 @@ def test_dispense_and_wait(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -407,6 +426,7 @@ def test_dispense_and_wait(
 def test_dispense_and_wait_skips_delay(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should skip the wait after dispense."""
@@ -415,6 +435,7 @@ def test_dispense_and_wait_skips_delay(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -435,6 +456,7 @@ def test_dispense_and_wait_skips_delay(
 def test_mix(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should execute mix steps."""
@@ -453,6 +475,7 @@ def test_mix(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -492,6 +515,7 @@ def test_mix(
 def test_mix_disabled(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should not perform a mix when it is disabled."""
@@ -505,6 +529,7 @@ def test_mix_disabled(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -532,6 +557,7 @@ def test_mix_disabled(
 def test_pre_wet(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should execute pre-wet steps."""
@@ -550,6 +576,7 @@ def test_pre_wet(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -586,6 +613,7 @@ def test_pre_wet(
 def test_pre_wet_disabled(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should NOT execute pre-wet steps."""
@@ -599,6 +627,7 @@ def test_pre_wet_disabled(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=source_well,
@@ -624,6 +653,7 @@ def test_pre_wet_disabled(
 def test_retract_after_aspiration(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should execute steps to retract from well after an aspiration."""
@@ -642,6 +672,7 @@ def test_retract_after_aspiration(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=source_well,
@@ -698,6 +729,7 @@ def test_retract_after_aspiration(
 def test_post_aspirate_retract_raises_when_retract_point_is_invalid(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """Should raise an error when the retract point is deemed bad."""
@@ -706,6 +738,7 @@ def test_post_aspirate_retract_raises_when_retract_point_is_invalid(
     well_bottom_point = Point(4, 5, 6)
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=source_well,
@@ -733,6 +766,7 @@ def test_post_aspirate_retract_raises_when_retract_point_is_invalid(
 def test_retract_after_aspiration_without_touch_tip_and_delay(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should execute steps to retract from well after an aspiration without a touch tip or delay."""
@@ -753,6 +787,7 @@ def test_retract_after_aspiration_without_touch_tip_and_delay(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=source_well,
@@ -790,6 +825,7 @@ def test_retract_after_aspiration_without_touch_tip_and_delay(
 def test_retract_after_aspiration_for_consolidate(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should execute steps to retract from well after an aspiration during a MANY_TO_ONE transfer."""
@@ -809,6 +845,7 @@ def test_retract_after_aspiration_for_consolidate(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=source_well,
@@ -890,6 +927,7 @@ Single dispense properties:
 def test_retract_after_dispense_with_blowout_in_source(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     add_final_air_gap: bool,
 ) -> None:
@@ -909,6 +947,7 @@ def test_retract_after_dispense_with_blowout_in_source(
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
@@ -998,6 +1037,7 @@ def test_retract_after_dispense_with_blowout_in_source(
 def test_retract_after_dispense_with_blowout_in_destination(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     add_final_air_gap: bool,
 ) -> None:
@@ -1020,6 +1060,7 @@ def test_retract_after_dispense_with_blowout_in_destination(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
@@ -1093,6 +1134,7 @@ def test_retract_after_dispense_with_blowout_in_destination(
 def test_retract_after_dispense_with_blowout_in_trash_well(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     add_final_air_gap: bool,
 ) -> None:
@@ -1117,6 +1159,7 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
@@ -1205,6 +1248,7 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
 def test_retract_after_dispense_with_blowout_in_disposal_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     add_final_air_gap: bool,
 ) -> None:
@@ -1227,6 +1271,7 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
@@ -1295,6 +1340,7 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
 def test_retract_after_dispense_raises_for_invalid_retract_point(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should raise an error if the retract end point is deemed bad."""
@@ -1305,6 +1351,7 @@ def test_retract_after_dispense_raises_for_invalid_retract_point(
     well_bottom_point = Point(4, 5, 6)
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
@@ -1347,6 +1394,7 @@ def test_retract_after_dispense_raises_for_invalid_retract_point(
 def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_blowout(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     is_last_retract: bool,
     add_final_air_gap: bool,
@@ -1372,6 +1420,7 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
@@ -1453,6 +1502,7 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
 def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning_volume(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     is_last_retract: bool,
     add_final_air_gap: bool,
@@ -1480,6 +1530,7 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
     )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
@@ -1565,6 +1616,7 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
 def test_multi_dispense_retract_raises_for_invalid_retract_point(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should raise an error if the retract end point is deemed bad."""
@@ -1574,6 +1626,7 @@ def test_multi_dispense_retract_raises_for_invalid_retract_point(
     well_top_point = Point(1, 2, 3)
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,

@@ -1906,6 +1906,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
         components_executor = tx_comps_executor.TransferComponentsExecutor(
             instrument_core=self,
+            engine_client=self._engine_client,
             transfer_properties=transfer_properties,
             target_location=aspirate_location,
             target_well=source_well,
@@ -2017,6 +2018,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
         components_executor = tx_comps_executor.TransferComponentsExecutor(
             instrument_core=self,
+            engine_client=self._engine_client,
             transfer_properties=transfer_properties,
             target_location=dispense_location,
             target_well=dest_well,
@@ -2099,6 +2101,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
         components_executor = tx_comps_executor.TransferComponentsExecutor(
             instrument_core=self,
+            engine_client=self._engine_client,
             transfer_properties=transfer_properties,
             target_location=dispense_location,
             target_well=dest_well,

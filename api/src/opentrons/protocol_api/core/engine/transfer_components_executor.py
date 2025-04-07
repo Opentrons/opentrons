@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import logging
+from contextlib import contextmanager
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union, Literal
+from typing import TYPE_CHECKING, Optional, Union, Literal, List, Generator
 from dataclasses import dataclass, field
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -23,6 +24,7 @@ from opentrons.protocol_api._liquid_properties import (
     TouchTipProperties,
 )
 from opentrons.protocol_engine.errors import TouchTipDisabledError
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.types import Location, Point
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
@@ -106,10 +108,18 @@ class TransferType(Enum):
     ONE_TO_MANY = "one_to_many"
 
 
+@dataclass
+class CommandAnnotationData:
+
+    name: str
+    command_ids: List[str]
+
+
 class TransferComponentsExecutor:
     def __init__(
         self,
         instrument_core: InstrumentCore,
+        engine_client: EngineClient,
         transfer_properties: TransferProperties,
         target_location: Location,
         target_well: WellCore,
@@ -117,11 +127,32 @@ class TransferComponentsExecutor:
         transfer_type: TransferType,
     ) -> None:
         self._instrument = instrument_core
+        self._engine_client = engine_client
         self._transfer_properties = transfer_properties
         self._target_location = target_location
         self._target_well = target_well
         self._tip_state: TipState = deepcopy(tip_state)  # don't modify caller's object
         self._transfer_type: TransferType = transfer_type
+        self._command_annotation: List[CommandAnnotationData] = []
+
+    @contextmanager
+    def _annotate_command(self, command_name: str) -> Generator[None, None, None]:
+
+        last_command = (
+            self._engine_client.state.commands.get_most_recently_finalized_command()
+        )
+        # If we are doing a transfer, then there must have been at least a load instrument command earlier
+        assert last_command is not None
+        yield
+        command_slice = self._engine_client.state.commands.get_slice_since_index(
+            last_command.index, include_fixit_commands=True
+        )
+        self._command_annotation.append(
+            CommandAnnotationData(
+                name=command_name,
+                command_ids=[command.id for command in command_slice.commands],
+            )
+        )
 
     @property
     def tip_state(self) -> TipState:

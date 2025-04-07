@@ -1861,6 +1861,7 @@ def test_aspirate_liquid_class_for_transfer(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=subject,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=source_well,
@@ -1922,6 +1923,7 @@ def test_aspirate_liquid_class_for_consolidate(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=subject,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=source_well,
@@ -2029,6 +2031,7 @@ def test_dispense_liquid_class(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=subject,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=dest_well,
@@ -2108,6 +2111,7 @@ def test_dispense_liquid_class_during_multi_dispense(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=subject,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=dest_well,
@@ -2191,6 +2195,7 @@ def test_last_dispense_liquid_class_during_multi_dispense(
     decoy.when(
         transfer_components_executor.TransferComponentsExecutor(
             instrument_core=subject,
+            engine_client=mock_engine_client,
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=dest_well,
