@@ -35,13 +35,10 @@ DILUENT_RESERVOIR_BY_CHANNELS = {
     8: "nest_12_reservoir_15ml",
     96: "nest_1_reservoir_290ml",
 }
-DYE_RESERVOIRS_BY_CHANNEL_AND_TIP = {
+DYE_RESERVOIRS_BY_CHANNELS_AND_TIP = {
     (1, 50): (1, "nest_96_wellplate_2ml_deep"),
     (1, 200): (1, "nest_96_wellplate_2ml_deep"),
-    (1, 1000): (
-        1,
-        "nest_12_reservoir_15ml",
-    ),  # FIXME: (sigler) wasteful for 10ul, add a 96-deep
+    (1, 1000): (1, "nest_12_reservoir_15ml"),
     (8, 50): (1, "nest_12_reservoir_15ml"),
     (8, 200): (1, "nest_12_reservoir_15ml"),
     (8, 1000): (2, "nest_12_reservoir_15ml"),
@@ -65,24 +62,21 @@ VOLUMES_BY_TIP_RACK = {
     "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 1000],
     "opentrons_flex_96_tiprack_1000ul": [10, 100, 1000],
 }
+# FIXME: increase 96ch trials by loading off-deck labware somehow
 TRIALS_BY_PIPETTE = {
     "flex_1channel_50": [12, 12, 12],
     "flex_8channel_50": [12, 12, 12],
     "flex_1channel_1000": [12, 12, 12],
     "flex_8channel_1000": [12, 12, 12],
-    "flex_96channel_1000": [
-        1,
-        1,
-        1,
-    ],  # NOTE: we could increase with more tip-rack handling
+    "flex_96channel_1000": [1, 1, 1],
 }
 
 # fmt: off
 SLOTS = {
-    "A1":   "tips_diluent", "A2":   "diluent",  "A3":   "tips_2",   "A4":   None,
-    "B1":   "plate_0",      "B2":   "dye_0",    "B3":   "tips_1",   "B4":   None,
-    "C1":   "plate_1",      "C2":   "dye_1",    "C3":   "tips_0",   "C4":   None,
-    "D1":   "plate_2",      "D2":   "dye_2",    "D3":   "trash",    "D4":   None,
+    "tips_diluent": "A1",   "diluent":  "A2",   "tips_2":   "A3",
+    "plate_0":      "B1",   "dye_0":    "B2",   "tips_1":   "B3",
+    "plate_1":      "C1",   "dye_1":    "C2",   "tips_0":   "C3",
+    "plate_2":      "D1",   "dye_2":    "D2",   "trash":    "D3",
 }
 # fmt: on
 
@@ -178,7 +172,7 @@ def load_labware(
     reservoir_diluent.load_empty(reservoir_diluent.wells())
 
     # dye reservoir(s)
-    reservoir_cfg = DYE_RESERVOIRS_BY_CHANNEL_AND_TIP[(pipette.channels, tip_ul)]
+    reservoir_cfg = DYE_RESERVOIRS_BY_CHANNELS_AND_TIP[(pipette.channels, tip_ul)]
     reservoirs_dye = [
         ctx.load_labware(reservoir_cfg[1], SLOTS[f"dye_{i}"])
         for i in range(reservoir_cfg[0])
@@ -189,13 +183,14 @@ def load_labware(
     # empty plates
     num_wells_needed = sum(
         [
-            int(ceil(ul / DYE_SHAKER_MAX_UL) * trials)
+            ceil(ul / DYE_SHAKER_MAX_UL) * trials
             for ul, trials in zip(volumes, TRIALS_BY_PIPETTE[pipette.name])
         ]
     )
+    num_plates_needed = ceil(num_wells_needed / 96)
     plates = [
         ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS[f"plate_{i}"])
-        for i in range(ceil(num_wells_needed / 96))
+        for i in range(int(num_plates_needed))
     ]
     for plate in plates:
         plate.load_empty(plate.wells())
@@ -209,39 +204,20 @@ def load_liquid_diluent(
     reservoir: Labware,
     volumes: List[float],
 ) -> None:
-    critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
     diluent_volumes = [max(DYE_READER_IDEAL_UL - ul, 0) for ul in volumes]
-    total_to_transfer_ul = sum(
-        [
-            (dil_ul * pipette.channels * trials)
-            for dil_ul, trials in zip(diluent_volumes, TRIALS_BY_PIPETTE[pipette.name])
-        ]
-    )
-
-    def _remaining_to_add() -> float:
-        available_now = sum(
-            [w.current_liquid_volume() - critical_ul["dead"] for w in reservoir.wells()]
-        )
-        return total_to_transfer_ul - available_now
-
+    num_dst_wells = sum([pipette.channels * t for t in TRIALS_BY_PIPETTE[pipette.name]])
+    total_to_transfer_ul = sum(diluent_volumes) * num_dst_wells
     diluent = ctx.define_liquid(
         "diluent", "diluent", display_color=DYE_CONFIGS["diluent"][2]
     )
+    critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
+    well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
     for well in reservoir.wells():
-        remaining_ul = _remaining_to_add()
-        if remaining_ul <= 0.0:
+        if total_to_transfer_ul <= 0.0:
             break
-        ul_not_too_low = max(
-            critical_ul["dead"] + remaining_ul, critical_ul["setup_min"]
-        )
-        ul_not_too_low_nor_high = min(ul_not_too_low, critical_ul["setup_max"])
-        well.load_liquid(diluent, ul_not_too_low_nor_high)
-    assert _remaining_to_add() <= 0.0, (
-        f"reservoir cannot hold {total_to_transfer_ul} ul of diluent, "
-        f"{_remaining_to_add()} remain to be added "
-        f"(dead volume is {critical_ul['dead']} ul, "
-        f"max is {critical_ul['setup_max']} ul)"
-    )
+        usable_ul = min(total_to_transfer_ul, well_working_ul)
+        total_to_transfer_ul -= usable_ul
+        well.load_liquid(diluent, critical_ul["dead"] + usable_ul)
 
 
 def load_liquid_dye(
@@ -260,13 +236,13 @@ def load_liquid_dye(
     well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
     all_wells: List[Well] = [w for r in reservoirs_dye for w in r.wells()]
     for ul, liquid in liquid_by_volume.items():
-        sum_ul_across_channels = ul * pipette.channels
+        ul_needed = ul * pipette.channels
         ul_accounted_for_in_a_well = 0.0
-        while ul_accounted_for_in_a_well < sum_ul_across_channels:
+        while ul_accounted_for_in_a_well < ul_needed:
             current_well = all_wells.pop(0)
-            ul_we_can_aspirate = min(sum_ul_across_channels, well_working_ul)
+            ul_we_can_aspirate = min(ul_needed, well_working_ul)
             current_well.load_liquid(liquid, critical_ul["dead"] + ul_we_can_aspirate)
-            ul_accounted_for_in_a_well += ul_we_can_aspirate
+            ul_needed -= ul_we_can_aspirate
 
 
 def run(ctx: ProtocolContext) -> None:
