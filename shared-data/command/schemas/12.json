@@ -1851,31 +1851,17 @@
       "description": "The parameters defining how a stacker should be emptied.",
       "properties": {
         "count": {
-          "anyOf": [
-            {
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
           "description": "The new count of labware in the pool. If None, default to an empty pool. If this number is larger than the amount of labware currently in the pool, default to the smaller amount. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
-          "title": "Count"
+          "ge": 0,
+          "title": "Count",
+          "type": "integer"
         },
         "message": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
           "description": "The message to display on connected clients during a manualWithPause strategy empty.",
-          "title": "Message"
+          "title": "Message",
+          "type": "string"
         },
         "moduleId": {
           "description": "Unique ID of the Flex Stacker",
@@ -2171,31 +2157,17 @@
       "description": "The parameters defining how a stacker should be filled.",
       "properties": {
         "count": {
-          "anyOf": [
-            {
-              "minimum": 1,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
           "description": "How full the labware pool should now be. If None, default to the maximum amount of the currently-configured labware the pool can hold. If this number is larger than the maximum the pool can hold, it will be clamped to the maximum. If this number is smaller than the current amount of labware the pool holds, it will be clamped to that minimum. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
-          "title": "Count"
+          "ge": 1,
+          "title": "Count",
+          "type": "integer"
         },
         "message": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
           "description": "The message to display on connected clients during a manualWithPause strategy fill.",
-          "title": "Message"
+          "title": "Message",
+          "type": "string"
         },
         "moduleId": {
           "description": "Unique ID of the Flex Stacker",
@@ -5092,42 +5064,23 @@
       "description": "Input parameters for a setStoredLabware command.",
       "properties": {
         "adapterLabware": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/StackerStoredLabwareDetails"
-            },
-            {
-              "type": "null"
-            }
-          ],
+          "$ref": "#/$defs/StackerStoredLabwareDetails",
           "default": null,
-          "description": "The details of the adapter under the primary labware, if any."
+          "description": "The details of the adapter under the primary labware, if any.",
+          "title": "Adapterlabware"
         },
         "initialCount": {
-          "anyOf": [
-            {
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
           "description": "The number of labware that should be initially stored in the stacker. This number will be silently clamped to the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker.",
-          "title": "Initialcount"
+          "ge": 0,
+          "title": "Initialcount",
+          "type": "integer"
         },
         "lidLabware": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/StackerStoredLabwareDetails"
-            },
-            {
-              "type": "null"
-            }
-          ],
+          "$ref": "#/$defs/StackerStoredLabwareDetails",
           "default": null,
-          "description": "The details of the lid on the primary labware, if any."
+          "description": "The details of the lid on the primary labware, if any.",
+          "title": "Lidlabware"
         },
         "moduleId": {
           "description": "Unique ID of the Flex Stacker.",
