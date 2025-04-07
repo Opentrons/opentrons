@@ -53,7 +53,14 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
     >
       <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting == null ? (
-          <AspirateSettingsList items={aspirateSettingsItems} />
+          <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+            {aspirateSettingsItems.map(displayItem => (
+              <AspirateSettingsList
+                key={displayItem.value}
+                displayItem={displayItem}
+              />
+            ))}
+          </Flex>
         ) : null}
         <AspirateSettingDetail
           selectedSetting={selectedSetting}

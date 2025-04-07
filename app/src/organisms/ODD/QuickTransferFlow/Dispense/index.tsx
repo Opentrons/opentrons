@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_CENTER,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  ListItem,
-  SPACING,
-  StyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
@@ -23,6 +12,7 @@ import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analy
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { DispenseSettingDetail } from './DispenseSettingDetail'
+import { DispenseSettingsList } from './DispenseSettingsList'
 
 import type { Dispatch } from 'react'
 import type {
@@ -191,35 +181,10 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting == null
           ? dispenseSettingsItems.map(displayItem => (
-              <ListItem
-                type="default"
-                key={displayItem.option}
-                onClick={displayItem.onClick}
-              >
-                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText
-                    oddStyle="level4HeaderSemiBold"
-                    width="20rem"
-                    color={displayItem.enabled ? COLORS.black90 : COLORS.grey50}
-                  >
-                    {displayItem.copy}
-                  </StyledText>
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                    <StyledText
-                      oddStyle="level4HeaderRegular"
-                      color={
-                        displayItem.enabled ? COLORS.grey60 : COLORS.grey50
-                      }
-                      textAlign={TYPOGRAPHY.textAlignRight}
-                    >
-                      {displayItem.value}
-                    </StyledText>
-                    {displayItem.enabled ? (
-                      <Icon name="more" size="2rem" />
-                    ) : null}
-                  </Flex>
-                </Flex>
-              </ListItem>
+              <DispenseSettingsList
+                key={displayItem.value}
+                displayItem={displayItem}
+              />
             ))
           : null}
         <DispenseSettingDetail
