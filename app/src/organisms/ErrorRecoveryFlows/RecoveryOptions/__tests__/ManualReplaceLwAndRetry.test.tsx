@@ -1,5 +1,5 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -98,7 +98,12 @@ describe('ManualReplaceLwAndRetry', () => {
       RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
     props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
     render(props)
+    const button = screen.getAllByRole('button')[0];
+    expect(button).toBeEnabled();
     screen.getByText('Load labware shuttle onto track')
+    // const handleClick = spyOn(props.recoveryCommands.homeShuttle(), 'handleClick');
+    fireEvent.click(button)
+    expect(handleClick).toBeCalledTimes(1)
   })
 
   it('renders SelectRecoveryOption for unknown step', () => {
