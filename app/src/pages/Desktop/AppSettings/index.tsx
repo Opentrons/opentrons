@@ -8,9 +8,10 @@ import {
   Box,
   COLORS,
   DIRECTION_ROW,
+  Divider,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -20,7 +21,6 @@ import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import { NavTab } from '/app/molecules/NavTab'
-import { Line } from '/app/atoms/structure'
 
 import type { DesktopRouteParams, AppSettingsTab } from '/app/App/types'
 
@@ -77,7 +77,7 @@ export function AppSettings(): JSX.Element {
             )}
           </Flex>
         </Box>
-        <Line />
+        <Divider marginY="0" />
         {appSettingsContent}
       </Box>
     </Flex>
