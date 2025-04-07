@@ -555,7 +555,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 current_version=f"{self._api_version}",
             )
 
-        def delay_with_publish(seconds: float):
+        def delay_with_publish(seconds: float) -> None:
             # We don't have access to ProtocolContext.delay() which would automatically
             # publish a message to the broker, so we have to do it manually:
             with publisher.publish_context(
@@ -564,12 +564,12 @@ class InstrumentContext(publisher.CommandPublisher):
             ):
                 self._protocol_core.delay(seconds=seconds, msg=None)
 
-        def aspirate_with_delay(location: Optional[types.Location | labware.Well]):
+        def aspirate_with_delay(location: Optional[types.Location | labware.Well]) -> None:
             self.aspirate(volume=volume, location=location, rate=rate)
             if aspirate_delay:
                 delay_with_publish(aspirate_delay)
 
-        def dispense_with_delay(push_out: Optional[float]):
+        def dispense_with_delay(push_out: Optional[float]) -> None:
             self.dispense(volume=volume, rate=rate, push_out=push_out)
             if dispense_delay:
                 delay_with_publish(dispense_delay)
