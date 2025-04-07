@@ -109,7 +109,8 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                     speed = CURRENTS_SPEEDS[current]
                     # HOME
                     print("homing...")
-                    await api.home([ax])
+                    #await api.home([ax])
+                    await api.home()
                     print(f"run-current set to {current} amps")
                     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
                         api,
