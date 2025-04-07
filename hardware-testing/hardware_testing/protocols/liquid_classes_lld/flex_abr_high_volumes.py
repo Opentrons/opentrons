@@ -48,10 +48,10 @@ DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "end"
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
 SLOTS: Dict[str, str] = {
-    "shaker":   "A1",   "tips_3":           "A2",   "stack":        "A3",
-    "tips_1":   "B1",   "test_labware":     "B2",   "reader":       "B3",
-    "tips_2":   "C1",   "empty_0":          "C2",   "stack_end":    "C3",
-    "trash":    "D1",   "src_reservoir":    "D2",   "src_water":    "D3",
+    "tips_2":   "A1",   "tips_3":           "A2",   "reader":           "A3",
+    "tips_1":   "B1",   "test_labware":     "B2",   "stack":            "B3",
+    "shaker":   "C1",   "empty_0":          "C2",   "stack_end":        "C3",
+    "trash":    "D1",   "src_reservoir":    "D2",   "water_reservoir":  "D3",
 }
 # fmt: on
 
@@ -450,7 +450,8 @@ def run(ctx: ProtocolContext) -> None:
         ],
     )
 
-    range_hv = ctx.define_liquid(name="red-dye", display_color="#FF0000")
+    red_dye = ctx.define_liquid(name="red-dye", display_color="#FF0000")
+    water = ctx.define_liquid(name="water", display_color="#aaaaFF")
     # FIXME: get rid of this "air" liquid once the bug is fixed
     #        where we're not able to estimate-height if well is empty
     air = ctx.define_liquid(name="air", display_color="#FFFFFF")
@@ -459,6 +460,9 @@ def run(ctx: ProtocolContext) -> None:
     ctx.load_trash_bin(SLOTS["trash"])
     src_reservoir = ctx.load_labware(
         ctx.params.reservoir, SLOTS["src_reservoir"]  # type: ignore[attr-defined]
+    )
+    water_reservoir = ctx.load_labware(
+        "nest_1_reservoir_195ml", SLOTS["water_reservoir"]
     )
     test_labware = ctx.load_labware(
         ctx.params.test_labware, SLOTS["test_labware"]  # type: ignore[attr-defined]
@@ -484,6 +488,7 @@ def run(ctx: ProtocolContext) -> None:
     # NOTE: iterating through plates in reverse
     #       b/c that's how gripper picks them up
     remaining_dst_wells = [w for p in dst_plates[::-1] for w in p.wells()]
+    all_disp_vols: List[float] = []
     for test_well in test_labware.wells():
         trial = TestTrial.build(ctx, pipette, test_labware, test_well.well_name)
         assert len(trial.destination_volumes) in [1, 4], (
@@ -494,15 +499,20 @@ def run(ctx: ProtocolContext) -> None:
             remaining_dst_wells.pop(0)  # pop!
             for _ in range(len(trial.destination_volumes))
         ]
+        all_disp_vols += trial.destination_volumes
         assert len(set([w.parent for w in dst_wells])) == 1
         trials_and_dst_wells.append((trial, dst_wells))
+    assert len(set(all_disp_vols)) == 1, "Every dispense must be of identical volumes"
+    dispense_volume = all_disp_vols[0]
 
     # LOAD LIQUID
     dye_src_well = src_reservoir["A1"]
+    water_src_well = water_reservoir["A1"]
     dead_vol_for_reservoir = LOAD_NAME_SRC_RESERVOIRS[ctx.params.reservoir]  # type: ignore[attr-defined]
     total_dye_transferred = sum([t.ul_to_add for t, _ in trials_and_dst_wells])
     min_dye_required_in_reservoir = dead_vol_for_reservoir + total_dye_transferred
-    src_reservoir.load_liquid([dye_src_well], min_dye_required_in_reservoir, range_hv)
+    dye_src_well.load_liquid(red_dye, min_dye_required_in_reservoir)
+    water_src_well.load_liquid(water, dispense_volume * 96)
 
     # DETECT LIQUID
     _pick_up_tip_and_zero_min_height(ctx, pipette)
@@ -515,7 +525,9 @@ def run(ctx: ProtocolContext) -> None:
         )
 
     # RUN
-    all_disp_vols: List[float] = []
+    # TODO: add liquid-classes
+    # TODO: add 1x plate for water
+    # TODO: add water to water-plate
     done_stack: List[Labware] = []
     while len(trials_and_dst_wells):
         trial, dst_wells = trials_and_dst_wells.pop(0)  # pop!
@@ -590,20 +602,17 @@ def run(ctx: ProtocolContext) -> None:
         )
 
         # MULTI-DISPENSE TO PLATE
-        for w, v in zip(dst_wells, trial.destination_volumes):
-            all_disp_vols.append(v)
-            push_out = 0 if v < pipette.current_volume else P1000_MAX_PUSH_OUT_UL
+        for w in dst_wells:
             pipette.dispense(
-                volume=v,
+                volume=dispense_volume,
                 location=w.meniscus(
                     target=DEFAULT_TIP_MENISCUS_TARGET, z=DISPENSE_MM_FROM_MENISCUS
                 ),
-                push_out=push_out,
             )
             pipette.touch_tip(w)
         pipette.drop_tip()
 
-    assert len(set(all_disp_vols)) == 1, "Every dispense must be of identical volumes"
+    # some helpful info for when setting up or developing
     total_wells = len(all_disp_vols)
     total_plates = ceil(total_wells / 96)
     ctx.comment(
