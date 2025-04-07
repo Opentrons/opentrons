@@ -75,7 +75,7 @@ DEFAULT_TARGET_BY_PLATE = [0.5, 1.0, 2.0, 5.0]  # maximum 4x plates
 DEFAULT_DYE_WELLS = ["A1", "B1", "C1", "D1", "E1", "F1"]
 
 # NOTE: (sigler) do not edit the values below, they are from PRODUCTION
-# FIXME: (sigler) figure out where this -1.5 should be defined in production
+# TODO: (sigler) figure out where this -1.5 should be defined in production
 #        software, and then import it into this protocol
 DEFAULT_SUBMERGE_MM = -1.5  # NOTE: defined in hardware-testing + liquid-classes
 DEFAULT_WELL_BOTTOM_MM = float(_DEFAULT_ASPIRATE_CLEARANCE)  # 1mm
@@ -113,7 +113,7 @@ DYE_LABWARE = "nest_96_wellplate_2ml_deep"
 SRC_LABWARE = "opentrons_96_wellplate_200ul_pcr_full_skirt"
 DILUENT_LABWARE = "nest_12_reservoir_15ml"
 
-# FIXME: (sigler) let's add the Artel (aka Corning?) lid ("plate_lid")
+# TODO:  (sigler) let's add the Artel (aka Corning?) lid ("plate_lid")
 #        to shared-data in a separate pull-request, and modify the
 #        Corning plate to be stackable with it
 DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
