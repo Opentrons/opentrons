@@ -91,6 +91,7 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
       copy: t('submerge'),
       enabled: false,
       onClick: () => {
+        // (kk: 04/07/2025)ToDo add submerge setting
         // setSelectedSetting('submerge')
       },
     },
@@ -139,7 +140,18 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
       copy: t('push_out'),
       enabled: false,
       onClick: () => {
+        // (kk: 04/07/2025)ToDo add push out
         // setSelectedSetting('push_out')
+      },
+    },
+    // ToDo replace dummy configs for retract
+    {
+      option: 'dispense_retract',
+      copy: t('retract'),
+      enabled: false,
+      onClick: () => {
+        // (kk: 04/07/2025)ToDo add retract
+        // setSelectedSetting('retract')
       },
     },
     {
