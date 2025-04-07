@@ -1,6 +1,6 @@
 """Opentrons Flex Pipette IQ/OQ."""
 from math import ceil
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Any
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -8,6 +8,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
     Labware,
     Well,
+    LiquidClass,
 )
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -155,9 +156,9 @@ def load_tip_racks(
             ctx.load_labware(ctx.params.tips, SLOTS[f"tips_{i}"])
             for i in range(ceil(num_tips_needed / 96))
         ]
-        diluent_pipette.tip_racks = ctx.load_labware(
+        diluent_pipette.tip_racks = [ctx.load_labware(
             "opentrons_flex_96_filtertiprack_200ul", SLOTS["tips_diluent"]
-        )
+        )]
     tip_ul = int(ctx.params.tips.split("_")[-1].replace("ul", ""))
     return tip_ul
 
@@ -203,21 +204,38 @@ def load_liquid_diluent(
     pipette: InstrumentContext,
     reservoir: Labware,
     volumes: List[float],
-) -> None:
-    diluent_volumes = [max(DYE_READER_IDEAL_UL - ul, 0) for ul in volumes]
-    num_dst_wells = sum([pipette.channels * t for t in TRIALS_BY_PIPETTE[pipette.name]])
-    total_to_transfer_ul = sum(diluent_volumes) * num_dst_wells
+) -> Dict[float, List[Well]]:
+    dil_wells_by_test_ul: Dict[float, List[Well]] = {v: [] for v in volumes}
     diluent = ctx.define_liquid(
         "diluent", "diluent", display_color=DYE_CONFIGS["diluent"][2]
     )
+    diluent_pip_ch = 96 if pipette.channels == 96 else 8
+    reservoir_wells = reservoir.wells()
     critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
     well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
-    for well in reservoir.wells():
-        if total_to_transfer_ul <= 0.0:
-            break
-        usable_ul = min(total_to_transfer_ul, well_working_ul)
-        total_to_transfer_ul -= usable_ul
-        well.load_liquid(diluent, critical_ul["dead"] + usable_ul)
+    num_aspirates_per_plate = 1 if diluent_pip_ch == 96 else 12
+
+    # count how much diluent is needed in each well before loading
+    dil_ul_by_reservoir_well: Dict[Well, float] = {
+        w: 0.0 for w in reservoir_wells
+    }
+    current_well = reservoir_wells.pop(0)
+    for plate_ul in dil_wells_by_test_ul.keys():
+        diluent_per_well = max(DYE_READER_IDEAL_UL - plate_ul, 0)
+        diluent_per_aspirate = diluent_per_well * diluent_pip_ch
+        assert diluent_per_aspirate <= well_working_ul, \
+            (f"diluent aspirate of {diluent_per_aspirate} ul "
+             f"is greater than well working volume {well_working_ul}")
+        max_ul_in_well = critical_ul["setup_max"] - diluent_per_aspirate
+        for _ in range(num_aspirates_per_plate):
+            if dil_ul_by_reservoir_well[current_well] > max_ul_in_well:
+                current_well = reservoir_wells.pop(0)
+            dil_ul_by_reservoir_well[current_well] += diluent_per_aspirate
+            dil_wells_by_test_ul[plate_ul].append(current_well)
+    for well, ul in dil_ul_by_reservoir_well.items():
+        well.load_liquid(diluent, ul + critical_ul["dead"])
+
+    return dil_wells_by_test_ul
 
 
 def load_liquid_dye(
@@ -225,7 +243,11 @@ def load_liquid_dye(
     pipette: InstrumentContext,
     reservoirs_dye: List[Labware],
     volumes: List[float],
-) -> None:
+) -> Dict[float, List[Well]]:
+    dye_wells_by_volume: Dict[float, List[Well]] = {
+        v: [] for v in volumes
+    }
+
     liquid_by_volume = {
         v: ctx.define_liquid(name, name, cfg[2])
         for v in volumes
@@ -234,36 +256,96 @@ def load_liquid_dye(
     }
     critical_ul = CRITICAL_UL_BY_LABWARE[reservoirs_dye[0].load_name]
     well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
-    all_wells: List[Well] = [w for r in reservoirs_dye for w in r.wells()]
-    for ul, liquid in liquid_by_volume.items():
-        ul_needed = ul * pipette.channels
-        ul_accounted_for_in_a_well = 0.0
-        while ul_accounted_for_in_a_well < ul_needed:
-            current_well = all_wells.pop(0)
-            ul_we_can_aspirate = min(ul_needed, well_working_ul)
-            current_well.load_liquid(liquid, critical_ul["dead"] + ul_we_can_aspirate)
-            ul_needed -= ul_we_can_aspirate
+    src_wells: List[Well] = [w for r in reservoirs_dye for w in r.wells()]
+    num_trials_by_volume = {v: TRIALS_BY_PIPETTE[pipette.name][i] for i, v in enumerate(volumes)}
+    for test_ul, liquid in liquid_by_volume.items():
+        ul_per_aspirate = test_ul * pipette.channels
+        total_ul_aspirated_per_test_ul = 0.0
+        current_src_well = src_wells.pop(0)  # pop!
+        for _ in range(num_trials_by_volume[test_ul]):
+            if total_ul_aspirated_per_test_ul + ul_per_aspirate > well_working_ul:
+                assert total_ul_aspirated_per_test_ul > 0
+                ul_in_well = critical_ul["dead"] + total_ul_aspirated_per_test_ul
+                current_src_well.load_liquid(liquid, ul_in_well)
+                total_ul_aspirated_per_test_ul = 0.0
+                current_src_well = src_wells.pop(0)  # pop!
+            dye_wells_by_volume[test_ul].append(current_src_well)
+            total_ul_aspirated_per_test_ul += ul_per_aspirate
+    return dye_wells_by_volume
+
+
+def _transfer_src_to_dst(
+        pipette: InstrumentContext,
+        liq_cls: LiquidClass,
+        source: List[Well],
+        plate: Labware,
+        ul: float,
+        trials: int,
+        new_tip: str,
+) -> None:
+    dest = {
+        1: plate.wells()[:trials],
+        8: plate.columns()[:trials],
+        96: plate["A1"],
+    }[pipette.channels]
+    assert len(source) == len(dest), f"source={len(source)}, dest={len(dest)}"
+    pipette.transfer_liquid(
+        liq_cls, ul, source, dest, new_tip=new_tip
+    )
 
 
 def run(ctx: ProtocolContext) -> None:
     ctx.load_trash_bin(SLOTS["trash"])
-    pipette = ctx.load_instrument(ctx.params.pipette, "left")
-    if pipette.channels == 96:
-        diluent_pipette = None
-    else:
+    test_pipette = ctx.load_instrument(ctx.params.pipette, "left")
+    diluent_pipette: Optional[InstrumentContext] = None
+    if test_pipette.channels != 96:
         diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
-    tip_ul = load_tip_racks(ctx, pipette, diluent_pipette)
+    tip_ul = load_tip_racks(ctx, test_pipette, diluent_pipette)
     volumes = [
-        min(max(v, pipette.min_volume), tip_ul)
+        min(max(v, test_pipette.min_volume), tip_ul)
         for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]
     ]
     reservoir_diluent, reservoirs_dye, plates = load_labware(
-        ctx, pipette, volumes, tip_ul
+        ctx, test_pipette, volumes, tip_ul
     )
-    load_liquid_diluent(ctx, pipette, reservoir_diluent, volumes)
-    load_liquid_dye(ctx, pipette, reservoirs_dye, volumes)
-    liquid_class = ctx.define_liquid_class(ctx.params.liquid)
+    dye_wells_by_volume = load_liquid_dye(
+        ctx, test_pipette, reservoirs_dye, volumes
+    )
+    diluent_wells_by_volume = load_liquid_diluent(
+        ctx, test_pipette, reservoir_diluent, volumes
+    )
+    trials_by_ul = {
+        v: t
+        for v, t in zip(volumes, TRIALS_BY_PIPETTE[test_pipette.name])
+    }
+
+    diluent_class = ctx.define_liquid_class("water")
+    test_class = ctx.define_liquid_class(ctx.params.liquid)
+
+    # DILUENT
+    pip_for_dil: InstrumentContext = diluent_pipette if diluent_pipette else test_pipette
+    pip_for_dil.pick_up_tip()
     for ul, plate in zip(volumes, plates):
-        # TODO: transfer DILUENT
-        # TODO: transfer DYE
-        pass
+        if ul < DYE_READER_IDEAL_UL:
+            _transfer_src_to_dst(
+                pip_for_dil,
+                diluent_class,
+                diluent_wells_by_volume[ul],
+                plate,
+                DYE_READER_IDEAL_UL - ul,
+                trials_by_ul[ul],
+                new_tip="never"
+            )
+    pip_for_dil.drop_tip()
+
+    # DYE
+    for ul, plate in zip(volumes, plates):
+        _transfer_src_to_dst(
+            test_pipette,
+            test_class,
+            dye_wells_by_volume[ul],
+            plate,
+            ul,
+            trials_by_ul[ul],
+            new_tip="always"
+        )
