@@ -33,8 +33,7 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
-import { useModuleCommandAnalytics, ModuleAnalyticLiveCommand } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
-
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
@@ -77,10 +76,11 @@ export function useLatchControls(module: AttachedModule): LatchControls {
         kind: 'liveCommand',
         moduleType: module.moduleType,
         analyticCommand: latchCommand.commandType,
-        result: { status: 'succeeded' as CommandStatus, data: undefined },
+        result: { status: 'succeeded', data: undefined },
         serialNumber: module.serialNumber,
+        errorDetails: "",
         firmwareVersion: module.firmwareVersion,
-      } as ModuleAnalyticLiveCommand);
+      });
     })
       .catch((e: Error) => {
         reportModuleCommand({
@@ -88,10 +88,10 @@ export function useLatchControls(module: AttachedModule): LatchControls {
           moduleType: module.moduleType,
           analyticCommand: latchCommand.commandType,
           errorDetails: e.message,
-          result: {status: 'failed' as CommandStatus, data: undefined},
+          result: {status: 'failed', data: undefined},
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
-        } as ModuleAnalyticLiveCommand);
+        });
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
         );
@@ -239,21 +239,22 @@ export function useModuleOverflowMenu(
         kind: 'liveCommand',
         moduleType: module.moduleType,
         analyticCommand: deactivateCommand.commandType,
-        result: { status: 'succeeded' as CommandStatus, data: undefined },
+        result: { status: 'succeeded', data: undefined },
         serialNumber: module.serialNumber,
+        errorDetails: "",
         firmwareVersion: module.firmwareVersion
-      } as ModuleAnalyticLiveCommand);
+      });
     })
       .catch((e: Error) => {
         reportModuleCommand({
           kind: 'liveCommand',
           moduleType: module.moduleType,
           analyticCommand: deactivateCommand.commandType,
-          result: {status: 'failed' as CommandStatus, data: undefined},
+          result: {status: 'failed', data: undefined},
           errorDetails: e.message,
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion
-        }as ModuleAnalyticLiveCommand);
+        });
         console.error(
           `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
         );
@@ -280,10 +281,11 @@ export function useModuleOverflowMenu(
         kind: 'liveCommand',
         moduleType: module.moduleType,
         analyticCommand: lidCommand.commandType,
-        result: { status: 'succeeded' as CommandStatus, data: undefined },
+        result: { status: 'succeeded', data: undefined },
         serialNumber: module.serialNumber,
+        errorDetails: "",
         firmwareVersion: module.firmwareVersion
-      }as ModuleAnalyticLiveCommand);
+      });
     })
       .catch((e: Error) => {
         reportModuleCommand({
@@ -291,10 +293,10 @@ export function useModuleOverflowMenu(
           moduleType: module.moduleType,
           analyticCommand: lidCommand.commandType,
           errorDetails: e.message,
-          result: {status: 'failed' as CommandStatus, data: undefined},
+          result: {status: 'failed', data: undefined},
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
-        } as ModuleAnalyticLiveCommand);
+        });
         console.error(
           `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
         )

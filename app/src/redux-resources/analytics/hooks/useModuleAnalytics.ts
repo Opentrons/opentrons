@@ -45,7 +45,7 @@ interface BaseModuleAnalytics {
 export interface ModuleAnalyticProtocolCommand extends BaseModuleAnalytics {
     kind: 'protocolCommand'
     runId: string,
-    params: CommandData['data']['params'],
+    params: CommandData['data']['params'] | undefined,
 
 }
 
@@ -58,10 +58,13 @@ export interface ModuleAnalyticLiveCommand extends BaseModuleAnalytics {
 
 }
 
+export type ModuleAnalyticType =
+  | ModuleAnalyticProtocolCommand
+  | ModuleAnalyticLiveCommand
 
 export interface UseModuleCommandAnalyticsResult {
     /* Report when a module command completes. */
-    reportModuleCommand: (params: BaseModuleAnalytics) => void;
+    reportModuleCommand: (params: ModuleAnalyticType) => void;
 }
 
 export function useModuleCommandAnalytics(modules?: AttachedModule[]): UseModuleCommandAnalyticsResult {

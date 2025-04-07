@@ -28,8 +28,7 @@ import type {
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
 import type { ThermocyclerModule } from '/app/redux/modules/types'
-import { useModuleCommandAnalytics, ModuleAnalyticLiveCommand } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
-
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
@@ -91,11 +90,12 @@ export const ThermocyclerModuleSlideout = (
           analyticCommand: modulePart == 'Lid'
           ? saveLidCommand.commandType
           : saveBlockCommand.commandType,
-          result: {status: 'succeeded' as CommandStatus, data: undefined},
+          result: {status: 'succeeded', data: undefined},
           serialNumber: module.serialNumber,
           temperature: tempValue,
+          errorDetails: "",
           firmwareVersion: module.firmwareVersion
-        } as ModuleAnalyticLiveCommand);
+        });
       }).catch((e: Error) => {
         reportModuleCommand({
           kind: "liveCommand",
@@ -103,12 +103,12 @@ export const ThermocyclerModuleSlideout = (
           analyticCommand: modulePart == 'Lid'
           ? saveLidCommand.commandType
           : saveBlockCommand.commandType,
-          result: {status: 'failed' as CommandStatus, data: undefined},
+          result: {status: 'failed', data: undefined},
           errorDetails: e.message,
           serialNumber: module.serialNumber,
           temperature: tempValue,
           firmwareVersion: module.firmwareVersion
-        }as ModuleAnalyticLiveCommand)
+        })
         console.error(
           `error setting module status with command type ${
             saveLidCommand.commandType ?? saveBlockCommand.commandType

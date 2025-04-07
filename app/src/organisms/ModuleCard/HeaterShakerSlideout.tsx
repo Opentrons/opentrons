@@ -24,8 +24,7 @@ import {CommandStatus} from '@opentrons/shared-data'
 import type { MouseEventHandler } from 'react'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import { useModuleCommandAnalytics, ModuleAnalyticLiveCommand } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
-
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule
@@ -69,7 +68,7 @@ export const HeaterShakerSlideout = (
           temperature: hsValue,
           errorDetails: "",
           firmwareVersion: module.firmwareVersion
-        } as ModuleAnalyticLiveCommand);
+        });
       })
         .catch((e: Error) => {
           reportModuleCommand({
@@ -81,7 +80,7 @@ export const HeaterShakerSlideout = (
             serialNumber: module.serialNumber,
             temperature: hsValue,
             firmwareVersion: module.firmwareVersion
-          } as ModuleAnalyticLiveCommand);
+          });
 
           console.error(
             `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`

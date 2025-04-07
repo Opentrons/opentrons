@@ -68,7 +68,6 @@ import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
-const {reportModuleCommand} = useModuleCommandAnalytics()
 
 export interface ProtocolSetupLabwareProps {
   runId: string
@@ -259,6 +258,7 @@ function LabwareLatch({
   const isLatchClosed =
     matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
     matchedHeaterShaker.data.labwareLatchStatus === 'opening'
+  const {reportModuleCommand} = useModuleCommandAnalytics()
 
   let icon: 'latch-open' | 'latch-closed' | null = null
 
@@ -279,9 +279,11 @@ function LabwareLatch({
     })
       .then((result) => {
         reportModuleCommand({
-          moduleType: matchedHeaterShaker.moduleModel,
-          action: latchCommand.commandType,
-          result: {status: 'succeeded', data: result},
+          kind: "liveCommand",
+          moduleType: matchedHeaterShaker.moduleType,
+          analyticCommand: latchCommand.commandType,
+          result: {status: 'succeeded', data: undefined},
+          errorDetails: "",
           serialNumber: matchedHeaterShaker.serialNumber,
           firmwareVersion: matchedHeaterShaker.firmwareVersion
         })
@@ -291,6 +293,15 @@ function LabwareLatch({
             setIsRefetchingModules(false)
           })
           .catch((e: Error) => {
+            reportModuleCommand({
+              kind: "liveCommand",
+              moduleType: matchedHeaterShaker.moduleType,
+              analyticCommand: latchCommand.commandType,
+              result: {status: 'succeeded', data: undefined},
+              serialNumber: matchedHeaterShaker.serialNumber,
+              errorDetails: e.message,
+              firmwareVersion: matchedHeaterShaker.firmwareVersion
+            })
             console.error(
               `error refetching modules after toggle latch: ${e.message}`
             )
@@ -299,12 +310,14 @@ function LabwareLatch({
       })
       .catch((e: Error) => {
         reportModuleCommand({
-          moduleType: matchedHeaterShaker.moduleModel,
-          action: latchCommand.commandType,
+          kind: 'liveCommand',
+          moduleType: matchedHeaterShaker.moduleType,
+          analyticCommand: latchCommand.commandType,
           serialNumber: matchedHeaterShaker.serialNumber,
           errorDetails: e.message,
-          firmwareVersion: matchedHeaterShaker.firmwareVersion
-        })
+          result: {status: 'failed', data: undefined},
+          firmwareVersion: matchedHeaterShaker.firmwareVersion,
+        });
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
         )
