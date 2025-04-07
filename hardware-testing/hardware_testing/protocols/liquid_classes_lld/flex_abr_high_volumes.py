@@ -82,9 +82,9 @@ LOAD_NAME_SRC_LABWARE_BY_CHANNELS = {
         "TUBES_1_5ML_SNAPCAP": "opentrons_24_tuberack_nest_1.5ml_snapcap",
         "TUBES_15ML": "opentrons_15_tuberack_nest_15ml_conical",
         "TUBES_50ML": "opentrons_6_tuberack_nest_50ml_conical",
-        "PLATE_200UL_PCR": "opentrons_96_wellplate_200ul_pcr_full_skirt",  # single-dispense (~150ul)
-        "PLATE_200UL_FLAT": "nest_96_wellplate_200ul_flat",  # single-dispense (~150ul)
-        "PLATE_360UL_FLAT": "corning_96_wellplate_360ul_flat",  # single-dispense (~200ul)
+        "PLATE_200UL_PCR": "opentrons_96_wellplate_200ul_pcr_full_skirt",  # <200ul dispense
+        "PLATE_200UL_FLAT": "nest_96_wellplate_200ul_flat",  # <200ul dispense
+        "PLATE_360UL_FLAT": "corning_96_wellplate_360ul_flat",  # <200ul dispense
         "PLATE_2ML_DEEP": "nest_96_wellplate_2ml_deep",
     },
     8: {  # 8ch pipette
@@ -97,16 +97,16 @@ LOAD_NAME_SRC_LABWARE_BY_CHANNELS = {
 }
 
 
-class AspirateMode(Enum):
+class _AspirateMode(Enum):
     MENISCUS = "meniscus"
     MENISCUS_LLD = "meniscus-lld"
 
 
 # ASPIRATE-MODES are PRE-CONFIGURED by SOURCE-WELL
-M = AspirateMode.MENISCUS
-M_LLD = AspirateMode.MENISCUS_LLD
+M = _AspirateMode.MENISCUS
+M_LLD = _AspirateMode.MENISCUS_LLD
 # fmt: off
-ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[AspirateMode]]] = {
+ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[_AspirateMode]]] = {
     6: {
         "A": [M_LLD, M_LLD, M_LLD],
         "B": [M, M, M],
@@ -139,7 +139,7 @@ ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[AspirateMode]]] = {
 # fmt: on
 
 
-def _get_aspirate_mode_for_well(well: Well) -> AspirateMode:
+def _get_aspirate_mode_for_well(well: Well) -> _AspirateMode:
     num_wells = len(well.parent.wells())
     well_row = well.well_name[0]
     well_column = int(well.well_name[1:]) - 1  # zero indexed
@@ -147,8 +147,8 @@ def _get_aspirate_mode_for_well(well: Well) -> AspirateMode:
 
 
 @dataclass
-class TestTrial:
-    mode: AspirateMode
+class _TestTrial:
+    mode: _AspirateMode
     test_well: Well
     ul_to_add: float
     ul_to_remove: float
@@ -163,13 +163,17 @@ class TestTrial:
         pipette: InstrumentContext,
         labware: Labware,
         well_name: str,
-    ) -> "TestTrial":
-
+    ) -> "_TestTrial":
+        """Build."""
         p = ctx.params
         well = labware[well_name]
         mode = _get_aspirate_mode_for_well(well)
-        sub_mm = {M: p.submerge_no_lld, M_LLD: p.submerge_yes_lld}[mode]  # type: ignore[attr-defined]
-        minimum_liquid_height = abs(sub_mm) + p.tip_clearance_at_well_bottom  # type: ignore[attr-defined]
+        sub_mm_by_mode: Dict[_AspirateMode, float] = {
+            M: p.submerge_no_lld,  # type: ignore[attr-defined]
+            M_LLD: p.submerge_yes_lld,  # type: ignore[attr-defined]
+        }
+        clearance: float = p.tip_clearance_at_well_bottom  # type: ignore[attr-defined]
+        minimum_liquid_height = abs(sub_mm_by_mode[mode]) + clearance
 
         # NOTE: error will raise if "tip_clearance_at_well_bottom"
         #       is less than the minimum LLD height of the pipette + tip
@@ -190,12 +194,12 @@ class TestTrial:
         )
         dispense_ul: float = ul_to_remove / destination_count
 
-        return TestTrial(
+        return _TestTrial(
             mode=mode,
             test_well=well,
             ul_to_add=ul_to_add,
             ul_to_remove=ul_to_remove,
-            submerge_mm=sub_mm,
+            submerge_mm=sub_mm_by_mode[mode],
             dispense_ul=dispense_ul,
             destination_count=destination_count,
         )
@@ -226,7 +230,7 @@ class TestTrial:
         #       position is critical to determine if our submerge
         #       depths are reliable or not
         calibrate_tip_overlap(ctx, pipette)
-        if self.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():  # FIXME
+        if self.mode == _AspirateMode.MENISCUS_LLD and not ctx.is_simulating():  # FIXME
             pipette.require_liquid_presence(self.test_well)
         # MULTI-DISPENSE TO PLATE
         pipette.distribute_liquid(
@@ -488,7 +492,6 @@ def _define_liquid_class(
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-
     # LOAD MODULES
     reader_module = cast(
         AbsorbanceReaderContext, ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
@@ -522,16 +525,21 @@ def run(ctx: ProtocolContext) -> None:
     # LOAD LABWARE
     ctx.load_trash_bin(SLOTS["trash"])
     src_reservoir = ctx.load_labware(
-        ctx.params.reservoir, SLOTS["src_reservoir"], label="dye_reservoir"  # type: ignore[attr-defined]
+        ctx.params.reservoir,  # type: ignore[attr-defined]
+        SLOTS["src_reservoir"],
+        label="dye_reservoir",
     )
     water_reservoir = ctx.load_labware(
         "nest_1_reservoir_195ml", SLOTS["water_reservoir"], label="water_reservoir"
     )
     test_labware = ctx.load_labware(
-        ctx.params.test_labware, SLOTS["test_labware"], label="test_labware"  # type: ignore[attr-defined]
+        ctx.params.test_labware,  # type: ignore[attr-defined]
+        SLOTS["test_labware"],
+        label="test_labware",
     )
-    possible_lws = list(LOAD_NAME_SRC_LABWARE_BY_CHANNELS[ctx.params.channels].values())  # type: ignore[attr-defined]
-    err_msg = f"{ctx.params.test_labware} and {ctx.params.channels}ch"  # type: ignore[attr-defined]
+    channels: int = ctx.params.channels  # type: ignore[attr-defined]
+    possible_lws = list(LOAD_NAME_SRC_LABWARE_BY_CHANNELS[channels].values())
+    err_msg = f"{ctx.params.test_labware} and {channels}ch"  # type: ignore[attr-defined]
     assert ctx.params.test_labware in possible_lws, err_msg  # type: ignore[attr-defined]
 
     # FIXME: get rid of this "air" liquid once the bug is fixed
@@ -553,11 +561,11 @@ def run(ctx: ProtocolContext) -> None:
         plate.load_liquid(plate.wells(), 0.01, air)  # FIXME
 
     # TRIALS -> DESTINATION-WELLS
-    trials_and_dst_wells: List[Tuple[TestTrial, List[Well]]] = []
+    trials_and_dst_wells: List[Tuple[_TestTrial, List[Well]]] = []
     # NOTE: reversing plates and skipping water plate (bottom)
     remaining_dst_wells = [w for p in stack[-1:0:-1] for w in p.wells()]
     for test_well in test_labware.wells():
-        trial = TestTrial.build(ctx, pipette, test_labware, test_well.well_name)
+        trial = _TestTrial.build(ctx, pipette, test_labware, test_well.well_name)
         dst_wells = [
             remaining_dst_wells.pop(0) for _ in range(trial.destination_count)  # pop!
         ]
@@ -586,7 +594,9 @@ def run(ctx: ProtocolContext) -> None:
     water = ctx.define_liquid(name="water", display_color="#aaaaFF")
     dye_src_well = src_reservoir["A1"]
     water_src_well = water_reservoir["A1"]
-    dead_vol_for_reservoir = LOAD_NAME_SRC_RESERVOIRS[ctx.params.reservoir]  # type: ignore[attr-defined]
+    dead_vol_for_reservoir = LOAD_NAME_SRC_RESERVOIRS[
+        ctx.params.reservoir  # type: ignore[attr-defined]
+    ]
     dead_vol_for_water = LOAD_NAME_SRC_RESERVOIRS[water_reservoir.load_name]
     total_dye_transferred = sum([t.ul_to_add for t, _ in trials_and_dst_wells])
     min_dye_by_src = {
@@ -629,7 +639,9 @@ def run(ctx: ProtocolContext) -> None:
         # SHAKE, READ, and RE-STACK
         _shake_then_read(ctx, top_most_plate, shaker_module, reader_module)
         new_location = done_stack[-1] if done_stack else SLOTS["stack_end"]
-        ctx.move_labware(top_most_plate, new_location=new_location, use_gripper=True)  # type: ignore[arg-type]
+        ctx.move_labware(
+            top_most_plate, new_location=new_location, use_gripper=True  # type: ignore[arg-type]
+        )
         done_stack.append(top_most_plate)
 
     # some helpful info for when developing or preparing dye
