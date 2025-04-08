@@ -12,7 +12,6 @@ import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
 import { MoveLiquidTools } from '../'
 
 import type { ComponentProps } from 'react'
-import type { FieldPropsByName } from '../../../types'
 import type { FormData } from '../../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../../steplist'
 
@@ -21,6 +20,7 @@ vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../FirstStepMoveLiquidTools')
 vi.mock('../SecondStepsMoveLiquidTools')
 vi.mock('../LiquidClassesStepTools')
+vi.mock('../hooks')
 
 const render = (props: ComponentProps<typeof MoveLiquidTools>) => {
   return renderWithProviders(<MoveLiquidTools {...props} />)
@@ -32,7 +32,9 @@ describe('MoveLiquidTools', () => {
   beforeEach(() => {
     props = {
       toolboxStep: 0,
-      propsForFields: {} as FieldPropsByName,
+      propsForFields: {
+        liquidClass: { updateValue: vi.fn() },
+      } as any,
       formData: {} as FormData,
       visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',

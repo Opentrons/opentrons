@@ -577,6 +577,27 @@ export const getCurrentFormHasUnsavedChanges: Selector<
     return !isEqual(unsavedForm, savedForm)
   }
 )
+export const getCurrentFormUnsavedChangedFields: Selector<
+  BaseState,
+  string[]
+> = createSelector(
+  getUnsavedForm,
+  getSavedStepForms,
+  (unsavedForm, savedStepForms) => {
+    const id = unsavedForm?.id
+    const savedForm = id != null ? savedStepForms[id] : null
+
+    if (savedForm == null || unsavedForm == null) {
+      // nonexistent = no unsaved changes
+      return []
+    }
+    const fields = Object.keys(savedForm)
+    return fields.reduce<string[]>((acc, field) => {
+      return savedForm[field] !== unsavedForm[field] ? [...acc, field] : acc
+    }, [])
+  }
+)
+
 export const getBatchEditFieldChanges: Selector<
   BaseState,
   BatchEditFormChangesState
