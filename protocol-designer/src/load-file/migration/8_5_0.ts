@@ -139,7 +139,7 @@ export const migrateFile = (
           dispense_submerge_y_position: null,
           dispense_submerge_position_reference: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
-          liquidClass: liquidClass ?? null,
+          liquidClass: 'none',
           pushOut_checkbox:
             defaultPushOutVolume != null && defaultPushOutVolume > 0,
           pushOut_volume: defaultPushOutVolume,
@@ -181,6 +181,7 @@ export const migrateFile = (
                     1
                   ),
             liquidClassesSupported: liquidClassesSupported ?? false,
+            liquidClass: 'none',
           },
         }
       }

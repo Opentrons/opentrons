@@ -20,7 +20,6 @@ import { MixTools } from '..'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { FieldPropsByName } from '../../../types'
 import type { FormData } from '../../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../../steplist'
 
@@ -30,6 +29,7 @@ vi.mock('../../../utils')
 vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
 vi.mock('../../MoveLiquidTools/LiquidClassesStepTools')
+vi.mock('../../MoveLiquidTools/hooks')
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
@@ -43,7 +43,9 @@ describe('MixToolFirstStep', () => {
 
   beforeEach(() => {
     props = {
-      propsForFields: {} as FieldPropsByName,
+      propsForFields: {
+        liquidClass: { updateValue: vi.fn() },
+      } as any,
       formData: {} as FormData,
       toolboxStep: 0,
       visibleFormErrors: {} as StepFormErrors,
