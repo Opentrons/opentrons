@@ -8,6 +8,8 @@ import type { Ingredients } from '@opentrons/step-generation'
 import type { RootState as IngredRoot } from './labware-ingred/reducers'
 import type { RootState as StepformRoot } from './step-forms'
 import type { RootState as DismissRoot } from './dismiss'
+import type { FileMetadataFields } from './file-data'
+
 export interface PipetteLoadInfo {
   pipetteName: PipetteName
 }
@@ -43,6 +45,7 @@ export interface PythonDesignerApplication extends DesignerApplication {
   robot: {
     model: RobotType
   }
+  metadata: FileMetadataFields
 }
 
 export interface PDPythonFile {
