@@ -14,13 +14,16 @@ import {
   undoLoadFile,
 } from '../../../load-file/actions'
 import { useFileUploadModalContents } from './utils'
+import { getEnablePythonExport } from '../../../feature-flags/selectors'
 
 export function FileUploadMessagesModal(): JSX.Element | null {
   const message = useSelector(getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')
+  const enableExportPython = useSelector(getEnablePythonExport)
   const modalContents = useFileUploadModalContents({
     uploadResponse: message,
+    enableExportPython,
   })
   const dismissModal = (): void => {
     dispatch(dismissFileUploadMessage())
