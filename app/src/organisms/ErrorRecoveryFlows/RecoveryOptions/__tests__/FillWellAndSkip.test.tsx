@@ -4,7 +4,11 @@ import { screen, waitFor } from '@testing-library/react'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { FillWellAndSkip, FillWell, SkipToNextStep } from '../FillWellAndSkip'
+import {
+  FillWellAndRetrySameTips,
+  FillWell,
+  SkipToNextStep,
+} from '../FillWellAndRetrySameTips'
 import { RECOVERY_MAP } from '../../constants'
 import { CancelRun } from '../CancelRun'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
@@ -32,8 +36,8 @@ vi.mock('../CancelRun')
 vi.mock('../SelectRecoveryOption')
 vi.mock('/app/molecules/Command')
 
-const render = (props: ComponentProps<typeof FillWellAndSkip>) => {
-  return renderWithProviders(<FillWellAndSkip {...props} />, {
+const render = (props: ComponentProps<typeof FillWellAndRetrySameTips>) => {
+  return renderWithProviders(<FillWellAndRetrySameTips {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -51,7 +55,7 @@ const renderSkipToNextStep = (props: ComponentProps<typeof SkipToNextStep>) => {
 }
 
 describe('FillWellAndSkip', () => {
-  let props: ComponentProps<typeof FillWellAndSkip>
+  let props: ComponentProps<typeof FillWellAndRetrySameTips>
 
   beforeEach(() => {
     props = {
@@ -64,12 +68,12 @@ describe('FillWellAndSkip', () => {
     )
   })
 
-  it(`renders FillWell when step is ${RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL}`, () => {
+  it(`renders FillWell when step is ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL,
+        step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL,
       },
     }
     render(props)
@@ -78,12 +82,13 @@ describe('FillWellAndSkip', () => {
     )
   })
 
-  it(`renders SkipToNextStep when step is ${RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP}`, () => {
+  it(`renders SkipToNextStep when step is ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+        step:
+          RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
       },
     }
     render(props)

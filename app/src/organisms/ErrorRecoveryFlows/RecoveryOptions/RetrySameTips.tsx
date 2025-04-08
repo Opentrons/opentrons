@@ -11,11 +11,12 @@ import type { RecoveryContentProps } from '../types'
 export function RetrySameTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
-  const { RETRY_SAME_TIPS } = RECOVERY_MAP
+  const { RETRY_SAME_TIPS, MANUAL_FILL_AND_RETRY_SAME_TIPS } = RECOVERY_MAP
 
   const buildContent = (): JSX.Element => {
     switch (step) {
       case RETRY_SAME_TIPS.STEPS.RETRY:
+      case MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS:
         return <RetrySameTipsInfo {...props} />
       default:
         console.warn(

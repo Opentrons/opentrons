@@ -17,7 +17,7 @@ import {
   CancelRun,
   ManageTips,
   RetrySameTips,
-  FillWellAndSkip,
+  FillWellAndRetrySameTips,
   SkipStepNewTips,
   SkipStepSameTips,
   IgnoreErrorSkipStep,
@@ -178,7 +178,7 @@ describe('ErrorRecoveryContent', () => {
     ROBOT_SKIPPING_STEP,
     RETRY_NEW_TIPS,
     RETRY_SAME_TIPS,
-    MANUAL_FILL_AND_SKIP,
+    MANUAL_FILL_AND_RETRY_SAME_TIPS,
     SKIP_STEP_WITH_SAME_TIPS,
     SKIP_STEP_WITH_NEW_TIPS,
     IGNORE_AND_SKIP,
@@ -208,7 +208,7 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(RetryNewTips).mockReturnValue(<div>MOCK_RETRY_NEW_TIPS</div>)
     vi.mocked(RecoveryError).mockReturnValue(<div>MOCK_RECOVERY_ERROR</div>)
     vi.mocked(RetrySameTips).mockReturnValue(<div>MOCK_RETRY_SAME_TIPS</div>)
-    vi.mocked(FillWellAndSkip).mockReturnValue(
+    vi.mocked(FillWellAndRetrySameTips).mockReturnValue(
       <div>MOCK_FILL_WELL_AND_SKIP</div>
     )
     vi.mocked(SkipStepSameTips).mockReturnValue(
@@ -302,12 +302,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_RETRY_SAME_TIPS')
   })
 
-  it(`returns appropriate view when the route is ${MANUAL_FILL_AND_SKIP.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: MANUAL_FILL_AND_SKIP.ROUTE,
+        route: MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
       },
     }
     renderRecoveryContent(props)

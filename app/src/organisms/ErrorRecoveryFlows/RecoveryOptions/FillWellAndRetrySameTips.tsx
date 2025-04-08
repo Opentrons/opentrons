@@ -17,20 +17,23 @@ import {
 } from '../shared'
 import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
+import { RetrySameTips } from './RetrySameTips'
 
 import type { RecoveryContentProps } from '../types'
 
-export function FillWellAndSkip(props: RecoveryContentProps): JSX.Element {
+export function FillWellAndRetrySameTips(
+  props: RecoveryContentProps
+): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
-  const { MANUAL_FILL_AND_SKIP, CANCEL_RUN } = RECOVERY_MAP
+  const { MANUAL_FILL_AND_RETRY_SAME_TIPS, CANCEL_RUN } = RECOVERY_MAP
 
   const buildContent = (): JSX.Element => {
     switch (step) {
-      case MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL:
+      case MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL:
         return <FillWell {...props} />
-      case MANUAL_FILL_AND_SKIP.STEPS.SKIP:
-        return <SkipToNextStep {...props} />
+      case MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS:
+        return <RetrySameTips {...props} />
       case CANCEL_RUN.STEPS.CONFIRM_CANCEL:
         return <CancelRun {...props} />
       default:
