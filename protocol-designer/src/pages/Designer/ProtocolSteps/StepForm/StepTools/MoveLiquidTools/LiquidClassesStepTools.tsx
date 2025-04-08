@@ -75,7 +75,7 @@ export const LiquidClassesStepTools = ({
     {
       name: t('dont_use_liquid_class'),
       value: '',
-      subButtonLabel: '',
+      subButtonLabel: t('default'),
     },
   ]
   if (!hasAssignedLiquidClasses) {
