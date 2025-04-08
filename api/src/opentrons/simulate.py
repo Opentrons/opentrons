@@ -49,7 +49,9 @@ from opentrons.protocol_engine import error_recovery_policy
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_engine.types.run_time_parameters import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types.run_time_parameters import (
+    PrimitiveRunTimeParamValuesType,
+)
 from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
 from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocols.duration import DurationEstimator
@@ -664,12 +666,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "-r",
-        "--params",
-        choices=["debug", "info", "warning", "error", "none"],
-        default="warning",
-        help="Specify the level filter for logs to show on the command line. "
-             'Log levels below warning can be chatty. If "none", do not show logs',
+        "--rp", nargs="+", help="my_str=help my_bool=true my_int=1 my_float=1.0"
     )
 
     parser.add_argument(
@@ -1019,6 +1016,40 @@ def _clear_live_protocol_engine_contexts() -> None:
     _LIVE_PROTOCOL_ENGINE_CONTEXTS.close()
 
 
+def _convert_runtime_param_value(val: str) -> Any:
+    if val.lower() == "true":
+        return True
+    elif val.lower() == "false":
+        return False
+    if "." in val:  # NOTE: arg must explicitly define a float vs int with "."
+        try:
+            return float(val)
+        except ValueError:
+            pass
+    else:
+        try:
+            return int(val)
+        except ValueError:
+            pass
+    return val
+
+
+def _parse_runtime_parameters_list(
+    name_value_list: str,
+) -> PrimitiveRunTimeParamValuesType:
+    result: Dict[str, Any] = {}
+    for name_value in name_value_list:
+        if "=" in name_value:
+            name, value = name_value.split("=", 1)
+            if name and value:
+                result[name] = _convert_runtime_param_value(value)
+                continue
+        raise argparse.ArgumentTypeError(
+            f"Invalid argument format: '{name_value}' (expected name=value)"
+        )
+    return result
+
+
 # Note - this script is also set up as a setuptools entrypoint and thus does
 # an absolute minimum of work since setuptools does something odd generating
 # the scripts
@@ -1035,14 +1066,11 @@ def main() -> int:
     # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
     duration_estimator = DurationEstimator() if args.estimate_duration else None
 
-    # TODO: (sigler) parse runtime parameters from args
-    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None
-
     try:
         runlog, maybe_bundle = simulate(
             protocol_file=args.protocol,
             file_name=args.protocol.name,
-            run_time_param_values=run_time_param_values,
+            run_time_param_values=_parse_runtime_parameters_list(args.rp),
             custom_labware_paths=args.custom_labware_path,
             custom_data_paths=(args.custom_data_path + args.custom_data_file),
             duration_estimator=duration_estimator,

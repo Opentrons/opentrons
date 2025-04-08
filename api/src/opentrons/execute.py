@@ -21,6 +21,7 @@ from typing import (
     Optional,
     TextIO,
     Union,
+    Any,
 )
 
 from opentrons_shared_data.labware.labware_definition import (
@@ -67,7 +68,9 @@ from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
-from opentrons.protocol_engine.types.run_time_parameters import PrimitiveRunTimeParamValuesType
+from opentrons.protocol_engine.types.run_time_parameters import (
+    PrimitiveRunTimeParamValuesType,
+)
 
 from opentrons.protocol_reader import ProtocolSource
 
@@ -231,6 +234,11 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         "this option and should be configured in the config file. If "
         "'none', do not show logs",
     )
+
+    parser.add_argument(
+        "--rp", nargs="+", help="my_str=help my_bool=true my_int=1 my_float=1.0"
+    )
+
     parser.add_argument(
         "-L",
         "--custom-labware-path",
@@ -459,6 +467,40 @@ def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
     return _print_runlog
 
 
+def _convert_runtime_param_value(val: str) -> Any:
+    if val.lower() == "true":
+        return True
+    elif val.lower() == "false":
+        return False
+    if "." in val:  # NOTE: arg must explicitly define a float vs int with "."
+        try:
+            return float(val)
+        except ValueError:
+            pass
+    else:
+        try:
+            return int(val)
+        except ValueError:
+            pass
+    return val
+
+
+def _parse_runtime_parameters_list(
+    name_value_list: str,
+) -> PrimitiveRunTimeParamValuesType:
+    result: Dict[str, Any] = {}
+    for name_value in name_value_list:
+        if "=" in name_value:
+            name, value = name_value.split("=", 1)
+            if name and value:
+                result[name] = _convert_runtime_param_value(value)
+                continue
+        raise argparse.ArgumentTypeError(
+            f"Invalid argument format: '{name_value}' (expected name=value)"
+        )
+    return result
+
+
 def main() -> int:
     """Handler for command line invocation to run a protocol.
 
@@ -492,13 +534,11 @@ def main() -> int:
         # when executing via Protocol Engine, because Protocol Engine logs when commands fail.
         log_level = "warning"
 
-    # TODO: (sigler) parse runtime parameters from args
-    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None
     try:
         execute(
             protocol_file=args.protocol,
             protocol_name=args.protocol.name,
-            run_time_param_values=run_time_param_values,
+            run_time_param_values=_parse_runtime_parameters_list(args.rp),
             custom_labware_paths=args.custom_labware_path,
             custom_data_paths=(args.custom_data_path + args.custom_data_file),
             log_level=log_level,
