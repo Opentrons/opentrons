@@ -135,6 +135,49 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
     })
   })
 
+  it('should return the relevant retrieve command for stacker error kinds', () => {
+    const retrieveCommand = {
+      commandType: 'flexStacker/retrieve',
+      params: {
+        moduleId: 'module-id',
+      },
+    } as any
+
+    const retrieveErrorKinds = [
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING],
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.SHUTTLE_MISSING],
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.STACKER_STALL],
+    ]
+
+    retrieveErrorKinds.forEach(([commandType, errorType]) => {
+      const failedRetrieveCommand = {
+        commandType: 'flexStacker/retrieve',
+        params: {
+          moduleId: 'module-id',
+        },
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const runCommands = {
+        data: [retrieveCommand, failedRetrieveCommand],
+      } as any
+      const result = getRelevantFailedLabwareCmdFrom({
+        failedCommand: {
+          byRunRecord: {
+            ...failedRetrieveCommand,
+            commandType,
+            error: { isDefined: true, errorType },
+          },
+        } as any,
+        runCommands,
+      })
+      console.log('result::', result)
+      expect(result).toStrictEqual(failedRetrieveCommand)
+    })
+  })
+
   it('should return the failedCommand for GRIPPER_ERROR error kind', () => {
     const failedGripperCommand = {
       ...failedCommand,

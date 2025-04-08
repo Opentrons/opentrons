@@ -8,7 +8,7 @@ import { RECOVERY_MAP } from '../../constants'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../shared', async (importOriginal) => {
+vi.mock('../../shared', async importOriginal => {
   const mod = await importOriginal() // type is inferred
   return {
     ...mod,
@@ -38,7 +38,7 @@ describe('ManualReplaceLwAndRetry', () => {
           RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
       },
       doorStatusUtils: {
-        isDoorOpen: false
+        isDoorOpen: false,
       },
       routeUpdateActions: {
         proceedToRouteAndStep: vi.fn(),
@@ -48,8 +48,8 @@ describe('ManualReplaceLwAndRetry', () => {
         homeShuttle: vi.fn(() => Promise.resolve()),
       },
       stepCounts: {
-        hasRunDiverged: false
-      }
+        hasRunDiverged: false,
+      },
     } as any
   })
 
@@ -110,22 +110,21 @@ describe('ManualReplaceLwAndRetry', () => {
       RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
     props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
     render(props)
-    const button = screen.getAllByRole('button')[0];
-    expect(button).toBeEnabled();
+    const button = screen.getAllByRole('button')[0]
+    expect(button).toBeEnabled()
     screen.getByText('Load labware shuttle onto track')
   })
-
 
   it(`renders TwoColTextAndFailedStepNextStep for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING} step`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING
     props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
     render(props)
-    const button = screen.getAllByRole('button')[0];
-    expect(button).toBeEnabled();
+    const button = screen.getAllByRole('button')[0]
+    expect(button).toBeEnabled()
     // screen.getByText('Load labware shuttle onto track')
     fireEvent.click(button)
-    const spy =  vi.spyOn(props.recoveryCommands, 'homeShuttle')
+    const spy = vi.spyOn(props.recoveryCommands, 'homeShuttle')
     expect(spy).toBeCalledTimes(1)
   })
 
