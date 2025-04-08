@@ -5,7 +5,7 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { AspirateSettingsList } from '../../Aspirate/AspirateSettingsList'
+import { AspirateSettingItem } from '../../Aspirate/AspirateSettingItem'
 import { AspirateSettingDetail } from '../../Aspirate/AspirateSettingDetail'
 import { useAspirateSettingsConfig } from '../../Aspirate/hooks/useAspirateSettingsConfig'
 
