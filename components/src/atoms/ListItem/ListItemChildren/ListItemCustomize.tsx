@@ -62,8 +62,7 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
           role="button"
           onClick={onClick}
           css={css`
-            width: 12%;
-            text-align: right;
+            width: 10%;
             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             color: ${COLORS.grey60};
             &:hover {

@@ -119,12 +119,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       return
     }
 
-    // Skip position calculation in test environment
-    if (process.env.NODE_ENV === 'test') {
-      setDropdownPosition('bottom')
-      return
-    }
-
     const handlePositionCalculation = (): void => {
       const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
       if (!dropdownRect) return
@@ -200,8 +194,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     align-items: ${ALIGN_CENTER};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
     width: ${width};
-    min-height: 2.25rem;
-    height: auto;
+    height: 2.25rem;
+
     &:hover {
       border: 1px ${BORDERS.styleSolid}
         ${disabled ? COLORS.grey35 : hoverBorderColor};
@@ -275,7 +269,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             >
               <StyledText
                 desktopStyle="captionRegular"
-                css={LINE_CLAMP_TEXT_STYLE(3)}
+                css={LINE_CLAMP_TEXT_STYLE(1)}
               >
                 {currentOption.name}
               </StyledText>
