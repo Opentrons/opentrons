@@ -34,6 +34,8 @@ from .core.legacy.labware_offset_provider import (
 from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimulator
 from .core.engine import ENGINE_CORE_API_VERSION, ProtocolCore
 
+from ._command_annotations import CommandAnnotationAggregator
+
 
 class ProtocolEngineCoreRequiredError(Exception):
     """Raised when a Protocol Engine core was required, but not provided.
@@ -51,6 +53,7 @@ def create_protocol_context(
     protocol_engine_loop: Optional[asyncio.AbstractEventLoop] = None,
     broker: Optional[LegacyBroker] = None,
     equipment_broker: Optional[Broker[Any]] = None,
+    command_annotation_aggregator: Optional[CommandAnnotationAggregator] = None,
     use_simulating_core: bool = False,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
@@ -120,6 +123,9 @@ def create_protocol_context(
             engine_client=engine_client,
             api_version=api_version,
             sync_hardware=sync_hardware,
+            command_annotation_aggregator=command_annotation_aggregator
+            if command_annotation_aggregator is not None
+            else CommandAnnotationAggregator(),
         )
 
     elif use_simulating_core:

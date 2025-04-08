@@ -61,6 +61,7 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
+from ..._command_annotations import CommandAnnotationAggregator, CommandAnnotationData
 from ..._types import OffDeckType
 from ..._liquid import Liquid, LiquidClass
 from ...disposal_locations import TrashBin, WasteChute
@@ -108,10 +109,12 @@ class ProtocolCore(
         engine_client: ProtocolEngineClient,
         api_version: APIVersion,
         sync_hardware: SyncHardwareAPI,
+        command_annotation_aggregator: CommandAnnotationAggregator,
     ) -> None:
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_hardware = sync_hardware
+        self._command_annotation_aggregator = command_annotation_aggregator
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._labware_cores_by_id: Dict[str, LabwareCore] = {}
@@ -1134,6 +1137,11 @@ class ProtocolCore(
             return self._labware_cores_by_id[labware_location.labwareId]
 
         return OffDeckType.OFF_DECK
+
+    def add_command_annotations(
+        self, command_annotations: List[CommandAnnotationData]
+    ) -> None:
+        self._command_annotation_aggregator.add_command_annotations(command_annotations)
 
     def _convert_labware_location(
         self,

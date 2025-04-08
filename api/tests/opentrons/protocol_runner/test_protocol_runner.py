@@ -646,6 +646,7 @@ async def test_load_legacy_python(
             protocol=legacy_protocol,
             broker=broker_captor,
             equipment_broker=matchers.IsA(Broker),
+            command_annotation_aggregator=python_runner_subject._command_annotation_aggregator,
         )
     ).then_return(protocol_context)
 
@@ -727,7 +728,10 @@ async def test_load_python_with_pe_papi_core(
     broker_captor = matchers.Captor()
     decoy.when(
         protocol_context_creator.create(
-            protocol=protocol, broker=broker_captor, equipment_broker=None
+            protocol=protocol,
+            broker=broker_captor,
+            equipment_broker=None,
+            command_annotation_aggregator=python_runner_subject._command_annotation_aggregator,
         )
     ).then_return(protocol_context)
 
@@ -791,6 +795,7 @@ async def test_load_legacy_json(
             legacy_protocol,
             broker=matchers.IsA(LegacyBroker),
             equipment_broker=matchers.IsA(Broker),
+            command_annotation_aggregator=python_runner_subject._command_annotation_aggregator,
         )
     ).then_return(protocol_context)
 

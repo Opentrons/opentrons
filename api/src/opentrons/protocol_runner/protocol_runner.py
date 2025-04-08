@@ -10,6 +10,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
+from opentrons.protocol_api._command_annotations import CommandAnnotationAggregator
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_engine.commands.command import CommandStatus
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
@@ -97,7 +98,7 @@ class AbstractRunner(ABC):
 
     @property
     def command_annotations(self) -> List[CommandAnnotation]:
-        """Command annotations defined by protocol, if any. Currently only for json protocols."""
+        """Command annotations defined by protocol, if any."""
         return []
 
     def was_started(self) -> bool:
@@ -164,6 +165,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         self._protocol_file_reader = (
             python_and_legacy_file_reader or PythonAndLegacyFileReader()
         )
+        self._command_annotation_aggregator = CommandAnnotationAggregator()
         self._protocol_context_creator = (
             protocol_context_creator
             or ProtocolContextCreator(
@@ -188,6 +190,13 @@ class PythonAndLegacyRunner(AbstractRunner):
         if self._parameter_context is not None:
             return self._parameter_context.export_parameters_for_analysis()
         return []
+
+    @property
+    def command_annotations(self) -> List[CommandAnnotation]:
+        """Command annotations defined by protocol, if any."""
+        return list(
+            self._command_annotation_aggregator.export_command_annotations_as_pe_types()
+        )
 
     async def load(
         self,
@@ -241,6 +250,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             protocol=protocol,
             broker=self._broker,
             equipment_broker=equipment_broker,
+            command_annotation_aggregator=self._command_annotation_aggregator,
         )
         initial_home_command = pe_commands.HomeCreate(
             # this command homes all axes, including pipette plunger and gripper jaw
@@ -284,11 +294,12 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
+        command_annotations = self.command_annotations
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=parameters,
-            command_annotations=[],
+            command_annotations=command_annotations,
         )
 
 

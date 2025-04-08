@@ -26,6 +26,7 @@ from opentrons.protocol_api import (
     create_protocol_context,
     Parameters,
 )
+from opentrons.protocol_api._command_annotations import CommandAnnotationAggregator
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 
@@ -112,6 +113,7 @@ class ProtocolContextCreator:
         protocol: Protocol,
         broker: Optional[LegacyBroker],
         equipment_broker: Optional[Broker[LoadInfo]],
+        command_annotation_aggregator: CommandAnnotationAggregator,
     ) -> ProtocolContext:
         """Create a Protocol API v2 context."""
         extra_labware = (
@@ -130,6 +132,7 @@ class ProtocolContextCreator:
             protocol_engine_loop=asyncio.get_running_loop(),
             broker=broker,
             equipment_broker=equipment_broker,
+            command_annotation_aggregator=command_annotation_aggregator,
             extra_labware=extra_labware,
             use_simulating_core=self._USE_SIMULATING_CORE,
             bundled_data=bundled_data,

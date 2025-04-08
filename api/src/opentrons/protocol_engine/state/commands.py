@@ -660,7 +660,7 @@ class CommandView:
     def get_slice_since_index(
         self, index: int, include_fixit_commands: bool
     ) -> CommandSlice:
-        """Get all commands from start up to given index."""
+        """Get all commands from given index up through current command."""
         current_command = self.get_current()
         if current_command is None:
             return CommandSlice(

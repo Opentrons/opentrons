@@ -49,7 +49,7 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
     ).then_return(CommandEntry(command=decoy.mock(cls=Aspirate), index=0))
     decoy.when(
         mock_client.state.commands.get_slice_since_index(
-            0,
+            1,
             include_fixit_commands=True,
         )
     ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))

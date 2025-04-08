@@ -77,6 +77,7 @@ from opentrons.protocol_api.core.engine import (
     ModuleCore,
     load_labware_params,
 )
+from opentrons.protocol_api._command_annotations import CommandAnnotationAggregator
 from opentrons.protocol_api._liquid import Liquid, LiquidClass
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
@@ -191,6 +192,7 @@ def subject(
         engine_client=mock_engine_client,
         api_version=api_version,
         sync_hardware=mock_sync_hardware_api,
+        command_annotation_aggregator=CommandAnnotationAggregator(),
     )
 
 

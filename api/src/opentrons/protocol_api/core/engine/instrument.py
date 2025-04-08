@@ -1952,6 +1952,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 volume=volume, add_air_gap=True
             )
 
+        # Add generated command annotations to the aggregator
+        self._protocol_core.add_command_annotations(
+            components_executor.command_annotations
+        )
+
         # return copy of tip_contents with last entry replaced by tip state from executor
         last_contents = components_executor.tip_state.last_liquid_and_air_gap_in_tip
         new_tip_contents = tip_contents[0:-1] + [last_contents]
@@ -2052,6 +2057,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             source_well=source[1] if source else None,
             add_final_air_gap=add_final_air_gap,
         )
+
+        # Add generated command annotations to the aggregator
+        self._protocol_core.add_command_annotations(
+            components_executor.command_annotations
+        )
+
         last_contents = components_executor.tip_state.last_liquid_and_air_gap_in_tip
         new_tip_contents = tip_contents[0:-1] + [last_contents]
         return new_tip_contents
@@ -2139,6 +2150,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             add_final_air_gap=add_final_air_gap,
             is_last_retract=tip_starting_volume - volume == disposal_volume,
         )
+
+        # Add generated command annotations to the aggregator
+        self._protocol_core.add_command_annotations(
+            components_executor.command_annotations
+        )
+
         last_contents = components_executor.tip_state.last_liquid_and_air_gap_in_tip
         new_tip_contents = tip_contents[0:-1] + [last_contents]
         return new_tip_contents

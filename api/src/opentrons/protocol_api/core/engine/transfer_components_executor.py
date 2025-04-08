@@ -15,6 +15,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 )
 from opentrons_shared_data.pipette.types import LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
 
+from opentrons.protocol_api._command_annotations import CommandAnnotationData
 from opentrons.protocol_api._liquid_properties import (
     Submerge,
     TransferProperties,
@@ -108,13 +109,6 @@ class TransferType(Enum):
     ONE_TO_MANY = "one_to_many"
 
 
-@dataclass
-class CommandAnnotationData:
-
-    name: str
-    command_ids: List[str]
-
-
 class TransferComponentsExecutor:
     def __init__(
         self,
@@ -133,7 +127,11 @@ class TransferComponentsExecutor:
         self._target_well = target_well
         self._tip_state: TipState = deepcopy(tip_state)  # don't modify caller's object
         self._transfer_type: TransferType = transfer_type
-        self._command_annotation: List[CommandAnnotationData] = []
+        self._command_annotations: List[CommandAnnotationData] = []
+
+    @property
+    def command_annotations(self) -> List[CommandAnnotationData]:
+        return self._command_annotations
 
     @contextmanager
     def _annotate_command(self, command_name: str) -> Iterator[None]:
@@ -145,9 +143,9 @@ class TransferComponentsExecutor:
         assert last_command is not None
         yield
         command_slice = self._engine_client.state.commands.get_slice_since_index(
-            last_command.index, include_fixit_commands=True
+            last_command.index + 1, include_fixit_commands=True
         )
-        self._command_annotation.append(
+        self._command_annotations.append(
             CommandAnnotationData(
                 name=command_name,
                 command_ids=[command.id for command in command_slice.commands],
