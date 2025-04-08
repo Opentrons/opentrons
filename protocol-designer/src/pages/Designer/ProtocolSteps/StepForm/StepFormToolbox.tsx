@@ -85,9 +85,6 @@ type StepFormMap = {
   [K in StepType]?: ComponentType<StepFormProps> | null
 }
 
-const TWO_STEPS = 2
-const THREE_STEPS = 3
-
 const STEP_FORM_MAP: StepFormMap = {
   mix: MixTools,
   pause: PauseTools,
@@ -268,12 +265,15 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     )
   }
 
+  const numStepFormPages = getStepFormNumPages(
+    formData.stepType,
+    enableReadOrInitialization != null,
+    enableLiquidClasses
+  )
   const isMultiStepToolbox =
-    (formData.stepType === 'absorbanceReader' &&
-      enableReadOrInitialization != null) ||
-    formData.stepType === 'moveLiquid' ||
-    formData.stepType === 'mix' ||
-    formData.stepType === 'thermocycler'
+    formData.stepType === 'absorbanceReader'
+      ? enableReadOrInitialization
+      : numStepFormPages > 1
   const numWarnings =
     visibleFormWarnings.length + timelineWarningsForSelectedStep.length
   const numErrors = timeline.errors?.length ?? 0
@@ -352,17 +352,14 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     }
   }
 
-  const is3PageForm =
-    (formData.stepType === 'moveLiquid' && enableLiquidClasses) ||
-    (formData.stepType === 'mix' && enableLiquidClasses)
   const handleContinue = (): void => {
-    if (toolboxStep === 1 && is3PageForm) {
+    if (toolboxStep === 1 && numStepFormPages > 2) {
       if (isConfirmationRequired) {
         setShowConfirmationModal(true)
       } else {
         handleUpdateLiquidClassValues()
       }
-    } else if (isMultiStepToolbox && toolboxStep < (is3PageForm ? 2 : 1)) {
+    } else if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
       if (!isErrorOnCurrentPage) {
         setToolboxStep(prevStep => prevStep + 1)
         setShowFormErrors(false)
@@ -410,7 +407,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
               {t('shared:part', {
                 current: toolboxStep + 1,
-                max: is3PageForm ? THREE_STEPS : TWO_STEPS,
+                max: numStepFormPages,
               })}
             </StyledText>
           ) : null
@@ -455,7 +452,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               </SecondaryButton>
             ) : null}
             <PrimaryButton onClick={handleContinue} width="100%">
-              {isMultiStepToolbox && toolboxStep < (is3PageForm ? 2 : 1)
+              {isMultiStepToolbox && toolboxStep < numStepFormPages - 1
                 ? i18n.format(t('shared:continue'), 'capitalize')
                 : t('shared:save')}
             </PrimaryButton>
@@ -503,4 +500,22 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       </Toolbox>
     </>
   )
+}
+
+const getStepFormNumPages = (
+  stepType: StepType,
+  enableReadOrInitialization: boolean,
+  enableLiquidClasses: boolean
+): number => {
+  switch (stepType) {
+    case 'mix':
+    case 'moveLiquid':
+      return enableLiquidClasses ? 3 : 2
+    case 'thermocycler':
+      return 2
+    case 'absorbanceReader':
+      return enableReadOrInitialization ? 2 : 1
+    default:
+      return 1
+  }
 }
