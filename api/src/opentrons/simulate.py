@@ -666,7 +666,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "--rp", nargs="+", help="my_str=help my_bool=true my_int=1 my_float=1.0"
+        "--parameters", nargs="+", help="my_str=help my_bool=true my_int=1 my_float=1.0"
     )
 
     parser.add_argument(
@@ -1034,7 +1034,7 @@ def _convert_runtime_param_value(val: str) -> Any:
     return val
 
 
-def _parse_runtime_parameters_list(
+def _parse_parameters(
     name_value_list: List[str],
 ) -> PrimitiveRunTimeParamValuesType:
     if not name_value_list:
@@ -1072,7 +1072,7 @@ def main() -> int:
         runlog, maybe_bundle = simulate(
             protocol_file=args.protocol,
             file_name=args.protocol.name,
-            run_time_param_values=_parse_runtime_parameters_list(args.rp),
+            run_time_param_values=_parse_parameters(args.parameters),
             custom_labware_paths=args.custom_labware_path,
             custom_data_paths=(args.custom_data_path + args.custom_data_file),
             duration_estimator=duration_estimator,

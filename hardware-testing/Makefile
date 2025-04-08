@@ -93,8 +93,8 @@ test-cov:
 .PHONY: test-protocols
 test-protocols:
 	$(MAKE) test-protocol-iq-oq
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args)
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_low_volumes.py $(custom_lw_args)
+	$(MAKE) test-protocol-abr-high-volumes
+	$(MAKE) test-protocol-abr-low-volumes
 
 
 .PHONY: test-protocol-iq-oq
@@ -105,32 +105,36 @@ test-protocol-iq-oq:
 
 .PHONY: test-protocol-iq-oq-1ch
 test-protocol-iq-oq-1ch:
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_1channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_1channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=water
 
 .PHONY: test-protocol-iq-oq-8ch
 test-protocol-iq-oq-8ch:
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_8channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_8channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=water
 
 .PHONY: test-protocol-iq-oq-96ch
 test-protocol-iq-oq-96ch:
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --rp pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_pipette_iq_oq.py --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=water
 
 .PHONY: test-protocol-abr-high-volumes
 test-protocol-abr-high-volumes:
-#	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --rp channels=1 reservoir=nest_1_reservoir_290ml test_labware=nest_96_wellplate_2ml_deep
-#	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --rp channels=1 reservoir=nest_1_reservoir_290ml test_labware=opentrons_24_tuberack_nest_2ml_screwcap
-#	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --rp channels=1 reservoir=nest_1_reservoir_290ml test_labware=opentrons_15_tuberack_nest_15ml_conical
-#	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --rp channels=1 reservoir=nest_1_reservoir_290ml test_labware=opentrons_6_tuberack_nest_50ml_conical
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --rp channels=8 reservoir=nest_1_reservoir_290ml test_labware=nest_12_reservoir_15ml
-	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --rp channels=96 reservoir=nest_1_reservoir_290ml test_labware=nest_1_reservoir_195ml
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --parameters channels=1 reservoir=nest_1_reservoir_290ml test_labware=nest_96_wellplate_2ml_deep
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --parameters channels=1 reservoir=nest_1_reservoir_290ml test_labware=opentrons_24_tuberack_nest_2ml_screwcap
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --parameters channels=1 reservoir=nest_1_reservoir_290ml test_labware=opentrons_15_tuberack_nest_15ml_conical
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --parameters channels=1 reservoir=nest_1_reservoir_290ml test_labware=opentrons_6_tuberack_nest_50ml_conical
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --parameters channels=8 reservoir=nest_1_reservoir_290ml test_labware=nest_12_reservoir_15ml
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_high_volumes.py $(custom_lw_args) --parameters channels=96 reservoir=nest_1_reservoir_290ml test_labware=nest_1_reservoir_195ml
+
+.PHONY: test-protocol-abr-low-volumes
+test-protocol-abr-low-volumes:
+	$(python) -m opentrons.simulate $(protocols_dir)/abr/flex_abr_low_volumes.py $(custom_lw_args)
 
 .PHONY: test-photometric-single
 test-photometric-single:
