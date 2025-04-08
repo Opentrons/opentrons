@@ -484,20 +484,20 @@ class GeometryView:
             if z_offset < lld_min_height:
                 if isinstance(well_location, PickUpTipWellLocation):
                     raise OperationLocationNotInWellError(
-                        f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location that could be below the bottom of the well"
+                        f"Specifying {well_location.origin} with a height offset of {well_location.offset.z} results in a height of {z_offset}mm; the minimum allowed height for liquid tracking is {lld_min_height}mm"
                     )
                 else:
                     raise OperationLocationNotInWellError(
-                        f"Specifying {well_location.origin} with an offset of {well_location.offset} and a volume offset of {well_location.volumeOffset} results in an operation location that could be below the bottom of the well"
+                        f"Specifying {well_location.origin} with a height offset of {well_location.offset.z} results in a height of {z_offset}mm; the minimum allowed height for liquid tracking is {lld_min_height}mm"
                     )
         elif z_offset < 0:
             if isinstance(well_location, PickUpTipWellLocation):
                 raise OperationLocationNotInWellError(
-                    f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location below the bottom of the well"
+                    f"Specifying {well_location.origin} with an offset of {well_location.offset.z} results in a location below the bottom of the well"
                 )
             else:
                 raise OperationLocationNotInWellError(
-                    f"Specifying {well_location.origin} with an offset of {well_location.offset} and a volume offset of {well_location.volumeOffset} results in an operation location below the bottom of the well"
+                    f"Specifying {well_location.origin} with an offset of {well_location.offset.z} and a volume offset of {well_location.volumeOffset} results in a location below the bottom of the well"
                 )
 
     def get_well_position(
