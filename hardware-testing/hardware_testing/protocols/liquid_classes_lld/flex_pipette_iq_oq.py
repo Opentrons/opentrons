@@ -84,32 +84,37 @@ SLOTS = {
 
 def add_parameters(params: ParameterContext) -> None:
     """Add parameters."""
+    _pipettes = [
+        "flex_1channel_1000",
+        "flex_1channel_50",
+        "flex_8channel_1000",
+        "flex_8channel_50",
+        "flex_96channel_1000"
+    ]
     params.add_str(
         display_name="pipette",
         variable_name="pipette",
-        default="flex_1channel_1000",
+        default=_pipettes[0],
         choices=[
-            {"display_name": "P50S", "value": "flex_1channel_50"},
-            {"display_name": "P50M", "value": "flex_8channel_50"},
-            {"display_name": "P1000S", "value": "flex_1channel_1000"},
-            {"display_name": "P1000M", "value": "flex_8channel_1000"},
-            {"display_name": "P1000H", "value": "flex_96channel_1000"},
+            {"display_name": p.replace("flex_", ""), "value": p}
+            for p in _pipettes
         ],
     )
+    _racks = [
+        "opentrons_flex_96_filtertiprack_50ul",
+        "opentrons_flex_96_filtertiprack_200ul",
+        "opentrons_flex_96_filtertiprack_1000ul",
+        "opentrons_flex_96_tiprack_50ul",
+        "opentrons_flex_96_tiprack_200ul",
+        "opentrons_flex_96_tiprack_1000ul",
+    ]
     params.add_str(
         display_name="tips",
         variable_name="tips",
-        default="opentrons_flex_96_filtertiprack_50ul",
+        default=_racks[0],
         choices=[
-            {"display_name": "T50F", "value": "opentrons_flex_96_filtertiprack_50ul"},
-            {"display_name": "T50", "value": "opentrons_flex_96_tiprack_50ul"},
-            {"display_name": "T200F", "value": "opentrons_flex_96_filtertiprack_200ul"},
-            {"display_name": "T200", "value": "opentrons_flex_96_tiprack_200ul"},
-            {
-                "display_name": "T1000F",
-                "value": "opentrons_flex_96_filtertiprack_1000ul",
-            },
-            {"display_name": "T1000", "value": "opentrons_flex_96_tiprack_1000ul"},
+            {"display_name": r.replace("opentrons_flex_96_", ""), "value": r}
+            for r in _racks
         ],
     )
     params.add_str(
