@@ -390,3 +390,31 @@ export const getFormLevelError = (
     ? mappedErrorsToField[fieldName].title
     : null
 }
+
+export const getShouldUpdateForLiquidClass = (
+  changedFields: string[],
+  formType: string
+): boolean => {
+  switch (formType) {
+    case 'moveLiquid':
+      return [
+        'aspirate_labware',
+        'aspirate_wells',
+        'pipette',
+        'tipRack',
+        'path',
+        'liquidClass',
+      ].some(field => changedFields.includes(field))
+    case 'mix':
+      return [
+        'labware',
+        'wells',
+        'pipette',
+        'tipRack',
+        'path',
+        'liquidClass',
+      ].some(field => changedFields.includes(field))
+    default:
+      return false
+  }
+}
