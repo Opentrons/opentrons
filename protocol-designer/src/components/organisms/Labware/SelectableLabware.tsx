@@ -41,7 +41,6 @@ export interface SelectableLabwareProps {
 type ChannelType = 8 | 96
 
 const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
-  console.log(nozzleType)
   if (nozzleType === '8-channel' || nozzleType === COLUMN) {
     return 8
   } else {
