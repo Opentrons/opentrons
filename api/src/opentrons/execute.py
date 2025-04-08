@@ -486,8 +486,10 @@ def _convert_runtime_param_value(val: str) -> Any:
 
 
 def _parse_runtime_parameters_list(
-    name_value_list: str,
+    name_value_list: List[str],
 ) -> PrimitiveRunTimeParamValuesType:
+    if not name_value_list:
+        return {}
     result: Dict[str, Any] = {}
     for name_value in name_value_list:
         if "=" in name_value:
