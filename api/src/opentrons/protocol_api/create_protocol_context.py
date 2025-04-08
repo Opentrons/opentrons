@@ -73,6 +73,8 @@ def create_protocol_context(
             ProtocolEngine mutations must occur.
         broker: A message broker for protocol command event publishing.
         equipment_broker: A message broker for equipment load event publishing.
+        command_annotation_aggregator: A command annotation aggregator to store
+            command annotation data for analysis and run results
         use_simulating_core: For pre-ProtocolEngine API versions,
             use a simulating protocol core that will skip _most_ calls
             to the `hardware_api`.

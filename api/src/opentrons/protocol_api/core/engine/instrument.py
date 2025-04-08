@@ -68,6 +68,7 @@ from . import transfer_components_executor as tx_comps_executor
 from .well import WellCore
 from .labware import LabwareCore
 from ..instrument import AbstractInstrument
+from ..._command_annotations import CommandAnnotationData
 from ...disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
@@ -1184,6 +1185,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 ) from None
             raise
 
+        last_command_before_transfer = (
+            self._engine_client.state.commands.get_most_recently_finalized_command()
+        )
+        # Within an instrument context we are guaranteed to have a previous command, this assert is for mypy purposes
+        assert last_command_before_transfer is not None
+
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
             name=liquid_class.name,
@@ -1334,6 +1341,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
 
+        command_slice = self._engine_client.state.commands.get_slice_since_index(
+            last_command_before_transfer.index + 1, include_fixit_commands=True
+        )
+        self._protocol_core.add_command_annotations(
+            [
+                CommandAnnotationData(
+                    name="transfer",
+                    command_ids=[command.id for command in command_slice.commands],
+                )
+            ]
+        )
+
     # TODO(spp, 2025-02-25): wire up return tip
     def distribute_liquid(  # noqa: C901
         self,
@@ -1428,6 +1447,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 return_tip=return_tip,
             )
             return
+
+        last_command_before_transfer = (
+            self._engine_client.state.commands.get_most_recently_finalized_command()
+        )
+        # Within an instrument context we are guaranteed to have a previous command, this assert is for mypy purposes
+        assert last_command_before_transfer is not None
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1636,6 +1661,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
 
+        command_slice = self._engine_client.state.commands.get_slice_since_index(
+            last_command_before_transfer.index + 1, include_fixit_commands=True
+        )
+        self._protocol_core.add_command_annotations(
+            [
+                CommandAnnotationData(
+                    name="distribute",
+                    command_ids=[command.id for command in command_slice.commands],
+                )
+            ]
+        )
+
     def _tip_can_hold_volume_for_multi_dispensing(
         self,
         transfer_volume: float,
@@ -1694,6 +1731,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 'Blowout location "source" incompatible with consolidate liquid.'
                 ' Please choose "destination" or "trash".'
             )
+
+        last_command_before_transfer = (
+            self._engine_client.state.commands.get_most_recently_finalized_command()
+        )
+        # Within an instrument context we are guaranteed to have a previous command, this assert is for mypy purposes
+        assert last_command_before_transfer is not None
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1836,6 +1879,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             prev_src = next_source
         if new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
+
+        command_slice = self._engine_client.state.commands.get_slice_since_index(
+            last_command_before_transfer.index + 1, include_fixit_commands=True
+        )
+        self._protocol_core.add_command_annotations(
+            [
+                CommandAnnotationData(
+                    name="consolidate",
+                    command_ids=[command.id for command in command_slice.commands],
+                )
+            ]
+        )
 
     def _get_location_and_well_core_from_next_tip_info(
         self,
