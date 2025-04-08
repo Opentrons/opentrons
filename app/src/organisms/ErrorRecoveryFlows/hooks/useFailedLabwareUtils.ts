@@ -331,6 +331,7 @@ export function getFailedLabwareQuantity(
   return null
 }
 
+// add tests
 // Get the name of the relevant labware relevant to the failed command, if any.
 export function getFailedCmdRelevantLabware(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
@@ -342,43 +343,36 @@ export function getFailedCmdRelevantLabware(
     protocolAnalysis?.commands ?? []
   )
   let labwareNickname, failedLWURI
-  switch (errorKind) {
-    case ERROR_KINDS.STALL_WHILE_STACKING:
-    case ERROR_KINDS.SHUTTLE_MISSING:
-    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
-      for (const key in lwDefsByURI) {
-        if (lwDefsByURI.hasOwnProperty(key)) {
-          labwareNickname = getLabwareDisplayName(lwDefsByURI[key])
-          break
-        }
+  if (STACKER_ERROR_KINDS.includes(errorKind)) {
+    for (const key in lwDefsByURI) {
+      if (lwDefsByURI.hasOwnProperty(key)) {
+        labwareNickname = getLabwareDisplayName(lwDefsByURI[key])
+        break
       }
+    }
+    return {
+      name: labwareNickname ?? '',
+      nickname: labwareNickname ?? null,
+    }
+  } else {
+    labwareNickname =
+      protocolAnalysis != null
+        ? getLoadedLabware(
+            protocolAnalysis.labware,
+            recentRelevantFailedLabwareCmd?.params.labwareId || ''
+          )?.displayName ?? null
+        : null
+    failedLWURI = runRecord?.data.labware.find(
+      labware => labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
+    )?.definitionUri
+    if (failedLWURI != null && Object.keys(lwDefsByURI).includes(failedLWURI)) {
       return {
-        name: labwareNickname ?? '',
-        nickname: labwareNickname ?? null,
+        name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
+        nickname: labwareNickname,
       }
-    default:
-      labwareNickname =
-        protocolAnalysis != null
-          ? getLoadedLabware(
-              protocolAnalysis.labware,
-              recentRelevantFailedLabwareCmd?.params.labwareId || ''
-            )?.displayName ?? null
-          : null
-      failedLWURI = runRecord?.data.labware.find(
-        labware =>
-          labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
-      )?.definitionUri
-      if (
-        failedLWURI != null &&
-        Object.keys(lwDefsByURI).includes(failedLWURI)
-      ) {
-        return {
-          name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
-          nickname: labwareNickname,
-        }
-      } else {
-        return null
-      }
+    } else {
+      return null
+    }
   }
 }
 
@@ -448,24 +442,19 @@ export function useRelevantFailedLwLocations({
   }
 
   let location
-  switch (errorKind) {
-    case ERROR_KINDS.STALL_WHILE_STACKING:
-    case ERROR_KINDS.SHUTTLE_MISSING:
-    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER: // consolidate all validations into one method
-      if (
-        failedCommandByRunRecord?.params != null &&
-        'moduleId' in failedCommandByRunRecord?.params
-      ) {
-        location = {
-          moduleId: failedCommandByRunRecord?.params.moduleId,
-        }
-      } else {
-        location = null
+  if (STACKER_ERROR_KINDS.includes(errorKind)) {
+    if (
+      failedCommandByRunRecord?.params != null &&
+      'moduleId' in failedCommandByRunRecord?.params
+    ) {
+      location = {
+        moduleId: failedCommandByRunRecord?.params.moduleId,
       }
-      break
-    default:
-      location = failedLabware?.location ?? null
-      break
+    } else {
+      location = null
+    }
+  } else {
+    location = failedLabware?.location ?? null
   }
 
   const displayNameCurrentLoc = getLabwareDisplayLocation({
