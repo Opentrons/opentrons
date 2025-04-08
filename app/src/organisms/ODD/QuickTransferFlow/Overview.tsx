@@ -6,6 +6,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   ListItem,
+  NO_WRAP,
   SPACING,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
@@ -134,6 +135,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
             <LegacyStyledText
               css={TYPOGRAPHY.level4HeaderSemiBold}
               width="20rem"
+              whiteSpace={NO_WRAP}
             >
               {displayItem.option}
             </LegacyStyledText>

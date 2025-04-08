@@ -1,33 +1,29 @@
 import { useTranslation } from 'react-i18next'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { ACTIONS } from '../../constants'
-import { SETTING_OPTIONS } from '../constants'
+import {
+  ACTIONS,
+  ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS,
+} from '../../constants'
 
 import type { Dispatch } from 'react'
 import type {
+  AspirateSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
+  SettingItem,
 } from '../../types'
-import type { SettingOption } from '../types'
-
-export interface SettingItem {
-  option: string
-  copy: string
-  value: string
-  enabled: boolean
-  onClick: () => void
-}
 
 interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
-  setSelectedSetting: (setting: SettingOption | null) => void
+  setSelectedSetting: (setting: AspirateSettingOption | null) => void
 }
 
-export function useAspirateSettingsConfig(
-  props: UseAspirateSettingsConfigProps
-): SettingItem[] {
-  const { state, dispatch, setSelectedSetting } = props
+export function useAspirateSettingsConfig({
+  state,
+  dispatch,
+  setSelectedSetting,
+}: UseAspirateSettingsConfigProps): SettingItem[] {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
 

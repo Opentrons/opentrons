@@ -4,44 +4,45 @@ import { Mix } from '../QuickTransferAdvancedSettings/Mix'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
-import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../constants'
+import { BlowOut } from '../QuickTransferAdvancedSettings/BlowOut'
+import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../constants'
 
 import type { ComponentType, Dispatch } from 'react'
 import type {
-  AspirateSettingOption,
+  DispenseSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
 
 interface CommonSettingProps {
-  kind: 'aspirate'
+  kind: 'dispense'
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
   onBack: () => void
 }
 
 const SettingComponentMap: Partial<
-  Record<AspirateSettingOption, ComponentType<CommonSettingProps>>
+  Record<DispenseSettingOption, ComponentType<CommonSettingProps>>
 > = {
-  [SETTING_OPTIONS.ASPIRATE_FLOW_RATE]: FlowRateEntry,
-  [SETTING_OPTIONS.ASPIRATE_TIP_POSITION]: TipPositionEntry,
-  [SETTING_OPTIONS.ASPIRATE_MIX]: Mix,
-  [SETTING_OPTIONS.ASPIRATE_DELAY]: Delay,
-  [SETTING_OPTIONS.ASPIRATE_TOUCH_TIP]: TouchTip,
-  [SETTING_OPTIONS.ASPIRATE_AIR_GAP]: AirGap,
-  // ToDo(kk:04/03/2025) add pre-wet tip
-  // [SETTING_OPTIONS.PRE_WET_TIP]: PreWetTip,
-}
-interface AspirateSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {
-  selectedSetting: AspirateSettingOption | null
+  [SETTING_OPTIONS.DISPENSE_FLOW_RATE]: FlowRateEntry,
+  [SETTING_OPTIONS.DISPENSE_TIP_POSITION]: TipPositionEntry,
+  [SETTING_OPTIONS.DISPENSE_MIX]: Mix,
+  [SETTING_OPTIONS.DISPENSE_DELAY]: Delay,
+  [SETTING_OPTIONS.DISPENSE_TOUCH_TIP]: TouchTip,
+  [SETTING_OPTIONS.DISPENSE_AIR_GAP]: AirGap,
+  [SETTING_OPTIONS.DISPENSE_BLOW_OUT]: BlowOut,
 }
 
-export function AspirateSettingDetail({
+interface DispenseSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {
+  selectedSetting: DispenseSettingOption | null
+}
+
+export function DispenseSettingDetail({
   selectedSetting,
   state,
   dispatch,
   onBack,
-}: AspirateSettingDetailProps): JSX.Element | null {
+}: DispenseSettingDetailProps): JSX.Element | null {
   if (selectedSetting === null || !(selectedSetting in SettingComponentMap)) {
     return null
   }
@@ -49,7 +50,7 @@ export function AspirateSettingDetail({
   if (SelectedComponent !== undefined) {
     return (
       <SelectedComponent
-        kind="aspirate"
+        kind="dispense"
         state={state}
         dispatch={dispatch}
         onBack={onBack}
