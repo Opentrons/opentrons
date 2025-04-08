@@ -58,7 +58,7 @@ class SubsystemManager:
     _expected_core_targets: Set[FirmwareTarget]
     _present_tools: tools.types.ToolSummary
     _tool_task_condition: asyncio.Condition
-    _tool_task_state: Union[bool, Exception]
+    _tool_task_state: Union[bool, BaseException]
     _updates_required: Dict[FirmwareTarget, FirmwareUpdateRequirements]
     _updates_ongoing: Dict[SubSystem, UpdateStatus]
     _update_bag: FirmwareUpdate
@@ -370,7 +370,8 @@ class SubsystemManager:
     async def _tool_detection_task_main(self) -> None:
         try:
             await self._tool_detection_task_protected()
-        except Exception as e:
+        except BaseException as e:
+            log.exception("Tool reader task failed")
             async with self._tool_task_condition:
                 self._tool_task_state = e
                 self._tool_task_condition.notify_all()

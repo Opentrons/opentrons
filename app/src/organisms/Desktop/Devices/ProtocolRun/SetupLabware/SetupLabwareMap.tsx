@@ -133,6 +133,7 @@ export function SetupLabwareMap({
               labwareId={topLabwareId}
               displayName={topLabwareDisplayName}
               runId={runId}
+              labwareHasLiquid={Object.values(wellFill).length > 0}
             />
           ) : null}
         </g>
@@ -195,12 +196,13 @@ export function SetupLabwareMap({
                   setHoverLabwareId(null)
                 }}
               >
-                {topLabwareDefinition != null ? (
+                {topLabwareDisplayName != null ? (
                   <LabwareInfoOverlay
                     definition={topLabwareDefinition}
                     labwareId={topLabwareId}
-                    displayName={topLabwareDisplayName ?? null}
+                    displayName={topLabwareDisplayName}
                     runId={runId}
+                    labwareHasLiquid={Object.values(wellFill).length > 0}
                   />
                 ) : null}
               </g>

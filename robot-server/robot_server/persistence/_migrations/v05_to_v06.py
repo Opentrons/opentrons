@@ -23,7 +23,7 @@ from contextlib import ExitStack
 import sqlalchemy
 
 from ..database import sql_engine_ctx, sqlite_rowid
-from ..tables import schema_5, schema_6
+from ..tables import schema_05, schema_06
 from .._folder_migrator import Migration
 
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
@@ -57,7 +57,7 @@ class Migration5to6(Migration):  # noqa: D101
             source_engine = exit_stack.enter_context(sql_engine_ctx(source_db_file))
 
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
-            schema_6.metadata.create_all(dest_engine)
+            schema_06.metadata.create_all(dest_engine)
 
             source_transaction = exit_stack.enter_context(source_engine.begin())
             dest_transaction = exit_stack.enter_context(dest_engine.begin())
@@ -70,8 +70,8 @@ def _migrate_db_with_changes(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     copy_rows_unmodified(
-        schema_5.data_files_table,
-        schema_6.data_files_table,
+        schema_05.data_files_table,
+        schema_06.data_files_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
@@ -85,22 +85,22 @@ def _migrate_db_with_changes(
         dest_transaction,
     )
     copy_rows_unmodified(
-        schema_5.run_table,
-        schema_6.run_table,
+        schema_05.run_table,
+        schema_06.run_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
     copy_rows_unmodified(
-        schema_5.action_table,
-        schema_6.action_table,
+        schema_05.action_table,
+        schema_06.action_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
     copy_rows_unmodified(
-        schema_5.run_command_table,
-        schema_6.run_command_table,
+        schema_05.run_command_table,
+        schema_06.run_command_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
@@ -112,16 +112,16 @@ def _migrate_protocol_table_with_new_protocol_kind_col(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     """Add a new 'protocol_kind' column to protocols table."""
-    select_old_protocols = sqlalchemy.select(schema_5.protocol_table).order_by(
+    select_old_protocols = sqlalchemy.select(schema_05.protocol_table).order_by(
         sqlite_rowid
     )
-    insert_new_protocol = sqlalchemy.insert(schema_6.protocol_table)
+    insert_new_protocol = sqlalchemy.insert(schema_06.protocol_table)
     for old_row in source_transaction.execute(select_old_protocols).all():
         new_protocol_kind = (
             # Account for old_row.protocol_kind being NULL.
-            schema_6.ProtocolKindSQLEnum.QUICK_TRANSFER
+            schema_06.ProtocolKindSQLEnum.QUICK_TRANSFER
             if old_row.protocol_kind == "quick-transfer"
-            else schema_6.ProtocolKindSQLEnum.STANDARD
+            else schema_06.ProtocolKindSQLEnum.STANDARD
         )
         dest_transaction.execute(
             insert_new_protocol,
@@ -137,10 +137,10 @@ def _migrate_analysis_table_excluding_rtp_defaults_and_vals(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     """Remove run_time_parameter_values_and_defaults column from analysis_table."""
-    select_old_analyses = sqlalchemy.select(schema_5.analysis_table).order_by(
+    select_old_analyses = sqlalchemy.select(schema_05.analysis_table).order_by(
         sqlite_rowid
     )
-    insert_new_analyses = sqlalchemy.insert(schema_6.analysis_table)
+    insert_new_analyses = sqlalchemy.insert(schema_06.analysis_table)
     for old_row in source_transaction.execute(select_old_analyses).all():
         dest_transaction.execute(
             insert_new_analyses,

@@ -18,6 +18,10 @@ import { useRunCalibrationStatus } from '../useRunCalibrationStatus'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useRunHasStarted } from '../useRunHasStarted'
 import { useIsFlex } from '/app/redux-resources/robots'
+import {
+  getIsFixtureMismatch,
+  useDeckConfigurationCompatibility,
+} from '/app/resources/deck_configuration'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
@@ -30,6 +34,7 @@ vi.mock('../useMostRecentCompletedAnalysis')
 vi.mock('../useRunHasStarted')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/deck_configuration')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
@@ -67,6 +72,8 @@ describe('useLPCDisabledReason', () => {
       _uncastedSimpleV6Protocol.labwareDefinitions as {}
     )
     vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue({} as any)
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -157,6 +164,16 @@ describe('useLPCDisabledReason', () => {
       missingModuleIds: ['mockId'],
       remainingAttachedModules: [],
     })
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(
+      'Make sure all modules are connected before running Labware Position Check'
+    )
+  })
+  it('renders disabled reason for fixture mismatch', () => {
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
     const { result } = renderHook(
       () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
@@ -326,5 +343,32 @@ describe('useLPCDisabledReason', () => {
       { wrapper }
     )
     expect(result.current).toStrictEqual(null)
+  })
+  it('handles deck configuration compatibility check for OT-2', () => {
+    vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue({} as any)
+
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
+
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(
+      'Make sure all modules are connected before running Labware Position Check'
+    )
+  })
+  it('handles deck configuration compatibility check for Flex', () => {
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue({} as any)
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
+
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ robotName: 'flexie', runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(
+      'Make sure all modules are connected before running Labware Position Check'
+    )
   })
 })

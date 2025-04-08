@@ -15,7 +15,7 @@ import sqlalchemy
 
 from ._util import add_column, copy_contents
 from ..database import sql_engine_ctx, sqlite_rowid
-from ..tables import schema_7
+from ..tables import schema_07
 from .._folder_migrator import Migration
 
 from ..file_and_directory_names import (
@@ -35,20 +35,20 @@ class Migration6to7(Migration):  # noqa: D101
         with ExitStack() as exit_stack:
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
 
-            schema_7.metadata.create_all(dest_engine)
+            schema_07.metadata.create_all(dest_engine)
 
             dest_transaction = exit_stack.enter_context(dest_engine.begin())
 
             add_column(
                 dest_engine,
-                schema_7.run_command_table.name,
-                schema_7.run_command_table.c.command_intent,
+                schema_07.run_command_table.name,
+                schema_07.run_command_table.c.command_intent,
             )
 
             add_column(
                 dest_engine,
-                schema_7.data_files_table.name,
-                schema_7.data_files_table.c.source,
+                schema_07.data_files_table.name,
+                schema_07.data_files_table.c.source,
             )
 
             _migrate_command_table_with_new_command_intent_col(
@@ -64,7 +64,7 @@ def _migrate_command_table_with_new_command_intent_col(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     """Add a new 'command_intent' column to run_command_table table."""
-    select_commands = sqlalchemy.select(schema_7.run_command_table).order_by(
+    select_commands = sqlalchemy.select(schema_07.run_command_table).order_by(
         sqlite_rowid
     )
     for row in dest_transaction.execute(select_commands).all():
@@ -78,8 +78,8 @@ def _migrate_command_table_with_new_command_intent_col(
         )
 
         dest_transaction.execute(
-            sqlalchemy.update(schema_7.run_command_table)
-            .where(schema_7.run_command_table.c.row_id == row.row_id)
+            sqlalchemy.update(schema_07.run_command_table)
+            .where(schema_07.run_command_table.c.row_id == row.row_id)
             .values(command_intent=new_command_intent),
         )
 
@@ -89,7 +89,7 @@ def _migrate_data_files_table_with_new_source_col(
 ) -> None:
     """Add a new 'source' column to data_files table."""
     dest_transaction.execute(
-        sqlalchemy.update(schema_7.data_files_table).values(
-            {"source": schema_7.DataFileSourceSQLEnum.UPLOADED}
+        sqlalchemy.update(schema_07.data_files_table).values(
+            {"source": schema_07.DataFileSourceSQLEnum.UPLOADED}
         )
     )

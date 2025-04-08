@@ -12,7 +12,7 @@ from contextlib import ExitStack
 from ._util import add_column, copy_contents
 from ..database import sql_engine_ctx
 from ..file_and_directory_names import DB_FILE
-from ..tables import schema_4
+from ..tables import schema_04
 from .._folder_migrator import Migration
 
 
@@ -27,15 +27,15 @@ class Migration3to4(Migration):  # noqa: D101
         # Append the new column to existing analyses in v4 database
         with ExitStack() as exit_stack:
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
-            schema_4.metadata.create_all(dest_engine)
+            schema_04.metadata.create_all(dest_engine)
 
             add_column(
                 dest_engine,
-                schema_4.analysis_table.name,
-                schema_4.analysis_table.c.run_time_parameter_values_and_defaults,
+                schema_04.analysis_table.name,
+                schema_04.analysis_table.c.run_time_parameter_values_and_defaults,
             )
             add_column(
                 dest_engine,
-                schema_4.run_table.name,
-                schema_4.run_table.c.run_time_parameters,
+                schema_04.run_table.name,
+                schema_04.run_table.c.run_time_parameters,
             )

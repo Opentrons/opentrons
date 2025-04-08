@@ -18,6 +18,7 @@ import {
 } from '/app/redux/protocol-runs'
 import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
 import { useState } from 'react'
+import { useUpdateClientLPC } from '/app/resources/client_data'
 
 export function SetupOffsetsHeader({
   runId,
@@ -32,6 +33,7 @@ export function SetupOffsetsHeader({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const lwOffsetsForRun = useSelector(selectLabwareOffsetsToAddToRun(runId))
+  const { updateWithRunId } = useUpdateClientLPC()
 
   const [isApplyOffsets, setIsApplyingOffsets] = useState(false)
 
@@ -48,6 +50,7 @@ export function SetupOffsetsHeader({
         )
           .then(() => {
             dispatch(appliedOffsetsToRun(runId))
+            updateWithRunId(runId)
             setSetupScreen('prepare to run')
           })
           .catch(() => {

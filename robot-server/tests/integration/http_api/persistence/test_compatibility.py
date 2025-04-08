@@ -245,6 +245,13 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
                 else:
                     assert run["data"].get("dataError") is not None
 
+                # This .location field migrated to .locationSequence.
+                # The new field should always exist and always be non-empty.
+                for labware_offset in run["data"]["labwareOffsets"]:
+                    location_sequence = labware_offset.get("locationSequence", None)
+                    assert isinstance(location_sequence, list)
+                    assert len(location_sequence) > 0
+
                 all_command_summaries = (
                     await robot_client.get_run_commands(
                         run_id=expected_run.id,
