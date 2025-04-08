@@ -28,6 +28,9 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
     LocationCheckDescriptors,
 )
 from opentrons.protocol_engine.clients.sync_client import SyncClient as EngineClient
+from opentrons.protocol_engine.commands.aspirate import Aspirate
+from opentrons.protocol_engine.state.commands import CommandSlice
+from opentrons.protocol_engine.state.command_history import CommandEntry
 from opentrons.types import Location, Point
 
 
@@ -40,7 +43,17 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
 @pytest.fixture
 def mock_engine_client(decoy: Decoy) -> EngineClient:
     """Return a mocked out engine client."""
-    return decoy.mock(cls=EngineClient)
+    mock_client = decoy.mock(cls=EngineClient)
+    decoy.when(
+        mock_client.state.commands.get_most_recently_finalized_command()
+    ).then_return(CommandEntry(command=decoy.mock(cls=Aspirate), index=0))
+    decoy.when(
+        mock_client.state.commands.get_slice_since_index(
+            0,
+            include_fixit_commands=True,
+        )
+    ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
+    return mock_client
 
 
 @pytest.fixture
