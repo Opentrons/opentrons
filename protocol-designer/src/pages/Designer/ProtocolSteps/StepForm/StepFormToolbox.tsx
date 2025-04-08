@@ -47,7 +47,7 @@ import {
   hoverSelection,
   selectDropdownItem,
 } from '../../../../ui/steps/actions/actions'
-import { SettingsUpdateConfirmationModal } from './AdvancedSettingsUpdateConfirmationModal'
+import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/organisms/AdvancedSettingsUpdateConfirmationModal'
 import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
@@ -378,7 +378,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   return (
     <>
       {showConfirmationModal ? (
-        <SettingsUpdateConfirmationModal
+        <AdvancedSettingsUpdateConfirmationModal
           formData={formData}
           fieldsChangedRequiringConfirmation={
             fieldsChangedRequiringConfirmation
