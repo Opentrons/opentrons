@@ -3,7 +3,7 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { saveFile, savePythonFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
-import type { PDProtocolFile, PDPythonFile } from '../file-types'
+import type { PDProtocolFile, PythonExtractedFile } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type {
   FileUploadErrorType,
@@ -29,7 +29,7 @@ export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
 })
 // expects valid, parsed JSON protocol.
 export const loadFileAction = (
-  payload: PDProtocolFile | PDPythonFile
+  payload: PDProtocolFile | PythonExtractedFile
 ): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migration(payload),
@@ -85,10 +85,31 @@ export const loadProtocolFile = (
         const designerApplication = result.match(
           /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/m
         )
-        if (designerApplication != null && designerApplication[1]) {
+        //  extract py metadata object
+        const fileMetadata = result.match(/metadata\s*=\s*({[\s\S]*?})/)
+        if (
+          designerApplication != null &&
+          designerApplication[1] &&
+          fileMetadata != null &&
+          fileMetadata[1]
+        ) {
           const designerApplicationString = designerApplication[1]
-          const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
-          dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
+          const fileMetadataObj = fileMetadata[1]
+          const designerApplicationJson = JSON.parse(designerApplicationString)
+          const rawFileMetadata = fileMetadataObj.replace(/,\s*([}\]])/g, '$1') // remove py formatting
+          const filterMetadataJson = JSON.parse(rawFileMetadata)
+
+          const pythonExtractedDesignerApplication: PythonExtractedFile = {
+            ...designerApplicationJson,
+            metadata: {
+              ...filterMetadataJson,
+              created: Date.parse(filterMetadataJson.created as string), // turn stringed date into type Date
+              lastModified: Date.parse(
+                filterMetadataJson.lastModified as string
+              ),
+            },
+          }
+          dispatch(loadFileAction(pythonExtractedDesignerApplication))
         } else {
           console.warn('No blob found in file.')
         }
