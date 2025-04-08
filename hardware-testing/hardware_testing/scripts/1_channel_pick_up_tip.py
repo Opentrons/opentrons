@@ -388,6 +388,8 @@ async def _main() -> None:
                     print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}\n')
                     y_offset += 9
                 print(f'Tip Measurements: {measurement_map}\n')
+                for key in measurement_map:
+                    print(f"{measurement_map[key]}\n")
                 tiprack_loc = Point(pickup_loc[0] + (NOZZLE_TO_NOZZLE_MM * i),
                                     pickup_loc[1],
                                     pickup_loc[2] - (tip_length[args.tip_size] - 20))
