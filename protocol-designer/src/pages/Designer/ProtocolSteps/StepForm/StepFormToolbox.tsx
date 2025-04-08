@@ -177,7 +177,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     field => {
       // if field has been updated and confirmed in modal, check its most recent confirmed value
       const referenceObjectForField =
-        field in confirmedFieldUpdates ? confirmedFieldUpdates : savedStepForm
+        field in confirmedFieldUpdates
+          ? confirmedFieldUpdates
+          : savedStepForm ?? {}
       return formData[field] !== referenceObjectForField[field]
     }
   )
