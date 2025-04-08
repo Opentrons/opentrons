@@ -1,4 +1,5 @@
 import {
+  getFlexNameConversion,
   getLabwareDisplayName,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
@@ -309,14 +310,40 @@ export function generateChatPrompt(
     'liquid_section_title'
   )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
 
+  // we need to do this nonsense to convert pipette names to api load names
+  // this data does not yet live in  pipette defs, but hopefully aill within 6 months
+  // of writing this comment. https://opentrons.atlassian.net/browse/EXEC-1426
+  let leftPipetteApiLoadName: string | null = null
+  let rightPipetteApiLoadName: string | null = null
+
+  if (values.instruments.pipettes === TWO_PIPETTES) {
+    const leftPipetteSpecs = getPipetteSpecsV2(
+      values.instruments.leftPipette as PipetteName
+    )
+    const rightPipetteSpecs = getPipetteSpecsV2(
+      values.instruments.rightPipette as PipetteName
+    )
+    if (leftPipetteSpecs != null) {
+      leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
+    }
+
+    if (rightPipetteSpecs != null) {
+      rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
+    }
+  }
+
   const mounts: string[] =
     values.instruments.pipettes === TWO_PIPETTES
       ? [
           values.instruments.leftPipette !== NO_PIPETTES
-            ? `left pipette ${values.instruments.leftPipette}`
+            ? `left pipette ${
+                leftPipetteApiLoadName ?? values.instruments.leftPipette
+              }`
             : '',
           values.instruments.rightPipette !== NO_PIPETTES
-            ? `right pipette ${values.instruments.rightPipette}`
+            ? `right pipette ${
+                rightPipetteApiLoadName ?? values.instruments.rightPipette
+              }`
             : '',
         ].filter(Boolean)
       : [values.instruments.pipettes]

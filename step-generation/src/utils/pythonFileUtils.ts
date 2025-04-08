@@ -3,6 +3,7 @@ import {
   isFlexPipette,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
+  getFlexNameConversion,
 } from '@opentrons/shared-data'
 import {
   formatPyDict,
@@ -24,19 +25,9 @@ import type {
 } from '../types'
 import type {
   CutoutId,
-  PipetteV2Specs,
   ProtocolFile,
   RobotType,
 } from '@opentrons/shared-data'
-const DEFAULT_LIQUID_TYPE = 'default'
-//  Flex pipette api names are different from pipetteName
-//  p1000_multi_flex -> flex_8channel_1000
-//  we do not need to worry about -_em pipette in PD
-export const getFlexNameConversion = (pipetteSpec: PipetteV2Specs): string => {
-  const channels = pipetteSpec.channels
-  const maxVolume = pipetteSpec.liquids[DEFAULT_LIQUID_TYPE].maxVolume
-  return `flex_${channels}channel_${maxVolume}`
-}
 
 const PAPI_VERSION = '2.23' // latest version from api/src/opentrons/protocols/api_support/definitions.py
 
