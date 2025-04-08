@@ -97,7 +97,7 @@ export function ProtocolSteps(): JSX.Element {
         paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
         height="100%"
         position={POSITION_RELATIVE}
-        overflowY={OVERFLOW_AUTO}
+        overflow={OVERFLOW_AUTO}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
