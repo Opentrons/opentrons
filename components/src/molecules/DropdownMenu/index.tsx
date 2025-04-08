@@ -84,7 +84,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     filterOptions,
     onClick,
     currentOption,
-    width = '13rem',
+    width = '9.125rem',
     dropdownType = 'rounded',
     title,
     caption,

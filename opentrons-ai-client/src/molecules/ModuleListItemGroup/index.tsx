@@ -108,6 +108,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                       adapters != null && adapters.length > 0
                         ? {
                             title: (null as unknown) as string,
+                            width: '13rem',
                             currentOption: {
                               name:
                                 getDefDisplayName(
