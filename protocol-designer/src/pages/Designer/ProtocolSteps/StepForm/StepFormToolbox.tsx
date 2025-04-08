@@ -48,7 +48,6 @@ import {
   selectDropdownItem,
 } from '../../../../ui/steps/actions/actions'
 import { SettingsUpdateConfirmationModal } from './AdvancedSettingsUpdateConfirmationModal'
-import { FORM_TYPE_TO_FIELDS_REQUIRING_CONFIRMATION } from './constants'
 import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
@@ -101,6 +100,15 @@ const STEP_FORM_MAP: StepFormMap = {
   comment: CommentTools,
   absorbanceReader: AbsorbanceReaderTools,
 }
+
+// used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings
+export const FIELDS_REQUIRING_CONFIRMATION: string[] = [
+  'pipette',
+  'tipRack',
+  'liquidClass',
+  'volume',
+  'path',
+]
 
 interface StepFormToolboxProps {
   canSave: boolean
@@ -159,15 +167,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const timeline = useSelector(getRobotStateTimeline)
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
-  const fieldsRequiringConfirmation =
-    FORM_TYPE_TO_FIELDS_REQUIRING_CONFIRMATION[formData.stepType]
   const savedStepForm = useSelector(getSavedStepForms)[formData.id]
 
   // state used to track fields that have been confirmed through the modal but before saving the step form
   const [confirmedFieldUpdates, setConfirmedFieldUpdates] = useState<
     Record<string, any>
   >({})
-  const fieldsChangedRequiringConfirmation = fieldsRequiringConfirmation.filter(
+  const fieldsChangedRequiringConfirmation = FIELDS_REQUIRING_CONFIRMATION.filter(
     field => {
       // if field has been updated and confirmed in modal, check its most recent confirmed value
       const referenceObjectForField =
@@ -294,7 +300,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   }
   const handleConfirmValues = (): void => {
     setConfirmedFieldUpdates(
-      fieldsRequiringConfirmation.reduce((acc, field) => {
+      FIELDS_REQUIRING_CONFIRMATION.reduce((acc, field) => {
         return { ...acc, [field]: formData[field] }
       }, {})
     )
