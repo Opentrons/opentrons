@@ -11,7 +11,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  CommandStatus
 } from '@opentrons/shared-data'
 
 import {
@@ -134,6 +133,7 @@ export function useModuleOverflowMenu(
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -230,7 +230,6 @@ export function useModuleOverflowMenu(
         moduleId: module.id,
       },
     }
-    const { reportModuleCommand } = useModuleCommandAnalytics()
 
     createLiveCommand({
       command: deactivateCommand,

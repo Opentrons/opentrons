@@ -7,8 +7,8 @@ import {
   CELSIUS,
   HS_TEMP_MIN,
   HS_TEMP_MAX,
-  HeaterShakerSetTargetTemperatureCreateCommand
 } from '@opentrons/shared-data'
+import type {HeaterShakerSetTargetTemperatureCreateCommand} from '@opentrons/shared-data'
 import {
   COLORS,
   DIRECTION_COLUMN,

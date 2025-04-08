@@ -1,9 +1,8 @@
-import { AttachedModule} from '@opentrons/api-client'
-import {
-    useTrackEvent, ANALYTICS_MODULE_COMMAND_ERROR, ANALYTICS_MODULE_COMMAND_COMPLETED
+import type { AttachedModule} from '@opentrons/api-client'
+import { useTrackEvent, ANALYTICS_MODULE_COMMAND_ERROR, ANALYTICS_MODULE_COMMAND_COMPLETED
 } from '/app/redux/analytics'
 import { useModulesQuery } from '@opentrons/react-api-client'
-import { CommandStatus, ModuleOnlyParams, ModuleType, TemperatureParams} from '@opentrons/shared-data'
+import type { CommandStatus, ModuleOnlyParams, ModuleType, TemperatureParams, RunTimeCommand} from '@opentrons/shared-data'
 import type {CommandData} from '@opentrons/api-client'
 import {
     getAttachedProtocolModuleMatches,
@@ -14,8 +13,8 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
     FLEX_ROBOT_TYPE,
     getDeckDefFromRobotType,
-    RunTimeCommand
   } from '@opentrons/shared-data'
+ 
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
     'thermocycler/closeLid',
@@ -67,6 +66,9 @@ export interface UseModuleCommandAnalyticsResult {
     reportModuleCommand: (params: ModuleAnalyticType) => void;
 }
 
+const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
+const moduleQuery = useModulesQuery()
+
 export function useModuleCommandAnalytics(modules?: AttachedModule[]): UseModuleCommandAnalyticsResult {
     const doTrackEvent = useTrackEvent();
     const reportModuleCommand = ({
@@ -78,8 +80,6 @@ export function useModuleCommandAnalytics(modules?: AttachedModule[]): UseModule
         if (!isValidCommandType(analyticCommand)){
             return;
         }
-        const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
-        const moduleQuery = useModulesQuery()
         const attachedModules = moduleQuery?.data?.data ?? []
         const mostRecentAnalysis = useMostRecentCompletedAnalysis('runId' in rest && typeof rest.runId === 'string' ? rest.runId : null);
         const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
