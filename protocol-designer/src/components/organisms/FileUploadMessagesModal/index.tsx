@@ -26,11 +26,15 @@ export function FileUploadMessagesModal(): JSX.Element | null {
     dispatch(dismissFileUploadMessage())
   }
 
-  if (modalContents == null) return null
+  if (modalContents == null) {
+    return null
+  }
 
   const { title, body } = modalContents
   const showButtons =
-    title !== t('invalid_json_file') && title !== t('incorrect_file_header')
+    title !== t('invalid_json_file') &&
+    title !== t('incorrect_file_header') &&
+    title !== t('incorrect_python_file_header')
 
   return (
     <Modal
