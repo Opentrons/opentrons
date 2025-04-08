@@ -63,9 +63,7 @@ TEST_MATRIX: Dict[str, Dict[str, _Strategy]] = {
 }
 
 
-# FIXME: (sigler) change to "dynamic" after bug in API is fixed
-#        where liquid volumes in wells aren't tracked correctly
-DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "end"
+DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "dynamic"
 
 TIP_VOLUME = 50
 PIP_VOLUME = 50
@@ -570,8 +568,9 @@ def transfer_diluent_or_baseline(
         # multi would have dropped tips after emptying the previous diluent well
         if not multi.has_tip:
             multi.pick_up_tip()
+            # NOTE: don't LLD during simulation, so we can rely on load-liquid
+            #       to track when wells have ran out of volume (or over-flowed)
             if not ctx.is_simulating():
-                # FIXME: (sigler) is it expected that users should not probe during simulation?
                 multi.require_liquid_presence(diluent_well)  # NOTE: probe!
         t_cls = get_transfer_class_for_strategies(
             ctx, multi, strategies=(_Strategy.DILUENT, _Strategy.DILUENT)
@@ -613,8 +612,9 @@ def transfer_dye_to_pcr_column(
     )
 
     pick_up_tip_and_manage_racks(ctx, pipette)
+    # NOTE: don't LLD during simulation, so we can rely on load-liquid
+    #       to track when wells have ran out of volume (or over-flowed)
     if not ctx.is_simulating():
-        # FIXME: (sigler) is it expected that users should not probe during simulation?
         pipette.require_liquid_presence(dye_well)
     pipette.transfer_liquid(
         transfer_class,
@@ -652,8 +652,9 @@ def transfer_dye_to_photo_plate(
 
     # LLD (optional)
     if strategy["aspirate"].includes("LLD"):
+        # NOTE: don't LLD during simulation, so we can rely on load-liquid
+        #       to track when wells have ran out of volume (or over-flowed)
         if not ctx.is_simulating():
-            # FIXME: (sigler) is it expected that users should not probe during simulation?
             pipette.require_liquid_presence(src)
         # NOTE: (sigler) we've found that "wet" tips (eg: post-LLD) are
         #       far less reliable at aspirating ~1uL of aqueous solution.
