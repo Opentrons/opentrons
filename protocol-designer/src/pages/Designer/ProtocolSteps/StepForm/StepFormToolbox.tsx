@@ -102,7 +102,7 @@ const STEP_FORM_MAP: StepFormMap = {
 }
 
 // used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings
-export const FIELDS_REQUIRING_CONFIRMATION: string[] = [
+const FIELDS_REQUIRING_CONFIRMATION: string[] = [
   'pipette',
   'tipRack',
   'liquidClass',
