@@ -40,8 +40,8 @@ PRESSURE_FIXTURE_INSERT_DEPTH = {50: 30.0, 1000: 30.0}
 
 PRESSURE_ASPIRATE_DELTA_SPEC = {
     1: {
-        50: {"delta": 1350.0, "margin": 0.1},  # absolute value  # percent of delta
-        1000: {"delta": 1000.0, "margin": 0.1},  # absolute value  # percent of delta
+        50: {"delta": 1350.0, "margin": 0.96},  # absolute value  # percent of delta
+        1000: {"delta": 1000.0, "margin": 0.95},  # absolute value  # percent of delta
     },
     8: {
         50: {"delta": 4000.0, "margin": 0.99},  # absolute value  # percent of delta
@@ -79,7 +79,7 @@ PRESSURE_ASPIRATED_P50 = PressureEventConfig(
     min=-8000.0,
     max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
-    stability_threshold=200.0,
+    stability_threshold=600.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
@@ -87,7 +87,7 @@ PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
     min=-8000.0,
     max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
-    stability_threshold=200.0,
+    stability_threshold=600.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )

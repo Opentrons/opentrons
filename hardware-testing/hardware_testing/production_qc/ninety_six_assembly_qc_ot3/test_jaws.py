@@ -1,5 +1,5 @@
 """Test Jaws."""
-from typing import List, Union, Tuple, Dict, Literal
+from typing import List, Union, Tuple, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -98,9 +98,7 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
     return led_check, jaws_aligned
 
 
-async def run(
-    api: OT3API, report: CSVReport, section: str, pipette: Literal[200, 1000]
-) -> None:
+async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     ax = Axis.Q
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
