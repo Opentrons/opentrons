@@ -327,7 +327,7 @@ def _pick_up_tip_and_zero_min_height(
     ctx: ProtocolContext, pipette: InstrumentContext
 ) -> None:
     pipette.pick_up_tip()
-    if ctx.params.zero_minimum_tip_height:  # type: ignore[attr-defined]
+    if ctx.params.disable_minimum_lld_height:  # type: ignore[attr-defined]
         pipette_id = pipette._core.pipette_id  # type: ignore[attr-defined]
         if (
             pipette._core._engine_client.state.pipettes.get_config(  # type: ignore[attr-defined]
@@ -374,8 +374,8 @@ def _shake_then_read(
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     parameters.add_bool(
-        display_name="zero_minimum_tip_height",
-        variable_name="zero_minimum_tip_height",
+        display_name="disable_minimum_lld_height",
+        variable_name="disable_minimum_lld_height",
         default=True,
     )
     parameters.add_float(
