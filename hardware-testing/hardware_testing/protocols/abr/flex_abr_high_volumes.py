@@ -107,6 +107,9 @@ M = _AspirateMode.MENISCUS
 M_LLD = _AspirateMode.MENISCUS_LLD
 # fmt: off
 ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[_AspirateMode]]] = {
+    1: {
+        "A": [M_LLD],
+    },
     6: {
         "A": [M_LLD, M_LLD, M_LLD],
         "B": [M, M, M],
@@ -512,14 +515,18 @@ def run(ctx: ProtocolContext) -> None:
 
     # LOAD PIPETTES
     num_tip_slots = len([s for s in SLOTS.keys() if "tip" in s])
+    rack_ln = "opentrons_flex_96_tiprack_1000ul"
+    rack_slots = [SLOTS[f"tips_{i + 1}"] for i in range(num_tip_slots)]
+    if ctx.params.channels == 96:
+        adapter_ln = "opentrons_flex_96_tiprack_adapter"
+        tip_racks = [ctx.load_adapter(adapter_ln, slot).load_labware(rack_ln) for slot in rack_slots]
+    else:
+        tip_racks = [ctx.load_labware(rack_ln, slot) for slot in rack_slots]
     pipette = ctx.load_instrument(
         instrument_name=f"flex_{ctx.params.channels}"  # type: ignore[attr-defined]
         f"channel_{TIP_VOLUME}",
         mount=ctx.params.mount,  # type: ignore[attr-defined]
-        tip_racks=[
-            ctx.load_labware("opentrons_flex_96_tiprack_1000ul", SLOTS[f"tips_{i + 1}"])
-            for i in range(num_tip_slots)
-        ],
+        tip_racks=tip_racks,
     )
 
     # LOAD LABWARE
