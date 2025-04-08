@@ -21,6 +21,7 @@
   "continue_to_drop_tip": "Continue to drop tip",
   "do_you_need_to_blowout": "First, do you need to blow out aspirated liquid?",
   "door_open_robot_home": "The robot needs to safely move to its home location before you manually move the labware.",
+  "droplets_or_liquid_cause_failure": "Droplets or liquid in the tips may cause liquid level detection to fail",
   "ensure_lw_is_accurately_placed": "Ensure labware is accurately placed in the slot to prevent further errors.",
   "error": "Error",
   "error_details": "Error details",
@@ -119,6 +120,7 @@
   "tip_drop_failed": "Tip drop failed",
   "tip_not_detected": "Tip not detected",
   "tip_presence_errors_are_caused": "Tip presence errors are usually caused by improperly placed labware or inaccurate labware offsets",
+  "use_dry_unused_tips": "Use dry, unused tips for best results",
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection."
