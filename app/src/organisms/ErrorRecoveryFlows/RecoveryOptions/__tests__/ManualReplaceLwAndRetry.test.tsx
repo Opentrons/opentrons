@@ -9,7 +9,7 @@ import { RECOVERY_MAP } from '../../constants'
 import type { ComponentProps } from 'react'
 
 vi.mock('../../shared', async importOriginal => {
-  const mod = await importOriginal() // type is inferred
+  const mod = (await importOriginal()) as any
   return {
     ...mod,
     GripperIsHoldingLabware: vi.fn(() => (
@@ -129,6 +129,7 @@ describe('ManualReplaceLwAndRetry', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
     })
 
+    expect(props.routeUpdateActions.handleMotionRouting).toHaveBeenCalled()
     expect(props.recoveryCommands.homeShuttle).toHaveBeenCalled()
   })
 

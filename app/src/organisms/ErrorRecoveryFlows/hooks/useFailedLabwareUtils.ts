@@ -331,7 +331,7 @@ export function getFailedLabwareQuantity(
   return null
 }
 
-// add tests
+// TODO (tz, 4-8-2025): write tests for this method
 // Get the name of the relevant labware relevant to the failed command, if any.
 export function getFailedCmdRelevantLabware(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
