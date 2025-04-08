@@ -7,7 +7,7 @@ import { MediumButton } from '/app/atoms/buttons'
 import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { DispenseSettingDetail } from './DispenseSettingDetail'
-import { DispenseSettingsList } from './DispenseSettingsList'
+import { DispenseSettingItem } from './DispenseSettingItem'
 import { useDispenseSettingsConfig } from './hooks/useDispenseSettingsConfig'
 
 import type { Dispatch } from 'react'
@@ -53,7 +53,7 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting == null
           ? dispenseSettingsItems.map(displayItem => (
-              <DispenseSettingsList
+              <DispenseSettingItem
                 key={displayItem.value}
                 displayItem={displayItem}
               />

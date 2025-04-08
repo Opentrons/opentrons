@@ -5,7 +5,7 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { AspirateSettingsList } from '../../Aspirate/AspirateSettingsList'
+import { AspirateSettingItem } from '../../Aspirate/AspirateSettingItem'
 import { AspirateSettingDetail } from '../../Aspirate/AspirateSettingDetail'
 import { useAspirateSettingsConfig } from '../../Aspirate/hooks/useAspirateSettingsConfig'
 
@@ -14,7 +14,7 @@ import { Aspirate } from '../../Aspirate'
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux-resources/analytics')
-vi.mock('../../Aspirate/AspirateSettingsList')
+vi.mock('../../Aspirate/AspirateSettingItem')
 vi.mock('../../Aspirate/AspirateSettingDetail')
 vi.mock('../../Aspirate/hooks/useAspirateSettingsConfig')
 
@@ -157,8 +157,8 @@ describe('Aspirate', () => {
       } as any,
       dispatch: vi.fn(),
     }
-    vi.mocked(AspirateSettingsList).mockReturnValue(
-      <div>mock AspirateSettingsList</div>
+    vi.mocked(AspirateSettingItem).mockReturnValue(
+      <div>mock AspirateSettingItem</div>
     )
     vi.mocked(AspirateSettingDetail).mockReturnValue(
       <div>mock AspirateSettingDetail</div>
@@ -176,7 +176,7 @@ describe('Aspirate', () => {
 
   it('renders mock components and reset button', () => {
     render(props)
-    expect(screen.getAllByText('mock AspirateSettingsList').length).toBe(9)
+    expect(screen.getAllByText('mock AspirateSettingItem').length).toBe(9)
     screen.getByText('mock AspirateSettingDetail')
     screen.getByRole('button', { name: 'Reset aspirate settings' })
   })

@@ -6,7 +6,7 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { MediumButton } from '/app/atoms/buttons'
-import { AspirateSettingsList } from './AspirateSettingsList'
+import { AspirateSettingItem } from './AspirateSettingItem'
 import { AspirateSettingDetail } from './AspirateSettingDetail'
 import { useAspirateSettingsConfig } from './hooks/useAspirateSettingsConfig'
 
@@ -55,7 +55,7 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
         {selectedSetting == null ? (
           <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
             {aspirateSettingsItems.map(displayItem => (
-              <AspirateSettingsList
+              <AspirateSettingItem
                 key={displayItem.value}
                 displayItem={displayItem}
               />

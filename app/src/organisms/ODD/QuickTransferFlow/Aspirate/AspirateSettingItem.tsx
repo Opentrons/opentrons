@@ -1,38 +1,24 @@
 import {
+  ALIGN_CENTER,
+  COLORS,
   Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   ListItem,
+  SPACING,
   StyledText,
   TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  ALIGN_CENTER,
-  Icon,
 } from '@opentrons/components'
 
-type DispenseSettingOption =
-  | {
-      option: string
-      copy: any
-      value: any
-      enabled: boolean
-      onClick: () => void
-    }
-  | {
-      option: string
-      copy: any
-      enabled: boolean
-      onClick: () => void
-      value?: undefined
-    }
+import type { SettingItem } from '../types'
 
-interface DispenseSettingsListProps {
-  displayItem: DispenseSettingOption
+interface AspirateSettingItemProps {
+  displayItem: SettingItem
 }
 
-export function DispenseSettingsList({
+export function AspirateSettingItem({
   displayItem,
-}: DispenseSettingsListProps): JSX.Element {
+}: AspirateSettingItemProps): JSX.Element {
   return (
     <ListItem
       type="default"

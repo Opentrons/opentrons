@@ -3,19 +3,19 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { AspirateSettingsList } from '../../Aspirate/AspirateSettingsList'
+import { AspirateSettingItem } from '../../Aspirate/AspirateSettingItem'
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof AspirateSettingsList>) => {
-  return renderWithProviders(<AspirateSettingsList {...props} />, {
+const render = (props: ComponentProps<typeof AspirateSettingItem>) => {
+  return renderWithProviders(<AspirateSettingItem {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 const mockClick = vi.fn()
 
-describe('AspirateSettingsList', () => {
-  let props: ComponentProps<typeof AspirateSettingsList>
+describe('AspirateSettingItem', () => {
+  let props: ComponentProps<typeof AspirateSettingItem>
   beforeEach(() => {
     props = {
       displayItem: {

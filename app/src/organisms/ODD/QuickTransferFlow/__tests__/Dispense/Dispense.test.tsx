@@ -5,7 +5,7 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { DispenseSettingsList } from '../../Dispense/DispenseSettingsList'
+import { DispenseSettingItem } from '../../Dispense/DispenseSettingItem'
 import { DispenseSettingDetail } from '../../Dispense/DispenseSettingDetail'
 
 import { Dispense } from '../../Dispense'
@@ -13,7 +13,7 @@ import { Dispense } from '../../Dispense'
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux-resources/analytics')
-vi.mock('../../Dispense/DispenseSettingsList')
+vi.mock('../../Dispense/DispenseSettingItem')
 vi.mock('../../Dispense/DispenseSettingDetail')
 vi.mock('../../Dispense/hooks/useAspirateSettingsConfig')
 
@@ -88,8 +88,8 @@ describe('Dispense', () => {
       } as any,
       dispatch: vi.fn(),
     }
-    vi.mocked(DispenseSettingsList).mockReturnValue(
-      <div>mock DispenseSettingsList</div>
+    vi.mocked(DispenseSettingItem).mockReturnValue(
+      <div>mock DispenseSettingItem</div>
     )
     vi.mocked(DispenseSettingDetail).mockReturnValue(
       <div>mock DispenseSettingDetail</div>
@@ -104,7 +104,7 @@ describe('Dispense', () => {
 
   it('renders mock components and reset button', () => {
     render(props)
-    expect(screen.getAllByText('mock DispenseSettingsList').length).toBe(9)
+    expect(screen.getAllByText('mock DispenseSettingItem').length).toBe(9)
     screen.getByText('mock DispenseSettingDetail')
     screen.getByRole('button', { name: 'Reset dispense settings' })
   })
