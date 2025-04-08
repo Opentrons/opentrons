@@ -141,8 +141,6 @@ export function SummaryAndSettings(
     })
   }
 
-  console.log('QuickTransfer', selectedCategory)
-
   return showSaveOrRunModal ? (
     <SaveOrRunModal onSave={handleClickSave} onRun={handleClickRun} />
   ) : (

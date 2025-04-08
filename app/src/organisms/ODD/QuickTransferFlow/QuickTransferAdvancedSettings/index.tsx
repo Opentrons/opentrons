@@ -424,7 +424,6 @@ export function QuickTransferAdvancedSettings(
                     </StyledText>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                       <StyledText
-                        // css={TYPOGRAPHY.level4HeaderRegular}
                         oddStyle="level4HeaderRegular"
                         color={
                           displayItem.enabled ? COLORS.grey60 : COLORS.grey50

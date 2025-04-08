@@ -21,7 +21,6 @@ export function AspirateSettingsList(
   props: AspirateSettingsListProps
 ): JSX.Element {
   const { items } = props
-  console.log('AspirateSettingsList', items)
 
   return (
     <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
