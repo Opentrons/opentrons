@@ -118,14 +118,13 @@ describe('ManualReplaceLwAndRetry', () => {
   it(`renders TwoColTextAndFailedStepNextStep for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING} step`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING
+
     props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
     render(props)
-    const button = screen.getAllByRole('button')[0]
+    const button = screen.getAllByRole('button')[1]
     expect(button).toBeEnabled()
-    // screen.getByText('Load labware shuttle onto track')
     fireEvent.click(button)
-    const spy = vi.spyOn(props.recoveryCommands, 'homeShuttle')
-    expect(spy).toBeCalledTimes(1)
+    expect(props.recoveryCommands.homeShuttle).toHaveBeenCalled()
   })
 
   it('renders SelectRecoveryOption for unknown step', () => {
