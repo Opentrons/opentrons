@@ -1,6 +1,6 @@
 """Test Tip Sensor."""
 import asyncio
-from typing import List, Union, cast, Literal
+from typing import List, Union, cast
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import MessageId
@@ -75,9 +75,7 @@ async def get_tip_status(api: OT3API) -> bool:
     return result
 
 
-async def run(
-    api: OT3API, report: CSVReport, section: str, pipette: Literal[200, 1000]
-) -> None:
+async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     ax = Axis.Q
     await api.home_z(OT3Mount.LEFT)

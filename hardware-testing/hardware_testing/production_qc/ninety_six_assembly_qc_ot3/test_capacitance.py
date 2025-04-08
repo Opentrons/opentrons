@@ -1,6 +1,6 @@
 """Test Capacitance."""
 from asyncio import sleep
-from typing import List, Union, Tuple, Optional, cast, Literal
+from typing import List, Union, Tuple, Optional, cast
 
 from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
@@ -45,8 +45,6 @@ THRESHOLDS = {
     ),
 }
 
-PROBE_POSITIONS = [InstrumentProbeType.PRIMARY, InstrumentProbeType.SECONDARY]
-
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
     return f"{probe.name.lower()}-{reading}"
@@ -55,7 +53,7 @@ def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    for p in PROBE_POSITIONS:
+    for p in InstrumentProbeType:
         for r in PROBE_READINGS:
             lines.append(CSVLine(_get_test_tag(p, r), [float, CSVResult]))
             if "mm" in r:
@@ -106,9 +104,7 @@ def _get_hover_and_probe_pos(
     return hover_pos + probe_offset, probe_pos + probe_offset
 
 
-async def run(
-    api: OT3API, report: CSVReport, section: str, pipette: Literal[200, 1000]
-) -> None:
+async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     z_ax = Axis.Z_L
     p_ax = Axis.P_L
@@ -120,7 +116,7 @@ async def run(
     if not api.is_simulator:
         ui.get_user_ready("REMOVE everything from the deck")
 
-    for probe in PROBE_POSITIONS:
+    for probe in InstrumentProbeType:
         # store the thresolds (for reference)
         for k in THRESHOLDS.keys():
             report(section, _get_test_tag(probe, f"{k}-min"), [THRESHOLDS[k][0]])
@@ -149,7 +145,7 @@ async def run(
         # ATTACHED-pF
         if not api.is_simulator:
             ui.get_user_ready(f"ATTACH probe to {probe.name} channel")
-        api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
+        await api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
         attached_pf = await _read_from_sensor(api, sensor_id, 10)
         if not attached_pf:
             ui.print_error(f"{probe} cap sensor not working, skipping")
@@ -177,7 +173,7 @@ async def run(
                 NodeId.pipette_left,
                 NodeId.head_l,
                 distance=distance,
-                mount_speed=speed,
+                speed=speed,
                 sensor_id=sensor_id,
                 relative_threshold_pf=default_probe_cfg.sensor_threshold_pf,
             )
@@ -233,4 +229,4 @@ async def run(
         await api.home_z(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready("REMOVE probe")
-        api.remove_tip(OT3Mount.LEFT)
+        await api.remove_tip(OT3Mount.LEFT)

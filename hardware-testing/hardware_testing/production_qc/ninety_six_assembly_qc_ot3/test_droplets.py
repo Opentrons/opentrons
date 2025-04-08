@@ -1,7 +1,7 @@
 """Test Droplets."""
 from asyncio import sleep
-from time import monotonic
-from typing import List, Union, Tuple, Optional, Dict, Literal
+from time import time
+from typing import List, Union, Tuple, Optional, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.motion_utilities import target_position_from_relative
@@ -16,14 +16,17 @@ from hardware_testing.data.csv_report import (
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
 
+TIP_VOLUME = 1000
+ASPIRATE_VOLUME = [1000, 5]
 NUM_SECONDS_TO_WAIT = 30
 HOVER_HEIGHT_MM = 50
 DEPTH_INTO_RESERVOIR_FOR_ASPIRATE = -24
 DEPTH_INTO_RESERVOIR_FOR_DISPENSE = DEPTH_INTO_RESERVOIR_FOR_ASPIRATE
 
+TIP_RACK_LABWARE = f"opentrons_flex_96_tiprack_{TIP_VOLUME}ul"
 RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
 
-TIP_RACK_96_SLOT = 4
+TIP_RACK_96_SLOT = 10
 TIP_RACK_PARTIAL_SLOT = 5
 RESERVOIR_SLOT = 2
 TRASH_SLOT = 12
@@ -83,31 +86,31 @@ def get_reservoir_nominal() -> Point:
     return reservoir_a1_nominal
 
 
-def get_tiprack_96_nominal(pipette: Literal[200, 1000]) -> Point:
+def get_tiprack_96_nominal() -> Point:
     """Get nominal tiprack position for 96-tip pick-up."""
     tip_rack_a1_nominal = helpers_ot3.get_theoretical_a1_position(
-        TIP_RACK_96_SLOT, f"opentrons_flex_96_tiprack_{pipette}ul"
+        TIP_RACK_96_SLOT, TIP_RACK_LABWARE
     )
     return tip_rack_a1_nominal + Point(z=TIP_RACK_96_ADAPTER_HEIGHT)
 
 
-def get_tiprack_partial_nominal(pipette: Literal[200, 1000]) -> Point:
+def get_tiprack_partial_nominal() -> Point:
     """Get nominal tiprack position for partial-tip pick-up."""
     tip_rack_a1_nominal = helpers_ot3.get_theoretical_a1_position(
-        TIP_RACK_PARTIAL_SLOT, f"opentrons_flex_96_tiprack_{pipette}ul"
+        TIP_RACK_PARTIAL_SLOT, TIP_RACK_LABWARE
     )
     return tip_rack_a1_nominal
 
 
 async def aspirate_and_wait(
-    api: OT3API, reservoir: Point, volume: int, seconds: int = 30
+    api: OT3API, reservoir: Point, aspirate_value, seconds: int = 30
 ) -> Tuple[bool, float]:
     """Aspirate and wait."""
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, reservoir)
     await api.move_to(
         OT3Mount.LEFT, reservoir + Point(z=DEPTH_INTO_RESERVOIR_FOR_ASPIRATE)
     )
-    await api.aspirate(OT3Mount.LEFT, volume)
+    await api.aspirate(OT3Mount.LEFT, aspirate_value)
     await api.move_to(OT3Mount.LEFT, reservoir + Point(z=HOVER_HEIGHT_MM))
 
     start_time = monotonic()
@@ -133,16 +136,16 @@ async def aspirate_and_wait(
     return result, duration_seconds
 
 
-async def _drop_tip(api: OT3API, trash: Point, pipette: Literal[200, 1000]) -> None:
+async def _drop_tip(api: OT3API, trash: Point) -> None:
     print("drop in trash")
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, trash + Point(z=20))
     await api.move_to(OT3Mount.LEFT, trash)
     await api.drop_tip(OT3Mount.LEFT)
     # NOTE: a FW bug (as of v14) will sometimes not fully drop tips.
     #       so here we ask if the operator needs to try again
-    while not api.is_simulator and ui.get_user_answer("try dropping again"):
-        api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(pipette))
-        await api.drop_tip(OT3Mount.LEFT)
+    # while not api.is_simulator and ui.get_user_answer("try dropping again"):
+    #     await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+    #     await api.drop_tip(OT3Mount.LEFT)
     await api.home_z(OT3Mount.LEFT)
 
 
@@ -161,9 +164,7 @@ async def _partial_pick_up_z_motion(
     await api._update_position_estimation([Axis.Z_L])
 
 
-async def _partial_pick_up(
-    api: OT3API, position: Point, current: float, pipette: Literal[200, 1000]
-) -> None:
+async def _partial_pick_up(api: OT3API, position: Point, current: float) -> None:
     await helpers_ot3.move_to_arched_ot3(
         api,
         OT3Mount.LEFT,
@@ -171,26 +172,24 @@ async def _partial_pick_up(
         safe_height=position.z + 10,
     )
     await _partial_pick_up_z_motion(api, current=current, distance=13, speed=5)
-    api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(pipette))
+    await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
     await api.prepare_for_aspirate(OT3Mount.LEFT)
     await api.home_z(OT3Mount.LEFT)
 
 
-async def run(
-    api: OT3API, report: CSVReport, section: str, pipette: Literal[200, 1000]
-) -> None:
+async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     # GATHER NOMINAL POSITIONS
     trash_nominal = get_trash_nominal()
-    tip_rack_96_a1_nominal = get_tiprack_96_nominal(pipette)
+    tip_rack_96_a1_nominal = get_tiprack_96_nominal()
     # tip_rack_partial_a1_nominal = get_tiprack_partial_nominal()
     reservoir_a1_nominal = get_reservoir_nominal()
     reservoir_a1_actual: Optional[Point] = None
 
     async def _find_reservoir_pos() -> None:
         nonlocal reservoir_a1_actual
-        if reservoir_a1_actual:
-            return
+        # if reservoir_a1_actual:  # re-find reservoir position for 5ul
+        #     return
         # SAVE RESERVOIR POSITION
         ui.print_header("JOG to TOP of RESERVOIR")
         print("jog tips to the TOP of the RESERVOIR")
@@ -200,47 +199,37 @@ async def run(
         await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
         reservoir_a1_actual = await api.gantry_position(OT3Mount.LEFT)
 
-    # PICK-UP 96 TIPS
-    droplets_result = True
-    for trial in range(2):
+    result = True
+    for test_volume in ASPIRATE_VOLUME:
+        answer = ui.get_user_answer(f"Test {test_volume}uL")
+        if not answer:
+            continue
+        tip_volume = 50 if test_volume<=50 else 1000
+        # PICK-UP 96 TIPS
         ui.print_header("JOG to 96-Tip RACK")
-        if trial == 0:
-            tip_rack = str(pipette) + "ul"
-            test_volume: int = pipette
-        else:
-            tip_rack = "50ul"
-            test_volume = 1 if pipette == 200 else 5
         if not api.is_simulator:
-            ui.get_user_ready(f"ADD 96 tip-rack-{tip_rack} to slot #{TIP_RACK_96_SLOT}")
+            ui.get_user_ready(f"picking up tips, place tip-rack {tip_volume} on slot {TIP_RACK_96_SLOT}")
         await helpers_ot3.move_to_arched_ot3(
             api, OT3Mount.LEFT, tip_rack_96_a1_nominal + Point(z=30)
         )
         await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
-        print("picking up tips")
-        await api.pick_up_tip(
-            OT3Mount.LEFT, helpers_ot3.get_default_tip_length(pipette)
-        )
-        await api.home_z(OT3Mount.LEFT)
-        if reservoir_a1_actual is None:
-            if not api.is_simulator:
-                ui.get_user_ready("about to move to RESERVOIR")
 
-            # TEST DROPLETS for 96 TIPS
-            ui.print_header("96 Tips: ASPIRATE and WAIT")
-            await _find_reservoir_pos()
-        assert reservoir_a1_actual
-        result, duration = await aspirate_and_wait(
-            api,
-            reservoir_a1_actual,
-            test_volume,
-            seconds=NUM_SECONDS_TO_WAIT,
-        )
-        droplets_result = droplets_result & result
-        await _drop_tip(api, trash_nominal, pipette)
+        await api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(tip_volume))
         await api.home_z(OT3Mount.LEFT)
-    report(
-        section, "droplets-96-tips", [duration, CSVResult.from_bool(droplets_result)]
-    )
+        if not api.is_simulator:
+            ui.get_user_ready("about to move to RESERVOIR")
+        # TEST DROPLETS for 96 TIPS
+        ui.print_header("96 Tips: ASPIRATE and WAIT")
+        await _find_reservoir_pos()
+        assert reservoir_a1_actual
+        ret, duration = await aspirate_and_wait(
+            api, reservoir_a1_actual, test_volume, seconds=NUM_SECONDS_TO_WAIT
+        )
+        result = result&ret
+        await api.home_z(OT3Mount.LEFT)
+        await _drop_tip(api, trash_nominal)
+    report(section, "droplets-96-tips", [duration, CSVResult.from_bool(result)])
+
 
     # if not api.is_simulator:
     #     ui.get_user_ready(f"REMOVE 96 tip-rack from slot #{TIP_RACK_96_SLOT}")
