@@ -1542,6 +1542,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
               - ``"once"``: Use one tip for the entire command.
               - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
+              - ``"per source"``: Use one tip for each source well, even if
+                :ref:`tip refilling <complex-tip-refilling>` is required.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
@@ -1623,7 +1625,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
 
-              - ``"once"``: Use one tip for the entire command.
+              - ``"once"`` or ``"per source"``: Use one tip for the entire command.
               - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
               - ``"never"``: Do not pick up or drop tips at all.
 
@@ -1712,6 +1714,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
               - ``"once"``: Use one tip for the entire command.
               - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
+              - ``"per source"``: Not available when consolidating.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
