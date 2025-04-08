@@ -89,15 +89,14 @@ def add_parameters(params: ParameterContext) -> None:
         "flex_1channel_50",
         "flex_8channel_1000",
         "flex_8channel_50",
-        "flex_96channel_1000"
+        "flex_96channel_1000",
     ]
     params.add_str(
         display_name="pipette",
         variable_name="pipette",
         default=_pipettes[0],
         choices=[
-            {"display_name": p.replace("flex_", ""), "value": p}
-            for p in _pipettes
+            {"display_name": p.replace("flex_", ""), "value": p} for p in _pipettes
         ],
     )
     _racks = [
@@ -269,10 +268,10 @@ def load_liquid_dye(
     num_trials_by_volume = {
         v: TRIALS_BY_PIPETTE[pipette.name][i] for i, v in enumerate(volumes)
     }
+    current_src_well = src_wells.pop(0)  # initial pop!
     for test_ul, liquid in liquid_by_volume.items():
         ul_per_aspirate = test_ul * pipette.channels
         total_ul_aspirated_per_test_ul = 0.0
-        current_src_well = src_wells.pop(0)  # pop!
 
         def _load_liquid_and_pop_to_next_well() -> None:
             nonlocal total_ul_aspirated_per_test_ul, current_src_well
@@ -304,7 +303,7 @@ def _transfer_src_to_dst(
     dest_by_ch: Dict[int, List[Well]] = {
         1: plate.wells()[:trials],
         8: plate.columns()[:trials],  # type: ignore[dict-item]
-        96: [plate["A1"]],
+        96: [plate.wells()],
     }
     dest: List[Well] = dest_by_ch[pipette.channels]
     assert len(source) == len(dest), f"source={len(source)}, dest={len(dest)}"
