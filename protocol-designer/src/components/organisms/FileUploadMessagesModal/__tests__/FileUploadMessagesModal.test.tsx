@@ -81,7 +81,7 @@ describe('FileUploadMessagesModal', () => {
       errorType: 'INVALID_PYTHON_FILE',
     })
     render()
-    screen.getByText('Unable to upload')
+    screen.getByText('Unable to import')
     screen.getByText(
       'This protocol file has been modified after export and can’t be imported. Please use the original, unedited file created in Protocol Designer.'
     )
@@ -93,7 +93,7 @@ describe('FileUploadMessagesModal', () => {
       errorMessage: 'mock error message',
     })
     render()
-    screen.getByText('Unable to upload')
+    screen.getByText('Unable to import')
     screen.getByText(
       'Protocol files must be created in Protocol Designer to be compatible.'
     )
