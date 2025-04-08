@@ -7,6 +7,7 @@ import {
   CELSIUS,
   HS_TEMP_MIN,
   HS_TEMP_MAX,
+  HeaterShakerSetTargetTemperatureCreateCommand
 } from '@opentrons/shared-data'
 import {
   COLORS,
@@ -20,10 +21,8 @@ import {
 
 import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
-import {CommandStatus} from '@opentrons/shared-data'
 import type { MouseEventHandler } from 'react'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
-import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface HeaterShakerSlideoutProps {
@@ -31,7 +30,6 @@ interface HeaterShakerSlideoutProps {
   onCloseClick: () => unknown
   isExpanded: boolean
 }
-const { reportModuleCommand } = useModuleCommandAnalytics()
 
 
 export const HeaterShakerSlideout = (
@@ -43,6 +41,7 @@ export const HeaterShakerSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = t('temperature')
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   const sendSetTemperatureCommand: MouseEventHandler<HTMLInputElement> = e => {
     e.preventDefault()
@@ -63,7 +62,7 @@ export const HeaterShakerSlideout = (
           kind: 'liveCommand',
           moduleType: module.moduleType,
           analyticCommand: setTempCommand.commandType,
-          result: { status: 'succeeded' as CommandStatus, data: undefined},
+          result: { status: 'succeeded', data: undefined},
           serialNumber: module.serialNumber,
           temperature: hsValue,
           errorDetails: "",
@@ -75,7 +74,7 @@ export const HeaterShakerSlideout = (
             kind: 'liveCommand',
             moduleType: module.moduleType,
             analyticCommand: setTempCommand.commandType,
-            result: {status: 'failed' as CommandStatus, data: undefined},
+            result: {status: 'failed', data: undefined},
             errorDetails: e.message,
             serialNumber: module.serialNumber,
             temperature: hsValue,

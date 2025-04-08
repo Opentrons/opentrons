@@ -7,7 +7,6 @@ import {
   TEMP_LID_MIN,
   TEMP_BLOCK_MAX,
   TEMP_MIN,
-  CommandStatus
 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -37,8 +36,6 @@ interface ThermocyclerModuleSlideoutProps {
   isSecondaryTemp?: boolean
 }
 
-const { reportModuleCommand } = useModuleCommandAnalytics()
-
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
@@ -49,6 +46,7 @@ export const ThermocyclerModuleSlideout = (
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -87,7 +85,7 @@ export const ThermocyclerModuleSlideout = (
         reportModuleCommand({
           kind: "liveCommand",
           moduleType: module.moduleType,
-          analyticCommand: modulePart == 'Lid'
+          analyticCommand: modulePart === 'Lid'
           ? saveLidCommand.commandType
           : saveBlockCommand.commandType,
           result: {status: 'succeeded', data: undefined},
@@ -100,7 +98,7 @@ export const ThermocyclerModuleSlideout = (
         reportModuleCommand({
           kind: "liveCommand",
           moduleType: module.moduleType,
-          analyticCommand: modulePart == 'Lid'
+          analyticCommand: modulePart === 'Lid'
           ? saveLidCommand.commandType
           : saveBlockCommand.commandType,
           result: {status: 'failed', data: undefined},

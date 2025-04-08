@@ -21,7 +21,7 @@ import {
 import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 
-import type { TemperatureModuleSetTargetTemperatureCreateCommand, CommandStatus } from '@opentrons/shared-data'
+import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { TemperatureModule } from '/app/redux/modules/types'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
@@ -31,8 +31,6 @@ interface TemperatureModuleSlideoutProps {
   isExpanded: boolean
 }
 
-const { reportModuleCommand } = useModuleCommandAnalytics()
-
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
@@ -41,6 +39,7 @@ export const TemperatureModuleSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = useState<number | null>(null)
+  const { reportModuleCommand } = useModuleCommandAnalytics()
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
