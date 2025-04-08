@@ -67,6 +67,7 @@ from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocol_engine.types.run_time_parameters import PrimitiveRunTimeParamValuesType
 
 from opentrons.protocol_reader import ProtocolSource
 
@@ -293,6 +294,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 def execute(
     protocol_file: Union[BinaryIO, TextIO],
     protocol_name: str,
+    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     propagate_logs: bool = False,
     log_level: str = "warning",
     emit_runlog: Optional[_EmitRunlogCallable] = None,
@@ -317,6 +319,7 @@ def execute(
     :param protocol_name: The name of the protocol file. This is required
         internally, but it may not be a thing we can get
         from the ``protocol_file`` argument.
+    :param run_time_param_values: Runtime parameter values
     :param propagate_logs: Whether this function should allow logs from the
         Opentrons stack to propagate up to the root handler.
         This can be useful if you're integrating this
@@ -430,6 +433,7 @@ def execute(
         protocol_file.seek(0)
         _run_file_pe(
             protocol=protocol,
+            run_time_param_values=run_time_param_values,
             hardware_api=_get_global_hardware_controller(_get_robot_type()),
             emit_runlog=emit_runlog,
         )
@@ -488,10 +492,13 @@ def main() -> int:
         # when executing via Protocol Engine, because Protocol Engine logs when commands fail.
         log_level = "warning"
 
+    # TODO: (sigler) parse runtime parameters from args
+    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None
     try:
         execute(
             protocol_file=args.protocol,
             protocol_name=args.protocol.name,
+            run_time_param_values=run_time_param_values,
             custom_labware_paths=args.custom_labware_path,
             custom_data_paths=(args.custom_data_path + args.custom_data_file),
             log_level=log_level,
@@ -623,6 +630,7 @@ def _run_file_non_pe(
 
 def _run_file_pe(
     protocol: Protocol,
+    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
     hardware_api: ThreadManagedHardware,
     emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
@@ -668,6 +676,7 @@ def _run_file_pe(
             result = await orchestrator.run(
                 deck_configuration=entrypoint_util.get_deck_configuration(),
                 protocol_source=protocol_source,
+                run_time_param_values=run_time_param_values,
             )
         finally:
             unsubscribe()

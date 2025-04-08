@@ -49,6 +49,7 @@ from opentrons.protocol_engine import error_recovery_policy
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
+from opentrons.protocol_engine.types.run_time_parameters import PrimitiveRunTimeParamValuesType
 from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
 from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocols.duration import DurationEstimator
@@ -435,6 +436,7 @@ def bundle_from_sim(
 def simulate(
     protocol_file: Union[BinaryIO, TextIO],
     file_name: Optional[str] = None,
+    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     custom_labware_paths: Optional[List[str]] = None,
     custom_data_paths: Optional[List[str]] = None,
     propagate_logs: bool = False,
@@ -483,6 +485,7 @@ def simulate(
 
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
+    :param run_time_param_values: Runtime parameter values
     :param custom_labware_paths: A list of directories to search for custom labware.
         Loads valid labware from these paths and makes them available
         to the protocol context. If this is ``None`` (the default), and
@@ -581,6 +584,7 @@ def simulate(
             protocol_file.seek(0)
             return _run_file_pe(
                 protocol=protocol,
+                run_time_param_values=run_time_param_values,
                 robot_type=protocol.robot_type,
                 hardware_api=hardware_simulator,
                 stack_logger=stack_logger,
@@ -657,6 +661,15 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         default="warning",
         help="Specify the level filter for logs to show on the command line. "
         'Log levels below warning can be chatty. If "none", do not show logs',
+    )
+
+    parser.add_argument(
+        "-r",
+        "--params",
+        choices=["debug", "info", "warning", "error", "none"],
+        default="warning",
+        help="Specify the level filter for logs to show on the command line. "
+             'Log levels below warning can be chatty. If "none", do not show logs',
     )
 
     parser.add_argument(
@@ -911,6 +924,7 @@ def _run_file_non_pe(
 
 def _run_file_pe(
     protocol: Protocol,
+    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
     robot_type: RobotType,
     hardware_api: ThreadManagedHardware,
     stack_logger: logging.Logger,
@@ -965,6 +979,7 @@ def _run_file_pe(
                 # the Protocol Engine config specifies use_simulated_deck_config=True.
                 deck_configuration=[],
                 protocol_source=protocol_source,
+                run_time_param_values=run_time_param_values,
             )
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
@@ -1020,10 +1035,14 @@ def main() -> int:
     # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
     duration_estimator = DurationEstimator() if args.estimate_duration else None
 
+    # TODO: (sigler) parse runtime parameters from args
+    run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None
+
     try:
         runlog, maybe_bundle = simulate(
             protocol_file=args.protocol,
             file_name=args.protocol.name,
+            run_time_param_values=run_time_param_values,
             custom_labware_paths=args.custom_labware_path,
             custom_data_paths=(args.custom_data_path + args.custom_data_file),
             duration_estimator=duration_estimator,
