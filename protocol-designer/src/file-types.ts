@@ -45,16 +45,12 @@ export interface PythonDesignerApplication extends DesignerApplication {
   robot: {
     model: RobotType
   }
+  metadata: FileMetadataFields
 }
 
 export interface PDPythonFile {
   pythonProtocol: string
   designerApplication: PythonDesignerApplication
-}
-
-export interface PythonExtractedFile
-  extends Omit<PDPythonFile, 'pythonProtocol'> {
-  metadata: FileMetadataFields
 }
 
 export type PDProtocolFile = ProtocolFile<PDMetadata>
