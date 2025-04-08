@@ -1653,7 +1653,10 @@ class OT3Controller(FlexBackend):
             module_serial: str | None = None
             for module in self.module_controls.available_modules:
                 # Systematically handle doored modules
-                if module.module_door_state == modules.types.HopperDoorState.OPENED:
+                if (
+                    module.MODULE_TYPE == modules.types.ModuleType.FLEX_STACKER
+                    and module.hopper_door_state == modules.types.HopperDoorState.OPENED
+                ):
                     module_serial = module.serial_number
                     break
             callback(door_state, module_serial)

@@ -181,18 +181,9 @@ class AbstractModule(abc.ABC):
         return self.device_info.get("serial")
 
     @property
-    def module_door_state(self) -> Optional[HopperDoorState]:
-        """The potential door state of a module. Returns None if the module has no door."""
-        if self.MODULE_TYPE == ModuleType.FLEX_STACKER:
-            # todo(chb, 2025-04-08): In the future if we have other modules with doors
-            # we should return a union of door states or just the singular DoorState type
-            module_data = self.live_data.get("data")
-            hopper_state = (
-                module_data.get("hopperDoorState") if module_data is not None else None
-            )
-            if isinstance(hopper_state, HopperDoorState):
-                return hopper_state
-        return None
+    def hopper_door_state(self) -> Optional[HopperDoorState]:
+        """Return a Flex Stacker Hopper Module Door State"""
+        pass
 
     @abc.abstractmethod
     async def prep_for_update(self) -> str:
