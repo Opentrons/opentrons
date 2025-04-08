@@ -42,9 +42,7 @@ TIP_VOLUME = 1000
 PROBE_START_HEIGHT_ABOVE_EXPECTED_MM = 10.0
 PROBE_OVERSHOOT_BELOW_EXPECTED_MM = 5.0
 
-# FIXME: (sigler) change to "dynamic" after bug in API is fixed
-#        where liquid volumes in wells aren't tracked correctly
-DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "end"
+DEFAULT_TIP_MENISCUS_TARGET: Literal["start", "end", "dynamic"] = "dynamic"
 
 # NOTE: (sigler) disabling formatter here, b/c spatial deck-maps are nice...
 # fmt: off
@@ -233,7 +231,9 @@ class _TestTrial:
         #       position is critical to determine if our submerge
         #       depths are reliable or not
         calibrate_tip_overlap(ctx, pipette)
-        if self.mode == _AspirateMode.MENISCUS_LLD and not ctx.is_simulating():  # FIXME
+        # NOTE: don't LLD during simulation, so we can rely on load-liquid
+        #       to track when wells have ran out of volume (or over-flowed)
+        if self.mode == _AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
             pipette.require_liquid_presence(self.test_well)
         # MULTI-DISPENSE TO PLATE
         pipette.distribute_liquid(
@@ -519,7 +519,10 @@ def run(ctx: ProtocolContext) -> None:
     rack_slots = [SLOTS[f"tips_{i + 1}"] for i in range(num_tip_slots)]
     if ctx.params.channels == 96:
         adapter_ln = "opentrons_flex_96_tiprack_adapter"
-        tip_racks = [ctx.load_adapter(adapter_ln, slot).load_labware(rack_ln) for slot in rack_slots]
+        tip_racks = [
+            ctx.load_adapter(adapter_ln, slot).load_labware(rack_ln)
+            for slot in rack_slots
+        ]
     else:
         tip_racks = [ctx.load_labware(rack_ln, slot) for slot in rack_slots]
     pipette = ctx.load_instrument(
@@ -613,7 +616,9 @@ def run(ctx: ProtocolContext) -> None:
     for src, (liq, ul) in min_dye_by_src.items():
         src.load_liquid(liq, ul)
         _pick_up_tip_and_zero_min_height(ctx, pipette)
-        if not ctx.is_simulating():  # FIXME
+        # NOTE: don't LLD during simulation, so we can rely on load-liquid
+        #       to track when wells have ran out of volume (or over-flowed)
+        if not ctx.is_simulating():
             pipette.require_liquid_presence(src)
         pipette.drop_tip()
         ul = cast(float, src.current_liquid_volume())
