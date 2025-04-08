@@ -28,6 +28,11 @@
     "steps": {
       "mix": "mix",
       "moveLiquid": "transfer"
+    },
+    "string_helpers": {
+      "and_comma_spaces": ", and ",
+      "and_spaces": " and ",
+      "comma_space": ", "
     }
   },
   "generic": {

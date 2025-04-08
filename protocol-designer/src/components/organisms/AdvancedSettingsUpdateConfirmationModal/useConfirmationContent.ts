@@ -15,10 +15,13 @@ export function useConfirmationContent(
   const changedFieldsDisplay = changedFields.reduce<string>((acc, field, i) => {
     let joiner = ''
     if (i === changedFields.length - 2) {
-      joiner = changedFields.length === 2 ? ' and ' : ', and '
+      joiner =
+        changedFields.length === 2
+          ? t('field_update_confirmation_modal.string_helpers.and_spaces')
+          : t('field_update_confirmation_modal.string_helpers.and_comma_spaces')
     }
     if (i < changedFields.length - 2) {
-      joiner = ', '
+      joiner = t('field_update_confirmation_modal.string_helpers.comma_space')
     }
     return acc + t(`field_update_confirmation_modal.fields.${field}`) + joiner
   }, '')
