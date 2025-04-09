@@ -155,11 +155,11 @@ docs/dist/%: docs/root/%
 	$(SHX) cp -R docs/root/* docs/dist/
 
 .PHONY: docs
-docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1 docs/dist/hardware
+docs: docs/dist/v2
 
 .PHONY: docs-clean
 docs-clean:
-	$(SHX) rm -rf docs/dist docs/build
+	$(SHX) rm -rf docs/dist/v2 docs/build
 
 .PHONY: dev
 dev:
