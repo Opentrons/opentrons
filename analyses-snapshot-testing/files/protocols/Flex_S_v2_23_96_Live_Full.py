@@ -169,13 +169,11 @@ def run(ctx):
     liquid_class = ctx.define_liquid_class(liquid_class_name)
     volume = 105
     new_tip = "once"
-    test_description = f"""
-This test uses the liquid class: {liquid_class_name}.
-It will transfer, consolidate, and distribute liquid using the 96 channel pipette.
-The volume we are using is {volume} μl and is less than the max volume of the 200 μl tip.
-The tip strategy is {new_tip}.
-"""
-    ctx.comment(test_description)
+
+    ctx.comment(f"This test uses the liquid class: {liquid_class_name}.")
+    ctx.comment(f"It will transfer, consolidate, and distribute liquid using the 96 channel pipette.")
+    ctx.comment(f"The volume we are using is {volume} μl and is less than the max volume of the 200 μl tip.")
+    ctx.comment(f"The tip strategy is {new_tip}.")
 
     tiprack_A1 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "A1", adapter="opentrons_flex_96_tiprack_adapter")
     tiprack_A2 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "A2", adapter="opentrons_flex_96_tiprack_adapter")
@@ -186,10 +184,10 @@ The tip strategy is {new_tip}.
         tiprack_A3,
     ]
     waste_chute_D3 = ctx.load_waste_chute()
-    pipette_96 = ctx.load_instrument("flex_96channel_1000", "right", tip_racks=tip_racks, trash=waste_chute_D3)
+    pipette_96 = ctx.load_instrument("flex_96channel_1000", "right", tip_racks=tip_racks)
 
-    source_B1 = ctx.load_labware(nest_1_reservoir_290ml, "B1", "water")
-    source_B2 = ctx.load_labware(nest_1_reservoir_290ml, "B2", "ethanol")
+    source_B1 = ctx.load_labware(nest_1_reservoir_290ml, "B1", liquid_class_name)
+    source_B2 = ctx.load_labware(nest_1_reservoir_290ml, "B2", liquid_class_name)
     sources = [
         source_B1,
         source_B2,
@@ -214,12 +212,12 @@ The tip strategy is {new_tip}.
     for source in sources:
         source.load_liquid(wells=source.wells(), liquid=liquid_type, volume=200000)
 
-    dest_C1 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C1")
-    dest_C2 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C2")
+    dest_C1 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C1", f"{liquid_class_name} destination C1")
+    dest_C2 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C2", f"{liquid_class_name} destination C2")
 
     destinations = [dest_C1, dest_C2]
     for dest in destinations:
-        dest.load_empty()
+        dest.load_empty(wells=dest.wells())
 
     pipette_96.transfer_with_liquid_class(
         liquid_class=liquid_class,
