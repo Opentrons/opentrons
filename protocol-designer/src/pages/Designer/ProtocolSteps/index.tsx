@@ -11,9 +11,11 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_AUTO,
+  POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
+  Tag,
   ToggleGroup,
 } from '@opentrons/components'
 import {
@@ -39,8 +41,7 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
-import { HotKeyDisplay } from ''
-import { TimelineAlerts } from ''
+import { TimelineAlerts } from '../../../organisms'
 import { DraggableSidebar } from './DraggableSidebar'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
@@ -174,7 +175,29 @@ export function ProtocolSteps(): JSX.Element {
           </Flex>
         </Flex>
         {enableHotKeyDisplay ? (
-          <HotKeyDisplay targetWidth={targetWidth} />
+          <Flex
+            position={POSITION_FIXED}
+            left={`calc(1.5rem + ${targetWidth}px)`}
+            bottom="0.75rem"
+            gridGap={SPACING.spacing4}
+            flexDirection={DIRECTION_COLUMN}
+          >
+            <Tag
+              text={t('double_click_to_edit')}
+              type="default"
+              shrinkToContent
+            />
+            <Tag
+              text={t('shift_click_to_select_range')}
+              type="default"
+              shrinkToContent
+            />
+            <Tag
+              text={t('command_click_to_multi_select')}
+              type="default"
+              shrinkToContent
+            />
+          </Flex>
         ) : null}
       </Flex>
       {formData == null && selectedSubstep ? (
