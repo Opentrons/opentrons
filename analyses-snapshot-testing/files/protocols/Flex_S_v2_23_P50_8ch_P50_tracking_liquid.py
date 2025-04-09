@@ -196,13 +196,14 @@ def run(ctx):
         visit_every_well=True,
     )
 
-
     dest_volume = water_dest_well.current_liquid_volume()
     assert math.isclose(volume, dest_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {volume}, got {dest_volume}"
 
     actual_source_volume = water_source_well.current_liquid_volume()
     expected_source_volume = source_start_volume - volume
-    assert math.isclose(expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
+    assert math.isclose(
+        expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
 
     comment_labware_well_volume_status(ctx, dest)
 
@@ -221,8 +222,9 @@ def run(ctx):
 
     actual_source_volume = ethanol_source_well.current_liquid_volume()
     expected_source_volume = source_start_volume - (volume * 8)
-    assert math.isclose(expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
-
+    assert math.isclose(
+        expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
 
     comment_labware_well_volume_status(ctx, dest)
 

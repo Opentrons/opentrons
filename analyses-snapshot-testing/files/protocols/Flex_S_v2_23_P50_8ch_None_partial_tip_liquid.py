@@ -159,6 +159,7 @@ def comment_tip_rack_status(ctx, tip_rack):
         # Print the full status line for the row
         ctx.comment(status_line)
 
+
 def well_name(well) -> str:
     """Extract the well name from a full display name string.
 
@@ -168,14 +169,15 @@ def well_name(well) -> str:
     Returns:
         str: The well name (e.g., "A1")
     """
-    return well.display_name.split(' of ')[0]
+    return well.display_name.split(" of ")[0]
+
 
 def comment_labware_well_volume_status(ctx, labware):
     """
     Log the volume status for each well in a labware.
-    
+
     Each row will print a line with the well name and its volume in microliters.
-    
+
     Args:
         ctx: The protocol context, used to call `comment()`.
         labware: The labware object containing wells with volume info.
@@ -193,9 +195,6 @@ def comment_labware_well_volume_status(ctx, labware):
                 volume = "???"
             status_line += f"{well.display_name.split(' of ')[0]}: {volume} μl  "
         ctx.comment(status_line)
-
-
-
 
 
 def run(ctx):
@@ -254,12 +253,11 @@ def run(ctx):
     for well in GLYCEROL_SOURCE_WELLS:
         source.wells_by_name()[well].load_liquid(liquid=glycerol, volume=14000)
 
-
     # dest
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep
     dest = ctx.load_labware("nest_96_wellplate_2ml_deep", "D2")
 
-    # This is not liked 
+    # This is not liked
     # for well in dest.wells():
     #     well.load_liquid(liquid=empty, volume=0)
     # comment_labware_well_volume_status(ctx, source)
@@ -291,8 +289,7 @@ def run(ctx):
     set_configure_nozzle_layout(ctx=ctx, pipette=pipette_8ch_50, tipracks=tipracks, tip_config=tip_config)
 
     pipette_50 = ctx.load_instrument("flex_1channel_50", "right", tip_racks=filter_tipracks)
-    
-    
+
     dest.wells_by_name()["A1"].load_liquid(liquid=empty, volume=0)
     pipette_50.pick_up_tip()
     pipette_50.aspirate(44, source.wells_by_name()["A1"])
@@ -343,9 +340,7 @@ def run(ctx):
 
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
 
-
-
-#####################  GOOOOOOD ^^^^^^
+    #####################  GOOOOOOD ^^^^^^
 
     # # Distribute with regular tips
 

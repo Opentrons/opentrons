@@ -6,12 +6,13 @@ import math
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 metadata = {"protocolName": "Track liquid volume"}
 
+
 def comment_labware_well_volume_status(ctx, labware):
     """
     Log the volume status for each well in a labware.
-    
+
     Each row will print a line with the well name and its volume in microliters.
-    
+
     Args:
         ctx: The protocol context, used to call `comment()`.
         labware: The labware object containing wells with volume info.
@@ -30,10 +31,11 @@ def comment_labware_well_volume_status(ctx, labware):
             status_line += f"{well.display_name.split(' of ')[0]}: {volume}  "
         ctx.comment(status_line)
 
-def color_wells_with_liquid(labware,liquid):
+
+def color_wells_with_liquid(labware, liquid):
     """
     Color the wells of a labware with a specific liquid.
-    
+
     Args:
         labware: The labware object containing wells to be colored.
         liquid: The liquid object used to color the wells.
@@ -47,10 +49,7 @@ def color_wells_with_liquid(labware,liquid):
             pass
 
 
-
-
 def run(ctx):
-
 
     tiprack_1 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B2")
     tiprack_2 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B3")
@@ -99,7 +98,9 @@ def run(ctx):
 
     actual_source_volume = source.wells_by_name()["A1"].current_liquid_volume()
     expected_source_volume = source_start_volume - volume
-    assert math.isclose(expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
+    assert math.isclose(
+        expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
 
     comment_labware_well_volume_status(ctx, dest)
 
@@ -110,13 +111,16 @@ def run(ctx):
 
     expected_dest_volume = volume2 + volume
     dest_volume2 = dest.wells_by_name()["A1"].current_liquid_volume()
-    assert math.isclose(expected_dest_volume, dest_volume2, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_dest_volume}, got {dest_volume2}"
+    assert math.isclose(
+        expected_dest_volume, dest_volume2, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {expected_dest_volume}, got {dest_volume2}"
     actual_source_volume2 = source.wells_by_name()["A1"].current_liquid_volume()
     expected_source_volume2 = expected_source_volume - volume2
-    assert math.isclose(expected_source_volume2, actual_source_volume2, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_source_volume2}, got {actual_source_volume2}"
+    assert math.isclose(
+        expected_source_volume2, actual_source_volume2, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {expected_source_volume2}, got {actual_source_volume2}"
 
     comment_labware_well_volume_status(ctx, dest)
-
 
     # Now transfer from a different source but still to A1 dest
     volume3 = 20
@@ -125,10 +129,14 @@ def run(ctx):
     dest_volume3 = dest.wells_by_name()["A1"].current_liquid_volume()
 
     expected_dest_volume3 = expected_dest_volume + volume3
-    assert math.isclose(expected_dest_volume3, dest_volume3, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_dest_volume3}, got {dest_volume3}"
+    assert math.isclose(
+        expected_dest_volume3, dest_volume3, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {expected_dest_volume3}, got {dest_volume3}"
     actual_source_volume3 = source.wells_by_name()["A2"].current_liquid_volume()
     expected_source_volume3 = source_start_volume - volume3
-    assert math.isclose(expected_source_volume3, actual_source_volume3, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_source_volume3}, got {actual_source_volume3}"
+    assert math.isclose(
+        expected_source_volume3, actual_source_volume3, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {expected_source_volume3}, got {actual_source_volume3}"
     comment_labware_well_volume_status(ctx, dest)
 
     # Now with 8 channel
@@ -143,9 +151,13 @@ def run(ctx):
 
     m_expected_source_volume = source_start_volume - (m_volume * 8)
 
-    assert math.isclose(m_expected_source_volume, m_actual_source_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {m_expected_source_volume}, got {m_actual_source_volume}"
+    assert math.isclose(
+        m_expected_source_volume, m_actual_source_volume, rel_tol=0.1, abs_tol=0.1
+    ), f"Expected volume {m_expected_source_volume}, got {m_actual_source_volume}"
 
     for well in dest.columns()[2]:
-        assert math.isclose(m_volume, well.current_liquid_volume(), rel_tol=0.1, abs_tol=0.1), f"Expected volume {m_volume}, got {well.current_liquid_volume()}"
+        assert math.isclose(
+            m_volume, well.current_liquid_volume(), rel_tol=0.1, abs_tol=0.1
+        ), f"Expected volume {m_volume}, got {well.current_liquid_volume()}"
 
     color_wells_with_liquid(dest, filled)
