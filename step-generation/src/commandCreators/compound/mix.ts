@@ -77,7 +77,8 @@ export function mixUtil(args: {
     aspirateDelaySeconds != null ||
     (aspirateDelaySeconds != null && aspirateDelaySeconds === 0) ||
     dispenseDelaySeconds != null ||
-    (dispenseDelaySeconds != null && dispenseDelaySeconds === 0)
+    (dispenseDelaySeconds != null && dispenseDelaySeconds === 0) ||
+    finalPushOut != null
 
   const curryCreator = hasUnsupportedMixApiArg
     ? curryCommandCreator
