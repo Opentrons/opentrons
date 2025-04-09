@@ -82,7 +82,7 @@ export const ThermocyclerModuleSlideout = (
       createLiveCommand({
         command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
       })
-        .then(result => {
+        .then(() => {
           reportModuleCommand({
             kind: 'liveCommand',
             moduleType: module.moduleType,

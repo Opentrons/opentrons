@@ -234,7 +234,7 @@ export function useModuleOverflowMenu(
     createLiveCommand({
       command: deactivateCommand,
     })
-      .then(result => {
+      .then(() => {
         reportModuleCommand({
           kind: 'liveCommand',
           moduleType: module.moduleType,
@@ -277,7 +277,7 @@ export function useModuleOverflowMenu(
     createLiveCommand({
       command: lidCommand,
     })
-      .then(result => {
+      .then(() => {
         reportModuleCommand({
           kind: 'liveCommand',
           moduleType: module.moduleType,

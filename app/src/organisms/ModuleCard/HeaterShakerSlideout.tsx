@@ -57,7 +57,7 @@ export const HeaterShakerSlideout = (
       createLiveCommand({
         command: setTempCommand,
       })
-        .then(result => {
+        .then(() => {
           reportModuleCommand({
             kind: 'liveCommand',
             moduleType: module.moduleType,

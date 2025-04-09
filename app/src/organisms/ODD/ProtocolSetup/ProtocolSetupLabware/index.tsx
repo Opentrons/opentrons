@@ -277,7 +277,7 @@ function LabwareLatch({
       command: latchCommand,
       waitUntilComplete: true,
     })
-      .then(result => {
+      .then(() => {
         reportModuleCommand({
           kind: 'liveCommand',
           moduleType: matchedHeaterShaker.moduleType,

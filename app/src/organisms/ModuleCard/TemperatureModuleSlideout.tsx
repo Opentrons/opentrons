@@ -52,7 +52,7 @@ export const TemperatureModuleSlideout = (
       createLiveCommand({
         command: saveTempCommand,
       })
-        .then(result => {
+        .then(() => {
           reportModuleCommand({
             kind: 'liveCommand',
             moduleType: module.moduleType,

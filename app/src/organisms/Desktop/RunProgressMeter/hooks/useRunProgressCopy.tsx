@@ -131,11 +131,6 @@ export function useRunProgressCopy({
     }
   })()
   const { reportModuleCommand } = useModuleCommandAnalytics()
-  // Check if error occurred, then determine type
-  let error
-  if (typeof runCommandDetails?.data?.error === 'object') {
-    error = runCommandDetails?.data?.error?.errorType
-  }
 
   reportModuleCommand({
     kind: 'protocolCommand',
@@ -144,7 +139,7 @@ export function useRunProgressCopy({
       status: runCommandDetails?.data?.status ?? undefined,
       data: runCommandDetails?.data?.result,
     },
-    errorDetails: error ?? '',
+    errorDetails: runCommandDetails?.data?.error?.errorType ?? '',
     params: runCommandDetails?.data?.params ?? undefined,
     runId: runId ?? '',
   })
