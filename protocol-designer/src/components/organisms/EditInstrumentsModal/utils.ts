@@ -12,7 +12,7 @@ import type {
 import type {
   Gen,
   PipetteType,
-} from '../../../pages/CreateNewProtocolWizard/types'
+} from '../../../pages/Onboarding/types'
 import type { PipetteOnDeck } from '../../../step-forms'
 
 export interface PipetteSections {

@@ -39,7 +39,7 @@ import {
   PIPETTE_GENS,
   PIPETTE_TYPES,
   PIPETTE_VOLUMES,
-} from '../../../pages/CreateNewProtocolWizard/constants'
+} from '../../../pages/Onboarding/constants'
 
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type { PipetteOnDeck } from '../../../step-forms'
@@ -48,7 +48,7 @@ import type {
   PipetteInfoByGen,
   PipetteInfoByType,
   PipetteType,
-} from '../../../pages/CreateNewProtocolWizard/types'
+} from '../../../pages/Onboarding/types'
 import type { ThunkDispatch } from '../../../types'
 import type { PipetteConfig } from './usePipetteConfig'
 

@@ -10,7 +10,7 @@ import type { ComponentProps } from 'react'
 import type {
   WizardFormState,
   WizardTileProps,
-} from '../../../../pages/CreateNewProtocolWizard/types'
+} from '../../../../pages/Onboarding/types'
 
 vi.mock('../../../feature-flags/selectors')
 

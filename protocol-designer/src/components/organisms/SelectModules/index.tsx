@@ -17,21 +17,21 @@ import {
 } from '@opentrons/shared-data'
 
 import { uuid } from '../../../utils'
-import { ModuleDiagram } from '../../../pages/CreateNewProtocolWizard/ModuleDiagram'
-import { WizardBody } from '../../../pages/CreateNewProtocolWizard/WizardBody'
+import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
+import { WizardBody } from '../../../pages/Onboarding/WizardBody'
 import {
   DEFAULT_SLOT_MAP_FLEX,
   DEFAULT_SLOT_MAP_OT2,
   FLEX_SUPPORTED_MODULE_MODELS,
   OT2_SUPPORTED_MODULE_MODELS,
-} from '../../../pages/CreateNewProtocolWizard/constants'
+} from '../../../pages/Onboarding/constants'
 import { HandleEnter } from '../../atoms'
-import { PDListItemCustomize as ListItemCustomize } from '../../../pages/CreateNewProtocolWizard/PDListItemCustomize'
+import { PDListItemCustomize as ListItemCustomize } from '../../../pages/Onboarding/PDListItemCustomize'
 import { AddModuleEmptySelectorButton } from './AddModuleEmptySelectorButton'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { FormModule } from '../../../step-forms'
-import type { WizardTileProps } from '../../../pages/CreateNewProtocolWizard/types'
+import type { WizardTileProps } from '../../../pages/Onboarding/types'
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
