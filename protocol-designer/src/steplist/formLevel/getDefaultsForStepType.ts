@@ -44,6 +44,8 @@ export function getDefaultsForStepType(
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
+        pushOut_checkbox: null,
+        pushOut_volume: null,
         times: null,
         tipRack: null,
         volume: undefined,

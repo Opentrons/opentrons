@@ -390,6 +390,8 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_y_position?: number | null
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
   times?: number | null
   liquidClass?: string | null
 }

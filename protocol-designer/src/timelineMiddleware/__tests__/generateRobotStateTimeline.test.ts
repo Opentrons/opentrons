@@ -58,6 +58,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
         },
       },
       b: {
@@ -100,6 +101,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
         },
       },
       c: {
@@ -129,6 +131,7 @@ describe('generateRobotStateTimeline', () => {
           tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           xOffset: 0,
           yOffset: 0,
+          finalPushOut: 0,
         },
       },
     }

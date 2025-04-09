@@ -415,6 +415,7 @@ export function generateQuickTransferArgs(
     name: null,
     description: null,
     nozzles,
+    pushOut: null,
   }
 
   switch (quickTransferState.path) {
