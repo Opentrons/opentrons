@@ -219,6 +219,8 @@ describe('createPresavedStepForm', () => {
       preWetTip: false,
       pushOut_checkbox: null,
       pushOut_volume: null,
+      conditioning_checkbox: false,
+      conditioning_volume: null,
       stepDetails: '',
       stepName: 'transfer',
       volume: null,
@@ -229,7 +231,7 @@ describe('createPresavedStepForm', () => {
       blowout_z_offset: 0,
       blowout_flowRate: null,
       liquidClassesSupported: true,
-      liquidClass: null,
+      liquidClass: 'none',
     })
   })
   describe('mix step', () => {
@@ -271,6 +273,7 @@ describe('createPresavedStepForm', () => {
         tipRack: null,
         blowout_flowRate: null,
         liquidClassesSupported: true,
+        liquidClass: 'none',
       })
     })
   })

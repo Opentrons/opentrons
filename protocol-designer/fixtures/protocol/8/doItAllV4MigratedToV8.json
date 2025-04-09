@@ -247,7 +247,7 @@
           "disposalVolume_volume": "20",
           "dropTip_location": "64f8eae8-b8d6-4a4a-8f51-beb41a5a4adc:trashBin",
           "liquidClassesSupported": false,
-          "liquidClass": null,
+          "liquidClass": "none",
           "nozzles": null,
           "path": "single",
           "pipette": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
@@ -260,7 +260,9 @@
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
           "dispense_touchTip_mmfromTop": null,
           "pushOut_checkbox": false,
-          "pushOut_volume": 0
+          "pushOut_volume": 0,
+          "conditioning_checkbox": false,
+          "conditioning_volume": null
         },
         "4f4057e0-75c7-11ea-b42f-4b64e50f43e5": {
           "engageHeight": "6",

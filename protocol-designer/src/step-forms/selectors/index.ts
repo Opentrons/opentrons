@@ -577,6 +577,27 @@ export const getCurrentFormHasUnsavedChanges: Selector<
     return !isEqual(unsavedForm, savedForm)
   }
 )
+export const getCurrentFormUnsavedChangedFields: Selector<
+  BaseState,
+  string[]
+> = createSelector(
+  getUnsavedForm,
+  getSavedStepForms,
+  (unsavedForm, savedStepForms) => {
+    const id = unsavedForm?.id
+    const savedForm = id != null ? savedStepForms[id] : null
+
+    if (savedForm == null || unsavedForm == null) {
+      // nonexistent = no unsaved changes
+      return []
+    }
+    const fields = Object.keys(savedForm)
+    return fields.reduce<string[]>((acc, field) => {
+      return savedForm[field] !== unsavedForm[field] ? [...acc, field] : acc
+    }, [])
+  }
+)
+
 export const getBatchEditFieldChanges: Selector<
   BaseState,
   BatchEditFormChangesState
@@ -588,9 +609,15 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
 
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
-  moduleEntities: ModuleEntities
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities
 ): StepFormErrors => {
-  return getFormErrors(hydratedForm.stepType, hydratedForm, moduleEntities)
+  return getFormErrors(
+    hydratedForm.stepType,
+    hydratedForm,
+    moduleEntities,
+    labwareEntities
+  )
 }
 
 const _dynamicFieldFormErrors = (
@@ -673,7 +700,11 @@ export const _hasFormLevelErrors = (
   invariantContext: InvariantContext
 ): boolean => {
   if (
-    _formLevelErrors(hydratedForm, invariantContext.moduleEntities).length > 0
+    _formLevelErrors(
+      hydratedForm,
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
+    ).length > 0
   )
     return true
 
@@ -833,7 +864,8 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
 
     const errors = _formLevelErrors(
       hydratedForm,
-      invariantContext.moduleEntities
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
     )
 
     return errors

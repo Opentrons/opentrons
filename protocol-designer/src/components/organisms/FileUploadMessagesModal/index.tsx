@@ -14,23 +14,30 @@ import {
   undoLoadFile,
 } from '../../../load-file/actions'
 import { useFileUploadModalContents } from './utils'
+import { getEnablePythonExport } from '../../../feature-flags/selectors'
 
 export function FileUploadMessagesModal(): JSX.Element | null {
   const message = useSelector(getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')
+  const enableExportPython = useSelector(getEnablePythonExport)
   const modalContents = useFileUploadModalContents({
     uploadResponse: message,
+    enableExportPython,
   })
   const dismissModal = (): void => {
     dispatch(dismissFileUploadMessage())
   }
 
-  if (modalContents == null) return null
+  if (modalContents == null) {
+    return null
+  }
 
   const { title, body } = modalContents
   const showButtons =
-    title !== t('invalid_json_file') && title !== t('incorrect_file_header')
+    title !== t('invalid_json_file') &&
+    title !== t('incorrect_file_header') &&
+    title !== t('incorrect_python_file_header')
 
   return (
     <Modal
