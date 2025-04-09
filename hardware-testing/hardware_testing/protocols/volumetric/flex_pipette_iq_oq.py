@@ -123,8 +123,8 @@ def add_parameters(params: ParameterContext) -> None:
         default="water",
         choices=[
             {"display_name": "water", "value": "water"},
-            {"display_name": "glycerol-50", "value": "glycerol-50"},
-            {"display_name": "ethanol-80", "value": "ethanol-80"},
+            {"display_name": "glycerol_50", "value": "glycerol_50"},
+            {"display_name": "ethanol_80", "value": "ethanol_80"},
             {"display_name": "legacy", "value": "legacy"},
         ],
     )
