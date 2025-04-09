@@ -277,7 +277,6 @@ export function SelectPipetteModal(
                   allowAllTipracks,
                   selectedPipetteName,
                 })
-                console.log(tiprackOptions)
                 return (
                   <Flex
                     flexDirection={DIRECTION_COLUMN}

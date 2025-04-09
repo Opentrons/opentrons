@@ -88,11 +88,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
   const [loaded, setLoaded] = useState<boolean>(false)
 
   useLayoutEffect(() => {
-    const assetIndex =
-      subStepNumber != null && subStepNumber < 4 ? subStepNumber : stepNumber
-
-    const videoAsset = ONBOARDING_ANIMATIONS[assetIndex]
-
+    const videoAsset = ONBOARDING_ANIMATIONS[subStepNumber as number]
     setLoaded(false)
     setAsset(videoAsset)
     const timeout = setTimeout(() => {
@@ -101,7 +97,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     return () => {
       clearTimeout(timeout)
     }
-  }, [subStepNumber, stepNumber])
+  }, [subStepNumber])
 
   return (
     <Flex
@@ -190,7 +186,6 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
               border-radius: ${BORDERS.borderRadius16};
             `}
             autoPlay
-            key={asset}
             loop={false}
             controls={false}
             aria-label={`onboarding animation for page ${stepNumber}`}

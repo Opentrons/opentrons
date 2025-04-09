@@ -19,8 +19,8 @@ import { WizardBody } from './WizardBody'
 import type { AnalyticsEvent } from '../../analytics/mixpanel'
 import type { WizardTileProps } from './types'
 
-const FLEX_METADATA_WIZARD_STEP = 6
-const OT2_METADATA_WIZARD_STEP = 4
+const FLEX_METADATA_WIZARD_STEP = 4
+const OT2_METADATA_WIZARD_STEP = 3
 interface AddMetadataProps extends WizardTileProps {
   analyticsStartTime: Date
 }
@@ -44,6 +44,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
     <HandleEnter onEnter={handleProceed}>
       <WizardBody
         robotType={robotType}
+        subStepNumber={6}
         stepNumber={
           robotType === FLEX_ROBOT_TYPE
             ? FLEX_METADATA_WIZARD_STEP

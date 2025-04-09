@@ -52,7 +52,7 @@ describe('SelectModules', () => {
   })
   it('renders the flex options and overall text', () => {
     render(props)
-    screen.getByText('Step 4')
+    screen.getByText('Step 2')
     screen.getByText('Add your modules')
     screen.getByText('Select modules to use in your protocol.')
     screen.getByText('Temperature Module GEN2')

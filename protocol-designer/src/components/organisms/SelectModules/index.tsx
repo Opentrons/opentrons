@@ -90,7 +90,8 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
     <HandleEnter onEnter={proceed}>
       <WizardBody
         robotType={robotType}
-        stepNumber={robotType === FLEX_ROBOT_TYPE ? 4 : 3}
+        stepNumber={2}
+        subStepNumber={4}
         header={t('add_modules')}
         goBack={() => {
           goBack(1)
