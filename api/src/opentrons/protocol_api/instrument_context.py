@@ -1509,7 +1509,7 @@ class InstrumentContext(publisher.CommandPublisher):
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
     @requires_version(2, 23)
-    def transfer_liquid(
+    def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1552,7 +1552,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
             )
 
-        self._core.transfer_liquid(
+        self._core.transfer_with_liquid_class(
             liquid_class=liquid_class,
             volume=volume,
             source=[
@@ -1574,7 +1574,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 23)
-    def distribute_liquid(
+    def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1621,7 +1621,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         verified_source = transfer_args.sources_list[0]
-        self._core.distribute_liquid(
+        self._core.distribute_with_liquid_class(
             liquid_class=liquid_class,
             volume=volume,
             source=(
@@ -1643,7 +1643,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 23)
-    def consolidate_liquid(
+    def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1690,7 +1690,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         verified_dest = transfer_args.destinations_list[0]
-        self._core.consolidate_liquid(
+        self._core.consolidate_with_liquid_class(
             liquid_class=liquid_class,
             volume=volume,
             source=[
