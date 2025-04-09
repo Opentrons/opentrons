@@ -86,6 +86,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
 
     await api.home_z(OT3Mount.LEFT)
     # LOOP THROUGH CURRENTS + SPEEDS
+    await api.home()
     today = datetime.now().strftime("%m-%d-%y_%H-%M")
     with open(
         f"/data/testing_data/P200H_test_plunger_speed_test_{today}.csv", "w", newline=""
@@ -109,8 +110,8 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                     speed = CURRENTS_SPEEDS[current]
                     # HOME
                     print("homing...")
-                    #await api.home([ax])
-                    await api.home()
+                    await api.home([ax])
+                    
                     print(f"run-current set to {current} amps")
                     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
                         api,
