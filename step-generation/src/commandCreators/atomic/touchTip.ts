@@ -62,7 +62,6 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
     ...(mmFromEdge != null ? [`mm_from_edge=${mmFromEdge}`] : []),
   ]
 
-  //  TODO: add mmFromEdge to python and commandCreator
   const python = `${pipettePythonName}.touch_tip(${pythonArgs.join(', ')})`
 
   const commands: CreateCommand[] = [
