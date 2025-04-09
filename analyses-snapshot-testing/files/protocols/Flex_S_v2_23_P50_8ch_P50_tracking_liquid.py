@@ -49,7 +49,6 @@ def color_wells_with_liquid(labware, liquid):
             pass
 
 
-
 def run(ctx):
 
     tiprack_1 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B2")
@@ -76,46 +75,103 @@ def run(ctx):
     # Load liquids into source wells
 
     WATER_SOURCE_WELL = "A1"
+    WATER_SOURCE_COLUMN = 0
     ETHANOL_SOURCE_WELL = "A2"
+    ETHANOL_SOURCE_COLUMN = 1
     GLYCEROL_SOURCE_WELL = "A3"
+    GLYCEROL_SOURCE_COLUMN = 2
 
     WATER_SOURCE_WELLS = [
+        WATER_SOURCE_WELL,
         "A4",
         "A5",
         "A6",
     ]
+    WATER_SOURCE_COLUMNS = [
+        WATER_SOURCE_COLUMN,
+        3,
+        4,
+        5,
+    ]
     ETHANOL_SOURCE_WELLS = [
+        ETHANOL_SOURCE_WELL,
         "A7",
         "A8",
         "A9",
     ]
+    ETHANOL_SOURCE_COLUMNS = [
+        ETHANOL_SOURCE_COLUMN,
+        6,
+        7,
+        8,
+    ]
     GLYCEROL_SOURCE_WELLS = [
+        GLYCEROL_SOURCE_WELL,
         "A10",
         "A11",
         "A12",
     ]
+    GLYCEROL_SOURCE_COLUMNS = [
+        GLYCEROL_SOURCE_COLUMN,
+        9,
+        10,
+        11,
+    ]
+
+    # the actual well(s) as variables
+    water_source_well = source.wells_by_name()[WATER_SOURCE_WELL]
+    water_source_column = source.columns()[0]
+    ethanol_source_well = source.wells_by_name()[ETHANOL_SOURCE_WELL]
+    ethanol_source_column = source.columns()[1]
+    glycerol_source_well = source.wells_by_name()[GLYCEROL_SOURCE_WELL]
+    glycerol_source_column = source.columns()[2]
+    water_source_wells = [source.wells_by_name()[well] for well in WATER_SOURCE_WELLS]
+    water_source_column_wells = [source.columns()[col] for col in WATER_SOURCE_COLUMNS]
+    ethanol_source_wells = [source.wells_by_name()[well] for well in ETHANOL_SOURCE_WELLS]
+    ethanol_source_column_wells = [source.columns()[col] for col in ETHANOL_SOURCE_COLUMNS]
+    glycerol_source_wells = [source.wells_by_name()[well] for well in GLYCEROL_SOURCE_WELLS]
+    glycerol_source_column_wells = [source.columns()[col] for col in GLYCEROL_SOURCE_COLUMNS]
 
     # Load liquids into source wells
     source_start_volume = 14000
-    for well in WATER_SOURCE_WELLS + [WATER_SOURCE_WELL]:
-        source.load_liquid(wells=[source.wells()], liquid=water, volume=source_start_volume)
-    for well in ETHANOL_SOURCE_WELLS + [ETHANOL_SOURCE_WELL]:
-        source.wells_by_name()[well].load_liquid(liquid=ethanol, volume=source_start_volume)
-    for well in GLYCEROL_SOURCE_WELLS + [GLYCEROL_SOURCE_WELL]:
-        source.wells_by_name()[well].load_liquid(liquid=glycerol, volume=source_start_volume)
 
+    source.load_liquid(wells=water_source_wells, liquid=water, volume=source_start_volume)
+    source.load_liquid(wells=ethanol_source_wells, liquid=ethanol, volume=source_start_volume)
+    source.load_liquid(wells=glycerol_source_wells, liquid=glycerol, volume=source_start_volume)
 
     # dest
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep
     dest = ctx.load_labware("nest_96_wellplate_2ml_deep", "D2")
 
-    WATER_TARGET_WELL = "A1"
-    ETHANOL_TARGET_WELL = "A2"
-    GLYCEROL_TARGET_WELL = "A3"
+    WATER_DEST_WELL = "A1"
+    WATER_DEST_COLUMN = 0
+    ETHANOL_DEST_WELL = "A2"
+    ETHANOL_DEST_COLUMN = 1
+    GLYCEROL_DEST_WELL = "A3"
+    GLYCEROL_DEST_COLUMN = 2
 
-    WATER_TARGET_WELLS = ["H4", "H5"]
-    ETHANOL_TARGET_WELLS = ["H6", "H7"]
-    GLYCEROL_TARGET_WELLS = ["H8", "H9"]
+    WATER_DEST_WELLS = [WATER_DEST_WELL, "H4", "H5"]
+    ETHANOL_DEST_WELLS = [ETHANOL_DEST_WELL, "H6", "H7"]
+    GLYCEROL_DEST_WELLS = [GLYCEROL_DEST_WELL, "H8", "H9"]
+    WATER_DEST_COLUMNS = [WATER_DEST_COLUMN, 3, 4]
+    ETHANOL_DEST_COLUMNS = [ETHANOL_DEST_COLUMN, 6, 7]
+    GLYCEROL_DEST_COLUMNS = [GLYCEROL_DEST_COLUMN, 9, 10]
+
+    # Single well and column variables
+    water_dest_well = dest.wells_by_name()[WATER_DEST_WELL]
+    ethanol_dest_well = dest.wells_by_name()[ETHANOL_DEST_WELL]
+    glycerol_dest_well = dest.wells_by_name()[GLYCEROL_DEST_WELL]
+    water_dest_column = dest.columns()[WATER_DEST_COLUMN]
+    ethanol_dest_column = dest.columns()[ETHANOL_DEST_COLUMN]
+    glycerol_dest_column = dest.columns()[GLYCEROL_DEST_COLUMN]
+
+    # Multi well and column variables
+    water_dest_wells = [dest.wells_by_name()[well] for well in WATER_DEST_WELLS]
+    ethanol_dest_wells = [dest.wells_by_name()[well] for well in ETHANOL_DEST_WELLS]
+    glycerol_dest_wells = [dest.wells_by_name()[well] for well in GLYCEROL_DEST_WELLS]
+    water_dest_columns = [dest.columns()[col] for col in WATER_DEST_COLUMNS]
+    ethanol_dest_columns = [dest.columns()[col] for col in ETHANOL_DEST_COLUMNS]
+    glycerol_dest_columns = [dest.columns()[col] for col in GLYCEROL_DEST_COLUMNS]
 
     # displays black in deck map
     dest.load_empty(wells=dest.wells())
@@ -123,38 +179,61 @@ def run(ctx):
     pipette_50 = ctx.load_instrument("flex_1channel_50", "right", tip_racks=filter_tipracks)
     pipette_8ch_50 = ctx.load_instrument("flex_8channel_50", "left", tip_racks=tipracks)
 
-
-        # Stock liquid classes
+    # Stock liquid classes
     water_class = ctx.define_liquid_class("water")
     ethanol_class = ctx.define_liquid_class("ethanol_80")
     glycerol_class = ctx.define_liquid_class("glycerol_50")
 
     volume = 44
 
-    pipette_50.transfer_liquid(
+    pipette_50.transfer_with_liquid_class(
         liquid_class=water_class,
         volume=volume,
-        source=source.wells_by_name()["A1"],
-        dest=dest.wells_by_name()["A1"],
+        source=water_source_well,
+        dest=water_dest_well,
         new_tip="always",
         trash_location=trash,
         visit_every_well=True,
     )
 
+
+    dest_volume = water_dest_well.current_liquid_volume()
+    assert math.isclose(volume, dest_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {volume}, got {dest_volume}"
+
+    actual_source_volume = water_source_well.current_liquid_volume()
+    expected_source_volume = source_start_volume - volume
+    assert math.isclose(expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
+
     comment_labware_well_volume_status(ctx, dest)
 
-    pipette_8ch_50.transfer_liquid(
-        liquid_class=water_class,
+    pipette_8ch_50.transfer_with_liquid_class(
+        liquid_class=ethanol_class,
         volume=volume,
-        source=source.wells_by_name()["A1"],
-        dest=dest.wells_by_name()["A2"],
+        source=ethanol_source_column,
+        dest=ethanol_dest_column,
         new_tip="always",
         trash_location=trash,
-        visit_every_well=True,
     )
+
+    for well in ethanol_dest_column:
+        dest_volume = well.current_liquid_volume()
+    assert math.isclose(volume, dest_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {volume}, got {dest_volume}"
+
+    actual_source_volume = ethanol_source_well.current_liquid_volume()
+    expected_source_volume = source_start_volume - (volume * 8)
+    assert math.isclose(expected_source_volume, actual_source_volume, rel_tol=0.1, abs_tol=0.1), f"Expected volume {expected_source_volume}, got {actual_source_volume}"
+
 
     comment_labware_well_volume_status(ctx, dest)
 
-    pipette_8ch_50.consolidate_liquid(
+    pipette_8ch_50.distribute_with_liquid_class(
+        liquid_class=glycerol_class,
+        volume=volume,
+        source=water_source_column,
+        dest=water_dest_columns,
+        new_tip="always",
+        trash_location=trash,
+    )
 
     color_wells_with_liquid(dest, filled)
+    comment_labware_well_volume_status(ctx, dest)

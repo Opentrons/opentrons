@@ -206,7 +206,7 @@ def run(ctx: protocol_api.ProtocolContext):
         # slice source to only the first 2 elements
         source = source[:2]
 
-    pipette_96.consolidate_liquid(
+    pipette_96.consolidate_with_liquid_class(
         liquid_class=water_class,
         volume=volume,
         source=source,
@@ -259,7 +259,7 @@ def run(ctx: protocol_api.ProtocolContext):
         # slice source to only the first 2 elements
         source = source[:2]
 
-    pipette_96.consolidate_liquid(
+    pipette_96.consolidate_with_liquid_class(
         liquid_class=ethanol_class,
         volume=volume,
         source=source,
@@ -313,7 +313,7 @@ def run(ctx: protocol_api.ProtocolContext):
         # slice source to only the first 2 elements
         source = source[:2]
 
-    pipette_96.consolidate_liquid(
+    pipette_96.consolidate_with_liquid_class(
         liquid_class=glycerol_class,
         volume=volume,
         source=source,

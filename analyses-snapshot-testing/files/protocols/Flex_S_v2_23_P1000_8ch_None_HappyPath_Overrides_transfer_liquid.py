@@ -85,7 +85,7 @@ def run(ctx):
     new_tip = "once"
     # new_tip = "always"
 
-    pipette_8ch_1000.transfer_liquid(
+    pipette_8ch_1000.transfer_with_liquid_class(
         liquid_class=water_class,
         volume=volume,
         source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -95,7 +95,7 @@ def run(ctx):
         visit_every_well=True,
     )
 
-    pipette_8ch_1000.transfer_liquid(
+    pipette_8ch_1000.transfer_with_liquid_class(
         liquid_class=ethanol_class,
         volume=volume,
         source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -105,7 +105,7 @@ def run(ctx):
         visit_every_well=True,
     )
 
-    pipette_8ch_1000.transfer_liquid(
+    pipette_8ch_1000.transfer_with_liquid_class(
         liquid_class=glycerol_class,
         volume=volume,
         source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],

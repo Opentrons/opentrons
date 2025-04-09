@@ -307,7 +307,7 @@ def run(ctx):
     if new_tip == "never":
         pipette_8ch_50.pick_up_tip()
 
-    # pipette_50.transfer_liquid(
+    # pipette_50.transfer_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -319,7 +319,7 @@ def run(ctx):
     comment_labware_well_volume_status(ctx, dest)
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
 
-    # pipette_8ch_50.transfer_liquid(
+    # pipette_8ch_50.transfer_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -331,7 +331,7 @@ def run(ctx):
 
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
 
-    # pipette_8ch_50.transfer_liquid(
+    # pipette_8ch_50.transfer_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -349,7 +349,7 @@ def run(ctx):
 
     # # Distribute with regular tips
 
-    # pipette_8ch_50.distribute_liquid(
+    # pipette_8ch_50.distribute_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -363,7 +363,7 @@ def run(ctx):
 
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
 
-    # pipette_8ch_50.distribute_liquid(
+    # pipette_8ch_50.distribute_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=ETHANOL_SOURCE_COLUMN_WELLS,
@@ -372,7 +372,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.distribute_liquid(
+    # pipette_8ch_50.distribute_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=GLYCEROL_SOURCE_COLUMN_WELLS,
@@ -383,7 +383,7 @@ def run(ctx):
 
     # # Consolidate with regular tips
     # volume = 244
-    # pipette_8ch_50.consolidate_liquid(
+    # pipette_8ch_50.consolidate_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=WATER_SOURCE_COLUMNS_WELLS,
@@ -392,7 +392,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.consolidate_liquid(
+    # pipette_8ch_50.consolidate_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=ETHANOL_SOURCE_COLUMNS_WELLS,
@@ -401,7 +401,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.consolidate_liquid(
+    # pipette_8ch_50.consolidate_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=GLYCEROL_SOURCE_COLUMNS_WELLS,
@@ -417,7 +417,7 @@ def run(ctx):
     # new_tip = "once"
     # # new_tip = "always"
 
-    # pipette_8ch_50.transfer_liquid(
+    # pipette_8ch_50.transfer_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=WATER_SOURCE_COLUMN_WELLS,
@@ -426,7 +426,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.transfer_liquid(
+    # pipette_8ch_50.transfer_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=ETHANOL_SOURCE_COLUMN_WELLS,
@@ -435,7 +435,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.transfer_liquid(
+    # pipette_8ch_50.transfer_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=GLYCEROL_SOURCE_COLUMN_WELLS,
@@ -446,7 +446,7 @@ def run(ctx):
 
     # # Distribute with filter tips
 
-    # pipette_8ch_50.distribute_liquid(
+    # pipette_8ch_50.distribute_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=WATER_SOURCE_COLUMN_WELLS,
@@ -455,7 +455,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.distribute_liquid(
+    # pipette_8ch_50.distribute_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=ETHANOL_SOURCE_COLUMN_WELLS,
@@ -464,7 +464,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.distribute_liquid(
+    # pipette_8ch_50.distribute_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=GLYCEROL_SOURCE_COLUMN_WELLS,
@@ -475,7 +475,7 @@ def run(ctx):
 
     # # Consolidate with filter tips
     # volume = 15
-    # pipette_8ch_50.consolidate_liquid(
+    # pipette_8ch_50.consolidate_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=WATER_SOURCE_COLUMNS_WELLS,
@@ -484,7 +484,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.consolidate_liquid(
+    # pipette_8ch_50.consolidate_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=ETHANOL_SOURCE_COLUMNS_WELLS,
@@ -493,7 +493,7 @@ def run(ctx):
     #     trash_location=trash,
     # )
 
-    # pipette_8ch_50.consolidate_liquid(
+    # pipette_8ch_50.consolidate_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=GLYCEROL_SOURCE_COLUMNS_WELLS,

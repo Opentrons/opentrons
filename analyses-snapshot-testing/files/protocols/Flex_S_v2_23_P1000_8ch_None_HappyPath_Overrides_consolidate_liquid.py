@@ -98,7 +98,7 @@ def run(ctx):
     new_tip = "once"
     # new_tip = "always"
 
-    pipette_8ch_1000.consolidate_liquid(
+    pipette_8ch_1000.consolidate_with_liquid_class(
         liquid_class=water_class,
         volume=volume,
         source=WATER_SOURCE_COLUMNS_WELLS,
@@ -107,7 +107,7 @@ def run(ctx):
         trash_location=trash,
     )
 
-    pipette_8ch_1000.consolidate_liquid(
+    pipette_8ch_1000.consolidate_with_liquid_class(
         liquid_class=ethanol_class,
         volume=volume,
         source=ETHANOL_SOURCE_COLUMNS_WELLS,
@@ -116,7 +116,7 @@ def run(ctx):
         trash_location=trash,
     )
 
-    pipette_8ch_1000.consolidate_liquid(
+    pipette_8ch_1000.consolidate_with_liquid_class(
         liquid_class=glycerol_class,
         volume=volume,
         source=GLYCEROL_SOURCE_COLUMNS_WELLS,

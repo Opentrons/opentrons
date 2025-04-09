@@ -172,7 +172,7 @@ def run(ctx: protocol_api.ProtocolContext):
     # Now I have retrieved and altered the liquid class configuration
     # and that retrieved configuration was specific for a pipette and a tiprack
 
-    pipette_50.transfer_liquid(
+    pipette_50.transfer_with_liquid_class(
         liquid_class=water_class_p50_tr50,
         volume=volume,
         source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -181,7 +181,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_50.transfer_liquid(
+    pipette_50.transfer_with_liquid_class(
         liquid_class=ethanol_class_p50_tr50,
         volume=volume,
         source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -190,7 +190,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_50.transfer_liquid(
+    pipette_50.transfer_with_liquid_class(
         liquid_class=glycerol_class_p50_tr50,
         volume=volume,
         source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -199,7 +199,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.transfer_liquid(
+    pipette_1000.transfer_with_liquid_class(
         liquid_class=water_class_p1000_tr50,
         volume=volume,
         source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -208,7 +208,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.transfer_liquid(
+    pipette_1000.transfer_with_liquid_class(
         liquid_class=ethanol_class_p1000_tr50,
         volume=volume,
         source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -217,7 +217,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.transfer_liquid(
+    pipette_1000.transfer_with_liquid_class(
         liquid_class=glycerol_class_p1000_tr50,
         volume=volume,
         source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -228,7 +228,7 @@ def run(ctx: protocol_api.ProtocolContext):
 
     # Distribute with tiprack_50
 
-    pipette_50.distribute_liquid(
+    pipette_50.distribute_with_liquid_class(
         liquid_class=water_class_p50_tr50,
         volume=volume,
         source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -237,7 +237,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_50.distribute_liquid(
+    pipette_50.distribute_with_liquid_class(
         liquid_class=ethanol_class_p50_tr50,
         volume=volume,
         source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -246,7 +246,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_50.distribute_liquid(
+    pipette_50.distribute_with_liquid_class(
         liquid_class=ethanol_class_p50_tr50,
         volume=volume,
         source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -255,7 +255,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.distribute_liquid(
+    pipette_1000.distribute_with_liquid_class(
         liquid_class=ethanol_class_p50_tr50,
         volume=volume,
         source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -264,7 +264,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.distribute_liquid(
+    pipette_1000.distribute_with_liquid_class(
         liquid_class=ethanol_class_p1000_tr50,
         volume=volume,
         source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -273,7 +273,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.distribute_liquid(
+    pipette_1000.distribute_with_liquid_class(
         liquid_class=glycerol_class_p1000_tr50,
         volume=volume,
         source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -285,7 +285,7 @@ def run(ctx: protocol_api.ProtocolContext):
     # Consolidate with tiprack_50
 
     volume = 75
-    pipette_50.consolidate_liquid(
+    pipette_50.consolidate_with_liquid_class(
         liquid_class=water_class_p50_tr50,
         volume=volume,
         source=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
@@ -294,7 +294,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_50.consolidate_liquid(
+    pipette_50.consolidate_with_liquid_class(
         liquid_class=ethanol_class_p50_tr50,
         volume=volume,
         source=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
@@ -303,7 +303,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_50.consolidate_liquid(
+    pipette_50.consolidate_with_liquid_class(
         liquid_class=glycerol_class_p50_tr50,
         volume=volume,
         source=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
@@ -312,7 +312,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.consolidate_liquid(
+    pipette_1000.consolidate_with_liquid_class(
         liquid_class=water_class_p1000_tr50,
         volume=volume,
         source=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
@@ -321,7 +321,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.consolidate_liquid(
+    pipette_1000.consolidate_with_liquid_class(
         liquid_class=ethanol_class_p1000_tr50,
         volume=volume,
         source=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
@@ -330,7 +330,7 @@ def run(ctx: protocol_api.ProtocolContext):
         trash_location=trash,
     )
 
-    pipette_1000.consolidate_liquid(
+    pipette_1000.consolidate_with_liquid_class(
         liquid_class=glycerol_class_p1000_tr50,
         volume=volume,
         source=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
@@ -347,7 +347,7 @@ def run(ctx: protocol_api.ProtocolContext):
     # new_tip = "once"
     # # new_tip = "always"
 
-    # pipette_50.transfer_liquid(
+    # pipette_50.transfer_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -356,7 +356,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_50.transfer_liquid(
+    # pipette_50.transfer_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -365,7 +365,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_50.transfer_liquid(
+    # pipette_50.transfer_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -374,7 +374,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.transfer_liquid(
+    # pipette_1000.transfer_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -383,7 +383,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.transfer_liquid(
+    # pipette_1000.transfer_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -392,7 +392,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.transfer_liquid(
+    # pipette_1000.transfer_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -403,7 +403,7 @@ def run(ctx: protocol_api.ProtocolContext):
 
     # # Distribute with filter_tiprack_50
 
-    # pipette_50.distribute_liquid(
+    # pipette_50.distribute_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -412,7 +412,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_50.distribute_liquid(
+    # pipette_50.distribute_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -421,7 +421,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_50.distribute_liquid(
+    # pipette_50.distribute_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -430,7 +430,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.distribute_liquid(
+    # pipette_1000.distribute_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -439,7 +439,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.distribute_liquid(
+    # pipette_1000.distribute_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -448,7 +448,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.distribute_liquid(
+    # pipette_1000.distribute_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -460,7 +460,7 @@ def run(ctx: protocol_api.ProtocolContext):
     # # Consolidate with filter_tiprack_50
 
     # volume = 100
-    # pipette_50.consolidate_liquid(
+    # pipette_50.consolidate_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
@@ -469,7 +469,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_50.consolidate_liquid(
+    # pipette_50.consolidate_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
@@ -478,7 +478,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_50.consolidate_liquid(
+    # pipette_50.consolidate_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
@@ -487,7 +487,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.consolidate_liquid(
+    # pipette_1000.consolidate_with_liquid_class(
     #     liquid_class=water_class,
     #     volume=volume,
     #     source=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
@@ -496,7 +496,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.consolidate_liquid(
+    # pipette_1000.consolidate_with_liquid_class(
     #     liquid_class=ethanol_class,
     #     volume=volume,
     #     source=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
@@ -505,7 +505,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     trash_location=trash,
     # )
 
-    # pipette_1000.consolidate_liquid(
+    # pipette_1000.consolidate_with_liquid_class(
     #     liquid_class=glycerol_class,
     #     volume=volume,
     #     source=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
@@ -535,7 +535,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #     new_tip = "once"
     #     # new_tip = "always"
 
-    #     pipette_1000.transfer_liquid(
+    #     pipette_1000.transfer_with_liquid_class(
     #         liquid_class=water_class,
     #         volume=test.transfer_volume,
     #         source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -544,7 +544,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.transfer_liquid(
+    #     pipette_1000.transfer_with_liquid_class(
     #         liquid_class=ethanol_class,
     #         volume=test.transfer_volume,
     #         source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -553,7 +553,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.transfer_liquid(
+    #     pipette_1000.transfer_with_liquid_class(
     #         liquid_class=glycerol_class,
     #         volume=test.transfer_volume,
     #         source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -562,7 +562,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.distribute_liquid(
+    #     pipette_1000.distribute_with_liquid_class(
     #         liquid_class=water_class,
     #         volume=test.distribute_volume,
     #         source=source.wells_by_name()[WATER_SOURCE_WELL],
@@ -571,7 +571,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.distribute_liquid(
+    #     pipette_1000.distribute_with_liquid_class(
     #         liquid_class=ethanol_class,
     #         volume=test.distribute_volume,
     #         source=source.wells_by_name()[ETHANOL_SOURCE_WELL],
@@ -580,7 +580,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.distribute_liquid(
+    #     pipette_1000.distribute_with_liquid_class(
     #         liquid_class=glycerol_class,
     #         volume=test.distribute_volume,
     #         source=source.wells_by_name()[GLYCEROL_SOURCE_WELL],
@@ -589,7 +589,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.consolidate_liquid(
+    #     pipette_1000.consolidate_with_liquid_class(
     #         liquid_class=water_class,
     #         volume=test.consolidate_volume,
     #         source=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
@@ -598,7 +598,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.consolidate_liquid(
+    #     pipette_1000.consolidate_with_liquid_class(
     #         liquid_class=ethanol_class,
     #         volume=test.consolidate_volume,
     #         source=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
@@ -607,7 +607,7 @@ def run(ctx: protocol_api.ProtocolContext):
     #         trash_location=trash,
     #     )
 
-    #     pipette_1000.consolidate_liquid(
+    #     pipette_1000.consolidate_with_liquid_class(
     #         liquid_class=glycerol_class,
     #         volume=test.consolidate_volume,
     #         source=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],

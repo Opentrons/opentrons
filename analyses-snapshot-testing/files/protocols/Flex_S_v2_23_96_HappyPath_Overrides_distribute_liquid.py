@@ -122,7 +122,7 @@ def run(protocol_context):
     new_tip = "once"
     # new_tip = "always"
 
-    pipette_96.distribute_liquid(
+    pipette_96.distribute_with_liquid_class(
         liquid_class=water_class,
         volume=volume,
         source=water_source.wells(),
@@ -131,7 +131,7 @@ def run(protocol_context):
         trash_location=trash,
     )
 
-    pipette_96.distribute_liquid(
+    pipette_96.distribute_with_liquid_class(
         liquid_class=ethanol_class,
         volume=volume,
         source=ethanol_source.wells(),
@@ -140,7 +140,7 @@ def run(protocol_context):
         trash_location=trash,
     )
 
-    pipette_96.distribute_liquid(
+    pipette_96.distribute_with_liquid_class(
         liquid_class=glycerol_class,
         volume=volume,
         source=glycerol_source.wells(),
