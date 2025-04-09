@@ -326,9 +326,11 @@ class Well:
         :param Liquid liquid: The liquid to load into the well.
         :param float volume: The volume of liquid to load, in µL.
 
-        .. TODO: flag as deprecated in 2.22 docs
-            In API version 2.22 and later, use :py:meth:`~Labware.load_liquid`, :py:meth:`~Labware.load_liquid_by_well`,
-            or :py:meth:`~Labware.load_empty` to load liquid into a well.
+        .. deprecated:: 2.23
+
+        In API version 2.22 and later, use :py:meth:`~.Labware.load_liquid`, :py:meth:`~.Labware.load_liquid_by_well`,
+            or :py:meth:`~.Labware.load_empty` to load liquid into a well.
+
         """
         self._core.load_liquid(
             liquid=liquid,
@@ -1275,17 +1277,10 @@ class Labware:
         has not been named in a call to :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
         :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked.
 
-        For example, to load 10µL of a liquid named ``water`` (defined with :py:meth:`~ProtocolContext.define_liquid`)
-        into all the wells of a labware, you could call ``labware.load_liquid(labware.wells(), 10, water)``.
-
-        If you want to load different volumes of liquid into different wells, use :py:meth:`~Labware.load_liquid_by_well`.
-
-        If you want to mark the well as containing no liquid, use :py:meth:`~Labware.load_empty`.
-
         :param wells: The wells to load the liquid into.
-        :type wells: List of well names or list of Well objects, for instance from :py:meth:`~Labware.wells`.
+        :type wells: List of well names or list of Well objects- for instance, from :py:meth:`~Labware.wells`.
 
-        :param volume: The volume of liquid to load into each well, in 10µL.
+        :param volume: The volume of liquid to load into each well. Must be a multiple of 10.
         :type volume: float
 
         :param liquid: The liquid to load into each well, previously defined by :py:meth:`~ProtocolContext.define_liquid`
@@ -1321,18 +1316,9 @@ class Labware:
     ) -> None:
         """Mark several wells as containing unique volumes of liquid.
 
-        This method should be called at the beginning of a protocol, soon after loading the labware and before
-        liquid handling operations begin. It is a base of information for liquid tracking functionality. If a well in a labware
-        has not been named in a call to :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
-        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked.
-
-        For example, to load a decreasing amount of of a liquid named ``water`` (defined with :py:meth:`~ProtocolContext.define_liquid`)
-        into each successive well of a row, you could call
-        ``labware.load_liquid_by_well({'A1': 1000, 'A2': 950, 'A3': 900, ..., 'A12': 600}, water)``
-
-        If you want to load the same volume of a liquid into multiple wells, it is often easier to use :py:meth:`~Labware.load_liquid`.
-
-        If you want to mark the well as containing no liquid, use :py:meth:`~Labware.load_empty`.
+        This method should be called at the beginning of a protocol, soon after loading labware and before
+        liquid handling begins. Loading liquids is required for liquid tracking functionality- if a well hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
+        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
 
         :param volumes: A dictionary of well names (or :py:class:`Well` objects, for instance from ``labware['A1']``)
         :type wells: Dict[Union[str, Well], float]
@@ -1368,12 +1354,9 @@ class Labware:
     def load_empty(self, wells: Sequence[Union[Well, str]]) -> None:
         """Mark several wells as empty.
 
-        This method should be called at the beginning of a protocol, soon after loading the labware and before liquid handling
-        operations begin. It is a base of information for liquid tracking functionality. If a well in a labware has not been named
-        in a call to :py:meth:`Labware.load_empty`, :py:meth:`Labware.load_liquid`, or :py:meth:`Labware.load_liquid_by_well`, the
-        volume it contains is unknown and the well's liquid will not be tracked.
-
-        For instance, to mark all wells in the labware as empty, you can call ``labware.load_empty(labware.wells())``.
+        This method should be called at the beginning of a protocol, after loading the labware and before liquid handling
+        begins. Loading liquids is required for liquid tracking functionality- if a well in a labware hasn't been assigned a starting volume with :py:meth:`Labware.load_empty`, :py:meth:`Labware.load_liquid`, or :py:meth:`Labware.load_liquid_by_well`, the
+        volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
 
         :param wells: The list of wells to mark empty. To mark all wells as empty, pass ``labware.wells()``. You can also specify
                       wells by their names (for instance, ``labware.load_empty(['A1', 'A2'])``).
