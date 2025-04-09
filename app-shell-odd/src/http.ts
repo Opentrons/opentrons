@@ -72,7 +72,7 @@ export function fetchToFile(
 ): Promise<string> {
   return fetch(input, { signal: options?.signal }).then(response => {
     let downloaded = 0
-    const size = Number(response.headers.get('Content-Length')) || null
+    const size = Number(response.headers.get('Content-Length')) ?? null
 
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
