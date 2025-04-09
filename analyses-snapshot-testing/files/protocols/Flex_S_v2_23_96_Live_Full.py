@@ -221,10 +221,6 @@ The tip strategy is {new_tip}.
     for dest in destinations:
         dest.load_empty()
 
-    DEST_WELL = "A1"  # Target A1 with 96 channel
-
-    # Transfer
-
     pipette_96.transfer_with_liquid_class(
         liquid_class=liquid_class,
         volume=volume,
