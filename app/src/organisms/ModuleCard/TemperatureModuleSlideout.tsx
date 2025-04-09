@@ -51,29 +51,30 @@ export const TemperatureModuleSlideout = (
       }
       createLiveCommand({
         command: saveTempCommand,
-      }).then((result) => {
-        reportModuleCommand({
-          kind: 'liveCommand',
-          moduleType: module.moduleType,
-          analyticCommand: saveTempCommand.commandType,
-          result: { status: 'succeeded', data: undefined },
-          serialNumber: module.serialNumber,
-          temperature: temperatureValue,
-          errorDetails: "",
-          firmwareVersion: module.firmwareVersion
-        });
       })
+        .then(result => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: saveTempCommand.commandType,
+            result: { status: 'succeeded', data: undefined },
+            serialNumber: module.serialNumber,
+            temperature: temperatureValue,
+            errorDetails: '',
+            firmwareVersion: module.firmwareVersion,
+          })
+        })
         .catch((e: Error) => {
           reportModuleCommand({
             kind: 'liveCommand',
             moduleType: module.moduleType,
             analyticCommand: saveTempCommand.commandType,
-            result: {status: 'failed', data: undefined},
+            result: { status: 'failed', data: undefined },
             errorDetails: e.message,
             serialNumber: module.serialNumber,
             temperature: temperatureValue,
-            firmwareVersion: module.firmwareVersion
-          });
+            firmwareVersion: module.firmwareVersion,
+          })
           console.error(
             `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
           )

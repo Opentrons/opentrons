@@ -8,7 +8,7 @@ import {
   HS_TEMP_MIN,
   HS_TEMP_MAX,
 } from '@opentrons/shared-data'
-import type {HeaterShakerSetTargetTemperatureCreateCommand} from '@opentrons/shared-data'
+import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -30,7 +30,6 @@ interface HeaterShakerSlideoutProps {
   onCloseClick: () => unknown
   isExpanded: boolean
 }
-
 
 export const HeaterShakerSlideout = (
   props: HeaterShakerSlideoutProps
@@ -57,34 +56,35 @@ export const HeaterShakerSlideout = (
       }
       createLiveCommand({
         command: setTempCommand,
-      }).then((result) => {
-        reportModuleCommand({
-          kind: 'liveCommand',
-          moduleType: module.moduleType,
-          analyticCommand: setTempCommand.commandType,
-          result: { status: 'succeeded', data: undefined},
-          serialNumber: module.serialNumber,
-          temperature: hsValue,
-          errorDetails: "",
-          firmwareVersion: module.firmwareVersion
-        });
       })
+        .then(result => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: setTempCommand.commandType,
+            result: { status: 'succeeded', data: undefined },
+            serialNumber: module.serialNumber,
+            temperature: hsValue,
+            errorDetails: '',
+            firmwareVersion: module.firmwareVersion,
+          })
+        })
         .catch((e: Error) => {
           reportModuleCommand({
             kind: 'liveCommand',
             moduleType: module.moduleType,
             analyticCommand: setTempCommand.commandType,
-            result: {status: 'failed', data: undefined},
+            result: { status: 'failed', data: undefined },
             errorDetails: e.message,
             serialNumber: module.serialNumber,
             temperature: hsValue,
-            firmwareVersion: module.firmwareVersion
-          });
+            firmwareVersion: module.firmwareVersion,
+          })
 
           console.error(
             `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
-          );
-        });
+          )
+        })
 
       setHsValue(null)
       onCloseClick()
