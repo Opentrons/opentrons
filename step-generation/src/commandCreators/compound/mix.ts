@@ -74,10 +74,8 @@ export function mixUtil(args: {
   //  If delay is specified to something other than 0,
   //  emit individual py commands. Otherwise, emit mix()
   const hasUnsupportedMixApiArg =
-    aspirateDelaySeconds != null ||
-    (aspirateDelaySeconds != null && aspirateDelaySeconds === 0) ||
-    dispenseDelaySeconds != null ||
-    (dispenseDelaySeconds != null && dispenseDelaySeconds === 0) ||
+    (aspirateDelaySeconds != null && aspirateDelaySeconds !== 0) ||
+    (dispenseDelaySeconds != null && dispenseDelaySeconds !== 0) ||
     finalPushOut != null
 
   const curryCreator = hasUnsupportedMixApiArg
