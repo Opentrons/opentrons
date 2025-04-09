@@ -366,7 +366,7 @@ def _get_current_liquid_height(labware: protocol_api.Labware) -> float:
     return source_core_geometry.get_meniscus_height(source_labware_id, source_well_name)
 
 
-def run(ctx: protocol_api.ProtocolContext) -> None:
+def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
     """Run."""
     ctx.load_trash_bin("A3")
     # tips

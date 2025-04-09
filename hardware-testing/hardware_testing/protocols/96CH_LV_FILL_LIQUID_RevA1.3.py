@@ -5,13 +5,10 @@ from opentrons import types
 import random
 
 metadata = {
-    'protocolName': '96CH_LV_FILL_LIQUID_RevA1.3',
-    'author': 'Andy Hu <andy.hu@opentrons.com>',
+    "protocolName": "96CH_LV_FILL_LIQUID_RevA1.3",
+    "author": "Andy Hu <andy.hu@opentrons.com>",
 }
-requirements = {
-    'robotType': 'Flex',
-    'apiLevel': '2.20'
-}
+requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 
 def add_parameters(parameters: protocol_api.ParameterContext) -> None:
