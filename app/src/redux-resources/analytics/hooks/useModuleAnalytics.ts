@@ -1,20 +1,22 @@
-import type { AttachedModule} from '@opentrons/api-client'
-import { useTrackEvent, ANALYTICS_MODULE_COMMAND_ERROR, ANALYTICS_MODULE_COMMAND_COMPLETED
-} from '/app/redux/analytics'
+import { useTrackEvent, ANALYTICS_MODULE_COMMAND_ERROR, ANALYTICS_MODULE_COMMAND_COMPLETED } from '/app/redux/analytics'
 import { useModulesQuery } from '@opentrons/react-api-client'
-import type { CommandStatus, ModuleOnlyParams, ModuleType, TemperatureParams, RunTimeCommand} from '@opentrons/shared-data'
-import type {CommandData} from '@opentrons/api-client'
+import type {
+    CommandStatus,
+    ModuleOnlyParams,
+    ModuleType,
+    TemperatureParams,
+    RunTimeCommand,
+    CompletedProtocolAnalysis
+} from '@opentrons/shared-data'
+import type { CommandData, AttachedModule } from '@opentrons/api-client'
 import {
     getAttachedProtocolModuleMatches,
     getProtocolModulesInfo,
 } from '/app/transformations/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import {
-    FLEX_ROBOT_TYPE,
-    getDeckDefFromRobotType,
-  } from '@opentrons/shared-data'
- 
+import { FLEX_ROBOT_TYPE, getDeckDefFromRobotType } from '@opentrons/shared-data'
+
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
     'thermocycler/closeLid',
@@ -30,118 +32,141 @@ const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
     'heaterShaker/deactivateShaker',
     'heaterShaker/deactivateHeater',
     'heaterShaker/openLabwareLatch',
-    'heaterShaker/closeLabwareLatch' 
-];
+    'heaterShaker/closeLabwareLatch',
+]
 
 export type ModuleAnalyticKind = 'protocolCommand' | 'liveCommand'
 
 interface BaseModuleAnalytics {
-    kind: ModuleAnalyticKind,
-    analyticCommand: RunTimeCommand | string,
-    result: {status: CommandStatus | undefined; data: CommandData['data'] | undefined},
-    errorDetails: string;
+    kind: ModuleAnalyticKind
+    analyticCommand: RunTimeCommand | string
+    result: {
+        status: CommandStatus | undefined
+        data: CommandData['data'] | undefined
+    }
+    errorDetails: string
 }
+
 export interface ModuleAnalyticProtocolCommand extends BaseModuleAnalytics {
     kind: 'protocolCommand'
-    runId: string,
-    params: CommandData['data']['params'] | undefined,
-
+    runId: string
+    params: CommandData['data']['params'] | undefined
 }
 
 export interface ModuleAnalyticLiveCommand extends BaseModuleAnalytics {
     kind: 'liveCommand'
-    moduleType: ModuleType | string,
-    serialNumber: string,
-    temperature?: number | string,
-    firmwareVersion: string,
-
+    moduleType: ModuleType | string
+    serialNumber: string
+    temperature?: number | string
+    firmwareVersion: string
 }
 
 export type ModuleAnalyticType =
-  | ModuleAnalyticProtocolCommand
-  | ModuleAnalyticLiveCommand
+    | ModuleAnalyticProtocolCommand
+    | ModuleAnalyticLiveCommand
 
 export interface UseModuleCommandAnalyticsResult {
-    /* Report when a module command completes. */
-    reportModuleCommand: (params: ModuleAnalyticType) => void;
+    reportModuleCommand: (params: ModuleAnalyticType) => void
 }
 
-const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
-const moduleQuery = useModulesQuery()
-
-export function useModuleCommandAnalytics(modules?: AttachedModule[]): UseModuleCommandAnalyticsResult {
-    const doTrackEvent = useTrackEvent();
+function UseMostRecentAnalysisWrapper(runId: string | null): CompletedProtocolAnalysis | null {
+    return useMostRecentCompletedAnalysis(runId)
+}
+export function useModuleCommandAnalytics(
+    modules?: AttachedModule[]
+): UseModuleCommandAnalyticsResult {
+    const doTrackEvent = useTrackEvent()
+    const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
+    const moduleQuery = useModulesQuery()
     const reportModuleCommand = ({
         kind,
-        analyticCommand, 
+        analyticCommand,
         errorDetails,
-        ... rest
+        ...rest
     }: BaseModuleAnalytics): void => {
-        if (!isValidCommandType(analyticCommand)){
-            return;
-        }
+        if (!isValidCommandType(analyticCommand)) return
+
         const attachedModules = moduleQuery?.data?.data ?? []
-        const mostRecentAnalysis = useMostRecentCompletedAnalysis('runId' in rest && typeof rest.runId === 'string' ? rest.runId : null);
+        const mostRecentAnalysis = UseMostRecentAnalysisWrapper(
+            'runId' in rest && typeof rest.runId === 'string' ? rest.runId : null
+        )
         const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+        
+
         const protocolModulesInfo =
             mostRecentAnalysis != null
-            ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-            : []
+                ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+                : []
+
         const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
             attachedModules,
             protocolModulesInfo,
             deckConfig
         )
-        const matchedModules = attachedProtocolModuleMatches.map(module=> ({
+
+        const matchedModules = attachedProtocolModuleMatches.map(module => ({
             moduleType: module.attachedModuleMatch?.moduleType,
             moduleId: module.attachedModuleMatch?.id,
             serialNumber: module.attachedModuleMatch?.serialNumber,
-            firmwareVersion: module.attachedModuleMatch?.firmwareVersion
+            firmwareVersion: module.attachedModuleMatch?.firmwareVersion,
         }))
-        const { moduleId, celsius } = isParamType('params' in rest ? rest.params: null);
-        const matchedModule = matchedModules.find(module => module.moduleId === moduleId);
-        const reportedSerialNumber = 'serialNumber' in rest ? rest.serialNumber : matchedModule?.serialNumber ?? null;
-        const reportedTemperature = 'temperature' in rest ? rest.temperature : celsius ?? null;
-        const reportedFirmwareVersion = 'firmwareVersion' in rest ? rest.firmwareVersion : matchedModule?.firmwareVersion ?? null
-        const reportedModuleType = 'moduleType' in rest ? rest.moduleType : matchedModule?.moduleType ?? null
+
+        const { moduleId, celsius } = isParamType('params' in rest ? rest.params : null)
+
+        const matchedModule = matchedModules.find(module => module.moduleId === moduleId)
+
+        const reportedSerialNumber =
+            'serialNumber' in rest ? rest.serialNumber : matchedModule?.serialNumber ?? null
+
+        const reportedTemperature =
+            'temperature' in rest ? rest.temperature : celsius ?? null
+
+        const reportedFirmwareVersion =
+            'firmwareVersion' in rest ? rest.firmwareVersion : matchedModule?.firmwareVersion ?? null
+
+        const reportedModuleType =
+            'moduleType' in rest ? rest.moduleType : matchedModule?.moduleType ?? null
+
         const reportedErrorDetails = 'errorDetails' in rest ? rest.errorDetails : null
+
         doTrackEvent({
-            name: reportedErrorDetails ? ANALYTICS_MODULE_COMMAND_ERROR : ANALYTICS_MODULE_COMMAND_COMPLETED,
+            name: reportedErrorDetails != null
+                ? ANALYTICS_MODULE_COMMAND_ERROR
+                : ANALYTICS_MODULE_COMMAND_COMPLETED,
             properties: {
                 reportedModuleType,
                 analyticCommand,
-                ...(reportedErrorDetails
-                    ? { reportedErrorDetails }
-                    : { resultStatus: 'result' in rest ? rest.result: null}),
-                serialNumber: reportedSerialNumber,
+                ...(reportedErrorDetails != null ? { reportedErrorDetails } : {}),
+                reportedSerialNumber,
                 reportedTemperature,
-                reportedFirmwareVersion
+                reportedFirmwareVersion,
             },
-        });
-    };
+        })
+    }
 
-    return { reportModuleCommand };
+    return { reportModuleCommand }
 }
 
-function isModuleOnlyParams(params: any): params is ModuleOnlyParams {
-    return params && typeof params === "object" && "moduleId" in params;
+
+function isModuleOnlyParams(params: unknown): params is ModuleOnlyParams {
+    return typeof params === 'object' && params !== null && 'moduleId' in params;
 }
 
-function isTemperatureParams(params: any): params is TemperatureParams {
-    return params && typeof params === "object" && "celsius" in params;
+function isTemperatureParams(params: unknown): params is TemperatureParams {
+    return typeof params === 'object' && params !== null && 'celsius' in params;
 }
 
 /* Checks param type and returns variables found */
-function isParamType(params: any): { moduleId: string; celsius: string } {
+function isParamType(params: unknown): { moduleId: string; celsius: string } {
     if (isModuleOnlyParams(params)) {
-        return { moduleId: String(params.moduleId), celsius: "" };
+        return { moduleId: String(params.moduleId), celsius: '' };
     }
     if (isTemperatureParams(params)) {
         return { moduleId: String(params.moduleId), celsius: String(params.celsius) };
     }
-    return { moduleId: "", celsius: "" }; 
+    return { moduleId: '', celsius: '' };
 }
 
-function isValidCommandType(cmd: any): cmd is RunTimeCommand['commandType'] {
+function isValidCommandType(cmd: unknown): cmd is RunTimeCommand['commandType'] {
     return typeof cmd === 'string' && ANALYTIC_COMMAND_TYPES.includes(cmd as RunTimeCommand['commandType']);
-  }
+}

@@ -87,7 +87,7 @@ export function useLatchControls(module: AttachedModule): LatchControls {
           moduleType: module.moduleType,
           analyticCommand: latchCommand.commandType,
           errorDetails: e.message,
-          result: {status: 'failed', data: undefined},
+          result: { status: 'failed', data: undefined },
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
         });
@@ -133,7 +133,6 @@ export function useModuleOverflowMenu(
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -249,7 +248,7 @@ export function useModuleOverflowMenu(
           kind: 'liveCommand',
           moduleType: module.moduleType,
           analyticCommand: deactivateCommand.commandType,
-          result: {status: 'failed', data: undefined},
+          result: { status: 'failed', data: undefined },
           errorDetails: e.message,
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion
@@ -292,7 +291,7 @@ export function useModuleOverflowMenu(
           moduleType: module.moduleType,
           analyticCommand: lidCommand.commandType,
           errorDetails: e.message,
-          result: {status: 'failed', data: undefined},
+          result: { status: 'failed', data: undefined },
           serialNumber: module.serialNumber,
           firmwareVersion: module.firmwareVersion,
         });

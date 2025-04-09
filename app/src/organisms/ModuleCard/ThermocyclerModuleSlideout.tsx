@@ -52,7 +52,7 @@ export const ThermocyclerModuleSlideout = (
   if (isSecondaryTemp) {
     errorMessage =
       tempValue != null &&
-      (tempValue < TEMP_LID_MIN || tempValue > TEMP_LID_MAX)
+        (tempValue < TEMP_LID_MIN || tempValue > TEMP_LID_MAX)
         ? t('input_out_of_range')
         : null
   } else {
@@ -81,14 +81,14 @@ export const ThermocyclerModuleSlideout = (
       }
       createLiveCommand({
         command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
-      }).then((result)=> {
+      }).then((result) => {
         reportModuleCommand({
           kind: "liveCommand",
           moduleType: module.moduleType,
           analyticCommand: modulePart === 'Lid'
-          ? saveLidCommand.commandType
-          : saveBlockCommand.commandType,
-          result: {status: 'succeeded', data: undefined},
+            ? saveLidCommand.commandType
+            : saveBlockCommand.commandType,
+          result: { status: 'succeeded', data: undefined },
           serialNumber: module.serialNumber,
           temperature: tempValue,
           errorDetails: "",
@@ -99,17 +99,16 @@ export const ThermocyclerModuleSlideout = (
           kind: "liveCommand",
           moduleType: module.moduleType,
           analyticCommand: modulePart === 'Lid'
-          ? saveLidCommand.commandType
-          : saveBlockCommand.commandType,
-          result: {status: 'failed', data: undefined},
+            ? saveLidCommand.commandType
+            : saveBlockCommand.commandType,
+          result: { status: 'failed', data: undefined },
           errorDetails: e.message,
           serialNumber: module.serialNumber,
           temperature: tempValue,
           firmwareVersion: module.firmwareVersion
         })
         console.error(
-          `error setting module status with command type ${
-            saveLidCommand.commandType ?? saveBlockCommand.commandType
+          `error setting module status with command type ${saveLidCommand.commandType ?? saveBlockCommand.commandType
           }: ${e.message}`
         )
       })
