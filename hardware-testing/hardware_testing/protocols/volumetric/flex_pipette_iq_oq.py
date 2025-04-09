@@ -1,6 +1,6 @@
 """Opentrons Flex Pipette IQ/OQ."""
 from math import ceil
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Dict
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -8,6 +8,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
     Labware,
     Well,
+    LiquidClass,
 )
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -18,6 +19,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
 
+# TODO: (sigler) test using Buonoy at low volumes
 DYE_READER_IDEAL_UL = 200.0
 DYE_SHAKER_MAX_UL = 250.0
 DYE_CONFIGS = {
@@ -123,6 +125,7 @@ def add_parameters(params: ParameterContext) -> None:
             {"display_name": "water", "value": "water"},
             {"display_name": "glycerol-50", "value": "glycerol-50"},
             {"display_name": "ethanol-80", "value": "ethanol-80"},
+            {"display_name": "legacy", "value": "legacy"},
         ],
     )
     params.add_bool(
@@ -327,17 +330,24 @@ def run(ctx: ProtocolContext) -> None:
     )
     # liquid-classes
     diluent_class = ctx.define_liquid_class("water")
-    test_class = ctx.define_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
+    test_class: Optional[LiquidClass] = None
+    if ctx.params.liquid != "legacy":
+        ctx.define_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
     # GATHER TARGET WELLS
-    trials = TRIALS_BY_PIPETTE[test_pipette.name]
-    dest_well_by_plate_by_ch: Dict[Labware, Dict[int, Any]] = {
-        plate: {
-            1: plate.wells()[:trials],
-            8: plate.columns()[:trials],
-            96: [plate.wells()],
-        }
-        for ul, plate, trials in zip(volumes, plates, trials)
+    trials_by_volume = {
+        ul: trials
+        for ul, trials in zip(volumes, TRIALS_BY_PIPETTE[test_pipette.name])
+    }
+    all_wells = [w for p in plates for w in p.wells()]
+    dest_wells_by_volume = {
+        ul: [
+            all_wells.pop(0)
+            for _ in range(ceil(ul / DYE_SHAKER_MAX_UL))
+            for _ in range(test_pipette.channels)
+            for _ in range(trials_by_volume[ul])
+        ]
+        for ul in volumes
     }
 
     # TRANSFER DILUENT
@@ -345,23 +355,31 @@ def run(ctx: ProtocolContext) -> None:
         diluent_pipette if diluent_pipette else test_pipette
     )
     pip_for_dil.pick_up_tip()
-    for ul, plate in zip(volumes, plates):
+    for ul in volumes:
         if ul < DYE_READER_IDEAL_UL:
             pip_for_dil.transfer_liquid(
                 liquid_class=diluent_class,
                 volume=DYE_READER_IDEAL_UL - ul,
                 source=diluent_wells_by_volume[ul],
-                dest=dest_well_by_plate_by_ch[plate][pip_for_dil.channels],
+                dest=dest_wells_by_volume[ul],
                 new_tip="never",
             )
     pip_for_dil.drop_tip()
 
     # TRANSFER DYE
-    for ul, plate in zip(volumes, plates):
-        test_pipette.transfer_liquid(
-            liquid_class=test_class,
-            volume=ul,
-            source=dye_wells_by_volume[ul],
-            dest=dest_well_by_plate_by_ch[plate][test_pipette.channels],
-            new_tip="always",
-        )
+    for ul in volumes:
+        if test_class:
+            test_pipette.transfer_liquid(
+                liquid_class=test_class,
+                volume=ul,
+                source=dye_wells_by_volume[ul],
+                dest=dest_wells_by_volume[ul],
+                new_tip="always",
+            )
+        else:
+            test_pipette.transfer(
+                volume=ul,
+                source=dye_wells_by_volume[ul],
+                dest=dest_wells_by_volume[ul],
+                new_tip="always",
+            )
