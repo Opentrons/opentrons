@@ -48,7 +48,7 @@ def raise_if_location_inside_liquid(
         liquid_height_from_bottom = well_core.current_liquid_height()
     except LiquidHeightUnknownError:
         liquid_height_from_bottom = None
-    if isinstance(liquid_height_from_bottom, (int, float)):
+    if liquid_height_from_bottom is not None:
         if liquid_height_from_bottom + well_core.get_bottom(0).z > location.point.z:
             raise RuntimeError(
                 f"{location_check_descriptors.location_type.capitalize()} location {location} is"
@@ -60,6 +60,7 @@ def raise_if_location_inside_liquid(
         # liquid classes-based transfer to only when LPD is enabled or when liquids are
         # loaded in protocols using `load_liquid`. This can be quite restrictive
         # so we will not raise but just log a warning.
+        # todo: allow simulatedliquidprobe and dont raise this error
         logger.warning(
             f"Could not verify height of liquid in well {well_core.get_display_name()}, either"
             f" because the liquid in this well has not been probed or because"
