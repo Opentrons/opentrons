@@ -75,7 +75,7 @@ describe('pythonRequirements', () => {
       `
 requirements = {
     "robotType": "OT-2",
-    "apiLevel": "2.23",
+    "apiLevel": "2.24",
 }`.trimStart()
     )
 
@@ -83,7 +83,7 @@ requirements = {
       `
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.24",
 }`.trimStart()
     )
   })
