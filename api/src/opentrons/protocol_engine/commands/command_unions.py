@@ -17,6 +17,7 @@ from .movement_common import StallOrCollisionError
 from .flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerHopperError,
 )
 
 from . import absorbance_reader
@@ -929,6 +930,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
     DefinedErrorData[FlexStackerShuttleError],
+    DefinedErrorData[FlexStackerHopperError],
 ]
 
 

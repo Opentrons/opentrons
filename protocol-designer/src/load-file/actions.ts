@@ -3,7 +3,7 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { saveFile, savePythonFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
-import type { PDProtocolFile } from '../file-types'
+import type { PDProtocolFile, PDPythonFile } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type {
   FileUploadErrorType,
@@ -28,7 +28,9 @@ export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
   type: 'DISMISS_FILE_UPLOAD_MESSAGE',
 })
 // expects valid, parsed JSON protocol.
-export const loadFileAction = (payload: PDProtocolFile): LoadFileAction => ({
+export const loadFileAction = (
+  payload: PDProtocolFile | PDPythonFile
+): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migration(payload),
 })
@@ -54,9 +56,9 @@ export const loadProtocolFile = (
   // reset the state of the input to allow file re-uploads
   event.currentTarget.value = ''
 
-  if (!file.name.endsWith('.json')) {
+  if (!file.name.endsWith('.json') && !file.name.endsWith('.py')) {
     fileError('INVALID_FILE_TYPE')
-  } else {
+  } else if (file.name.endsWith('.json')) {
     reader.onload = readEvent => {
       const result = ((readEvent.currentTarget as any) as FileReader).result
       let parsedProtocol: PDProtocolFile | null | undefined
@@ -69,6 +71,32 @@ export const loadProtocolFile = (
         console.error(error)
         if (error instanceof Error) {
           fileError('INVALID_JSON_FILE', error.message)
+        }
+      }
+    }
+
+    reader.readAsText(file)
+  } else {
+    reader.onload = readEvent => {
+      const result = (readEvent.currentTarget as FileReader).result as string
+
+      try {
+        // Extract designer application blob
+        const designerApplication = result.match(
+          /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/m
+        )
+        if (designerApplication != null && designerApplication[1]) {
+          const designerApplicationString = designerApplication[1]
+          const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
+
+          dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
+        } else {
+          fileError('INVALID_PYTHON_FILE')
+        }
+      } catch (error) {
+        console.error('Error extracting blob:', error)
+        if (error instanceof Error) {
+          fileError('INVALID_PYTHON_FILE', error.message)
         }
       }
     }

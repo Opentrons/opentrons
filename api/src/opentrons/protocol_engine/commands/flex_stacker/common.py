@@ -23,3 +23,15 @@ class FlexStackerShuttleError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.STACKER_SHUTTLE_MISSING.value.code
     detail: str = ErrorCodes.STACKER_SHUTTLE_MISSING.value.detail
+
+
+class FlexStackerHopperError(ErrorOccurrence):
+    """Returned when the Flex Stacker hopper labware presence sensor raises an error."""
+
+    isDefined: bool = True
+    errorType: Literal[
+        "flexStackerHopperLabwareFailed"
+    ] = "flexStackerHopperLabwareFailed"
+
+    errorCode: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.code
+    detail: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.detail

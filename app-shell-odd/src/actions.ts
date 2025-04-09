@@ -357,7 +357,7 @@ export const usbRequestsStop = (): UsbRequestsAction => ({
 export const appRestart = (message: string): AppRestartAction => ({
   type: APP_RESTART,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })
@@ -365,7 +365,7 @@ export const appRestart = (message: string): AppRestartAction => ({
 export const reloadUi = (message: string): ReloadUiAction => ({
   type: RELOAD_UI,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })
@@ -373,7 +373,7 @@ export const reloadUi = (message: string): ReloadUiAction => ({
 export const sendLog = (message: string): SendLogAction => ({
   type: SEND_LOG,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })
@@ -381,7 +381,7 @@ export const sendLog = (message: string): SendLogAction => ({
 export const updateBrightness = (message: string): UpdateBrightnessAction => ({
   type: UPDATE_BRIGHTNESS,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })

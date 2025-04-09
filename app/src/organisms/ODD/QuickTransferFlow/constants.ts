@@ -194,3 +194,25 @@ export const NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE = [
   'opentrons/usascientific_12_reservoir_22ml/2',
   'opentrons/usascientific_96_wellplate_2.4ml_deep/2',
 ]
+
+export const ASPIRATE_SETTING_OPTIONS = {
+  ASPIRATE_FLOW_RATE: 'aspirate_flow_rate',
+  ASPIRATE_TIP_POSITION: 'aspirate_tip_position',
+  ASPIRATE_SUBMERGE: 'aspirate_submerge',
+  PRE_WET_TIP: 'pre_wet_tip',
+  ASPIRATE_MIX: 'aspirate_mix',
+  ASPIRATE_DELAY: 'aspirate_delay',
+  ASPIRATE_RETRACT: 'aspirate_retract',
+  ASPIRATE_TOUCH_TIP: 'aspirate_touch_tip',
+  ASPIRATE_AIR_GAP: 'aspirate_air_gap',
+} as const
+
+export const DISPENSE_SETTING_OPTIONS = {
+  DISPENSE_FLOW_RATE: 'dispense_flow_rate',
+  DISPENSE_TIP_POSITION: 'dispense_tip_position',
+  DISPENSE_MIX: 'dispense_mix',
+  DISPENSE_DELAY: 'dispense_delay',
+  DISPENSE_TOUCH_TIP: 'dispense_touch_tip',
+  DISPENSE_AIR_GAP: 'dispense_air_gap',
+  DISPENSE_BLOW_OUT: 'dispense_blow_out',
+} as const
