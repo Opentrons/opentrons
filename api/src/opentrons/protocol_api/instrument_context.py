@@ -74,7 +74,7 @@ class _Unset:
     """A sentinel value when no value has been supplied for an argument.
     User code should never use this explicitly."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         # Without this, the generated docs render the argument as
         # "<opentrons.protocol_api.instrument_context._Unset object at 0x1234>"
         return self.__class__.__name__
