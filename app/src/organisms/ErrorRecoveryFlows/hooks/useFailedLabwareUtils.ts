@@ -50,9 +50,9 @@ interface RelevantFailedLabwareLocations {
 
 interface LabwareNames {
   /* The name of the labware relevant to the failed command, if any.  */
-  name: string | null
+  name: string | undefined
   /* The user-content nickname of the failed labware, if any */
-  nickName: string | null
+  nickName: string | undefined
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
@@ -150,8 +150,8 @@ export function useFailedLabwareUtils({
   return {
     ...tipSelectionUtils,
     failedLabwareNames: {
-      name: failedLabwareDetails?.name ?? null,
-      nickName: failedLabwareDetails?.nickname ?? null,
+      name: failedLabwareDetails?.name ?? undefined,
+      nickName: failedLabwareDetails?.nickname ?? undefined,
     },
     failedLabware,
     failedLabwareLocations,
@@ -159,8 +159,8 @@ export function useFailedLabwareUtils({
     relevantPickUpTipLabware,
     relevantPickUpTipLwLocs,
     relevantPickUpTipLwNames: {
-      name: relevantPickUpTipCmdDetails?.name ?? null,
-      nickName: relevantPickUpTipCmdDetails?.nickname ?? null,
+      name: relevantPickUpTipCmdDetails?.name ?? undefined,
+      nickName: relevantPickUpTipCmdDetails?.nickname ?? undefined,
     },
   }
 }

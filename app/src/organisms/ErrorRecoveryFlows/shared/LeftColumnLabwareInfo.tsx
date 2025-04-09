@@ -37,7 +37,7 @@ export function LeftColumnLabwareInfo({
 
   const buildInfoNames = (): {
     labwareName: string
-    labwareNickname: string
+    labwareNickname: string | undefined
     currentLocationProps: { deckLabel: string }
   } => {
     if (
@@ -48,7 +48,7 @@ export function LeftColumnLabwareInfo({
     ) {
       return {
         labwareName: relevantPickUpTipLwNames.name ?? '',
-        labwareNickname: relevantPickUpTipLwNames.nickName ?? '',
+        labwareNickname: relevantPickUpTipLwNames.nickName,
         currentLocationProps: {
           deckLabel: relevantPickUpTipLwLocs.displayNameCurrentLoc.toUpperCase(),
         },
@@ -56,7 +56,7 @@ export function LeftColumnLabwareInfo({
     } else {
       return {
         labwareName: failedLabwareNames.name ?? '',
-        labwareNickname: failedLabwareNames.nickName ?? '',
+        labwareNickname: failedLabwareNames.nickName,
         currentLocationProps: {
           deckLabel: failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
         },
