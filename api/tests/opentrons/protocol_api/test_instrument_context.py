@@ -1728,7 +1728,7 @@ def test_transfer_liquid_raises_for_invalid_locations(
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
     with pytest.raises(ValueError):
-        subject.transfer_liquid(
+        subject.transfer_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[],
@@ -1757,7 +1757,7 @@ def test_transfer_liquid_raises_for_unequal_source_and_dest(
     with pytest.raises(
         ValueError, match="Sources and destinations should be of the same length"
     ):
-        subject.transfer_liquid(
+        subject.transfer_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=mock_well,
@@ -1788,7 +1788,7 @@ def test_transfer_liquid_raises_for_non_liquid_handling_locations(
         )
     ).then_raise(ValueError("Uh oh"))
     with pytest.raises(ValueError, match="Uh oh"):
-        subject.transfer_liquid(
+        subject.transfer_with_liquid_class(
             liquid_class=test_liq_class, volume=10, source=[mock_well], dest=[mock_well]
         )
 
@@ -1810,7 +1810,7 @@ def test_transfer_liquid_raises_for_bad_tip_policy(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     with pytest.raises(ValueError, match="invalid value for 'new_tip'"):
-        subject.transfer_liquid(
+        subject.transfer_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
@@ -1836,7 +1836,7 @@ def test_transfer_liquid_raises_for_no_tip(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     with pytest.raises(RuntimeError, match="Pipette has no tip"):
-        subject.transfer_liquid(
+        subject.transfer_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
@@ -1875,7 +1875,7 @@ def test_transfer_liquid_raises_if_tip_has_liquid(
     ).then_return((decoy.mock(cls=Labware), decoy.mock(cls=Well)))
     decoy.when(mock_instrument_core.get_current_volume()).then_return(1000)
     with pytest.raises(RuntimeError, match="liquid already in the tip"):
-        subject.transfer_liquid(
+        subject.transfer_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
@@ -1908,7 +1908,7 @@ def test_transfer_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
-    subject.transfer_liquid(
+    subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
         volume=10,
         source=[mock_well],
@@ -1918,7 +1918,7 @@ def test_transfer_liquid_delegates_to_engine_core(
         return_tip=True,
     )
     decoy.verify(
-        mock_instrument_core.transfer_liquid(
+        mock_instrument_core.transfer_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[(Location(Point(), labware=mock_well), mock_well._core)],
@@ -1963,7 +1963,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
-    subject.transfer_liquid(
+    subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
         volume=10,
         source=[[mock_well, mock_well]],
@@ -1973,7 +1973,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
         return_tip=True,
     )
     decoy.verify(
-        mock_instrument_core.transfer_liquid(
+        mock_instrument_core.transfer_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[(Location(Point(), labware=mock_well), mock_well._core)],
@@ -2004,7 +2004,7 @@ def test_distribute_liquid_raises_if_more_than_one_source(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     with pytest.raises(ValueError, match="Source should be a single well"):
-        subject.distribute_liquid(
+        subject.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well, mock_well],
@@ -2035,7 +2035,7 @@ def test_distribute_liquid_raises_for_non_liquid_handling_locations(
         )
     ).then_raise(ValueError("Uh oh"))
     with pytest.raises(ValueError, match="Uh oh"):
-        subject.distribute_liquid(
+        subject.distribute_with_liquid_class(
             liquid_class=test_liq_class, volume=10, source=mock_well, dest=[mock_well]
         )
 
@@ -2057,7 +2057,7 @@ def test_distribute_liquid_raises_for_bad_tip_policy(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     with pytest.raises(ValueError, match="invalid value for 'new_tip'"):
-        subject.distribute_liquid(
+        subject.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=mock_well,
@@ -2083,7 +2083,7 @@ def test_distribute_liquid_raises_for_no_tip(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     with pytest.raises(RuntimeError, match="Pipette has no tip"):
-        subject.distribute_liquid(
+        subject.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=mock_well,
@@ -2122,7 +2122,7 @@ def test_distribute_liquid_raises_if_tip_has_liquid(
     ).then_return((decoy.mock(cls=Labware), decoy.mock(cls=Well)))
     decoy.when(mock_instrument_core.get_current_volume()).then_return(1000)
     with pytest.raises(RuntimeError, match="liquid already in the tip"):
-        subject.distribute_liquid(
+        subject.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=mock_well,
@@ -2151,7 +2151,7 @@ def test_distribute_liquid_raises_if_tip_policy_per_source(
     with pytest.raises(
         RuntimeError, match='"per source" incompatible with distribute.'
     ):
-        subject.distribute_liquid(
+        subject.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=mock_well,
@@ -2185,7 +2185,7 @@ def test_distribute_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
-    subject.distribute_liquid(
+    subject.distribute_with_liquid_class(
         liquid_class=test_liq_class,
         volume=10,
         source=mock_well,
@@ -2195,7 +2195,7 @@ def test_distribute_liquid_delegates_to_engine_core(
         return_tip=True,
     )
     decoy.verify(
-        mock_instrument_core.distribute_liquid(
+        mock_instrument_core.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=(Location(Point(), labware=mock_well), mock_well._core),
@@ -2245,7 +2245,7 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
-    subject.distribute_liquid(
+    subject.distribute_with_liquid_class(
         liquid_class=test_liq_class,
         volume=10,
         source=[mock_well, mock_well, mock_well],
@@ -2255,7 +2255,7 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
         return_tip=True,
     )
     decoy.verify(
-        mock_instrument_core.distribute_liquid(
+        mock_instrument_core.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=(Location(Point(), labware=mock_well), mock_well._core),
@@ -2289,7 +2289,7 @@ def test_consolidate_liquid_raises_if_more_than_one_destination(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     with pytest.raises(ValueError, match="Destination should be a single well"):
-        subject.consolidate_liquid(
+        subject.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well, mock_well],
@@ -2320,7 +2320,7 @@ def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
         )
     ).then_raise(ValueError("Uh oh"))
     with pytest.raises(ValueError, match="Uh oh"):
-        subject.consolidate_liquid(
+        subject.consolidate_with_liquid_class(
             liquid_class=test_liq_class, volume=10, source=[mock_well], dest=mock_well
         )
 
@@ -2342,7 +2342,7 @@ def test_consolidate_liquid_raises_for_bad_tip_policy(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     with pytest.raises(ValueError, match="invalid value for 'new_tip'"):
-        subject.consolidate_liquid(
+        subject.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
@@ -2368,7 +2368,7 @@ def test_consolidate_liquid_raises_for_no_tip(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     with pytest.raises(RuntimeError, match="Pipette has no tip"):
-        subject.consolidate_liquid(
+        subject.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
@@ -2400,7 +2400,7 @@ def test_consolidate_liquid_raises_if_tip_has_liquid(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(1000)
     with pytest.raises(RuntimeError, match="liquid already in the tip"):
-        subject.consolidate_liquid(
+        subject.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
@@ -2429,7 +2429,7 @@ def test_consolidate_liquid_raises_if_tip_policy_per_source(
     with pytest.raises(
         RuntimeError, match='"per source" incompatible with consolidate.'
     ):
-        subject.consolidate_liquid(
+        subject.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
@@ -2464,7 +2464,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
     decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
-    subject.consolidate_liquid(
+    subject.consolidate_with_liquid_class(
         liquid_class=test_liq_class,
         volume=10,
         source=[mock_well],
@@ -2474,7 +2474,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
         return_tip=True,
     )
     decoy.verify(
-        mock_instrument_core.consolidate_liquid(
+        mock_instrument_core.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[(Location(Point(), labware=mock_well), mock_well._core)],
@@ -2525,7 +2525,7 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
-    subject.consolidate_liquid(
+    subject.consolidate_with_liquid_class(
         liquid_class=test_liq_class,
         volume=10,
         source=[[mock_well, mock_well]],
@@ -2535,7 +2535,7 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
         return_tip=True,
     )
     decoy.verify(
-        mock_instrument_core.consolidate_liquid(
+        mock_instrument_core.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[

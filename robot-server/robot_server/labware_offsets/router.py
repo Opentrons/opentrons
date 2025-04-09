@@ -79,8 +79,7 @@ async def post_labware_offsets(  # noqa: D103
         )
     ]
 
-    for new_offset in new_offsets:
-        store.add(new_offset)
+    store.add(new_offsets)
 
     stored_offsets = [
         StoredLabwareOffset.model_construct(

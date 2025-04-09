@@ -39,12 +39,17 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
   const allDefinitions = getAllDefinitions()
   const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
     const { moduleDef, slotName } = module
-    const stackOnModule = Object.entries(startingDeck).find(([key, value]) =>
+    const slotAndStackOnModule = Object.entries(
+      startingDeck
+    ).find(([key, value]) =>
       value.some(
         (stackItem): stackItem is ModuleInStack =>
           'moduleId' in stackItem && stackItem.moduleId === module.moduleId
       )
-    )?.[1]
+    )
+    const slotDisplayName = slotAndStackOnModule?.[0]
+    const stackOnModule = slotAndStackOnModule?.[1]
+
     const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
     const topLabwareDefinition =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -70,7 +75,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       nestedLabwareDef: topLabwareDefinition,
       nestedLabwareWellFill: wellFill,
       onLabwareClick: () => {
-        handleLabwareClick([slotName, stackOnModule ?? []])
+        handleLabwareClick([slotDisplayName ?? slotName, stackOnModule ?? []])
       },
       highlightLabware: true,
       moduleChildren: null,

@@ -135,7 +135,7 @@ def _offset_location_sequence_to_legacy_offset_location(
     )
     (
         cutout_id,
-        cutout_fixtures,
+        _cutout_fixtures,
     ) = deck_configuration_provider.get_potential_cutout_fixtures(
         last_element.addressableAreaName, deck_definition
     )

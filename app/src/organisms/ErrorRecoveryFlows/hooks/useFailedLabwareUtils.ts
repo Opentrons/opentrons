@@ -271,7 +271,10 @@ function useTipSelectionUtils(
 
   // Use this labware to represent all tip racks for manual tip selection.
   const tipSelectorDef = useMemo(
-    () => getAllLabwareDefs().thermoscientificnunc96Wellplate1300UlV1,
+    () =>
+      getAllLabwareDefs()[
+        'opentrons/thermoscientificnunc_96_wellplate_1300ul/1'
+      ],
     []
   )
 

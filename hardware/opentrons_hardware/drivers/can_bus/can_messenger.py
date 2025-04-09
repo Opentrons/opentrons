@@ -348,7 +348,11 @@ class CanMessenger:
         listener: MessageListenerCallback,
         filter: Optional[MessageListenerCallbackFilter] = None,
     ) -> None:
-        """Add a message listener."""
+        """Add a message listener.
+
+        Will not leak listener objects if called multiple times with the same-by-identity
+        function; it will overwrite the old entry each time in that case.
+        """
         self._listeners[listener] = listener, filter
 
     def remove_listener(self, listener: MessageListenerCallback) -> None:
