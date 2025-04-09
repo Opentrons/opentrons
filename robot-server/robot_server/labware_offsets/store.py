@@ -68,25 +68,26 @@ class LabwareOffsetStore:
 
     def add(
         self,
-        offset: IncomingStoredLabwareOffset,
+        offsets: list[IncomingStoredLabwareOffset],
     ) -> None:
-        """Store a new labware offset."""
+        """Store new labware offsets."""
         with self._sql_engine.begin() as transaction:
-            offset_row_id = transaction.execute(
-                sqlalchemy.insert(labware_offset_table).values(
-                    _pydantic_to_sql_offset(offset)
+            for offset in offsets:
+                offset_row_id = transaction.execute(
+                    sqlalchemy.insert(labware_offset_table).values(
+                        _pydantic_to_sql_offset(offset)
+                    )
+                ).inserted_primary_key.row_id
+                location_components_to_insert = list(
+                    _pydantic_to_sql_location_sequence_iterator(offset, offset_row_id)
                 )
-            ).inserted_primary_key.row_id
-            location_components_to_insert = list(
-                _pydantic_to_sql_location_sequence_iterator(offset, offset_row_id)
-            )
-            if location_components_to_insert:
-                transaction.execute(
-                    sqlalchemy.insert(
-                        labware_offset_location_sequence_components_table
-                    ),
-                    location_components_to_insert,
-                )
+                if location_components_to_insert:
+                    transaction.execute(
+                        sqlalchemy.insert(
+                            labware_offset_location_sequence_components_table
+                        ),
+                        location_components_to_insert,
+                    )
         self._publish_change_notification()
 
     def get_all(self) -> list[StoredLabwareOffset]:

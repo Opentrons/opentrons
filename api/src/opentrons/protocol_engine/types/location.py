@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Literal, Union, TypeGuard
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from opentrons.types import DeckSlotName, StagingSlotName
 
@@ -107,7 +108,7 @@ class OnLabwareLocationSequenceComponent(BaseModel):
 
     kind: Literal["onLabware"] = "onLabware"
     labwareId: str
-    lidId: str | None
+    lidId: str | SkipJsonSchema[None] = Field(None)
 
 
 class OnModuleLocationSequenceComponent(BaseModel):
