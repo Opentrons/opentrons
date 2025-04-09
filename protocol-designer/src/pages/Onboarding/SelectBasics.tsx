@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
 import { uuid } from '@opentrons/step-generation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   ALIGN_CENTER,
   Btn,
@@ -44,6 +44,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
   const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
   const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
+  const ref = useRef<HTMLDivElement | null>(null)
 
   const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
@@ -86,6 +87,19 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   } else if (!noPipette) {
     subStepNumber = 3
   }
+
+  const handleScrollToBottom = (): void => {
+    if (ref.current != null) {
+      ref.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+      })
+    }
+  }
+
+  useEffect(() => {
+    handleScrollToBottom()
+  }, [pipetteModal])
 
   return (
     <>
@@ -288,7 +302,11 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
             </>
           ) : null}
           {robotType === FLEX_ROBOT_TYPE && !noPipette && (
-            <>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              ref={ref}
+              gridGap={SPACING.spacing60}
+            >
               <BasicsButtons
                 type="gripper"
                 subHeader={t('some_modules_require_gripper')}
@@ -358,7 +376,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 }}
                 isSelected={additionalEquipment.includes('wasteChute')}
               />
-            </>
+            </Flex>
           )}
         </WizardBody>
       </HandleEnter>
