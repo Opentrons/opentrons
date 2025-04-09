@@ -159,6 +159,7 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
       case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return 'stacked'
       default:
         return 'default'

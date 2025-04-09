@@ -49,9 +49,6 @@ describe('ManualReplaceLwAndRetry', () => {
       stepCounts: {
         hasRunDiverged: false,
       },
-      recoveryCommands: {
-        homeShuttle: vi.fn(),
-      },
     } as any
   })
 
