@@ -4,7 +4,7 @@ import { screen, waitFor } from '@testing-library/react'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RetrySameTips, RetrySameTipsInfo } from '../RetrySameTips'
+import { RetrySameTips, RetryWithSameTips } from '../RetrySameTips'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { clickButtonLabeled } from '../../__tests__/util'
@@ -22,9 +22,9 @@ const render = (props: ComponentProps<typeof RetrySameTips>) => {
 }
 
 const renderRetrySameTipsInfo = (
-  props: ComponentProps<typeof RetrySameTipsInfo>
+  props: ComponentProps<typeof RetryWithSameTips>
 ) => {
-  return renderWithProviders(<RetrySameTipsInfo {...props} />, {
+  return renderWithProviders(<RetryWithSameTips {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -72,7 +72,7 @@ describe('RetrySameTips', () => {
 })
 
 describe('RetrySameTipsInfo', () => {
-  let props: ComponentProps<typeof RetrySameTipsInfo>
+  let props: ComponentProps<typeof RetryWithSameTips>
   let mockhandleMotionRouting: Mock
   let mockRetryFailedCommand: Mock
   let mockResumeRun: Mock
