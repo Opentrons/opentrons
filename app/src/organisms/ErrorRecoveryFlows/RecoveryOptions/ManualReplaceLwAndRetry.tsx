@@ -13,6 +13,7 @@ import {
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps, RouteStep } from '../types'
+import { TwoColTextAndImage } from '../shared/TwoColTextAndImage'
 
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps
@@ -23,13 +24,26 @@ export function ManualReplaceLwAndRetry(
     MANUAL_REPLACE_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    ROBOT_IN_MOTION,
   } = RECOVERY_MAP
 
   const { t } = useTranslation('error_recovery')
-  const { routeUpdateActions } = props
-  const { proceedToRouteAndStep } = routeUpdateActions
-  const primaryBtnOnClick = (): Promise<void> =>
-    proceedToRouteAndStep(route, buildNextStep())
+  const { routeUpdateActions, recoveryCommands } = props
+  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
+  const { homeShuttle } = recoveryCommands
+
+  const primaryBtnOnClick = (): Promise<void> => {
+    return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
+      if (route === LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE) {
+        void homeShuttle().then(() => {
+          proceedToRouteAndStep(route, buildNextStep())
+        })
+      } else {
+        proceedToRouteAndStep(route, buildNextStep())
+      }
+    })
+  }
 
   const buildNextStep = (): RouteStep => {
     if (doorStatusUtils.isDoorOpen) {
@@ -45,6 +59,9 @@ export function ManualReplaceLwAndRetry(
         case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
           return RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
             .CONFIRM_RETRY
+        case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+          return RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS
+            .MANUAL_REPLACE
         default:
           return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
       }
@@ -68,8 +85,12 @@ export function ManualReplaceLwAndRetry(
         return <RecoveryDoorOpenSpecial {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
         return <TwoColLwInfoAndDeck {...props} />
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
+        return <TwoColTextAndImage {...props} />
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
         return (
           <TwoColTextAndFailedStepNextStep
             {...props}
