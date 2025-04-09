@@ -20,8 +20,7 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import {useModuleCommandAnalytics} from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
-
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface UseRunProgressResult {
   currentStepContents: ReactNode
@@ -131,24 +130,24 @@ export function useRunProgressCopy({
       }
     }
   })()
-  const {reportModuleCommand} = useModuleCommandAnalytics()
+  const { reportModuleCommand } = useModuleCommandAnalytics()
   // Check if error occurred, then determine type
-  let error; 
+  let error
   if (typeof runCommandDetails?.data?.error === 'object') {
-    error = runCommandDetails?.data?.error?.errorType;
+    error = runCommandDetails?.data?.error?.errorType
   }
 
   reportModuleCommand({
     kind: 'protocolCommand',
-    analyticCommand: runCommandDetails?.data?.commandType ?? "",
+    analyticCommand: runCommandDetails?.data?.commandType ?? '',
     result: {
       status: runCommandDetails?.data?.status ?? undefined,
-      data: runCommandDetails?.data?.result
+      data: runCommandDetails?.data?.result,
     },
-    errorDetails: error ?? "",
+    errorDetails: error ?? '',
     params: runCommandDetails?.data?.params ?? undefined,
-    runId: runId ?? "",
-  });
+    runId: runId ?? '',
+  })
 
   return {
     currentStepContents,
