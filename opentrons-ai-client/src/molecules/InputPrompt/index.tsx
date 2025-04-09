@@ -122,6 +122,8 @@ export function InputPrompt(): JSX.Element {
         ? getCreateOrUpdateEndpoint()
         : getChatEndpoint()
 
+      console.log({ watchUserPrompt })
+
       const config = {
         url,
         method: 'POST',

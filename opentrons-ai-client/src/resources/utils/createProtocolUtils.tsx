@@ -257,6 +257,47 @@ export function generateChatPrompt(
     values.application.scientificApplication
   )}`
   const description = `- ${values.application.description}`
+
+   // we need to do this nonsense to convert pipette names to api load names
+  // this data does not yet live in  pipette defs, but hopefully aill within 6 months
+  // of writing this comment. https://opentrons.atlassian.net/browse/EXEC-1426
+  let leftPipetteApiLoadName: string | null = null
+  let rightPipetteApiLoadName: string | null = null
+
+  if (values.instruments.pipettes === TWO_PIPETTES) {
+    const leftPipetteSpecs = getPipetteSpecsV2(
+      values.instruments.leftPipette as PipetteName
+    )
+    const rightPipetteSpecs = getPipetteSpecsV2(
+      values.instruments.rightPipette as PipetteName
+    )
+    if (leftPipetteSpecs != null) {
+      leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
+    }
+
+    if (rightPipetteSpecs != null) {
+      rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
+    }
+  }
+
+  const leftPipettePromptName =
+    leftPipetteApiLoadName ?? values.instruments.leftPipette
+  const rightPipettePromptName =
+    rightPipetteApiLoadName ?? values.instruments.rightPipette
+
+  const mounts: string[] =
+    values.instruments.pipettes === TWO_PIPETTES
+      ? [
+          values.instruments.leftPipette !== NO_PIPETTES
+            ? `left pipette ${leftPipettePromptName}`
+            : '',
+          values.instruments.rightPipette !== NO_PIPETTES
+            ? `right pipette ${rightPipettePromptName}`
+            : '',
+        ].filter(Boolean)
+      : [values.instruments.pipettes]
+      
+  // this is what you want to change
   const pipetteMounts =
     values.instruments.pipettes === TWO_PIPETTES
       ? [
@@ -309,44 +350,6 @@ export function generateChatPrompt(
   )}:\n${modules}\n\n${t('labware_section_title')}:\n${labwares}\n\n${t(
     'liquid_section_title'
   )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
-
-  // we need to do this nonsense to convert pipette names to api load names
-  // this data does not yet live in  pipette defs, but hopefully aill within 6 months
-  // of writing this comment. https://opentrons.atlassian.net/browse/EXEC-1426
-  let leftPipetteApiLoadName: string | null = null
-  let rightPipetteApiLoadName: string | null = null
-
-  if (values.instruments.pipettes === TWO_PIPETTES) {
-    const leftPipetteSpecs = getPipetteSpecsV2(
-      values.instruments.leftPipette as PipetteName
-    )
-    const rightPipetteSpecs = getPipetteSpecsV2(
-      values.instruments.rightPipette as PipetteName
-    )
-    if (leftPipetteSpecs != null) {
-      leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
-    }
-
-    if (rightPipetteSpecs != null) {
-      rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
-    }
-  }
-
-  const mounts: string[] =
-    values.instruments.pipettes === TWO_PIPETTES
-      ? [
-          values.instruments.leftPipette !== NO_PIPETTES
-            ? `left pipette ${
-                leftPipetteApiLoadName ?? values.instruments.leftPipette
-              }`
-            : '',
-          values.instruments.rightPipette !== NO_PIPETTES
-            ? `right pipette ${
-                rightPipetteApiLoadName ?? values.instruments.rightPipette
-              }`
-            : '',
-        ].filter(Boolean)
-      : [values.instruments.pipettes]
 
   setCreateProtocolChatAtom({
     prompt,

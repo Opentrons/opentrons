@@ -107,3 +107,16 @@ export interface PromptData {
     }
   }
 }
+
+export interface EntityData {
+  robotType: string
+  description: string
+  scientificApplication: string
+  pipettes: any
+  gripper: boolean
+  modules: any
+  labware: any
+  liquid: any
+  steps: any
+  t: any
+}

@@ -5,6 +5,7 @@ import type {
   ChatData,
   CreatePrompt,
   CreateProtocolAtomProps,
+  EntityData,
   HeaderWithMeterAtomProps,
   Mixpanel,
   UpdatePrompt,
@@ -30,8 +31,19 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
   fake_id: 0,
 })
 
-/** CreateProtocolChatAtom is for the prefilled userprompt when navigating to the chat page from Update Protocol page */
+/** updateProtocolChatAtom is for the prefilled userprompt when navigating to the chat page from Update Protocol page */
 export const updateProtocolChatAtom = atom<UpdatePrompt>({
+  prompt: '',
+  protocol_text: '',
+  regenerate: false,
+  update_type: 'adapt_python_protocol',
+  update_details: '',
+  fake: false,
+  fake_id: 0,
+})
+
+/** entityDataAtom represents all of the data required to generate a prompt */
+export const entityDataAtom = atom<EntityData>({
   prompt: '',
   protocol_text: '',
   regenerate: false,
