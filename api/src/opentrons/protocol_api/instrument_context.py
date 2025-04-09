@@ -70,6 +70,16 @@ _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
 
 
+class _Unset:
+    """A sentinel value when no value has been supplied for an argument.
+    User code should never use this explicitly."""
+
+    def __repr__(self):
+        # Without this, the generated docs render the argument as
+        # "<opentrons.protocol_api.instrument_context._Unset object at 0x1234>"
+        return self.__class__.__name__
+
+
 class InstrumentContext(publisher.CommandPublisher):
     """
     A context for a specific pipette or instrument.
@@ -650,7 +660,7 @@ class InstrumentContext(publisher.CommandPublisher):
         radius: float = 1.0,
         v_offset: float = -1.0,
         speed: float = 60.0,
-        mm_from_edge: Optional[float] = None,
+        mm_from_edge: Union[float | _Unset] = _Unset(),
     ) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
@@ -720,7 +730,7 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             raise TypeError(f"location should be a Well, but it is {location}")
 
-        if mm_from_edge is not None:
+        if not isinstance(mm_from_edge, _Unset):
             if self.api_version < APIVersion(2, 24):
                 raise APIVersionError(
                     api_element="mm_from_edge",
@@ -751,7 +761,7 @@ class InstrumentContext(publisher.CommandPublisher):
             radius=radius,
             z_offset=v_offset,
             speed=checked_speed,
-            mm_from_edge=mm_from_edge,
+            mm_from_edge=mm_from_edge if not isinstance(mm_from_edge, _Unset) else None,
         )
         return self
 
