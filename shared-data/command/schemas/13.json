@@ -1865,17 +1865,10 @@
           "title": "Count"
         },
         "message": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
           "description": "The message to display on connected clients during a manualWithPause strategy empty.",
-          "title": "Message"
+          "title": "Message",
+          "type": "string"
         },
         "moduleId": {
           "description": "Unique ID of the Flex Stacker",
@@ -2185,17 +2178,10 @@
           "title": "Count"
         },
         "message": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
           "description": "The message to display on connected clients during a manualWithPause strategy fill.",
-          "title": "Message"
+          "title": "Message",
+          "type": "string"
         },
         "moduleId": {
           "description": "Unique ID of the Flex Stacker",
@@ -5092,16 +5078,10 @@
       "description": "Input parameters for a setStoredLabware command.",
       "properties": {
         "adapterLabware": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/StackerStoredLabwareDetails"
-            },
-            {
-              "type": "null"
-            }
-          ],
+          "$ref": "#/$defs/StackerStoredLabwareDetails",
           "default": null,
-          "description": "The details of the adapter under the primary labware, if any."
+          "description": "The details of the adapter under the primary labware, if any.",
+          "title": "Adapterlabware"
         },
         "initialCount": {
           "anyOf": [
@@ -5118,16 +5098,10 @@
           "title": "Initialcount"
         },
         "lidLabware": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/StackerStoredLabwareDetails"
-            },
-            {
-              "type": "null"
-            }
-          ],
+          "$ref": "#/$defs/StackerStoredLabwareDetails",
           "default": null,
-          "description": "The details of the lid on the primary labware, if any."
+          "description": "The details of the lid on the primary labware, if any.",
+          "title": "Lidlabware"
         },
         "moduleId": {
           "description": "Unique ID of the Flex Stacker.",
