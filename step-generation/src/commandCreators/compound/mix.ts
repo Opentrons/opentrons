@@ -159,9 +159,11 @@ export function mixUtil(args: {
           flowRate: dispenseFlowRateUlSec,
           tipRack,
           nozzles: nozzles,
-          ...(finalPushOut == null
+          ...(i < times - 1
+            ? { pushOut: 0 }
+            : finalPushOut == null
             ? {}
-            : { pushOut: i === times - 1 ? finalPushOut : 0 }), // only push out if final repetition
+            : { pushOut: finalPushOut }), // only push out if final repetition
         }),
         ...getDelayCommand(dispenseDelaySeconds),
       ]
