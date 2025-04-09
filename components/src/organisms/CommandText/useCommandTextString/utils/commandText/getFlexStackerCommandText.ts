@@ -7,6 +7,8 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
+import { getLabwareDisplayLocation } from '../../utils/getLabwareDisplayLocation'
+import {getLabwareDefinitionsFromCommands} from '../../utils/getLabwareDefinitionsFromCommands'
 
 export type FlexStackerCommand =
   | FlexStackerSetStoredLabwareRunTimeCommand
@@ -44,6 +46,10 @@ GetFlexStackerCommandText): string => {
   console.log('allRunDefs: ', allRunDefs)
   console.log('command: ', command)
   if (command.commandType === 'flexStacker/retrieve') {
+    const slotName = getLabwareDisplayLocation(command.params)
+    console.log("slotName: ", slotName)
+    const labwareDef = getLabwareDefinitionsFromCommands(commandTextData?.commands)
+    console.log("labwareDef: ", labwareDef)
     return (
       'flexStacker/retrieve' +
       'Retrieve {command.result.primaryLabwareURI} from Flex Stacker to slotLocation'
