@@ -11,11 +11,13 @@ from opentrons.drivers.flex_stacker.types import (
     MoveParams,
     MoveResult,
     StackerAxis,
+    TOFSensor,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
     STALLGUARD_CONFIG,
+    TOF_DETECTION_CONFIG,
     FlexStackerDriver,
 )
 from opentrons.drivers.flex_stacker.abstract import AbstractFlexStackerDriver
@@ -37,10 +39,12 @@ from opentrons.hardware_control.modules.types import (
 )
 
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+from opentrons_shared_data.module import load_tof_baseline_data
+
 
 log = logging.getLogger(__name__)
 
-POLL_PERIOD = 1.0
+POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
 DFU_PID = "df11"
@@ -62,6 +66,9 @@ OFFSET_LG = 20.0
 
 # height limit in mm of labware to use OFFSET_MD used when storing labware.
 MEDIUM_LABWARE_Z_LIMIT = 20.0
+
+# The name of the tof sensor baseline file
+TOF_BASELINE_FILE = "tof_baseline.json"
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -435,6 +442,31 @@ class FlexStacker(mod_abc.AbstractModule):
             await self.close_latch()
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
+
+    async def labware_detected(self, axis: StackerAxis, direction: Direction) -> bool:
+        """Detect labware on the TOF sensor using the `baseline` method
+
+        NOTE: This method is still under development and is inconsistent when detecting
+        labware on the X axis smaller than a tiprack. We can consistently detect
+        labware on the Z, but we need to do more data collection and testing
+        to validate this method.
+        """
+        sensor = TOFSensor.X if axis == StackerAxis.X else TOFSensor.Z
+        baseline = load_tof_baseline_data(self.model())[sensor.value]
+        histogram = await self._driver.get_tof_histogram(sensor)
+        config = TOF_DETECTION_CONFIG[sensor][direction]
+        for zone in config.zones:
+            raw_data = histogram.bins[zone]
+            baseline_data = baseline[zone]
+            for bin in config.bins:
+                # We need to ignore raw photon count below N photons as
+                # it becomes inconsistent to detect labware given false positives.
+                if raw_data[bin] < config.threshold:
+                    continue
+                delta = raw_data[bin] - baseline_data[bin]
+                if delta > 0:
+                    return True
+        return False
 
 
 class FlexStackerReader(Reader):

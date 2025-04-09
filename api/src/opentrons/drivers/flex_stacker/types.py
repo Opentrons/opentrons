@@ -329,6 +329,7 @@ class TOFDetection:
     sensor: TOFSensor
     zones: List[int]
     bins: list[int]
+    threshold: int
 
 
 @dataclass
