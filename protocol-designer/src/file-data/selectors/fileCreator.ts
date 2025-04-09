@@ -375,6 +375,7 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
           labware: getLabwareLoadInfo(labwareEntities, labwareNicknamesById),
         },
       },
+      metadata: fileMetadata,
     }
 
     const pythonProtocol =

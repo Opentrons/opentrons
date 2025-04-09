@@ -67,6 +67,7 @@ export function CheckboxExpandStepFormField(
                 onClick={() => {
                   updateValue(!value)
                 }}
+                disabled={disabled}
               >
                 <Check
                   color={COLORS.blue50}

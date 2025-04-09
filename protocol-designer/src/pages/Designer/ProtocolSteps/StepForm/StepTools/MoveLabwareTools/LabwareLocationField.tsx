@@ -53,6 +53,7 @@ export function LabwareLocationField(
       {...props}
       options={unoccupiedLabwareLocationsOptions}
       errorToShow={props.errorToShow}
+      width="100%"
       title={t('protocol_steps:new_location')}
       onEnter={(id: string) => {
         dispatch(

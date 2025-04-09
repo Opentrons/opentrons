@@ -268,6 +268,13 @@ def run(protocol: protocol_api.ProtocolContext):
         name: 'opentrons/protocol-designer',
       },
       robot: { model: OT2_ROBOT_TYPE },
+      metadata: {
+        author: 'The Author',
+        created: 1582667312515,
+        description: 'Protocol description',
+        protocolName: 'Test Protocol',
+        source: 'Protocol Designer',
+      },
     })
   })
 })
