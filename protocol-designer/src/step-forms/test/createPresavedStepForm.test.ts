@@ -274,6 +274,8 @@ describe('createPresavedStepForm', () => {
         blowout_flowRate: null,
         liquidClassesSupported: true,
         liquidClass: 'none',
+        pushOut_checkbox: null,
+        pushOut_volume: null,
       })
     })
   })

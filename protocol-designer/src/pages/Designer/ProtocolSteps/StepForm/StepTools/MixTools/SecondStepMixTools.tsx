@@ -15,6 +15,8 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
 } from '../../../../../../components/molecules'
+import { getMaxPushOutVolume } from '../../../../../../utils'
+import { getPipetteEntities } from '../../../../../../step-forms/selectors'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -77,6 +79,12 @@ export function SecondStepMixTools({
       })
     }
   }
+
+  const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
+  const maxPushoutVolume = getMaxPushOutVolume(
+    Number(formData.volume),
+    pipetteSpec
+  )
 
   return (
     <>
@@ -144,7 +152,7 @@ export function SecondStepMixTools({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`0 ${SPACING.spacing16}`}
-          gridGap={SPACING.spacing8}
+          gridGap={SPACING.spacing4}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('protocol_steps:advanced_settings')}
@@ -173,6 +181,33 @@ export function SecondStepMixTools({
           </CheckboxExpandStepFormField>
           {tab === 'dispense' ? (
             <>
+              <CheckboxExpandStepFormField
+                title={i18n.format(
+                  t('form:step_edit_form.field.pushOut.title'),
+                  'capitalize'
+                )}
+                fieldProps={propsForFields.pushOut_checkbox}
+              >
+                {formData.pushOut_checkbox === true ? (
+                  <InputStepFormField
+                    showTooltip={false}
+                    padding="0"
+                    title={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.label'
+                    )}
+                    caption={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.caption',
+                      { min: 0, max: maxPushoutVolume }
+                    )}
+                    {...propsForFields.pushOut_volume}
+                    units={t('application:units.microliter')}
+                    errorToShow={getFormLevelError(
+                      'pushOut_volume',
+                      mappedErrorsToField
+                    )}
+                  />
+                ) : null}
+              </CheckboxExpandStepFormField>
               <CheckboxExpandStepFormField
                 title={i18n.format(
                   t('form:step_edit_form.field.blowout.label'),

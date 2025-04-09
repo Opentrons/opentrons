@@ -47,6 +47,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     wellLocation,
     nozzles,
     tipRack,
+    pushOut,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
@@ -227,8 +228,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
         wellName,
         wellLocation,
         flowRate,
-        //  pushOut will always be undefined in step-generation for now
-        //  since there is no easy way to allow users to  for it in PD
+        ...(pushOut != null ? { pushOut } : {}),
       },
       ...(isAirGap && { meta: { isAirGap } }),
     },
@@ -246,6 +246,8 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     // rate= is a ratio in the PAPI, and we have no good way to figure out what
     // flowrate the PAPI has set the pipette to, so we just have to emit a division:
     `rate=${flowRate} / ${pipettePythonName}.flow_rate.dispense`,
+    // only pass push_out if it is not null
+    ...(pushOut != null ? [`push_out=${pushOut}`] : []),
     // PAPI has no way to indicate that we're dispensing air, so we don't do anything
     // with the isAirGap parameter.
   ]
