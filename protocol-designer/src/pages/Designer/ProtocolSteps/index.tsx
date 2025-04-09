@@ -91,77 +91,84 @@ export function ProtocolSteps(): JSX.Element {
       </Flex>
       <Flex
         flex="2.85"
-        alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
         height="100%"
         position={POSITION_RELATIVE}
-        overflow={OVERFLOW_AUTO}
+        overflowY={OVERFLOW_AUTO}
       >
         <Flex
+          width="100%"
+          height="100%"
+          overflow={OVERFLOW_AUTO}
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing24}
-          width={CONTENT_MAX_WIDTH}
-          justifyContent={JUSTIFY_CENTER}
-          paddingY={SPACING.spacing120}
         >
-          {showTimelineAlerts ? (
-            <TimelineAlerts
-              justifyContent={JUSTIFY_CENTER}
-              width="100%"
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing4}
-            />
-          ) : null}
-          <Flex
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-            height="2.25rem"
-          >
-            {currentStep != null && hoveredTerminalItem == null ? (
-              <StyledText desktopStyle="headingSmallBold">
-                {i18n.format(currentStep.stepName, 'titleCase')}
-              </StyledText>
-            ) : null}
-            {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
-            currentHoveredStepId == null ? (
-              <StyledText desktopStyle="headingSmallBold">
-                {t(hoveredTerminalItem ?? selectedTerminalItem)}
-              </StyledText>
-            ) : null}
-
-            <ToggleGroup
-              selectedValue={deckView}
-              leftText={leftString}
-              rightText={rightString}
-              leftClick={() => {
-                setDeckView(leftString)
-              }}
-              rightClick={() => {
-                setDeckView(rightString)
-              }}
-            />
-          </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing16}
-            height="100%"
+            gridGap={SPACING.spacing24}
+            width={CONTENT_MAX_WIDTH}
+            justifyContent={JUSTIFY_CENTER}
+            paddingY={SPACING.spacing120}
+            marginX="auto"
           >
-            {deckView === leftString ? (
-              <DeckSetupContainer tab="protocolSteps" />
-            ) : (
-              <OffDeck tab="protocolSteps" />
-            )}
-            {/* avoid shifting the deck view container */}
-            <Flex
-              height={STEP_SUMMARY_HEIGHT}
-              opacity={formData == null ? 1 : 0}
-            >
-              <StepSummary
-                currentStep={currentStep}
-                stepDetails={stepDetails}
+            {showTimelineAlerts ? (
+              <TimelineAlerts
+                justifyContent={JUSTIFY_CENTER}
+                width="100%"
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing4}
               />
+            ) : null}
+            <Flex
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+              height="2.25rem"
+            >
+              {currentStep != null && hoveredTerminalItem == null ? (
+                <StyledText desktopStyle="headingSmallBold">
+                  {i18n.format(currentStep.stepName, 'titleCase')}
+                </StyledText>
+              ) : null}
+              {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
+              currentHoveredStepId == null ? (
+                <StyledText desktopStyle="headingSmallBold">
+                  {t(hoveredTerminalItem ?? selectedTerminalItem)}
+                </StyledText>
+              ) : null}
+
+              <ToggleGroup
+                selectedValue={deckView}
+                leftText={leftString}
+                rightText={rightString}
+                leftClick={() => {
+                  setDeckView(leftString)
+                }}
+                rightClick={() => {
+                  setDeckView(rightString)
+                }}
+              />
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing16}
+              // height="100%"
+            >
+              {deckView === leftString ? (
+                <DeckSetupContainer tab="protocolSteps" />
+              ) : (
+                <OffDeck tab="protocolSteps" />
+              )}
+              {/* avoid shifting the deck view container */}
+              <Flex
+                height={STEP_SUMMARY_HEIGHT}
+                opacity={formData == null ? 1 : 0}
+              >
+                <StepSummary
+                  currentStep={currentStep}
+                  stepDetails={stepDetails}
+                />
+              </Flex>
             </Flex>
           </Flex>
         </Flex>
