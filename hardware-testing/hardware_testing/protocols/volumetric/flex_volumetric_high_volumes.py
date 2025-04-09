@@ -16,6 +16,7 @@ from opentrons.protocol_api import (
     AbsorbanceReaderContext,
     LiquidClass,
 )
+from opentrons.protocol_api.labware import OutOfTipsError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import OT3Mount
@@ -33,6 +34,10 @@ assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
 SHAKER_MAX_UL = 250
 SHAKER_RPM_250ul = 1100  # NOTE: 200ul in well is 1500 rpm
 SHAKER_SECONDS = 60
+
+# NOTE: to test 1000ul, we need more plates and tips,
+#       which can be done with more effort into loading things from off deck
+MAX_96_CH_UL_PER_TIP = SHAKER_MAX_UL
 
 # NOTE: (sigler) tip volume probably never changes from 1000uL
 #       because high-volume aspirate are tip priority for this test
@@ -184,16 +189,21 @@ class _TestTrial:
         )
 
         # always try to aspirate 1000ul (b/c it creates largest Z travel)
-        ul_to_remove = min(max_vol - min_vol, pipette.max_volume)
+        ul_to_remove = min(
+            max_vol - min_vol,
+            pipette.max_volume * pipette.channels,
+            MAX_96_CH_UL_PER_TIP * 96,
+        )
         ul_to_add = min_vol + ul_to_remove
 
         # split aspirate ul into 1-4x dispenses
-        destination_count: int = int(ceil(ul_to_remove / SHAKER_MAX_UL))
+        asp_ul_when_removing = ul_to_remove / pipette.channels
+        destination_count: int = int(ceil(asp_ul_when_removing / SHAKER_MAX_UL))
         assert destination_count in [1, 4], (
             f"unable to support multi-dispense (aka: distribute) "
             f"with {destination_count}x dispenses"
         )
-        dispense_ul: float = ul_to_remove / destination_count
+        dispense_ul: float = asp_ul_when_removing / destination_count
 
         return _TestTrial(
             mode=mode,
@@ -219,7 +229,7 @@ class _TestTrial:
             _pick_up_tip_and_zero_min_height(ctx, pipette)
         pipette.transfer_liquid(
             add_liquid_class,
-            volume=self.ul_to_add,
+            volume=self.ul_to_add / pipette.channels,
             source=src,
             dest=self.test_well,
             new_tip="never",
@@ -238,7 +248,7 @@ class _TestTrial:
         # MULTI-DISPENSE TO PLATE
         pipette.distribute_liquid(
             remove_liquid_class,
-            volume=self.ul_to_remove / len(dst_wells),
+            volume=self.dispense_ul,
             source=self.test_well,
             dest=dst_wells,
             new_tip="never",
@@ -329,7 +339,13 @@ def _binary_search_liquid_volume_at_height(
 def _pick_up_tip_and_zero_min_height(
     ctx: ProtocolContext, pipette: InstrumentContext
 ) -> None:
-    pipette.pick_up_tip()
+    try:
+        pipette.pick_up_tip()
+    except OutOfTipsError:
+        pipette._retract()
+        ctx.pause("Replace empty tip-racks")
+        pipette.reset_tipracks()
+        pipette.pick_up_tip()
     if ctx.params.disable_minimum_lld_height:  # type: ignore[attr-defined]
         pipette_id = pipette._core.pipette_id  # type: ignore[attr-defined]
         if (
@@ -517,7 +533,7 @@ def run(ctx: ProtocolContext) -> None:
     num_tip_slots = len([s for s in SLOTS.keys() if "tip" in s])
     rack_ln = "opentrons_flex_96_tiprack_1000ul"
     rack_slots = [SLOTS[f"tips_{i + 1}"] for i in range(num_tip_slots)]
-    if ctx.params.channels == 96:
+    if ctx.params.channels == 96:  # type: ignore[attr-defined]
         adapter_ln = "opentrons_flex_96_tiprack_adapter"
         tip_racks = [
             ctx.load_adapter(adapter_ln, slot).load_labware(rack_ln)
@@ -562,7 +578,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.load_labware(DST_LABWARE, location=SLOTS["stack"], label="plate_water")
     ]
     dispenses_per_aspirate = ceil(pipette.max_volume / SHAKER_MAX_UL)
-    total_dst_wells = len(test_labware.wells()) * dispenses_per_aspirate
+    total_dst_wells = len(test_labware.wells()) * dispenses_per_aspirate * channels
     total_dst_plates = ceil(total_dst_wells / 96)
     for _ in range(total_dst_plates):
         plate = stack[-1].load_labware(DST_LABWARE, label=f"plate_{len(stack)}")
@@ -573,15 +589,18 @@ def run(ctx: ProtocolContext) -> None:
     # TRIALS -> DESTINATION-WELLS
     trials_and_dst_wells: List[Tuple[_TestTrial, List[Well]]] = []
     # NOTE: reversing plates and skipping water plate (bottom)
-    remaining_dst_wells = [w for p in stack[-1:0:-1] for w in p.wells()]
+    remaining_destinations = [w for p in stack[-1:0:-1] for w in p.wells()]
     for test_well in test_labware.wells():
         trial = _TestTrial.build(ctx, pipette, test_labware, test_well.well_name)
         dst_wells = [
-            remaining_dst_wells.pop(0) for _ in range(trial.destination_count)  # pop!
+            remaining_destinations.pop(0)  # pop!
+            for _ in range(trial.destination_count)
+            for _ in range(channels)
         ]
+        unique_labware = set([w.parent for w in dst_wells])
         assert (
-            len(set([w.parent for w in dst_wells])) == 1
-        ), "destination wells must be in same plate"
+            len(unique_labware) == 1
+        ), f"destination wells must be in same plate: {unique_labware}"
         trials_and_dst_wells.append((trial, dst_wells))
     unique_dispense_uls = set([t.dispense_ul for t, _ in trials_and_dst_wells])
     assert len(unique_dispense_uls) == 1, (
@@ -674,20 +693,21 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     # TRANSFER WATER
-    water_plate = stack[0]
-    water_wells = water_plate.wells()
-    ctx.move_labware(water_plate, shaker_adapter, use_gripper=True)
+    plate = stack[0]
+    ctx.move_labware(plate, shaker_adapter, use_gripper=True)
     shaker_module.close_labware_latch()
     _pick_up_tip_and_zero_min_height(ctx, pipette)
-    num_dispenses = 1 if test_labware["A1"].max_volume < 500 else 4
-    for i in range(0, len(water_wells), num_dispenses):
+    dests = plate.columns() if channels == 8 else plate.wells()
+    if channels == 96:
+        dests = [dests]
+    for dest in dests:
         pipette.distribute_liquid(
             water_cls,
             volume=shared_dispense_ul,
             source=water_src_well,
-            dest=[water_wells[i + n] for n in range(num_dispenses)],
+            dest=dest,
             new_tip="never",
         )
     pipette.drop_tip()
-    _shake_then_read(ctx, water_plate, shaker_module, reader_module, just_read=True)
-    ctx.move_labware(water_plate, new_location=done_stack[-1], use_gripper=True)
+    _shake_then_read(ctx, plate, shaker_module, reader_module, just_read=True)
+    ctx.move_labware(plate, new_location=done_stack[-1], use_gripper=True)
