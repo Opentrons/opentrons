@@ -660,7 +660,7 @@ class InstrumentContext(publisher.CommandPublisher):
         radius: float = 1.0,
         v_offset: float = -1.0,
         speed: float = 60.0,
-        mm_from_edge: Union[float | _Unset] = _Unset(),
+        mm_from_edge: Union[float, _Unset] = _Unset(),
     ) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
