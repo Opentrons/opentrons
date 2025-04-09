@@ -206,7 +206,7 @@ async def run(
         ui.print_header("JOG to 96-Tip RACK")
         if trial == 0:
             tip_rack = str(pipette) + "ul"
-            test_volume = pipette
+            test_volume: int = pipette
         else:
             tip_rack = "50ul"
             test_volume = 1 if pipette == 200 else 5
