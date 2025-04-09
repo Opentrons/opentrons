@@ -61,7 +61,10 @@ export function getDisabledFieldsMoveLiquidForm(
     }
   })
 
-  if (hydratedForm.conditioning_checkbox === true) {
+  if (
+    hydratedForm.conditioning_checkbox === true &&
+    hydratedForm.path === 'multiDispense'
+  ) {
     disabled.add('aspirate_airGap_checkbox')
   }
 
