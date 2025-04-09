@@ -5,10 +5,10 @@ import type {
   FlexStackerFillRunTimeCommand,
   FlexStackerEmptyRunTimeCommand,
   RunTimeCommand,
+  getAllLabwareDefs
 } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
-import { getLabwareDisplayLocation } from '../../utils/getLabwareDisplayLocation'
-import {getLabwareDefinitionsFromCommands} from '../../utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDisplayLocation, type DisplayLocationParams } from '../../utils/getLabwareDisplayLocation'
 
 export type FlexStackerCommand =
   | FlexStackerSetStoredLabwareRunTimeCommand
@@ -34,7 +34,6 @@ type HandledCommands = Extract<
 
 type GetFlexStackerCommandText = HandlesCommands<HandledCommands>
 
-// hold until Casey's work is implemented?
 export const getFlexStackerCommandText = ({
   command,
   allRunDefs,
@@ -46,14 +45,23 @@ GetFlexStackerCommandText): string => {
   console.log('allRunDefs: ', allRunDefs)
   console.log('command: ', command)
   if (command.commandType === 'flexStacker/retrieve') {
-    const slotName = getLabwareDisplayLocation(command.params)
+    const location = {moduleId: command.params?.moduleId as string}
+    const displayLocationParams: DisplayLocationParams = location
+    const slotName = getLabwareDisplayLocation(displayLocationParams)
     console.log("slotName: ", slotName)
-    const labwareDef = getLabwareDefinitionsFromCommands(commandTextData?.commands)
-    console.log("labwareDef: ", labwareDef)
-    return (
-      'flexStacker/retrieve' +
-      'Retrieve {command.result.primaryLabwareURI} from Flex Stacker to slotLocation'
-    )
+    if ('result' in command){
+      const currentLabwareDef = getAllLabwareDefs()[command?.result.primaryLabwareURI]
+      const primaryDefinitionUri = command.result.primaryLabwareURI
+      console.log("labware def uri: ", command?.result.primaryLabwareURI)
+      console.log('currentLabwareDef: ', currentLabwareDef)
+
+      return (
+        `Retrieve ${primaryDefinitionUri} from Flex Stacker to ${slotName}`
+      )
+    }
+    else{
+      return `Retrieve from Flex Stacker.`
+    }  
   }
   return t(KEYS_BY_COMMAND_TYPE[command.commandType])
 }
