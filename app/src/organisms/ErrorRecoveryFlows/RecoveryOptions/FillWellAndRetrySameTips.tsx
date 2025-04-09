@@ -1,21 +1,10 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  LegacyStyledText,
-} from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import { CancelRun } from './CancelRun'
-import {
-  RecoveryFooterButtons,
-  RecoverySingleColumnContentWrapper,
-  LeftColumnLabwareInfo,
-  TwoColTextAndFailedStepNextStep,
-} from '../shared'
-import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
+import { TwoColTextAndFailedStepNextStep, FillWell } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 import { RetrySameTips } from './RetrySameTips'
 
@@ -38,42 +27,13 @@ export function FillWellAndRetrySameTips(
         return <CancelRun {...props} />
       default:
         console.warn(
-          `FillWellAndSkip: ${step} in ${route} not explicitly handled. Rerouting.`
+          `FillWellAndRetrySameTips: ${step} in ${route} not explicitly handled. Rerouting.`
         )
         return <SelectRecoveryOption {...props} />
     }
   }
 
   return buildContent()
-}
-
-export function FillWell(props: RecoveryContentProps): JSX.Element | null {
-  const { routeUpdateActions, failedLabwareUtils, deckMapUtils } = props
-  const { t } = useTranslation('error_recovery')
-  const { goBackPrevStep, proceedNextStep } = routeUpdateActions
-
-  return (
-    <RecoverySingleColumnContentWrapper>
-      <TwoColumn>
-        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          <LeftColumnLabwareInfo
-            {...props}
-            title={t('manually_fill_liquid_in_well', {
-              well: failedLabwareUtils.relevantWellName,
-            })}
-            type="location"
-          />
-        </Flex>
-        <Flex marginTop="1.742rem">
-          <DeckMapContent {...deckMapUtils} />
-        </Flex>
-      </TwoColumn>
-      <RecoveryFooterButtons
-        primaryBtnOnClick={proceedNextStep}
-        secondaryBtnOnClick={goBackPrevStep}
-      />
-    </RecoverySingleColumnContentWrapper>
-  )
 }
 
 export function SkipToNextStep(

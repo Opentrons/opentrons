@@ -20,5 +20,6 @@ export { RetryStepInfo } from './RetryStepInfo'
 export { SkipStepInfo } from './SkipStepInfo'
 export { GripperIsHoldingLabware } from './GripperIsHoldingLabware'
 export { RecoveryDoorOpenSpecial } from './RecoveryDoorOpenSpecial'
+export { FillWell } from './FillWell'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'

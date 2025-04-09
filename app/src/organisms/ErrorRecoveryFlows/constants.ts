@@ -143,6 +143,16 @@ export const RECOVERY_MAP = {
       RETRY_SAME_TIPS: 'retry-same-tips',
     },
   },
+  MANUAL_FILL_AND_RETRY_NEW_TIPS: {
+    ROUTE: 'manual-fill-well-and-retry-new-tips',
+    STEPS: {
+      MANUAL_FILL: 'manual-fill',
+      DROP_TIPS: 'drop-tips',
+      REPLACE_TIPS: 'replace-tips',
+      SELECT_TIPS: 'select-tips',
+      RETRY: 'retry',
+    },
+  },
   MANUAL_MOVE_AND_SKIP: {
     ROUTE: 'manual-move-labware-and-skip',
     STEPS: {
@@ -220,6 +230,7 @@ const {
   RETRY_SAME_TIPS,
   ERROR_WHILE_RECOVERING,
   MANUAL_FILL_AND_RETRY_SAME_TIPS,
+  MANUAL_FILL_AND_RETRY_NEW_TIPS,
   MANUAL_MOVE_AND_SKIP,
   MANUAL_REPLACE_AND_RETRY,
   SKIP_STEP_WITH_NEW_TIPS,
@@ -271,6 +282,13 @@ export const STEP_ORDER: StepOrder = {
   [MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE]: [
     MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL,
     MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
+  ],
+  [MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE]: [
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.MANUAL_FILL,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.DROP_TIPS,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.RETRY,
   ],
   [MANUAL_MOVE_AND_SKIP.ROUTE]: [
     MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_HOLDING_LABWARE,
@@ -386,7 +404,24 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: true,
     },
     [MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS]: {
+      allowDoorOpen: true,
+    },
+  },
+  [MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE]: {
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.MANUAL_FILL]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.DROP_TIPS]: {
       allowDoorOpen: false,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.RETRY]: {
+      allowDoorOpen: true,
     },
   },
   [MANUAL_MOVE_AND_SKIP.ROUTE]: {
