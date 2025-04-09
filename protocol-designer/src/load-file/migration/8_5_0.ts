@@ -168,7 +168,7 @@ export const migrateFile = (
         const pipetteSpecs =
           pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
         const defaultPushOutVolume =
-          pipetteSpecs == null
+          pipetteSpecs === null
             ? null
             : getDefaultPushOutVolume(
                 Number(form.volume),

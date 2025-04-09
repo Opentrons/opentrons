@@ -181,35 +181,33 @@ export function SecondStepMixTools({
           </CheckboxExpandStepFormField>
           {tab === 'dispense' ? (
             <>
-              {tab === 'dispense' ? (
-                <CheckboxExpandStepFormField
-                  title={i18n.format(
-                    t('form:step_edit_form.field.pushOut.title'),
-                    'capitalize'
-                  )}
-                  fieldProps={propsForFields.pushOut_checkbox}
-                >
-                  {formData.pushOut_checkbox === true ? (
-                    <InputStepFormField
-                      showTooltip={false}
-                      padding="0"
-                      title={t(
-                        'form:step_edit_form.field.pushOut.pushOut_volume.label'
-                      )}
-                      caption={t(
-                        'form:step_edit_form.field.pushOut.pushOut_volume.caption',
-                        { min: 0, max: maxPushoutVolume }
-                      )}
-                      {...propsForFields.pushOut_volume}
-                      units={t('application:units.microliter')}
-                      errorToShow={getFormLevelError(
-                        'pushOut_volume',
-                        mappedErrorsToField
-                      )}
-                    />
-                  ) : null}
-                </CheckboxExpandStepFormField>
-              ) : null}
+              <CheckboxExpandStepFormField
+                title={i18n.format(
+                  t('form:step_edit_form.field.pushOut.title'),
+                  'capitalize'
+                )}
+                fieldProps={propsForFields.pushOut_checkbox}
+              >
+                {formData.pushOut_checkbox === true ? (
+                  <InputStepFormField
+                    showTooltip={false}
+                    padding="0"
+                    title={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.label'
+                    )}
+                    caption={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.caption',
+                      { min: 0, max: maxPushoutVolume }
+                    )}
+                    {...propsForFields.pushOut_volume}
+                    units={t('application:units.microliter')}
+                    errorToShow={getFormLevelError(
+                      'pushOut_volume',
+                      mappedErrorsToField
+                    )}
+                  />
+                ) : null}
+              </CheckboxExpandStepFormField>
               <CheckboxExpandStepFormField
                 title={i18n.format(
                   t('form:step_edit_form.field.blowout.label'),
