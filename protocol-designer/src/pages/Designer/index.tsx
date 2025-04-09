@@ -11,6 +11,7 @@ import {
   INFO_TOAST,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
+  OVERFLOW_HIDDEN,
   SPACING,
   ToggleGroup,
   useOnClickOutside,
@@ -219,7 +220,9 @@ export function Designer(): JSX.Element {
             </Flex>
           </Flex>
         ) : (
-          <ProtocolSteps />
+          <Flex height="100%" width="100%" overflowY={OVERFLOW_HIDDEN}>
+            <ProtocolSteps />
+          </Flex>
         )}
       </Flex>
     </>
