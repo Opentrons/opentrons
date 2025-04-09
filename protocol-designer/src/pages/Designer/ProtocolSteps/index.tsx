@@ -10,11 +10,10 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_FIXED,
+  OVERFLOW_AUTO,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
-  Tag,
   ToggleGroup,
 } from '@opentrons/components'
 import {
@@ -40,11 +39,12 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
+import { HotKeyDisplay } from '../../../components/molecules'
 import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
-import { getUserOS } from './Timeline/utils'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
+const STEP_SUMMARY_HEIGHT = '5.5rem'
 
 export function ProtocolSteps(): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
@@ -55,8 +55,6 @@ export function ProtocolSteps(): JSX.Element {
   const selectedSubstep = useSelector(getSelectedSubstep)
   const enableHotKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const tab = useSelector(getDesignerTab)
-  const userOs = getUserOS()
-  const isMac = userOs === 'Mac OS'
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -87,116 +85,95 @@ export function ProtocolSteps(): JSX.Element {
       height="calc(100vh - 4rem)"
       width="100%"
       minHeight={FLEX_MAX_CONTENT}
-      id="container"
     >
       <Flex height="100%" padding={SPACING.spacing12}>
         <DraggableSidebar setTargetWidth={setTargetWidth} />
       </Flex>
       <Flex
-        alignItems={ALIGN_CENTER}
+        flex="2.85"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        flex="2.85"
         paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
         height="100%"
         position={POSITION_RELATIVE}
+        overflowY={OVERFLOW_AUTO}
       >
         <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing24}
-          width={CONTENT_MAX_WIDTH}
+          width="100%"
           height="100%"
-          justifyContent={JUSTIFY_CENTER}
-          paddingY={SPACING.spacing120}
+          overflow={OVERFLOW_AUTO}
+          flexDirection={DIRECTION_COLUMN}
         >
-          {showTimelineAlerts ? (
-            <TimelineAlerts
-              justifyContent={JUSTIFY_CENTER}
-              width="100%"
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing4}
-            />
-          ) : null}
-          <Flex
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-            height="2.25rem"
-          >
-            {currentStep != null && hoveredTerminalItem == null ? (
-              <StyledText desktopStyle="headingSmallBold">
-                {i18n.format(currentStep.stepName, 'titleCase')}
-              </StyledText>
-            ) : null}
-            {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
-            currentHoveredStepId == null ? (
-              <StyledText desktopStyle="headingSmallBold">
-                {t(hoveredTerminalItem ?? selectedTerminalItem)}
-              </StyledText>
-            ) : null}
-
-            <ToggleGroup
-              selectedValue={deckView}
-              leftText={leftString}
-              rightText={rightString}
-              leftClick={() => {
-                setDeckView(leftString)
-              }}
-              rightClick={() => {
-                setDeckView(rightString)
-              }}
-            />
-          </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing16}
-            height="100%"
+            gridGap={SPACING.spacing24}
+            width={CONTENT_MAX_WIDTH}
+            justifyContent={JUSTIFY_CENTER}
+            paddingY={SPACING.spacing120}
+            marginX="auto"
           >
-            {deckView === leftString ? (
-              <DeckSetupContainer tab="protocolSteps" />
-            ) : (
-              <OffDeck tab="protocolSteps" />
-            )}
-            {/* avoid shifting the deck view container */}
-            <Flex
-              height="5.5rem"
-              opacity={formData == null ? 1 : 0}
-              id="summary container"
-            >
-              <StepSummary
-                currentStep={currentStep}
-                stepDetails={stepDetails}
+            {showTimelineAlerts ? (
+              <TimelineAlerts
+                justifyContent={JUSTIFY_CENTER}
+                width="100%"
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing4}
               />
+            ) : null}
+            <Flex
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+              height="2.25rem"
+            >
+              {currentStep != null && hoveredTerminalItem == null ? (
+                <StyledText desktopStyle="headingSmallBold">
+                  {i18n.format(currentStep.stepName, 'titleCase')}
+                </StyledText>
+              ) : null}
+              {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
+              currentHoveredStepId == null ? (
+                <StyledText desktopStyle="headingSmallBold">
+                  {t(hoveredTerminalItem ?? selectedTerminalItem)}
+                </StyledText>
+              ) : null}
+
+              <ToggleGroup
+                selectedValue={deckView}
+                leftText={leftString}
+                rightText={rightString}
+                leftClick={() => {
+                  setDeckView(leftString)
+                }}
+                rightClick={() => {
+                  setDeckView(rightString)
+                }}
+              />
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing16}
+              // height="100%"
+            >
+              {deckView === leftString ? (
+                <DeckSetupContainer tab="protocolSteps" />
+              ) : (
+                <OffDeck tab="protocolSteps" />
+              )}
+              {/* avoid shifting the deck view container */}
+              <Flex
+                height={STEP_SUMMARY_HEIGHT}
+                opacity={formData == null ? 1 : 0}
+              >
+                <StepSummary
+                  currentStep={currentStep}
+                  stepDetails={stepDetails}
+                />
+              </Flex>
             </Flex>
           </Flex>
         </Flex>
         {enableHotKeyDisplay ? (
-          <Flex
-            position={POSITION_FIXED}
-            left={`calc(1.5rem + ${targetWidth}px)`}
-            bottom="0.75rem"
-            gridGap={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Tag
-              text={t('double_click_to_edit')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={t('shift_click_to_select_range')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={
-                isMac
-                  ? t('command_click_to_multi_select_mac')
-                  : t('command_click_to_multi_select_windows')
-              }
-              type="default"
-              shrinkToContent
-            />
-          </Flex>
+          <HotKeyDisplay targetWidth={targetWidth} />
         ) : null}
       </Flex>
       {formData == null && selectedSubstep ? (

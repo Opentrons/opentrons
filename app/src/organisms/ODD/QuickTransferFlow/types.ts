@@ -4,7 +4,14 @@ import type {
   LabwareDefinition2,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
-import type { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
+import type {
+  ACTIONS,
+  CONSOLIDATE,
+  DISTRIBUTE,
+  TRANSFER,
+  ASPIRATE_SETTING_OPTIONS,
+  DISPENSE_SETTING_OPTIONS,
+} from './constants'
 
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs
@@ -26,6 +33,15 @@ export type ChangeTipOptions =
   | 'perSource'
 export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
+export type AspirateSettingOption = typeof ASPIRATE_SETTING_OPTIONS[keyof typeof ASPIRATE_SETTING_OPTIONS]
+export type DispenseSettingOption = typeof DISPENSE_SETTING_OPTIONS[keyof typeof DISPENSE_SETTING_OPTIONS]
+export interface SettingItem {
+  option: string
+  copy: string
+  value: string
+  enabled: boolean
+  onClick: () => void
+}
 
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs

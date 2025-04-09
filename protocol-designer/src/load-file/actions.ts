@@ -88,6 +88,7 @@ export const loadProtocolFile = (
         if (designerApplication != null && designerApplication[1]) {
           const designerApplicationString = designerApplication[1]
           const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
+
           dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
         } else {
           fileError('INVALID_PYTHON_FILE')
