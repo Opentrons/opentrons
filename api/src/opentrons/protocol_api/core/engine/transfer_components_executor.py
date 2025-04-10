@@ -207,8 +207,7 @@ class TransferComponentsExecutor:
             minimum_z_height=None,
             speed=submerge_properties.speed,
         )
-        if submerge_properties.delay.enabled:
-            assert submerge_properties.delay.duration is not None
+        if submerge_properties.delay.enabled and submerge_properties.delay.duration:
             self._instrument.delay(submerge_properties.delay.duration)
 
     def aspirate_and_wait(self, volume: float) -> None:
@@ -227,9 +226,7 @@ class TransferComponentsExecutor:
         )
         self._tip_state.append_liquid(volume)
         delay_props = aspirate_props.delay
-        if delay_props.enabled:
-            # Assertion only for mypy purposes
-            assert delay_props.duration is not None
+        if delay_props.enabled and delay_props.duration:
             self._instrument.delay(delay_props.duration)
 
     def dispense_and_wait(
@@ -257,8 +254,7 @@ class TransferComponentsExecutor:
             self._tip_state.ready_to_aspirate = False
         self._tip_state.delete_liquid(volume)
         dispense_delay = dispense_properties.delay
-        if dispense_delay.enabled:
-            assert dispense_delay.duration is not None
+        if dispense_delay.enabled and dispense_delay.duration:
             self._instrument.delay(dispense_delay.duration)
 
     def mix(self, mix_properties: MixProperties, last_dispense_push_out: bool) -> None:
@@ -361,8 +357,7 @@ class TransferComponentsExecutor:
             speed=retract_props.speed,
         )
         retract_delay = retract_props.delay
-        if retract_delay.enabled:
-            assert retract_delay.duration is not None
+        if retract_delay.enabled and retract_delay.duration:
             self._instrument.delay(retract_delay.duration)
         touch_tip_props = retract_props.touch_tip
         if touch_tip_props.enabled:
@@ -459,8 +454,7 @@ class TransferComponentsExecutor:
             speed=retract_props.speed,
         )
         retract_delay = retract_props.delay
-        if retract_delay.enabled:
-            assert retract_delay.duration is not None
+        if retract_delay.enabled and retract_delay.duration:
             self._instrument.delay(retract_delay.duration)
 
         blowout_props = retract_props.blowout
@@ -599,8 +593,7 @@ class TransferComponentsExecutor:
             speed=retract_props.speed,
         )
         retract_delay = retract_props.delay
-        if retract_delay.enabled:
-            assert retract_delay.duration is not None
+        if retract_delay.enabled and retract_delay.duration:
             self._instrument.delay(retract_delay.duration)
 
         blowout_props = retract_props.blowout
@@ -791,9 +784,7 @@ class TransferComponentsExecutor:
             correction_volume=correction_volume,
         )
         delay_props = aspirate_props.delay
-        if delay_props.enabled:
-            # Assertion only for mypy purposes
-            assert delay_props.duration is not None
+        if delay_props.enabled and delay_props.duration:
             self._instrument.delay(delay_props.duration)
         self._tip_state.append_air_gap(air_gap_volume)
 
@@ -824,8 +815,7 @@ class TransferComponentsExecutor:
         )
         self._tip_state.delete_air_gap(last_air_gap)
         dispense_delay = dispense_props.delay
-        if dispense_delay.enabled:
-            assert dispense_delay.duration is not None
+        if dispense_delay.enabled and dispense_delay.duration:
             self._instrument.delay(dispense_delay.duration)
 
 
