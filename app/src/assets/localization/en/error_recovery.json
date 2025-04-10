@@ -125,7 +125,6 @@
   "stall_or_collision_error": "Stall or collision",
   "stacker_stall_or_collision_error": "Stacker stalled",
   "stacker_empty": "Stacker empty",
-  "shuttle_missing": "Shuttle missing",
   "stand_back": "Stand back, robot is in motion",
   "stand_back_picking_up_tips": "Stand back, picking up tips",
   "stand_back_resuming": "Stand back, resuming current step",
