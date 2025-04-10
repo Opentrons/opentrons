@@ -186,6 +186,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
               border-radius: ${BORDERS.borderRadius16};
             `}
             autoPlay
+            key={`video-${subStepNumber ?? 1}`}
             loop={false}
             controls={false}
             aria-label={`onboarding animation for page ${stepNumber}`}
