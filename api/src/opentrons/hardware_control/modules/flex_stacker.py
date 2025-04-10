@@ -484,13 +484,16 @@ class FlexStacker(mod_abc.AbstractModule):
         """Verify the shuttle is present and in the expected location."""
         await self._reader.read()
         # Validate the platform state matches, ignore EXTENDED checks on EVT
-        if self.platform_state != expected and (
-            self.device_info["model"] != HardwareRevision.EVT.value
-            and expected != PlatformState.EXTENDED
-        ):
-            raise FlexStackerShuttleMissingError(
-                self.device_info["serial"], expected, self.platform_state
-            )
+        if self.platform_state != expected:
+            if (
+                self.device_info["model"] == HardwareRevision.EVT.value
+                and expected == PlatformState.EXTENDED
+            ):
+                return
+            else:
+                raise FlexStackerShuttleMissingError(
+                    self.device_info["serial"], expected, self.platform_state
+                )
 
     async def verify_shuttle_labware_presence(
         self, direction: Direction, labware_expected: bool
