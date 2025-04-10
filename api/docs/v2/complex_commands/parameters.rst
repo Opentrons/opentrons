@@ -256,16 +256,16 @@ As a result, the ``transfer()`` is split into two aspirates of 150 µL, each wit
 
 .. code-block:: text
 
-	Picking up tip from A1 of tip rack on 3
-	Aspirating 150.0 uL from A1 of well plate on 2 at 92.86 uL/sec
-	Air gap
-		Aspirating 20.0 uL from A1 of well plate on 2 at 92.86 uL/sec
-	Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
-	Aspirating 150.0 uL from A1 of well plate on 2 at 92.86 uL/sec
-	Air gap
-		Aspirating 20.0 uL from A1 of well plate on 2 at 92.86 uL/sec
-	Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
-	Dropping tip into A1 of Opentrons Fixed Trash on 12
+    Picking up tip from A1 of tip rack on 3
+    Aspirating 150.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+    Air gap
+        Aspirating 20.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+    Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
+    Aspirating 150.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+    Air gap
+        Aspirating 20.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+    Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
+    Dropping tip into A1 of Opentrons Fixed Trash on 12
 
 .. _param-mix-after:
 
@@ -398,7 +398,7 @@ The default is ``True``, so you only have to set ``trash`` when you want the tip
 
 .. versionadded:: 2.0
 
-In a liquid class complex command, use the ``trash_location`` to drop tips in a trash container or well. 
+In a liquid class complex command, use the ``trash_location`` to drop tips in a trash container or well:: 
 
     ## define liquid and trash 
     liquid_1 = protocol_context.define_liquid_class("ethanol_80")

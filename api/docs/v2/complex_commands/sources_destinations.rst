@@ -18,7 +18,7 @@ This example uses :py:meth:`.InstrumentContext.transfer()` to perform a basic tr
 
 .. versionadded:: 2.0
 
-You could also use :py:meth:`.InstrumentContext.transfer_with_liquid_class` to perform the transfer. 
+You could also use :py:meth:`.InstrumentContext.transfer_with_liquid_class` to perform the transfer:: 
 
     liquid_1 = protocol_context.define_liquid_class("glycerol_50")
     pipette.transfer_with_liquid_class(

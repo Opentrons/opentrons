@@ -30,7 +30,7 @@ There are six complex liquid handling commands, each optimized for a different l
         * :py:meth:`.InstrumentContext.consolidate_with_liquid_class`
 
 
-The basic commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by a liquid class definition to account for properties like viscosity. For more information, see :ref:`_liquid-classes`.
+The basic commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by a liquid class definition to account for properties like viscosity. For more information, see :ref:`liquid-classes`.
 
 
 Pages in this section of the documentation cover:
