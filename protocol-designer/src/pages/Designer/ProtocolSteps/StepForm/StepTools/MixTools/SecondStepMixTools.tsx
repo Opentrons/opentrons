@@ -15,8 +15,13 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
 } from '../../../../../../components/molecules'
+import {
+  getAdditionalEquipmentEntities,
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../../../../step-forms/selectors'
+import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
 import { getMaxPushOutVolume } from '../../../../../../utils'
-import { getPipetteEntities } from '../../../../../../step-forms/selectors'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -54,6 +59,11 @@ export function SecondStepMixTools({
   const { t, i18n } = useTranslation(['application', 'form'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const aspirateTab = {
     text: i18n.format(t('aspirate'), 'capitalize'),
@@ -91,6 +101,16 @@ export function SecondStepMixTools({
       {showResetModal ? (
         <ResetSettingsModal
           tab={tab}
+          onContinue={() => {
+            updateFieldsForLiquidClass({
+              propsForFields,
+              rawForm: formData,
+              pipetteEntities,
+              labwareEntities,
+              additionalEquipmentEntities,
+              liquidHandlingAction: tab,
+            })
+          }}
           onClose={() => {
             setShowResetModal(false)
           }}
@@ -279,7 +299,6 @@ export function SecondStepMixTools({
           <ResetSettingsField
             tab={tab}
             onClick={() => {
-              console.log('TODO: wire up onClick handler')
               setShowResetModal(true)
             }}
           />
