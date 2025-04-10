@@ -57,7 +57,7 @@ In a ``transfer_with_liquid_class()``, the liquid class definition specifies nea
     18. Delay for an amount of time
     19. Blow out at the specified location
     20. Touch tip at the blow out location
-    10. Drop tip
+    21. Drop tip
 
 The ``transfer_with_liquid_class()`` method includes more steps, like delays or air gaps. Your chosen liquid class definition adds some or all of this transfer behavior, including position information, to optimize liquid transfers. For more information, see :ref:`liquid-class-definitions`. 
 
@@ -74,6 +74,7 @@ The smallest possible number of steps in a complex command like ``transfer()`` i
         dest=plate["B1"],
         new_tip="never",
     )
+
 You can also use ``new_tip="never"`` to reuse pipette tips and decrease the total number of steps in any liquid class complex command.
 
 Here's another example, a distribute command that adds touch tip steps (and does not turn off tip handling). The code for this command is::

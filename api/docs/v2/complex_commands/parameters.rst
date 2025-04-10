@@ -395,6 +395,7 @@ The default is ``True``, so you only have to set ``trash`` when you want the tip
         dest=plate["B1"],
         trash=False,
     )
+
 .. versionadded:: 2.0
 
 In a liquid class complex command, use the ``trash_location`` to drop tips in a trash container or well. 
