@@ -147,6 +147,15 @@ export function useCommandTextString(
           command,
         }),
       }
+    case 'flexStacker/retrieve':
+    case 'flexStacker/store':
+      return {
+        kind: 'generic',
+        commandText: utils.getFlexStackerCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
     case 'thermocycler/runProfile':
       return utils.getTCRunProfileCommandText({ ...fullParams, command })
 

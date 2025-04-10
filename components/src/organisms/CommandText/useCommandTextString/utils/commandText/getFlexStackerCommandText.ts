@@ -8,7 +8,7 @@ import type {
 } from '@opentrons/shared-data'
 import {getAllLabwareDefs} from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
-import { getLabwareDisplayLocation, type DisplayLocationParams } from '../../utils/getLabwareDisplayLocation'
+import { getLabwareDisplayLocation, type DisplayLocationParams, DisplayLocationSlotOnlyParams } from '../../utils/getLabwareDisplayLocation'
 
 export type FlexStackerCommand =
   | FlexStackerSetStoredLabwareRunTimeCommand
@@ -24,12 +24,12 @@ const KEYS_BY_COMMAND_TYPE: {
   'flexStacker/store': 'flex_stacker_store',
   'flexStacker/setStoredLabware': 'flex_stacker_set_stored_labware',
   'flexStacker/empty': 'flex_stacker_empty',
-  'flexStacker/fill': 'flex_stacker_set_stored_labware',
+  'flexStacker/fill': 'flex_stacker_fill',
 }
 
 type HandledCommands = Extract<
   RunTimeCommand,
-  { commandType: FlexStackerCommand }
+  { commandType: keyof typeof KEYS_BY_COMMAND_TYPE }
 >
 
 type GetFlexStackerCommandText = HandlesCommands<HandledCommands>
@@ -39,6 +39,7 @@ export const getFlexStackerCommandText = ({
   allRunDefs,
   commandTextData,
   t,
+  robotType,
 }: // stackerCommand,
 GetFlexStackerCommandText): string => {
   console.log('commandTextData:', commandTextData)
@@ -46,38 +47,42 @@ GetFlexStackerCommandText): string => {
   console.log('command: ', command)
   let primaryDefinitionDisplayName = null
   if ('result' in command){
-    const currentLabwareDef = getAllLabwareDefs()[command?.result.primaryLabwareURI]
+    const currentLabwareDef = getAllLabwareDefs()[command.result?.primaryLabwareURI]
     primaryDefinitionDisplayName = currentLabwareDef.metadata.displayName
   }
 
   if (command.commandType === 'flexStacker/retrieve') {
-    const location = {moduleId: command.params?.moduleId as string}
-    const displayLocationParams: DisplayLocationParams = location
-    const slotName = getLabwareDisplayLocation(displayLocationParams)
+    const slotName = getLabwareDisplayLocation({
+      loadedLabwares: commandTextData?.labware ?? [],
+      location: {moduleId: command.params?.moduleId as string},
+      robotType,
+      allRunDefs,
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
     console.log("slotName: ", slotName)
     if (primaryDefinitionDisplayName != null && slotName != null){
       // add logic for lid etc
       
       return t('retrieve_labware_from_stacker_to', {primaryDefinitionDisplayName, slotName})
     }
-    else{
-      return t('retrieve_from_stacker')
-    }  
   }
   else if (command.commandType === 'flexStacker/store') {
     // get origin slot name
-    const location = {moduleId: command.params?.moduleId as string}
-    const displayLocationParams: DisplayLocationParams = location
-    const slotName = getLabwareDisplayLocation(displayLocationParams)
+      const slotName = getLabwareDisplayLocation({
+      loadedLabwares: commandTextData?.labware ?? [],
+      location: {moduleId: command.params?.moduleId as string},
+      robotType,
+      allRunDefs,
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
     console.log("slotName: ", slotName)
     if (primaryDefinitionDisplayName != null && slotName != null){
       // add logic for lid etc
       
       return t('store_labware_from_slot_to_stacker', {primaryDefinitionDisplayName, slotName})
     }
-    else{
-      return t('store_into_stacker')
-    }  
   }
   return t(KEYS_BY_COMMAND_TYPE[command.commandType])
 }
