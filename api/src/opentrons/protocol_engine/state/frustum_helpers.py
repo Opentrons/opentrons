@@ -369,7 +369,9 @@ def find_volume_at_well_height(
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
     max_height = volumetric_capacity[-1][0]
     if target_height < 0 or target_height > max_height:
-        raise InvalidLiquidHeightFound("Invalid target height.")
+        raise InvalidLiquidHeightFound(
+            f"Invalid target height. {target_height}mm is not between 0 and well height: {max_height}mm"
+        )
     # volumes in volumetric_capacity are relative to each frustum,
     # so we have to find the volume of all the full sections enclosed
     # beneath the target height
@@ -439,7 +441,12 @@ def find_height_at_well_volume(
 
     if raise_error_if_result_invalid:
         if target_volume < 0 or target_volume > max_volume:
-            raise InvalidLiquidHeightFound("Invalid target volume.")
+            err_str = "Invalid target volume."
+            if target_volume < 0:
+                err_str = f"{err_str} Not enough liquid in well need at least {abs(target_volume)}ul more."
+            else:
+                err_str = f"{err_str} Action would overflow well with {target_volume}ul. max: {max_volume}ul."
+            raise InvalidLiquidHeightFound(err_str)
 
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height
