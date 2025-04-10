@@ -504,27 +504,49 @@ const getNoLiquidClassValuesMoveLiquid = (
       singleDispense.pushOutByVolume as Array<[number, number]>
     ) ?? 0
 
+  const aspirateOffsetFields = getOffsetFields(aspirate.offset, 'aspirate')
+  const dispenseOffsetFields = getOffsetFields(dispense.offset, 'dispense')
+  const aspiratePositionReferenceFields = getPositionReferenceFields(
+    aspirate.positionReference,
+    'aspirate'
+  )
+  const dispensePositionReferenceFields = getPositionReferenceFields(
+    dispense.positionReference,
+    'dispense'
+  )
+
   const aspirateFields = {
     ...aspirateFlowRateFields,
+    ...aspirateOffsetFields,
+    ...aspiratePositionReferenceFields,
     aspirate_submerge_mmFromBottom: 0,
     aspirate_submerge_position_reference: WELL_TOP,
     aspirate_submerge_x_position: 0,
     aspirate_submerge_y_position: 0,
     aspirate_submerge_speed: aspirate.submerge.speed,
-
     aspirate_retract_speed: aspirate.retract.speed,
+    aspirate_retract_mmFromBottom: 0,
+    aspirate_retract_position_reference: WELL_TOP,
+    aspirate_retract_x_position: 0,
+    aspirate_retract_y_position: 0,
     aspirate_touchTip_speed: aspirate.retract.touchTip.params?.speed,
     aspirate_touchTip_mmFromEdge: aspirate.retract.touchTip.params?.mmToEdge,
     aspirate_touchTip_mmFromTop: aspirate.retract.touchTip.params?.zOffset,
   }
   const dispenseFields = {
     ...dispenseFlowRateFields,
+    ...dispenseOffsetFields,
+    ...dispensePositionReferenceFields,
     dispense_submerge_mmFromBottom: 0,
     dispense_submerge_position_reference: WELL_TOP,
     dispense_submerge_x_position: 0,
     dispense_submerge_y_position: 0,
     dispense_submerge_speed: dispense.submerge.speed,
     dispense_retract_speed: dispense.retract.speed,
+    dispense_retract_mmFromBottom: 0,
+    dispense_retract_position_reference: WELL_TOP,
+    dispense_retract_x_position: 0,
+    dispense_retract_y_position: 0,
     pushOut_checkbox: pushOutVolume > 0,
     pushOut_volume: pushOutVolume,
     dispense_touchTip_speed: dispense.retract.touchTip.params?.speed,
