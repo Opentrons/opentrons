@@ -172,6 +172,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const [confirmedFieldUpdates, setConfirmedFieldUpdates] = useState<
     Record<string, any>
   >({})
+  console.log(confirmedFieldUpdates)
   const fieldsChangedRequiringConfirmation = FIELDS_REQUIRING_CONFIRMATION.filter(
     field => {
       // if field has been updated and confirmed in modal, check its most recent confirmed value
@@ -354,7 +355,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       if (isConfirmationRequired) {
         setShowConfirmationModal(true)
       } else {
-        handleUpdateLiquidClassValues()
+        if (!hasSeenAdvancedSettings) {
+          handleUpdateLiquidClassValues()
+        } else {
+          setToolboxStep(toolboxStep + 1)
+        }
       }
     } else if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
       if (!isErrorOnCurrentPage) {
