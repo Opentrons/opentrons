@@ -342,7 +342,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     proceed,
     goBack,
     analyticsStartTime,
-    setWizardSteps,
   } = props
   const { ...formProps } = useForm<WizardFormState>({
     defaultValues: initialFormState,
