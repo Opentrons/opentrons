@@ -54,7 +54,6 @@
   "labware_released_from_current_height": "The labware will be released from its current height.",
   "launch_recovery_mode": "Launch recovery mode",
   "load_labware_into_stacker_and_retry_step": "Load labware into Stacker and retry step",
-  "load_labware_into_labware_shuttle": "Load labware into labware shuttle",
   "load_labware_shuttle_and_retry_step": "Load labware shuttle and retry step",
   "load_labware_into_stacker": "Load <#> labware into Stacker",
   "load_labware_into_labware_shuttle": "Load labware into labware shuttle",
