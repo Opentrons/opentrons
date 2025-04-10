@@ -91,6 +91,8 @@ from .types import (
     GripperProbe,
     UpdateStatus,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
@@ -575,6 +577,7 @@ class OT3API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
+        self._log.info(f"Setting status bar state to {state}")
         await self._backend.set_status_bar_state(state)
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
@@ -582,6 +585,11 @@ class OT3API(
 
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        return self._backend.add_status_bar_listener(listener)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
