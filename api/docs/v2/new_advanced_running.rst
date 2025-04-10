@@ -123,7 +123,7 @@ This automatically generated code uses generic names for the loaded labware. If 
 
 Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot 2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
 
-Keep in mind that ``set_offset()`` commands will override any labware offsets set by running Labware Position Check in the Opentrons App. In Flex protocols, you should only  reuse labware offset measurements when they apply to the *same labware type* used across the Flex deck. On the OT-2, use Labware Position Check to create and reuse labware offsets **only** for the *same labware type* in the *same deck slot* on the *same robot*.
+Keep in mind that ``set_offset()`` commands will override any labware offsets set by running Labware Position Check in the Opentrons App. In Flex protocols, you should only  reuse labware offset measurements when they apply to the *same labware type* used across the Flex deck. On the OT-2, use Labware Position Check to create and reuse labware offsets only for the *same labware type* in the *same deck slot* on the *same robot*.
 
 .. warning::
 
@@ -153,16 +153,16 @@ In the latest API version, labware offsets can apply to the same labware when us
         labware=tiprack2, new_location="B3"
     )  # tiprack2 now has offset 0.1, 0.1, 0.1
     
-In OT-2 protocols, only reuse labware offsets with the same labware type and location combination. If you want an offset to apply to a piece of labware as it moves around the OT-2 deck, call ``set_offset()`` again after each movement::
+In OT-2 protocols, only reuse labware offsets with the same labware type-location combination. If you want an offset to apply to a piece of labware as it moves around the OT-2 deck, call ``set_offset()`` again after each movement::
 
     plate = protocol.load_labware(
-        load_name="corning_96_wellplate_360ul_flat", location="D2"
+        load_name="corning_96_wellplate_360ul_flat", location="2"
     )
     plate.set_offset(
         x=-0.1, y=-0.2, z=-0.3
     )  # plate now has offset -0.1, -0.2, -0.3
     protocol.move_labware(
-        labware=plate, new_location="D3"
+        labware=plate, new_location="3"
     )  # plate now has offset 0, 0, 0
     plate.set_offset(
         x=-0.1, y=-0.2, z=-0.3
