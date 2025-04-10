@@ -5,7 +5,7 @@ from enum import Enum
 from math import ceil
 from typing import Tuple, List, Dict, cast, Literal
 
-from opentrons.types import Point
+from opentrons.types import Point, Location
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -23,6 +23,9 @@ from opentrons.hardware_control.types import OT3Mount
 from opentrons_shared_data.deck import (
     Z_PREP_OFFSET,
     get_calibration_square_position_in_slot,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    PositionReference,
 )
 
 
@@ -152,6 +155,32 @@ def _get_aspirate_mode_for_well(well: Well) -> _AspirateMode:
     return ASPIRATE_MODE_BY_WELL[num_wells][well_row][well_column]
 
 
+def _legacy_src_dest_from_liquid_class_props(
+        pipette: InstrumentContext, src_well: Well, dest_wells: List[Well], cls_in_use: LiquidClass
+) -> Tuple[Location, List[Location]]:
+    cls_props = cls_in_use.get_for(pipette, pipette.tip_racks[0])
+    print(1)
+    input(Well.__repr__(dest_wells[0]))
+    assert (
+            cls_props.aspirate.position_reference
+            == cls_props.dispense.position_reference
+            == PositionReference.LIQUID_MENISCUS
+    )
+    _src_loc = src_well.meniscus(
+        target=DEFAULT_TIP_MENISCUS_TARGET, z=cls_props.aspirate.offset.z
+    )
+    _dest_wells: List[Location] = [
+        w.meniscus(
+            target=DEFAULT_TIP_MENISCUS_TARGET,
+            z=cls_props.dispense.offset.z
+        )
+        for w in dest_wells
+    ]
+    print(2)
+    input(Well.__repr__(_dest_wells[0].labware))  # FIXME: wtf is LabwareLike ???
+    return _src_loc, _dest_wells
+
+
 @dataclass
 class _TestTrial:
     mode: _AspirateMode
@@ -227,14 +256,41 @@ class _TestTrial:
         """Run."""
         if not pipette.has_tip:
             _pick_up_tip_and_zero_min_height(ctx, pipette)
-        pipette.transfer_liquid(
-            add_liquid_class,
-            volume=self.ul_to_add / pipette.channels,
-            source=src,
-            dest=self.test_well,
-            new_tip="never",
-        )
+
+        if ctx.params.use_liquid_classes:
+            pipette.transfer_liquid(
+                add_liquid_class,
+                volume=self.ul_to_add / pipette.channels,
+                source=src,
+                dest=self.test_well,
+                new_tip="never",
+            )
+        else:
+            # NOTE: use liquid-class properties to control legacy behavior
+            print(0)
+            input(Well.__repr__(self.test_well))
+            src_loc, dest_loc_list = _legacy_src_dest_from_liquid_class_props(
+                pipette, src, [self.test_well], add_liquid_class
+            )
+            print(3)
+            input(Well.__repr__(dest_loc_list[0].labware))
+            assert len(dest_loc_list) == 1, f"{len(dest_loc_list)}"
+            dest_loc = dest_loc_list[0]
+            assert cast(Well, dest_loc.labware) == self.test_well, f"{dest_loc.labware} != {self.test_well}"
+            print(dest_loc.labware)
+            print(self.test_well)
+            print_count = 0
+            while self.test_well.current_liquid_volume() < self.ul_to_add:
+                ul = min(self.ul_to_add / pipette.channels, pipette.max_volume)
+                if print_count < 3:
+                    print_count += 1
+                    print(f"dispensing {ul} ul into {dest_loc.labware} "
+                          f"(current liquid volume is {dest_loc.labware.current_liquid_volume()} ul)")
+                pipette.aspirate(ul, src_loc)
+                pipette.dispense(ul, dest_loc)
+                pipette.prepare_to_aspirate()
         pipette.drop_tip()
+
         # REMOVE DYE FROM TEST-LABWARE
         _pick_up_tip_and_zero_min_height(ctx, pipette)
         # NOTE: (sigler) calibrating THIS tip, because the
@@ -245,14 +301,31 @@ class _TestTrial:
         #       to track when wells have ran out of volume (or over-flowed)
         if self.mode == _AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
             pipette.require_liquid_presence(self.test_well)
+
         # MULTI-DISPENSE TO PLATE
-        pipette.distribute_liquid(
-            remove_liquid_class,
-            volume=self.dispense_ul,
-            source=self.test_well,
-            dest=dst_wells,
-            new_tip="never",
-        )
+        if ctx.params.use_liquid_classes:
+            pipette.distribute_liquid(
+                remove_liquid_class,
+                volume=self.dispense_ul,
+                source=self.test_well,
+                dest=dst_wells,
+                new_tip="never",
+            )
+        else:
+            # NOTE: use liquid-class properties to control legacy behavior
+            src_loc, dest_loc_list = _legacy_src_dest_from_liquid_class_props(
+                pipette, self.test_well, dst_wells, remove_liquid_class
+            )
+            # NOTE: use liquid-class properties to control legacy behavior
+            remove_props = add_liquid_class.get_for(pipette, pipette.tip_racks[0])
+            assert (
+                remove_props.aspirate.position_reference
+                == remove_props.dispense.position_reference
+                == PositionReference.LIQUID_MENISCUS
+            )
+            pipette.aspirate(self.ul_to_remove / pipette.channels, src_loc)
+            for loc in dest_loc_list:
+                pipette.dispense(self.dispense_ul, loc)
         pipette.drop_tip()
 
 
@@ -396,6 +469,11 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="disable_minimum_lld_height",
         variable_name="disable_minimum_lld_height",
         default=True,
+    )
+    parameters.add_bool(
+        display_name="use_liquid_classes",
+        variable_name="use_liquid_classes",
+        default=False,
     )
     parameters.add_float(
         variable_name="overlap_error",
