@@ -108,5 +108,9 @@
   "waiting_for_tc_lid_to_reach": "Waiting for Thermocycler lid to reach target temperature",
   "waiting_to_reach_temp_module": "Waiting for Temperature Module to reach {{temp}}",
   "waste_chute": "Waste Chute",
-  "with_reference_of": "with reference of {{wavelength}} nm"
+  "with_reference_of": "with reference of {{wavelength}} nm",
+  "retrieve_labware_from_stacker_to": "Retrieve {{primaryDefinitionDisplayName}} from Flex Stacker to {{slotName}}",
+  "retrieve_from_stacker": "Retrieve from Flex Stacker",
+  "store_into_stacker": "Store into Flex Stacker",
+  "store_labware_from_slot_to_stacker": "Store {{primaryDefinitionDisplayName}} from {{slotName}} to Flex Stacker"
 }

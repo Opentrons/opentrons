@@ -5,8 +5,8 @@ import type {
   FlexStackerFillRunTimeCommand,
   FlexStackerEmptyRunTimeCommand,
   RunTimeCommand,
-  getAllLabwareDefs
 } from '@opentrons/shared-data'
+import {getAllLabwareDefs} from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 import { getLabwareDisplayLocation, type DisplayLocationParams } from '../../utils/getLabwareDisplayLocation'
 
@@ -44,23 +44,39 @@ GetFlexStackerCommandText): string => {
   console.log('commandTextData:', commandTextData)
   console.log('allRunDefs: ', allRunDefs)
   console.log('command: ', command)
+  let primaryDefinitionDisplayName = null
+  if ('result' in command){
+    const currentLabwareDef = getAllLabwareDefs()[command?.result.primaryLabwareURI]
+    primaryDefinitionDisplayName = currentLabwareDef.metadata.displayName
+  }
+
   if (command.commandType === 'flexStacker/retrieve') {
     const location = {moduleId: command.params?.moduleId as string}
     const displayLocationParams: DisplayLocationParams = location
     const slotName = getLabwareDisplayLocation(displayLocationParams)
     console.log("slotName: ", slotName)
-    if ('result' in command){
-      const currentLabwareDef = getAllLabwareDefs()[command?.result.primaryLabwareURI]
-      const primaryDefinitionUri = command.result.primaryLabwareURI
-      console.log("labware def uri: ", command?.result.primaryLabwareURI)
-      console.log('currentLabwareDef: ', currentLabwareDef)
-
-      return (
-        `Retrieve ${primaryDefinitionUri} from Flex Stacker to ${slotName}`
-      )
+    if (primaryDefinitionDisplayName != null && slotName != null){
+      // add logic for lid etc
+      
+      return t('retrieve_labware_from_stacker_to', {primaryDefinitionDisplayName, slotName})
     }
     else{
-      return `Retrieve from Flex Stacker.`
+      return t('retrieve_from_stacker')
+    }  
+  }
+  else if (command.commandType === 'flexStacker/store') {
+    // get origin slot name
+    const location = {moduleId: command.params?.moduleId as string}
+    const displayLocationParams: DisplayLocationParams = location
+    const slotName = getLabwareDisplayLocation(displayLocationParams)
+    console.log("slotName: ", slotName)
+    if (primaryDefinitionDisplayName != null && slotName != null){
+      // add logic for lid etc
+      
+      return t('store_labware_from_slot_to_stacker', {primaryDefinitionDisplayName, slotName})
+    }
+    else{
+      return t('store_into_stacker')
     }  
   }
   return t(KEYS_BY_COMMAND_TYPE[command.commandType])
