@@ -54,6 +54,7 @@ from opentrons.protocol_engine.types import (
     NextTipInfo,
     NoTipAvailable,
     NoTipReason,
+    WellLocationFunction,
 )
 from opentrons.protocol_api.disposal_locations import (
     TrashBin,
@@ -302,8 +303,11 @@ def test_move_to_well(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
         )
-    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+    ).then_return(
+        (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
+    )
 
     subject.move_to(
         location=location,
@@ -319,7 +323,7 @@ def test_move_to_well(
                 pipetteId="abc123",
                 labwareId="labware-id",
                 wellName="well-name",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
                 forceDirect=True,
@@ -378,14 +382,18 @@ def test_pick_up_tip(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_pick_up_tip_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.PICK_UP_TIP,
         )
     ).then_return(
-        PickUpTipWellLocation(
-            origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+        (
+            PickUpTipWellLocation(
+                origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            False,
         )
     )
 
@@ -496,8 +504,11 @@ def test_drop_tip_with_location(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.DROP_TIP,
         )
-    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+    ).then_return(
+        (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
+    )
     decoy.when(
         mock_engine_client.state.tips.get_pipette_channels("abc123")
     ).then_return(8)
@@ -622,10 +633,11 @@ def test_aspirate_from_well(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
             meniscus_tracking=None,
         )
     ).then_return(
@@ -729,10 +741,11 @@ def test_aspirate_from_meniscus(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
             meniscus_tracking=MeniscusTrackingTarget.END,
         )
     ).then_return(
@@ -833,9 +846,14 @@ def test_blow_out_to_well(
 
     decoy.when(
         mock_engine_client.state.geometry.get_relative_well_location(
-            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+            labware_id="123abc",
+            well_name="my cool well",
+            absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.BASE,
         )
-    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+    ).then_return(
+        (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
+    )
 
     subject.blow_out(location=location, well_core=well_core, in_place=False)
 
@@ -935,10 +953,11 @@ def test_dispense_to_well(
     decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
             meniscus_tracking=None,
         )
     ).then_return(

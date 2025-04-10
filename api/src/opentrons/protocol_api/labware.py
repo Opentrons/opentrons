@@ -46,7 +46,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
     UnsupportedAPIError,
 )
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed

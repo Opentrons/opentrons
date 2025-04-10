@@ -8,7 +8,7 @@ from .pipetting_common import (
     PipetteIdMixin,
 )
 from .movement_common import (
-    WellLocationMixin,
+    LiquidHandlingWellLocationMixin,
     MovementMixin,
     DestinationPositionResult,
     StallOrCollisionError,
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 MoveToWellCommandType = Literal["moveToWell"]
 
 
-class MoveToWellParams(PipetteIdMixin, WellLocationMixin, MovementMixin):
+class MoveToWellParams(PipetteIdMixin, LiquidHandlingWellLocationMixin, MovementMixin):
     """Payload required to move a pipette to a specific well."""
 
     pass

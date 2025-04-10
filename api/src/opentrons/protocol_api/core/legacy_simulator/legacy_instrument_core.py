@@ -23,7 +23,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ...disposal_locations import TrashBin, WasteChute

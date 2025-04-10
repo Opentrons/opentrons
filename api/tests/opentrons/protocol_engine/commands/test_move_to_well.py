@@ -26,6 +26,7 @@ from opentrons.protocol_engine.commands.move_to_well import (
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.types import LiquidHandlingWellLocation
 
 
 @pytest.fixture
@@ -55,7 +56,7 @@ async def test_move_to_well_implementation(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
-        wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        wellLocation=LiquidHandlingWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         forceDirect=True,
         minimumZHeight=4.56,
         speed=7.89,
@@ -66,7 +67,7 @@ async def test_move_to_well_implementation(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            well_location=LiquidHandlingWellLocation(offset=WellOffset(x=1, y=2, z=3)),
             force_direct=True,
             minimum_z_height=4.56,
             speed=7.89,
@@ -104,7 +105,9 @@ async def test_move_to_well_with_tip_rack_and_volume_offset(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
-        wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3), volumeOffset=-40.0),
+        wellLocation=LiquidHandlingWellLocation(
+            offset=WellOffset(x=1, y=2, z=3), volumeOffset=-40.0
+        ),
         forceDirect=True,
         minimumZHeight=4.56,
         speed=7.89,
@@ -149,7 +152,7 @@ async def test_move_to_well_stall_defined_error(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
-        wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        wellLocation=LiquidHandlingWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         forceDirect=True,
         minimumZHeight=4.56,
         speed=7.89,
