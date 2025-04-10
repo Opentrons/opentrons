@@ -31,7 +31,6 @@ import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface WizardBodyProps {
-  robotType: RobotType
   stepNumber: number
   header: string
   children: ReactNode
@@ -40,6 +39,8 @@ interface WizardBodyProps {
   goBack?: () => void
   subHeader?: string
   tooltipOnDisabled?: string
+  robotType?: RobotType
+  subStepNumber?: number
 }
 
 const OT2_GIFS: Record<number, string> = {
@@ -77,6 +78,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     disabled = false,
     tooltipOnDisabled,
     robotType,
+    subStepNumber,
   } = props
   const { t } = useTranslation('shared')
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -86,7 +88,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
   const [loaded, setLoaded] = useState<boolean>(false)
 
   useLayoutEffect(() => {
-    const videoAsset = ONBOARDING_ANIMATIONS[stepNumber]
+    const videoAsset = ONBOARDING_ANIMATIONS[subStepNumber as number]
     setLoaded(false)
     setAsset(videoAsset)
     const timeout = setTimeout(() => {
@@ -95,7 +97,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     return () => {
       clearTimeout(timeout)
     }
-  }, [stepNumber])
+  }, [subStepNumber])
 
   return (
     <Flex
@@ -184,6 +186,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
               border-radius: ${BORDERS.borderRadius16};
             `}
             autoPlay
+            key={`video-${subStepNumber ?? 1}`}
             loop={false}
             controls={false}
             aria-label={`onboarding animation for page ${stepNumber}`}

@@ -46,7 +46,7 @@ describe('SelectFixtures', () => {
 
   it('renders the trash bin by default and all the default text', () => {
     render(props)
-    screen.getByText('Step 5')
+    screen.getByText('Step 3')
     screen.getByText('Add your fixtures')
     screen.getByText(
       'Fixtures replace standard deck slots and let you add functionality to your Flex.'

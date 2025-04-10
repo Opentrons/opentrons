@@ -40,12 +40,10 @@ import {
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
 import { SelectOt2Modules } from './SelectOt2Modules'
-import { SelectRobot } from './SelectRobot'
-import { SelectPipettes } from './SelectPipettes'
-import { SelectGripper } from './SelectGripper'
 import { SelectFixtures } from './SelectFixtures'
 import { AddMetadata } from './AddMetadata'
 import { getTrashSlot } from './utils'
+import { SelectBasics } from './SelectBasics'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
@@ -63,27 +61,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { WizardFormState } from './types'
 
-type WizardStep =
-  | 'robot'
-  | 'pipette'
-  | 'gripper'
-  | 'modules'
-  | 'fixtures'
-  | 'metadata'
-const WIZARD_STEPS: WizardStep[] = [
-  'robot',
-  'pipette',
-  'gripper',
-  'modules',
-  'fixtures',
-  'metadata',
-]
-const WIZARD_STEPS_OT2: WizardStep[] = [
-  'robot',
-  'pipette',
-  'modules',
-  'metadata',
-]
+type WizardStep = 'basics' | 'modules' | 'fixtures' | 'metadata'
+const WIZARD_STEPS: WizardStep[] = ['basics', 'modules', 'fixtures', 'metadata']
+const WIZARD_STEPS_OT2: WizardStep[] = ['basics', 'modules', 'metadata']
 
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
@@ -103,7 +83,7 @@ const initialFormState: WizardFormState = {
     name: undefined,
     description: undefined,
     organizationOrAuthor: undefined,
-    robotType: FLEX_ROBOT_TYPE,
+    robotType: undefined,
   },
   pipettesByMount: {
     left: { pipetteName: undefined, tiprackDefURI: undefined },
@@ -154,7 +134,7 @@ const validationSchema: any = Yup.object().shape({
   }),
 })
 
-export function CreateNewProtocolWizard(): JSX.Element | null {
+export function Onboarding(): JSX.Element | null {
   const navigate = useNavigate()
   const [analyticsStartTime] = useState<Date>(new Date())
   const customLabware = useSelector(
@@ -380,8 +360,8 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
         currentWizardStep={currentWizardStep}
         createProtocolFile={createProtocolFile}
         proceed={proceed}
-        goBack={goBack}
         setWizardSteps={setWizardSteps}
+        goBack={goBack}
         analyticsStartTime={analyticsStartTime}
       />
     </Box>
@@ -403,8 +383,8 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     createProtocolFile,
     proceed,
     goBack,
-    setWizardSteps,
     analyticsStartTime,
+    setWizardSteps,
   } = props
   const { ...formProps } = useForm<WizardFormState>({
     defaultValues: initialFormState,
@@ -424,9 +404,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     <form onSubmit={formProps.handleSubmit(() => {})}>
       {(() => {
         switch (currentWizardStep) {
-          case 'robot':
+          case 'basics':
             return (
-              <SelectRobot
+              <SelectBasics
                 {...formProps}
                 goBack={goBack}
                 proceed={() => {
@@ -437,10 +417,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
                 }}
               />
             )
-          case 'pipette':
-            return <SelectPipettes {...{ ...formProps, proceed, goBack }} />
-          case 'gripper':
-            return <SelectGripper {...{ ...formProps, proceed, goBack }} />
           case 'modules':
             return <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />
           case 'fixtures':

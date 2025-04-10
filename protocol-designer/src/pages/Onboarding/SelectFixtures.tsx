@@ -66,7 +66,8 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
     <HandleEnter onEnter={handleProceed}>
       <WizardBody
         robotType={FLEX_ROBOT_TYPE}
-        stepNumber={5}
+        stepNumber={3}
+        subStepNumber={5}
         header={t('add_fixtures')}
         subHeader={t('fixtures_replace')}
         disabled={!hasTrash}

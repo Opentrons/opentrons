@@ -74,6 +74,7 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
       <WizardBody
         robotType={OT2_ROBOT_TYPE}
         stepNumber={2}
+        subStepNumber={4}
         header={t('add_modules')}
         goBack={() => {
           goBack(1)
