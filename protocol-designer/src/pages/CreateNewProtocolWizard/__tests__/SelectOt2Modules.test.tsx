@@ -2,15 +2,12 @@ import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { SelectOt2Modules } from '..'
+import { i18n } from '../../../assets/localization'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { SelectOt2Modules } from '../SelectOt2Modules'
 
 import type { ComponentProps } from 'react'
-import type {
-  WizardFormState,
-  WizardTileProps,
-} from '../../../../pages/CreateNewProtocolWizard/types'
+import type { WizardFormState, WizardTileProps } from '../types'
 
 vi.mock('../../../feature-flags/selectors')
 

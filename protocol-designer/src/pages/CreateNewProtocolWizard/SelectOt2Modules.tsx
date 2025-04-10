@@ -19,19 +19,17 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { uuid } from '../../../utils'
-import { ModuleDiagram } from '../../../pages/CreateNewProtocolWizard/ModuleDiagram'
-import { WizardBody } from '../../../pages/CreateNewProtocolWizard/WizardBody'
-import {
-  DEFAULT_SLOT_MAP_OT2,
-  OT2_SUPPORTED_MODULE_MODELS,
-} from '../../../pages/CreateNewProtocolWizard/constants'
-import { HandleEnter } from '../../atoms'
-import { PDListItemCustomize as ListItemCustomize } from '../../../pages/CreateNewProtocolWizard/PDListItemCustomize'
+import { uuid } from '../../utils'
+import { ModuleDiagram } from './ModuleDiagram'
+import { WizardBody } from './WizardBody'
+import { DEFAULT_SLOT_MAP_OT2, OT2_SUPPORTED_MODULE_MODELS } from './constants'
+import { HandleEnter } from '../../components/atoms'
+import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { FormModule } from '../../../step-forms'
-import type { WizardTileProps } from '../../../pages/CreateNewProtocolWizard/types'
+import type { FormModule } from '../../step-forms'
+import type { WizardTileProps } from './types'
+import type { OT2ModuleType } from './ModuleDiagram'
 
 export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -79,7 +77,6 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
         header={t('add_modules')}
         goBack={() => {
           goBack(1)
-          setValue('modules', null)
         }}
         proceed={() => {
           proceed(1)
@@ -87,11 +84,7 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-            {filteredSupportedModules.length > 0 ||
-            !(
-              filteredSupportedModules.length === 1 &&
-              filteredSupportedModules[0] === 'absorbanceReaderV1'
-            ) ? (
+            {filteredSupportedModules.length > 0 ? (
               <StyledText desktopStyle="headingSmallBold">
                 {t('which_modules')}
               </StyledText>
@@ -117,12 +110,7 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing12}
-                paddingTop={
-                  filteredSupportedModules.length === 1 &&
-                  filteredSupportedModules[0] === 'absorbanceReaderV1'
-                    ? 0
-                    : SPACING.spacing32
-                }
+                paddingTop={SPACING.spacing32}
               >
                 <StyledText desktopStyle="headingSmallBold">
                   {t('modules_added')}
@@ -150,7 +138,7 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
                       []
                     )
                     .map(module => (
-                      <ListItem type="default" key={`${module.model}`}>
+                      <ListItem type="default" key={module.model}>
                         <ListItemCustomize
                           linkText={t('remove')}
                           onClick={() => {
@@ -167,7 +155,7 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
                               height="3.625rem"
                             >
                               <ModuleDiagram
-                                type={module.type}
+                                type={module.type as OT2ModuleType}
                                 model={module.model}
                               />
                             </Flex>

@@ -39,7 +39,7 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
-import { SelectOt2Modules } from '../../components/organisms/SelectOt2Modules'
+import { SelectOt2Modules } from './SelectOt2Modules'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
 import { SelectGripper } from './SelectGripper'
