@@ -1238,7 +1238,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available among {tip_racks} for this transfer."
+                    f"No tip available for this transfer step"
+                    f" among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[tip_rack[1].get_display_name() for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
@@ -1478,7 +1480,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available among {tip_racks} for this transfer."
+                    f"No tip available for this distribute step"
+                    f" among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[tip_rack[1].get_display_name() for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
@@ -1569,7 +1573,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 and not transfer_props.multi_dispense.retract.blowout.enabled
             ):
                 raise RuntimeError(
-                    "Distribute liquid uses a disposal volume but location for disposing of"
+                    "Distribute uses a disposal volume but location for disposing of"
                     " the disposal volume cannot be found when blowout is disabled."
                     " Specify a blowout location and enable blowout when using a disposal volume."
                 )
@@ -1751,7 +1755,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available among {tip_racks} for this transfer."
+                    f"No tip available for this consolidate step"
+                    f" among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[tip_rack[1].get_display_name() for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
