@@ -14,6 +14,7 @@ from .types import (
     UploadFunction,
     LiveData,
     ModuleType,
+    HopperDoorState,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -178,6 +179,11 @@ class AbstractModule(abc.ABC):
     def serial_number(self) -> Optional[str]:
         """The usb serial number of this device."""
         return self.device_info.get("serial")
+
+    @property
+    def hopper_door_state(self) -> Optional[HopperDoorState]:
+        """Return a Flex Stacker Hopper Module Door State"""
+        pass
 
     @abc.abstractmethod
     async def prep_for_update(self) -> str:
