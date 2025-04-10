@@ -339,10 +339,10 @@ class RunArgs:
                 fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
         else:
-            if args.increment:
+            if args.increment or args.isolate_channels == [1]:
                 assert len(tip_volumes) == 1, (
                     f"tip must be specified "
-                    f"when running --increment test "
+                    f"when running --increment or --isolate-channels 1 test "
                     f"with {args.channels}ch P{args.pipette}"
                 )
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
