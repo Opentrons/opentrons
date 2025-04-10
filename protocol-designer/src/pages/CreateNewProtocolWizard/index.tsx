@@ -39,7 +39,7 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
-import { SelectModules } from '../../components/organisms/SelectModules'
+import { SelectOt2Modules } from '../../components/organisms/SelectOt2Modules'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
 import { SelectGripper } from './SelectGripper'
@@ -442,7 +442,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
           case 'gripper':
             return <SelectGripper {...{ ...formProps, proceed, goBack }} />
           case 'modules':
-            return <SelectModules {...{ ...formProps, proceed, goBack }} />
+            return <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />
           case 'fixtures':
             return <SelectFixtures {...{ ...formProps, proceed, goBack }} />
           case 'metadata':

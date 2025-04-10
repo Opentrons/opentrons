@@ -4,72 +4,57 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   ListItem,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getModuleDisplayName,
   getModuleType,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import { uuid } from '../../../utils'
 import { ModuleDiagram } from '../../../pages/CreateNewProtocolWizard/ModuleDiagram'
 import { WizardBody } from '../../../pages/CreateNewProtocolWizard/WizardBody'
 import {
-  DEFAULT_SLOT_MAP_FLEX,
   DEFAULT_SLOT_MAP_OT2,
-  FLEX_SUPPORTED_MODULE_MODELS,
   OT2_SUPPORTED_MODULE_MODELS,
 } from '../../../pages/CreateNewProtocolWizard/constants'
 import { HandleEnter } from '../../atoms'
 import { PDListItemCustomize as ListItemCustomize } from '../../../pages/CreateNewProtocolWizard/PDListItemCustomize'
-import { AddModuleEmptySelectorButton } from './AddModuleEmptySelectorButton'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { FormModule } from '../../../step-forms'
 import type { WizardTileProps } from '../../../pages/CreateNewProtocolWizard/types'
 
-export function SelectModules(props: WizardTileProps): JSX.Element | null {
+export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
-  const fields = watch('fields')
   const modules = watch('modules')
-  const additionalEquipment = watch('additionalEquipment')
-  const robotType = fields.robotType
-  const supportedModules =
-    robotType === FLEX_ROBOT_TYPE
-      ? FLEX_SUPPORTED_MODULE_MODELS
-      : OT2_SUPPORTED_MODULE_MODELS
+  const supportedModules = OT2_SUPPORTED_MODULE_MODELS
   const filteredSupportedModules = supportedModules.filter(
     moduleModel =>
       !(
         modules != null &&
-        Object.values(modules).some(module =>
-          robotType === FLEX_ROBOT_TYPE
-            ? module.model === moduleModel
-            : module.type === getModuleType(moduleModel)
+        Object.values(modules).some(
+          module => module.type === getModuleType(moduleModel)
         )
       )
   )
-  const hasGripper = additionalEquipment.some(aE => aE === 'gripper')
 
-  const handleAddModule = (
-    moduleModel: ModuleModel,
-    hasNoAvailableSlots: boolean
-  ): void => {
+  const handleAddModule = (moduleModel: ModuleModel): void => {
     setValue('modules', {
       ...modules,
       [uuid()]: {
         model: moduleModel,
         type: getModuleType(moduleModel),
-        slot:
-          robotType === FLEX_ROBOT_TYPE
-            ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-            : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
+        slot: DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
       },
     })
   }
@@ -89,8 +74,8 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
   return (
     <HandleEnter onEnter={proceed}>
       <WizardBody
-        robotType={robotType}
-        stepNumber={robotType === FLEX_ROBOT_TYPE ? 4 : 3}
+        robotType={OT2_ROBOT_TYPE}
+        stepNumber={2}
         header={t('add_modules')}
         goBack={() => {
           goBack(1)
@@ -115,14 +100,17 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
               {filteredSupportedModules
                 .sort((moduleA, moduleB) => moduleA.localeCompare(moduleB))
                 .map(moduleModel => (
-                  <AddModuleEmptySelectorButton
-                    key={moduleModel}
-                    moduleModel={moduleModel}
-                    areSlotsAvailable={true}
-                    hasGripper={hasGripper}
-                    handleAddModule={handleAddModule}
-                    tooltipText={t('add_gripper_for_absorbance_reader')}
-                  />
+                  <Flex width={FLEX_MAX_CONTENT}>
+                    <EmptySelectorButton
+                      disabled={false}
+                      textAlignment={TYPOGRAPHY.textAlignLeft}
+                      iconName="plus"
+                      text={getModuleDisplayName(moduleModel)}
+                      onClick={() => {
+                        handleAddModule(moduleModel)
+                      }}
+                    />
+                  </Flex>
                 ))}
             </Flex>
             {modules != null && Object.keys(modules).length > 0 ? (
