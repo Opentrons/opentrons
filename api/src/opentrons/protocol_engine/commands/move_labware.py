@@ -48,6 +48,8 @@ from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
+from opentrons.hardware_control.modules.types import PlatformState
+
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
     from ..state.state import StateView
@@ -293,13 +295,26 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 raise LabwareMovementNotAllowedError(
                     "Cannot move a labware onto itself."
                 )
-        # Validate labware for the absorbance reader
+        # Validate labware for the module placement
         elif isinstance(available_new_location, ModuleLocation):
             module = self._state_view.modules.get(available_new_location.moduleId)
             if module is not None and module.model == ModuleModel.ABSORBANCE_READER_V1:
                 self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
                     current_labware_definition
                 )
+            if (
+                module is not None
+                and module.model == ModuleModel.FLEX_STACKER_MODULE_V1
+            ):
+                # Validate that stacker is in position to receive labware
+                stacker_sub = self._state_view.modules.get_flex_stacker_substate(
+                    module.id
+                )
+                stacker_hw = self._equipment.get_module_hardware_api(
+                    stacker_sub.module_id
+                )
+                if stacker_hw is not None:
+                    await stacker_hw.verify_shuttle_location(PlatformState.EXTENDED)
 
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(
