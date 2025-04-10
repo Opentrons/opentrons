@@ -317,9 +317,6 @@ class FlexStacker(mod_abc.AbstractModule):
         acceleration: Optional[float] = None,
     ) -> bool:
         """Close the latch, dropping any labware its holding."""
-        # Dont move the latch if its already closed.
-        if self.limit_switch_status[StackerAxis.L] == StackerAxisState.EXTENDED:
-            return True
         success = await self.home_axis(
             StackerAxis.L,
             Direction.RETRACT,
@@ -339,9 +336,6 @@ class FlexStacker(mod_abc.AbstractModule):
         acceleration: Optional[float] = None,
     ) -> bool:
         """Open the latch."""
-        # Dont move the latch if its already opened.
-        if self.limit_switch_status[StackerAxis.L] == StackerAxisState.RETRACTED:
-            return True
         # The latch only has one limit switch, so we have to travel a fixed distance
         # to open the latch.
         success = await self.move_axis(
@@ -353,8 +347,10 @@ class FlexStacker(mod_abc.AbstractModule):
         )
         # Check that the latch is opened.
         await self._reader.get_limit_switch_status()
-        axis_state = self.limit_switch_status[StackerAxis.L]
-        return success and axis_state == StackerAxisState.RETRACTED
+        return (
+            success
+            and self.limit_switch_status[StackerAxis.L] == StackerAxisState.RETRACTED
+        )
 
     async def dispense_labware(self, labware_height: float) -> bool:
         """Dispenses the next labware in the stacker."""
@@ -404,6 +400,11 @@ class FlexStacker(mod_abc.AbstractModule):
     async def _move_and_home_axis(
         self, axis: StackerAxis, direction: Direction, offset: float = 0
     ) -> bool:
+        """Move the axis in a direction by the given offset in mm and home it.
+
+        Warning: It is assumed that the axis is already in a known state
+        before this function gets called. Do not use this function if the axis
+        has not been homed/has recently stalled."""
         distance = MAX_TRAVEL[axis] - offset
         await self.move_axis(axis, direction, distance)
         return await self.home_axis(axis, direction)
