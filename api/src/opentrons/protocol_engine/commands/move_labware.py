@@ -350,6 +350,22 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     current_labware.location
                 )
             )
+            # If the current location is a module location, validate availability of said module
+            if isinstance(validated_current_loc, ModuleLocation):
+                module = self._state_view.modules.get(validated_current_loc.moduleId)
+                if (
+                    module is not None
+                    and module.model == ModuleModel.FLEX_STACKER_MODULE_V1
+                ):
+                    # Validate that stacker is in position to receive labware
+                    stacker_sub = self._state_view.modules.get_flex_stacker_substate(
+                        module.id
+                    )
+                    stacker_hw = self._equipment.get_module_hardware_api(
+                        stacker_sub.module_id
+                    )
+                    if stacker_hw is not None:
+                        await stacker_hw.verify_shuttle_location(PlatformState.EXTENDED)
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
