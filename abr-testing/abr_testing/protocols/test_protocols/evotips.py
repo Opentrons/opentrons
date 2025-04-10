@@ -40,9 +40,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    evotips_adapter = protocol.load_adapter(
-        "evotip_flex_96_tiprack_adapter", "C1"
-    )
+    evotips_adapter = protocol.load_adapter("evotip_flex_96_tiprack_adapter", "C1")
     evosep_tips_labware = evotips_adapter.load_labware(
         "evotip_flex_96_labware",
     )
@@ -50,9 +48,9 @@ def run(protocol: ProtocolContext) -> None:
     gripper_repeats = protocol.params.gripper_repeats  # type: ignore[attr-defined]
     soak_seconds = protocol.params.soak_seconds  # type: ignore[attr-defined]
     gripper_only = protocol.params.gripper_only  # type: ignore[attr-defined]
-    soak_plate = protocol.load_adapter("evotip_flex_short_adapter", "B2")
-
-    sol_a_plate = protocol.load_labware("nest_1_reservoir_195ml", "C2","Solvent A")
+    short_adapter = protocol.load_adapter("evotip_flex_short_adapter", "B2")
+    soak_plate = short_adapter.load_labware("nest_1_reservoir_195ml")
+    sol_a_plate = protocol.load_labware("nest_1_reservoir_195ml", "C2", "Solvent A")
     sol_a = sol_a_plate.wells()[0]
 
     sample_plate = protocol.load_labware(
@@ -83,7 +81,6 @@ def run(protocol: ProtocolContext) -> None:
 
         p1k_96.tip_racks = tips_50
         p1k_96.pick_up_tip()
-        protocol.pause("Check Tip Alignment")
 
         p1k_96.flow_rate.aspirate = 20
         p1k_96.flow_rate.dispense = 5
@@ -154,9 +151,9 @@ def run(protocol: ProtocolContext) -> None:
 
         # ------------------------Soak tips Action ------------------------------
 
-        # protocol.move_labware(evosep_tips_labware, soak_plate, True)
-        # protocol.delay(SEC_SOAK)
-        # protocol.move_labware(evosep_tips_labware, evotips_adapter, True)
+        protocol.move_labware(evosep_tips_labware, soak_plate, True)
+        protocol.delay(soak_seconds)
+        protocol.move_labware(evosep_tips_labware, evotips_adapter, True)
     for i in range(gripper_repeats):
         protocol.move_labware(
             labware=evosep_tips_labware,
@@ -175,13 +172,14 @@ def run(protocol: ProtocolContext) -> None:
     if not gripper_only:
         # Seal the pipette to the evotips
         p1k_96.resin_tip_seal(location=evosep_tips_labware)
+        protocol.pause("check tip alignment.")
 
         p1k_96.resin_tip_dispense(
-            location=evotip.top(z=H_TIP_IN_WELL + 10), volume=300.0, rate=100.0
+            location=sample_plate["A1"].bottom(), volume=300.0, rate=100.0
         )
-        # protocol.delay(seconds=20)
+        protocol.delay(seconds=20)
         p1k_96.resin_tip_dispense(
-            location=evotip.top(z=H_TIP_IN_WELL + 10), volume=100.0, rate=1.0
+            location=sample_plate["A1"].bottom(), volume=100.0, rate=1.0
         )
         protocol.delay(seconds=30)
 
