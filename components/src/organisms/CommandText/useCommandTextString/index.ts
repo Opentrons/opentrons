@@ -149,6 +149,9 @@ export function useCommandTextString(
       }
     case 'flexStacker/retrieve':
     case 'flexStacker/store':
+    case 'flexStacker/setStoredLabware':
+    case 'flexStacker/empty':
+    case 'flexStacker/fill':
       return {
         kind: 'generic',
         commandText: utils.getFlexStackerCommandText({
