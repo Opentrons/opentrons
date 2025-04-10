@@ -268,8 +268,9 @@ class Well:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
             negative offsets are lower.
-        :param target: The relative position inside the well to target when performing a liquid handling operation.
-        :return: A :py:class:`~opentrons.types.Location` that indicates location is meniscus and that holds the ``z`` offset in its point.z field.
+        :param target: The relative position of the liquid meniscus inside the well to target when performing a liquid handling operation.
+
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the liquid meniscus, plus a target position and ``z`` offset as specified.
 
         """
         return Location(

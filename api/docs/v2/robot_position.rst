@@ -93,9 +93,10 @@ Let's look at the :py:meth:`~.Well.meniscus` method. It returns a position at th
     plate["A1"].meniscus(target= "end", z=-1) # 1 mm below the meniscus of liquid inside the well
 
 
-The liquid meniscus in a well changes during aspirating or dispensing, so you'll also need to specify a ``target`` position for the pipette: 
-- Set ``target= "end"`` to ensure the pipette stays submerged while aspirating.
-- Set ``target= "start"`` or ``end`` to choose where the pipette begins dispensing. 
+The liquid meniscus in a well changes during aspirating or dispensing, so you'll also need to specify a ``target`` position relative to the meniscus. Each position target is useful in different scenarios: 
+
+- Set ``target= "start"`` to target the existing liquid meniscus in the destination well before an aspirate or dispense. 
+- Set ``target= "end"`` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
 
 .. note::
     To use the :py:meth: `~.Labware.well-meniscus` method, you'll first need to determine the volume of liquid inside the well. You can do this at any time in your protocol by:
