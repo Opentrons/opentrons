@@ -12,7 +12,7 @@ from contextlib import ExitStack
 from ._util import add_column, copy_contents
 from ..database import sql_engine_ctx
 from ..file_and_directory_names import DB_FILE
-from ..tables import schema_5
+from ..tables import schema_05
 from .._folder_migrator import Migration
 
 
@@ -27,10 +27,10 @@ class Migration4to5(Migration):  # noqa: D101
         # Append the new column to existing protocols in v4 database
         with ExitStack() as exit_stack:
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
-            schema_5.metadata.create_all(dest_engine)
+            schema_05.metadata.create_all(dest_engine)
 
             add_column(
                 dest_engine,
-                schema_5.protocol_table.name,
-                schema_5.protocol_table.c.protocol_kind,
+                schema_05.protocol_table.name,
+                schema_05.protocol_table.c.protocol_kind,
             )

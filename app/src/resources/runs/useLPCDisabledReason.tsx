@@ -1,13 +1,21 @@
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getLoadedLabwareDefinitionsByUri,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { useRunCalibrationStatus } from './useRunCalibrationStatus'
 import { useRunHasStarted } from './useRunHasStarted'
 import { useUnmatchedModulesForProtocol } from './useUnmatchedModulesForProtocol'
 import { useIsFlex } from '/app/redux-resources/robots'
+import {
+  getIsFixtureMismatch,
+  useDeckConfigurationCompatibility,
+} from '/app/resources/deck_configuration'
 
 interface LPCDisabledReasonProps {
   runId: string
@@ -39,10 +47,16 @@ export function useLPCDisabledReason(
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE,
+    robotProtocolAnalysis
+  )
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
   const hasMissingModules =
     hasMissingModulesForOdd ?? missingModuleIds.length > 0
   const calibrationIncomplete = !hasMissingModules && !isCalibrationComplete
-  const moduleSetupIncomplete = hasMissingModules && isCalibrationComplete
+  const moduleSetupIncomplete =
+    (hasMissingModules || isFixtureMismatch) && isCalibrationComplete
   const moduleAndCalibrationIncomplete =
     hasMissingModules && !isCalibrationComplete
   const labwareDefinitions =

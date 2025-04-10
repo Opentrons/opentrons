@@ -1,7 +1,15 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
-import { TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+import {
+  TYPOGRAPHY,
+  LegacyStyledText,
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  RESPONSIVENESS,
+} from '@opentrons/components'
 
 import {
   selectIsSelectedLwTipRack,
@@ -9,6 +17,7 @@ import {
   OFFSET_KIND_DEFAULT,
   selectLwDisplayName,
   getFlexSlotNameOnly,
+  selectActivePipetteChannelCount,
 } from '/app/redux/protocol-runs'
 import { UnorderedList } from '/app/molecules/UnorderedList'
 import { DescriptionContent } from '/app/molecules/InterventionModal'
@@ -23,6 +32,7 @@ import type {
 import type { State } from '/app/redux/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 export function PlaceItemInstruction(
   props: EditOffsetContentProps
@@ -33,11 +43,14 @@ export function PlaceItemInstruction(
   const { protocolData } = useSelector(
     (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
   )
+  const isActivePipette96ch =
+    useSelector(selectActivePipetteChannelCount(runId)) === 96
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(runId)
   ) as SelectedLwOverview
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const isDefaultOffset = offsetLocationDetails.kind === OFFSET_KIND_DEFAULT
 
   const buildHeader = (): string =>
     t('prepare_item_in_location', {
@@ -57,34 +70,51 @@ export function PlaceItemInstruction(
   ) as LabwareStackupDetail[]
 
   return (
-    <DescriptionContent
-      headline={buildHeader()}
-      message={
-        <UnorderedList
-          items={[
-            <ClearDeckCopy
-              {...props}
-              key="clear_deck"
-              slotOnlyDisplayLocation={slotOnlyDisplayLocation}
-              labwareInfo={selectedLwInfo}
-            />,
-            ...lwOnlyLocSeq.map((component, index) => (
-              <PlaceItemInstructionContent
-                key={`${slotOnlyDisplayLocation}-${index}`}
-                isLwTiprack={isLwTiprack}
+    <Flex css={CONATINER_STYLE}>
+      <DescriptionContent
+        headline={buildHeader()}
+        message={
+          <UnorderedList
+            items={[
+              <ClearDeckCopy
+                {...props}
+                key="clear_deck"
                 slotOnlyDisplayLocation={slotOnlyDisplayLocation}
                 labwareInfo={selectedLwInfo}
-                lwComponent={component}
-                isFirstItemInStackup={index === 0}
-                {...props}
-              />
-            )),
-          ]}
+              />,
+              ...lwOnlyLocSeq.map((component, index) => (
+                <PlaceItemInstructionContent
+                  key={`${slotOnlyDisplayLocation}-${index}`}
+                  isLwTiprack={isLwTiprack}
+                  slotOnlyDisplayLocation={slotOnlyDisplayLocation}
+                  labwareInfo={selectedLwInfo}
+                  lwComponent={component}
+                  isFirstItemInStackup={index === 0}
+                  {...props}
+                />
+              )),
+            ]}
+          />
+        }
+      />
+      {isActivePipette96ch && isDefaultOffset && (
+        <InlineNotification
+          type="alert"
+          heading={t('ensure_tip_rack_accurately_placed')}
         />
-      }
-    />
+      )}
+    </Flex>
   )
 }
+
+const CONATINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing12};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: ${SPACING.spacing24};
+  }
+`
 
 interface PlaceItemInstructionContentProps extends LPCWizardContentProps {
   isLwTiprack: boolean

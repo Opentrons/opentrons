@@ -9,6 +9,8 @@ import {
   RESPONSIVENESS,
   Flex,
   SPACING,
+  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import { selectAllLabwareInfoAndDefaultStatusSorted } from '/app/redux/protocol-runs'
@@ -39,7 +41,7 @@ export function LabwareOffsetsTable(
 
   return (
     <Flex css={CONTAINER_STYLE}>
-      <ListTable headers={[t('labware_type'), t('total_offsets')]}>
+      <ListTable headers={[<TableHeaders key="1" />]}>
         {labwareInfo.map(aLwInfo => (
           <ListAccordion
             key={aLwInfo.uri}
@@ -90,5 +92,45 @@ const OFFSET_COLUMN_STYLE = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding-right: 0;
+  }
+`
+
+function TableHeaders(): JSX.Element {
+  const { t } = useTranslation('protocol_setup')
+
+  return (
+    <Flex css={TABLE_HEADER_CONTAINER_STYLE}>
+      <StyledText
+        css={TABLE_HEADER_COLUMN_ONE_TEXT_STYLE}
+        desktopStyle="bodyDefaultRegular"
+      >
+        {t('labware_type')}
+      </StyledText>
+      <StyledText
+        css={TABLE_HEADER_COLUMN_TWO_TEXT_STYLE}
+        desktopStyle="bodyDefaultRegular"
+      >
+        {t('total_offsets')}
+      </StyledText>
+    </Flex>
+  )
+}
+
+const TABLE_HEADER_CONTAINER_STYLE = css`
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: 0 ${SPACING.spacing12};
+  gap: ${SPACING.spacing24};
+`
+
+const TABLE_HEADER_COLUMN_ONE_TEXT_STYLE = css`
+  color: ${COLORS.grey60};
+`
+
+const TABLE_HEADER_COLUMN_TWO_TEXT_STYLE = css`
+  color: ${COLORS.grey60};
+  padding-right: 4rem;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding-right: 7.5rem;
   }
 `
