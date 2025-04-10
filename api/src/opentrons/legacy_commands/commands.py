@@ -323,20 +323,20 @@ def move_to_disposal_location(
     }
 
 
-def transfer_liquid(
+def transfer_with_liquid_class(
     instrument: InstrumentContext,
     liquid_class: LiquidClass,
     volume: float,
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
     destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
-) -> command_types.TransferLiquidCommand:
+) -> command_types.TransferWithLiquidClassCommand:
     text = (
         "Transferring "
         + f"{volume} uL of {liquid_class.display_name} liquid class from "
         + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
     )
     return {
-        "name": command_types.TRANSFER_LIQUID,
+        "name": command_types.TRANSFER_WITH_LIQUID_CLASS,
         "payload": {
             "instrument": instrument,
             "liquid_class": liquid_class,
@@ -348,20 +348,20 @@ def transfer_liquid(
     }
 
 
-def distribute_liquid(
+def distribute_with_liquid_class(
     instrument: InstrumentContext,
     liquid_class: LiquidClass,
     volume: float,
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
     destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
-) -> command_types.DistributeLiquidCommand:
+) -> command_types.DistributeWithLiquidClassCommand:
     text = (
         "Distributing "
         + f"{volume} uL of {liquid_class.display_name} liquid class from "
         + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
     )
     return {
-        "name": command_types.DISTRIBUTE_LIQUID,
+        "name": command_types.DISTRIBUTE_WITH_LIQUID_CLASS,
         "payload": {
             "instrument": instrument,
             "liquid_class": liquid_class,
@@ -373,20 +373,20 @@ def distribute_liquid(
     }
 
 
-def consolidate_liquid(
+def consolidate_with_liquid_class(
     instrument: InstrumentContext,
     liquid_class: LiquidClass,
     volume: float,
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
     destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
-) -> command_types.ConsolidateLiquidCommand:
+) -> command_types.ConsolidateWithLiquidClassCommand:
     text = (
         "Consolidating "
         + f"{volume} uL of {liquid_class.display_name} liquid class from "
         + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
     )
     return {
-        "name": command_types.CONSOLIDATE_LIQUID,
+        "name": command_types.CONSOLIDATE_WITH_LIQUID_CLASS,
         "payload": {
             "instrument": instrument,
             "liquid_class": liquid_class,

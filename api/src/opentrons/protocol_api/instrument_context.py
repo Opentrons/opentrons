@@ -1574,7 +1574,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.transfer_liquid(
+            command=cmds.transfer_with_liquid_class(
                 instrument=self,
                 liquid_class=liquid_class,
                 volume=volume,
@@ -1671,7 +1671,7 @@ class InstrumentContext(publisher.CommandPublisher):
         verified_source = transfer_args.sources_list[0]
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.distribute_liquid(
+            command=cmds.distribute_with_liquid_class(
                 instrument=self,
                 liquid_class=liquid_class,
                 volume=volume,
@@ -1769,7 +1769,7 @@ class InstrumentContext(publisher.CommandPublisher):
         verified_dest = transfer_args.destinations_list[0]
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.consolidate_liquid(
+            command=cmds.consolidate_with_liquid_class(
                 instrument=self,
                 liquid_class=liquid_class,
                 volume=volume,

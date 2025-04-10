@@ -44,9 +44,9 @@ TOUCH_TIP: Final = "command.TOUCH_TIP"
 RETURN_TIP: Final = "command.RETURN_TIP"
 MOVE_TO: Final = "command.MOVE_TO"
 MOVE_TO_DISPOSAL_LOCATION: Final = "command.MOVE_TO_DISPOSAL_LOCATION"
-TRANSFER_LIQUID: Final = "command.TRANSFER_LIQUID"
-DISTRIBUTE_LIQUID: Final = "command.DISTRIBUTE_LIQUID"
-CONSOLIDATE_LIQUID: Final = "command.CONSOLIDATE_LIQUID"
+TRANSFER_WITH_LIQUID_CLASS: Final = "command.TRANSFER_WITH_LIQUID_CLASS"
+DISTRIBUTE_WITH_LIQUID_CLASS: Final = "command.DISTRIBUTE_WITH_LIQUID_CLASS"
+CONSOLIDATE_WITH_LIQUID_CLASS: Final = "command.CONSOLIDATE_WITH_LIQUID_CLASS"
 SEAL: Final = "command.SEAL"
 UNSEAL: Final = "command.UNSEAL"
 PRESSURIZE: Final = "command.PRESSURIZE"
@@ -551,18 +551,18 @@ class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
 
 
-class TransferLiquidCommand(TypedDict):
-    name: Literal["command.TRANSFER_LIQUID"]
+class TransferWithLiquidClassCommand(TypedDict):
+    name: Literal["command.TRANSFER_WITH_LIQUID_CLASS"]
     payload: LiquidClassCommandPayload
 
 
-class DistributeLiquidCommand(TypedDict):
-    name: Literal["command.DISTRIBUTE_LIQUID"]
+class DistributeWithLiquidClassCommand(TypedDict):
+    name: Literal["command.DISTRIBUTE_WITH_LIQUID_CLASS"]
     payload: LiquidClassCommandPayload
 
 
-class ConsolidateLiquidCommand(TypedDict):
-    name: Literal["command.CONSOLIDATE_LIQUID"]
+class ConsolidateWithLiquidClassCommand(TypedDict):
+    name: Literal["command.CONSOLIDATE_WITH_LIQUID_CLASS"]
     payload: LiquidClassCommandPayload
 
 
@@ -648,9 +648,9 @@ Command = Union[
     MoveToCommand,
     MoveToDisposalLocationCommand,
     MoveLabwareCommand,
-    TransferLiquidCommand,
-    DistributeLiquidCommand,
-    ConsolidateLiquidCommand,
+    TransferWithLiquidClassCommand,
+    DistributeWithLiquidClassCommand,
+    ConsolidateWithLiquidClassCommand,
     SealCommand,
     UnsealCommand,
     PressurizeCommand,
