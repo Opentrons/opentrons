@@ -91,31 +91,32 @@ GetFlexStackerCommandText): string => {
   } else if (command.commandType === 'flexStacker/setStoredLabware') {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
-      location: { moduleId: command.params?.moduleId[0] },
+      location: { moduleId: command.params?.moduleId },
       robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
     console.log('slotName: ', slotName)
-    if (primaryDefinitionDisplayName != null && slotName != null) {
-      return t('store_labware_from_slot_to_stacker', {
+    if ('primaryLabwareDefinition' in command?.result && slotName != null) {
+      return t('flex_stacker_set_stored_labware_with_quantity_and_location', {
         quantity: command.params.initialCount,
         slotName,
-        primaryDefinitionDisplayName,
-      })
+        primaryDefinitionDisplayName:
+          command.result?.primaryLabwareDefinition.metadata.displayName,
+      }) + (command.result?.lidLabwareURI != null ? t('with_lid_name', {lidDisplayName: command.result?.lidLabwareURI}) : '')
     }
   } else if (command.commandType === 'flexStacker/fill') {
     if (primaryDefinitionDisplayName != null) {
       return t('flex_stacker_fill_with_quantity_and_labware', {
         quantity: command.params.count,
         primaryDefinitionDisplayName,
-      })
+      }) + (command.result?.lidLabwareURI != null ? t('with_lid_name', {lidDisplayName: command.result?.lidLabwareURI}) : '')
     }
-  } else if (command.commandType === 'flexStacker/fill') {
+  } else if (command.commandType === 'flexStacker/empty') {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
-      location: { moduleId: command.params?.moduleId[0] },
+      location: { moduleId: command.params?.moduleId },
       robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],

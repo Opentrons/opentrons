@@ -35,12 +35,12 @@
   "engaging_magnetic_module": "Engaging Magnetic Module",
   "fixed_trash": "Fixed Trash",
   "flex_stacker_empty": "Manually empty all labware out of Flex Stacker",
-  "flex_stacker_empty_from_location": "Manually empty all labware out of Stacker in {{location}}",
+  "flex_stacker_empty_from_location": "Manually empty all labware out of Stacker in {{slotName}}",
   "flex_stacker_fill": "Fill Flex Stacker",
-  "flex_stacker_fill_with_quantity_and_labware": "Fill Flex Stacker with {{quantity}} {{primaryDefinitionDisplayName}} with lidDisplayName",
+  "flex_stacker_fill_with_quantity_and_labware": "Fill Flex Stacker with {{quantity}} {{primaryDefinitionDisplayName}}",
   "flex_stacker_retrieve": "Retrieve from Flex Stacker",
   "flex_stacker_set_stored_labware": "Set stored labware in Flex Stacker",
-  "flex_stacker_set_stored_labware_with_quantity_and_location": "Set stored labware in Flex Stacker at {{moduleId}} with {{quantity}} {{primaryDefinitionDisplayName}}",
+  "flex_stacker_set_stored_labware_with_quantity_and_location": "Set stored labware at {{slotName}} with {{quantity}} {{primaryDefinitionDisplayName}}",
   "flex_stacker_store": "Store into Flex Stacker",
   "get_next_tip": "Calculating position of the next available tip",
   "home_gantry": "Homing all gantry, pipette, and plunger axes",
@@ -118,5 +118,6 @@
   "waiting_for_tc_lid_to_reach": "Waiting for Thermocycler lid to reach target temperature",
   "waiting_to_reach_temp_module": "Waiting for Temperature Module to reach {{temp}}",
   "waste_chute": "Waste Chute",
-  "with_reference_of": "with reference of {{wavelength}} nm"
+  "with_reference_of": "with reference of {{wavelength}} nm",
+  "with_lid_name": " with {{lidDisplayName}}"
 }
