@@ -71,6 +71,7 @@ export function SelectRecoveryOptionHome({
             setSelectedRecoveryOption(selectedRoute)
             void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
           },
+          isSticky: true,
         }}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
