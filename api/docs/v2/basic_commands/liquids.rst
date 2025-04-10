@@ -49,7 +49,7 @@ You can also aspirate from a location along the center vertical axis within a we
     pipette.aspirate(200, depth)
 
 
-Use the :py:meth:`~.Labware.Well.mensicus` method to aspirate relative to the meniscus of liquid in a well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
+Use the :py:meth:`~.Well.meniscus` method to aspirate relative to the meniscus of liquid in a well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
 - Specify your starting liquid volume with :py:meth:`~.Labware.load_liquid`, or
 - Use :py:meth:`~.InstrumentContext.measure_liquid_height` to define liquid height in a well before aspirating, or earlier in the protocol. 
 
@@ -119,7 +119,7 @@ You can also dispense from a location along the center vertical axis within a we
     pipette.dispense(200, depth)
 
 
-Use the :py:meth:`~.Labware.Well.Meniscus` method to dispense at the meniscus of liquid in your well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
+Use the :py:meth:`~.Well.meniscus` method to dispense at the meniscus of liquid in your well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
 - Specify your starting liquid volume with :py:meth:`~.Labware.load_liquid`, or
 - Use :py:meth:`~.InstrumentContext.measure_liquid_height` to define liquid height in a well before aspirating, or earlier in the protocol. 
 

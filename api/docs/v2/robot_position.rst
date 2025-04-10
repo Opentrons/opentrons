@@ -86,7 +86,7 @@ Let's look at the :py:meth:`.Well.center` method. It returns a position centered
 Meniscus
 ^^^^^^^^
 
-Let's look at the :py:meth:`~.Labware.well-meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Like the `.Well.top` and `.Well.bottom` methods, you can adjust the height of the meniscus with the optional argument ``z``, which is measured in mm. Positive ``z`` values move the position up, and negative ones move it down. 
+Let's look at the :py:meth:`~.Well.meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Like the `.Well.top` and `.Well.bottom` methods, you can adjust the height of the meniscus with the optional argument ``z``, which is measured in mm. Positive ``z`` values move the position up, and negative ones move it down. 
 
 .. code-block:: python
 
