@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, Optional, Mapping
+from typing import Any, Dict, Optional, Mapping
 
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -36,6 +36,7 @@ from opentrons.hardware_control.modules.types import (
     LiveData,
     FlexStackerData,
 )
+from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
@@ -247,12 +248,6 @@ class FlexStacker(mod_abc.AbstractModule):
     async def deactivate(self, must_be_running: bool = True) -> None:
         await self._driver.stop_motors()
 
-    async def reset_stall_detected(self) -> None:
-        """Sets the statusbar to normal."""
-        if self._stall_detected:
-            await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
-            self._stall_detected = False
-
     async def set_led_state(
         self,
         power: float,
@@ -276,7 +271,6 @@ class FlexStacker(mod_abc.AbstractModule):
         current: Optional[float] = None,
     ) -> bool:
         """Move the axis in a direction by the given distance in mm."""
-        await self.reset_stall_detected()
         default = STACKER_MOTION_CONFIG[axis]["move"]
         await self._driver.set_run_current(
             axis, current if current is not None else default.run_current
@@ -300,7 +294,6 @@ class FlexStacker(mod_abc.AbstractModule):
         acceleration: Optional[float] = None,
         current: Optional[float] = None,
     ) -> bool:
-        await self.reset_stall_detected()
         default = STACKER_MOTION_CONFIG[axis]["home"]
         await self._driver.set_run_current(
             axis, current if current is not None else default.run_current
@@ -323,9 +316,6 @@ class FlexStacker(mod_abc.AbstractModule):
         acceleration: Optional[float] = None,
     ) -> bool:
         """Close the latch, dropping any labware its holding."""
-        # Dont move the latch if its already closed.
-        if self.limit_switch_status[StackerAxis.L] == StackerAxisState.EXTENDED:
-            return True
         success = await self.home_axis(
             StackerAxis.L,
             Direction.RETRACT,
@@ -345,9 +335,6 @@ class FlexStacker(mod_abc.AbstractModule):
         acceleration: Optional[float] = None,
     ) -> bool:
         """Open the latch."""
-        # Dont move the latch if its already opened.
-        if self.limit_switch_status[StackerAxis.L] == StackerAxisState.RETRACTED:
-            return True
         # The latch only has one limit switch, so we have to travel a fixed distance
         # to open the latch.
         success = await self.move_axis(
@@ -359,8 +346,10 @@ class FlexStacker(mod_abc.AbstractModule):
         )
         # Check that the latch is opened.
         await self._reader.get_limit_switch_status()
-        axis_state = self.limit_switch_status[StackerAxis.L]
-        return success and axis_state == StackerAxisState.RETRACTED
+        return (
+            success
+            and self.limit_switch_status[StackerAxis.L] == StackerAxisState.RETRACTED
+        )
 
     async def dispense_labware(
         self,
@@ -447,6 +436,11 @@ class FlexStacker(mod_abc.AbstractModule):
     async def _move_and_home_axis(
         self, axis: StackerAxis, direction: Direction, offset: float = 0
     ) -> bool:
+        """Move the axis in a direction by the given offset in mm and home it.
+
+        Warning: It is assumed that the axis is already in a known state
+        before this function gets called. Do not use this function if the axis
+        has not been homed/has recently stalled."""
         distance = MAX_TRAVEL[axis] - offset
         await self.move_axis(axis, direction, distance)
         return await self.home_axis(axis, direction)
@@ -517,6 +511,34 @@ class FlexStacker(mod_abc.AbstractModule):
                 self.device_info["serial"],
                 labware_expected=labware_expected,
             )
+
+    def event_listener(self, event: Any) -> None:
+        if isinstance(event, StatusBarUpdateEvent):
+            asyncio.run_coroutine_threadsafe(
+                self._handle_status_bar_event(event), self._loop
+            )
+
+    async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:
+        if event.enabled:
+            match event.state:
+                case StatusBarState.RUNNING:
+                    await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
+                case StatusBarState.PAUSED:
+                    await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE)
+                case StatusBarState.IDLE:
+                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
+                case StatusBarState.HARDWARE_ERROR:
+                    await self.set_led_state(0.5, LEDColor.RED, LEDPattern.FLASH)
+                case StatusBarState.SOFTWARE_ERROR:
+                    await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.STATIC)
+                case StatusBarState.ERROR_RECOVERY:
+                    await self.set_led_state(0.5, LEDColor.YELLOW, LEDPattern.PULSE)
+                case StatusBarState.RUN_COMPLETED:
+                    await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.PULSE)
+                case StatusBarState.UPDATING:
+                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE)
+                case _:
+                    await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
 
 
 class FlexStackerReader(Reader):

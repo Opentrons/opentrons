@@ -9,6 +9,7 @@ import {
   orderWells,
   THERMOCYCLER_MODULE_TYPE,
   SINGLE,
+  getLabwareDefIsStandard,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from './constants'
 import type {
@@ -133,7 +134,7 @@ export function getNextTiprack(
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===
           'opentrons_flex_96_tiprack_adapter' &&
-        adapterEntity?.def.namespace === 'opentrons'
+        getLabwareDefIsStandard(adapterEntity?.def)
 
       return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
     }
