@@ -37,7 +37,8 @@ const render = (props: ComponentProps<typeof SelectBasics>) => {
 }
 
 const values = {
-  additionalEquipment: [],
+  fixtures: {},
+  hasGripper: false,
   fields: {
     name: '',
     description: '',
@@ -51,7 +52,7 @@ const values = {
     },
     right: {},
   },
-  modules: null,
+  modules: {},
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {

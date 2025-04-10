@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import without from 'lodash/without'
 import { uuid } from '@opentrons/step-generation'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -22,6 +21,7 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
@@ -29,12 +29,7 @@ import { WizardBody } from './WizardBody'
 import { DEFAULT_SLOT_MAP_FLEX } from './constants'
 import { BasicsButtons } from './BasicsButtons'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type {
-  AdditionalEquipment,
-  Gen,
-  PipetteType,
-  WizardTileProps,
-} from './types'
+import type { FixtureInfo, Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
   const { setValue, proceed, watch } = props
@@ -48,8 +43,9 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
   const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
-  const additionalEquipment = watch('additionalEquipment')
+  const fixtures = watch('fixtures')
   const modules = watch('modules')
+  const hasGripper = watch('hasGripper')
 
   const robotType = fields?.robotType
   const has96Channel = pipettesByMount.left.pipetteName === 'p1000_96'
@@ -113,6 +109,21 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('pipettesByMount.right.tiprackDefURI', leftTiprackDefURI)
   }
 
+  const flexTrashFixture = {
+    [uuid()]: {
+      cutoutId: 'cutoutA3',
+      name: 'trashBin',
+      cutoutFixtureId: 'trashBinAdapter',
+    } as FixtureInfo,
+  }
+  const ot2TrashFixture = {
+    [uuid()]: {
+      cutoutId: 'cutout12',
+      name: 'trashBin',
+      cutoutFixtureId: 'fixedTrashSlot',
+    } as FixtureInfo,
+  }
+
   return (
     <>
       {pipetteModal ? (
@@ -150,8 +161,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 onChange={() => {
                   setValue('fields.robotType', FLEX_ROBOT_TYPE)
                   resetPipettes()
-                  setValue('modules', null)
-                  setValue('additionalEquipment', ['trashBin'])
+                  setValue('modules', {})
+                  setValue('fixtures', flexTrashFixture)
                 }}
                 buttonLabel={t('shared:opentrons_flex')}
                 buttonValue={FLEX_ROBOT_TYPE}
@@ -161,8 +172,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 onChange={() => {
                   setValue('fields.robotType', OT2_ROBOT_TYPE)
                   resetPipettes()
-                  setValue('modules', null)
-                  setValue('additionalEquipment', ['trashBin'])
+                  setValue('modules', {})
+                  setValue('fixtures', ot2TrashFixture)
                 }}
                 buttonLabel={t('shared:ot2')}
                 buttonValue={OT2_ROBOT_TYPE}
@@ -301,14 +312,9 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 subHeader={t('some_modules_require_gripper')}
                 header={t('need_gripper')}
                 onChange={value => {
-                  setValue(
-                    'additionalEquipment',
-                    value
-                      ? [...additionalEquipment, 'gripper']
-                      : without(additionalEquipment, 'gripper')
-                  )
+                  setValue('hasGripper', value)
                 }}
-                isSelected={additionalEquipment.includes('gripper')}
+                isSelected={hasGripper}
               />
               <BasicsButtons
                 type="thermocycler"
@@ -321,49 +327,68 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                         model: THERMOCYCLER_MODULE_V2,
                         type: THERMOCYCLER_MODULE_TYPE,
                         slot: DEFAULT_SLOT_MAP_FLEX[THERMOCYCLER_MODULE_V2],
+                        cutoutFixtureId: 'thermocyclerModuleV2Front',
+                        cutoutId: 'cutoutB1',
                       },
                     })
                   } else {
-                    const updatedModules =
-                      modules != null
-                        ? Object.fromEntries(
-                            Object.entries(modules).filter(
-                              ([_, value]) =>
-                                value.type !== THERMOCYCLER_MODULE_TYPE
-                            )
-                          )
-                        : {}
+                    const updatedModules = Object.fromEntries(
+                      Object.entries(modules).filter(
+                        ([_, value]) => value.type !== THERMOCYCLER_MODULE_TYPE
+                      )
+                    )
                     setValue('modules', updatedModules)
                   }
                 }}
-                isSelected={
-                  modules != null &&
-                  Object.values(modules).some(
-                    mod => mod.type === THERMOCYCLER_MODULE_TYPE
-                  )
-                }
+                isSelected={Object.values(modules).some(
+                  mod => mod.type === THERMOCYCLER_MODULE_TYPE
+                )}
               />
               <BasicsButtons
                 type="wasteChute"
-                header={t('are_you_using_gripper')}
+                header={t('are_you_using_waste_chute')}
                 onChange={value => {
                   if (value) {
-                    const updated: AdditionalEquipment[] = without(
-                      [...additionalEquipment, 'wasteChute'],
-                      'trashBin'
-                    )
-                    setValue('additionalEquipment', updated)
+                    // If adding wasteChute, remove trashBin
+                    const updatedFixtures =
+                      fixtures != null
+                        ? Object.fromEntries(
+                            Object.entries(fixtures).filter(
+                              ([_, val]) => val.name !== 'trashBin'
+                            )
+                          )
+                        : {}
+
+                    updatedFixtures[uuid()] = {
+                      cutoutId: WASTE_CHUTE_CUTOUT,
+                      name: 'wasteChute',
+                      cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
+                    }
+
+                    setValue('fixtures', updatedFixtures)
                   } else {
-                    const updated: AdditionalEquipment[] = Array.from(
-                      new Set([
-                        ...without(additionalEquipment, 'wasteChute'),
-                        'trashBin',
-                      ])
-                    )
-                    setValue('additionalEquipment', updated)
+                    // If removing wasteChute, filter it out
+                    const filteredFixtures =
+                      fixtures != null
+                        ? Object.fromEntries(
+                            Object.entries(fixtures).filter(
+                              ([_, val]) => val.name !== 'wasteChute'
+                            )
+                          )
+                        : {}
+
+                    filteredFixtures[uuid()] = {
+                      cutoutId: 'cutoutA3',
+                      name: 'trashBin',
+                      cutoutFixtureId: 'trashBinAdapter',
+                    }
+
+                    setValue('fixtures', filteredFixtures)
                   }
                 }}
-                isSelected={additionalEquipment.includes('wasteChute')}
+                isSelected={Object.values(fixtures).some(
+                  fixture => fixture.name === 'wasteChute'
+                )}
               />
             </Flex>
           )}

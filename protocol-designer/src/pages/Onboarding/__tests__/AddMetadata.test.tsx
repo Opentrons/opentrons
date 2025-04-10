@@ -16,7 +16,8 @@ const render = (props: ComponentProps<typeof AddMetadata>) => {
 }
 
 const values = {
-  additionalEquipment: [],
+  fixtures: {},
+  hasGripper: false,
   fields: {
     name: '',
     description: '',
@@ -24,7 +25,7 @@ const values = {
     robotType: FLEX_ROBOT_TYPE,
   },
   pipettesByMount: {} as any,
-  modules: null,
+  modules: {},
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {

@@ -14,6 +14,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  getCutoutIdFromAddressableArea,
   getModuleDisplayName,
   getModuleType,
   OT2_ROBOT_TYPE,
@@ -38,11 +39,8 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   const supportedModules = OT2_SUPPORTED_MODULE_MODELS
   const filteredSupportedModules = supportedModules.filter(
     moduleModel =>
-      !(
-        modules != null &&
-        Object.values(modules).some(
-          module => module.type === getModuleType(moduleModel)
-        )
+      !Object.values(modules).some(
+        module => module.type === getModuleType(moduleModel)
       )
   )
 
@@ -58,14 +56,11 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   }
 
   const handleRemoveModule = (moduleType: ModuleType): void => {
-    const updatedModules =
-      modules != null
-        ? Object.fromEntries(
-            Object.entries(modules).filter(
-              ([key, value]) => value.type !== moduleType
-            )
-          )
-        : {}
+    const updatedModules = Object.fromEntries(
+      Object.entries(modules).filter(
+        ([key, value]) => value.type !== moduleType
+      )
+    )
     setValue('modules', updatedModules)
   }
 
@@ -107,7 +102,7 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
                   </Flex>
                 ))}
             </Flex>
-            {modules != null && Object.keys(modules).length > 0 ? (
+            {Object.keys(modules).length > 0 ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing12}

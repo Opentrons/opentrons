@@ -23,9 +23,10 @@ const values = {
     organizationOrAuthor: '',
     robotType: OT2_ROBOT_TYPE,
   },
-  additionalEquipment: ['trashBin'],
   modules: {},
   pipettesByMount: {} as any,
+  fixtures: {},
+  hasGripper: false,
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {

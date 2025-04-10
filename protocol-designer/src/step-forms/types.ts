@@ -9,6 +9,9 @@ import type {
   MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
   NozzleConfigurationStyle,
+  FlexModuleCutoutFixtureId,
+  CutoutId,
+  OT2CutoutId,
 } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
 
@@ -32,6 +35,8 @@ export interface FormModule {
   model: ModuleModel
   type: ModuleType
   slot: DeckSlot
+  cutoutFixtureId: FlexModuleCutoutFixtureId | null
+  cutoutId: CutoutId | null
 }
 export type FormModules = Record<number, FormModule>
 export type ModuleEntities = Record<string, ModuleEntity>
