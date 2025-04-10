@@ -71,6 +71,7 @@ def _stringify_multiple_wells_for_labware(wells: List[Well]) -> str:
         return ""
     elif len(wells) == 1:
         return str(wells[0])
+    # TODO(jbl 2025-04-10) this logic can be improved to more intelligently group wells
     elif len(wells) < 9:  # At most we'll print out a full column's worth of well
         return ", ".join([well.well_name for well in wells[:-1]]) + f", {wells[-1]}"
     else:  # Otherwise print the first and last three
