@@ -13,6 +13,7 @@ import {
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
 import type {
+  InvariantContext,
   LabwareEntities,
   LabwareLiquidState,
   LiquidEntities,
@@ -29,7 +30,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
-const PAPI_VERSION = '2.23' // latest version from api/src/opentrons/protocols/api_support/definitions.py
+const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
 
 export function pythonImports(): string {
   return [
@@ -94,6 +95,7 @@ export function getLoadModules(
     : ''
   return hasModules ? `# Load Modules:\n${pythonModules}` : ''
 }
+
 //  note: label arg is not needed since PD does not support giving an adapter
 //  a nickname
 export function getLoadAdapters(
@@ -190,18 +192,6 @@ export function getLoadLabware(
     .join('\n')
 
   return pythonLabware ? `# Load Labware:\n${pythonLabware}` : ''
-}
-
-export function stepCommands(robotStateTimeline: Timeline): string {
-  return (
-    '# PROTOCOL STEPS\n\n' +
-    robotStateTimeline.timeline
-      .map(
-        (timelineFrame, idx) =>
-          `# Step ${idx + 1}:\n${timelineFrame.python || 'pass'}`
-      )
-      .join('\n\n')
-  )
 }
 
 export function getLoadPipettes(
@@ -307,4 +297,63 @@ export function getLoadWasteChute(
   return pythonLoadWasteChute.length > 0
     ? `# Load Waste Chute:\n${pythonLoadWasteChute}`
     : ''
+}
+
+export function stepCommands(robotStateTimeline: Timeline): string {
+  return (
+    '# PROTOCOL STEPS\n\n' +
+    robotStateTimeline.timeline
+      .map(
+        (timelineFrame, idx) =>
+          `# Step ${idx + 1}:\n${timelineFrame.python || 'pass'}`
+      )
+      .join('\n\n')
+  )
+}
+
+export function pythonDefRun(
+  invariantContext: InvariantContext,
+  robotState: TimelineFrame,
+  robotStateTimeline: Timeline,
+  liquidsByLabwareId: LabwareLiquidState,
+  labwareNicknamesById: Record<string, string>,
+  robotType: RobotType
+): string {
+  const {
+    moduleEntities,
+    labwareEntities,
+    pipetteEntities,
+    liquidEntities,
+    wasteChuteEntities,
+    trashBinEntities,
+  } = invariantContext
+  const { modules, labware, pipettes } = robotState
+  const sections: string[] = [
+    getLoadModules(moduleEntities, modules),
+    getLoadAdapters(moduleEntities, labwareEntities, labware),
+    getLoadLabware(
+      moduleEntities,
+      labwareEntities,
+      labware,
+      labwareNicknamesById
+    ),
+    getLoadPipettes(pipetteEntities, labwareEntities, pipettes),
+    ...(robotType === FLEX_ROBOT_TYPE
+      ? [
+          getLoadTrashBins(trashBinEntities),
+          getLoadWasteChute(wasteChuteEntities),
+        ]
+      : []),
+    getDefineLiquids(liquidEntities),
+    getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
+    stepCommands(robotStateTimeline),
+  ]
+  const functionBody =
+    sections
+      .filter(section => section) // skip empty sections
+      .join('\n\n') || 'pass'
+  return (
+    `def run(${PROTOCOL_CONTEXT_NAME}: protocol_api.ProtocolContext):\n` +
+    `${indentPyLines(functionBody)}`
+  )
 }

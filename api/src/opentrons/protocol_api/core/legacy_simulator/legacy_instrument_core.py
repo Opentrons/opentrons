@@ -513,7 +513,7 @@ class LegacyInstrumentCoreSimulator(
         """This will never be called because it was added in API 2.15."""
         pass
 
-    def transfer_liquid(
+    def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -527,7 +527,7 @@ class LegacyInstrumentCoreSimulator(
         """This will never be called because it was added in API 2.23."""
         assert False, "transfer_liquid is not supported in legacy context"
 
-    def distribute_liquid(
+    def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -541,7 +541,7 @@ class LegacyInstrumentCoreSimulator(
         """This will never be called because it was added in API 2.23."""
         assert False, "distribute_liquid is not supported in legacy context"
 
-    def consolidate_liquid(
+    def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,

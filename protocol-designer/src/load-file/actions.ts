@@ -88,14 +88,15 @@ export const loadProtocolFile = (
         if (designerApplication != null && designerApplication[1]) {
           const designerApplicationString = designerApplication[1]
           const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
+
           dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
         } else {
-          console.warn('No blob found in file.')
+          fileError('INVALID_PYTHON_FILE')
         }
       } catch (error) {
         console.error('Error extracting blob:', error)
         if (error instanceof Error) {
-          fileError('INVALID_FILE_TYPE', error.message)
+          fileError('INVALID_PYTHON_FILE', error.message)
         }
       }
     }

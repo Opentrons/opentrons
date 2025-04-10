@@ -78,6 +78,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     destLabware,
     sourceLabware,
     nozzles,
+    pushOut,
   } = args
 
   const pipetteData = prevRobotState.pipettes[args.pipette]
@@ -285,6 +286,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               yOffset: aspirateYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
       const preWetTipCommands = args.preWetTip // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
@@ -304,6 +306,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             yOffset: aspirateYOffset,
             nozzles,
             invariantContext,
+            finalPushOut: pushOut,
           })
         : []
       //  can not mix in a waste chute
@@ -325,6 +328,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               yOffset: dispenseYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
 

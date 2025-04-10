@@ -1,4 +1,5 @@
 """Test unsafe drop tip in place commands."""
+
 from opentrons.protocol_engine.state.update_types import (
     PipetteTipStateUpdate,
     PipetteUnknownFluidUpdate,
@@ -29,11 +30,13 @@ def mock_tip_handler(decoy: Decoy) -> TipHandler:
     return decoy.mock(cls=TipHandler)
 
 
+@pytest.mark.parametrize("channels", [1, 8, 96])
 async def test_drop_tip_implementation(
     decoy: Decoy,
     mock_tip_handler: TipHandler,
     state_view: StateView,
     ot3_hardware_api: OT3HardwareControlAPI,
+    channels: int,
 ) -> None:
     """A DropTip command should have an execution implementation."""
     subject = UnsafeDropTipInPlaceImplementation(
@@ -46,6 +49,9 @@ async def test_drop_tip_implementation(
     decoy.when(state_view.motion.get_pipette_location(pipette_id="abc")).then_return(
         PipetteLocationData(mount=MountType.LEFT, critical_point=None)
     )
+    decoy.when(
+        state_view.tips.get_pipette_active_channels(params.pipetteId)
+    ).then_return(channels)
 
     result = await subject.execute(params)
 
@@ -61,6 +67,8 @@ async def test_drop_tip_implementation(
 
     decoy.verify(
         await ot3_hardware_api.update_axis_position_estimations([Axis.P_L]),
-        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False),
+        await mock_tip_handler.drop_tip(
+            pipette_id="abc", home_after=False, ignore_plunger=(channels == 96)
+        ),
         times=1,
     )

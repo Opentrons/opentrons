@@ -56,6 +56,9 @@ class AttachedModulesControl:
         self._api = api
         self._usb = usb
 
+    def subscribe_to_api_event(self, module: modules.AbstractModule) -> None:
+        self._api.add_status_bar_listener(module.event_listener)
+
     @classmethod
     async def build(
         cls,
@@ -92,7 +95,7 @@ class AttachedModulesControl:
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
     ) -> modules.AbstractModule:
-        return await modules.build(
+        mod = await modules.build(
             port=port,
             usb_port=usb_port,
             type=type,
@@ -103,6 +106,8 @@ class AttachedModulesControl:
             sim_serial_number=sim_serial_number,
             disconnected_callback=self._disconnected_callback,
         )
+        self.subscribe_to_api_event(mod)
+        return mod
 
     def _disconnected_callback(self, port: str, serial: Optional[str]) -> None:
         """Used by the module to indicate that it was disconnected and should be deleted."""

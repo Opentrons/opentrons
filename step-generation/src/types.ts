@@ -287,6 +287,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseXOffset: number
   /** y offset mm */
   dispenseYOffset: number
+  /** will be non-null once introduced to quick transfer */
+  pushOut: number | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -376,6 +378,7 @@ export type MixArgs = CommonArgs & {
   /** delays */
   aspirateDelaySeconds: number | null | undefined
   dispenseDelaySeconds: number | null | undefined
+  finalPushOut: number
 }
 
 export type PauseArgs = CommonArgs & {

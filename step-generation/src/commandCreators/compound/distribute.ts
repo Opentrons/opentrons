@@ -73,6 +73,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     dispenseXOffset,
     dispenseYOffset,
     nozzles,
+    pushOut,
   } = args
 
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
@@ -411,6 +412,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               yOffset: aspirateYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
 
@@ -450,6 +452,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               yOffset: aspirateYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
       return [

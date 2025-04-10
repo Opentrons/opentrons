@@ -11,6 +11,7 @@ import {
   FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
 import {
+  pythonDefRun,
   pythonImports,
   pythonMetadata,
   pythonRequirements,
@@ -30,7 +31,6 @@ import {
   getModulesLoadInfo,
   getPipettesLoadInfo,
 } from './utils'
-import { pythonDefRun } from './pythonFile'
 
 import type { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
 import type {
@@ -375,6 +375,7 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
           labware: getLabwareLoadInfo(labwareEntities, labwareNicknamesById),
         },
       },
+      metadata: fileMetadata,
     }
 
     const pythonProtocol =

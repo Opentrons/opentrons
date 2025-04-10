@@ -111,6 +111,8 @@ describe('form casting', () => {
       nozzles: null,
       tipRack: 'some tiprack',
       liquidClassesSupported: true,
+      pushOut_checkbox: false,
+      pushOut_volume: null,
     }
 
     expect(_castForm(input)).toEqual({
