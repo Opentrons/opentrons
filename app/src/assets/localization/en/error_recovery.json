@@ -56,7 +56,6 @@
   "load_labware_into_stacker_and_retry_step": "Load labware into Stacker and retry step",
   "load_labware_into_labware_shuttle": "Load labware into labware shuttle",
   "load_labware_shuttle_and_retry_step": "Load labware shuttle and retry step",
-  "load_labware_shuttle_onto_track": "Load labware shuttle onto track",
   "load_labware_into_stacker": "Load <#> labware into Stacker",
   "load_labware_into_labware_shuttle": "Load labware into labware shuttle",
   "load_labware_shuttle_and_retry_step": "Load labware shuttle and retry step",
