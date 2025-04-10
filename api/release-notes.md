@@ -8,6 +8,12 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.3.2
+
+The 8.3.2 hotfix release fixes a bug where protocol commands could time out, especially when running many long protocols.
+
+---
+
 ## Opentrons Robot Software Changes in 8.3.1
 
 The 8.3.1 hotfix release contains two bug fixes:    
