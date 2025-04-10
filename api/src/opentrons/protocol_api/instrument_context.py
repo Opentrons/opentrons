@@ -2609,10 +2609,6 @@ class InstrumentContext(publisher.CommandPublisher):
         """Check the height of the liquid within a well.
 
         :returns: The height, in mm, of the liquid from the deck.
-
-        :meta private:
-
-        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
