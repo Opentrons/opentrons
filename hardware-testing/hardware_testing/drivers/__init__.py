@@ -45,7 +45,9 @@ def find_port(vid: int, pid: int) -> str:
     raise RuntimeError(f"Unable to find serial " f"port for VID:PID={vid}:{pid}")
 
 
-def search_for_port_with_filter(filter_cb: Callable, baudrate: int = 115200) -> Optional[str]:
+def search_for_port_with_filter(
+    filter_cb: Callable, baudrate: int = 115200
+) -> Optional[str]:
     available_port_names = [p.device for p in comports()]
     test_port = Serial(port=None, baudrate=baudrate)
     for port_name in available_port_names:

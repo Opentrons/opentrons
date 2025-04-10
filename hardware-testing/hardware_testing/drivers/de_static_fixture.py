@@ -2,10 +2,8 @@
 from abc import ABC, abstractmethod
 from serial import Serial  # type: ignore[import]
 from serial.tools.list_ports import comports
-from time import sleep
+from time import sleep, time
 from typing_extensions import Final, Optional, cast
-
-from . import search_for_port_with_filter, list_ports_and_select
 
 
 FIXTURE_BAUD_RATE: Final[int] = 115200
@@ -115,4 +113,25 @@ def find_and_build(simulate: bool) -> DeStaticFixtureBase:
         finally:
             if bar:
                 bar.disconnect()
-    raise RuntimeError(f"unable to find de-static bar on USB ports: {available_port_names}")
+    raise RuntimeError(
+        f"unable to find de-static bar on USB ports: {available_port_names}"
+    )
+
+
+if __name__ == "__main__":
+    trigger_timestamp = 0.0
+    trigger_interval_seconds = 3.0
+
+    bar = find_and_build(simulate=False)
+    bar.connect()
+    try:
+        while True:
+            print(bar.is_enabled())
+            seconds_since_last_trigger = time() - trigger_timestamp
+            if seconds_since_last_trigger < trigger_interval_seconds:
+                continue
+            print("\nTRIGGER!!!!!!\n")
+            bar.enable_power_for_one_second()
+            trigger_timestamp = time()
+    finally:
+        bar.disconnect()
