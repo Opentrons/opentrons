@@ -11,6 +11,7 @@ import {
   FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
 import {
+  pythonCustomLabwareDict,
   pythonDefRun,
   pythonImports,
   pythonMetadata,
@@ -392,6 +393,7 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
           labwareNicknamesById,
           robotType
         ),
+        pythonCustomLabwareDict(invariantContext.labwareEntities),
       ]
         .filter(section => section) // skip any blank sections
         .join('\n\n') + '\n'

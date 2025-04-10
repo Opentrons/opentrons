@@ -70,9 +70,27 @@ describe('createFile selector', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
+
+  // The labware in the fixtures have namespace "fixture", which makes them
+  // custom labware. Change their namespace to "opentrons" so that they're
+  // treated as standard labware.
+  const labwareEntitiesOpentrons = {
+    ...labwareEntities,
+    tiprackId: {
+      ...labwareEntities['tiprackId'],
+      def: { ...labwareEntities['tiprackId'].def, namespace: 'opentrons' },
+    },
+    plateId: {
+      ...labwareEntities['plateId'],
+      def: { ...labwareEntities['plateId'].def, namespace: 'opentrons' },
+    },
+    // We'll leave labwareEntities['fixedTrash'] with the "fixture" namespace,
+    // to demonstrate what custom labware loading looks like.
+  }
+
   const entities = {
     moduleEntities: v7Fixture.moduleEntities,
-    labwareEntities,
+    labwareEntities: labwareEntitiesOpentrons,
     pipetteEntities,
     liquidEntities: ingredients,
   }
@@ -119,6 +137,7 @@ describe('createFile selector', () => {
     // generated Python will be tested in separate unit tests.
     expect(result.pythonProtocol).toBe(
       `
+import json
 from contextlib import nullcontext as pd_step
 from opentrons import protocol_api, types
 
@@ -138,25 +157,23 @@ requirements = {
 
 def run(protocol: protocol_api.ProtocolContext):
     # Load Labware:
-    mock_python_name_1 = protocol.load_labware(
-        "fixture_trash",
+    mock_python_name_1 = protocol.load_labware_from_definition(
+        CUSTOM_LABWARE["fixture/fixture_trash/1"],
         location="12",
         label="Trash",
-        namespace="fixture",
-        version=1,
     )
     mock_python_name_2 = protocol.load_labware(
         "fixture_tiprack_10_ul",
         location="1",
         label="Opentrons 96 Tip Rack 10 µL",
-        namespace="fixture",
+        namespace="opentrons",
         version=1,
     )
     mock_python_name_3 = protocol.load_labware(
         "fixture_96_plate",
         location="7",
         label="NEST 96 Well Plate 100 µL PCR Full Skirt",
-        namespace="fixture",
+        namespace="opentrons",
         version=1,
     )
 
@@ -167,6 +184,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # Step 1:
     pass
+
+CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"schemaVersion":2,"version":1,"namespace":"fixture","metadata":{"displayCategory":"trash","displayVolumeUnits":"L","displayName":"Tall Fixed Trash","tags":["trash","opentrons","tall"]},"dimensions":{"xDimension":172.86,"yDimension":165.86,"zDimension":82},"parameters":{"format":"trash","isTiprack":false,"loadName":"fixture_trash","isMagneticModuleCompatible":false,"quirks":["fixedTrash","centerMultichannelOnWells","touchTipDisabled"]},"wells":{"A1":{"shape":"rectangular","yDimension":165.67,"xDimension":107.11,"totalLiquidVolume":1100000,"depth":77,"x":82.84,"y":53.56,"z":5}},"brand":{"brand":"Opentrons"},"groups":[{"wells":["A1"],"metadata":{}}],"cornerOffsetFromSlot":{"x":0,"y":0,"z":0}}}""")
 `.trimStart()
     )
 
