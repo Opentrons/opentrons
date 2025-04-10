@@ -360,7 +360,7 @@ This example uses ``load_liquid`` to label the initial well location, contents, 
     well_plate.load_liquid_by_well({'B1': 200, 'B2': 100, 'B3': 50}, blueWater)
 
 
-You can also use :py:meth:`.Labware.load_empty`to label individual wells or an entire labware as empty at the beginning of your protocol. 
+You can also use :py:meth:`.Labware.load_empty` to label individual wells or an entire labware as empty at the beginning of your protocol. 
         
 .. versionadded:: 2.23
 
