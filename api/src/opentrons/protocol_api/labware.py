@@ -328,8 +328,8 @@ class Well:
 
         .. deprecated:: 2.23
 
-        In API version 2.22 and later, use :py:meth:`~.Labware.load_liquid`, :py:meth:`~.Labware.load_liquid_by_well`,
-            or :py:meth:`~.Labware.load_empty` to load liquid into a well.
+        In API version 2.22 and later, use :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`,
+            or :py:meth:`.Labware.load_empty` to load liquid into a well.
 
         """
         self._core.load_liquid(
@@ -1272,15 +1272,15 @@ class Labware:
     ) -> None:
         """Mark several wells as containing the same amount of liquid.
 
-        This method should be called at the beginning of a protocol, soon after loading the labware and before
-        liquid handling operations begin. It is a base of information for liquid tracking functionality. If a well in a labware
-        has not been named in a call to :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
-        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked.
+        This method should be called at the beginning of a protocol, soon after loading labware and before
+        liquid handling operations begin. Loading liquids is required for liquid tracking functionality- if a well
+        hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
+        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
 
         :param wells: The wells to load the liquid into.
         :type wells: List of well names or list of Well objects- for instance, from :py:meth:`~Labware.wells`.
 
-        :param volume: The volume of liquid to load into each well. Must be a multiple of 10.
+        :param volume: The volume of liquid to load into each well.
         :type volume: float
 
         :param liquid: The liquid to load into each well, previously defined by :py:meth:`~ProtocolContext.define_liquid`
