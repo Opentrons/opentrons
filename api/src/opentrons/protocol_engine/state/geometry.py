@@ -1748,7 +1748,13 @@ class GeometryView:
         labware_location: LabwareLocation,
         labware_pending_load: dict[str, LoadedLabware] | None = None,
     ) -> Optional[LabwareOffsetLocationSequence]:
-        """Get the offset location that a labware loaded into this location would match."""
+        """Get the offset location that a labware loaded into this location would match.
+
+        `None` indicates that the very concept of a labware offset would not make sense
+        for the given location, such as if it's some kind of off-deck location. This
+        is a difference from `get_predicted_location_sequence()`, where off-deck
+        locations are still represented as lists, but with special final elements.
+        """
         return self._recurse_labware_offset_location(
             labware_location, [], labware_pending_load or {}
         )
