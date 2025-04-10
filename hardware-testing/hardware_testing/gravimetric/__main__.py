@@ -590,6 +590,7 @@ def _main(
         getattr(union_cfg, "increment", False)
         or union_cfg.pipette_channels == 96
         or args.photometric
+        or args.isolate_channels == [1]  # NOTE: special case
     )
     _tip_racks = helpers._load_tipracks(
         run_args.ctx, union_cfg, use_adapters=args.channels == 96
@@ -667,7 +668,7 @@ if __name__ == "__main__":
         "--starting-tip",
         type=str,
         choices=[f"{c}{str(r + 1)}" for r in range(12) for c in "ABCDEFGH"],
-        default="A1",
+        default="",
     )
     parser.add_argument("--serial-log", action="store_true")
     parser.add_argument("--tune-volume-correction", action="store_true")

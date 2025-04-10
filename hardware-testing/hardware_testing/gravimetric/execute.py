@@ -633,7 +633,13 @@ def _run_trial(
 def _get_test_channels(cfg: config.GravimetricConfig) -> List[int]:
     if cfg.pipette_channels == 8 and not cfg.increment:
         # NOTE: only test channels separately when QC'ing a 8ch
-        return MULTI_CHANNEL_TEST_ORDER
+        if not cfg.isolate_channels:
+            return MULTI_CHANNEL_TEST_ORDER
+        return [
+            ch
+            for ch in MULTI_CHANNEL_TEST_ORDER
+            if ch + 1 in cfg.isolate_channels  # NOTE: args are not zero indexed
+        ]
     else:
         return [0]
 
