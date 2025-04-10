@@ -49,7 +49,7 @@ You can also aspirate from a location along the center vertical axis within a we
     pipette.aspirate(200, depth)
 
 
-Use the :py:meth:`~.Labware.Well.mensicus` method to aspirate from the meniscus of liquid in a well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
+Use the :py:meth:`~.Labware.Well.mensicus` method to aspirate relative to the meniscus of liquid in a well with a Flex pipette. First, you'll need to define the volume of liquid in your well: 
 - Specify your starting liquid volume with :py:meth:`~.Labware.load_liquid`, or
 - Use :py:meth:`~.InstrumentContext.measure_liquid_height` to define liquid height in a well before aspirating, or earlier in the protocol. 
 
@@ -57,7 +57,7 @@ Use the :py:meth:`~.Labware.Well.mensicus` method to aspirate from the meniscus 
     pipette.measure_liquid_height(plate["A2"])
     pipette.aspirate(200, location=plate["A2"].meniscus(target="end", z=-1)) # aspirates at 1 mm below the liquid meniscus
 
-The liquid meniscus changes when you aspirate liquid from a well. Set ``target`` to the ending position of the liquid within a well to ensure the pipette stays submerged while aspirating. For more information, see :ref:`well-meniscus`.
+The liquid meniscus changes when you aspirate liquid from a well. Set ``target="end"`` to ensure the pipette stays submerged while aspirating. For more information, see :ref:`well-meniscus`.
 
 .. versionadded:: 2.23
 
@@ -354,7 +354,7 @@ Measure Liquids
 
 The :py:meth:`~.InstrumentContext.measure_liquid_height` method tells a Flex pipette to measure the height of liquid relative to the bottom of a well. When ``measure_liquid_height()`` finds an empty well, it raises and error and pauses the protocol to let you resove the problem. 
 
-``measure_liquid_height`` is a standalone method that records the height of liquid in a well during a protocol. You can use the liquid height to aspirate or dispense from, or move to, the liquid meniscus, either immediately after or later in your protocol.
+``measure_liquid_height()`` is a standalone method that records the height of liquid in a well during a protocol. You can use the liquid height to aspirate or dispense from, or move to, the liquid meniscus, either immediately after or later in your protocol.
 
 .. code-block:: python
 
