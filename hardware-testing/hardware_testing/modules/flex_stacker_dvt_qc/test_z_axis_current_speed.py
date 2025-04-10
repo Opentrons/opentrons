@@ -23,7 +23,7 @@ STALLTHRESHOLD = STALLGUARD_CONFIG[TEST_AXIS].threshold
 TEST_SPEEDS = [150, 180]  # mm/s
 TEST_CURRENTS = [1.5, 1.0, 0.7, 0.5, 0.4]  # A rms
 TEST_ACCELERATION = STACKER_MOTION_CONFIG[TEST_AXIS]["move"].move_params.acceleration
-CURRENT_THRESHOD = 0.7  # A rms
+CURRENT_THRESHOD = 1.0  # A rms # If current is above this, all trials must pass  # change the spec based on Chris's email
 TEST_TRIALS = 10
 TEST_DIRECTIONS = [Direction.RETRACT, Direction.EXTEND]
 
