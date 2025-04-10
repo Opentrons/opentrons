@@ -21,7 +21,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element {
           <LeftColumnLabwareInfo
             {...props}
             title={t('manually_fill_liquid_in_well', {
-              well: failedLabwareUtils.relevantWellName,
+              well: failedLabwareUtils.relevantPickUpTipWellName,
             })}
             type="location"
           />

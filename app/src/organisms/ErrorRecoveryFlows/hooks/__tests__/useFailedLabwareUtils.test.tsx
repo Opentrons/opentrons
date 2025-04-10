@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { screen, renderHook } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -7,11 +7,40 @@ import {
   getRelevantWellName,
   getRelevantFailedLabwareCmdFrom,
   useRelevantFailedLwLocations,
+  useFailedLabwareUtils,
+  getFailedCmdRelevantLabware,
 } from '../useFailedLabwareUtils'
 import { DEFINED_ERROR_TYPES } from '../../constants'
 
 import type { ComponentProps } from 'react'
 import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
+
+vi.mock('@opentrons/shared-data', async () => {
+  const actual = await vi.importActual('@opentrons/shared-data')
+  return {
+    ...actual,
+    getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
+    getAllLabwareDefs: vi.fn(() => ({
+      'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
+        some: 'definition',
+      },
+    })),
+    getLoadedLabwareDefinitionsByUri: vi.fn(() => ({
+      'some/uri': { some: 'definition' },
+    })),
+  }
+})
+
+vi.mock('@opentrons/components', async () => {
+  const actual = await vi.importActual('@opentrons/components')
+  return {
+    ...actual,
+    getLabwareDisplayLocation: vi.fn(params =>
+      params.location ? `Slot ${params.location.slotName}` : ''
+    ),
+    getLoadedLabware: vi.fn(() => ({ displayName: 'Mock Nickname' })),
+  }
+})
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {
@@ -247,5 +276,158 @@ describe('useRelevantFailedLwLocations', () => {
 
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
     expect(result.current.newLoc).toStrictEqual({ slotName: 'C2' })
+  })
+})
+
+describe('getFailedCmdRelevantLabware', () => {
+  const mockProtocolAnalysis = {
+    commands: [],
+    labware: [],
+  } as any
+
+  const mockRunRecord = {
+    data: {
+      labware: [
+        {
+          id: 'labwareId',
+          definitionUri: 'some/uri',
+        },
+      ],
+    },
+  } as any
+
+  it('should return labware name and nickname when labware is found', () => {
+    const mockCommand = {
+      params: {
+        labwareId: 'labwareId',
+      },
+    } as any
+
+    const result = getFailedCmdRelevantLabware(
+      mockProtocolAnalysis,
+      mockCommand,
+      mockRunRecord
+    )
+
+    expect(result).toEqual({
+      name: 'Mock Labware Name',
+      nickname: 'Mock Nickname',
+    })
+  })
+
+  it('should return null when labware is not found', () => {
+    const mockCommand = {
+      params: {
+        labwareId: 'nonExistentId',
+      },
+    } as any
+
+    const result = getFailedCmdRelevantLabware(
+      mockProtocolAnalysis,
+      mockCommand,
+      mockRunRecord
+    )
+
+    expect(result).toBeNull()
+  })
+
+  it('should return null when command is null', () => {
+    const result = getFailedCmdRelevantLabware(
+      mockProtocolAnalysis,
+      null,
+      mockRunRecord
+    )
+
+    expect(result).toBeNull()
+  })
+})
+
+describe('useFailedLabwareUtils', () => {
+  const mockPickUpTipCommand = {
+    key: 'pickUpTipKey',
+    commandType: 'pickUpTip',
+    params: {
+      pipetteId: 'pipetteId',
+      labwareId: 'tipLabwareId',
+      wellName: 'A1',
+    },
+  } as any
+
+  const mockFailedCommand = {
+    key: 'failedKey',
+    commandType: 'aspirate',
+    params: {
+      pipetteId: 'pipetteId',
+      labwareId: 'failedLabwareId',
+      wellName: 'B2',
+    },
+    error: {
+      errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
+    },
+  } as any
+
+  const mockRunCommands = {
+    data: [mockPickUpTipCommand, mockFailedCommand],
+    meta: {
+      totalLength: 2,
+    },
+  } as any
+
+  const mockRunRecord = {
+    data: {
+      labware: [
+        {
+          id: 'failedLabwareId',
+          definitionUri: 'some/uri',
+          location: { slotName: 'D1' },
+        },
+        {
+          id: 'tipLabwareId',
+          definitionUri: 'some/uri',
+          location: { slotName: 'C1' },
+        },
+      ],
+    },
+  } as any
+
+  const mockPipetteInfo = {
+    data: {
+      channels: 8,
+    },
+  } as any
+
+  const mockProtocolAnalysis = {
+    id: 'analysisId',
+    commands: [],
+    labware: [],
+  } as any
+
+  it('should handle case when no relevant tip pickup command is found', () => {
+    const noPickupCommandsRun = {
+      ...mockRunCommands,
+      data: [
+        {
+          key: 'someOtherKey',
+          commandType: 'aspirate',
+          params: { pipetteId: 'differentPipette' },
+        },
+        mockFailedCommand,
+      ],
+    }
+
+    const { result } = renderHook(() =>
+      useFailedLabwareUtils({
+        failedCommand: { byRunRecord: mockFailedCommand } as any,
+        runCommands: noPickupCommandsRun,
+        runRecord: mockRunRecord,
+        failedPipetteInfo: mockPipetteInfo,
+        protocolAnalysis: mockProtocolAnalysis,
+      })
+    )
+
+    expect(result.current.relevantPickUpTipLabware).toBeNull()
+    expect(result.current.relevantPickUpTipWellName).toBe('')
+    expect(result.current.selectedTipLocations).toBeNull()
+    expect(result.current.areTipsSelected).toBe(false)
   })
 })
