@@ -780,8 +780,8 @@ class TransferComponentsExecutor:
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(
             air_gap_volume
         )
-        # The maximum flow rate should be air_gap_volume per second
-        flow_rate = min(
+        # The minimum flow rate should be air_gap_volume per second
+        flow_rate = max(
             aspirate_props.flow_rate_by_volume.get_for_volume(air_gap_volume),
             air_gap_volume,
         )
@@ -807,8 +807,8 @@ class TransferComponentsExecutor:
         correction_volume = dispense_props.correction_by_volume.get_for_volume(
             last_air_gap
         )
-        # The maximum flow rate should be air_gap_volume per second
-        flow_rate = min(
+        # The minimum flow rate should be air_gap_volume per second
+        flow_rate = max(
             dispense_props.flow_rate_by_volume.get_for_volume(last_air_gap),
             last_air_gap,
         )
