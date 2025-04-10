@@ -38,7 +38,7 @@ export const getFlexNameConversion = (pipetteSpec: PipetteV2Specs): string => {
   return `flex_${channels}channel_${maxVolume}`
 }
 
-const PAPI_VERSION = '2.23' // latest version from api/src/opentrons/protocols/api_support/definitions.py
+const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
 
 export function pythonImports(): string {
   return [

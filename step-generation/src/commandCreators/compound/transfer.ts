@@ -81,6 +81,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     sourceLabware,
     dispenseXOffset,
     dispenseYOffset,
+    pushOut,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -269,6 +270,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
                   invariantContext,
+                  finalPushOut: pushOut,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -289,6 +291,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
                   invariantContext,
+                  finalPushOut: pushOut,
                 })
               : []
           const delayAfterAspirateCommands =
@@ -350,6 +353,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   yOffset: dispenseYOffset,
                   nozzles: args.nozzles,
                   invariantContext,
+                  finalPushOut: pushOut,
                 })
               : []
 

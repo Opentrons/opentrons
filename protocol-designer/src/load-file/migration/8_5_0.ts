@@ -61,6 +61,7 @@ export const migrateFile = (
         aspirate_labware,
         dispense_labware,
         liquidClassesSupported,
+        liquidClass,
         ...rest
       } = form
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
@@ -138,10 +139,12 @@ export const migrateFile = (
           dispense_submerge_y_position: null,
           dispense_submerge_position_reference: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
-          liquidClass: null,
+          liquidClass: 'none',
           pushOut_checkbox:
             defaultPushOutVolume != null && defaultPushOutVolume > 0,
           pushOut_volume: defaultPushOutVolume,
+          conditioning_checkbox: false,
+          conditioning_volume: null,
         },
       }
     }
@@ -158,6 +161,21 @@ export const migrateFile = (
           liquidClassesSupported,
           ...rest
         } = form
+        const tipRackDef = labwareDefinitions[form.tipRack]
+        const pipetteName =
+          equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
+          null
+        const pipetteSpecs =
+          pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
+        const defaultPushOutVolume =
+          pipetteSpecs === null
+            ? null
+            : getDefaultPushOutVolume(
+                Number(form.volume),
+                pipetteSpecs,
+                tipRackDef
+              )
+
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
           labwareDefinitions,
           loadLabwareCommands,
@@ -178,6 +196,10 @@ export const migrateFile = (
                     1
                   ),
             liquidClassesSupported: liquidClassesSupported ?? false,
+            liquidClass: 'none',
+            pushOut_checkbox:
+              defaultPushOutVolume != null && defaultPushOutVolume > 0,
+            pushOut_volume: defaultPushOutVolume,
           },
         }
       }

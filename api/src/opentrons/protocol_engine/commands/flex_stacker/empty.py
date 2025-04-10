@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING
+from typing import Optional, Literal, TYPE_CHECKING, Annotated
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors import (
@@ -39,12 +40,12 @@ class EmptyParams(BaseModel):
         ),
     )
 
-    message: str | None = Field(
+    message: str | SkipJsonSchema[None] = Field(
         None,
         description="The message to display on connected clients during a manualWithPause strategy empty.",
     )
 
-    count: int | None = Field(
+    count: Optional[Annotated[int, Field(ge=0)]] = Field(
         None,
         description=(
             "The new count of labware in the pool. If None, default to an empty pool. If this number is "
@@ -52,7 +53,6 @@ class EmptyParams(BaseModel):
             "Do not use the value in the parameters as an outside observer; instead, use the count value "
             "from the results."
         ),
-        ge=0,
     )
 
 
@@ -66,11 +66,11 @@ class EmptyResult(BaseModel):
         ...,
         description="The labware definition URI of the primary labware.",
     )
-    adapterLabwareURI: str | None = Field(
+    adapterLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the adapter labware.",
     )
-    lidLabwareURI: str | None = Field(
+    lidLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the lid labware.",
     )

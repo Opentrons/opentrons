@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -6,13 +6,15 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
+  TYPOGRAPHY,
+  NO_WRAP,
   DIRECTION_ROW,
   FLEX_MAX_CONTENT,
   Flex,
   Icon,
+  StyledText,
   LegacyStyledText,
   SPACING,
-  StyledText,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -47,7 +49,6 @@ import {
   MODULE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
-  LIQUID_SETUP_STEP_KEY,
   updateRunSetupStepsComplete,
   getMissingSetupSteps,
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -60,10 +61,10 @@ import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupStep } from './SetupStep'
-import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useUpdateClientLPC } from '/app/resources/client_data'
 
 import type { RefObject } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
@@ -80,7 +81,7 @@ export function ProtocolRunSetup({
   robotName,
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch<Dispatch>()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -129,9 +130,17 @@ export function ProtocolRunSetup({
   const flexOffsetsMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
+  const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
+
+  // A separate app can apply offsets. We need to update the missing steps as a side effect.
+  useEffect(() => {
+    if (flexOffsetsApplied) {
+      dispatch(updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: true }))
+    }
+  }, [flexOffsetsApplied])
 
   const offsetsConfirmed = isFlex
     ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
@@ -171,8 +180,6 @@ export function ProtocolRunSetup({
 
   const isMissingModule = missingModuleIds.length > 0
 
-  const liquids = protocolAnalysis?.liquids ?? []
-  const hasLiquids = liquids.length > 0
   const hasModules = protocolAnalysis != null && modules.length > 0
   // need config compatibility (including check for single slot conflicts)
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
@@ -268,11 +275,9 @@ export function ProtocolRunSetup({
         <SetupLabwarePositionCheck
           {...{ runId, robotName, robotType }}
           setOffsetsConfirmed={confirmed => {
-            dispatch(
-              updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: confirmed })
-            )
             if (confirmed) {
               dispatch(appliedOffsetsToRun(runId))
+              updateLPCStatusWithRunId(runId)
 
               setExpandedStepKey(LABWARE_SETUP_STEP_KEY)
             }
@@ -306,14 +311,7 @@ export function ProtocolRunSetup({
               })
             )
             if (confirmed) {
-              const nextStep =
-                orderedApplicableSteps.findIndex(
-                  v => v === LABWARE_SETUP_STEP_KEY
-                ) ===
-                orderedApplicableSteps.length - 1
-                  ? null
-                  : LIQUID_SETUP_STEP_KEY
-              setExpandedStepKey(nextStep)
+              setExpandedStepKey(null)
             }
           }}
         />
@@ -325,38 +323,17 @@ export function ProtocolRunSetup({
         complete: !missingSteps.includes(LABWARE_SETUP_STEP_KEY),
         completeText: t('placements_ready'),
         incompleteText: null,
-        incompleteElement: null,
-      },
-    },
-    [LIQUID_SETUP_STEP_KEY]: {
-      stepInternals: (
-        <SetupLiquids
-          robotName={robotName}
-          runId={runId}
-          protocolAnalysis={protocolAnalysis}
-          isLiquidSetupConfirmed={!missingSteps.includes(LIQUID_SETUP_STEP_KEY)}
-          setLiquidSetupConfirmed={(confirmed: boolean) => {
-            dispatch(
-              updateRunSetupStepsComplete(runId, {
-                [LIQUID_SETUP_STEP_KEY]: confirmed,
-              })
-            )
-            if (confirmed) {
-              setExpandedStepKey(null)
-            }
-          }}
-        />
-      ),
-      description: hasLiquids
-        ? t(`${LIQUID_SETUP_STEP_KEY}_description`)
-        : i18n.format(t('liquids_not_in_the_protocol'), 'capitalize'),
-      descriptionElement: null,
-      rightElProps: {
-        stepKey: LIQUID_SETUP_STEP_KEY,
-        complete: !missingSteps.includes(LIQUID_SETUP_STEP_KEY),
-        completeText: t('liquids_ready'),
-        incompleteText: null,
-        incompleteElement: null,
+        incompleteElement: (
+          <StyledText
+            color={COLORS.black90}
+            css={TYPOGRAPHY.pSemiBold}
+            marginRight={SPACING.spacing16}
+            id={`RunSetupCard_${LABWARE_SETUP_STEP_KEY}_incompleteText`}
+            whitespace={NO_WRAP}
+          >
+            {t('check_locations_and_volumes')}
+          </StyledText>
+        ),
       },
     },
   }
@@ -380,7 +357,6 @@ export function ProtocolRunSetup({
             orderedSteps.map((stepKey, index) => {
               const setupStepTitle = t(`${stepKey}_title`)
               const showEmptySetupStep =
-                (stepKey === 'liquid_setup_step' && !hasLiquids) ||
                 (stepKey === 'module_setup_step' &&
                   ((!isFlex && !hasModules) ||
                     (isFlex && !hasModules && !hasFixtures))) ||

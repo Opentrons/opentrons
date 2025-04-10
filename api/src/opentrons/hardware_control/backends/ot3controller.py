@@ -145,6 +145,11 @@ from opentrons.hardware_control.types import (
     PipetteSensorType,
     PipetteSensorData,
     PipetteSensorResponseQueue,
+    StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
+    HepaFanState,
+    HepaUVState,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -210,12 +215,12 @@ from ..dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from ..types import HepaFanState, HepaUVState, StatusBarState
 
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
 from .status_bar_state import StatusBarStateController
 from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_hardware.sensors.utils import send_evo_dispense_count_increase
 
 from .. import modules
 
@@ -1720,6 +1725,12 @@ class OT3Controller(FlexBackend):
     def get_status_bar_state(self) -> StatusBarState:
         return self._status_bar_controller.get_current_state()
 
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        remove_cb = self._status_bar_controller.add_listener(listener)
+        return remove_cb
+
     @property
     def estop_status(self) -> EstopOverallStatus:
         return EstopOverallStatus(
@@ -1844,3 +1855,9 @@ class OT3Controller(FlexBackend):
         """This is something we only use in the simulator.
         It is required so that PE simulations using ot3api don't break."""
         pass
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+        await send_evo_dispense_count_increase(
+            self._messenger, sensor_node_for_pipette(OT3Mount(mount.value))
+        )

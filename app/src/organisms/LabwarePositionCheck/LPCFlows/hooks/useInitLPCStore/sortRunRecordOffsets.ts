@@ -3,7 +3,9 @@ import isEqual from 'lodash/isEqual'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 // Sort offsets by most recent first, removing duplicates.
-export function sortUniqueOffsets(offsets: LabwareOffset[]): LabwareOffset[] {
+export function sortRunRecordOffsets(
+  offsets: LabwareOffset[]
+): LabwareOffset[] {
   return (
     offsets
       .sort(

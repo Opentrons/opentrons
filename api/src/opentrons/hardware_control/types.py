@@ -601,6 +601,16 @@ class StatusBarState(enum.Enum):
         }
 
 
+@dataclass(frozen=True)
+class StatusBarUpdateEvent:
+    state: StatusBarState
+    enabled: bool
+
+
+StatusBarUpdateListener = Callable[[StatusBarUpdateEvent], None]
+StatusBarUpdateUnsubscriber = Callable[[], None]
+
+
 @dataclass
 class AionotifyEvent:
     flags: enum.EnumMeta

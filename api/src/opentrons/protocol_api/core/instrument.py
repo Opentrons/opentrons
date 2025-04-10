@@ -359,7 +359,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def transfer_liquid(
+    def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -374,7 +374,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def distribute_liquid(
+    def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -392,7 +392,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def consolidate_liquid(
+    def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,

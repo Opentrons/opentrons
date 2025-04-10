@@ -9,10 +9,7 @@ import type {
   PipetteV2Specs,
   PipetteMount,
 } from '@opentrons/shared-data'
-import type {
-  Gen,
-  PipetteType,
-} from '../../../pages/CreateNewProtocolWizard/types'
+import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
 import type { PipetteOnDeck } from '../../../step-forms'
 
 export interface PipetteSections {

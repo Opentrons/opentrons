@@ -310,6 +310,8 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   blowout_flowRate?: number | null
   blowout_location?: string | null
   blowout_z_offset?: number | null
+  conditioning_checkbox: boolean | null
+  conditioning_volume: number | null
   dispense_airGap_volume?: number | null
   dispense_delay_mmFromBottom?: number | null
   dispense_delay_seconds?: number | null
@@ -388,7 +390,10 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_y_position?: number | null
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
   times?: number | null
+  liquidClass?: string | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

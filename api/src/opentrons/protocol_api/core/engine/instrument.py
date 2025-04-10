@@ -1141,7 +1141,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             result.nextTipInfo if isinstance(result.nextTipInfo, NextTipInfo) else None
         )
 
-    def transfer_liquid(  # noqa: C901
+    def transfer_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1191,7 +1191,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack_uri=tiprack_uri_for_transfer_props,
         )
 
-        # TODO: add multi-channel pipette handling here
         source_dest_per_volume_step = (
             tx_commons.expand_for_volume_constraints_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],
@@ -1336,7 +1335,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             _drop_tip()
 
     # TODO(spp, 2025-02-25): wire up return tip
-    def distribute_liquid(  # noqa: C901
+    def distribute_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1418,7 +1417,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_working_volume=working_volume,
             )
         ):
-            self.transfer_liquid(
+            self.transfer_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[source for _ in range(len(dest))],
@@ -1447,8 +1446,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
+        last_tip_picked_up_from: Optional[WellCore] = None
+
         def _drop_tip() -> None:
-            if isinstance(trash_location, (TrashBin, WasteChute)):
+            if return_tip:
+                assert last_tip_picked_up_from is not None
+                self.drop_tip(
+                    location=None,
+                    well_core=last_tip_picked_up_from,
+                    home_after=False,
+                    alternate_drop_location=False,
+                )
+            elif isinstance(trash_location, (TrashBin, WasteChute)):
                 self.drop_tip_in_disposal_location(
                     disposal_location=trash_location,
                     home_after=False,
@@ -1462,7 +1471,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     alternate_drop_location=True,
                 )
 
-        def _pick_up_tip() -> None:
+        def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
                 starting_well=None,
@@ -1487,10 +1496,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 presses=None,
                 increment=None,
             )
+            return tip_well
 
         tip_used = False
         if new_tip != TransferTipPolicyV2.NEVER:
-            _pick_up_tip()
+            last_tip_picked_up_from = _pick_up_tip()
 
         tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
@@ -1535,7 +1545,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
             if new_tip == TransferTipPolicyV2.ALWAYS and tip_used:
                 _drop_tip()
-                _pick_up_tip()
+                last_tip_picked_up_from = _pick_up_tip()
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
                         liquid=0,
@@ -1647,7 +1657,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             <= tip_working_volume
         )
 
-    def consolidate_liquid(  # noqa: C901
+    def consolidate_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1701,7 +1711,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             ).volume,
         )
 
-        # TODO: add multi-channel pipette handling here
         source_per_volume_step = (
             tx_commons.expand_for_volume_constraints_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],

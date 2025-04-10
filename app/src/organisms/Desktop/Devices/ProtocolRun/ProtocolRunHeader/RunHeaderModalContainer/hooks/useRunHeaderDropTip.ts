@@ -124,6 +124,7 @@ export function useRunHeaderDropTip({
       }
       // Only run tip checking if it wasn't *just* handled during Error Recovery.
       else if (
+        runSummaryNoFixit != null &&
         !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled) &&
         isRunCurrent &&
         isTerminalRunStatus(runStatus)

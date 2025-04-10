@@ -35,6 +35,9 @@ describe('ManualReplaceLwAndRetry', () => {
       routeUpdateActions: {
         proceedToRouteAndStep: vi.fn(),
       },
+      recoveryCommands: {
+        homeShuttle: vi.fn(),
+      },
     } as any
   })
 
@@ -88,6 +91,14 @@ describe('ManualReplaceLwAndRetry', () => {
       RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
+  })
+
+  it(`renders TwoColTextAndImage for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE} step`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
+    props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
+    render(props)
+    screen.getByText('Load labware shuttle onto track')
   })
 
   it('renders SelectRecoveryOption for unknown step', () => {

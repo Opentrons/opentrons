@@ -5,6 +5,7 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import {
+  getAllDefinitions,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -1016,36 +1017,72 @@ export const labwareInvariantProperties: Reducer<
     ): NormalizedLabwareById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const labwareDefinitions = file.labwareDefinitions
+      const labwareDefinitions = file?.labwareDefinitions
+      const allLabware = getAllDefinitions()
+      let labware: NormalizedLabwareById = {}
+      if (labwareDefinitions != null) {
+        labware = Object.entries(metadata.labware).reduce(
+          (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
+            if (labwareDefinitions[labwareLoadInfo.labwareDefURI] == null) {
+              console.error(
+                `expected to find matching labware definiton with labwareDefURI ${labwareLoadInfo.labwareDefURI} but could not`
+              )
+            }
+            const displayCategory =
+              labwareDefinitions[labwareLoadInfo.labwareDefURI]?.metadata
+                .displayCategory ?? 'otherLabware'
 
-      const labware: NormalizedLabwareById = Object.entries(
-        metadata.labware
-      ).reduce((acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
-        if (labwareDefinitions[labwareLoadInfo.labwareDefURI] == null) {
-          console.error(
-            `expected to find matching labware definiton with labwareDefURI ${labwareLoadInfo.labwareDefURI} but could not`
-          )
-        }
-        const displayCategory =
-          labwareDefinitions[labwareLoadInfo.labwareDefURI]?.metadata
-            .displayCategory ?? 'otherLabware'
+            const displayCategoryCount = Object.values(acc).filter(
+              lw => lw.displayCategory === displayCategory
+            ).length
 
-        const displayCategoryCount = Object.values(acc).filter(
-          lw => lw.displayCategory === displayCategory
-        ).length
+            acc[id] = {
+              labwareDefURI: labwareLoadInfo.labwareDefURI,
+              pythonName: getLabwarePythonName(
+                displayCategory,
+                displayCategoryCount + 1
+              ),
+              displayCategory,
+            }
 
-        acc[id] = {
-          labwareDefURI: labwareLoadInfo.labwareDefURI,
-          pythonName: getLabwarePythonName(
-            displayCategory,
-            displayCategoryCount + 1
-          ),
-          displayCategory,
-        }
+            return acc
+          },
+          {}
+        )
+        //  if loading a python file - should include all labwares that are
+        //  not custom labwares
+      } else {
+        labware = Object.entries(metadata.labware).reduce(
+          (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
+            const labwareDefinition = allLabware[labwareLoadInfo.labwareDefURI]
 
-        return acc
-      }, {})
+            if (labwareDefinition == null) {
+              console.error(
+                `expected to find matching labware definition in the opentrons labware library but could not with labwareDefUri ${labwareLoadInfo.labwareDefURI}`
+              )
+            }
 
+            const displayCategory =
+              labwareDefinition?.metadata.displayCategory ?? 'otherLabware'
+
+            const displayCategoryCount = Object.values(acc).filter(
+              lw => lw.displayCategory === displayCategory
+            ).length
+
+            acc[id] = {
+              labwareDefURI: labwareLoadInfo.labwareDefURI,
+              pythonName: getLabwarePythonName(
+                displayCategory,
+                displayCategoryCount + 1
+              ),
+              displayCategory,
+            }
+
+            return acc
+          },
+          {}
+        )
+      }
       return { ...labware, ...state }
     },
     EDIT_MULTIPLE_LABWARE_PYTHON_NAME: (

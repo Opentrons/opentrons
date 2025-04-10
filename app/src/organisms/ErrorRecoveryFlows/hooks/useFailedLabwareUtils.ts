@@ -30,7 +30,7 @@ import {
   getLoadedLabware,
   getLabwareDisplayLocation,
 } from '@opentrons/components'
-import { ERROR_KINDS } from '../constants'
+import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
@@ -172,6 +172,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.GRIPPER_ERROR:
       return failedCommandByRunRecord as MoveLabwareRunTimeCommand
     case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -270,7 +271,10 @@ function useTipSelectionUtils(
 
   // Use this labware to represent all tip racks for manual tip selection.
   const tipSelectorDef = useMemo(
-    () => getAllLabwareDefs().thermoscientificnunc96Wellplate1300UlV1,
+    () =>
+      getAllLabwareDefs()[
+        'opentrons/thermoscientificnunc_96_wellplate_1300ul/1'
+      ],
     []
   )
 
@@ -291,7 +295,7 @@ export function getFailedLabwareQuantity(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
 ): string | null {
-  if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING && runCommands != null) {
+  if (STACKER_ERROR_KINDS.includes(errorKind) && runCommands != null) {
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
@@ -342,6 +346,7 @@ export function getFailedCmdRelevantLabware(
   let labwareNickname, failedLWURI
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
       for (const key in lwDefsByURI) {
         if (lwDefsByURI.hasOwnProperty(key)) {
           labwareNickname = getLabwareDisplayName(lwDefsByURI[key])
@@ -446,6 +451,7 @@ export function useRelevantFailedLwLocations({
   let location
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
       if (
         failedCommandByRunRecord?.params != null &&
         'moduleId' in failedCommandByRunRecord?.params

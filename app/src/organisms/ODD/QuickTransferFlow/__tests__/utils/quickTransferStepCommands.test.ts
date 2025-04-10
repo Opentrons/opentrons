@@ -149,6 +149,7 @@ describe('quickTransferStepCommands', () => {
       dispenseYOffset: 0,
       name: 'transfer',
       description: 'transferring from 1 well to another',
+      pushOut: null,
     }
     expect(
       quickTransferStepCommands({
@@ -215,6 +216,7 @@ pipette.drop_tip()`.trimStart()
       dispenseYOffset: 0,
       name: 'transfer',
       description: 'transferring from 1 well to another',
+      pushOut: null,
     }
     expect(
       quickTransferStepCommands({
@@ -286,6 +288,7 @@ pipette.drop_tip()`.trimStart()
       name: 'transfer',
       description: 'transferring from 1 well to another',
       disposalVolume: null,
+      pushOut: null,
     }
     expect(
       quickTransferStepCommands({
