@@ -10,8 +10,8 @@ import {
 import { PIPETTE_TYPES } from '../../../pages/Onboarding/constants'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
 import type { PipetteMount, RobotType } from '@opentrons/shared-data'
+import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
 import type { FormPipettesByMount } from '../../../step-forms'
 
 interface SelectPipetteTypeProps {
@@ -37,6 +37,13 @@ export function SelectPipetteType(props: SelectPipetteTypeProps): JSX.Element {
     setValue,
   } = props
   const { t } = useTranslation('create_new_protocol')
+  const handleSelectPipetteType = (value: PipetteType): void => {
+    setPipetteType(value)
+    setPipetteGen('flex')
+    setPipetteVolume(null)
+    setValue(`pipettesByMount.${mount}.pipetteName`, undefined)
+    setValue(`pipettesByMount.${mount}.tiprackDefURI`, undefined)
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
@@ -52,11 +59,7 @@ export function SelectPipetteType(props: SelectPipetteTypeProps): JSX.Element {
             <RadioButton
               key={`${type.label}_${type.value}`}
               onChange={() => {
-                setPipetteType(type.value)
-                setPipetteGen('flex')
-                setPipetteVolume(null)
-                setValue(`pipettesByMount.${mount}.pipetteName`, undefined)
-                setValue(`pipettesByMount.${mount}.tiprackDefURI`, undefined)
+                handleSelectPipetteType(type.value)
               }}
               buttonLabel={t(`shared:${type.label}`)}
               buttonValue="single"

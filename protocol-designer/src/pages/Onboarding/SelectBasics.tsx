@@ -101,6 +101,18 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     handleScrollToBottom()
   }, [pipetteModal])
 
+  const handleSwapMounts = (): void => {
+    const leftPipetteName = pipettesByMount.left.pipetteName
+    const rightPipetteName = pipettesByMount.right.pipetteName
+    const leftTiprackDefURI = pipettesByMount.left.tiprackDefURI
+    const rightTiprackDefURI = pipettesByMount.right.tiprackDefURI
+
+    setValue('pipettesByMount.left.pipetteName', rightPipetteName)
+    setValue('pipettesByMount.right.pipetteName', leftPipetteName)
+    setValue('pipettesByMount.left.tiprackDefURI', rightTiprackDefURI)
+    setValue('pipettesByMount.right.tiprackDefURI', leftTiprackDefURI)
+  }
+
   return (
     <>
       {pipetteModal ? (
@@ -179,30 +191,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                     <Btn
                       css={LINK_BUTTON_STYLE}
                       onClick={() => {
-                        const leftPipetteName = pipettesByMount.left.pipetteName
-                        const rightPipetteName =
-                          pipettesByMount.right.pipetteName
-                        const leftTiprackDefURI =
-                          pipettesByMount.left.tiprackDefURI
-                        const rightTiprackDefURI =
-                          pipettesByMount.right.tiprackDefURI
-
-                        setValue(
-                          'pipettesByMount.left.pipetteName',
-                          rightPipetteName
-                        )
-                        setValue(
-                          'pipettesByMount.right.pipetteName',
-                          leftPipetteName
-                        )
-                        setValue(
-                          'pipettesByMount.left.tiprackDefURI',
-                          rightTiprackDefURI
-                        )
-                        setValue(
-                          'pipettesByMount.right.tiprackDefURI',
-                          leftTiprackDefURI
-                        )
+                        handleSwapMounts()
                       }}
                     >
                       <Flex flexDirection={DIRECTION_ROW}>
