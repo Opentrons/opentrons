@@ -2,7 +2,9 @@
 
 Summary of changes from schema 9:
 
-- Adds a new `labware_offset_sequence_components` table.
+- Change the way we represent locations in the `labware_offset` table:
+  replace its `location_*` columns with a separate
+  `labware_offset_sequence_components` table.
 """
 
 from pathlib import Path
@@ -23,7 +25,7 @@ from opentrons.protocol_engine.labware_offset_standardization import (
 
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
-from robot_server.persistence.tables import schema_10, schema_9
+from robot_server.persistence.tables import schema_10, schema_09
 
 from ._util import copy_contents
 from .._folder_migrator import Migration
@@ -34,18 +36,22 @@ class Migration9to10(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 9 to 10."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        # First we create the new version of our labware offsets table and sequence table
         with sql_engine_ctx(
             dest_dir / DB_FILE
         ) as engine, engine.begin() as transaction:
+            assert (
+                schema_09.labware_offset_table.name
+                != schema_10.labware_offset_table.name
+            )
+            # First we create the new version of our labware offsets table and sequence table
             schema_10.labware_offset_table.create(transaction)
             schema_10.labware_offset_location_sequence_components_table.create(
                 transaction
             )
             # Then we upmigrate the data to the new tables
             _upmigrate_stored_offsets(transaction)
-            # Then, we drop the table with we don't care about anymore
-            schema_9.labware_offset_table.drop(transaction)
+            # Then, we drop the old table which we don't care about anymore
+            schema_09.labware_offset_table.drop(transaction)
 
 
 def _upmigrate_stored_offsets(connection: sqlalchemy.engine.Connection) -> None:
@@ -54,7 +60,7 @@ def _upmigrate_stored_offsets(connection: sqlalchemy.engine.Connection) -> None:
         DeckType(guess_deck_type_from_global_config()), version=5
     )
 
-    offsets = connection.execute(sqlalchemy.select(schema_9.labware_offset_table))
+    offsets = connection.execute(sqlalchemy.select(schema_09.labware_offset_table))
 
     for offset in offsets:
         new_row = connection.execute(

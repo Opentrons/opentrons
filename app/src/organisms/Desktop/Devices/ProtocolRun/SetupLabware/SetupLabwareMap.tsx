@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 import {
   BaseDeck,
@@ -13,11 +13,13 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
-  getAllDefinitions,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+import {
+  getStackedItemsOnStartingDeck,
+  getLabwareDefinitionsByURIForProtocol,
+} from '/app/transformations/commands'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
@@ -45,10 +47,19 @@ export function SetupLabwareMap({
     stack: StackItem[]
   } | null>(null)
   const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
-  const startingDeck = getStackedItemsOnStartingDeck(
-    protocolAnalysis?.commands ?? [],
-    protocolAnalysis?.labware ?? [],
-    protocolAnalysis?.modules ?? []
+  const startingDeck = useMemo(
+    () =>
+      getStackedItemsOnStartingDeck(
+        protocolAnalysis?.commands ?? [],
+        protocolAnalysis?.labware ?? [],
+        protocolAnalysis?.modules ?? []
+      ),
+    [protocolAnalysis]
+  )
+  const labwareDefinitionsByURI = useMemo(
+    () =>
+      getLabwareDefinitionsByURIForProtocol(protocolAnalysis?.commands ?? []),
+    [protocolAnalysis]
   )
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
     ? startingDeck.offDeck
@@ -76,7 +87,7 @@ export function SetupLabwareMap({
     const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
     const topLabwareDefinition =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
-        ? getAllDefinitions()[topLabwareInfo.definitionUri]
+        ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
         : null
     const topLabwareId =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -133,6 +144,7 @@ export function SetupLabwareMap({
               labwareId={topLabwareId}
               displayName={topLabwareDisplayName}
               runId={runId}
+              labwareHasLiquid={Object.values(wellFill).length > 0}
             />
           ) : null}
         </g>
@@ -156,7 +168,7 @@ export function SetupLabwareMap({
       const topLabwareInfo = stackedItems[0]
       const topLabwareDefinition =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo
-          ? getAllDefinitions()[topLabwareInfo.definitionUri]
+          ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
           : null
       const topLabwareId =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -195,12 +207,13 @@ export function SetupLabwareMap({
                   setHoverLabwareId(null)
                 }}
               >
-                {topLabwareDefinition != null ? (
+                {topLabwareDisplayName != null ? (
                   <LabwareInfoOverlay
                     definition={topLabwareDefinition}
                     labwareId={topLabwareId}
-                    displayName={topLabwareDisplayName ?? null}
+                    displayName={topLabwareDisplayName}
                     runId={runId}
+                    labwareHasLiquid={Object.values(wellFill).length > 0}
                   />
                 ) : null}
               </g>
@@ -229,6 +242,7 @@ export function SetupLabwareMap({
             labwareItems={offDeckItems}
             isFlex={robotType === FLEX_ROBOT_TYPE}
             setSelectedStack={setSelectedStack}
+            definitionsByURI={labwareDefinitionsByURI}
           />
         ) : null}
       </Flex>

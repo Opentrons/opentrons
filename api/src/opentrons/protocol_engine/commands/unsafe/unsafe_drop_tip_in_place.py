@@ -78,7 +78,12 @@ class UnsafeDropTipInPlaceImplementation(
             [Axis.of_main_tool_actuator(pipette_location.mount.to_hw_mount())]
         )
         await self._tip_handler.drop_tip(
-            pipette_id=params.pipetteId, home_after=params.homeAfter
+            pipette_id=params.pipetteId,
+            home_after=params.homeAfter,
+            ignore_plunger=(
+                self._state_view.tips.get_pipette_active_channels(params.pipetteId)
+                == 96
+            ),
         )
 
         state_update = StateUpdate()

@@ -21,13 +21,13 @@ from opentrons.protocol_engine import commands  # noqa: E402
 from server_utils import sql_utils  # noqa: E402
 _imports.extend([commands, sql_utils])
 
-from robot_server.persistence.tables import schema_2, schema_3  # noqa: E402
+from robot_server.persistence.tables import schema_02, schema_03  # noqa: E402
 from robot_server.persistence import (  # noqa: E402
     database,
     pydantic as pydantic_helpers,
     _legacy_pickle,
 )
-_imports.extend([schema_2, schema_3, database, pydantic_helpers, _legacy_pickle])
+_imports.extend([schema_02, schema_03, database, pydantic_helpers, _legacy_pickle])
 
 # fmt: on
 
@@ -71,10 +71,10 @@ def migrate_commands_for_run(
     ) as source_engine, database.sql_engine_ctx(
         dest_db_file
     ) as dest_engine:
-        select_old_commands = sqlalchemy.select(schema_2.run_table.c.commands).where(
-            schema_2.run_table.c.id == run_id
+        select_old_commands = sqlalchemy.select(schema_02.run_table.c.commands).where(
+            schema_02.run_table.c.id == run_id
         )
-        insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
+        insert_new_command = sqlalchemy.insert(schema_03.run_command_table)
 
         with lock, source_engine.begin() as source_transaction:
             old_commands_bytes: typing.Optional[bytes] = source_transaction.execute(

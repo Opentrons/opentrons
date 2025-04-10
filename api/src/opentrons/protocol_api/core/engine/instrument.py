@@ -1141,7 +1141,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             result.nextTipInfo if isinstance(result.nextTipInfo, NextTipInfo) else None
         )
 
-    def transfer_liquid(  # noqa: C901
+    def transfer_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1335,7 +1335,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             _drop_tip()
 
     # TODO(spp, 2025-02-25): wire up return tip
-    def distribute_liquid(  # noqa: C901
+    def distribute_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1417,7 +1417,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_working_volume=working_volume,
             )
         ):
-            self.transfer_liquid(
+            self.transfer_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[source for _ in range(len(dest))],
@@ -1657,7 +1657,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             <= tip_working_volume
         )
 
-    def consolidate_liquid(  # noqa: C901
+    def consolidate_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
         volume: float,
