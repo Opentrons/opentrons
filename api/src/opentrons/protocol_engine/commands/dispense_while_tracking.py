@@ -101,11 +101,7 @@ class DispenseWhileTrackingImplementation(
 
         current_location = self._state_view.pipettes.get_current_location()
         current_position = await self._gantry_mover.get_position(params.pipetteId)
-        current_well = CurrentWell(
-            pipette_id=params.pipetteId,
-            labware_id=params.labwareId,
-            well_name=params.wellName,
-        )
+
         state_update = StateUpdate()
         move_result = await move_to_well(
             movement=self._movement,
@@ -114,7 +110,6 @@ class DispenseWhileTrackingImplementation(
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
-            current_well=current_well,
             operation_volume=-params.volume,
         )
         state_update.append(move_result.state_update)
