@@ -251,8 +251,6 @@ export function generateChatPrompt(
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
   ) => void
 ): string {
-  const defs = getOnlyLatestDefs()
-
   const robotType = t(values.instruments.robot)
   const scientificApplication = `- ${t(
     values.application.scientificApplication
