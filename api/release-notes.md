@@ -29,6 +29,12 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 
 - When you use `load_liquid()` and then use `measure_liquid_height()` on the same well, protocol analysis won't raise an error if there's not enough liquid to complete your transfers. To avoid errors during an actual run, use only one of the two commands. 
 
+## Opentrons Robot Software Changes in 8.3.2
+
+The 8.3.2 hotfix release fixes a bug where protocol commands could time out, especially when running many long protocols.
+
+---
+
 ## Opentrons Robot Software Changes in 8.3.1
 
 The 8.3.1 hotfix release contains two bug fixes:    
