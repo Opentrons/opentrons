@@ -135,6 +135,49 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
     })
   })
 
+  it('should return the relevant retrieve command for stacker error kinds', () => {
+    const retrieveCommand = {
+      commandType: 'flexStacker/retrieve',
+      params: {
+        moduleId: 'module-id',
+      },
+    } as any
+
+    const retrieveErrorKinds = [
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING],
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.SHUTTLE_MISSING],
+      ['flexStacker/retrieve', DEFINED_ERROR_TYPES.STACKER_STALL],
+    ]
+
+    retrieveErrorKinds.forEach(([commandType, errorType]) => {
+      const failedRetrieveCommand = {
+        commandType: 'flexStacker/retrieve',
+        params: {
+          moduleId: 'module-id',
+        },
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const runCommands = {
+        data: [retrieveCommand, failedRetrieveCommand],
+      } as any
+      const result = getRelevantFailedLabwareCmdFrom({
+        failedCommand: {
+          byRunRecord: {
+            ...failedRetrieveCommand,
+            commandType,
+            error: { isDefined: true, errorType },
+          },
+        } as any,
+        runCommands,
+      })
+      console.log('result::', result)
+      expect(result).toStrictEqual(failedRetrieveCommand)
+    })
+  })
+
   it('should return the failedCommand for GRIPPER_ERROR error kind', () => {
     const failedGripperCommand = {
       ...failedCommand,
@@ -244,13 +287,73 @@ describe('getFailedLabwareQuantity', () => {
     links: {},
   }
 
-  it('should return the quantity for STALL_WHILE_STACKING error kind', () => {
-    const result = getFailedLabwareQuantity(
-      runCommands,
-      failedRetriveCommand,
-      ERROR_KINDS.STALL_WHILE_STACKING
-    )
-    expect(result).toEqual('Quantity: 4')
+  it('should return the quantity for stacker error kinds', () => {
+    const errors = [
+      ERROR_KINDS.SHUTTLE_MISSING,
+      ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+      ERROR_KINDS.STALL_WHILE_STACKING,
+    ]
+    errors.forEach(errorType => {
+      const failedLocalRetriveCommand = {
+        ...failedCommand,
+        commandType: 'flexStacker/retrieve',
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const localRunCommands = {
+        data: [
+          {
+            id: 'set-stored-labware-1',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 2,
+            },
+          } as any,
+          {
+            id: 'retrive-id-1',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'retrive-id-2',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'set-stored-labware',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 5,
+            },
+          } as any,
+          {
+            id: 'retrive-id',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          { ...failedLocalRetriveCommand },
+        ] as RunCommandSummary[],
+        meta: {
+          totalLength: 10,
+          pageLength: 1,
+        },
+        links: {},
+      }
+      const result = getFailedLabwareQuantity(
+        localRunCommands,
+        failedLocalRetriveCommand,
+        errorType
+      )
+      expect(result).toEqual('Quantity: 4')
+    })
   })
 
   it('should return 0 if there is no commands in list', () => {
@@ -294,7 +397,6 @@ describe('getFailedLabwareQuantity', () => {
       failedMoveLabwareCommand,
       ERROR_KINDS.GRIPPER_ERROR
     )
-    console.log('result: ', result)
     expect(result).toBeNull()
   })
 })

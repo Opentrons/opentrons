@@ -39,6 +39,8 @@ export function TwoColLwInfoAndDeck(
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    HOPPER_MANUAL_LOAD_AND_RETRY,
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { relevantWellName, failedLabware } = failedLabwareUtils
@@ -80,13 +82,20 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (
+          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
+          step ===
+            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE
+        ) {
           return t('load_labware_into_labware_shuttle')
         } else {
           return t('ensure_stacker_has_labware')
         }
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
+      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+        return t('load_labware_into_stacker')
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -108,9 +117,15 @@ export function TwoColLwInfoAndDeck(
           : t('replace_tips_and_select_location')
       }
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
         return t('make_sure_loaded_correct_number_of_labware_stacker')
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (
+          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
+          step ===
+            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE
+        ) {
           return null
         } else {
           return t('make_sure_loaded_correct_number_of_labware_stacker')
@@ -143,6 +158,8 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return 'stacked'
       default:
         return 'default'

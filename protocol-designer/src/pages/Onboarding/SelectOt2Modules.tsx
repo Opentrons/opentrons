@@ -14,7 +14,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  getCutoutIdFromAddressableArea,
   getModuleDisplayName,
   getModuleType,
   OT2_ROBOT_TYPE,
