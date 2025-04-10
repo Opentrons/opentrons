@@ -367,6 +367,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         dest: List[Tuple[types.Location, WellCoreType]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
+        starting_tip: Optional[WellCoreType],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:

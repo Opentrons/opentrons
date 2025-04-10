@@ -1127,9 +1127,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         return result.liquidClassId
 
     def get_next_tip(
-        self, tip_racks: List[LabwareCore], starting_well: Optional[str]
+        self, tip_racks: List[LabwareCore], starting_well: Optional[WellCore]
     ) -> Optional[NextTipInfo]:
         """Get the next tip to pick up."""
+        # TODO: check which labware contains the starting tip and according use labware
+        #  from that list element on. i.e., discard all labware in the tip_racks list
+        #  before the tip rack that contains the starting tip.
         result = self._engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
                 pipetteId=self._pipette_id,
@@ -1141,7 +1144,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             result.nextTipInfo if isinstance(result.nextTipInfo, NextTipInfo) else None
         )
 
-    def transfer_with_liquid_class(  # noqa: C901
+    def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -1149,6 +1152,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest: List[Tuple[Location, WellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1234,7 +1238,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
@@ -1424,6 +1428,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 dest=dest,
                 new_tip=new_tip,
                 tip_racks=tip_racks,
+                starting_tip=None,  # update me,
                 trash_location=trash_location,
                 return_tip=return_tip,
             )

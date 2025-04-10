@@ -2051,6 +2051,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             dest=[(Location(Point(), labware=mock_well), mock_well._core)],
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
+            starting_tip=None,
             trash_location=trash_location.move(Point(1, 2, 3)),
             return_tip=True,
         )
@@ -2117,6 +2118,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             dest=[(Location(Point(), labware=mock_well), mock_well._core)],
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
+            starting_tip="update me",
             trash_location=trash_location.move(Point(1, 2, 3)),
             return_tip=True,
         )
