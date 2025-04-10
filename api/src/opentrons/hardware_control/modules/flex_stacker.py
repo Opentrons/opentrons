@@ -512,13 +512,11 @@ class FlexStacker(mod_abc.AbstractModule):
 
     def event_listener(self, event: Any) -> None:
         if isinstance(event, StatusBarUpdateEvent):
-            print(f"Received status bar event: {event}")
             asyncio.run_coroutine_threadsafe(
                 self._handle_status_bar_event(event), self._loop
             )
 
     async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:
-        print(f"Received status bar event: {event}")
         if event.enabled:
             match event.state:
                 case StatusBarState.RUNNING:
