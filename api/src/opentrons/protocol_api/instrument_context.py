@@ -1572,26 +1572,35 @@ class InstrumentContext(publisher.CommandPublisher):
                 " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
                 " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
             )
-
-        self._core.transfer_with_liquid_class(
-            liquid_class=liquid_class,
-            volume=volume,
-            source=[
-                (types.Location(types.Point(), labware=well), well._core)
-                for well in transfer_args.sources_list
-            ],
-            dest=[
-                (types.Location(types.Point(), labware=well), well._core)
-                for well in transfer_args.destinations_list
-            ],
-            new_tip=transfer_args.tip_policy,
-            tip_racks=[
-                (types.Location(types.Point(), labware=rack), rack._core)
-                for rack in transfer_args.tip_racks
-            ],
-            trash_location=transfer_args.trash_location,
-            return_tip=return_tip,
-        )
+        with publisher.publish_context(
+            broker=self.broker,
+            command=cmds.transfer_with_liquid_class(
+                instrument=self,
+                liquid_class=liquid_class,
+                volume=volume,
+                source=source,
+                destination=dest,
+            ),
+        ):
+            self._core.transfer_with_liquid_class(
+                liquid_class=liquid_class,
+                volume=volume,
+                source=[
+                    (types.Location(types.Point(), labware=well), well._core)
+                    for well in transfer_args.sources_list
+                ],
+                dest=[
+                    (types.Location(types.Point(), labware=well), well._core)
+                    for well in transfer_args.destinations_list
+                ],
+                new_tip=transfer_args.tip_policy,
+                tip_racks=[
+                    (types.Location(types.Point(), labware=rack), rack._core)
+                    for rack in transfer_args.tip_racks
+                ],
+                trash_location=transfer_args.trash_location,
+                return_tip=return_tip,
+            )
         return self
 
     @requires_version(2, 23)
@@ -1660,25 +1669,35 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         verified_source = transfer_args.sources_list[0]
-        self._core.distribute_with_liquid_class(
-            liquid_class=liquid_class,
-            volume=volume,
-            source=(
-                types.Location(types.Point(), labware=verified_source),
-                verified_source._core,
+        with publisher.publish_context(
+            broker=self.broker,
+            command=cmds.distribute_with_liquid_class(
+                instrument=self,
+                liquid_class=liquid_class,
+                volume=volume,
+                source=source,
+                destination=dest,
             ),
-            dest=[
-                (types.Location(types.Point(), labware=well), well._core)
-                for well in transfer_args.destinations_list
-            ],
-            new_tip=transfer_args.tip_policy,
-            tip_racks=[
-                (types.Location(types.Point(), labware=rack), rack._core)
-                for rack in transfer_args.tip_racks
-            ],
-            trash_location=transfer_args.trash_location,
-            return_tip=return_tip,
-        )
+        ):
+            self._core.distribute_with_liquid_class(
+                liquid_class=liquid_class,
+                volume=volume,
+                source=(
+                    types.Location(types.Point(), labware=verified_source),
+                    verified_source._core,
+                ),
+                dest=[
+                    (types.Location(types.Point(), labware=well), well._core)
+                    for well in transfer_args.destinations_list
+                ],
+                new_tip=transfer_args.tip_policy,
+                tip_racks=[
+                    (types.Location(types.Point(), labware=rack), rack._core)
+                    for rack in transfer_args.tip_racks
+                ],
+                trash_location=transfer_args.trash_location,
+                return_tip=return_tip,
+            )
         return self
 
     @requires_version(2, 23)
@@ -1748,25 +1767,35 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         verified_dest = transfer_args.destinations_list[0]
-        self._core.consolidate_with_liquid_class(
-            liquid_class=liquid_class,
-            volume=volume,
-            source=[
-                (types.Location(types.Point(), labware=well), well._core)
-                for well in transfer_args.sources_list
-            ],
-            dest=(
-                types.Location(types.Point(), labware=verified_dest),
-                verified_dest._core,
+        with publisher.publish_context(
+            broker=self.broker,
+            command=cmds.consolidate_with_liquid_class(
+                instrument=self,
+                liquid_class=liquid_class,
+                volume=volume,
+                source=source,
+                destination=dest,
             ),
-            new_tip=transfer_args.tip_policy,
-            tip_racks=[
-                (types.Location(types.Point(), labware=rack), rack._core)
-                for rack in transfer_args.tip_racks
-            ],
-            trash_location=transfer_args.trash_location,
-            return_tip=return_tip,
-        )
+        ):
+            self._core.consolidate_with_liquid_class(
+                liquid_class=liquid_class,
+                volume=volume,
+                source=[
+                    (types.Location(types.Point(), labware=well), well._core)
+                    for well in transfer_args.sources_list
+                ],
+                dest=(
+                    types.Location(types.Point(), labware=verified_dest),
+                    verified_dest._core,
+                ),
+                new_tip=transfer_args.tip_policy,
+                tip_racks=[
+                    (types.Location(types.Point(), labware=rack), rack._core)
+                    for rack in transfer_args.tip_racks
+                ],
+                trash_location=transfer_args.trash_location,
+                return_tip=return_tip,
+            )
         return self
 
     @requires_version(2, 0)
