@@ -8,7 +8,8 @@ import {
 } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { StyledText, TertiaryButton } from '../../atoms'
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/StyledText'
 import type { MouseEventHandler } from 'react'
 
 interface FixtureOptionProps {
@@ -22,15 +23,12 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   return isOnDevice ? (
     <FixtureButtonODD onClick={props.onClickHandler}>
       <StyledText
-        desktopStyle="bodyDefaultRegular"
         oddStyle="bodyTextRegular"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.optionName}
       </StyledText>
-      <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextRegular">
-        {props.buttonText}
-      </StyledText>
+      <StyledText oddStyle="bodyTextRegular">{props.buttonText}</StyledText>
     </FixtureButtonODD>
   ) : (
     <Flex

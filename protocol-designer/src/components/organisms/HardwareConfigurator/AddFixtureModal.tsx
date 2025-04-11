@@ -258,14 +258,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   return (
     <>
       <Modal {...modalProps}>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('add_fixture_description')}
-          </StyledText>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-            {fixtureOptions}
-            {nextStageOptions}
-          </Flex>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {fixtureOptions}
+          {nextStageOptions}
         </Flex>
         {optionStage === 'wasteChuteOptions' ? (
           <Btn
