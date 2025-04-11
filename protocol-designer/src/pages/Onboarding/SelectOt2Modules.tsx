@@ -33,7 +33,7 @@ import type { OT2ModuleType } from './ModuleDiagram'
 
 export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
   const modules = watch('modules')
   const supportedModules = OT2_SUPPORTED_MODULE_MODELS
   const filteredSupportedModules = supportedModules.filter(
@@ -88,7 +88,7 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
               {filteredSupportedModules
                 .sort((moduleA, moduleB) => moduleA.localeCompare(moduleB))
                 .map(moduleModel => (
-                  <Flex width={FLEX_MAX_CONTENT}>
+                  <Flex width={FLEX_MAX_CONTENT} key={moduleModel}>
                     <EmptySelectorButton
                       disabled={false}
                       textAlignment={TYPOGRAPHY.textAlignLeft}

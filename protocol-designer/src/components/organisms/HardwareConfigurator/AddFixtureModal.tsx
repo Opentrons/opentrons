@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { uuid } from '@opentrons/step-generation'
@@ -15,37 +15,19 @@ import {
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
-  ABSORBANCE_READER_CUTOUTS,
-  ABSORBANCE_READER_V1_FIXTURE,
   ABSORBANCE_READER_V1,
-  HEATER_SHAKER_CUTOUTS,
-  HEATERSHAKER_MODULE_V1_FIXTURE,
-  HEATERSHAKER_MODULE_V1,
-  MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_CUTOUTS,
-  SINGLE_LEFT_CUTOUTS,
-  SINGLE_RIGHT_CUTOUTS,
-  STAGING_AREA_CUTOUTS,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  TEMPERATURE_MODULE_CUTOUTS,
-  TEMPERATURE_MODULE_V2_FIXTURE,
-  THERMOCYCLER_MODULE_CUTOUTS,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
   getFixtureDisplayName,
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   MAGNETIC_BLOCK_V1,
-  THERMOCYCLER_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
   getModuleType,
   MODULE_MODELS,
 } from '@opentrons/shared-data'
 import { useKitchen } from '../Kitchen/hooks'
+import { getAvailableOptions } from './util'
 
 import type { UseFormSetValue } from 'react-hook-form'
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   CutoutConfig,
   CutoutId,
@@ -71,15 +53,14 @@ interface AddFixtureModalProps {
   setValue: UseFormSetValue<WizardFormState>
   hasGripper: boolean
 }
-type OptionStage =
+export type OptionStage =
   | 'modulesOrFixtures'
   | 'fixtureOptions'
   | 'moduleOptions'
   | 'wasteChuteOptions'
-  | 'providedOptions'
 
-interface CutoutConfigExtended extends CutoutConfig {
-  type: FixtureName | ModuleModel | 'stagingAreaAndMagneticBlock'
+export interface CutoutConfigExtended extends CutoutConfig {
+  type?: FixtureName | ModuleModel | 'stagingAreaAndMagneticBlock'
 }
 
 const FIXTURES = ['wasteChute', 'trashBin', 'stagingArea']
@@ -98,12 +79,11 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     setValue,
     hasGripper,
   } = props
-  const { t } = useTranslation('shared')
+  const { t, i18n } = useTranslation('shared')
   const { makeSnackbar } = useKitchen()
-  let initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only magnetic block can be configured in column 2
+  const initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only magnetic block can be configured in column 2
     ? 'moduleOptions'
     : 'modulesOrFixtures'
-
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
 
   const modalProps: ModalProps = {
@@ -116,118 +96,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     width: '26.75rem',
   }
 
-  let availableOptions: CutoutConfigExtended[][] = []
-  if (optionStage === 'fixtureOptions') {
-    if (
-      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
-      SINGLE_LEFT_CUTOUTS.includes(cutoutId)
-    ) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-            type: 'trashBin',
-          },
-        ],
-      ]
-    }
-    if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
-            type: 'stagingArea',
-          },
-        ],
-      ]
-    }
-  } else if (optionStage === 'moduleOptions') {
-    availableOptions = [
-      ...availableOptions,
-      [
-        {
-          cutoutId,
-          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
-          type: MAGNETIC_BLOCK_V1,
-        },
-      ],
-    ]
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-            type: 'stagingAreaAndMagneticBlock',
-          },
-        ],
-      ]
-    }
-    if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
-            cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
-            type: THERMOCYCLER_MODULE_V1,
-          },
-        ],
-      ]
-    }
-    if (HEATER_SHAKER_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
-            type: HEATERSHAKER_MODULE_V1,
-          },
-        ],
-      ]
-    }
-    if (TEMPERATURE_MODULE_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-            type: TEMPERATURE_MODULE_V1,
-          },
-        ],
-      ]
-    }
-    if (ABSORBANCE_READER_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
-            type: ABSORBANCE_READER_V1,
-          },
-        ],
-      ]
-    }
-  } else if (optionStage === 'wasteChuteOptions') {
-    availableOptions = [
-      WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-    ].map(fixture => [
-      {
-        cutoutId,
-        cutoutFixtureId: fixture,
-        type: 'wasteChute',
-      },
-    ])
-  }
+  const availableOptions = getAvailableOptions({ optionStage, cutoutId })
 
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
@@ -277,6 +146,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   const handleAddFixture = (
     addedCutoutConfigs: CutoutConfigExtended[]
   ): void => {
+    //  only allow 1 trashBin
     if (
       addedCutoutConfigs.some(
         cutoutConfig => cutoutConfig.type === 'trashBin'
@@ -284,13 +154,25 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       Object.values(fixtures).some(fixture => fixture.name === 'trashBin')
     ) {
       makeSnackbar(t('only_one_trash') as string)
+      //  only allow absorbance reader if gripper is attached
     } else if (
       !hasGripper &&
       addedCutoutConfigs.some(
-        cutoutConfig => cutoutConfig.type === 'absorbanceReaderV1'
+        cutoutConfig => cutoutConfig.type === ABSORBANCE_READER_V1
       )
     ) {
       makeSnackbar(t('add_gripper_for_plate') as string)
+      //  block thermocycler from being added if there is something in slot A1
+    } else if (
+      addedCutoutConfigs.some(
+        cutoutConfig => cutoutConfig.type === 'thermocyclerModuleV2'
+      ) &&
+      (Object.values(modules).some(module => module.cutoutId === 'cutoutA1') ||
+        Object.values(fixtures).some(
+          fixture => fixture.cutoutId === 'cutoutA1'
+        ))
+    ) {
+      makeSnackbar(t('thermocycler_blocked') as string)
     } else {
       const newDeckConfig = deckConfig.map(fixture => {
         const replacementCutoutConfig = addedCutoutConfigs.find(
@@ -305,7 +187,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       )
       const newFixture = addedCutoutConfigs.find(
         cutoutConfig =>
-          FIXTURES.includes(cutoutConfig.type) ||
+          (cutoutConfig.type != null && FIXTURES.includes(cutoutConfig.type)) ||
           cutoutConfig.type === 'stagingAreaAndMagneticBlock'
       )
       if (newModule != null) {
@@ -355,18 +237,16 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         }
         setValue('fixtures', updatedFixtures)
       }
-
       setUpdatedDeckConfig(newDeckConfig)
       closeModal()
     }
   }
-
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
     return (
       <FixtureOption
         key={cutoutConfigs[0].cutoutFixtureId}
         optionName={getFixtureDisplayName(cutoutConfigs[0].cutoutFixtureId)}
-        buttonText={t('add')}
+        buttonText={i18n.format(t('add'), 'capitalize')}
         onClickHandler={() => {
           handleAddFixture(cutoutConfigs)
         }}

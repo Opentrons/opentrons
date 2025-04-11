@@ -1,9 +1,6 @@
 {
   "add_custom_tips": "Add custom pipette tips",
   "add_fixtures": "Add your fixtures",
-  "add_your_pipettes": "Add your pipettes",
-  "are_you_using_thermocycler": "Are you using a Thermocycler in your protocol?",
-  "are_you_using_gripper": "Are you using a Waste chute in your protocol?",
   "add_gripper_for_absorbance_reader": "Add a gripper to enable adding Absorbance Plate Reader",
   "add_gripper": "Add a gripper",
   "add_modules": "Add your modules",
@@ -12,6 +9,7 @@
   "add_your_pipettes": "Add your pipettes",
   "are_you_sure_clear_slot": "Are you sure you want to clear slot?",
   "are_you_sure_reconfigure_slot": "Are you sure you want to reconfigure the slot?",
+  "are_you_using_gripper": "Are you using a Waste chute in your protocol?",
   "are_you_using_thermocycler": "Are you using a Thermocycler in your protocol?",
   "are_you_using_waste_chute": "Are you using a Waste chute in your protocol?",
   "author_org": "Author/Organization",

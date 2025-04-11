@@ -27,7 +27,7 @@ export function EditProtocolMetadataModal(
 ): JSX.Element {
   const { onClose } = props
   const dispatch = useDispatch()
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const {
     handleSubmit,

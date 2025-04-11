@@ -61,7 +61,7 @@ export function SelectPipetteModal(
     setPipetteVolume,
     setPipetteType,
   } = props
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
   const pipettesByMount = watch('pipettesByMount')
   const fields = watch('fields')
   const allLabware = useSelector(getLabwareDefsByURI)

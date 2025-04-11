@@ -10,6 +10,7 @@
   "cancel": "Cancel",
   "change_robot_movement": "Change how the robot moves from well to well.",
   "close": "Close",
+  "thermocycler_blocked": "The Thermocycler requires slots A1 and B1 and there is something in A1",
   "confirm_import": "Are you sure you want to upload this protocol?",
   "confirm_reorder": "Are you sure you want to reorder these steps, it may cause errors?",
   "confirm": "Confirm",

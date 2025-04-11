@@ -3,7 +3,7 @@ import application from './application.json'
 import button from './button.json'
 import card from './card.json'
 import context_menu from './context_menu.json'
-import create_new_protocol from './create_new_protocol.json'
+import onboarding from './onboarding.json'
 import deck from './deck.json'
 import feature_flags from './feature_flags.json'
 import form from './form.json'
@@ -25,7 +25,6 @@ export const en = {
   button,
   card,
   context_menu,
-  create_new_protocol,
   deck,
   feature_flags,
   form,
@@ -33,6 +32,7 @@ export const en = {
   modal,
   modules,
   nav,
+  onboarding,
   protocol_command_text,
   protocol_overview,
   protocol_steps,

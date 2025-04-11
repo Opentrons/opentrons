@@ -11,7 +11,7 @@ export function SelectHardware(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch } = props
   const { makeSnackbar } = useKitchen()
   const fixtures = watch('fixtures')
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
   const hasTrash = Object.values(fixtures).some(
     fixture => fixture.name === 'trashBin' || fixture.name === 'wasteChute'
   )

@@ -78,8 +78,8 @@ export function HardwareConfigurator(props: WizardTileProps): JSX.Element {
     <>
       {addFixtureModal}
       <DeckConfigurator
-        editableCutoutIds={deckConfig.map(({ cutoutId }) => cutoutId)}
-        deckConfig={deckConfig}
+        editableCutoutIds={updatedDeckConfig.map(({ cutoutId }) => cutoutId)}
+        deckConfig={updatedDeckConfig}
         handleClickAdd={addFixtureToCutout}
         handleClickRemove={removeFixtureFromCutout}
       />

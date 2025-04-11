@@ -11,7 +11,6 @@ import type {
   NozzleConfigurationStyle,
   FlexModuleCutoutFixtureId,
   CutoutId,
-  OT2CutoutId,
 } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
 

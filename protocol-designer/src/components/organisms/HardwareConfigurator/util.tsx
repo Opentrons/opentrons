@@ -1,14 +1,38 @@
 import { useState } from 'react'
 import {
+  ABSORBANCE_READER_CUTOUTS,
+  ABSORBANCE_READER_V1,
+  ABSORBANCE_READER_V1_FIXTURE,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  HEATER_SHAKER_CUTOUTS,
+  HEATERSHAKER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  MAGNETIC_BLOCK_V1,
+  MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_CUTOUTS,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  TEMPERATURE_MODULE_CUTOUTS,
+  TEMPERATURE_MODULE_V2,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_MODULE_CUTOUTS,
+  THERMOCYCLER_MODULE_V2,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
-import { AddFixtureModal } from './AddFixtureModal'
+import {
+  AddFixtureModal,
+  CutoutConfigExtended,
+  OptionStage,
+} from './AddFixtureModal'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutFixtureId,
@@ -103,7 +127,6 @@ export function useDeckConfigurationEditing(
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
             }
           : cutoutConfig
       )
@@ -113,7 +136,6 @@ export function useDeckConfigurationEditing(
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
             }
           : cutoutConfig
       )
@@ -140,4 +162,129 @@ export function useDeckConfigurationEditing(
         />
       ) : null,
   }
+}
+
+interface AvailableOptionsProps {
+  optionStage: OptionStage
+  cutoutId: CutoutId
+}
+export const getAvailableOptions = (
+  props: AvailableOptionsProps
+): CutoutConfigExtended[][] => {
+  const { optionStage, cutoutId } = props
+
+  let availableOptions: CutoutConfigExtended[][] = []
+  if (optionStage === 'fixtureOptions') {
+    if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+            type: 'stagingArea',
+          },
+        ],
+      ]
+    }
+    if (
+      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
+      SINGLE_LEFT_CUTOUTS.includes(cutoutId)
+    ) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+            type: 'trashBin',
+          },
+        ],
+      ]
+    }
+  } else if (optionStage === 'moduleOptions') {
+    if (ABSORBANCE_READER_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
+            type: ABSORBANCE_READER_V1,
+          },
+        ],
+      ]
+    }
+    if (HEATER_SHAKER_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
+            type: HEATERSHAKER_MODULE_V1,
+          },
+        ],
+      ]
+    }
+    availableOptions = [
+      ...availableOptions,
+      [
+        {
+          cutoutId,
+          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+          type: MAGNETIC_BLOCK_V1,
+        },
+      ],
+    ]
+    if (TEMPERATURE_MODULE_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+            type: TEMPERATURE_MODULE_V2,
+          },
+        ],
+      ]
+    }
+    if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
+            cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+            type: THERMOCYCLER_MODULE_V2,
+          },
+        ],
+      ]
+    }
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+            type: 'stagingAreaAndMagneticBlock',
+          },
+        ],
+      ]
+    }
+  } else if (optionStage === 'wasteChuteOptions') {
+    availableOptions = [
+      WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    ].map(fixture => [
+      {
+        cutoutId,
+        cutoutFixtureId: fixture,
+        type: 'wasteChute',
+      },
+    ])
+  }
+
+  return availableOptions
 }
