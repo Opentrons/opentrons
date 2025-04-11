@@ -2,9 +2,9 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import {
   getAllLiquidClassDefs,
+  getFlexNameConversion,
   linearInterpolate,
 } from '@opentrons/shared-data'
-import { getFlexNameConversion } from '@opentrons/step-generation'
 import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import type {
