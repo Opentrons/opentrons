@@ -517,6 +517,7 @@ export interface FlexStackerFillRunTimeCommand
     CommonCommandRunTimeInfo {
   result?: {
     count: number
+    lidLabwareURI?: string
   }
 }
 

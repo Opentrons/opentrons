@@ -37,7 +37,7 @@ type GetFlexStackerCommandText = HandlesCommands<HandledCommands>
 const getPrimaryLabwareUriIfExsists = (
   command: FlexStackerCommand
 ): string | null => {
-  if ('result' in command && 'primaryLabwareURI' in command.result) {
+  if (command.result !== undefined && 'primaryLabwareURI' in command?.result) {
     const currentLabwareDef = getAllLabwareDefs()[
       command.result?.primaryLabwareURI
     ]
@@ -73,7 +73,7 @@ GetFlexStackerCommandText): string => {
   } else if (command.commandType === 'flexStacker/store') {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
-      location: command.result?.primaryOriginLocationSequence[0] ?? null,
+      location: command.result?.primaryOriginLocationSequence ?? null,
       robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
@@ -95,7 +95,7 @@ GetFlexStackerCommandText): string => {
       t,
     })
     if (
-      'result' in command &&
+      command.result !== undefined &&
       'primaryLabwareDefinition' in command?.result &&
       slotName != null
     ) {
@@ -106,9 +106,10 @@ GetFlexStackerCommandText): string => {
           primaryDefinitionDisplayName:
             command.result?.primaryLabwareDefinition.metadata.displayName,
         }) +
-        (command.result?.lidLabwareURI != null
+        (command.result?.lidLabwareDefinition != null
           ? t('with_lid_name', {
-              lidDisplayName: command.result?.lidLabwareURI,
+              lidDisplayName:
+                command.result?.lidLabwareDefinition.metadata.displayName,
             })
           : '')
       )
