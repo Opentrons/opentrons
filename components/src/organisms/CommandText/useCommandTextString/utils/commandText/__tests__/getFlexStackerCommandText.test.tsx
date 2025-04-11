@@ -41,133 +41,137 @@ const render = (command: any) => {
 
 describe('getPipettingCommandText', () => {
   beforeEach(() => {
-    vi.mocked(getLabwareDefURI).mockImplementation((def: any) => def.uri)
-    vi.mocked(getFinalLabwareLocation).mockReturnValue('slot-1' as any)
-    vi.mocked(getWellRange).mockReturnValue('A1')
-    vi.mocked(getLabwareDefinitionsFromCommands).mockReturnValue([
-      { uri: 'tiprack-uri', parameters: { isTiprack: true } },
-      { uri: 'plate-uri', parameters: { isTiprack: false } },
-    ] as any)
-    vi.mocked(getLabwareName).mockReturnValue('Test Labware')
-    vi.mocked(getLoadedLabware).mockImplementation(
-      (labware, id) =>
-        ({
-          definitionUri: id === 'tiprack-id' ? 'tiprack-uri' : 'plate-uri',
-        } as any)
-    )
-    vi.mocked(getLabwareDisplayLocation).mockReturnValue('Slot 1')
-    vi.mocked(getFinalMoveToAddressableAreaCmd).mockReturnValue({
-      id: 'cmd-1',
-      commandType: 'moveToAddressableArea',
+    vi.mocked(getAllLabwareDefs).mockReturnValue({
+      'tiprack-uri': { metadata: { displayName: 'tip rack' } },
+      'plate-uri': { metadata: { displayName: 'plate' } },
     } as any)
-    vi.mocked(getAddressableAreaDisplayName).mockReturnValue('Fixed Trash')
+    vi.mocked(getLabwareDisplayLocation).mockReturnValue('Slot 1')
   })
 
-  it('should render aspirate command text correctly', () => {
+  it('should render retrieve command text correctly', () => {
     const command = {
       id: 'cmd-1',
-      commandType: 'aspirate',
+      commandType: 'flexStacker/retrieve',
       params: {
-        labwareId: 'labware-1',
-        wellName: 'A1',
-        volume: 100,
-        flowRate: 150,
+        moduleId: 'module-id',
+      },
+      result: {
+        primaryLabwareURI: 'tiprack-uri',
+      },
+    }
+
+    render(command)
+    screen.getByText('retrieve_labware_from_stacker_to')
+  })
+
+  it('should render store command text correctly', () => {
+    const command = {
+      id: 'cmd-1',
+      commandType: 'flexStacker/store',
+      params: {
+        moduleId: 'module-id',
+      },
+      result: {
+        primaryLabwareURI: 'tiprack-uri',
+        primaryOriginLocationSequence: [
+          { kind: 'onAddressableArea', addressableAreaName: 'A1' },
+        ],
+      },
+    }
+
+    render(command)
+    screen.getByText('store_labware_from_slot_to_stacker')
+  })
+
+  it('should render setStoredLabware command text correctly', () => {
+    const command = {
+      id: 'cmd-1',
+      commandType: 'flexStacker/setStoredLabware',
+      params: {
+        moduleId: 'module-id',
+      },
+      result: {
+        primaryLabwareURI: 'tiprack-uri',
+        primaryLabwareDefinition: {
+          metadata: {
+            displayName: 'dummy def',
+          },
+        },
+        primaryOriginLocationSequence: [
+          { kind: 'onAddressableArea', addressableAreaName: 'A1' },
+        ],
       },
     }
 
     render(command)
     screen.getByText(
-      /Aspirating 100 µL from well A1 of Test Labware in Slot 1 at 150 µL\/sec/
+      'flex_stacker_set_stored_labware_with_quantity_and_location'
     )
   })
 
-  it('should render dispense command text correctly', () => {
+  it('should render fill command text correctly', () => {
     const command = {
       id: 'cmd-1',
-      commandType: 'dispense',
+      commandType: 'flexStacker/fill',
       params: {
-        labwareId: 'labware-1',
-        wellName: 'A1',
-        volume: 100,
-        flowRate: 150,
+        moduleId: 'module-id',
+      },
+      result: {
+        primaryLabwareURI: 'tiprack-uri',
+        primaryLabwareDefinition: {
+          metadata: {
+            displayName: 'dummy def',
+          },
+        },
+        primaryOriginLocationSequence: [
+          { kind: 'onAddressableArea', addressableAreaName: 'A1' },
+        ],
       },
     }
 
     render(command)
-    screen.getByText(
-      /Dispensing 100 µL into well A1 of Test Labware in Slot 1 at 150 µL\/sec/
-    )
+    screen.getByText('flex_stacker_fill_with_quantity_and_labware')
   })
 
-  it('should render dispense with push out command text correctly', () => {
+  it('should render empty command text correctly', () => {
     const command = {
       id: 'cmd-1',
-      commandType: 'dispense',
+      commandType: 'flexStacker/empty',
       params: {
-        labwareId: 'labware-1',
-        wellName: 'A1',
-        volume: 100,
-        flowRate: 150,
-        pushOut: 10,
+        moduleId: 'module-id',
+      },
+      result: {
+        primaryLabwareURI: 'tiprack-uri',
+        primaryLabwareDefinition: {
+          metadata: {
+            displayName: 'dummy def',
+          },
+        },
+        primaryOriginLocationSequence: [
+          { kind: 'onAddressableArea', addressableAreaName: 'A1' },
+        ],
       },
     }
-
-    render(command)
-    screen.getByText(
-      /Dispensing 100 µL into well A1 of Test Labware in Slot 1 at 150 µL\/sec and pushing out 10 µL/
-    )
   })
 
-  it('should render pickup tip command text correctly', () => {
-    const command = {
-      id: 'cmd-1',
-      commandType: 'pickUpTip',
-      params: {
-        labwareId: 'tiprack-id',
-        wellName: 'A1',
-        pipetteId: 'pipette-1',
-      },
+  it('should render defualt command text correctly', () => {
+    const COMMAND_TYPE_TRANSLATIONS = {
+      'flexStacker/retrieve': 'flex_stacker_retrieve',
+      'flexStacker/store': 'flex_stacker_store',
+      'flexStacker/setStoredLabware': 'flex_stacker_set_stored_labware',
+      'flexStacker/empty': 'flex_stacker_empty',
+      'flexStacker/fill': 'flex_stacker_fill',
     }
-
-    render(command)
-    screen.getByText(/Picking up tip\(s\) from A1 of Test Labware in Slot 1/)
-  })
-
-  it('should render drop tip in tiprack command text correctly', () => {
-    const command = {
-      id: 'cmd-1',
-      commandType: 'dropTip',
-      params: {
-        labwareId: 'tiprack-id',
-        wellName: 'A1',
-      },
+    for (const [key, value] of Object.entries(COMMAND_TYPE_TRANSLATIONS)) {
+      const command = {
+        id: 'cmd-1',
+        commandType: key,
+        params: {
+          moduleId: 'module-id',
+        },
+      }
+      render(command)
+      screen.getByText(value)
     }
-
-    render(command)
-    screen.getByText(/Returning tip to A1 of Test Labware in Slot 1/)
-  })
-
-  it('should render drop tip in place command text correctly if there is an addressable area name', () => {
-    const command = {
-      id: 'cmd-1',
-      commandType: 'dropTipInPlace',
-      params: {},
-    }
-
-    render(command)
-    screen.getByText('Dropping tip in Fixed Trash')
-  })
-
-  it('should render drop tip in place command text correctly if there is not an addressable area name', () => {
-    const command = {
-      id: 'cmd-1',
-      commandType: 'dropTipInPlace',
-      params: {},
-    }
-
-    vi.mocked(getFinalMoveToAddressableAreaCmd).mockReturnValue(null)
-
-    render(command)
-    screen.getByText('Dropping tip in place')
   })
 })

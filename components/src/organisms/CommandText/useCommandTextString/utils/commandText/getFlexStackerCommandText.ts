@@ -42,9 +42,6 @@ export const getFlexStackerCommandText = ({
   robotType,
 }: // stackerCommand,
 GetFlexStackerCommandText): string => {
-  console.log('commandTextData:', commandTextData)
-  console.log('allRunDefs: ', allRunDefs)
-  console.log('command: ', command)
   let primaryDefinitionDisplayName = null
   if ('result' in command && 'primaryLabwareURI' in command.result) {
     const currentLabwareDef = getAllLabwareDefs()[
@@ -63,10 +60,7 @@ GetFlexStackerCommandText): string => {
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
-    console.log('slotName: ', slotName)
     if (primaryDefinitionDisplayName != null && slotName != null) {
-      // add logic for lid etc
-
       return t('retrieve_labware_from_stacker_to', {
         primaryDefinitionDisplayName,
         slotName,
@@ -81,7 +75,6 @@ GetFlexStackerCommandText): string => {
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
-    console.log('slotName: ', slotName)
     if (primaryDefinitionDisplayName != null && slotName != null) {
       return t('store_labware_from_slot_to_stacker', {
         primaryDefinitionDisplayName,
@@ -97,21 +90,34 @@ GetFlexStackerCommandText): string => {
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
-    console.log('slotName: ', slotName)
     if ('primaryLabwareDefinition' in command?.result && slotName != null) {
-      return t('flex_stacker_set_stored_labware_with_quantity_and_location', {
-        quantity: command.params.initialCount,
-        slotName,
-        primaryDefinitionDisplayName:
-          command.result?.primaryLabwareDefinition.metadata.displayName,
-      }) + (command.result?.lidLabwareURI != null ? t('with_lid_name', {lidDisplayName: command.result?.lidLabwareURI}) : '')
+      return (
+        t('flex_stacker_set_stored_labware_with_quantity_and_location', {
+          quantity: command.params.initialCount,
+          slotName,
+          primaryDefinitionDisplayName:
+            command.result?.primaryLabwareDefinition.metadata.displayName,
+        }) +
+        (command.result?.lidLabwareURI != null
+          ? t('with_lid_name', {
+              lidDisplayName: command.result?.lidLabwareURI,
+            })
+          : '')
+      )
     }
   } else if (command.commandType === 'flexStacker/fill') {
     if (primaryDefinitionDisplayName != null) {
-      return t('flex_stacker_fill_with_quantity_and_labware', {
-        quantity: command.params.count,
-        primaryDefinitionDisplayName,
-      }) + (command.result?.lidLabwareURI != null ? t('with_lid_name', {lidDisplayName: command.result?.lidLabwareURI}) : '')
+      return (
+        t('flex_stacker_fill_with_quantity_and_labware', {
+          quantity: command.params.count,
+          primaryDefinitionDisplayName,
+        }) +
+        (command.result?.lidLabwareURI != null
+          ? t('with_lid_name', {
+              lidDisplayName: command.result?.lidLabwareURI,
+            })
+          : '')
+      )
     }
   } else if (command.commandType === 'flexStacker/empty') {
     const slotName = getLabwareDisplayLocation({
@@ -122,7 +128,6 @@ GetFlexStackerCommandText): string => {
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
-    console.log('slotName: ', slotName)
     if (primaryDefinitionDisplayName != null && slotName != null) {
       return t('flex_stacker_empty_from_location', {
         slotName,
