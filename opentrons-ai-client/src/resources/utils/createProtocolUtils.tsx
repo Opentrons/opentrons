@@ -263,17 +263,18 @@ export function generateChatPrompt(
   let leftPipetteApiLoadName: string | null = null
   let rightPipetteApiLoadName: string | null = null
 
-  if (values.instruments.pipettes === TWO_PIPETTES) {
-    const leftPipetteSpecs = getPipetteSpecsV2(
-      values.instruments.leftPipette as PipetteName
-    )
-    const rightPipetteSpecs = getPipetteSpecsV2(
-      values.instruments.rightPipette as PipetteName
-    )
+  const leftPipetteName = values.instruments.leftPipette
+  const rightPipetteName = values.instruments.rightPipette
+
+  if (leftPipetteName && leftPipetteName !== NO_PIPETTES) {
+    const leftPipetteSpecs = getPipetteSpecsV2(leftPipetteName as PipetteName)
     if (leftPipetteSpecs != null) {
       leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
     }
+  }
 
+  if (rightPipetteName && rightPipetteName !== NO_PIPETTES) {
+    const rightPipetteSpecs = getPipetteSpecsV2(rightPipetteName as PipetteName)
     if (rightPipetteSpecs != null) {
       rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
     }
