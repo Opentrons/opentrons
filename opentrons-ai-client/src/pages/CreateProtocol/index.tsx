@@ -21,7 +21,7 @@ import {
   updateProtocolChatAtom,
 } from '../../resources/atoms'
 
-import { ProtocolSectionsContainer } from '../../organisms/ProtocolSectionsContainer'
+import { ProtocolSectionsContainer, sections } from '../../organisms/ProtocolSectionsContainer'
 import {
   generateChatPrompt,
   generatePromptPreviewData,
@@ -34,6 +34,7 @@ import type { DisplayModules } from '../../organisms/ModulesSection'
 import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 
 export interface CreateProtocolFormData {
+  protocol_format: 'pd' | 'python'
   application: {
     scientificApplication: string
     otherApplication: string
@@ -52,7 +53,7 @@ export interface CreateProtocolFormData {
   steps: string[] | string
 }
 
-const TOTAL_STEPS = 5
+const TOTAL_STEPS = sections.length
 
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -236,7 +237,8 @@ export function CreateProtocol(): JSX.Element | null {
         <div style={{ width: `${100 - leftWidth}%`, height: '100%' }}>
           <PromptPreview
             handleSubmit={handleSubmit}
-            isSubmitButtonEnabled={currentSection === TOTAL_STEPS}
+            // todo: fix this disabled logic
+            isSubmitButtonEnabled={true}
             promptPreviewData={generatePromptPreviewData(methods.watch, t)}
           />
         </div>

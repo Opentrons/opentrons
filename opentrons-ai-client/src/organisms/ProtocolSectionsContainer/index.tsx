@@ -27,6 +27,39 @@ export const MODULES_STEP = 3
 export const LABWARE_LIQUIDS_STEP = 4
 export const STEPS_STEP = 5
 
+export const sections = [
+  {
+    sectionNumber: PROTOCOL_FORMAT_STEP,
+    title: 'protocol_format_title',
+    Component: ProtocolFormatSection,
+  },
+  {
+    sectionNumber: APPLICATION_STEP,
+    title: 'application_title',
+    Component: ApplicationSection,
+  },
+  {
+    sectionNumber: INSTRUMENTS_STEP,
+    title: 'instruments_title',
+    Component: InstrumentsSection,
+  },
+  {
+    sectionNumber: MODULES_STEP,
+    title: 'modules_title',
+    Component: ModulesSection,
+  },
+  {
+    sectionNumber: LABWARE_LIQUIDS_STEP,
+    title: 'labware_liquids_title',
+    Component: LabwareLiquidsSection,
+  },
+  {
+    sectionNumber: STEPS_STEP,
+    title: 'steps_title',
+    Component: StepsSection,
+  },
+]
+
 export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const {
@@ -61,38 +94,7 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
 
   return (
     <ProtocolSections>
-      {[
-        {
-          sectionNumber: PROTOCOL_FORMAT_STEP,
-          title: 'protocol_format_title',
-          Component: ProtocolFormatSection,
-        },
-        {
-          sectionNumber: APPLICATION_STEP,
-          title: 'application_title',
-          Component: ApplicationSection,
-        },
-        {
-          sectionNumber: INSTRUMENTS_STEP,
-          title: 'instruments_title',
-          Component: InstrumentsSection,
-        },
-        {
-          sectionNumber: MODULES_STEP,
-          title: 'modules_title',
-          Component: ModulesSection,
-        },
-        {
-          sectionNumber: LABWARE_LIQUIDS_STEP,
-          title: 'labware_liquids_title',
-          Component: LabwareLiquidsSection,
-        },
-        {
-          sectionNumber: STEPS_STEP,
-          title: 'steps_title',
-          Component: StepsSection,
-        },
-      ].map(({ sectionNumber, title, Component }) => (
+      {sections.map(({ sectionNumber, title, Component }) => (
         <Accordion
           key={sectionNumber}
           heading={t(title)}

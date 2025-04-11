@@ -1,6 +1,6 @@
 {
   "application_title": "Application",
-  "protocol_format_title": "Protocol Format",
+  "protocol_format": "Protocol Format",
   "application_scientific_dropdown_title": "What's your scientific application?",
   "application_scientific_dropdown_placeholder": "Select an option",
   "basic_aliquoting": "Basic aliquoting",

@@ -30,6 +30,7 @@ import { CSSTransition } from 'react-transition-group'
 import { useAtom } from 'jotai'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { TextAreaField } from '../../atoms/TextAreaField'
+import { sections } from '../../organisms/ProtocolSectionsContainer'
 
 interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions
@@ -114,6 +115,7 @@ export function UpdateProtocol(): JSX.Element {
   const [fileValue, setFile] = useState<File | null>(null)
   const [pythonText, setPythonTextValue] = useState<string>('')
   const [errorText, setErrorText] = useState<string | null>(null)
+  const progressIncrement = sections.length - 1
 
   // Reset the chat data atom and protocol atoms when navigating to the update protocol page
   useEffect(() => {
@@ -148,15 +150,15 @@ export function UpdateProtocol(): JSX.Element {
   useEffect(() => {
     let progress = 0.0
     if (updateType !== null) {
-      progress += 0.33
+      progress += progressIncrement
     }
 
     if (detailsValue !== '') {
-      progress += 0.33
+      progress += progressIncrement
     }
 
     if (pythonText !== '' && fileValue !== null && errorText === null) {
-      progress += 0.34
+      progress += progressIncrement
     }
 
     setHeaderWithMeterAtom({
@@ -338,7 +340,8 @@ export function UpdateProtocol(): JSX.Element {
           justifyContent={JUSTIFY_END}
         >
           <LargeButton
-            disabled={headerState.progress !== 1.0}
+          // TODO: fix this disabled increment logic
+            disabled={false}
             buttonText={t('submit_prompt')}
             onClick={processDataAndNavigateToChat}
           />

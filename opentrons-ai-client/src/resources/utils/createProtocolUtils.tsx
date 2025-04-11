@@ -1,3 +1,4 @@
+import startCase from 'lodash/startCase'
 import {
   getLabwareDisplayName,
   getPipetteSpecsV2,
@@ -251,6 +252,8 @@ export function generateChatPrompt(
 ): string {
   const defs = getOnlyLatestDefs()
 
+  const protocolFormat = `- ${startCase(values.protocol_format)}`
+
   const robotType = t(values.instruments.robot)
   const scientificApplication = `- ${t(
     values.application.scientificApplication
@@ -300,6 +303,8 @@ export function generateChatPrompt(
     : values.steps
 
   const prompt = `${t('create_protocol_prompt_robot', { robotType })}\n${t(
+    'protocol_format'
+  )}:\n${protocolFormat}\n\n${t(
     'application_title'
   )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
     'pipette_mounts'
