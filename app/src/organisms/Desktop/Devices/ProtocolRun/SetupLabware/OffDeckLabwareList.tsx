@@ -34,7 +34,7 @@ export function OffDeckLabwareList(
       >
         {t('additional_off_deck_labware')}
       </LegacyStyledText>
-      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+      <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
         {labwareItems.map((labwareItem, index) => (
           <LabwareListItem
             key={index}

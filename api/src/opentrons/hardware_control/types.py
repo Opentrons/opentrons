@@ -412,6 +412,7 @@ class DoorStateNotification:
         HardwareEventType.DOOR_SWITCH_CHANGE
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+    module_serial: str | None = None
 
 
 @dataclass(frozen=True)
@@ -598,6 +599,16 @@ class StatusBarState(enum.Enum):
             StatusBarState.ACTIVATION.value,
             StatusBarState.DISCO.value,
         }
+
+
+@dataclass(frozen=True)
+class StatusBarUpdateEvent:
+    state: StatusBarState
+    enabled: bool
+
+
+StatusBarUpdateListener = Callable[[StatusBarUpdateEvent], None]
+StatusBarUpdateUnsubscriber = Callable[[], None]
 
 
 @dataclass

@@ -144,6 +144,8 @@ describe('getDefaultsForStepType', () => {
         blowout_z_offset: 0,
         liquidClassesSupported: true,
         liquidClass: 'none',
+        pushOut_checkbox: null,
+        pushOut_volume: null,
       })
     })
   })

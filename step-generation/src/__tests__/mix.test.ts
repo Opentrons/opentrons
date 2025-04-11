@@ -94,7 +94,7 @@ describe('mix: change tip', () => {
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume, mockWellLocation),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
 
         aspirateHelper(well, volume, mockWellLocation),
         dispenseHelper(well, volume, mockWellLocation),
@@ -141,7 +141,7 @@ mockPythonName.mix(
       ...replaceTipCommands(0),
       ...flatMap(args.wells, well => [
         aspirateHelper(well, volume, mockWellLocation),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
         aspirateHelper(well, volume, mockWellLocation),
         dispenseHelper(well, volume, mockWellLocation),
       ]),
@@ -156,7 +156,7 @@ mockPythonName.mix(
     expect(res.commands).toEqual(
       flatMap(args.wells, well => [
         aspirateHelper(well, volume, mockWellLocation),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
         aspirateHelper(well, volume, mockWellLocation),
         dispenseHelper(well, volume, mockWellLocation),
       ])
@@ -183,7 +183,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
       aspirateHelper('A1', volume, mockWellLocation),
-      dispenseHelper('A1', volume, mockWellLocation),
+      dispenseHelper('A1', volume, { ...mockWellLocation, pushOut: 0 }),
       aspirateHelper('A1', volume, mockWellLocation),
       dispenseHelper('A1', volume, mockWellLocation),
     ])
@@ -206,7 +206,7 @@ describe('mix: advanced options', () => {
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume, mockWellLocation),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
 
         aspirateHelper(well, volume, mockWellLocation),
         dispenseHelper(well, volume, mockWellLocation),
@@ -232,7 +232,7 @@ describe('mix: advanced options', () => {
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume, mockWellLocation),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
 
         aspirateHelper(well, volume, mockWellLocation),
         dispenseHelper(well, volume, mockWellLocation),
@@ -266,7 +266,7 @@ describe('mix: advanced options', () => {
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume, mockWellLocation),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
 
         aspirateHelper(well, volume, mockWellLocation),
         dispenseHelper(well, volume, mockWellLocation),
@@ -300,7 +300,7 @@ describe('mix: advanced options', () => {
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume, mockWellLocation),
         delayCommand(12),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
         aspirateHelper(well, volume, mockWellLocation),
         delayCommand(12),
         dispenseHelper(well, volume, mockWellLocation),
@@ -324,7 +324,7 @@ describe('mix: advanced options', () => {
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume, mockWellLocation),
-        dispenseHelper(well, volume, mockWellLocation),
+        dispenseHelper(well, volume, { ...mockWellLocation, pushOut: 0 }),
         delayCommand(12),
         aspirateHelper(well, volume, mockWellLocation),
         dispenseHelper(well, volume, mockWellLocation),
@@ -361,7 +361,10 @@ describe('mix: advanced options', () => {
           ...replaceTipCommands(idx),
           aspirateHelper(well, volume, mockWellLocationCustomXY),
           delayCommand(10),
-          dispenseHelper(well, volume, mockWellLocationCustomXY),
+          dispenseHelper(well, volume, {
+            ...mockWellLocationCustomXY,
+            pushOut: 0,
+          }),
           delayCommand(12),
           aspirateHelper(well, volume, mockWellLocationCustomXY),
           delayCommand(10),
@@ -392,6 +395,7 @@ mockPythonName.dispense(
     volume=8,
     location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
+    push_out=0,
 )
 protocol.delay(seconds=12)
 mockPythonName.aspirate(
@@ -421,6 +425,7 @@ mockPythonName.dispense(
     volume=8,
     location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
+    push_out=0,
 )
 protocol.delay(seconds=12)
 mockPythonName.aspirate(
@@ -450,6 +455,7 @@ mockPythonName.dispense(
     volume=8,
     location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
+    push_out=0,
 )
 protocol.delay(seconds=12)
 mockPythonName.aspirate(

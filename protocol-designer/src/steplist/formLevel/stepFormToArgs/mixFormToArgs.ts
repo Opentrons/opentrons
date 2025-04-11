@@ -21,6 +21,8 @@ export const mixFormToArgs = (
     mix_x_position,
     mix_y_position,
     blowout_z_offset,
+    pushOut_checkbox,
+    pushOut_volume,
   } = hydratedFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
@@ -106,5 +108,7 @@ export const mixFormToArgs = (
     nozzles,
     xOffset: mix_x_position ?? 0,
     yOffset: mix_y_position ?? 0,
+    finalPushOut:
+      pushOut_checkbox && pushOut_volume != null ? pushOut_volume : 0,
   }
 }

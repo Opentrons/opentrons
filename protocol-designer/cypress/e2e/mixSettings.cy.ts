@@ -45,6 +45,7 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
     steps.add(MixVerifications.PartTwoDisp())
     steps.add(MixSteps.DispenseFlowRate())
     steps.add(MixSteps.Delay())
+    steps.add(MixSteps.PushOut())
     steps.add(MixSteps.BlowoutLocation())
     steps.add(MixSteps.BlowoutFlowRate())
     steps.add(MixSteps.BlowoutPosFromTop())

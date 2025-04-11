@@ -1151,13 +1151,13 @@ export const dispenseTouchTipMmFromEdgeRequired = (
     : null
 }
 export const pushOutVolumeRequired = (
-  fields: HydratedMoveLiquidFormData
+  fields: HydratedMoveLiquidFormData | HydratedMixFormData
 ): FormError | null => {
   const { pushOut_checkbox, pushOut_volume } = fields
   return pushOut_checkbox && !pushOut_volume ? PUSH_OUT_VOLUME_REQUIRED : null
 }
 export const pushOutVolumeOutOfRange = (
-  fields: HydratedMoveLiquidFormData
+  fields: HydratedMoveLiquidFormData | HydratedMixFormData
 ): FormError | null => {
   const { pushOut_checkbox, pushOut_volume, pipette, volume } = fields
   if (pipette == null || pushOut_volume == null) {

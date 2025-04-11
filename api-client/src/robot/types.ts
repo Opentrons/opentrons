@@ -2,6 +2,7 @@ export interface DoorStatus {
   data: {
     status: 'open' | 'closed'
     doorRequiredClosedForProtocol: boolean
+    moduleSerial: string | null
   }
 }
 export type EstopState =
