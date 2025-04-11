@@ -42,7 +42,7 @@ from typing_extensions import Final
 
 import sqlalchemy
 
-from ..tables.schema_2 import analysis_table, migration_table, run_table
+from ..tables.schema_02 import analysis_table, migration_table, run_table
 from .. import _legacy_pickle
 
 

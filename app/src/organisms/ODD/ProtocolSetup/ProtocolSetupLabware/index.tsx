@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -93,10 +93,14 @@ export function ProtocolSetupLabware({
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
-  const startingDeck = getStackedItemsOnStartingDeck(
-    mostRecentAnalysis?.commands ?? [],
-    mostRecentAnalysis?.labware ?? [],
-    mostRecentAnalysis?.modules ?? []
+  const startingDeck = useMemo(
+    () =>
+      getStackedItemsOnStartingDeck(
+        mostRecentAnalysis?.commands ?? [],
+        mostRecentAnalysis?.labware ?? [],
+        mostRecentAnalysis?.modules ?? []
+      ),
+    [mostRecentAnalysis]
   )
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []

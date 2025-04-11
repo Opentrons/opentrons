@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Btn,
   Tag,
+  Box,
   COLORS,
   DeckInfoLabel,
   ListButton,
@@ -27,7 +28,6 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleType,
-  getAllDefinitions,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -35,7 +35,6 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
 import { ToggleButton } from '/app/atoms/buttons'
-import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type { MouseEvent } from 'react'
@@ -51,6 +50,7 @@ import type {
   StackItem,
   ModuleInStack,
   LabwareInStack,
+  LabwareDefinitionsByURI,
 } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
@@ -63,6 +63,7 @@ interface LabwareListItemProps {
   onClick: () => void
   labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
+  definitionsByURI?: LabwareDefinitionsByURI
 }
 
 export function LabwareListItem(
@@ -76,6 +77,7 @@ export function LabwareListItem(
     isFlex,
     labwareByLiquidId,
     showLabwareSVG,
+    definitionsByURI,
     onClick,
   } = props
   const moduleInStack = stackedItems.find(
@@ -223,7 +225,12 @@ export function LabwareListItem(
   }
 
   return (
-    <ListButton onClick={onClick} type="noActive" gridGap={SPACING.spacing24}>
+    <ListButton
+      onClick={onClick}
+      type="noActive"
+      gridGap={SPACING.spacing24}
+      padding={SPACING.spacing12}
+    >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing2}
@@ -259,9 +266,9 @@ export function LabwareListItem(
             {labwareLiquidRenderInfo.map((labware, index) => (
               <>
                 <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-                  {showLabwareSVG ? (
+                  {showLabwareSVG && definitionsByURI != null ? (
                     <StandaloneLabware
-                      definition={getAllDefinitions()[labware.definitionUri]}
+                      definition={definitionsByURI[labware.definitionUri]}
                     />
                   ) : null}
                   <Flex
@@ -312,7 +319,11 @@ export function LabwareListItem(
                   </Flex>
                 </Flex>
                 {index !== labwareLiquidRenderInfo.length - 1 ? (
-                  <Divider marginY="0" width="100%" />
+                  <Box
+                    borderBottom={`1px solid ${String(COLORS.grey40)}`}
+                    marginY="0"
+                    width="100%"
+                  />
                 ) : null}
               </>
             ))}

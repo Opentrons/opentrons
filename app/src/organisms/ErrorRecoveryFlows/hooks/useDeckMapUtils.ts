@@ -15,6 +15,7 @@ import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
 } from '/app/organisms/InterventionModal/utils'
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { Run } from '@opentrons/api-client'
 import type {
@@ -35,7 +36,7 @@ import type {
   RunLabwareInfo,
   RunModuleInfo,
 } from '/app/organisms/InterventionModal/utils'
-import type { ERUtilsProps } from './useERUtils'
+import type { ERUtilsProps, ERUtilsResults } from './useERUtils'
 
 interface UseDeckMapUtilsProps {
   runId: ErrorRecoveryFlowsProps['runId']
@@ -43,6 +44,7 @@ interface UseDeckMapUtilsProps {
   failedLabwareUtils: UseFailedLabwareUtilsResult
   runLwDefsByUri: ERUtilsProps['runLwDefsByUri']
   runRecord: Run | undefined
+  recoveryMap: ERUtilsResults['recoveryMap']
 }
 
 export interface UseDeckMapUtilsResult {
@@ -65,6 +67,7 @@ export function useDeckMapUtils({
   runId,
   failedLabwareUtils,
   runLwDefsByUri,
+  recoveryMap,
 }: UseDeckMapUtilsProps): UseDeckMapUtilsResult {
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
@@ -108,6 +111,7 @@ export function useDeckMapUtils({
         failedLabwareUtils,
         runRecord,
         currentLabwareInfo: remainingLabware,
+        recoveryMap,
       }),
     [failedLabwareUtils, currentLabwareInfo]
   )
@@ -219,18 +223,32 @@ export function getRunCurrentLabwareOnDeck({
   currentLabwareInfo,
   runRecord,
   failedLabwareUtils,
+  recoveryMap,
 }: {
   failedLabwareUtils: UseDeckMapUtilsProps['failedLabwareUtils']
   runRecord: UseDeckMapUtilsProps['runRecord']
   currentLabwareInfo: RunCurrentLabwareInfo[]
+  recoveryMap: ERUtilsResults['recoveryMap']
 }): Array<RunCurrentLabwareOnDeck & { highlight: string | null }> {
-  const { failedLabware } = failedLabwareUtils
+  const { route, step } = recoveryMap
+  const { failedLabware, relevantPickUpTipLabware } = failedLabwareUtils
+
+  const labwareToMatch = (): LoadedLabware | null => {
+    if (
+      route === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE &&
+      step === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    ) {
+      return relevantPickUpTipLabware
+    } else {
+      return failedLabware
+    }
+  }
 
   return currentLabwareInfo.map(
     ({ slotName, labwareDef, labwareLocation }) => ({
       labwareLocation,
       definition: labwareDef,
-      highlight: getIsLabwareMatch(slotName, runRecord, failedLabware)
+      highlight: getIsLabwareMatch(slotName, runRecord, labwareToMatch())
         ? slotName
         : null,
     })

@@ -64,6 +64,7 @@ import { SetupStep } from './SetupStep'
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useUpdateClientLPC } from '/app/resources/client_data'
 
 import type { RefObject } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
@@ -129,6 +130,7 @@ export function ProtocolRunSetup({
   const flexOffsetsMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
+  const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
@@ -141,7 +143,8 @@ export function ProtocolRunSetup({
   }, [flexOffsetsApplied])
 
   const offsetsConfirmed = isFlex
-    ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
+    ? runHasStarted ||
+      (flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY))
     : !missingSteps.includes(LPC_STEP_KEY)
   const buildLPCIncompleteText = (): string | null => {
     if (isFlex) {
@@ -275,6 +278,7 @@ export function ProtocolRunSetup({
           setOffsetsConfirmed={confirmed => {
             if (confirmed) {
               dispatch(appliedOffsetsToRun(runId))
+              updateLPCStatusWithRunId(runId)
 
               setExpandedStepKey(LABWARE_SETUP_STEP_KEY)
             }

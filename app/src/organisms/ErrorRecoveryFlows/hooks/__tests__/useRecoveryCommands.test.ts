@@ -262,14 +262,14 @@ describe('useRecoveryCommands', () => {
       params: { ...mockFailedCommand.params, pipetteId: 'MOCK_ID' },
     }
 
-    const mockFailedLabware = {
+    const mockRelevantPickUpTipLabware = {
       id: 'MOCK_LW_ID',
     } as any
 
     const buildPickUpTipsCmd = buildPickUpTips(
       mockFailedLabwareUtils.selectedTipLocations,
       mockFailedCmdWithPipetteId,
-      mockFailedLabware
+      mockRelevantPickUpTipLabware
     )
 
     const testProps = {
@@ -277,7 +277,7 @@ describe('useRecoveryCommands', () => {
       unvalidatedFailedCommand: mockFailedCmdWithPipetteId,
       failedLabwareUtils: {
         ...mockFailedLabwareUtils,
-        failedLabware: mockFailedLabware,
+        relevantPickUpTipLabware: mockRelevantPickUpTipLabware,
       },
     }
 

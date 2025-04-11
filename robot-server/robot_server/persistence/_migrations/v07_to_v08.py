@@ -14,13 +14,13 @@ import sqlalchemy
 
 from ._util import add_column, copy_contents
 from ..database import sql_engine_ctx
-from ..tables import schema_8
+from ..tables import schema_08
 from .._folder_migrator import Migration
 
 from ..file_and_directory_names import (
     DB_FILE,
 )
-from ..tables.schema_8 import CommandStatusSQLEnum
+from ..tables.schema_08 import CommandStatusSQLEnum
 
 
 class Migration7to8(Migration):  # noqa: D101
@@ -38,14 +38,14 @@ class Migration7to8(Migration):  # noqa: D101
 
             add_column(
                 dest_engine,
-                schema_8.run_command_table.name,
-                schema_8.run_command_table.c.command_error,
+                schema_08.run_command_table.name,
+                schema_08.run_command_table.c.command_error,
             )
 
             add_column(
                 dest_engine,
-                schema_8.run_command_table.name,
-                schema_8.run_command_table.c.command_status,
+                schema_08.run_command_table.name,
+                schema_08.run_command_table.c.command_status,
             )
 
             _add_missing_indexes(dest_transaction=dest_transaction)
@@ -60,7 +60,7 @@ def _add_missing_indexes(dest_transaction: sqlalchemy.engine.Connection) -> None
     # https://opentrons.atlassian.net/browse/EXEC-827
     index = next(
         index
-        for index in schema_8.run_command_table.indexes
+        for index in schema_08.run_command_table.indexes
         if index.name == "ix_run_run_id_command_status_index_in_run"
     )
     index.create(dest_transaction)
@@ -70,7 +70,7 @@ def _migrate_command_table_with_new_command_error_col_and_command_status(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     """Add a new 'command_error' and 'command_status' column to run_command_table table."""
-    commands_table = schema_8.run_command_table
+    commands_table = schema_08.run_command_table
     select_commands = sqlalchemy.select(commands_table)
     commands_to_update = []
     for row in dest_transaction.execute(select_commands).all():

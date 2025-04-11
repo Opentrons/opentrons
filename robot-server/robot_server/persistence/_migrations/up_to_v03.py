@@ -30,7 +30,7 @@ from ..database import (
     sql_engine_ctx,
     sqlite_rowid,
 )
-from ..tables import schema_2, schema_3
+from ..tables import schema_02, schema_03
 from .._folder_migrator import Migration
 from ..file_and_directory_names import (
     DECK_CONFIGURATION_FILE,
@@ -38,8 +38,8 @@ from ..file_and_directory_names import (
     DB_FILE,
 )
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
-from . import up_to_2
-from . import _up_to_3_worker
+from . import up_to_v02
+from . import _up_to_v03_worker
 
 
 _log = getLogger(__name__)
@@ -60,11 +60,11 @@ class MigrationUpTo3(Migration):  # noqa: D101
 
         with ExitStack() as exit_stack:
             source_engine = exit_stack.enter_context(sql_engine_ctx(source_db_file))
-            schema_2.metadata.create_all(source_engine)
-            up_to_2.migrate(source_engine)
+            schema_02.metadata.create_all(source_engine)
+            up_to_v02.migrate(source_engine)
 
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
-            schema_3.metadata.create_all(dest_engine)
+            schema_03.metadata.create_all(dest_engine)
 
             source_transaction = exit_stack.enter_context(source_engine.begin())
             dest_transaction = exit_stack.enter_context(dest_engine.begin())
@@ -79,7 +79,7 @@ class MigrationUpTo3(Migration):  # noqa: D101
 
 def _get_run_ids(*, schema_3_transaction: sqlalchemy.engine.Connection) -> List[str]:
     return (
-        schema_3_transaction.execute(sqlalchemy.select(schema_3.run_table.c.id))
+        schema_3_transaction.execute(sqlalchemy.select(schema_03.run_table.c.id))
         .scalars()
         .all()
     )
@@ -90,8 +90,8 @@ def _migrate_db_excluding_commands(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     copy_rows_unmodified(
-        schema_2.protocol_table,
-        schema_3.protocol_table,
+        schema_02.protocol_table,
+        schema_03.protocol_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
@@ -108,8 +108,8 @@ def _migrate_db_excluding_commands(
     )
 
     copy_rows_unmodified(
-        schema_2.action_table,
-        schema_3.action_table,
+        schema_02.action_table,
+        schema_03.action_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
@@ -121,15 +121,15 @@ def _migrate_run_table_excluding_commands(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     select_old_runs = sqlalchemy.select(
-        schema_2.run_table.c.id,
-        schema_2.run_table.c.created_at,
-        schema_2.run_table.c.protocol_id,
-        schema_2.run_table.c.state_summary,
+        schema_02.run_table.c.id,
+        schema_02.run_table.c.created_at,
+        schema_02.run_table.c.protocol_id,
+        schema_02.run_table.c.state_summary,
         # schema_2.run_table.c.commands deliberately omitted
-        schema_2.run_table.c.engine_status,
-        schema_2.run_table.c._updated_at,
+        schema_02.run_table.c.engine_status,
+        schema_02.run_table.c._updated_at,
     ).order_by(sqlite_rowid)
-    insert_new_run = sqlalchemy.insert(schema_3.run_table)
+    insert_new_run = sqlalchemy.insert(schema_03.run_table)
 
     for old_row in source_transaction.execute(select_old_runs).all():
         try:
@@ -163,10 +163,10 @@ def _migrate_analysis_table(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
-    select_old_analyses = sqlalchemy.select(schema_2.analysis_table).order_by(
+    select_old_analyses = sqlalchemy.select(schema_02.analysis_table).order_by(
         sqlite_rowid
     )
-    insert_new_analysis = sqlalchemy.insert(schema_3.analysis_table)
+    insert_new_analysis = sqlalchemy.insert(schema_03.analysis_table)
     for old_row in source_transaction.execute(select_old_analyses).all():
         dest_transaction.execute(
             insert_new_analysis,
@@ -198,7 +198,7 @@ def _migrate_db_commands(
         return
 
     mp = multiprocessing.get_context("forkserver")
-    mp.set_forkserver_preload(_up_to_3_worker.imports)
+    mp.set_forkserver_preload(_up_to_v03_worker.imports)
 
     manager = mp.Manager()
     lock = manager.Lock()
@@ -213,6 +213,6 @@ def _migrate_db_commands(
         processes=4
     ) as pool:
         pool.starmap(
-            _up_to_3_worker.migrate_commands_for_run,
+            _up_to_v03_worker.migrate_commands_for_run,
             ((source_db_file, dest_db_file, run_id, lock) for run_id in run_ids),
         )

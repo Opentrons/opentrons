@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Optional, Literal, TYPE_CHECKING, Type, Union
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from ..command import (
     AbstractCommandImpl,
@@ -51,39 +52,41 @@ class StoreParams(BaseModel):
 class StoreResult(BaseModel):
     """Result data from a labware storage command."""
 
-    eventualDestinationLocationSequence: LabwareLocationSequence | None = Field(
+    eventualDestinationLocationSequence: LabwareLocationSequence | SkipJsonSchema[
+        None
+    ] = Field(
         None,
         description=(
             "The full location in which all labware moved by this command will eventually reside."
         ),
     )
-    primaryOriginLocationSequence: LabwareLocationSequence | None = Field(
-        None, description=("The origin location of the primary labware.")
-    )
-    primaryLabwareId: str | None = Field(
+    primaryOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
+        None
+    ] = Field(None, description=("The origin location of the primary labware."))
+    primaryLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The primary labware in the stack that was stored."
     )
-    adapterOriginLocationSequence: LabwareLocationSequence | None = Field(
-        None, description=("The origin location of the adapter labware, if any.")
-    )
-    adapterLabwareId: str | None = Field(
+    adapterOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
+        None
+    ] = Field(None, description=("The origin location of the adapter labware, if any."))
+    adapterLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The adapter in the stack that was stored, if any."
     )
-    lidOriginLocationSequence: LabwareLocationSequence | None = Field(
+    lidOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
         None, description=("The origin location of the lid labware, if any.")
     )
-    lidLabwareId: str | None = Field(
+    lidLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The lid in the stack that was stored, if any."
     )
     primaryLabwareURI: str = Field(
         ...,
         description="The labware definition URI of the primary labware.",
     )
-    adapterLabwareURI: str | None = Field(
+    adapterLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the adapter labware.",
     )
-    lidLabwareURI: str | None = Field(
+    lidLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the lid labware.",
     )
