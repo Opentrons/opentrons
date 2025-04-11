@@ -1,13 +1,18 @@
 # /// script
-# requires-python = "==3.13.*"
+# requires-python = "==3.10.*"
 # dependencies = [
 #     "rich"
 # ]
 # ///
 
+from typing import Any, Dict, List
+
+from rich.console import Console
+
+console = Console(record=True)
 
 # =============================================================================
-# Loadnames for Tip Racks and Adapter
+# Loadnames for Tip Racks
 # =============================================================================
 opentrons_flex_96_tiprack_50ul = "opentrons_flex_96_tiprack_50ul"
 opentrons_flex_96_filtertiprack_50ul = "opentrons_flex_96_filtertiprack_50ul"
@@ -15,9 +20,6 @@ opentrons_flex_96_tiprack_200ul = "opentrons_flex_96_tiprack_200ul"
 opentrons_flex_96_filtertiprack_200ul = "opentrons_flex_96_filtertiprack_200ul"
 opentrons_flex_96_tiprack_1000ul = "opentrons_flex_96_tiprack_1000ul"
 opentrons_flex_96_filtertiprack_1000ul = "opentrons_flex_96_filtertiprack_1000ul"
-
-# Flex pipette adapter for 96 channel loadname (currently not used as a tip rack)
-opentrons_flex_96_tiprack_adapter = "opentrons_flex_96_tiprack_adapter"
 
 # =============================================================================
 # Loadnames for Flex Pipettes
@@ -31,19 +33,23 @@ flex_8channel_50 = "flex_8channel_50"
 # =============================================================================
 # Parameter Definitions
 # =============================================================================
-FUNCTIONS = ["transfer_with_liquid_class", "consolidate_with_liquid_class", "distribute_with_liquid_class"]
-LIQUID_CLASSES = ["water", "ethanol_80", "glycerol_50"]
-
-# Updated tip strategies list
-TIP_STRATEGIES = ["never", "once", "always", "per source"]
-
-VOLUMES = ["below max tip", "above tip capacity (chunking required)"]
-
-# Pipette loadnames list
-PIPETTES = [flex_96channel_1000, flex_1channel_50, flex_1channel_1000, flex_8channel_1000, flex_8channel_50]
-
-# Define Tip Racks (using provided loadnames)
-TIP_RACKS = [
+FUNCTIONS: List[str] = [
+    "transfer_with_liquid_class",
+    "consolidate_with_liquid_class",
+    "distribute_with_liquid_class",
+]
+LIQUID_CLASSES: List[str] = ["water", "ethanol_80", "glycerol_50"]
+TRANSFER_TIP_STRATEGIES: List[str] = ["never", "once", "always", "per source"]
+C_AND_D_TIP_STRATEGIES: List[str] = ["never", "once"]
+VOLUMES: List[str] = ["chunking", "NO chunking"]
+PIPETTES: List[str] = [
+    flex_96channel_1000,
+    flex_1channel_50,
+    flex_1channel_1000,
+    flex_8channel_1000,
+    flex_8channel_50,
+]
+TIP_RACKS: List[str] = [
     opentrons_flex_96_tiprack_50ul,
     opentrons_flex_96_filtertiprack_50ul,
     opentrons_flex_96_tiprack_200ul,
@@ -51,46 +57,36 @@ TIP_RACKS = [
     opentrons_flex_96_tiprack_1000ul,
     opentrons_flex_96_filtertiprack_1000ul,
 ]
-
-# Pipettes that require low volume mode and are limited to tip racks with "50ul"
-LOW_VOLUME_PIPETTES = {flex_1channel_50, flex_8channel_50}
-
-# ANSI Colors for Functions (for colored terminal output)
-FUNCTION_COLORS = {
-    "transfer_with_liquid_class": "\033[94m",  # Blue
-    "consolidate_with_liquid_class": "\033[92m",  # Green
-    "distribute_with_liquid_class": "\033[91m",  # Red
-}
-RESET_COLOR = "\033[0m"
-
-# -----------------------------------------------------------------------------
-# Create a global Rich console with recording enabled to capture output.
-# -----------------------------------------------------------------------------
-from rich.console import Console
-
-console = Console(record=True)
+LOW_VOLUME_PIPETTES: set[str] = {flex_1channel_50, flex_8channel_50}
 
 
-def allowed_tip_racks(pipette: str) -> list:
+def allowed_tip_racks(pipette: str) -> List[str]:
     """Return allowed tip racks based on the pipette loadname."""
     if pipette in LOW_VOLUME_PIPETTES:
         return [rack for rack in TIP_RACKS if "50ul" in rack]
     return TIP_RACKS
 
 
-def generate_combinations() -> list:
+def allowed_tip_strategies(function: str) -> List[str]:
+    """Return allowed tip strategies based on the function."""
+    if function == "transfer_with_liquid_class":
+        return TRANSFER_TIP_STRATEGIES
+    return C_AND_D_TIP_STRATEGIES
+
+
+def generate_combinations() -> List[Dict[str, Any]]:  # noqa
     """Generate all valid combinations of parameters."""
-    combinations = []
+    combinations: List[Dict[str, Any]] = []
     for pipette in PIPETTES:
-        racks = allowed_tip_racks(pipette)
+        racks: List[str] = allowed_tip_racks(pipette)
         if pipette in LOW_VOLUME_PIPETTES:
             for low_volume_mode in [True, False]:
                 for tip_rack in racks:
                     for function in FUNCTIONS:
                         for liquid in LIQUID_CLASSES:
-                            for tip_strategy in TIP_STRATEGIES:
+                            for tip_strategy in allowed_tip_strategies(function):
                                 for volume in VOLUMES:
-                                    combo = {
+                                    combo: Dict[str, Any] = {
                                         "function": function,
                                         "liquid": liquid,
                                         "tip_strategy": tip_strategy,
@@ -104,7 +100,7 @@ def generate_combinations() -> list:
             for tip_rack in racks:
                 for function in FUNCTIONS:
                     for liquid in LIQUID_CLASSES:
-                        for tip_strategy in TIP_STRATEGIES:
+                        for tip_strategy in allowed_tip_strategies(function):
                             for volume in VOLUMES:
                                 combo = {
                                     "function": function,
@@ -119,48 +115,20 @@ def generate_combinations() -> list:
     return combinations
 
 
-def print_parameter_tables():
-    """Print little tables for each parameter used to generate combinations using rich."""
-    from rich.table import Table
-
-    parameters = {
-        "Functions": FUNCTIONS,
-        "Liquid Classes": LIQUID_CLASSES,
-        "Tip Strategies": TIP_STRATEGIES,
-        "Volumes": VOLUMES,
-        "Pipettes": PIPETTES,
-        "Tip Racks": TIP_RACKS,
-    }
-
-    for param_name, items in parameters.items():
-        table = Table(title=param_name)
-        table.add_column("Index", justify="right", style="cyan", no_wrap=True)
-        table.add_column("Value", style="magenta")
-        for idx, item in enumerate(items, start=1):
-            table.add_row(str(idx), item)
-        console.print(table)
-
-    # Print overall static parameter counts.
-    from rich.table import Table as SummaryTable
-
-    summary = SummaryTable(title="Parameters Summary")
-    summary.add_column("Parameter", style="green")
-    summary.add_column("Count", justify="right", style="yellow")
-    for param_name, items in parameters.items():
-        summary.add_row(param_name, str(len(items)))
-    console.print(summary)
-
-
-def print_overall_total(combos: list):
+def print_overall_total(combos: List[Dict[str, Any]]) -> None:
     """Print a panel with the overall total combinations count using rich."""
     from rich.panel import Panel
 
-    total_count = len(combos)
-    panel = Panel(f"[bold yellow]{total_count}[/bold yellow]", title="Overall Total Combinations", subtitle="Generated from all parameters")
+    total_count: int = len(combos)
+    panel = Panel(
+        f"[bold yellow]{total_count}[/bold yellow]",
+        title="Overall Total Combinations",
+        subtitle="Generated from all parameters",
+    )
     console.print(panel)
 
 
-def print_generation_order_info():
+def print_generation_order_info() -> None:
     """Print the order in which combinations are generated, using rich."""
     from rich.panel import Panel
 
@@ -172,66 +140,47 @@ def print_generation_order_info():
         "      - For each tip rack in allowed_tip_racks(pipette)\n"
         "      - For each function in FUNCTIONS\n"
         "      - For each liquid in LIQUID_CLASSES\n"
-        "      - For each tip strategy in TIP_STRATEGIES\n"
+        "      - For each tip strategy in allowed_tip_strategies\n"
         "      - For each volume in VOLUMES\n\n"
         "  • Otherwise (non-low-volume pipettes):\n"
         "      - For each tip rack in allowed_tip_racks(pipette)\n"
         "      - For each function in FUNCTIONS\n"
         "      - For each liquid in LIQUID_CLASSES\n"
-        "      - For each tip strategy in TIP_STRATEGIES\n"
+        "      - For each tip strategy in allowed_tip_strategies\n"
         "      - For each volume in VOLUMES\n"
     )
     panel = Panel(order_text, title="Generation Order Info", subtitle="Nested Loop Order")
     console.print(panel)
 
 
-def print_combinations_matrix(combos: list):
-    """Print an aggregated matrix of combination counts using rich.
+def export_combinations_csv(combos: List[Dict[str, Any]], filename: str = "combinations.csv") -> None:
+    """Export all parameter combinations to a CSV file.
 
-    This table aggregates the counts of valid combinations for each pipette (rows)
-    and volume scenario (columns) and adds a column showing the total count per pipette.
+    Args:
+        combos (List[Dict[str, Any]]): List of dictionaries representing the parameter combinations.
+        filename (str, optional): The filename for the CSV file. Defaults to "combinations.csv".
     """
-    from rich.table import Table
+    import csv
 
-    # Build a matrix (dictionary) for counts indexed by pipette and volume.
-    matrix = {pip: {vol: 0 for vol in VOLUMES} for pip in PIPETTES}
-    for combo in combos:
-        pip = combo["pipette"]
-        vol = combo["volume"]
-        matrix[pip][vol] += 1
+    # Determine fieldnames from the first combination.
+    if combos:
+        fieldnames: List[str] = list(combos[0].keys())
+    else:
+        fieldnames = []
 
-    table = Table(title="Aggregated Combinations Matrix")
-    table.add_column("Pipette", style="cyan", no_wrap=True)
-    for vol in VOLUMES:
-        table.add_column(vol, justify="right", style="magenta")
-    table.add_column("Total", justify="right", style="green")
-
-    for pip in sorted(PIPETTES):
-        counts = [matrix[pip][vol] for vol in VOLUMES]
-        total = sum(counts)
-        row = [str(count) for count in counts] + [str(total)]
-        table.add_row(pip, *row)
-
-    console.print(table)
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for combo in combos:
+            writer.writerow(combo)
 
 
-def main():
+def main() -> None:
     """Main entry point for generating and displaying parameter combinations."""
-    combos = generate_combinations()
-    print_parameter_tables()
     print_generation_order_info()
-    print_combinations_matrix(combos)
+    combos: List[Dict[str, Any]] = generate_combinations()
     print_overall_total(combos)
-
-    # Export the entire recorded console output to HTML.
-    # You can then use an external tool to convert this HTML to an image.
-    console.save_html("rich_output.html", inline_styles=True)
-    # Instruct the user:
-    console.print(
-        "\n[bold green]HTML output has been saved to 'rich_output.html'.\n"
-        "You can open this file in a browser and use a screenshot tool or an HTML-to-image converter "
-        "(e.g. wkhtmltoimage) to create a shareable image.[/bold green]"
-    )
+    export_combinations_csv(combos)
 
 
 if __name__ == "__main__":
