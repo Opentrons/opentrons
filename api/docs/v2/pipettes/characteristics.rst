@@ -129,6 +129,11 @@ Finally, let's tell the robot to dispense 100 µL into the well plate at locatio
 
 The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1.
 
+Complex Commands
+----------------
+All complex commands, including liquid class complex commands, work with single and multi-channel pipettes. 
+
+When you use a complex liquid class command, like ``transfer_with_liquid_class``, the pipette will visit every well you provide in a ``source`` or ``dest``, regardless of how many channels or attached tips the pipette has.  
 
 .. _new-plunger-flow-rates:
 
