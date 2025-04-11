@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { MediumButton } from '/app/atoms/buttons'
 import { AspirateSettingItem } from './AspirateSettingItem'
 import { AspirateSettingDetail } from './AspirateSettingDetail'
@@ -30,14 +28,6 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
     selectedSetting,
     setSelectedSetting,
   ] = useState<AspirateSettingOption | null>(null)
-  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
-
-  useEffect(() => {
-    trackEventWithRobotSerial({
-      name: ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB,
-      properties: {},
-    })
-  }, [])
 
   const aspirateSettingsItems = useAspirateSettingsConfig({
     state,
