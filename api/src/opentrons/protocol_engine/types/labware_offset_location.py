@@ -38,6 +38,10 @@ class OnAddressableAreaOffsetLocationSequenceComponent(BaseModel):
     """Offset location sequence component for a labware on an addressable area."""
 
     kind: Literal["onAddressableArea"] = "onAddressableArea"
+    # TODO: Can we simplify these semantics so, on Flex, a labware on a module just has
+    # [{"kind": "onAddressableArea", "addressableAreaName": "temperatureModuleV2A1"}]
+    # instead of
+    # [{"kind": "onModule", "moduleModel": "temperatureModuleV2"}, {"kind": "onAddressableArea", "addressableAreaName": "temperatureModuleV2A1"}]
     addressableAreaName: str = Field(
         ...,
         description=(
