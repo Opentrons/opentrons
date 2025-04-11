@@ -31,6 +31,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     OperationLocationNotInWellError,
 )
+from ..errors.exceptions import InvalidLiquidHeightFound
 from ..resources import (
     fixture_validation,
     labware_validation,
@@ -2020,13 +2021,19 @@ class GeometryView:
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
-        initial_volume = find_volume_at_well_height(
-            target_height=initial_height, well_geometry=well_geometry
-        )
-        final_volume = initial_volume + volume
-        return find_height_at_well_volume(
-            target_volume=final_volume, well_geometry=well_geometry
-        )
+        try:
+            initial_volume = find_volume_at_well_height(
+                target_height=initial_height, well_geometry=well_geometry
+            )
+            final_volume = initial_volume + volume
+            return find_height_at_well_volume(
+                target_volume=final_volume, well_geometry=well_geometry
+            )
+        except InvalidLiquidHeightFound as _exception:
+            raise InvalidLiquidHeightFound(
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+            )
 
     def get_well_height_after_liquid_handling_no_error(
         self,
@@ -2043,25 +2050,37 @@ class GeometryView:
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
-        initial_volume = find_volume_at_well_height(
-            target_height=initial_height, well_geometry=well_geometry
-        )
-        final_volume = initial_volume + volume
-        well_volume = find_height_at_well_volume(
-            target_volume=final_volume,
-            well_geometry=well_geometry,
-            raise_error_if_result_invalid=False,
-        )
-        return well_volume
+        try:
+            initial_volume = find_volume_at_well_height(
+                target_height=initial_height, well_geometry=well_geometry
+            )
+            final_volume = initial_volume + volume
+            well_volume = find_height_at_well_volume(
+                target_volume=final_volume,
+                well_geometry=well_geometry,
+                raise_error_if_result_invalid=False,
+            )
+            return well_volume
+        except InvalidLiquidHeightFound as _exception:
+            raise InvalidLiquidHeightFound(
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+            )
 
     def get_well_height_at_volume(
         self, labware_id: str, well_name: str, volume: LiquidTrackingType
     ) -> LiquidTrackingType:
         """Convert well volume to height."""
         well_geometry = self._labware.get_well_geometry(labware_id, well_name)
-        return find_height_at_well_volume(
-            target_volume=volume, well_geometry=well_geometry
-        )
+        try:
+            return find_height_at_well_volume(
+                target_volume=volume, well_geometry=well_geometry
+            )
+        except InvalidLiquidHeightFound as _exception:
+            raise InvalidLiquidHeightFound(
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+            )
 
     def get_well_volume_at_height(
         self,
@@ -2071,9 +2090,15 @@ class GeometryView:
     ) -> LiquidTrackingType:
         """Convert well height to volume."""
         well_geometry = self._labware.get_well_geometry(labware_id, well_name)
-        return find_volume_at_well_height(
-            target_height=height, well_geometry=well_geometry
-        )
+        try:
+            return find_volume_at_well_height(
+                target_height=height, well_geometry=well_geometry
+            )
+        except InvalidLiquidHeightFound as _exception:
+            raise InvalidLiquidHeightFound(
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+            )
 
     def validate_dispense_volume_into_well(
         self,
@@ -2091,9 +2116,15 @@ class GeometryView:
             meniscus_height = self.get_meniscus_height(
                 labware_id=labware_id, well_name=well_name
             )
-            meniscus_volume = find_volume_at_well_height(
-                target_height=meniscus_height, well_geometry=well_geometry
-            )
+            try:
+                meniscus_volume = find_volume_at_well_height(
+                    target_height=meniscus_height, well_geometry=well_geometry
+                )
+            except InvalidLiquidHeightFound as _exception:
+                raise InvalidLiquidHeightFound(
+                    message=_exception.message
+                    + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+                )
             # if meniscus volume is a simulated value, comparisons aren't meaningful
             if isinstance(meniscus_volume, SimulatedProbeResult):
                 return

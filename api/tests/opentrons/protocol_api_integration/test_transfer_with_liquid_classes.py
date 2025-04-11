@@ -1798,7 +1798,6 @@ def test_water_transfer_with_lpd(
         mock.patch.object(
             InstrumentCore,
             "liquid_probe_with_recovery",
-            side_effect=InstrumentCore.liquid_probe_with_recovery,
             autospec=True,
         ) as patched_liquid_probe
     ):
@@ -1850,7 +1849,6 @@ def test_water_transfer_does_lpd_only_once_for_a_source_well(
         mock.patch.object(
             InstrumentCore,
             "liquid_probe_with_recovery",
-            side_effect=InstrumentCore.liquid_probe_with_recovery,
             autospec=True,
         ) as patched_liquid_probe
     ):
@@ -1905,7 +1903,6 @@ def test_water_distribution_with_lpd(
         mock.patch.object(
             InstrumentCore,
             "liquid_probe_with_recovery",
-            side_effect=InstrumentCore.liquid_probe_with_recovery,
             autospec=True,
         ) as patched_liquid_probe
     ):
@@ -1958,7 +1955,6 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
         mock.patch.object(
             InstrumentCore,
             "liquid_probe_with_recovery",
-            side_effect=InstrumentCore.liquid_probe_with_recovery,
             autospec=True,
         ) as patched_liquid_probe,
     ):
