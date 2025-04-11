@@ -26,7 +26,21 @@ describe('SelectTipFrequency', () => {
         buttonText: 'Exit',
         onClick: vi.fn(),
       },
-      state: {},
+      state: {
+        pipette: {
+          displayName: 'Flex 1-Channel 50 µL',
+          model: 'p50',
+          displayCategory: 'FLEX',
+          validNozzleMaps: {
+            maps: {
+              SingleA1: ['A1'],
+            },
+          },
+        },
+        destinationWells: ['A1'],
+        sourceWells: ['A1'],
+        path: 'single',
+      } as any,
       dispatch: vi.fn(),
     }
   })
@@ -36,6 +50,8 @@ describe('SelectTipFrequency', () => {
     screen.getByText('Select change tip frequency')
     screen.getByText('Exit')
     screen.getByText('Continue')
+    screen.getByText('Once at the start of the transfer')
+    screen.getByText('Per source well')
   })
 
   it('should call mock function when tappin exit button', () => {
@@ -46,7 +62,12 @@ describe('SelectTipFrequency', () => {
 
   it('should call mock function when tappin continue button', () => {
     render(props)
+    fireEvent.click(screen.getByText('Once at the start of the transfer'))
     fireEvent.click(screen.getByText('Continue'))
     expect(props.onNext).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalledWith({
+      type: 'SET_CHANGE_TIP',
+      changeTip: 'once',
+    })
   })
 })
