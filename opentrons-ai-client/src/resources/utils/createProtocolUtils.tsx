@@ -269,17 +269,21 @@ export function generateChatPrompt(
   if (leftPipetteName && leftPipetteName !== NO_PIPETTES) {
     const leftPipetteSpecs = getPipetteSpecsV2(leftPipetteName as PipetteName)
     if (leftPipetteSpecs != null) {
-      leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
+      }
     }
   }
-
   if (rightPipetteName && rightPipetteName !== NO_PIPETTES) {
     const rightPipetteSpecs = getPipetteSpecsV2(rightPipetteName as PipetteName)
     if (rightPipetteSpecs != null) {
-      rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
+      }
     }
   }
-
   const leftPipettePromptName =
     leftPipetteApiLoadName ?? values.instruments.leftPipette
   const rightPipettePromptName =
