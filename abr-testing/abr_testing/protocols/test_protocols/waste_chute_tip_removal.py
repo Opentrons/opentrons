@@ -78,9 +78,10 @@ def run(protocol: ProtocolContext) -> None:
     hwapi._cache_current_position()
 
     mount = OT3Mount.LEFT
-
-    drop_tip_pos = 91.5
-    bottom_pos = 61.5
+    checked_mount = OT3Mount.from_mount(pipette._core.get_mount())
+    pipette_hw = hwapi._pipette_handler.get_pipette(checked_mount)
+    bottom_pos = pipette_hw.plunger_positions.bottom
+    drop_tip_pos = pipette_hw.plunger_positions.drop_tip
 
     def drop_tip_with_ejector_extended(api: SyncHardwareAPI, mount: OT3Mount) -> None:
         """Drop tip with pipette ejector extended."""

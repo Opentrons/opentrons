@@ -100,8 +100,10 @@ def run(protocol: ProtocolContext) -> None:
     hwapi._cache_current_position()
 
     mount = OT3Mount.LEFT
-    drop_tip_pos = 91.5
-    bottom_pos = 61.5
+    checked_mount = OT3Mount.from_mount(pipette._core.get_mount())
+    pipette_hw = hwapi._pipette_handler.get_pipette(checked_mount)
+    bottom_pos = pipette_hw.plunger_positions.bottom
+    drop_tip_pos = pipette_hw.plunger_positions.drop_tip
 
     def drop_tip_with_ejector_extended(api: SyncHardwareAPI, mount: OT3Mount) -> None:
         """Drop tip with pipette ejector extended."""
@@ -111,8 +113,7 @@ def run(protocol: ProtocolContext) -> None:
 
     def clip_trash_edge() -> None:
         """Knock tips off with trash bin edge."""
-        hwapi.move_rel(mount, types.Point(x=x_travel))
-        hwapi.move_rel(mount, types.Point(x=clip_offset))
+        hwapi.move_rel(mount, types.Point(x=clip_offset + x_travel))
 
     def pipette_to_neutral_position(api: SyncHardwareAPI, mount: OT3Mount) -> None:
         """Move pipette back to neutral state."""
@@ -131,3 +132,4 @@ def run(protocol: ProtocolContext) -> None:
         drop_tip_with_ejector_extended(hwapi, mount)
         clip_trash_edge()
         pipette_to_neutral_position(hwapi, mount)
+        pipette.home()
