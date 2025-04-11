@@ -13,7 +13,6 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
-  Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getFileMetadata } from '../../../file-data/selectors'
@@ -36,7 +35,6 @@ interface DesignerNavigationProps {
 // Note: this navigation is used in design page and liquids page
 export function DesignerNavigation({
   hasZoomInSlot,
-  tabs = [],
   hasTrashEntity,
   showLiquidOverflowMenu,
 }: DesignerNavigationProps): JSX.Element {
@@ -48,8 +46,6 @@ export function DesignerNavigation({
   const dispatch = useDispatch()
   const isLiquidsPage = location.pathname === '/liquids'
 
-  const showProtocolEditButtons = !(hasZoomInSlot === true || isLiquidsPage)
-
   let metadataText = t('edit_protocol')
   if (isLiquidsPage) {
     metadataText = t('add_liquid')
@@ -57,10 +53,8 @@ export function DesignerNavigation({
     metadataText = t('add_hardware_labware')
   }
   return (
-    <NavContainer showShadow={!showProtocolEditButtons}>
-      {showProtocolEditButtons ? <Tabs tabs={tabs} /> : null}
-
-      <MetadataContainer showProtocolEditButtons={showProtocolEditButtons}>
+    <NavContainer>
+      <MetadataContainer showProtocolEditButtons={false}>
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
           css={LINE_CLAMP_TEXT_STYLE(1)}

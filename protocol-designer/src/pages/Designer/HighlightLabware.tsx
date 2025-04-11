@@ -1,7 +1,9 @@
 import { useSelector } from 'react-redux'
 import { getLabwareEntities } from '../../step-forms/selectors'
-import { getHoveredStepLabware } from '../../ui/steps'
-import { getDesignerTab } from '../../file-data/selectors'
+import {
+  getHoveredStepLabware,
+  getSelectedTerminalItemId,
+} from '../../ui/steps'
 import { LabwareLabel } from './LabwareLabel'
 import type { CoordinateTuple } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../step-forms'
@@ -17,7 +19,7 @@ export function HighlightLabware(
   const { labwareOnDeck, position } = props
   const labwareEntities = useSelector(getLabwareEntities)
   const hoveredLabware = useSelector(getHoveredStepLabware)
-  const tab = useSelector(getDesignerTab)
+  const terminalItemId = useSelector(getSelectedTerminalItemId)
   const adapterId =
     labwareEntities[labwareOnDeck.slot] != null
       ? labwareEntities[labwareOnDeck.slot].id
@@ -25,7 +27,7 @@ export function HighlightLabware(
 
   const highlighted = hoveredLabware.includes(adapterId ?? labwareOnDeck.id)
 
-  if (tab === 'protocolSteps') {
+  if (terminalItemId === '__initial_setup__') {
     return null
   }
   if (highlighted) {

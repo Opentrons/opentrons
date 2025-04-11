@@ -16,9 +16,8 @@ import {
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
-import type { DeckSetupTabType } from '../types'
 
-interface DeckItemHighlightProps extends DeckSetupTabType {
+interface DeckItemHighlightProps {
   slotBoundingBox: Dimensions
   //  can be slotId or labwareId (for off-deck labware)
   itemId: string
@@ -28,7 +27,7 @@ interface DeckItemHighlightProps extends DeckSetupTabType {
 export function DeckItemHighlight(
   props: DeckItemHighlightProps
 ): JSX.Element | null {
-  const { tab, slotBoundingBox, itemId, slotPosition } = props
+  const { slotBoundingBox, itemId, slotPosition } = props
   const { t } = useTranslation('application')
   const hoveredDropdownSelection = useSelector(getHoveredDropdownItem)
   const selectedDropdownLocation = useSelector(getSelectedDropdownItem)
@@ -41,11 +40,7 @@ export function DeckItemHighlight(
     selected => selected.id === itemId && selected.field === '2'
   )
 
-  if (
-    tab === 'startingDeck' ||
-    slotPosition === null ||
-    (!isHovered && !isSelected)
-  ) {
+  if (slotPosition === null || (!isHovered && !isSelected)) {
     return null
   }
 

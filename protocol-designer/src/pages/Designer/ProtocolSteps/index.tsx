@@ -24,11 +24,11 @@ import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
   getIsMultiSelectMode,
   getSelectedSubstep,
-  getSelectedStepId,
   getHoveredStepId,
-  getSelectedTerminalItemId,
   getHoveredTerminalItemId,
+  getActiveItem,
 } from '../../../ui/steps/selectors'
+import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../OffDeck'
 import { SubStepsToolbox } from './Timeline'
@@ -36,12 +36,16 @@ import { StepForm } from './StepForm'
 import { StepSummary } from './StepSummary'
 import { BatchEditToolbox } from './BatchEditToolbox'
 import {
-  getDesignerTab,
   getRobotStateTimeline,
+  getRobotType,
 } from '../../../file-data/selectors'
 import { HotKeyDisplay } from '../../../components/molecules'
-import { TimelineAlerts } from '../../../components/organisms'
+import {
+  SlotDetailsContainer,
+  TimelineAlerts,
+} from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
+import { DeckSlot } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '5.5rem'
@@ -49,12 +53,14 @@ const STEP_SUMMARY_HEIGHT = '5.5rem'
 export function ProtocolSteps(): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
-  const selectedTerminalItem = useSelector(getSelectedTerminalItemId)
+  const zoomIn = useSelector(selectors.getZoomedInSlot)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selectedSubstep = useSelector(getSelectedSubstep)
   const enableHotKeyDisplay = useSelector(getEnableHotKeysDisplay)
-  const tab = useSelector(getDesignerTab)
+  const robotType = useSelector(getRobotType)
+  const activeItem = useSelector(getActiveItem)
+  const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -64,21 +70,17 @@ export function ProtocolSteps(): JSX.Element {
   const [targetWidth, setTargetWidth] = useState<number>(235)
 
   const currentHoveredStepId = useSelector(getHoveredStepId)
-  const currentSelectedStepId = useSelector(getSelectedStepId)
-  const currentstepIdForStepSummary =
-    currentHoveredStepId ?? currentSelectedStepId
   const savedStepForms = useSelector(getSavedStepForms)
   const currentStep =
-    currentstepIdForStepSummary != null
-      ? savedStepForms[currentstepIdForStepSummary]
-      : null
+    activeItem?.id != null ? savedStepForms[activeItem.id] : null
 
   const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
-  const showTimelineAlerts = hasTimelineErrors && tab === 'protocolSteps'
+  const showTimelineAlerts =
+    hasTimelineErrors && activeItem?.id !== '__initial_setup__'
   const stepDetails = currentStep?.stepDetails ?? null
-
+  console.log(zoomIn.cutout)
   return (
     <Flex
       backgroundColor={COLORS.grey10}
@@ -112,6 +114,8 @@ export function ProtocolSteps(): JSX.Element {
             paddingY={SPACING.spacing120}
             marginX="auto"
           >
+            {/* {zoomIn.cutout == null ? null : (
+            <> */}
             {showTimelineAlerts ? (
               <TimelineAlerts
                 justifyContent={JUSTIFY_CENTER}
@@ -130,10 +134,10 @@ export function ProtocolSteps(): JSX.Element {
                   {i18n.format(currentStep.stepName, 'titleCase')}
                 </StyledText>
               ) : null}
-              {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
+              {activeItem?.selectionType === 'TERMINAL_ITEM_SELECTION_TYPE' &&
               currentHoveredStepId == null ? (
                 <StyledText desktopStyle="headingSmallBold">
-                  {t(hoveredTerminalItem ?? selectedTerminalItem)}
+                  {t(activeItem.id)}
                 </StyledText>
               ) : null}
 
@@ -149,30 +153,40 @@ export function ProtocolSteps(): JSX.Element {
                 }}
               />
             </Flex>
+            {/* </>
+          )} */}
             <Flex
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing16}
-              // height="100%"
+              height="100%"
             >
               {deckView === leftString ? (
-                <DeckSetupContainer tab="protocolSteps" />
+                <DeckSetupContainer
+                  hoverSlot={hoverSlot}
+                  setHoverSlot={setHoverSlot}
+                  robotType={robotType}
+                />
               ) : (
-                <OffDeck tab="protocolSteps" />
+                <OffDeck />
               )}
               {/* avoid shifting the deck view container */}
-              <Flex
-                height={STEP_SUMMARY_HEIGHT}
-                opacity={formData == null ? 1 : 0}
-              >
-                <StepSummary
-                  currentStep={currentStep}
-                  stepDetails={stepDetails}
-                />
-              </Flex>
+              {activeItem?.selectionType === 'TERMINAL_ITEM_SELECTION_TYPE' ? (
+                <SlotDetailsContainer robotType={robotType} slot={hoverSlot} />
+              ) : (
+                <Flex
+                  height={STEP_SUMMARY_HEIGHT}
+                  opacity={formData == null ? 1 : 0}
+                >
+                  <StepSummary
+                    currentStep={currentStep}
+                    stepDetails={stepDetails}
+                  />
+                </Flex>
+              )}
             </Flex>
           </Flex>
         </Flex>
-        {enableHotKeyDisplay ? (
+        {enableHotKeyDisplay && zoomIn.slot == null ? (
           <HotKeyDisplay targetWidth={targetWidth} />
         ) : null}
       </Flex>

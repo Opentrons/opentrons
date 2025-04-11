@@ -8,9 +8,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LINK_BUTTON_STYLE } from '../../atoms'
-import { selectDesignerTab } from '../../../file-data/actions'
 
 import type { AlertLevel } from './types'
+import { selectTerminalItem } from '../../../ui/steps/actions/actions'
 
 interface ErrorContentsProps {
   errorType: string
@@ -40,7 +40,7 @@ export const ErrorContents = (
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               css={LINK_BUTTON_STYLE}
               onClick={() => {
-                dispatch(selectDesignerTab({ tab: 'startingDeck' }))
+                dispatch(selectTerminalItem('__initial_setup__'))
               }}
             >
               {t(`timeline.error.${errorType}.link`)}
@@ -60,7 +60,7 @@ export const ErrorContents = (
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               css={LINK_BUTTON_STYLE}
               onClick={() => {
-                dispatch(selectDesignerTab({ tab: 'startingDeck' }))
+                dispatch(selectTerminalItem('__initial_setup__'))
               }}
             >
               {t(`timeline.error.${errorType}.link`)}

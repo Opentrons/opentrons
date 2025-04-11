@@ -15,9 +15,9 @@ import type {
   DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
-import type { DeckSetupTabType } from '../types'
+import type { DeckSetupTerminalIdType } from '../types'
 
-interface OffDeckControlsProps extends DeckSetupTabType {
+interface OffDeckControlsProps extends DeckSetupTerminalIdType {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   slotBoundingBox: Dimensions
@@ -33,7 +33,7 @@ export function OffDeckControls(
 ): JSX.Element | null {
   const {
     hover,
-    tab,
+    terminalItemId,
     setHover,
     slotBoundingBox,
     labwareId,
@@ -43,7 +43,11 @@ export function OffDeckControls(
     isSelected = false,
   } = props
   const { t } = useTranslation('starting_deck_state')
-  if (tab === 'protocolSteps' || slotPosition === null || isSelected)
+  if (
+    terminalItemId !== '__initial_setup__' ||
+    slotPosition === null ||
+    isSelected
+  )
     return null
 
   const hoverOpacity =

@@ -45,7 +45,7 @@ export const LabwareControls = (
     setHover,
     setShowMenuListForId,
     isSelected,
-    tab,
+    terminalItemId,
     itemId,
   } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -109,7 +109,11 @@ export const LabwareControls = (
 
   drag(drop(ref))
 
-  if (tab === 'protocolSteps' || isSelected || slotPosition == null) {
+  if (
+    terminalItemId !== '__initial_setup__' ||
+    isSelected ||
+    slotPosition == null
+  ) {
     return null
   }
   const isLabwareSwapping =

@@ -48,7 +48,7 @@ export const AdapterControls = (
     setShowMenuListForId,
     itemId,
     isSelected,
-    tab,
+    terminalItemId,
     swapBlocked,
   } = props
   const { t } = useTranslation(['deck', 'starting_deck_state'])
@@ -112,7 +112,7 @@ export const AdapterControls = (
 
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
-    tab === 'protocolSteps' ||
+    terminalItemId !== '__initial_setup__' ||
     isSelected ||
     slotPosition == null
   ) {
