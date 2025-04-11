@@ -89,37 +89,36 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
 
 .. _loading-lids:
 
-Loading Lids 
+Loading Lids
 ============
 
-You can load lids on compatible plates or tip racks. Use the optional ``lid`` parameter of ``load_labware`` to add an Opentrons Tough Auto-Sealing Lid to a PCR plate, or load a new tip rack's lid in your protocol. 
-
-.. code-block:: python
+You can load lids on compatible plates or tip racks with the optional ``lid`` parameter of :py:meth:`~.ProtocolContext.load_labware`. This example adds an Opentrons Tough Auto-Sealing Lid to a PCR plate::
 
     plate = protocol.load_labware(
-        load_name="opentrons_96_wellplate_200ul_pcr_full_skirt", 
+        load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
         location="D2",
-        lid="opentrons_tough_pcr_auto_sealing_lid")
+        lid="opentrons_tough_pcr_auto_sealing_lid"
+    )
 
-
-.. code-block:: python
+And this example loads an Opentrons Flex Tip Rack Lid onto a rack of 200 µL tips::
 
     tiprack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
         location="D1",
-        lid="opentrons_flex_tiprack_lid")
+        lid="opentrons_flex_tiprack_lid"
+    )
 
-
-You might need multiple lids during your protocol. Use ``load_lid_stack`` to stack up to five Opentrons Tough Auto-Sealing Lids on a deck slot, riser, or compatible adapter. 
+You might need multiple lids during your protocol. Use :py:meth:`.load_lid_stack` to stack up to five Opentrons Tough Auto-Sealing Lids on a deck slot, riser, or compatible adapter.
 
 .. code-block:: python
 
-    def load_lid_stack(
-        load_name="opentrons_tough_pcr_auto_sealing_lid", 
+    lid_stack = protocol.load_lid_stack(
+        load_name="opentrons_tough_pcr_auto_sealing_lid",
         location="B2",
-        quantity="4")
+        quantity=4
+    )
 
-Tip rack lids can't be stacked or placed on the deck. 
+Tip rack lids can't be stacked or placed on the deck.
 
 .. versionadded:: 2.23
 
