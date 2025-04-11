@@ -71,9 +71,6 @@ OFFSET_LG = 20.0
 # height limit in mm of labware to use OFFSET_MD used when storing labware.
 MEDIUM_LABWARE_Z_LIMIT = 20.0
 
-# The name of the tof sensor baseline file
-TOF_BASELINE_FILE = "tof_baseline.json"
-
 
 class FlexStacker(mod_abc.AbstractModule):
     """Hardware control interface for an attached Flex-Stacker module."""
