@@ -2031,7 +2031,8 @@ class GeometryView:
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
-                message=_exception.message + f"for well {well_name} of {labware_id}"
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)}"
             )
 
     def get_well_height_after_liquid_handling_no_error(
@@ -2062,7 +2063,8 @@ class GeometryView:
             return well_volume
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
-                message=_exception.message + f"for well {well_name} of {labware_id}"
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)}"
             )
 
     def get_well_height_at_volume(
@@ -2076,7 +2078,8 @@ class GeometryView:
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
-                message=_exception.message + f"for well {well_name} of {labware_id}"
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)}"
             )
 
     def get_well_volume_at_height(
@@ -2093,7 +2096,8 @@ class GeometryView:
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
-                message=_exception.message + f"for well {well_name} of {labware_id}"
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)}"
             )
 
     def validate_dispense_volume_into_well(
@@ -2118,7 +2122,8 @@ class GeometryView:
                 )
             except InvalidLiquidHeightFound as _exception:
                 raise InvalidLiquidHeightFound(
-                    message=_exception.message + f"for well {well_name} of {labware_id}"
+                    message=_exception.message
+                    + f"for well {well_name} of {self._labware.get_display_name(labware_id)}"
                 )
             # if meniscus volume is a simulated value, comparisons aren't meaningful
             if isinstance(meniscus_volume, SimulatedProbeResult):
