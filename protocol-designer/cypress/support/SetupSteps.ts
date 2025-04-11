@@ -16,6 +16,7 @@ export enum SetupContent {
   Step2Title = 'Step 2',
   Step3Title = 'Step3',
   Step4Title = 'Step4',
+  Cancel = 'Cancel',
   AddPipette = 'Add a pipette',
   NinetySixChannel = '96-Channel',
   SingleChannel = '1-Channel',
@@ -238,6 +239,7 @@ export const SetupSteps = {
    */
   SingleChannelPipette50: (): StepThunk => ({
     call: () => {
+      cy.contains(SetupContent.AddPipette).click()
       cy.contains('label', SetupContent.SingleChannel)
         .should('exist')
         .and('be.visible')
@@ -589,6 +591,16 @@ export const SetupSteps = {
         .click({ force: true })
     },
   }),
+
+  /**
+   * Click "Cancel".
+   */
+  Cancel: (): StepThunk => ({
+    call: () => {
+      cy.contains(SetupContent.Cancel).should('be.visible').click()
+    },
+  }),
+
   /**
    * Chose source labware on a step form
    */
@@ -805,7 +817,6 @@ export const SetupVerifications = {
    */
   OnStep2: (): StepThunk => ({
     call: () => {
-      cy.contains(SetupContent.Step2Title).should('be.visible')
       cy.contains(SetupContent.AddPipette).should('be.visible')
     },
   }),
@@ -815,6 +826,7 @@ export const SetupVerifications = {
    */
   FlexSelected: (): StepThunk => ({
     call: () => {
+      cy.contains(SetupContent.OpentronsFlex).click()
       cy.contains(SetupContent.OpentronsFlex).should(
         'have.css',
         'background-color',
@@ -841,6 +853,7 @@ export const SetupVerifications = {
    */
   NinetySixChannel: (): StepThunk => ({
     call: () => {
+      cy.contains(SetupContent.AddPipette).click()
       cy.contains(SetupContent.NinetySixChannel).should('be.visible')
     },
   }),
@@ -875,8 +888,6 @@ export const SetupVerifications = {
       cy.contains(SetupContent.FullP50SingleName).should('be.visible')
       cy.contains(SetupContent.FullP50TiprackName).should('be.visible')
       cy.contains('Left Mount').should('be.visible')
-      cy.contains(SetupContent.Step2Title)
-      cy.contains('Robot pipettes')
       cy.contains(SetupContent.AddPipette)
     },
   }),
@@ -886,7 +897,6 @@ export const SetupVerifications = {
    */
   OnStep3: (): StepThunk => ({
     call: () => {
-      cy.contains('Add a gripper').should('be.visible')
       cy.contains(
         'Do you want to move labware automatically with the gripper?'
       ).should('be.visible')
@@ -1075,15 +1085,13 @@ export const CompositeSetupSteps = {
       SetupSteps.SelectFlex().call()
       SetupVerifications.FlexSelected().call()
       UniversalSteps.Snapshot().call()
-      SetupSteps.Confirm().call()
       SetupVerifications.OnStep2().call()
       SetupSteps.SingleChannelPipette50().call()
       SetupVerifications.StepTwo50uL().call()
       UniversalSteps.Snapshot().call()
-      SetupSteps.Confirm().call()
+      SetupSteps.Save().call()
       SetupVerifications.StepTwoPart3().call()
       UniversalSteps.Snapshot().call()
-      SetupSteps.Confirm().call()
       SetupVerifications.OnStep3().call()
       SetupSteps.YesGripper().call()
       SetupSteps.Confirm().call()

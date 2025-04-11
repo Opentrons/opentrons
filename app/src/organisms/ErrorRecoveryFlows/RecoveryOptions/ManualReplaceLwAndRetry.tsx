@@ -25,6 +25,8 @@ export function ManualReplaceLwAndRetry(
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    HOPPER_MANUAL_LOAD_AND_RETRY,
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
     ROBOT_IN_MOTION,
   } = RECOVERY_MAP
 
@@ -86,6 +88,8 @@ export function ManualReplaceLwAndRetry(
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+      case HOPPER_MANUAL_LOAD_AND_RETRY.STEPS.CONFIRM_RETRY:
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
         return <TwoColLwInfoAndDeck {...props} />
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
         return <TwoColTextAndImage {...props} />
@@ -100,10 +104,12 @@ export function ManualReplaceLwAndRetry(
             primaryBtnOnClick={primaryBtnOnClick}
           />
         )
+      case HOPPER_MANUAL_LOAD_AND_RETRY.STEPS.RETRY:
       case MANUAL_REPLACE_AND_RETRY.STEPS.RETRY:
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.RETRY:
         return <RetryStepInfo {...props} />
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP:
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.SKIP:
         return <SkipStepInfo {...props} />
       default:
         console.warn(

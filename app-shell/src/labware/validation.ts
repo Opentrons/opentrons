@@ -1,6 +1,7 @@
 import Ajv from 'ajv'
 import sortBy from 'lodash/sortBy'
 import {
+  getLabwareDefIsStandard,
   labwareSchemaV2 as labwareSchema,
   validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
@@ -46,9 +47,9 @@ export function validateLabwareFiles(
 
     const props = { filename, modified, definition }
 
-    return definition.namespace !== 'opentrons'
-      ? { ...props, type: VALID_LABWARE_FILE }
-      : { ...props, type: OPENTRONS_LABWARE_FILE }
+    return getLabwareDefIsStandard(definition)
+      ? { ...props, type: OPENTRONS_LABWARE_FILE }
+      : { ...props, type: VALID_LABWARE_FILE }
   })
 
   return validated.map(v => {
