@@ -191,6 +191,8 @@ When you're done with a lid, use ``move_lid()`` to dispose of it in the waste ch
 
 To work with tip rack lids, first :ref:`load the tip rack lid <loading-lids>` using the ``lid`` parameter of :py:meth:`~.ProtocolContext.load_labware`. Once loaded, you can only move a tip rack lid to another, unlidded tip rack or to a trash container. If you try setting another ``new_location``, the API will raise an error.
 
+.. versionadded:: 2.23
+
 .. _off-deck-location:
 
 The Off-Deck Location
