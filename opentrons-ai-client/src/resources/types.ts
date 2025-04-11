@@ -12,6 +12,8 @@ export interface ChatData {
   fake?: boolean
   /** uuid to map the chat prompt request to the response from the LLM */
   requestId: string
+  /** structured protocol content */
+  protocol_content?: string
 }
 
 export interface CreatePrompt {
@@ -53,6 +55,8 @@ export interface Chat {
   role: Role
   /** content ChatGPT API return or user prompt */
   content: string
+  /** structured protocol content */
+  protocol_content?: string
 }
 
 export interface RouteProps {

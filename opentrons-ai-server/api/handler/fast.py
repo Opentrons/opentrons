@@ -195,8 +195,10 @@ async def create_chat_completion(
         if body.fake:
             if body.fake_key is not None:
                 fake: FakeResponse = get_fake_response(body.fake_key)
-                return ChatResponse(reply=fake.chat_response.reply, fake=fake.chat_response.fake)
-            return ChatResponse(reply="Default fake response.  ", fake=body.fake)
+                return ChatResponse(
+                    reply=fake.chat_response.reply, fake=fake.chat_response.fake, protocol_content=fake.chat_response.protocol_content
+                )
+            return ChatResponse(reply="Default fake response.  ", fake=body.fake, protocol_content="")
 
         response: Optional[str] = None
 
@@ -214,9 +216,9 @@ async def create_chat_completion(
                 response = claude.update(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
 
         if response is None or response == "":
-            return ChatResponse(reply="No response was generated", fake=bool(body.fake))
+            return ChatResponse(reply="No response was generated", fake=bool(body.fake), protocol_content="")
 
-        return ChatResponse(reply=response, fake=bool(body.fake))
+        return ChatResponse(reply=response, fake=bool(body.fake), protocol_content="PDJSON is here")
 
     except Exception as e:
         logger.exception("Error processing chat completion")
@@ -250,7 +252,7 @@ async def create_protocol(
             )
 
         if body.fake:
-            return ChatResponse(reply="Fake response", fake=body.fake)
+            return ChatResponse(reply="Fake response", fake=body.fake, protocol_content="")
 
         response: Optional[str] = None
         if "openai" in settings.model.lower():
@@ -259,9 +261,9 @@ async def create_protocol(
             response = claude.create(user_id=str(user.sub), prompt=body.prompt, history=None)
 
         if response is None or response == "":
-            return ChatResponse(reply="No response was generated", fake=bool(body.fake))
+            return ChatResponse(reply="No response was generated", fake=bool(body.fake), protocol_content="None")
 
-        return ChatResponse(reply=response, fake=bool(body.fake))
+        return ChatResponse(reply=response, fake=bool(body.fake), protocol_content="PDJSON is here")
 
     except Exception as e:
         logger.exception("Error processing protocol creation")
@@ -294,7 +296,7 @@ async def update_protocol(
             )
 
         if body.fake:
-            return ChatResponse(reply="Fake response", fake=bool(body.fake))
+            return ChatResponse(reply="Fake response", fake=bool(body.fake), protocol_content="")
 
         response: Optional[str] = None
         if "openai" in settings.model.lower():
@@ -303,9 +305,9 @@ async def update_protocol(
             response = claude.update(user_id=str(user.sub), prompt=body.prompt, history=None)
 
         if response is None or response == "":
-            return ChatResponse(reply="No response was generated", fake=bool(body.fake))
+            return ChatResponse(reply="No response was generated", fake=bool(body.fake), protocol_content="")
 
-        return ChatResponse(reply=response, fake=bool(body.fake))
+        return ChatResponse(reply=response, fake=bool(body.fake), protocol_content="")
 
     except Exception as e:
         logger.exception("Error processing protocol update")

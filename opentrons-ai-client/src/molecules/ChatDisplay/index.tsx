@@ -57,6 +57,23 @@ const StyledIcon = styled(Icon)`
   color: ${COLORS.blue50};
 `
 
+const ProtocolContentBadge = styled(Flex)`
+  background-color: ${COLORS.blue50};
+  color: ${COLORS.white};
+  border-radius: ${BORDERS.borderRadius4};
+  padding: ${SPACING.spacing4} ${SPACING.spacing8};
+  font-size: ${TYPOGRAPHY.fontSize32};
+  margin-top: ${SPACING.spacing12};
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: ${COLORS.blue60};
+  }
+`
+
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const trackEvent = useTrackEvent()
@@ -68,7 +85,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { setValue } = useFormContext()
   const [chatdata] = useAtom(chatDataAtom)
   const [scrollToBottom, setScrollToBottom] = useAtom(scrollToBottomAtom)
-  const { role, reply, requestId } = chat
+
+  const [showProtocolContent, setShowProtocolContent] = useState(false)
+  const { role, reply, requestId, protocol_content } = chat
   const isUser = role === 'user'
 
   const setInputFieldToCorrespondingRequest = (): void => {
@@ -192,6 +211,26 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         >
           {reply}
         </Markdown>
+
+        {/* Display protocol_content badge and content */}
+        {!isUser && protocol_content && (
+          <>
+            <ProtocolContentBadge
+              onClick={() => { setShowProtocolContent(!showProtocolContent); }}
+            >
+              <StyledIcon
+                size={SPACING.spacing16}
+                name={showProtocolContent ? 'chevron-down' : 'chevron-right'}
+                marginRight={SPACING.spacing4}
+              />
+              PD JSON
+            </ProtocolContentBadge>
+
+            {showProtocolContent && (
+              <CodeWrapper>{protocol_content}</CodeWrapper>
+            )}
+          </>
+        )}
 
         {!isUser ? (
           <Flex

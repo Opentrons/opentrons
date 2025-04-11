@@ -179,15 +179,20 @@ export function InputPrompt(): JSX.Element {
 
   useEffect(() => {
     if (submitted && data != null && !isLoading) {
-      const { role, reply } = data as ChatData
+      const { role, reply, protocol_content } = data as ChatData
       const assistantResponse: ChatData = {
         requestId,
         role,
         reply,
+        protocol_content,
       }
       setChatHistory(chatHistory => [
         ...chatHistory,
-        { role: 'assistant', content: reply },
+        {
+          role: 'assistant',
+          content: reply,
+          protocol_content,
+        },
       ])
       setChatData(chatData => [...chatData, assistantResponse])
       trackEvent({
