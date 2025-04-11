@@ -32,7 +32,6 @@ import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
   ProtocolSetupLabware,
-  ProtocolSetupLiquids,
   ProtocolSetupModulesAndDeck,
   ProtocolSetupOffsets,
   ViewOnlyParameters,
@@ -41,7 +40,6 @@ import {
   getUnmatchedModulesForProtocol,
   getIncompleteInstrumentCount,
 } from '/app/organisms/ODD/ProtocolSetup'
-import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
 import {
@@ -142,7 +140,6 @@ const render = (path = '/') => {
 }
 
 const MockProtocolSetupLabware = vi.mocked(ProtocolSetupLabware)
-const MockProtocolSetupLiquids = vi.mocked(ProtocolSetupLiquids)
 const MockProtocolSetupOffsets = vi.mocked(ProtocolSetupOffsets)
 const MockProtocolSetupTitleSkeleton = vi.mocked(ProtocolSetupTitleSkeleton)
 const MockProtocolSetupStepSkeleton = vi.mocked(ProtocolSetupStepSkeleton)
@@ -179,13 +176,6 @@ const mockEmptyAnalysis = ({
   pipettes: [],
   commands: [],
 } as unknown) as SharedData.CompletedProtocolAnalysis
-const mockLiquids = [
-  {
-    id: 'm',
-    displayName: 'mock',
-    description: 'Mock liquid',
-  },
-]
 
 const mockPlay = vi.fn()
 const mockOffset = {
@@ -215,13 +205,6 @@ describe('ProtocolSetup', () => {
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockNavigate = vi.fn()
-    MockProtocolSetupLiquids.mockImplementation(
-      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
-        setIsConfirmed(true)
-        setSetupScreen('prepare to run')
-        return <div>Mock ProtocolSetupLiquids</div>
-      })
-    )
     MockProtocolSetupLabware.mockImplementation(
       vi.fn(({ setIsConfirmed, setSetupScreen }) => {
         setIsConfirmed(true)
@@ -315,12 +298,6 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith()
       .thenReturn({ data: { data: [] } } as any)
-    when(vi.mocked(useLaunchLegacyLPC))
-      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, PROTOCOL_NAME)
-      .thenReturn({
-        launchLegacyLPC: mockLaunchLPC,
-        LegacyLPCWizard: <div>mock LPC Wizard</div>,
-      })
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
     vi.mocked(useDoorQuery).mockReturnValue({ data: mockDoorStatus } as any)
     vi.mocked(useModulesQuery).mockReturnValue({
@@ -362,32 +339,21 @@ describe('ProtocolSetup', () => {
     screen.getByText('Prepare to run')
     screen.getByText('Instruments')
     screen.getByText('Deck hardware')
-    screen.getByText('Labware')
+    screen.getByText('Labware & Liquids')
     screen.getByText('Labware Position Check')
-    screen.getByText('Liquids')
   })
 
   it('should play protocol when click play button', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+      data: mockRobotSideAnalysis,
     } as any)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(
-        { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        flexDeckDefV5 as any
-      )
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
-    MockProtocolSetupLiquids.mockImplementation(
-      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
-        setIsConfirmed(true)
-        setSetupScreen('prepare to run')
-        return <div>Mock ProtocolSetupLiquids</div>
-      })
-    )
     MockProtocolSetupLabware.mockImplementation(
       vi.fn(({ setIsConfirmed, setSetupScreen }) => {
         setIsConfirmed(true)
@@ -403,8 +369,7 @@ describe('ProtocolSetup', () => {
       })
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware'))
-    fireEvent.click(screen.getByText('Liquids'))
+    fireEvent.click(screen.getByText('Labware & Liquids'))
     expect(mockPlay).toBeCalledTimes(0)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(MockConfirmSetupStepsCompleteModal).toBeCalledTimes(0)
@@ -432,40 +397,18 @@ describe('ProtocolSetup', () => {
     expect(vi.mocked(ProtocolSetupModulesAndDeck)).toHaveBeenCalled()
   })
 
-  it('should launch protocol setup liquids screen when click liquids', () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
-    } as any)
-    when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(
-        { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        flexDeckDefV5 as any
-      )
-      .thenReturn(mockProtocolModuleInfo)
-    when(vi.mocked(getUnmatchedModulesForProtocol))
-      .calledWith([], mockProtocolModuleInfo)
-      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
-    render(`/runs/${RUN_ID}/setup/`)
-    screen.getByText('1 initial liquid')
-    fireEvent.click(screen.getByText('Liquids'))
-    expect(MockProtocolSetupLiquids).toHaveBeenCalled()
-  })
-
   it('should launch protocol setup labware screen when click labware', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+      data: mockRobotSideAnalysis,
     } as any)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(
-        { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        flexDeckDefV5 as any
-      )
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup`)
-    fireEvent.click(screen.getByTestId('SetupButton_Labware'))
+    fireEvent.click(screen.getByTestId('SetupButton_Labware & Liquids'))
     expect(MockProtocolSetupLabware).toHaveBeenCalled()
   })
 
@@ -507,25 +450,15 @@ describe('ProtocolSetup', () => {
   it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+      data: mockRobotSideAnalysis,
     } as any)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(
-        { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        flexDeckDefV5 as any
-      )
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
-    MockProtocolSetupLiquids.mockImplementation(
-      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
-        setIsConfirmed(true)
-        setSetupScreen('prepare to run')
-        return <div>Mock ProtocolSetupLiquids</div>
-      })
-    )
     MockProtocolSetupLabware.mockImplementation(
       vi.fn(({ setIsConfirmed, setSetupScreen }) => {
         setIsConfirmed(true)
@@ -541,8 +474,7 @@ describe('ProtocolSetup', () => {
     )
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByText('Labware Position Check'))
-    fireEvent.click(screen.getByText('Labware'))
-    fireEvent.click(screen.getByText('Liquids'))
+    fireEvent.click(screen.getByText('Labware & Liquids'))
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
   })
@@ -586,13 +518,10 @@ describe('ProtocolSetup', () => {
 
   it('calls trackProtocolRunEvent when tapping play button', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+      data: mockRobotSideAnalysis,
     } as any)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(
-        { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        flexDeckDefV5 as any
-      )
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)

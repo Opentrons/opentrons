@@ -12,7 +12,6 @@ import type {
   LiquidEntities,
   LiquidEntity,
 } from '@opentrons/step-generation'
-import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 import type { Action, DeckSlot } from '../../types'
 import type {
   DisplayLabware,
@@ -43,6 +42,7 @@ import type {
   GenerateNewProtocolAction,
   EditMultipleLiquidGroupsAction,
 } from '../actions'
+
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
@@ -174,105 +174,24 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       action: LoadFileAction
     ): ContainersState => {
       const { file } = action.payload
+      const metadata = getPDMetadata(file)
+      const containers: ContainersState = Object.entries(
+        metadata.labware
+      ).reduce((acc: ContainersState, [id, labwareLoadInfo], key) => {
+        acc[id] = {
+          nickname: labwareLoadInfo.displayName,
+          disambiguationNumber: key,
+        }
 
-      const loadLabwareCommands = Object.values(file.commands).filter(
-        command => command.commandType === 'loadLabware'
-      ) as LoadLabwareCreateCommand[]
+        return acc
+      }, {})
 
-      return loadLabwareCommands.reduce(
-        (acc: ContainersState, command, key): ContainersState => {
-          const { labwareId, displayName } = command.params
-
-          if (labwareId == null) {
-            console.error('expected to find a labwareId but could not')
-          }
-
-          return {
-            ...acc,
-            [labwareId ?? '']: {
-              nickname: displayName,
-              disambiguationNumber: key,
-            },
-          }
-        },
-        {}
-      )
+      return containers
     },
   },
   initialLabwareState
 )
-type SavedLabwareState = Record<string, boolean>
 
-/** Keeps track of which labware have saved nicknames */
-// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
-// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
-  {
-    DELETE_CONTAINER: (
-      state: SavedLabwareState,
-      action: DeleteContainerAction
-    ) => ({ ...state, [action.payload.labwareId]: false }),
-    RENAME_LABWARE: (
-      state: SavedLabwareState,
-      action: RenameLabwareAction
-    ) => ({ ...state, [action.payload.labwareId]: true }),
-    DUPLICATE_LABWARE: (
-      state: SavedLabwareState,
-      action: DuplicateLabwareAction
-    ) => ({ ...state, [action.payload.duplicateLabwareId]: true }),
-    LOAD_FILE: (
-      state: SavedLabwareState,
-      action: LoadFileAction
-    ): SavedLabwareState => {
-      const file = action.payload.file
-      const loadLabwareAndAdapterCommands = Object.values(file.commands).filter(
-        (command): command is LoadLabwareCreateCommand =>
-          command.commandType === 'loadLabware'
-      )
-
-      const labware = loadLabwareAndAdapterCommands.reduce(
-        (
-          acc: Record<
-            string,
-            {
-              slot: string
-              definitionId?: string
-              displayName?: string
-            }
-          >,
-          command
-        ) => {
-          const { displayName, loadName, labwareId } = command.params
-          const location = command.params.location
-          let slot
-          if (location === 'offDeck' || location === 'systemLocation') {
-            slot = 'offDeck'
-          } else if ('moduleId' in location) {
-            slot = location.moduleId
-          } else if ('labwareId' in location) {
-            slot = location.labwareId
-          } else if ('addressableAreaName' in location) {
-            slot = location.addressableAreaName
-          } else {
-            slot = location.slotName
-          }
-
-          return {
-            ...acc,
-            [loadName]: {
-              slot,
-              definitionId: labwareId,
-              displayName: displayName,
-            },
-          }
-        },
-        {}
-      )
-      return mapValues(labware, () => true)
-    },
-  },
-  {}
-)
 export type IngredientsState = LiquidEntities
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -452,7 +371,6 @@ export interface RootState {
   selectedContainerId: SelectedContainerId
   drillDownLabwareId: DrillDownLabwareId
   containers: ContainersState
-  savedLabware: SavedLabwareState
   selectedLiquidGroup: SelectedLiquidGroupState
   ingredients: IngredientsState
   ingredLocations: LocationsState
@@ -466,7 +384,6 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   selectedLiquidGroup,
   drillDownLabwareId,
   containers,
-  savedLabware,
   ingredients,
   ingredLocations,
   generateNewProtocol,

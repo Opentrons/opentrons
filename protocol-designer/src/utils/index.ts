@@ -9,6 +9,7 @@ import {
   isAddressableAreaStandardSlot,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   LOW_VOLUME_PIPETTES,
+  getTiprackVolume,
 } from '@opentrons/shared-data'
 import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 import type {
@@ -309,7 +310,8 @@ export const getMaxPushOutVolume = (
     ? plungerPositionsConfigurations.lowVolumeDefault ??
       plungerPositionsConfigurations.default
     : plungerPositionsConfigurations.default
-  return round((blowout - bottom) * shaftULperMM, 1)
+  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
+  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
 }
 
 export const getDefaultPushOutVolume = (
@@ -334,4 +336,35 @@ export const getDefaultPushOutVolume = (
   return (
     liquids[lookupKey].supportedTips[tipVolumeKey]?.defaultPushOutVolume ?? 0
   )
+}
+
+export const getMaxConditioningVolume = (args: {
+  transferVolume: number
+  disposalVolume: number
+  tiprackDefUri: string
+  labwareEntities: LabwareEntities
+  pipetteSpecs: PipetteV2Specs
+}): number => {
+  const {
+    transferVolume,
+    disposalVolume,
+    labwareEntities,
+    tiprackDefUri,
+    pipetteSpecs,
+  } = args
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
+  )
+  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+
+  const maxWorkingVolume = Math.min(
+    isInLowVolumeMode
+      ? liquids.lowVolumeDefault.maxVolume
+      : liquids.default.maxVolume,
+    ...(tipMaxVolume != null ? [tipMaxVolume] : [])
+  )
+  return maxWorkingVolume - disposalVolume - transferVolume
 }

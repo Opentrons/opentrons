@@ -272,6 +272,7 @@ export function ModulesListItem({
         <TertiaryButton
           {...targetProps}
           onClick={handleCalibrateClick}
+          width="max-content"
           disabled={!calibrationStatus?.complete || isModuleTooHot}
         >
           {t('calibrate_now')}

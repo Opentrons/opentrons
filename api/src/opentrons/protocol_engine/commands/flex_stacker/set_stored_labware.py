@@ -1,10 +1,11 @@
 """Command models to configure the stored labware pool of a Flex Stacker.."""
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING
+from typing import Optional, Literal, TYPE_CHECKING, Annotated
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -45,21 +46,20 @@ class SetStoredLabwareParams(BaseModel):
         ...,
         description="The details of the primary labware (i.e. not the lid or adapter, if any) stored in the stacker.",
     )
-    lidLabware: StackerStoredLabwareDetails | None = Field(
+    lidLabware: StackerStoredLabwareDetails | SkipJsonSchema[None] = Field(
         default=None,
         description="The details of the lid on the primary labware, if any.",
     )
-    adapterLabware: StackerStoredLabwareDetails | None = Field(
+    adapterLabware: StackerStoredLabwareDetails | SkipJsonSchema[None] = Field(
         default=None,
         description="The details of the adapter under the primary labware, if any.",
     )
-    initialCount: int | None = Field(
+    initialCount: Optional[Annotated[int, Field(ge=0)]] = Field(
         None,
         description=(
             "The number of labware that should be initially stored in the stacker. This number will be silently clamped to "
             "the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker."
         ),
-        ge=0,
     )
 
 
@@ -69,11 +69,11 @@ class SetStoredLabwareResult(BaseModel):
     primaryLabwareDefinition: LabwareDefinition = Field(
         ..., description="The definition of the primary labware."
     )
-    lidLabwareDefinition: LabwareDefinition | None = Field(
-        ..., description="The definition of the lid on the primary labware, if any."
+    lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = Field(
+        None, description="The definition of the lid on the primary labware, if any."
     )
-    adapterLabwareDefinition: LabwareDefinition | None = Field(
-        ...,
+    adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = Field(
+        None,
         description="The definition of the adapter under the primary labware, if any.",
     )
     count: int = Field(
@@ -142,10 +142,19 @@ class SetStoredLabwareImpl(
         pool_height = self._state_view.geometry.get_height_of_labware_stack(
             [x for x in [lid_def, labware_def, adapter_def] if x is not None]
         )
-        max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
-            params.moduleId, pool_height
+        pool_definitions = [
+            x for x in [lid_def, labware_def, adapter_def] if x is not None
+        ]
+
+        overlap = self._state_view._labware.get_labware_overlap_offsets(
+            pool_definitions[-1], pool_definitions[0].parameters.loadName
         )
 
+        max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
+            params.moduleId,
+            pool_height,
+            overlap.z,
+        )
         initial_count = (
             params.initialCount if params.initialCount is not None else max_pool_count
         )
@@ -154,7 +163,12 @@ class SetStoredLabwareImpl(
         state_update = (
             update_types.StateUpdate()
             .update_flex_stacker_labware_pool_definition(
-                params.moduleId, max_pool_count, labware_def, adapter_def, lid_def
+                params.moduleId,
+                max_pool_count,
+                overlap.z,
+                labware_def,
+                adapter_def,
+                lid_def,
             )
             .update_flex_stacker_labware_pool_count(params.moduleId, count)
         )

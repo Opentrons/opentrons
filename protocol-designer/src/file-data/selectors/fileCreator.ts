@@ -10,7 +10,11 @@ import {
   OT2_STANDARD_MODEL,
   FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
-
+import {
+  pythonImports,
+  pythonMetadata,
+  pythonRequirements,
+} from '@opentrons/step-generation'
 import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
@@ -26,12 +30,7 @@ import {
   getModulesLoadInfo,
   getPipettesLoadInfo,
 } from './utils'
-import {
-  pythonDefRun,
-  pythonImports,
-  pythonMetadata,
-  pythonRequirements,
-} from './pythonFile'
+import { pythonDefRun } from './pythonFile'
 
 import type { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
 import type {
@@ -53,7 +52,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
-import type { PDMetadata } from '../../file-types'
+import type {
+  PDMetadata,
+  PDPythonFile,
+  PythonDesignerApplication,
+} from '../../file-types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -306,24 +309,76 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   }
 )
 
-export const createPythonFile: Selector<string> = createSelector(
+export const createPythonFile: Selector<PDPythonFile> = createSelector(
   getFileMetadata,
-  getRobotType,
-  stepFormSelectors.getInvariantContext,
   getInitialRobotState,
   getRobotStateTimeline,
+  getRobotType,
+  dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getLiquidsByLabwareId,
+  stepFormSelectors.getSavedStepForms,
+  stepFormSelectors.getOrderedStepIds,
   uiLabwareSelectors.getLabwareNicknamesById,
+  stepFormSelectors.getInvariantContext,
   (
     fileMetadata,
-    robotType,
-    invariantContext,
     robotState,
     robotStateTimeline,
-    liquidsByLabwareId,
-    labwareNicknamesById
+    robotType,
+    dismissedWarnings,
+    ingredLocations,
+    savedStepForms,
+    orderedStepIds,
+    labwareNicknamesById,
+    invariantContext
   ) => {
-    return (
+    const {
+      pipetteEntities,
+      moduleEntities,
+      labwareEntities,
+      liquidEntities,
+    } = invariantContext
+
+    const savedOrderedStepIds = orderedStepIds.filter(
+      stepId => savedStepForms[stepId]
+    )
+
+    const ingredients: Ingredients = Object.fromEntries(
+      Object.entries(
+        liquidEntities
+      ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
+    )
+
+    const designerApplication: PythonDesignerApplication = {
+      robot: {
+        model: robotType,
+      },
+      designerApplication: {
+        name: 'opentrons/protocol-designer',
+        //  hardcoding this version in to avoid unnecessary migrating
+        //  TODO: remember to update to the applicationVersion const
+        version: '8.5.0',
+        data: {
+          pipetteTiprackAssignments: mapValues(
+            pipetteEntities,
+            (
+              p: typeof pipetteEntities[keyof typeof pipetteEntities]
+            ): string[] => p.tiprackDefURI
+          ),
+          dismissedWarnings,
+          ingredients,
+          ingredLocations,
+          savedStepForms,
+          orderedStepIds: savedOrderedStepIds,
+          pipettes: getPipettesLoadInfo(pipetteEntities),
+          modules: getModulesLoadInfo(moduleEntities),
+          labware: getLabwareLoadInfo(labwareEntities, labwareNicknamesById),
+        },
+      },
+      metadata: fileMetadata,
+    }
+
+    const pythonProtocol =
       [
         // Here are the sections of the Python file:
         pythonImports(),
@@ -333,13 +388,14 @@ export const createPythonFile: Selector<string> = createSelector(
           invariantContext,
           robotState,
           robotStateTimeline,
-          liquidsByLabwareId,
+          ingredLocations,
           labwareNicknamesById,
           robotType
         ),
       ]
         .filter(section => section) // skip any blank sections
         .join('\n\n') + '\n'
-    )
+
+    return { pythonProtocol, designerApplication }
   }
 )

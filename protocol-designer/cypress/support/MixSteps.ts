@@ -73,6 +73,8 @@ enum MixContent {
   StepNotes = 'Step Notes',
   CypressTest = 'Cypress Mix Test',
   TouchTipFromTop = 'Touch tip position from top',
+  PushOut = 'Push out',
+  PushOutVolume = 'Push out volume',
 }
 
 enum MixLocators {
@@ -90,7 +92,7 @@ enum MixLocators {
   AspWellOrder = '[data-testid="WellsOrderField_ListButton_aspirate"]',
   ResetToDefault = 'button:contains("Reset to default")',
   PrimaryOrderDropdown = 'div[tabindex="0"].sc-bqWxrE jKLbYH iFjNDq',
-  CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]',
+  CancelAspSettings = 'button:contains("Done")',
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
   YpositionInput = '[id="TipPositionModal_y_custom_input"]',
@@ -109,6 +111,7 @@ enum MixLocators {
   // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
   StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
+  PushOutVolumeInput = '[name="pushOut_volume"]',
 }
 
 /**
@@ -131,7 +134,7 @@ export const MixSteps = {
   SelectLabware: (): StepThunk => ({
     call: () => {
       cy.contains(MixContent.ChooseOption).should('be.visible').click()
-      cy.contains(MixContent.Reservoir).should('be.visible').click()
+      cy.contains(MixContent.WellPlate).should('be.visible').click()
     },
   }),
 
@@ -212,10 +215,10 @@ export const MixSteps = {
         .should('be.visible')
       cy.get(MixLocators.MixTipPos).click()
       cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
-      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}4')
       cy.get(MixLocators.ResetToDefault).click()
-      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}5')
       cy.contains(MixContent.Cancel).should('exist').should('be.visible')
@@ -240,6 +243,25 @@ export const MixSteps = {
         .should('have.prop', 'value')
       cy.get(MixLocators.DelaySecondsInput)
         .eq(1)
+        .type('{selectAll}{backspace}5')
+    },
+  }),
+
+  PushOut: (): StepThunk => ({
+    call: () => {
+      cy.contains(MixContent.PushOut).should('exist').should('be.visible')
+      cy.get(MixLocators.Checkbox)
+        .should('exist')
+        .should('be.visible')
+        .eq(0)
+        .click()
+      cy.contains(MixContent.PushOutVolume).should('exist').should('be.visible')
+      cy.get(MixLocators.PushOutVolumeInput)
+        .should('exist')
+        .should('be.visible')
+        .should('have.prop', 'value')
+      cy.get(MixLocators.PushOutVolumeInput)
+        .eq(0)
         .type('{selectAll}{backspace}5')
     },
   }),

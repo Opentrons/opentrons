@@ -69,6 +69,7 @@ export type ModuleCreateCommand =
   | FlexStackerStoreCreateCommand
   | FlexStackerFillCreateCommand
   | FlexStackerEmptyCreateCommand
+  | FlexStackerPrepareShuttleCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -427,6 +428,10 @@ export interface FlexStackerRetrieveCreateCommand
   commandType: 'flexStacker/retrieve'
   params: {
     moduleId: string
+    labwareId?: string
+    displayName?: string
+    adapterId?: string
+    lidId?: string
   }
 }
 
@@ -454,6 +459,16 @@ export interface FlexStackerEmptyCreateCommand extends CommonCommandCreateInfo {
     count?: number
   }
 }
+
+export interface FlexStackerPrepareShuttleCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/prepareShuttle'
+  params: {
+    moduleId: string
+    ignoreLatch?: boolean
+  }
+}
+
 interface RetrieveResultPrimary {
   labwareId: string
   primaryLocationSequence: LabwareLocationSequence

@@ -310,6 +310,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       // mix 2
       aspirateHelper('A1', 50),
@@ -562,6 +563,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       // mix 2
       aspirateHelper('A1', 50),
@@ -703,6 +705,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       // mix 2
       aspirateHelper('A1', 250),
@@ -798,6 +801,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       delayCommand(12),
       // mix 2
@@ -1932,10 +1936,10 @@ it('should return an error for the labware already being discarded in previous s
   const mockWasteChuteId = 'mockWasteChuteId'
   const wasteChuteInvariantContext = {
     ...invariantContext,
-    additionalEquipmentEntities: {
-      ...invariantContext.additionalEquipmentEntities,
+    wasteChuteEntities: {
+      ...invariantContext.wasteChuteEntities,
       mockWasteChuteId: {
-        name: 'wasteChute',
+        pythonName: 'waste_chute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
       },

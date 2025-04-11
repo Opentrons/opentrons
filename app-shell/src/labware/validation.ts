@@ -1,6 +1,9 @@
 import Ajv from 'ajv'
 import sortBy from 'lodash/sortBy'
-import { labwareSchemaV2 as labwareSchema } from '@opentrons/shared-data'
+import {
+  labwareSchemaV2 as labwareSchema,
+  validateCustomLabwareHelper,
+} from '@opentrons/shared-data'
 import { sameIdentity } from './compare'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -34,7 +37,10 @@ export function validateLabwareFiles(
     // check file against the schema
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const definition = data && validateLabwareDefinition(data)
-    if (definition === null) {
+
+    const hasValidWellInfo = validateCustomLabwareHelper(definition)
+
+    if (definition === null || !hasValidWellInfo) {
       return { filename, modified, type: INVALID_LABWARE_FILE }
     }
 

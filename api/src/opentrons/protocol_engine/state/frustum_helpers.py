@@ -344,7 +344,7 @@ def _find_volume_in_partial_frustum(
 ) -> float:
     """Look through a sorted list of frusta for a target height, and find the volume at that height."""
     for segment in sorted_well:
-        if segment.bottomHeight < target_height < segment.topHeight:
+        if segment.bottomHeight <= target_height <= segment.topHeight:
             relative_target_height = target_height - segment.bottomHeight
             section_height = segment.topHeight - segment.bottomHeight
             return volume_at_height_within_section(
@@ -402,7 +402,7 @@ def _find_height_in_partial_frustum(
         section_top_height, section_volume = capacity
         if (
             bottom_section_volume
-            < target_volume
+            <= target_volume
             <= (bottom_section_volume + section_volume)
         ):
             relative_target_volume = target_volume - bottom_section_volume

@@ -34,6 +34,7 @@ class LabwareOffset(BaseModel):
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
     location: LegacyLabwareOffsetLocation = Field(
         ...,
+        deprecated=True,
         description="Where the labware is located on the robot. Deprecated and present only for backwards compatibility; cannot represent certain locations. Use locationSequence instead.",
     )
     locationSequence: Optional[LabwareOffsetLocationSequence] = Field(

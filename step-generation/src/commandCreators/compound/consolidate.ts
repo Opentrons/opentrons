@@ -13,7 +13,6 @@ import {
   blowoutLocationHelper,
   curryCommandCreator,
   dispenseLocationHelper,
-  getHasWasteChute,
   getIsSafePipetteMovement,
   delayLocationHelper,
   reduceCommandCreators,
@@ -79,6 +78,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     destLabware,
     sourceLabware,
     nozzles,
+    pushOut,
   } = args
 
   const pipetteData = prevRobotState.pipettes[args.pipette]
@@ -99,16 +99,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   if (
     !args.destLabware ||
     (!invariantContext.labwareEntities[args.destLabware] &&
-      !invariantContext.additionalEquipmentEntities[args.destLabware])
+      !invariantContext.trashBinEntities[args.destLabware] &&
+      !invariantContext.wasteChuteEntities[args.destLabware])
   ) {
     return { errors: [errorCreators.equipmentDoesNotExist()] }
   }
 
   const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
   const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
-  )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
 
   if (
     hasWasteChute &&
@@ -118,10 +118,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return { errors: [errorCreators.labwareDiscarded()] }
   }
 
-  if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  ) {
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
+
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
@@ -160,11 +162,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const destinationWell = args.destWell
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
-
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -289,6 +286,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               yOffset: aspirateYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
       const preWetTipCommands = args.preWetTip // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
@@ -308,6 +306,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             yOffset: aspirateYOffset,
             nozzles,
             invariantContext,
+            finalPushOut: pushOut,
           })
         : []
       //  can not mix in a waste chute
@@ -329,6 +328,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               yOffset: dispenseYOffset,
               nozzles,
               invariantContext,
+              finalPushOut: pushOut,
             })
           : []
 
@@ -417,7 +417,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInWasteChute, {
             pipetteId: args.pipette,
-            wasteChuteId: dropTipEntity.id,
+            wasteChuteId:
+              invariantContext.wasteChuteEntities[args.dropTipLocation].id,
           }),
         ]
       }
@@ -425,7 +426,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInTrash, {
             pipetteId: args.pipette,
-            trashLocation: dropTipEntity.location as CutoutId,
+            trashLocation: invariantContext.trashBinEntities[
+              args.dropTipLocation
+            ].location as CutoutId,
           }),
         ]
       }

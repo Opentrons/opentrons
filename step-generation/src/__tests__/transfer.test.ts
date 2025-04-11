@@ -110,9 +110,9 @@ describe('pick up tip if no tip on pipette', () => {
   it('...once, drop tip in waste chute', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         wasteChuteId: {
-          name: 'wasteChute',
+          pythonName: 'waste_chute',
           id: 'wasteChuteId',
           location: 'cutoutD3',
         },
@@ -241,15 +241,15 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
 
   invariantContext = {
     ...invariantContext,
-    additionalEquipmentEntities: {
+    wasteChuteEntities: {
       mockWasteChuteId: {
-        name: 'wasteChute',
+        pythonName: 'waste_chute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
       },
     },
   }
-  robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId = {
+  robotStateWithTip.liquidState.wasteChute.mockWasteChuteId = {
     '0': { volume: 200 },
   }
   robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
@@ -756,6 +756,7 @@ describe('advanced options', () => {
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          pushOut: 0,
         }),
         // mix 2
         aspirateHelper('A1', 250),
@@ -810,6 +811,7 @@ describe('advanced options', () => {
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          pushOut: 0,
         }),
         // mix 2
         aspirateHelper('A1', 250),
@@ -995,7 +997,7 @@ describe('advanced options', () => {
             },
           },
         }),
-        dispenseHelper('B1', 250),
+        dispenseHelper('B1', 250, { pushOut: 0 }),
         // mix 2
         aspirateHelper('B1', 250, {
           labwareId: DEST_LABWARE,
@@ -1058,6 +1060,7 @@ describe('advanced options', () => {
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          pushOut: 0,
         }),
         delayCommand(12),
         // mix 2
