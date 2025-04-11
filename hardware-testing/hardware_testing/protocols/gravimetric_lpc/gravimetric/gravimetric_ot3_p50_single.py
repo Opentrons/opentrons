@@ -13,6 +13,7 @@ SLOTS_TIPRACK = {
     20: [6],
 }
 LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
+SLOT_DE_STATIC = 10
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -23,6 +24,7 @@ def run(ctx: ProtocolContext) -> None:
         for slot in slots
     ]
     vial = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
+    de_static = ctx.load_labware("de_static_bar", SLOT_DE_STATIC)
     pipette = ctx.load_instrument("flex_1channel_50", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])

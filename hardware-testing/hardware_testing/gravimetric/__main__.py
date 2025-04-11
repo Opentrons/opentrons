@@ -44,12 +44,12 @@ from .measurement import DELAY_FOR_MEASUREMENT, SupportedLiquid
 from .measurement.scale import Scale
 from .trial import TestResources, _change_pipettes
 from .tips import get_tips
-from hardware_testing.drivers import asair_sensor
+from hardware_testing.drivers import asair_sensor, de_static_fixture
 from opentrons.protocol_api import InstrumentContext, disposal_locations
 from opentrons.protocol_engine.types import LabwareOffset
 
 
-CUSTOM_LABWARE_URIS = ["radwag_pipette_calibration_vial"]
+CUSTOM_LABWARE_URIS = ["radwag_pipette_calibration_vial", "de_static_fixture"]
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -172,6 +172,7 @@ class RunArgs:
     increment: bool
     name: str
     environment_sensor: asair_sensor.AsairSensorBase
+    de_static: de_static_fixture.DeStaticFixtureBase
     trials: int
     ctx: ProtocolContext
     protocol_cfg: Any
@@ -208,10 +209,13 @@ class RunArgs:
     def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa: C901
         """Build."""
         # TEST META DATA
-        operator_name = helpers._get_operator_name(True)
-        robot_serial = helpers._get_robot_serial(True)
+        operator_name = helpers._get_operator_name(args.simulate or args.skip_input)
+        robot_serial = helpers._get_robot_serial(args.simulate or args.skip_input)
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(True)
+        environment_sensor = asair_sensor.BuildAsairSensor(args.simulate)
+        de_static = de_static_fixture.find_and_build(
+            args.simulate or not args.de_static
+        )
         git_description = get_git_description()
 
         # SCALE
@@ -333,6 +337,7 @@ class RunArgs:
                 git_description=git_description,
                 tip_batches=tip_batches,
                 environment_sensor=environment_sensor,
+                de_static=de_static,
                 trials=trials,
                 name=name,
                 robot_serial=robot_serial,
@@ -369,6 +374,7 @@ class RunArgs:
                 increment=args.increment,
                 name=name,
                 environment_sensor=environment_sensor,
+                de_static=de_static,
                 trials=trials,
                 fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
@@ -395,6 +401,7 @@ class RunArgs:
             increment=args.increment,
             name=name,
             environment_sensor=environment_sensor,
+            de_static=de_static,
             trials=trials,
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
@@ -441,6 +448,7 @@ def build_gravimetric_cfg(
         labware_on_scale=run_args.protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
         slot_scale=run_args.protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
+        slot_de_static=run_args.protocol_cfg.SLOT_DE_STATIC,  # type: ignore[attr-defined]
         increment=increment,
         interactive=interactive,
         nominal_plunger=nominal_plunger,
@@ -610,6 +618,7 @@ def _main(
         test_volumes=volumes,
         tips=_tips,
         env_sensor=run_args.environment_sensor,
+        de_static=run_args.de_static,
         recorder=run_args.recorder,
         test_report=run_args.test_report,
     )
@@ -623,6 +632,8 @@ def _main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--skip-input", action="store_true")
+    parser.add_argument("--de-static", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)

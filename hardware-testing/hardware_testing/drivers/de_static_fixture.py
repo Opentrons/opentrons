@@ -17,6 +17,11 @@ class DeStaticFixtureBase(ABC):
     """Base Class if DeStaticFixture."""
 
     @abstractmethod
+    def is_simulating(self) -> bool:
+        """Is simulating."""
+        ...
+
+    @abstractmethod
     def connect(self) -> None:
         """Connect to the USB serial port."""
         ...
@@ -39,6 +44,9 @@ class DeStaticFixtureBase(ABC):
 
 class SimDeStaticFixture(DeStaticFixtureBase):
     """Simulating DeStaticFixture."""
+
+    def is_simulating(self) -> bool:
+        return True
 
     def connect(self) -> None:
         """Connect to the USB serial port."""
@@ -66,6 +74,9 @@ class DeStaticFixture(DeStaticFixtureBase):
         self._port.timeout = 1.0
         self._port.port = port_name
         self._port.baudrate = FIXTURE_BAUD_RATE
+
+    def is_simulating(self) -> bool:
+        return False
 
     def connect(self) -> None:
         """Connect to the USB serial port."""

@@ -23,6 +23,7 @@ class VolumetricConfig:
     tip_volume: int
     trials: int
     slots_tiprack: List[int]
+    slot_de_static: int
     increment: bool
     interactive: bool
     nominal_plunger: bool

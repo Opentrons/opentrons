@@ -109,6 +109,7 @@ def create_csv_test_report_photometric(
                     CSVLine("tips_200ul", [str]),
                     CSVLine("tips_1000ul", [str]),
                     CSVLine("environment", [str]),
+                    CSVLine("de_static", [str]),
                     CSVLine("liquid", [str]),
                 ],
             ),
@@ -212,6 +213,7 @@ def create_csv_test_report(
                     CSVLine("tips_1000ul", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
+                    CSVLine("de_static", [str]),
                     CSVLine("liquid", [str]),
                 ],
             ),
@@ -320,6 +322,7 @@ def store_serial_numbers_pm(
     pipette: str,
     tips: Dict[str, str],
     environment: str,
+    de_static: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
@@ -328,6 +331,7 @@ def store_serial_numbers_pm(
     for tip in tips.keys():
         report("SERIAL-NUMBERS", tip, [tips[tip]])
     report("SERIAL-NUMBERS", "environment", [environment])
+    report("SERIAL-NUMBERS", "de_static", [de_static])
     report("SERIAL-NUMBERS", "liquid", [liquid])
 
 
@@ -349,6 +353,7 @@ def store_serial_numbers(
     tips: Dict[str, str],
     scale: str,
     environment: str,
+    de_static: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
@@ -360,6 +365,7 @@ def store_serial_numbers(
         report("SERIAL-NUMBERS", tip, [tips[tip]])
     report("SERIAL-NUMBERS", "scale", [scale])
     report("SERIAL-NUMBERS", "environment", [environment])
+    report("SERIAL-NUMBERS", "de_static", [de_static])
     report("SERIAL-NUMBERS", "liquid", [liquid])
 
 

@@ -1,5 +1,5 @@
 """Gravimetric."""
-from time import sleep
+from time import sleep, time
 from typing import Optional, Tuple, List, Dict, Callable
 
 from opentrons.protocol_api import (
@@ -23,7 +23,7 @@ from opentrons.types import Location, Point
 from hardware_testing.data import ui, dump_data_to_file
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import OT3Mount, Axis
-from hardware_testing.drivers import asair_sensor
+from hardware_testing.drivers import asair_sensor, de_static_fixture
 import os
 from . import report
 from . import config
@@ -182,7 +182,9 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
-def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labware:
+def _load_labware(
+    ctx: ProtocolContext, cfg: config.GravimetricConfig
+) -> Tuple[Labware, Labware]:
     ui.print_info(f'Loading labware on scale: "{cfg.labware_on_scale}"')
     if cfg.labware_on_scale == "radwag_pipette_calibration_vial":
         namespace = "custom_beta"
@@ -194,17 +196,31 @@ def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labwar
         cfg.slot_scale in loaded_labwares.keys()
         and loaded_labwares[cfg.slot_scale].name == cfg.labware_on_scale
     ):
-        return loaded_labwares[cfg.slot_scale]
-
-    labware_on_scale = ctx.load_labware(
-        cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
-    )
-    if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
-        offset = get_latest_offset_for_labware(
-            _get_offsets_from_ctx(ctx), labware_on_scale
+        labware_on_scale = loaded_labwares[cfg.slot_scale]
+    else:
+        labware_on_scale = ctx.load_labware(
+            cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
         )
-        labware_on_scale.set_offset(offset.x, offset.y, offset.z)
-    return labware_on_scale
+        if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+            offset = get_latest_offset_for_labware(
+                _get_offsets_from_ctx(ctx), labware_on_scale
+            )
+            labware_on_scale.set_offset(offset.x, offset.y, offset.z)
+    if (
+        cfg.slot_de_static in loaded_labwares.keys()
+        and loaded_labwares[cfg.slot_de_static].name == "de_static_fixture"
+    ):
+        labware_de_static = loaded_labwares[cfg.slot_scale]
+    else:
+        labware_de_static = ctx.load_labware(
+            "de_static_fixture", location=cfg.slot_de_static, namespace="custom_beta"
+        )
+        if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+            offset = get_latest_offset_for_labware(
+                _get_offsets_from_ctx(ctx), labware_de_static
+            )
+            labware_de_static.set_offset(offset.x, offset.y, offset.z)
+    return labware_on_scale, labware_de_static
 
 
 def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
@@ -664,6 +680,7 @@ def build_gm_report(
     increment: bool,
     name: str,
     environment_sensor: asair_sensor.AsairSensorBase,
+    de_static: de_static_fixture.DeStaticFixtureBase,
     trials: int,
     fw_version: str,
 ) -> report.CSVReport:
@@ -683,6 +700,7 @@ def build_gm_report(
         tips=tip_batchs,
         scale=recorder.serial_number,
         environment=environment_sensor.get_serial(),
+        de_static="None" if de_static.is_simulating() else "ENABLED",
         liquid="None",
     )
     return test_report
@@ -745,6 +763,7 @@ def _calculate_evaporation(
         liquid_tracker,
         True,
         resources.env_sensor,
+        resources.de_static,
     )
     ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
     resources.pipette._retract()
@@ -832,7 +851,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
     ui.print_header("LOAD LABWARE")
-    labware_on_scale = _load_labware(resources.ctx, cfg)
+    labware_on_scale, labware_de_static = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
 
     UNITS = {
@@ -888,7 +907,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         _MEASUREMENTS = list()
     try:
         well = labware_on_scale["A1"]
-        if cfg.jog or cfg.blank or not cfg.lld_every_tip:
+        de_static = resources.de_static
+        calibrate_static_bar = not de_static.is_simulating()
+        if cfg.jog or cfg.blank or not cfg.lld_every_tip or calibrate_static_bar:
             first_tip = _next_tip_for_channel(
                 cfg, resources, 0, total_tips, tip_name=cfg.starting_tip
             )
@@ -899,9 +920,46 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 resources.ctx, resources.pipette, cfg, location=first_tip_location
             )
             resources.pipette._retract()
-            for i in range(5):
-                resources.pipette.aspirate(location=well.top(config.VIAL_SAFE_Z_OFFSET))
-                resources.pipette.dispense(location=well.top(config.VIAL_SAFE_Z_OFFSET), push_out=0)
+            if not de_static.is_simulating():
+
+                # initial enable
+                de_static_well = labware_de_static["A1"]
+                resources.pipette.move_to(de_static_well.top())
+                de_static.enable_power_for_one_second()
+                start_time = time()
+
+                def _delay_till_de_static_disables(re_enable: bool) -> None:
+                    nonlocal start_time
+                    _move_duration = time() - start_time
+                    _seconds_till_disable = max(1.0 - _move_duration, 0.0)
+                    sleep(_seconds_till_disable)
+                    if re_enable:
+                        de_static.enable_power_for_one_second()
+                        start_time = time()
+
+                # move down
+                resources.pipette.move_to(
+                    de_static_well.bottom(), speed=de_static_well.depth
+                )
+                _delay_till_de_static_disables(re_enable=True)
+                # move up
+                resources.pipette.move_to(
+                    de_static_well.top(), speed=de_static_well.depth
+                )
+                _delay_till_de_static_disables(re_enable=True)
+                # aspirate
+                resources.pipette.aspirate(
+                    resources.pipette.max_volume, de_static_well.top()
+                )
+                _delay_till_de_static_disables(re_enable=True)
+                # dispense
+                resources.pipette.dispense(
+                    resources.pipette.max_volume, de_static_well.top()
+                )
+                _delay_till_de_static_disables(re_enable=True)
+                # done
+                resources.pipette._retract()
+
             resources.pipette.prepare_to_aspirate()
             ui.print_info("moving to scale")
         if cfg.jog or not cfg.lld_every_tip:
@@ -967,6 +1025,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             liquid_tracker,
             False,
             resources.env_sensor,
+            resources.de_static,
         )
         for volume in trials.keys():
             actual_asp_list_all = []

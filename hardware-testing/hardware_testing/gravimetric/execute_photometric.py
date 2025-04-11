@@ -16,7 +16,7 @@ from .measurement import (
     EnvironmentData,
     SupportedLiquid,
 )
-from hardware_testing.drivers import asair_sensor
+from hardware_testing.drivers import asair_sensor, de_static_fixture
 from .measurement.environment import read_environment_data
 from . import report
 from . import config
@@ -340,6 +340,7 @@ def build_pm_report(
     git_description: str,
     tip_batches: Dict[str, str],
     environment_sensor: asair_sensor.AsairSensorBase,
+    de_static: de_static_fixture.DeStaticFixtureBase,
     trials: int,
     name: str,
     robot_serial: str,
@@ -360,6 +361,7 @@ def build_pm_report(
         pipette=pipette_tag,
         tips=tip_batches,
         environment=environment_sensor.get_serial(),
+        de_static="None" if de_static.is_simulating() else "ENABLED",
         liquid="None",
     )
     return test_report
