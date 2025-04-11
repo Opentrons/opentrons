@@ -29,6 +29,7 @@ import type {
   TCDeactivateLidCreateCommand,
   TCOpenLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
+  FlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
@@ -111,6 +112,20 @@ export function useModuleOverflowMenu(
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const homeShuttleBtn = (
+    <>
+      <MenuItem
+        key={`home_shuttle_${String(module.moduleModel)}`}
+        data-testid={`home_shuttle_${String(module.moduleModel)}`}
+        onClick={() => {
+          homeShuttle()
+        }}
+      >
+        {t('overflow_menu_home_shuttle')}
+      </MenuItem>
+    </>
+  )
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -234,6 +249,20 @@ export function useModuleOverflowMenu(
       console.error(
         `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
       )
+    })
+  }
+
+  const homeShuttleCommand: FlexStackerPrepareShuttleCreateCommand = {
+    commandType: 'flexStacker/prepareShuttle',
+    params: {
+      moduleId: module.id,
+    },
+  }
+  const homeShuttle = (): void => {
+    createLiveCommand({
+      command: homeShuttleCommand,
+    }).catch((e: Error) => {
+      console.error(`error homing flex stacker shuttle: ${e.message}`)
     })
   }
 
@@ -374,7 +403,7 @@ export function useModuleOverflowMenu(
         setSetting: t('overflow_menu_about'),
         isSecondary: false,
         isSettingDisabled: false,
-        menuButtons: [],
+        menuButtons: [homeShuttleBtn],
         onClick: handleAboutClick,
       },
     ],
