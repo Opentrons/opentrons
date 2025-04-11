@@ -52,7 +52,7 @@ vi.mock('/app/transformations/commands', async importOriginal => {
 vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/analysis/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
-vi.mock('/app/redux-resources/analytics')
+vi.mock('/app/redux-resources/analytics/hooks')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()
@@ -81,6 +81,9 @@ const render = () => {
 
 describe('ProtocolSetupLabware', () => {
   beforeEach(() => {
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
     mockCreateLiveCommand.mockResolvedValue(null)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -177,9 +180,6 @@ describe('ProtocolSetupLabware', () => {
   })
 
   it('sends a latch-close command when the labware latch is open and the button is clicked', () => {
-    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn(),
-    } as any)
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     fireEvent.click(screen.getByText('Labware Latch'))
@@ -199,9 +199,6 @@ describe('ProtocolSetupLabware', () => {
       ...mockUseModulesQueryClosed,
       refetch: mockRefetch,
     } as any)
-    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn(),
-    } as any)
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     fireEvent.click(screen.getByText('Labware Latch'))
@@ -220,9 +217,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useModulesQuery).mockReturnValue(
       mockUseModulesQueryOpening as any
     )
-    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn(),
-    } as any)
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Opening...')
@@ -232,9 +226,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useModulesQuery).mockReturnValue(
       mockUseModulesQueryClosing as any
     )
-    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn(),
-    } as any)
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Closing...')
@@ -244,9 +235,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useModulesQuery).mockReturnValue(
       mockUseModulesQueryUnknown as any
     )
-    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn(),
-    } as any)
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Open')
