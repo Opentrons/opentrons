@@ -30,7 +30,6 @@ import {
 } from '../hooks'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
-
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
 import type { State } from '/app/redux/types'
@@ -39,7 +38,6 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux-resources/analytics')
-
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -186,7 +184,7 @@ describe('useLatchControls', () => {
     } as any)
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
     vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn()
+      reportModuleCommand: vi.fn(),
     } as any)
   })
 
@@ -265,7 +263,7 @@ describe('useModuleOverflowMenu', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn()
+      reportModuleCommand: vi.fn(),
     } as any)
   })
 
