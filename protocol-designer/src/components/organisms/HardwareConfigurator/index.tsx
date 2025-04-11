@@ -5,6 +5,7 @@ import {
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
   FLEX_SIMPLEST_DECK_CONFIG,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationEditing } from './util'
 import type {
@@ -36,14 +37,24 @@ export function HardwareConfigurator(props: WizardTileProps): JSX.Element {
     }
   )
 
-  const moduleConfig: DeckConfiguration = Object.values(modules).map(
-    (module): CutoutConfig => ({
-      cutoutId: getCutoutIdFromAddressableArea(
-        module.slot,
-        deckDef
-      ) as CutoutId,
-      cutoutFixtureId: module.cutoutFixtureId ?? 'singleStandardSlot',
-    })
+  const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
+    (module): DeckConfiguration => {
+      const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
+      const defaultModuleConfig: CutoutConfig = {
+        cutoutId: getCutoutIdFromAddressableArea(
+          module.slot,
+          deckDef
+        ) as CutoutId,
+        cutoutFixtureId: module.cutoutFixtureId ?? 'singleStandardSlot',
+      }
+      const thermocyclerA1Config: CutoutConfig = {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: 'thermocyclerModuleV2Rear',
+      }
+      return hasThermocycler
+        ? [defaultModuleConfig, thermocyclerA1Config]
+        : [defaultModuleConfig]
+    }
   )
   const additionalEquipmentConfig: DeckConfiguration = Object.values(
     fixtures

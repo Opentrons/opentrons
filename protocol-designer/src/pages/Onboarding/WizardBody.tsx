@@ -198,6 +198,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
             <img
               src={OT2_GIFS[stepNumber]}
               width="100%"
+              alt={`OT-2 asset for onboarding flow page ${stepNumber}`}
               height="100%"
               css={css`
                 object-fit: cover;

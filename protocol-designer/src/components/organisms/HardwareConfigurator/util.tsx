@@ -25,6 +25,7 @@ import {
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
@@ -70,30 +71,38 @@ export function useDeckConfigurationEditing(
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ): void => {
+    const thermocyclerCutoutFixtureId =
+      cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
+      cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
+    const tcCutouts = ['cutoutA1', 'cutoutB1']
     //  remove any fixtures from that cutoutId
     if (
       Object.values(fixtures).some(fixture => fixture.cutoutId === cutoutId)
     ) {
-      const filteredFixtures =
-        fixtures != null
-          ? Object.fromEntries(
-              Object.entries(fixtures).filter(
-                ([_, fixture]) => fixture.cutoutId !== cutoutId
-              )
-            )
-          : {}
+      const filteredFixtures = Object.fromEntries(
+        Object.entries(fixtures).filter(
+          ([_, fixture]) => fixture.cutoutId !== cutoutId
+        )
+      )
       setValue('fixtures', filteredFixtures)
     }
     //  remove any modules from that cutoutId
-    if (Object.values(modules).some(module => module.cutoutId === cutoutId)) {
-      const fixturedModules =
-        fixtures != null
-          ? Object.fromEntries(
-              Object.entries(modules).filter(
-                ([_, module]) => module.cutoutId !== cutoutId
-              )
-            )
-          : {}
+    if (
+      Object.values(modules).some(
+        module =>
+          module.cutoutId === cutoutId ||
+          //  special-casing for thermocycler since deck config adds to both cutouts
+          (thermocyclerCutoutFixtureId &&
+            tcCutouts.includes(module.cutoutId ?? 'cutoutA1'))
+      )
+    ) {
+      const fixturedModules = Object.fromEntries(
+        Object.entries(modules).filter(([_, module]) =>
+          thermocyclerCutoutFixtureId
+            ? !tcCutouts.includes(module.cutoutId ?? 'cutoutA1')
+            : module.cutoutId !== cutoutId
+        )
+      )
       setValue('modules', fixturedModules)
     }
 
@@ -124,6 +133,7 @@ export function useDeckConfigurationEditing(
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
+              type: undefined,
             }
           : cutoutConfig
       )
@@ -133,6 +143,7 @@ export function useDeckConfigurationEditing(
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
+              type: undefined,
             }
           : cutoutConfig
       )
@@ -250,6 +261,11 @@ export const getAvailableOptions = (
       availableOptions = [
         ...availableOptions,
         [
+          {
+            cutoutId: THERMOCYCLER_MODULE_CUTOUTS[0],
+            cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+            type: THERMOCYCLER_MODULE_V2,
+          },
           {
             cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
             cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,

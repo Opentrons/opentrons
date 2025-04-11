@@ -22,6 +22,7 @@ import {
   MAGNETIC_BLOCK_V1,
   getModuleType,
   MODULE_MODELS,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { useKitchen } from '../Kitchen/hooks'
 import { getAvailableOptions } from './util'
@@ -129,17 +130,15 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     cutoutId === WASTE_CHUTE_CUTOUT
   ) {
     nextStageOptions = (
-      <>
-        <FixtureOption
-          key="wasteChuteOption"
-          optionName="Waste chute"
-          buttonText={t('select_options')}
-          onClickHandler={() => {
-            setOptionStage('wasteChuteOptions')
-          }}
-          isOnDevice={false}
-        />
-      </>
+      <FixtureOption
+        key="wasteChuteOption"
+        optionName="Waste chute"
+        buttonText={t('select_options')}
+        onClickHandler={() => {
+          setOptionStage('wasteChuteOptions')
+        }}
+        isOnDevice={false}
+      />
     )
   }
 
@@ -209,7 +208,10 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
                 ? MAGNETIC_BLOCK_V1
                 : (newModule.type as ModuleModel)
             ),
-            slot: newModule.cutoutId.split('cutout')[1],
+            slot:
+              newModule.type === THERMOCYCLER_MODULE_V2
+                ? 'B1'
+                : newModule.cutoutId.split('cutout')[1],
             cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
             cutoutId: newModule.cutoutId,
           },
@@ -256,27 +258,25 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   })
 
   return (
-    <>
-      <Modal {...modalProps}>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          {fixtureOptions}
-          {nextStageOptions}
-        </Flex>
-        {optionStage === 'wasteChuteOptions' ? (
-          <Btn
-            onClick={() => {
-              setOptionStage('fixtureOptions')
-            }}
-            aria-label="back"
-            paddingX={SPACING.spacing16}
-            marginTop="1.44rem"
-            marginBottom="0.56rem"
-          >
-            <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
-          </Btn>
-        ) : null}
-      </Modal>
-    </>
+    <Modal {...modalProps}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        {fixtureOptions}
+        {nextStageOptions}
+      </Flex>
+      {optionStage === 'wasteChuteOptions' ? (
+        <Btn
+          onClick={() => {
+            setOptionStage('fixtureOptions')
+          }}
+          aria-label="back"
+          paddingX={SPACING.spacing16}
+          marginTop="1.44rem"
+          marginBottom="0.56rem"
+        >
+          <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
+        </Btn>
+      ) : null}
+    </Modal>
   )
 }
 

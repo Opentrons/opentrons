@@ -4,6 +4,7 @@ import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
@@ -21,14 +22,14 @@ interface FixtureOptionProps {
 export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   const { onClickHandler, optionName, buttonText, isOnDevice } = props
   return isOnDevice ? (
-    <FixtureButtonODD onClick={props.onClickHandler}>
+    <FixtureButtonODD onClick={onClickHandler}>
       <StyledText
         oddStyle="bodyTextRegular"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
-        {props.optionName}
+        {optionName}
       </StyledText>
-      <StyledText oddStyle="bodyTextRegular">{props.buttonText}</StyledText>
+      <StyledText oddStyle="bodyTextRegular">{buttonText}</StyledText>
     </FixtureButtonODD>
   ) : (
     <Flex
@@ -52,7 +53,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
 }
 
 export const FixtureButtonODD = styled(Btn)`
-  display: flex;
+  display: ${DISPLAY_FLEX};
   background-color: ${COLORS.grey35};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   flex-direction: ${DIRECTION_ROW};
