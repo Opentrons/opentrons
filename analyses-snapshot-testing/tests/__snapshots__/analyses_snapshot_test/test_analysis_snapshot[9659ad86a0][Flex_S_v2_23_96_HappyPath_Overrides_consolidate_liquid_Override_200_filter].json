@@ -74103,7 +74103,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -74578,7 +74578,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -74589,7 +74589,7 @@
         "position": {
           "x": 63.88,
           "y": 256.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -75093,7 +75093,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -75104,7 +75104,7 @@
         "position": {
           "x": 63.88,
           "y": 256.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -75608,7 +75608,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -75619,7 +75619,7 @@
         "position": {
           "x": 63.88,
           "y": 256.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -76123,7 +76123,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -76134,7 +76134,7 @@
         "position": {
           "x": 63.88,
           "y": 149.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -76638,7 +76638,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -76649,7 +76649,7 @@
         "position": {
           "x": 63.88,
           "y": 149.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -77153,7 +77153,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -77164,7 +77164,7 @@
         "position": {
           "x": 63.88,
           "y": 149.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -77668,7 +77668,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -77679,7 +77679,7 @@
         "position": {
           "x": 63.88,
           "y": 42.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -78183,7 +78183,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -78194,7 +78194,7 @@
         "position": {
           "x": 63.88,
           "y": 42.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -78698,7 +78698,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -37.55
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -78709,7 +78709,7 @@
         "position": {
           "x": 63.88,
           "y": 42.74,
-          "z": 46.4
+          "z": 6.85
         }
       },
       "startedAt": "TIMESTAMP",
@@ -85651,7 +85651,7 @@
           "y": 0,
           "z": 2
         },
-        "positionReference": "well-top",
+        "positionReference": "well-bottom",
         "preWet": false,
         "retract": {
           "airGapByVolume": [

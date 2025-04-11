@@ -10377,7 +10377,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -10841,7 +10841,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -10852,7 +10852,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -11356,7 +11356,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -11367,7 +11367,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -15243,7 +15243,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -15707,7 +15707,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -15718,7 +15718,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -16222,7 +16222,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -16233,7 +16233,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -16737,7 +16737,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -16748,7 +16748,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -17252,7 +17252,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -17263,7 +17263,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -23709,7 +23709,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -24173,7 +24173,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -24184,7 +24184,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -24688,7 +24688,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -24699,7 +24699,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -25203,7 +25203,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -25214,7 +25214,7 @@
         "position": {
           "x": 77.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -25718,7 +25718,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -25729,7 +25729,7 @@
         "position": {
           "x": 77.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -26233,7 +26233,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -26244,7 +26244,7 @@
         "position": {
           "x": 86.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -26748,7 +26748,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -26759,7 +26759,7 @@
         "position": {
           "x": 86.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -27263,7 +27263,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -27274,7 +27274,7 @@
         "position": {
           "x": 95.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -27778,7 +27778,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -27789,7 +27789,7 @@
         "position": {
           "x": 95.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -28293,7 +28293,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -28304,7 +28304,7 @@
         "position": {
           "x": 104.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -28808,7 +28808,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -28819,7 +28819,7 @@
         "position": {
           "x": 104.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -32427,7 +32427,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -32891,7 +32891,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -32902,7 +32902,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -33406,7 +33406,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -33417,7 +33417,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -37293,7 +37293,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -37757,7 +37757,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -37768,7 +37768,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -38272,7 +38272,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -38283,7 +38283,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -38787,7 +38787,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -38798,7 +38798,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -39302,7 +39302,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -39313,7 +39313,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -45223,7 +45223,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -45687,7 +45687,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -45698,7 +45698,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -46135,7 +46135,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -46146,7 +46146,7 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -46583,7 +46583,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -46594,7 +46594,7 @@
         "position": {
           "x": 77.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -47031,7 +47031,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -47042,7 +47042,7 @@
         "position": {
           "x": 77.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -47479,7 +47479,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -47490,7 +47490,7 @@
         "position": {
           "x": 86.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -47927,7 +47927,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -47938,7 +47938,7 @@
         "position": {
           "x": 86.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -48375,7 +48375,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -48386,7 +48386,7 @@
         "position": {
           "x": 95.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -48823,7 +48823,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -48834,7 +48834,7 @@
         "position": {
           "x": 95.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -49271,7 +49271,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -49282,7 +49282,7 @@
         "position": {
           "x": 104.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -49719,7 +49719,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -49730,7 +49730,7 @@
         "position": {
           "x": 104.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
       "startedAt": "TIMESTAMP",
@@ -52320,7 +52320,7 @@
           "y": 0,
           "z": 2
         },
-        "positionReference": "well-top",
+        "positionReference": "well-bottom",
         "preWet": false,
         "retract": {
           "airGapByVolume": [
@@ -53309,7 +53309,7 @@
           "y": 0,
           "z": 2
         },
-        "positionReference": "well-top",
+        "positionReference": "well-bottom",
         "preWet": false,
         "retract": {
           "airGapByVolume": [
