@@ -1238,9 +1238,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available for this transfer step"
-                    f" among the tipracks assigned for {self.get_pipette_name()}:"
-                    f" {[tip_rack[1].get_display_name() for tip_rack in tip_racks]}"
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
@@ -1480,9 +1479,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available for this distribute step"
-                    f" among the tipracks assigned for {self.get_pipette_name()}:"
-                    f" {[tip_rack[1].get_display_name() for tip_rack in tip_racks]}"
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
@@ -1755,9 +1753,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available for this consolidate step"
-                    f" among the tipracks assigned for {self.get_pipette_name()}:"
-                    f" {[tip_rack[1].get_display_name() for tip_rack in tip_racks]}"
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[ f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
