@@ -17,7 +17,7 @@ export type FlexStackerCommand =
   | FlexStackerFillRunTimeCommand
   | FlexStackerEmptyRunTimeCommand
 
-const KEYS_BY_COMMAND_TYPE: {
+export const KEYS_BY_COMMAND_TYPE: {
   [commandType in FlexStackerCommand['commandType']]: string
 } = {
   'flexStacker/retrieve': 'flex_stacker_retrieve',

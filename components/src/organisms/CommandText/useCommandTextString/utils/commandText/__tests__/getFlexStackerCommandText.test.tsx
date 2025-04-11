@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { i18n } from '../../../../../../i18n'
-import { getFlexStackerCommandText } from '../getFlexStackerCommandText'
+import { getFlexStackerCommandText, KEYS_BY_COMMAND_TYPE } from '../getFlexStackerCommandText'
 import { getAllLabwareDefs } from '@opentrons/shared-data'
 import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
 
@@ -155,14 +155,8 @@ describe('getPipettingCommandText', () => {
   })
 
   it('should render defualt command text correctly', () => {
-    const COMMAND_TYPE_TRANSLATIONS = {
-      'flexStacker/retrieve': 'flex_stacker_retrieve',
-      'flexStacker/store': 'flex_stacker_store',
-      'flexStacker/setStoredLabware': 'flex_stacker_set_stored_labware',
-      'flexStacker/empty': 'flex_stacker_empty',
-      'flexStacker/fill': 'flex_stacker_fill',
-    }
-    for (const [key, value] of Object.entries(COMMAND_TYPE_TRANSLATIONS)) {
+    console.log("KEYS_BY_COMMAND_TYPE: ", KEYS_BY_COMMAND_TYPE)
+    for (const [key, value] of Object.entries(KEYS_BY_COMMAND_TYPE)) {
       const command = {
         id: 'cmd-1',
         commandType: key,
