@@ -60,11 +60,6 @@ def legacy_offset_location_to_offset_location_sequence(
             possible_cutout_fixture_id = location.moduleModel.value
 
         try:
-            # This is raising FixtureDoesNotExistError.
-            # (Pdb) cutout_id
-            # 'cutoutB1'
-            # (Pdb) possible_cutout_fixture_id
-            # 'thermocyclerModuleV2'
             addressable_area = deck_configuration_provider.get_labware_hosting_addressable_area_name_for_cutout_and_cutout_fixture(
                 cutout_id, possible_cutout_fixture_id, deck_definition
             )

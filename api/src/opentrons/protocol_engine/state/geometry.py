@@ -1800,8 +1800,6 @@ class GeometryView:
             )
 
             module_location = self._modules.get_location(module_id=module_id)
-            # TODO: A little unclear if the app is correctly mirroring both of these cases.
-            # Also a little unclear if our migration code is correctly mirroring both of these cases.
             if self._modules.get_deck_supports_module_fixtures():
                 module_aa = self._modules.ensure_and_convert_module_fixture_location(
                     module_location.slotName, module_model
