@@ -145,9 +145,6 @@ async def test_dispense_while_tracking_implementation(
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id-abc", labware_id="funky-labware", well_name="funky-well"
-    )
     decoy.when(
         await subject._movement.move_to_well(
             pipette_id="pipette-id-abc",
@@ -285,9 +282,6 @@ async def test_overpressure_error(
 
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
-    )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id", labware_id="funky-labware", well_name="funky-well"
     )
     decoy.when(
         await subject._movement.move_to_well(
