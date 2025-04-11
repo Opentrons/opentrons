@@ -77,12 +77,12 @@ describe('createFile selector', () => {
   const labwareEntitiesOpentrons = {
     ...labwareEntities,
     tiprackId: {
-      ...labwareEntities['tiprackId'],
-      def: { ...labwareEntities['tiprackId'].def, namespace: 'opentrons' },
+      ...labwareEntities.tiprackId,
+      def: { ...labwareEntities.tiprackId.def, namespace: 'opentrons' },
     },
     plateId: {
-      ...labwareEntities['plateId'],
-      def: { ...labwareEntities['plateId'].def, namespace: 'opentrons' },
+      ...labwareEntities.plateId,
+      def: { ...labwareEntities.plateId.def, namespace: 'opentrons' },
     },
     // We'll leave labwareEntities['fixedTrash'] with the "fixture" namespace,
     // to demonstrate what custom labware loading looks like.
