@@ -31,6 +31,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     OperationLocationNotInWellError,
 )
+from ..errors.exceptions import InvalidLiquidHeightFound
 from ..resources import (
     fixture_validation,
     labware_validation,
@@ -2059,9 +2060,14 @@ class GeometryView:
     ) -> LiquidTrackingType:
         """Convert well volume to height."""
         well_geometry = self._labware.get_well_geometry(labware_id, well_name)
-        return find_height_at_well_volume(
-            target_volume=volume, well_geometry=well_geometry
-        )
+        try:
+            return find_height_at_well_volume(
+                target_volume=volume, well_geometry=well_geometry
+            )
+        except InvalidLiquidHeightFound as _exception:
+            raise InvalidLiquidHeightFound(
+                message=_exception.message + f"for well {well_name} of {labware_id}"
+            )
 
     def get_well_volume_at_height(
         self,
@@ -2071,9 +2077,14 @@ class GeometryView:
     ) -> LiquidTrackingType:
         """Convert well height to volume."""
         well_geometry = self._labware.get_well_geometry(labware_id, well_name)
-        return find_volume_at_well_height(
-            target_height=height, well_geometry=well_geometry
-        )
+        try:
+            return find_volume_at_well_height(
+                target_height=height, well_geometry=well_geometry
+            )
+        except InvalidLiquidHeightFound as _exception:
+            raise InvalidLiquidHeightFound(
+                message=_exception.message + f"for well {well_name} of {labware_id}"
+            )
 
     def validate_dispense_volume_into_well(
         self,
