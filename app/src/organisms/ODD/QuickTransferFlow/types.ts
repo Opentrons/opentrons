@@ -23,6 +23,8 @@ export interface QuickTransferWizardState {
   destinationWells?: string[]
   transferType?: TransferType
   volume?: number
+  // Note added for liquid classes in Quick Transfer
+  path?: PathOption
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -100,6 +102,7 @@ export type QuickTransferWizardAction =
   | SetDestLabwareAction
   | SetDestWellsAction
   | SetVolumeAction
+  | SetPipettePath
 
 export type QuickTransferSummaryAction =
   | SetAspirateFlowRateAction
