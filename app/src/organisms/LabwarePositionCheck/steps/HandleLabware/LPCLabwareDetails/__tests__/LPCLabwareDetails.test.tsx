@@ -238,7 +238,7 @@ describe('LPCLabwareDetails', () => {
     const notification = screen.getByTestId('inline-notification')
     expect(notification).toBeInTheDocument()
     expect(notification.getAttribute('data-heading')).toBe(
-      'The default offset is used for all placements of the labware unless a manual adjustment is made to specific slot location.'
+      'The default offset is used for all placements of the labware unless you adjust the applied location offset.'
     )
   })
 })
