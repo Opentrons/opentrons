@@ -12,6 +12,7 @@ import {
   getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
 import { TERMINAL_RUN_STATUSES } from '../constants'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
 import type { ReactNode } from 'react'
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
@@ -20,7 +21,6 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface UseRunProgressResult {
   currentStepContents: ReactNode

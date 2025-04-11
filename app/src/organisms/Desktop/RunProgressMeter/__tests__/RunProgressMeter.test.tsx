@@ -35,6 +35,8 @@ import {
 import { RunProgressMeter } from '..'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
+
 
 import type { ComponentProps } from 'react'
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -54,6 +56,7 @@ vi.mock('/app/organisms/InterventionModal')
 vi.mock('../../Devices/hooks')
 vi.mock('/app/resources/protocols/hooks')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux-resources/analytics')
 
 const render = (props: ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -112,6 +115,9 @@ describe('RunProgressMeter', () => {
 
   it('should show only the total count of commands in run and not show the meter when protocol is non-deterministic', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
     render(props)
     expect(screen.getByText('Current Step N/A:')).toBeTruthy()
     expect(screen.queryByText('MOCK PROGRESS BAR')).toBeFalsy()

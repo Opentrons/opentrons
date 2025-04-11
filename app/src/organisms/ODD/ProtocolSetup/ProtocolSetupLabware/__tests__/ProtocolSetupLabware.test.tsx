@@ -95,9 +95,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
-      reportModuleCommand: vi.fn(),
-    } as any)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
