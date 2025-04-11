@@ -174,16 +174,13 @@ async def test_aspirate_while_tracking_implementation(
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id-abc", labware_id="funky-labware", well_name="funky-well"
-    )
     decoy.when(
         await subject._movement.move_to_well(
             pipette_id="pipette-id-abc",
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=_well_location,
-            current_well=_current_well,
+            current_well=None,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -311,16 +308,13 @@ async def test_aspirate_raises_volume_error(
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id-abc", labware_id="funky-labware", well_name="funky-well"
-    )
     decoy.when(
         await subject._movement.move_to_well(
             pipette_id="pipette-id-abc",
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=_well_location,
-            current_well=_current_well,
+            current_well=None,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -418,16 +412,13 @@ async def test_overpressure_error(
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
-    _current_well = CurrentWell(
-        pipette_id="pipette-id-abc", labware_id="funky-labware", well_name="funky-well"
-    )
     decoy.when(
         await subject._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=_well_location,
-            current_well=_current_well,
+            current_well=None,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
