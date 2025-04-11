@@ -1138,7 +1138,6 @@ export const CompositeSetupSteps = {
 
       SetupSteps.Confirm().call()
       SetupSteps.Confirm().call()
-      SetupSteps.Confirm().call()
       SetupSteps.EditProtocolA().call()
     },
   }),
