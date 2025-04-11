@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next'
 
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { i18n } from '../../../../../../i18n'
-import { getFlexStackerCommandText, KEYS_BY_COMMAND_TYPE } from '../getFlexStackerCommandText'
+import {
+  getFlexStackerCommandText,
+  KEYS_BY_COMMAND_TYPE,
+} from '../getFlexStackerCommandText'
 import { getAllLabwareDefs } from '@opentrons/shared-data'
 import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
 
@@ -152,20 +155,24 @@ describe('getPipettingCommandText', () => {
         ],
       },
     }
+    render(command)
+    screen.getByText('flex_stacker_empty_from_location')
   })
+})
 
-  it('should render defualt command text correctly', () => {
-    console.log("KEYS_BY_COMMAND_TYPE: ", KEYS_BY_COMMAND_TYPE)
-    for (const [key, value] of Object.entries(KEYS_BY_COMMAND_TYPE)) {
+describe.each(Object.entries(KEYS_BY_COMMAND_TYPE))(
+  'Default fallback for %s',
+  (commandType, expectedKey) => {
+    it(`should render default text for ${commandType} when result is missing`, () => {
       const command = {
         id: 'cmd-1',
-        commandType: key,
+        commandType: commandType,
         params: {
           moduleId: 'module-id',
         },
       }
       render(command)
-      screen.getByText(value)
-    }
-  })
-})
+      screen.getByText(expectedKey)
+    })
+  }
+)

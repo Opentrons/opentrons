@@ -34,6 +34,18 @@ type HandledCommands = Extract<
 
 type GetFlexStackerCommandText = HandlesCommands<HandledCommands>
 
+const getPrimaryLabwareUriIfExsists = (
+  command: FlexStackerCommand
+): string | null => {
+  if ('result' in command && 'primaryLabwareURI' in command.result) {
+    const currentLabwareDef = getAllLabwareDefs()[
+      command.result?.primaryLabwareURI
+    ]
+    return currentLabwareDef?.metadata.displayName ?? null
+  }
+  return null
+}
+
 export const getFlexStackerCommandText = ({
   command,
   allRunDefs,
@@ -42,15 +54,7 @@ export const getFlexStackerCommandText = ({
   robotType,
 }: // stackerCommand,
 GetFlexStackerCommandText): string => {
-  let primaryDefinitionDisplayName = null
-  if ('result' in command && 'primaryLabwareURI' in command.result) {
-    const currentLabwareDef = getAllLabwareDefs()[
-      command.result?.primaryLabwareURI
-    ]
-    primaryDefinitionDisplayName =
-      currentLabwareDef?.metadata.displayName ?? null
-  }
-
+  const primaryDefinitionDisplayName = getPrimaryLabwareUriIfExsists(command)
   if (command.commandType === 'flexStacker/retrieve') {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
@@ -90,7 +94,11 @@ GetFlexStackerCommandText): string => {
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
-    if ('primaryLabwareDefinition' in command?.result && slotName != null) {
+    if (
+      'result' in command &&
+      'primaryLabwareDefinition' in command?.result &&
+      slotName != null
+    ) {
       return (
         t('flex_stacker_set_stored_labware_with_quantity_and_location', {
           quantity: command.params.initialCount,
