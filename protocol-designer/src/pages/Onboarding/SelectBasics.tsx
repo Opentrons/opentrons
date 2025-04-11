@@ -18,6 +18,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -326,16 +327,21 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 header={t('are_you_using_thermocycler')}
                 onChange={value => {
                   if (value) {
-                    setValue('modules', {
-                      ...modules,
-                      [uuid()]: {
-                        model: THERMOCYCLER_MODULE_V2,
-                        type: THERMOCYCLER_MODULE_TYPE,
-                        slot: DEFAULT_SLOT_MAP_FLEX[THERMOCYCLER_MODULE_V2],
-                        cutoutFixtureId: 'thermocyclerModuleV2Front',
-                        cutoutId: 'cutoutB1',
-                      },
-                    })
+                    //   first remove anything that might have been placed previous in slot A1/B1
+                    const updatedModules = Object.fromEntries(
+                      Object.entries(modules).filter(
+                        ([_, value]) => !['A1', 'B1'].includes(value.slot)
+                      )
+                    )
+                    //  then add the thermocycler
+                    updatedModules[uuid()] = {
+                      model: THERMOCYCLER_MODULE_V2,
+                      type: THERMOCYCLER_MODULE_TYPE,
+                      slot: 'B1',
+                      cutoutFixtureId: 'thermocyclerModuleV2Front',
+                      cutoutId: 'cutoutB1',
+                    }
+                    setValue('modules', updatedModules)
                   } else {
                     const updatedModules = Object.fromEntries(
                       Object.entries(modules).filter(
@@ -355,15 +361,11 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 onChange={value => {
                   if (value) {
                     // If adding wasteChute, remove trashBin
-                    const updatedFixtures =
-                      fixtures != null
-                        ? Object.fromEntries(
-                            Object.entries(fixtures).filter(
-                              ([_, val]) => val.name !== 'trashBin'
-                            )
-                          )
-                        : {}
-
+                    const updatedFixtures = Object.fromEntries(
+                      Object.entries(fixtures).filter(
+                        ([_, val]) => val.name !== 'trashBin'
+                      )
+                    )
                     updatedFixtures[uuid()] = {
                       cutoutId: WASTE_CHUTE_CUTOUT,
                       name: 'wasteChute',
@@ -371,6 +373,13 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                     }
 
                     setValue('fixtures', updatedFixtures)
+                    //  remove any module that might already be in D3
+                    const updatedModules = Object.fromEntries(
+                      Object.entries(modules).filter(
+                        ([_, value]) => value.cutoutId !== WASTE_CHUTE_CUTOUT
+                      )
+                    )
+                    setValue('modules', updatedModules)
                   } else {
                     // If removing wasteChute, filter it out
                     const filteredFixtures =
