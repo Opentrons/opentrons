@@ -18,12 +18,14 @@ import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
 import { StepsSection } from '../StepsSection'
 import { useFormContext } from 'react-hook-form'
 import { COLUMN } from '@opentrons/shared-data'
+import { ProtocolFormatSection } from '../ProtocolFormatSection'
 
-export const APPLICATION_STEP = 0
-export const INSTRUMENTS_STEP = 1
-export const MODULES_STEP = 2
-export const LABWARE_LIQUIDS_STEP = 3
-export const STEPS_STEP = 4
+export const PROTOCOL_FORMAT_STEP = 0
+export const APPLICATION_STEP = 1
+export const INSTRUMENTS_STEP = 2
+export const MODULES_STEP = 3
+export const LABWARE_LIQUIDS_STEP = 4
+export const STEPS_STEP = 5
 
 export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -60,6 +62,11 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
   return (
     <ProtocolSections>
       {[
+        {
+          sectionNumber: PROTOCOL_FORMAT_STEP,
+          title: 'protocol_format_title',
+          Component: ProtocolFormatSection,
+        },
         {
           sectionNumber: APPLICATION_STEP,
           title: 'application_title',
