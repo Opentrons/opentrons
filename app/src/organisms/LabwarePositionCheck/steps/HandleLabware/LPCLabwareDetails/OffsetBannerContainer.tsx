@@ -1,30 +1,24 @@
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
   selectIsAnyOffsetHardCoded,
   selectIsDefaultOffsetAbsent,
   selectSelectedLwOverview,
+  selectShowDefaultOffsetInfoBanner,
+  toggleDefaultOffsetInfoBanner,
 } from '/app/redux/protocol-runs'
 import { InlineNotification } from '/app/atoms/InlineNotification'
-import { getIsOnDevice } from '/app/redux/config'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 type RenderedBanner = 'defaultInfo' | 'defaultAlert' | 'hardcodedInfo' | null
 
 export function OffsetBannerContainer({
-  bannerUtils,
   runId,
 }: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
-
-  const {
-    showBanner: showDefaultInfoBanner,
-    toggleBanner: toggleDefaultInfoBanner,
-  } = bannerUtils.defaultOffsetInfoBanner
-  const isOnDevice = useSelector(getIsOnDevice)
+  const dispatch = useDispatch()
   const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
   const uri = selectedLwInfo?.uri ?? ''
   const isDefaultOffsetAbsent = useSelector(
@@ -33,16 +27,12 @@ export function OffsetBannerContainer({
   const isAnyOffsetHardCoded = useSelector(
     selectIsAnyOffsetHardCoded(runId, uri)
   )
-
-  const [showDefaultAlertBanner, setShowDefaultAlertBanner] = useState(
-    isDefaultOffsetAbsent
-  )
-  const [showHardCodedBanner, setShowHardCodedBanner] = useState(
-    isAnyOffsetHardCoded
+  const showDefaultInfoBanner = useSelector(
+    selectShowDefaultOffsetInfoBanner(runId)
   )
 
   const bannerToRender = ((): RenderedBanner => {
-    if (showDefaultAlertBanner) {
+    if (isDefaultOffsetAbsent) {
       return 'defaultAlert'
     }
 
@@ -50,7 +40,7 @@ export function OffsetBannerContainer({
       return 'defaultInfo'
     }
 
-    if (showHardCodedBanner) {
+    if (isAnyOffsetHardCoded) {
       return 'hardcodedInfo'
     }
 
@@ -64,20 +54,15 @@ export function OffsetBannerContainer({
           type="alert"
           heading={t('add_a_default_offset')}
           message={t('specific_slots_can_be_adjusted')}
-          onCloseClick={
-            isOnDevice
-              ? undefined
-              : () => {
-                  setShowDefaultAlertBanner(false)
-                }
-          }
         />
       )}
       {bannerToRender === 'defaultInfo' && (
         <InlineNotification
           type="neutral"
           heading={t('default_offset_description')}
-          onCloseClick={toggleDefaultInfoBanner}
+          onCloseClick={() => {
+            dispatch(toggleDefaultOffsetInfoBanner(runId))
+          }}
         />
       )}
       {bannerToRender === 'hardcodedInfo' && (
@@ -85,13 +70,6 @@ export function OffsetBannerContainer({
           type="neutral"
           heading={t('changing_default_not_update_hardcoded')}
           message={t('hardcoded_offsets_changed_in_python')}
-          onCloseClick={
-            isOnDevice
-              ? undefined
-              : () => {
-                  setShowHardCodedBanner(false)
-                }
-          }
         />
       )}
     </>
