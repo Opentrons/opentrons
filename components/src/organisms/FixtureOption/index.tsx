@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import styled from 'styled-components'
 import { Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -20,15 +20,7 @@ interface FixtureOptionProps {
 export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   const { onClickHandler, optionName, buttonText, isOnDevice } = props
   return isOnDevice ? (
-    <Btn
-      onClick={props.onClickHandler}
-      display="flex"
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      flexDirection={DIRECTION_ROW}
-      alignItems={ALIGN_CENTER}
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      css={FIXTURE_BUTTON_STYLE_ODD}
-    >
+    <FixtureButtonODD onClick={props.onClickHandler}>
       <StyledText
         desktopStyle="bodyDefaultRegular"
         oddStyle="bodyTextRegular"
@@ -39,7 +31,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextRegular">
         {props.buttonText}
       </StyledText>
-    </Btn>
+    </FixtureButtonODD>
   ) : (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -50,18 +42,27 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       borderRadius={BORDERS.borderRadius4}
     >
       <StyledText css={TYPOGRAPHY.pSemiBold}>{optionName}</StyledText>
-      <TertiaryButton buttonType="primary" onClick={onClickHandler}>
+      <TertiaryButton
+        buttonType="primary"
+        onClick={onClickHandler}
+        data-testid={optionName}
+      >
         {buttonText}
       </TertiaryButton>
     </Flex>
   )
 }
 
-const FIXTURE_BUTTON_STYLE_ODD = css`
+export const FixtureButtonODD = styled(Btn)`
+  display: flex;
   background-color: ${COLORS.grey35};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  flex-direction: ${DIRECTION_ROW};
+  align-items: ${ALIGN_CENTER};
   cursor: ${CURSOR_DEFAULT};
   border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
 
   &:focus {
     background-color: ${COLORS.grey40};

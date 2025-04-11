@@ -40,7 +40,6 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.AddPlateReader())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
     steps.add(SetupSteps.AddHardwareLabware())

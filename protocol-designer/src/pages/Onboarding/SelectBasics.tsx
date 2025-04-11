@@ -30,7 +30,6 @@ import { DEFAULT_SLOT_MAP_FLEX } from './constants'
 import { BasicsButtons } from './BasicsButtons'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {
-  FixtureInfo,
   Gen,
   PipetteType,
   WizardFixtureType,
