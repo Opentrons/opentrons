@@ -64,28 +64,22 @@ TOF_DETECTION_CONFIG = {
         Direction.EXTEND: TOFDetection(
             TOFSensor.X,
             zones=[5, 6, 7],
-            bins=list(range(10, 50)),
+            bins=list(range(10, 40)),
             threshold=5000,
         ),
         Direction.RETRACT: TOFDetection(
             TOFSensor.X,
             zones=[5, 6, 7],
             bins=list(range(10, 25)),
-            threshold=20000,
+            threshold=15000,
         ),
     },
     TOFSensor.Z: {
         Direction.EXTEND: TOFDetection(
             TOFSensor.Z,
-            zones=[1],
-            bins=list(range(10, 80)),
-            threshold=20000,
-        ),
-        Direction.RETRACT: TOFDetection(
-            TOFSensor.Z,
-            zones=[1],
-            bins=list(range(50, 60)),
-            threshold=20000,
+            zones=[1, 2, 3],
+            bins=list(range(10, 60)),
+            threshold=5000,
         ),
     },
 }

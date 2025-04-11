@@ -488,14 +488,18 @@ class FlexStacker(mod_abc.AbstractModule):
         """Detect labware on the TOF sensor using the `baseline` method
 
         NOTE: This method is still under development and is inconsistent when detecting
-        labware on the X axis smaller than a tiprack. We can consistently detect
+        labware on the X axis in the Extended position. We can consistently detect
         labware on the Z, but we need to do more data collection and testing
         to validate this method.
         """
         sensor = TOFSensor.X if axis == StackerAxis.X else TOFSensor.Z
+        # The TOF Detection configs are the same for the Z sensor
+        direction = Direction.EXTEND if sensor == TOFSensor.Z else direction
         baseline = load_tof_baseline_data(self.model())[sensor.value]
-        histogram = await self._driver.get_tof_histogram(sensor)
         config = TOF_DETECTION_CONFIG[sensor][direction]
+
+        # Take a histogram reading and determine if labware was detected
+        histogram = await self._driver.get_tof_histogram(sensor)
         for zone in config.zones:
             raw_data = histogram.bins[zone]
             baseline_data = baseline[zone]
