@@ -180,7 +180,6 @@ class TransferComponentsExecutor:
             # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
             self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
             self._instrument.prepare_to_aspirate()
-
         tx_utils.raise_if_location_inside_liquid(
             location=submerge_start_location,
             well_location=self._target_location,
