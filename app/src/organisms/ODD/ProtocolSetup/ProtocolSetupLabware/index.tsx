@@ -48,6 +48,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
@@ -64,7 +65,6 @@ import type {
 } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

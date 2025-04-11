@@ -16,6 +16,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis/getProtocolModulesInfo'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 import { ProtocolSetupLabware } from '..'
 import {
@@ -51,6 +52,7 @@ vi.mock('/app/transformations/commands', async importOriginal => {
 vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/analysis/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
+vi.mock('/app/redux-resources-analytics')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()
@@ -187,6 +189,9 @@ describe('ProtocolSetupLabware', () => {
       },
       waitUntilComplete: true,
     })
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
   })
 
   it('sends a latch-open command when the labware latch is closed and the button is clicked', () => {
@@ -206,6 +211,9 @@ describe('ProtocolSetupLabware', () => {
       },
       waitUntilComplete: true,
     })
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
   })
 
   it('shows opening transition states of the labware latch button', () => {

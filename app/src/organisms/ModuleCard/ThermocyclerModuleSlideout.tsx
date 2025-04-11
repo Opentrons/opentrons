@@ -21,13 +21,13 @@ import {
 
 import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
 import type { ThermocyclerModule } from '/app/redux/modules/types'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule

@@ -21,9 +21,10 @@ import {
 
 import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+
 import type { MouseEventHandler } from 'react'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule

@@ -17,6 +17,7 @@ import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -32,7 +33,6 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/hooks/useModuleAnalytics'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
