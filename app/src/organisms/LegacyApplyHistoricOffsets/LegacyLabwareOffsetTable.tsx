@@ -34,13 +34,13 @@ const OffsetTableDatum = styled('td')`
   text-overflow: wrap;
 `
 
-interface LabwareOffsetTableProps {
+interface LegacyLabwareOffsetTableProps {
   offsetCandidates: OffsetCandidate[]
   labwareDefinitions: LabwareDefinition2[]
 }
 
-export function LabwareOffsetTable(
-  props: LabwareOffsetTableProps
+export function LegacyLabwareOffsetTable(
+  props: LegacyLabwareOffsetTableProps
 ): JSX.Element | null {
   const { offsetCandidates, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
