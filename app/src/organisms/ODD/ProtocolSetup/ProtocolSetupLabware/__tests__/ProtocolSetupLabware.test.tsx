@@ -52,7 +52,7 @@ vi.mock('/app/transformations/commands', async importOriginal => {
 vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/analysis/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
-vi.mock('/app/redux-resources-analytics')
+vi.mock('/app/redux-resources/analytics')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()

@@ -37,7 +37,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
-
 import type { ComponentProps } from 'react'
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
