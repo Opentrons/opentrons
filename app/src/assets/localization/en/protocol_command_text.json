@@ -97,7 +97,7 @@
   "single_nozzle_layout": "single nozzle layout",
   "slot": "Slot {{slot_name}}",
   "stacker_display_name": "Stacker {{stacker_slot}}",
-  "store_labware_from_slot_to_stacker": "Store {{primaryDefinitionDisplayName}} from {{slotName}} to Flex Stacker",
+  "store_labware_from_slot_to_stacker": "Store {{primaryDefinitionDisplayName}} from {{slotName}} into Flex Stacker",
   "target_temperature": "target temperature",
   "tc_awaiting_for_duration": "Waiting for Thermocycler profile to complete",
   "tc_run_profile_steps": "Temperature: {{celsius}}°C, hold time: {{duration}}",
