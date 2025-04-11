@@ -18,7 +18,6 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -27,7 +26,6 @@ import {
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { WizardBody } from './WizardBody'
-import { DEFAULT_SLOT_MAP_FLEX } from './constants'
 import { BasicsButtons } from './BasicsButtons'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {
