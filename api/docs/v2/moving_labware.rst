@@ -175,6 +175,7 @@ You can move the auto-sealing lids between deck slots, lid stacks, or compatible
     )
 
     # move one lid to a compatible well plate in the Thermocycler
+    tc_mod.open_lid()
     protocol.move_lid(
         source_location=lid_stack,
         new_location=plate,
