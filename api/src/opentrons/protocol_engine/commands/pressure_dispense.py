@@ -1,4 +1,4 @@
-"""Evotip Dispense-in-place command request, result, and implementation models."""
+"""Pressure Dispense-in-place command request, result, and implementation models."""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union
@@ -35,33 +35,33 @@ if TYPE_CHECKING:
     from ..state.state import StateView
 
 
-EvotipDispenseCommandType = Literal["evotipDispense"]
+PressureDispenseCommandType = Literal["pressureDispense"]
 
 
-class EvotipDispenseParams(
+class PressureDispenseParams(
     PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin, LiquidHandlingWellLocationMixin
 ):
-    """Payload required to dispense in place."""
+    """Payload required to pressure dispense in place."""
 
     pass
 
 
-class EvotipDispenseResult(BaseLiquidHandlingResult):
-    """Result data from the execution of a DispenseInPlace command."""
+class PressureDispenseResult(BaseLiquidHandlingResult):
+    """Result data from the execution of a PressureDispense command."""
 
     pass
 
 
 _ExecuteReturn = Union[
-    SuccessData[EvotipDispenseResult],
+    SuccessData[PressureDispenseResult],
     DefinedErrorData[StallOrCollisionError],
 ]
 
 
-class EvotipDispenseImplementation(
-    AbstractCommandImpl[EvotipDispenseParams, _ExecuteReturn]
+class PressureDispenseImplementation(
+    AbstractCommandImpl[PressureDispenseParams, _ExecuteReturn]
 ):
-    """DispenseInPlace command implementation."""
+    """Pressure dispense command implementation."""
 
     def __init__(
         self,
@@ -78,8 +78,8 @@ class EvotipDispenseImplementation(
         self._model_utils = model_utils
         self._movement = movement
 
-    async def execute(self, params: EvotipDispenseParams) -> _ExecuteReturn:
-        """Move to and dispense to the requested well."""
+    async def execute(self, params: PressureDispenseParams) -> _ExecuteReturn:
+        """Move to and pressure dispense to the requested well."""
         well_location = params.wellLocation
         labware_id = params.labwareId
         well_name = params.wellName
@@ -121,35 +121,35 @@ class EvotipDispenseImplementation(
                 message="Overpressure Error during Resin Tip Dispense Command."
             )
         return SuccessData(
-            public=EvotipDispenseResult(volume=result.public.volume),
+            public=PressureDispenseResult(volume=result.public.volume),
             state_update=StateUpdate.reduce(
                 move_result.state_update, result.state_update
             ),
         )
 
 
-class EvotipDispense(
+class PressureDispense(
     BaseCommand[
-        EvotipDispenseParams,
-        EvotipDispenseResult,
+        PressureDispenseParams,
+        PressureDispenseResult,
         StallOrCollisionError,
     ]
 ):
-    """DispenseInPlace command model."""
+    """PressureDispense command model."""
 
-    commandType: EvotipDispenseCommandType = "evotipDispense"
-    params: EvotipDispenseParams
-    result: Optional[EvotipDispenseResult] = None
+    commandType: PressureDispenseCommandType = "pressureDispense"
+    params: PressureDispenseParams
+    result: Optional[PressureDispenseResult] = None
 
     _ImplementationCls: Type[
-        EvotipDispenseImplementation
-    ] = EvotipDispenseImplementation
+        PressureDispenseImplementation
+    ] = PressureDispenseImplementation
 
 
-class EvotipDispenseCreate(BaseCommandCreate[EvotipDispenseParams]):
-    """DispenseInPlace command request model."""
+class PressureDispenseCreate(BaseCommandCreate[PressureDispenseParams]):
+    """PressureDispense command request model."""
 
-    commandType: EvotipDispenseCommandType = "evotipDispense"
-    params: EvotipDispenseParams
+    commandType: PressureDispenseCommandType = "pressureDispense"
+    params: PressureDispenseParams
 
-    _CommandCls: Type[EvotipDispense] = EvotipDispense
+    _CommandCls: Type[PressureDispense] = PressureDispense

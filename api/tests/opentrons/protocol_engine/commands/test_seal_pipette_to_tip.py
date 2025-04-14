@@ -1,4 +1,4 @@
-"""Test evotip seal commands."""
+"""Test pipette seal commands."""
 
 import pytest
 from datetime import datetime
@@ -30,10 +30,10 @@ from opentrons.protocol_engine.types import TipGeometry, FluidKind, AspiratedFlu
 
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.evotip_seal_pipette import (
-    EvotipSealPipetteParams,
-    EvotipSealPipetteResult,
-    EvotipSealPipetteImplementation,
+from opentrons.protocol_engine.commands.seal_pipette_to_tip import (
+    SealPipetteToTipParams,
+    SealPipetteToTipResult,
+    SealPipetteToTipImplementation,
 )
 from opentrons.protocol_engine.execution import (
     PipettingHandler,
@@ -64,7 +64,7 @@ async def test_success(
     pipetting: PipettingHandler,
 ) -> None:
     """A PickUpTip command should have an execution implementation."""
-    subject = EvotipSealPipetteImplementation(
+    subject = SealPipetteToTipImplementation(
         state_view=state_view,
         movement=movement,
         tip_handler=tip_handler,
@@ -111,7 +111,7 @@ async def test_success(
     ).then_return(TipGeometry(length=42, diameter=5, volume=300))
 
     result = await subject.execute(
-        EvotipSealPipetteParams(
+        SealPipetteToTipParams(
             pipetteId="pipette-id",
             labwareId="labware-id",
             wellName="A3",
@@ -120,7 +120,7 @@ async def test_success(
     )
 
     assert result == SuccessData(
-        public=EvotipSealPipetteResult(
+        public=SealPipetteToTipResult(
             tipLength=42,
             tipVolume=300,
             tipDiameter=5,
@@ -151,7 +151,7 @@ async def test_no_tip_physically_missing_error(
     evotips_definition: LabwareDefinition,
 ) -> None:
     """It should not return a TipPhysicallyMissingError even though evotips do not sit high enough on the pipette to be detected by the tip sensor."""
-    subject = EvotipSealPipetteImplementation(
+    subject = SealPipetteToTipImplementation(
         state_view=state_view,
         movement=movement,
         tip_handler=tip_handler,
@@ -202,13 +202,13 @@ async def test_no_tip_physically_missing_error(
     )
 
     result = await subject.execute(
-        EvotipSealPipetteParams(
+        SealPipetteToTipParams(
             pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
         )
     )
 
     assert result == SuccessData(
-        public=EvotipSealPipetteResult(
+        public=SealPipetteToTipResult(
             tipLength=42,
             tipVolume=300,
             tipDiameter=5,
@@ -239,7 +239,7 @@ async def test_stall_error(
     evotips_definition: LabwareDefinition,
 ) -> None:
     """It should return a TipPhysicallyMissingError if the HW API indicates that."""
-    subject = EvotipSealPipetteImplementation(
+    subject = SealPipetteToTipImplementation(
         state_view=state_view,
         movement=movement,
         tip_handler=tip_handler,
@@ -282,7 +282,7 @@ async def test_stall_error(
     )
 
     result = await subject.execute(
-        EvotipSealPipetteParams(
+        SealPipetteToTipParams(
             pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
         )
     )

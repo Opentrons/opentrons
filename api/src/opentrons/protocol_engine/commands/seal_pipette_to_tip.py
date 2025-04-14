@@ -1,4 +1,4 @@
-"""Seal evotip resin tip command request, result, and implementation models."""
+"""Seal tips to pipette command request, result, and implementation models."""
 
 from __future__ import annotations
 from pydantic import Field, BaseModel
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     )
 
 
-EvotipSealPipetteCommandType = Literal["evotipSealPipette"]
+SealPipetteToTipCommandType = Literal["sealPipetteToTip"]
 _CAM_PREP_DISTANCE_DEFAULT = 8.25
 _CAM_PRESS_DISTANCE_DEFAULT = 3.5
 _CAM_EJECTOR_PUSH_MM_DEFAULT = 7.0
@@ -64,7 +64,7 @@ class TipPickUpParams(BaseModel):
     )
 
 
-class EvotipSealPipetteParams(PipetteIdMixin):
+class SealPipetteToTipParams(PipetteIdMixin):
     """Payload needed to seal resin tips to a pipette."""
 
     labwareId: str = Field(..., description="Identifier of labware to use.")
@@ -78,8 +78,8 @@ class EvotipSealPipetteParams(PipetteIdMixin):
     )
 
 
-class EvotipSealPipetteResult(DestinationPositionResult):
-    """Result data from the execution of a EvotipSealPipette."""
+class SealPipetteToTipResult(DestinationPositionResult):
+    """Result data from the execution of a SealPipetteToTip."""
 
     tipVolume: float = Field(
         0,
@@ -101,15 +101,15 @@ class EvotipSealPipetteResult(DestinationPositionResult):
 
 
 _ExecuteReturn = Union[
-    SuccessData[EvotipSealPipetteResult],
+    SuccessData[SealPipetteToTipResult],
     DefinedErrorData[StallOrCollisionError],
 ]
 
 
-class EvotipSealPipetteImplementation(
-    AbstractCommandImpl[EvotipSealPipetteParams, _ExecuteReturn]
+class SealPipetteToTipImplementation(
+    AbstractCommandImpl[SealPipetteToTipParams, _ExecuteReturn]
 ):
-    """Evotip seal pipette command implementation."""
+    """Seal pipette command implementation."""
 
     def __init__(
         self,
@@ -217,8 +217,8 @@ class EvotipSealPipetteImplementation(
         )
 
     async def execute(
-        self, params: EvotipSealPipetteParams
-    ) -> Union[SuccessData[EvotipSealPipetteResult], _ExecuteReturn]:
+        self, params: SealPipetteToTipParams
+    ) -> Union[SuccessData[SealPipetteToTipResult], _ExecuteReturn]:
         """Move to and pick up a tip using the requested pipette."""
         pipette_id = params.pipetteId
         labware_id = params.labwareId
@@ -294,7 +294,7 @@ class EvotipSealPipetteImplementation(
             fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=_SAFE_TOP_VOLUME),
         )
         return SuccessData(
-            public=EvotipSealPipetteResult(
+            public=SealPipetteToTipResult(
                 tipVolume=tip_geometry.volume,
                 tipLength=tip_geometry.length,
                 tipDiameter=tip_geometry.diameter,
@@ -304,28 +304,28 @@ class EvotipSealPipetteImplementation(
         )
 
 
-class EvotipSealPipette(
+class SealPipetteToTip(
     BaseCommand[
-        EvotipSealPipetteParams,
-        EvotipSealPipetteResult,
+        SealPipetteToTipParams,
+        SealPipetteToTipResult,
         StallOrCollisionError,
     ]
 ):
-    """Seal evotip resin tip command model."""
+    """Seal tip command model."""
 
-    commandType: EvotipSealPipetteCommandType = "evotipSealPipette"
-    params: EvotipSealPipetteParams
-    result: Optional[EvotipSealPipetteResult] = None
+    commandType: SealPipetteToTipCommandType = "sealPipetteToTip"
+    params: SealPipetteToTipParams
+    result: Optional[SealPipetteToTipResult] = None
 
     _ImplementationCls: Type[
-        EvotipSealPipetteImplementation
-    ] = EvotipSealPipetteImplementation
+        SealPipetteToTipImplementation
+    ] = SealPipetteToTipImplementation
 
 
-class EvotipSealPipetteCreate(BaseCommandCreate[EvotipSealPipetteParams]):
-    """Seal evotip resin tip command creation request model."""
+class SealPipetteToTipCreate(BaseCommandCreate[SealPipetteToTipParams]):
+    """Seal tip command creation request model."""
 
-    commandType: EvotipSealPipetteCommandType = "evotipSealPipette"
-    params: EvotipSealPipetteParams
+    commandType: SealPipetteToTipCommandType = "sealPipetteToTip"
+    params: SealPipetteToTipParams
 
-    _CommandCls: Type[EvotipSealPipette] = EvotipSealPipette
+    _CommandCls: Type[SealPipetteToTip] = SealPipetteToTip

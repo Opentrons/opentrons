@@ -1930,208 +1930,6 @@
       "title": "EngageParams",
       "type": "object"
     },
-    "EvotipDispenseCreate": {
-      "description": "DispenseInPlace command request model.",
-      "properties": {
-        "commandType": {
-          "const": "evotipDispense",
-          "default": "evotipDispense",
-          "enum": ["evotipDispense"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/EvotipDispenseParams"
-        }
-      },
-      "required": ["params"],
-      "title": "EvotipDispenseCreate",
-      "type": "object"
-    },
-    "EvotipDispenseParams": {
-      "description": "Payload required to dispense in place.",
-      "properties": {
-        "correctionVolume": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "The correction volume in uL.",
-          "title": "Correctionvolume"
-        },
-        "flowRate": {
-          "description": "Speed in \u00b5L/s configured for the pipette",
-          "exclusiveMinimum": 0.0,
-          "title": "Flowrate",
-          "type": "number"
-        },
-        "labwareId": {
-          "description": "Identifier of labware to use.",
-          "title": "Labwareid",
-          "type": "string"
-        },
-        "pipetteId": {
-          "description": "Identifier of pipette to use for liquid handling.",
-          "title": "Pipetteid",
-          "type": "string"
-        },
-        "volume": {
-          "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
-          "minimum": 0.0,
-          "title": "Volume",
-          "type": "number"
-        },
-        "wellLocation": {
-          "$ref": "#/$defs/LiquidHandlingWellLocation",
-          "description": "Relative well location at which to perform the operation"
-        },
-        "wellName": {
-          "description": "Name of well to use in labware.",
-          "title": "Wellname",
-          "type": "string"
-        }
-      },
-      "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"],
-      "title": "EvotipDispenseParams",
-      "type": "object"
-    },
-    "EvotipSealPipetteCreate": {
-      "description": "Seal evotip resin tip command creation request model.",
-      "properties": {
-        "commandType": {
-          "const": "evotipSealPipette",
-          "default": "evotipSealPipette",
-          "enum": ["evotipSealPipette"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/EvotipSealPipetteParams"
-        }
-      },
-      "required": ["params"],
-      "title": "EvotipSealPipetteCreate",
-      "type": "object"
-    },
-    "EvotipSealPipetteParams": {
-      "description": "Payload needed to seal resin tips to a pipette.",
-      "properties": {
-        "labwareId": {
-          "description": "Identifier of labware to use.",
-          "title": "Labwareid",
-          "type": "string"
-        },
-        "pipetteId": {
-          "description": "Identifier of pipette to use for liquid handling.",
-          "title": "Pipetteid",
-          "type": "string"
-        },
-        "tipPickUpParams": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/TipPickUpParams"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Specific parameters for "
-        },
-        "wellLocation": {
-          "$ref": "#/$defs/PickUpTipWellLocation",
-          "description": "Relative well location at which to pick up the tip."
-        },
-        "wellName": {
-          "description": "Name of well to use in labware.",
-          "title": "Wellname",
-          "type": "string"
-        }
-      },
-      "required": ["pipetteId", "labwareId", "wellName"],
-      "title": "EvotipSealPipetteParams",
-      "type": "object"
-    },
-    "EvotipUnsealPipetteCreate": {
-      "description": "Evotip unseal command creation request model.",
-      "properties": {
-        "commandType": {
-          "const": "evotipUnsealPipette",
-          "default": "evotipUnsealPipette",
-          "enum": ["evotipUnsealPipette"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/EvotipUnsealPipetteParams"
-        }
-      },
-      "required": ["params"],
-      "title": "EvotipUnsealPipetteCreate",
-      "type": "object"
-    },
-    "EvotipUnsealPipetteParams": {
-      "description": "Payload required to drop a tip in a specific well.",
-      "properties": {
-        "labwareId": {
-          "description": "Identifier of labware to use.",
-          "title": "Labwareid",
-          "type": "string"
-        },
-        "pipetteId": {
-          "description": "Identifier of pipette to use for liquid handling.",
-          "title": "Pipetteid",
-          "type": "string"
-        },
-        "wellLocation": {
-          "$ref": "#/$defs/DropTipWellLocation",
-          "description": "Relative well location at which to drop the tip."
-        },
-        "wellName": {
-          "description": "Name of well to use in labware.",
-          "title": "Wellname",
-          "type": "string"
-        }
-      },
-      "required": ["pipetteId", "labwareId", "wellName"],
-      "title": "EvotipUnsealPipetteParams",
-      "type": "object"
-    },
     "FillCreate": {
       "description": "A request to execute a Flex Stacker fill command.",
       "properties": {
@@ -4287,6 +4085,86 @@
       "title": "PrepareToAspirateParams",
       "type": "object"
     },
+    "PressureDispenseCreate": {
+      "description": "PressureDispense command request model.",
+      "properties": {
+        "commandType": {
+          "const": "pressureDispense",
+          "default": "pressureDispense",
+          "enum": ["pressureDispense"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/PressureDispenseParams"
+        }
+      },
+      "required": ["params"],
+      "title": "PressureDispenseCreate",
+      "type": "object"
+    },
+    "PressureDispenseParams": {
+      "description": "Payload required to pressure dispense in place.",
+      "properties": {
+        "correctionVolume": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The correction volume in uL.",
+          "title": "Correctionvolume"
+        },
+        "flowRate": {
+          "description": "Speed in \u00b5L/s configured for the pipette",
+          "exclusiveMinimum": 0.0,
+          "title": "Flowrate",
+          "type": "number"
+        },
+        "labwareId": {
+          "description": "Identifier of labware to use.",
+          "title": "Labwareid",
+          "type": "string"
+        },
+        "pipetteId": {
+          "description": "Identifier of pipette to use for liquid handling.",
+          "title": "Pipetteid",
+          "type": "string"
+        },
+        "volume": {
+          "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
+          "minimum": 0.0,
+          "title": "Volume",
+          "type": "number"
+        },
+        "wellLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to perform the operation"
+        },
+        "wellName": {
+          "description": "Name of well to use in labware.",
+          "title": "Wellname",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"],
+      "title": "PressureDispenseParams",
+      "type": "object"
+    },
     "ProfileCycle": {
       "description": "An individual cycle in a Thermocycler extended profile.",
       "properties": {
@@ -4917,6 +4795,73 @@
       },
       "required": ["pipetteId"],
       "title": "SavePositionParams",
+      "type": "object"
+    },
+    "SealPipetteToTipCreate": {
+      "description": "Seal tip command creation request model.",
+      "properties": {
+        "commandType": {
+          "const": "sealPipetteToTip",
+          "default": "sealPipetteToTip",
+          "enum": ["sealPipetteToTip"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/SealPipetteToTipParams"
+        }
+      },
+      "required": ["params"],
+      "title": "SealPipetteToTipCreate",
+      "type": "object"
+    },
+    "SealPipetteToTipParams": {
+      "description": "Payload needed to seal resin tips to a pipette.",
+      "properties": {
+        "labwareId": {
+          "description": "Identifier of labware to use.",
+          "title": "Labwareid",
+          "type": "string"
+        },
+        "pipetteId": {
+          "description": "Identifier of pipette to use for liquid handling.",
+          "title": "Pipetteid",
+          "type": "string"
+        },
+        "tipPickUpParams": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TipPickUpParams"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific parameters for "
+        },
+        "wellLocation": {
+          "$ref": "#/$defs/PickUpTipWellLocation",
+          "description": "Relative well location at which to pick up the tip."
+        },
+        "wellName": {
+          "description": "Name of well to use in labware.",
+          "title": "Wellname",
+          "type": "string"
+        }
+      },
+      "required": ["pipetteId", "labwareId", "wellName"],
+      "title": "SealPipetteToTipParams",
       "type": "object"
     },
     "SetAndWaitForShakeSpeedCreate": {
@@ -5903,6 +5848,61 @@
       "title": "UnsafeUngripLabwareParams",
       "type": "object"
     },
+    "UnsealPipetteFromTipCreate": {
+      "description": "Unseal pipette command creation request model.",
+      "properties": {
+        "commandType": {
+          "const": "unsealPipetteFromTip",
+          "default": "unsealPipetteFromTip",
+          "enum": ["unsealPipetteFromTip"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/UnsealPipetteFromTipParams"
+        }
+      },
+      "required": ["params"],
+      "title": "UnsealPipetteFromTipCreate",
+      "type": "object"
+    },
+    "UnsealPipetteFromTipParams": {
+      "description": "Payload required to drop a tip in a specific well.",
+      "properties": {
+        "labwareId": {
+          "description": "Identifier of labware to use.",
+          "title": "Labwareid",
+          "type": "string"
+        },
+        "pipetteId": {
+          "description": "Identifier of pipette to use for liquid handling.",
+          "title": "Pipetteid",
+          "type": "string"
+        },
+        "wellLocation": {
+          "$ref": "#/$defs/DropTipWellLocation",
+          "description": "Relative well location at which to drop the tip."
+        },
+        "wellName": {
+          "description": "Name of well to use in labware.",
+          "title": "Wellname",
+          "type": "string"
+        }
+      },
+      "required": ["pipetteId", "labwareId", "wellName"],
+      "title": "UnsealPipetteFromTipParams",
+      "type": "object"
+    },
     "UpdatePositionEstimatorsCreate": {
       "description": "UpdatePositionEstimators command request model.",
       "properties": {
@@ -6682,9 +6682,6 @@
       "dispenseWhileTracking": "#/$defs/DispenseWhileTrackingCreate",
       "dropTip": "#/$defs/DropTipCreate",
       "dropTipInPlace": "#/$defs/DropTipInPlaceCreate",
-      "evotipDispense": "#/$defs/EvotipDispenseCreate",
-      "evotipSealPipette": "#/$defs/EvotipSealPipetteCreate",
-      "evotipUnsealPipette": "#/$defs/EvotipUnsealPipetteCreate",
       "flexStacker/closeLatch": "#/$defs/CloseLatchCreate",
       "flexStacker/empty": "#/$defs/EmptyCreate",
       "flexStacker/fill": "#/$defs/FillCreate",
@@ -6722,6 +6719,7 @@
       "pause": "#/$defs/WaitForResumeCreate",
       "pickUpTip": "#/$defs/PickUpTipCreate",
       "prepareToAspirate": "#/$defs/PrepareToAspirateCreate",
+      "pressureDispense": "#/$defs/PressureDispenseCreate",
       "reloadLabware": "#/$defs/ReloadLabwareCreate",
       "retractAxis": "#/$defs/RetractAxisCreate",
       "robot/closeGripperJaw": "#/$defs/closeGripperJawCreate",
@@ -6730,6 +6728,7 @@
       "robot/moveTo": "#/$defs/MoveToCreate",
       "robot/openGripperJaw": "#/$defs/openGripperJawCreate",
       "savePosition": "#/$defs/SavePositionCreate",
+      "sealPipetteToTip": "#/$defs/SealPipetteToTipCreate",
       "setRailLights": "#/$defs/SetRailLightsCreate",
       "setStatusBar": "#/$defs/SetStatusBarCreate",
       "temperatureModule/deactivate": "#/$defs/DeactivateTemperatureCreate",
@@ -6753,6 +6752,7 @@
       "unsafe/placeLabware": "#/$defs/UnsafePlaceLabwareCreate",
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
+      "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
       "waitForResume": "#/$defs/WaitForResumeCreate"
@@ -6893,13 +6893,13 @@
       "$ref": "#/$defs/TryLiquidProbeCreate"
     },
     {
-      "$ref": "#/$defs/EvotipSealPipetteCreate"
+      "$ref": "#/$defs/SealPipetteToTipCreate"
     },
     {
-      "$ref": "#/$defs/EvotipDispenseCreate"
+      "$ref": "#/$defs/PressureDispenseCreate"
     },
     {
-      "$ref": "#/$defs/EvotipUnsealPipetteCreate"
+      "$ref": "#/$defs/UnsealPipetteFromTipCreate"
     },
     {
       "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
