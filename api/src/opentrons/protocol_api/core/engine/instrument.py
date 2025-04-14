@@ -1130,21 +1130,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self, tip_racks: List[LabwareCore], starting_well: Optional[WellCore]
     ) -> Optional[NextTipInfo]:
         """Get the next tip to pick up."""
-        # TODO: check which labware contains the starting tip and according use labware
-        #  from that list element on. i.e., discard all labware in the tip_racks list
-        #  before the tip rack that contains the starting tip.
         result = self._engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
                 pipetteId=self._pipette_id,
                 labwareIds=[tip_rack.labware_id for tip_rack in tip_racks],
-                startingTipWell=starting_well,
+                startingTipWell=starting_well.get_name()
+                if starting_well is not None
+                else None,
             )
         )
         return (
             result.nextTipInfo if isinstance(result.nextTipInfo, NextTipInfo) else None
         )
 
-    def transfer_with_liquid_class(
+    def transfer_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
         volume: float,

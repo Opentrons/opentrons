@@ -2013,10 +2013,11 @@ def test_transfer_liquid_delegates_to_engine_core(
     """It should delegate the transfer execution to core."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
+    mock_starting_tip_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
     next_tiprack = decoy.mock(cls=Labware)
-    subject.starting_tip = None
+    subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
@@ -2051,7 +2052,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             dest=[(Location(Point(), labware=mock_well), mock_well._core)],
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
-            starting_tip=None,
+            starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location.move(Point(1, 2, 3)),
             return_tip=True,
         )
@@ -2118,7 +2119,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             dest=[(Location(Point(), labware=mock_well), mock_well._core)],
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
-            starting_tip="update me",
+            starting_tip=None,
             trash_location=trash_location.move(Point(1, 2, 3)),
             return_tip=True,
         )
