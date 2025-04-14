@@ -18,6 +18,7 @@ from .flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
     FlexStackerHopperError,
+    FlexStackerLabwareRetrieveError,
 )
 
 from . import absorbance_reader
@@ -931,6 +932,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[FlexStackerStallOrCollisionError],
     DefinedErrorData[FlexStackerShuttleError],
     DefinedErrorData[FlexStackerHopperError],
+    DefinedErrorData[FlexStackerLabwareRetrieveError],
 ]
 
 

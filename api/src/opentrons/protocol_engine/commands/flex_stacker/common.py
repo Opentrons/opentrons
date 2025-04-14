@@ -35,3 +35,15 @@ class FlexStackerHopperError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.detail
+
+
+class FlexStackerLabwareRetrieveError(ErrorOccurrence):
+    """Returned when the labware was not able to get to the shuttle."""
+
+    isDefined: bool = True
+    errorType: Literal[
+        "flexStackerLabwareRetrieveFailed"
+    ] = "flexStackerLabwareRetrieveFailed"
+
+    errorCode: str = ErrorCodes.STACKER_LABWARE_RETRIEVE_FAILED.value.code
+    detail: str = ErrorCodes.STACKER_LABWARE_RETRIEVE_FAILED.value.detail

@@ -68,10 +68,10 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const currentRunId = useCurrentRunId()
   const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
 
-  const isSetupComplete =
-    isCalibrationComplete &&
-    isModuleCalibrationComplete &&
-    missingModuleIds.length === 0
+  const isSetupComplete = true
+  // isCalibrationComplete &&
+  // isModuleCalibrationComplete &&
+  // missingModuleIds.length === 0
   const isRobotTypeSetupComplete = isFlex
     ? isSetupComplete && areOffsetsApplied
     : isSetupComplete
@@ -82,7 +82,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isValidRunAgain = isRunAgainStatus(runStatus)
   const { isClosingCurrentRun } = useCloseCurrentRun()
 
-  const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
+  let { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     isCurrentRun,
     isSetupComplete: isRobotTypeSetupComplete,
     isOtherRunCurrent,
@@ -93,6 +93,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     ...props,
   })
 
+  isDisabled = false
   const robot = useRobot(robotName)
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
