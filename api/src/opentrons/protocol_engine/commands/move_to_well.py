@@ -71,6 +71,8 @@ class MoveToWellImplementation(
         well_name = params.wellName
         well_location = params.wellLocation
 
+        if well_location.volumeOffset and well_location.volumeOffset != 0:
+            raise ValueError("volume offset not supported with MoveToWell")
         if (
             self._state_view.labware.is_tiprack(labware_id)
             and well_location.volumeOffset

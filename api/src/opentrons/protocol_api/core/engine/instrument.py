@@ -763,6 +763,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 location_type=WellLocationFunction.LIQUID_HANDLING,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
+            if well_location.volumeOffset and well_location.volumeOffset != 0:
+                raise ValueError("volume offset not supported with move_to")
             self._engine_client.execute_command(
                 cmd.MoveToWellParams(
                     pipetteId=self._pipette_id,
