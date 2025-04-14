@@ -355,7 +355,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       if (isConfirmationRequired) {
         setShowConfirmationModal(true)
       } else {
-        if (!hasSeenAdvancedSettings) {
+        if (!hasSeenAdvancedSettings && currentFormIsPresaved) {
+          // don't overwrite values for saved form
           handleUpdateLiquidClassValues()
         } else {
           setToolboxStep(toolboxStep + 1)

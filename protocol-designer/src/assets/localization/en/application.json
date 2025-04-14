@@ -63,6 +63,7 @@
     "minutes": "m",
     "rpm": "rpm",
     "seconds": "s",
+    "seconds_long": "seconds",
     "time": "mm:ss",
     "time_hms": "hh:mm:ss",
     "times": "x"

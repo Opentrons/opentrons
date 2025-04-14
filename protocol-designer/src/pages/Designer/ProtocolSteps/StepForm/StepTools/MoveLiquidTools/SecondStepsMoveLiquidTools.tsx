@@ -153,7 +153,7 @@ export const SecondStepsMoveLiquidTools = ({
       {
         fieldTitle: t('protocol_steps:delay_duration'),
         fieldKey: `${tab}_${type}_delay_seconds`,
-        units: 'application:units.seconds',
+        units: 'application:units.seconds_long',
         errorToShow: getFormLevelError(
           `${tab}_${type}_delay_seconds`,
           mappedErrorsToField
