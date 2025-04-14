@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from contextlib import contextmanager
+from itertools import dropwhile
 from typing import (
     Optional,
     TYPE_CHECKING,
@@ -1135,10 +1136,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self, tip_racks: List[LabwareCore], starting_well: Optional[WellCore]
     ) -> Optional[NextTipInfo]:
         """Get the next tip to pick up."""
+        if starting_well is not None:
+            # Drop tip racks until the one with the starting tip is reached (if any)
+            valid_tip_racks = list(
+                dropwhile(
+                    lambda tr: starting_well.labware_id != tr.labware_id, tip_racks
+                )
+            )
+        else:
+            valid_tip_racks = tip_racks
+
         result = self._engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
                 pipetteId=self._pipette_id,
-                labwareIds=[tip_rack.labware_id for tip_rack in tip_racks],
+                labwareIds=[tip_rack.labware_id for tip_rack in valid_tip_racks],
                 startingTipWell=starting_well.get_name()
                 if starting_well is not None
                 else None,
@@ -1441,7 +1452,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 dest=dest,
                 new_tip=new_tip,
                 tip_racks=tip_racks,
-                starting_tip=None,  # update me,
+                starting_tip=starting_tip,
                 trash_location=trash_location,
                 return_tip=return_tip,
             )

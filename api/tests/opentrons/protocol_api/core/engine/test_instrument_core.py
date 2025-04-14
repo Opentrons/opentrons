@@ -2250,11 +2250,13 @@ def test_get_next_tip(
     subject: InstrumentCore,
 ) -> None:
     """It should return the next tip result."""
-    tip_racks = [decoy.mock(cls=LabwareCore)]
+    tip_racks = [decoy.mock(cls=LabwareCore), decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("other-tiprack-id")
+    decoy.when(tip_racks[1].labware_id).then_return("tiprack-id")
     mock_starting_well = decoy.mock(cls=WellCore)
     decoy.when(mock_starting_well.get_name()).then_return("F00")
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
     expected_next_tip = NextTipInfo(labwareId="1234", tipStartingWell="BAR")
-    decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
@@ -2269,6 +2271,32 @@ def test_get_next_tip(
     assert result == expected_next_tip
 
 
+def test_get_next_tip_no_starting_tip(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should return the next tip result with no starting tip."""
+    tip_racks = [decoy.mock(cls=LabwareCore), decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("other-tiprack-id")
+    decoy.when(tip_racks[1].labware_id).then_return("tiprack-id")
+    expected_next_tip = NextTipInfo(labwareId="1234", tipStartingWell="BAR")
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.GetNextTipParams(
+                pipetteId="abc123",
+                labwareIds=["other-tiprack-id", "tiprack-id"],
+                startingTipWell=None,
+            )
+        )
+    ).then_return(GetNextTipResult(nextTipInfo=expected_next_tip))
+    result = subject.get_next_tip(
+        tip_racks=tip_racks,
+        starting_well=None,
+    )
+    assert result == expected_next_tip
+
+
 def test_get_next_tip_when_no_tip_available(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -2278,6 +2306,7 @@ def test_get_next_tip_when_no_tip_available(
     tip_racks = [decoy.mock(cls=LabwareCore)]
     decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
     mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
     decoy.when(mock_starting_well.get_name()).then_return("F00")
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
@@ -2306,6 +2335,7 @@ def test_get_next_tip_raises_for_starting_tip_with_partial_config(
     tip_racks = [decoy.mock(cls=LabwareCore)]
     decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
     mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
     decoy.when(mock_starting_well.get_name()).then_return("F00")
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
