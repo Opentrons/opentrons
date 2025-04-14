@@ -65,7 +65,6 @@ describe('The Redesigned Create Protocol Landing Page', () => {
     steps.add(SetupSteps.DeepWellTempModAdapter())
     steps.add(SetupSteps.AddNest96DeepWellPlate())
     steps.add(SetupSteps.SelectDone())
-    steps.add(SetupSteps.ProtocolStepsH())
     steps.add(SetupSteps.AddStep())
     steps.add(ModuleSteps.AddTemperatureStep())
     steps.add(ModuleVerifications.TempeDeckInitialForm())

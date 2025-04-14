@@ -27,6 +27,7 @@ from .types import (
     LEDColor,
     StallGuardParams,
     TOFConfiguration,
+    TOFDetection,
     TOFMeasurement,
     TOFMeasurementFrame,
     TOFMeasurementResult,
@@ -35,7 +36,10 @@ from .types import (
     TOFSensorState,
     TOFSensorStatus,
 )
-from .utils import validate_histogram_frame
+from .utils import (
+    NUMBER_OF_BINS,
+    validate_histogram_frame,
+)
 
 
 FS_BAUDRATE = 115200
@@ -55,7 +59,31 @@ MAX_REPS = 10
 
 # TOF Sensor
 TOF_FRAME_RETRIES = 1
-NUMBER_OF_BINS = 128
+TOF_DETECTION_CONFIG = {
+    TOFSensor.X: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(10, 40)),
+            threshold=5000,
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(10, 25)),
+            threshold=15000,
+        ),
+    },
+    TOFSensor.Z: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            bins=list(range(10, 60)),
+            threshold=5000,
+        ),
+    },
+}
+
 
 # Stallguard defaults
 STALLGUARD_CONFIG = {
@@ -592,7 +620,8 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             msb = data[ch + 20]
             # combine lsb, mid, and msb bytes to generate bin count for the ch
             bins[ch] = [
-                (msb[b] << 16) | (mid[b] << 8) | lsb[b] for b in range(NUMBER_OF_BINS)
+                float((msb[b] << 16) | (mid[b] << 8) | lsb[b])
+                for b in range(NUMBER_OF_BINS)
             ]
         return TOFMeasurementResult(start.sensor, start.kind, bins)
 

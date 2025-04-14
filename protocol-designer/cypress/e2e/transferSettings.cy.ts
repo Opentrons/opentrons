@@ -61,7 +61,6 @@ describe('Transfer stepform testing Single Channel - Happy Path', () => {
     steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
-    steps.add(SetupSteps.ProtocolStepsH())
     steps.add(SetupSteps.AddStep())
     steps.add(SetupVerifications.TransferPopOut())
     steps.add(UniversalSteps.Snapshot())

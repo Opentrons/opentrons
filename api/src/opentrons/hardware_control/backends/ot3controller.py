@@ -222,6 +222,8 @@ from .status_bar_state import StatusBarStateController
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.utils import send_evo_dispense_count_increase
 
+from .. import modules
+
 log = logging.getLogger(__name__)
 
 MapPayload = TypeVar("MapPayload")
@@ -1649,14 +1651,28 @@ class OT3Controller(FlexBackend):
         door_open = await get_door_state(self._usb_messenger)
         return DoorState.OPEN if door_open else DoorState.CLOSED
 
-    def add_door_state_listener(self, callback: Callable[[DoorState], None]) -> None:
+    def add_door_state_listener(
+        self, callback: Callable[[DoorState, str | None], None]
+    ) -> None:
+        def _module_door_listener(door_state: DoorState) -> None:
+            module_serial: str | None = None
+            for module in self.module_controls.available_modules:
+                # Systematically handle doored modules
+                if (
+                    module.MODULE_TYPE == modules.types.ModuleType.FLEX_STACKER
+                    and module.hopper_door_state == modules.types.HopperDoorState.OPENED
+                ):
+                    module_serial = module.serial_number
+                    break
+            callback(door_state, module_serial)
+
         def _door_listener(msg: BinaryMessageDefinition) -> None:
             door_state = (
                 DoorState.OPEN
                 if cast(DoorSwitchStateInfo, msg).door_open.value
                 else DoorState.CLOSED
             )
-            callback(door_state)
+            _module_door_listener(door_state)
 
         if self._usb_messenger is not None:
             self._usb_messenger.add_listener(

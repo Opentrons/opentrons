@@ -125,33 +125,23 @@ describe('getDeckErrors', () => {
 })
 
 describe('getSVGContainerWidth', () => {
-  it('returns 78.5% for OT2 robot type, startingDeck tab, and not zoomed', () => {
-    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, 'startingDeck', false)
+  it('returns 78.5% for OT2 robot type and not zoomed', () => {
+    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, false)
     expect(result).toBe('78.5%')
   })
 
-  it('returns 70% for non-OT2 robot type, not zoomed, and tab not protocolSteps', () => {
-    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'anotherTab', false)
+  it('returns 70% for non-OT2 robot type, not zoomed', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, false)
     expect(result).toBe('70%')
   })
 
-  it('returns 100% for OT2 robot type, startingDeck tab, and zoomed', () => {
-    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, 'startingDeck', true)
+  it('returns 100% for OT2 robot type,  and zoomed', () => {
+    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, true)
     expect(result).toBe('100%')
   })
 
   it('returns 100% for non-OT2 robot type and zoomed', () => {
-    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'anotherTab', true)
-    expect(result).toBe('100%')
-  })
-
-  it('returns 100% for OT2 robot type and tab other than startingDeck or protocolSteps', () => {
-    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'protocolSteps', false)
-    expect(result).toBe('100%')
-  })
-
-  it('returns 100% for non-OT2 robot type and tab protocolSteps', () => {
-    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'protocolSteps', false)
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, true)
     expect(result).toBe('100%')
   })
 })

@@ -4,11 +4,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { selectDesignerTab } from '../../../../file-data/actions'
 import { TimelineAlerts } from '../TimelineAlerts'
+import { selectTerminalItem } from '../../../../ui/steps/actions/actions'
 
 vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../file-data/actions')
+vi.mock('../../../../ui/steps/actions/actions')
 
 const render = () => {
   return renderWithProviders(<TimelineAlerts />, {
@@ -31,7 +31,7 @@ describe('TimelineAlerts', () => {
       'Add another tip rack to your deck or change your tip management during transfer and mix steps.'
     )
     fireEvent.click(screen.getByText('Edit starting deck'))
-    expect(vi.mocked(selectDesignerTab)).toHaveBeenCalled()
+    expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()
   })
   it('renders the no tip on pipette timeline error and the knowledge link', () => {
     vi.mocked(getRobotStateTimeline).mockReturnValue({

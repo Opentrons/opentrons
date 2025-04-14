@@ -1,13 +1,17 @@
 import {
   getCutoutDisplayName,
+  getLabwareDefIsStandard,
+  getLabwareDefURI,
   isFlexPipette,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
+  getFlexNameConversion,
 } from '@opentrons/shared-data'
 import {
   formatPyDict,
   formatPyStr,
   indentPyLines,
+  CUSTOM_LABWARE_DICT_NAME,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
@@ -23,26 +27,13 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import type {
-  CutoutId,
-  PipetteV2Specs,
-  ProtocolFile,
-  RobotType,
-} from '@opentrons/shared-data'
-const DEFAULT_LIQUID_TYPE = 'default'
-//  Flex pipette api names are different from pipetteName
-//  p1000_multi_flex -> flex_8channel_1000
-//  we do not need to worry about -_em pipette in PD
-export const getFlexNameConversion = (pipetteSpec: PipetteV2Specs): string => {
-  const channels = pipetteSpec.channels
-  const maxVolume = pipetteSpec.liquids[DEFAULT_LIQUID_TYPE].maxVolume
-  return `flex_${channels}channel_${maxVolume}`
-}
+import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 
 const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
 
 export function pythonImports(): string {
   return [
+    'import json',
     'from contextlib import nullcontext as pd_step',
     'from opentrons import protocol_api, types',
   ].join('\n')
@@ -121,28 +112,43 @@ export function getLoadAdapters(
       const { parameters, namespace, version } = def
       const adapterSlot = labwareRobotState[id].slot
       const onModule = moduleEntities[adapterSlot] != null
-      const location = onModule
-        ? moduleEntities[adapterSlot].pythonName
-        : PROTOCOL_CONTEXT_NAME
 
-      const adapterArgs = [
-        `${formatPyStr(parameters.loadName)}`,
-        ...(!onModule
-          ? [
-              `location=${formatPyStr(
-                adapterSlot === 'offDeck' ? OFF_DECK : adapterSlot
-              )}`,
-            ]
-          : []),
-        `namespace=${formatPyStr(namespace)}`,
-        `version=${version}`,
-      ].join(',\n')
+      let parentName: string
+      let locationArg: string | undefined
+      if (onModule) {
+        parentName = moduleEntities[adapterSlot].pythonName
+      } else {
+        parentName = PROTOCOL_CONTEXT_NAME
+        locationArg = `location=${formatPyStr(
+          adapterSlot === 'offDeck' ? OFF_DECK : adapterSlot
+        )}`
+      }
 
-      return (
-        `${pythonName} = ${location}.load_adapter(\n` +
-        `${indentPyLines(adapterArgs)},\n` +
-        `)`
-      )
+      const isStandard = getLabwareDefIsStandard(def)
+      if (isStandard) {
+        const adapterArgs = [
+          `${formatPyStr(parameters.loadName)}`,
+          ...(locationArg ? [locationArg] : []),
+          `namespace=${formatPyStr(namespace)}`,
+          `version=${version}`,
+        ].join(',\n')
+        return (
+          `${pythonName} = ${parentName}.load_adapter(\n` +
+          `${indentPyLines(adapterArgs)},\n` +
+          `)`
+        )
+      } else {
+        // custom adapter
+        const adapterArgs = [
+          `${CUSTOM_LABWARE_DICT_NAME}[${formatPyStr(getLabwareDefURI(def))}]`,
+          ...(locationArg ? [locationArg] : []),
+        ].join(',\n')
+        return (
+          `${pythonName} = ${parentName}.load_adapter_from_definition(\n` +
+          `${indentPyLines(adapterArgs)},\n` +
+          `)`
+        )
+      }
     })
     .join('\n')
 
@@ -163,40 +169,55 @@ export function getLoadLabware(
       const { id, def, pythonName } = labware
       const { metadata, parameters, namespace, version } = def
       const hasNickname =
-        labwareNicknamesById[id] != null
-          ? labwareNicknamesById[id] !== metadata.displayName
-          : false
+        labwareNicknamesById[id] != null &&
+        labwareNicknamesById[id] !== metadata.displayName
       const labwareSlot = labwareRobotState[id].slot
       const onModule = moduleEntities[labwareSlot] != null
       const onAdapter = allLabwareEntities[labwareSlot] != null
-      let location = PROTOCOL_CONTEXT_NAME
+
+      let parentName: string
+      let locationArg: string | undefined
       if (onAdapter) {
-        location = allLabwareEntities[labwareSlot].pythonName
+        parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
-        location = moduleEntities[labwareSlot].pythonName
+        parentName = moduleEntities[labwareSlot].pythonName
+      } else {
+        parentName = PROTOCOL_CONTEXT_NAME
+        locationArg = `location=${formatPyStr(
+          labwareSlot === 'offDeck' ? OFF_DECK : labwareSlot
+        )}`
       }
+      const labelArg = hasNickname
+        ? `label=${formatPyStr(labwareNicknamesById[id])}`
+        : undefined
 
-      const labwareArgs = [
-        `${formatPyStr(parameters.loadName)}`,
-        ...(!onModule && !onAdapter
-          ? [
-              `location=${formatPyStr(
-                labwareSlot === 'offDeck' ? OFF_DECK : labwareSlot
-              )}`,
-            ]
-          : []),
-        ...(hasNickname
-          ? [`label=${formatPyStr(labwareNicknamesById[id])}`]
-          : []),
-        `namespace=${formatPyStr(namespace)}`,
-        `version=${version}`,
-      ].join(',\n')
-
-      return (
-        `${pythonName} = ${location}.load_labware(\n` +
-        `${indentPyLines(labwareArgs)},\n` +
-        `)`
-      )
+      const isStandard = getLabwareDefIsStandard(def)
+      if (isStandard) {
+        const loadLabwareArgs = [
+          `${formatPyStr(parameters.loadName)}`,
+          ...(locationArg ? [locationArg] : []),
+          ...(labelArg ? [labelArg] : []),
+          `namespace=${formatPyStr(namespace)}`,
+          `version=${version}`,
+        ].join(',\n')
+        return (
+          `${pythonName} = ${parentName}.load_labware(\n` +
+          `${indentPyLines(loadLabwareArgs)},\n` +
+          `)`
+        )
+      } else {
+        // custom labware
+        const loadFromDefnArgs = [
+          `${CUSTOM_LABWARE_DICT_NAME}[${formatPyStr(getLabwareDefURI(def))}]`,
+          ...(locationArg ? [locationArg] : []),
+          ...(labelArg ? [labelArg] : []),
+        ].join(',\n')
+        return (
+          `${pythonName} = ${parentName}.load_labware_from_definition(\n` +
+          `${indentPyLines(loadFromDefnArgs)},\n` +
+          `)`
+        )
+      }
     })
     .join('\n')
 
@@ -365,4 +386,25 @@ export function pythonDefRun(
     `def run(${PROTOCOL_CONTEXT_NAME}: protocol_api.ProtocolContext):\n` +
     `${indentPyLines(functionBody)}`
   )
+}
+
+export function pythonCustomLabwareDict(
+  labwareEntities: LabwareEntities
+): string {
+  const customLabwareDefs = Object.values(labwareEntities)
+    .filter(labwareEntity => !getLabwareDefIsStandard(labwareEntity.def))
+    .map(labwareEntity => labwareEntity.def)
+  if (customLabwareDefs.length > 0) {
+    const customLabwareDict = Object.fromEntries(
+      customLabwareDefs.map(labwareDef => [
+        getLabwareDefURI(labwareDef),
+        labwareDef,
+      ])
+    )
+    return `${CUSTOM_LABWARE_DICT_NAME} = json.loads("""${JSON.stringify(
+      customLabwareDict
+    )}""")`
+  } else {
+    return ''
+  }
 }

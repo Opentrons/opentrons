@@ -169,6 +169,7 @@
   },
   "compatibleWith": ["temperatureModuleV1"],
   "incompatibleWithDecks": [],
+  "uniqueModuleData": {},
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

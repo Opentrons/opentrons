@@ -13,7 +13,6 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
     cy.importProtocol(protocol.path)
     verifyImportProtocolPage(protocol)
     cy.contains('Edit protocol').click()
-    cy.contains('Protocol steps').click()
     cy.get('[id="AddStepButton"]').contains('Add Step').click()
     cy.verifyOverflowBtn()
   })
