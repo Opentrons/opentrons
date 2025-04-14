@@ -38,6 +38,7 @@ from .helpers import (
     get_pipette_unique_name,
     get_latest_offset_for_labware,
     _get_offsets_from_ctx,
+    de_static_attached_tip,
 )
 from .trial import (
     build_gravimetric_trials,
@@ -496,14 +497,14 @@ def _run_trial(
     if not transfer_properties:
         aspirate_with_liquid_class(
             trial.ctx,
-            old_liquid_class,
+            old_liquid_class,  # type: ignore[arg-type]
             trial.pipette,
             trial.volume,
             trial.well,
             trial.channel_offset,
             trial.channel_count,
             trial.liquid_tracker,
-            callbacks=pipetting_callbacks,
+            callbacks=pipetting_callbacks,  # type: ignore[arg-type]
             blank=trial.blank,
             mode=trial.mode,
             clear_accuracy_function=trial.cfg.nominal_plunger,
@@ -564,7 +565,7 @@ def _run_trial(
         #        and so this would break any sort of multi-dispense testing
         assumed_air_gap = trial.pipette.current_volume
 
-        tip_contents = trial.pipette._core.aspirate_liquid_class(
+        tip_contents = trial.pipette._core.aspirate_liquid_class(  # type: ignore[attr-defined]
             volume=trial.volume,
             source=(Location(Point(), trial.well), trial.well._core),
             transfer_properties=transfer_properties,
@@ -592,14 +593,14 @@ def _run_trial(
     if not transfer_properties:
         dispense_with_liquid_class(
             ctx=trial.ctx,
-            liquid_class=old_liquid_class,
+            liquid_class=old_liquid_class,  # type: ignore[arg-type]
             pipette=trial.pipette,
             dispense_volume=trial.volume,
             well=trial.well,
             channel_offset=trial.channel_offset,
             channel_count=trial.channel_count,
             liquid_tracker=trial.liquid_tracker,
-            callbacks=pipetting_callbacks,
+            callbacks=pipetting_callbacks,  # type: ignore[arg-type]
             blank=trial.blank,
             mode=trial.mode,
             clear_accuracy_function=trial.cfg.nominal_plunger,
@@ -611,7 +612,7 @@ def _run_trial(
             disable_meniscus_rel,
         ) = _calculate_meniscus_relative_offsets(is_aspirate=False)
         enable_meniscus_rel()  # TODO: delete this and use actual liquid-height tracking
-        _ = trial.pipette._core.dispense_liquid_class(
+        _ = trial.pipette._core.dispense_liquid_class(  # type: ignore[attr-defined]
             volume=trial.volume,
             dest=(Location(Point(), trial.well), trial.well._core),
             source=(Location(Point(), trial.well), trial.well._core),
@@ -902,6 +903,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
     hw_api = get_sync_hw_api(resources.ctx)
+    resources.de_static.connect()
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
@@ -915,51 +917,19 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             )
             setup_channel_offset = _get_channel_offset(cfg, channel=0)
             first_tip_location = first_tip.top().move(setup_channel_offset)
-            resources.pipette._retract()
+            resources.pipette._retract()  # retract to top of gantry
             _pick_up_tip(
                 resources.ctx, resources.pipette, cfg, location=first_tip_location
             )
-            resources.pipette._retract()
+            resources.pipette._retract()  # retract to top of gantry
             if not de_static.is_simulating():
-
-                # initial enable
-                de_static_well = labware_de_static["A1"]
-                resources.pipette.move_to(de_static_well.top())
-                de_static.enable_power_for_one_second()
-                start_time = time()
-
-                def _delay_till_de_static_disables(re_enable: bool) -> None:
-                    nonlocal start_time
-                    _move_duration = time() - start_time
-                    _seconds_till_disable = max(1.0 - _move_duration, 0.0)
-                    sleep(_seconds_till_disable)
-                    if re_enable:
-                        de_static.enable_power_for_one_second()
-                        start_time = time()
-
-                # move down
-                resources.pipette.move_to(
-                    de_static_well.bottom(), speed=de_static_well.depth
+                de_static_attached_tip(
+                    resources.pipette,
+                    labware_de_static["A1"],
+                    de_static,
+                    overdo_it=True,
                 )
-                _delay_till_de_static_disables(re_enable=True)
-                # move up
-                resources.pipette.move_to(
-                    de_static_well.top(), speed=de_static_well.depth
-                )
-                _delay_till_de_static_disables(re_enable=True)
-                # aspirate
-                resources.pipette.aspirate(
-                    resources.pipette.max_volume, de_static_well.top()
-                )
-                _delay_till_de_static_disables(re_enable=True)
-                # dispense
-                resources.pipette.dispense(
-                    resources.pipette.max_volume, de_static_well.top()
-                )
-                _delay_till_de_static_disables(re_enable=True)
-                # done
-                resources.pipette._retract()
-
+                resources.pipette._retract()  # retract to top of gantry
             resources.pipette.prepare_to_aspirate()
             ui.print_info("moving to scale")
         if cfg.jog or not cfg.lld_every_tip:
@@ -1068,6 +1038,14 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             location=next_tip_location,
                         )
                         resources.pipette._retract()  # retract to top of gantry
+                        if not de_static.is_simulating():
+                            de_static_attached_tip(
+                                resources.pipette,
+                                labware_de_static["A1"],
+                                de_static,
+                                overdo_it=True,
+                            )
+                            resources.pipette._retract()  # retract to top of gantry
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -1274,6 +1252,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             # FIXME: see why it takes so long to store CSV data
             resources.test_report.save_to_disk()
     finally:
+        resources.de_static.disconnect()
         _return_tip = False if calibration_tip_in_use else cfg.return_tip
         _finish_test(cfg, resources, _return_tip)
     ui.print_title("RESULTS")

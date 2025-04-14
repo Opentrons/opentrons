@@ -1,9 +1,9 @@
 """De-Static Fixture Driver."""
 from abc import ABC, abstractmethod
 from serial import Serial  # type: ignore[import]
-from serial.tools.list_ports import comports
+from serial.tools.list_ports import comports  # type: ignore[import]
 from time import sleep, time
-from typing_extensions import Final, Optional, cast
+from typing_extensions import Final, Optional, cast, List, Any
 
 
 FIXTURE_BAUD_RATE: Final[int] = 115200
@@ -11,6 +11,8 @@ FIXTURE_CMD_GET_IS_ENABLED = "?"
 FIXTURE_CMD_SET_ENABLE = "enable"
 FIXTURE_RESPONSE_ENABLED = "on"
 FIXTURE_RESPONSE_DISABLED = "off"
+
+_DELAY_SECONDS: float = 0.1
 
 
 class DeStaticFixtureBase(ABC):
@@ -41,27 +43,41 @@ class DeStaticFixtureBase(ABC):
         """Enable power for just 1x second."""
         ...
 
+    @abstractmethod
+    def wait_for_disabled(self, timeout: float = 2.0) -> None:
+        """Wait for disabled."""
+        ...
+
 
 class SimDeStaticFixture(DeStaticFixtureBase):
     """Simulating DeStaticFixture."""
+
+    def __init__(self) -> None:
+        """Constructor."""
+        self._connected: bool = False
 
     def is_simulating(self) -> bool:
         return True
 
     def connect(self) -> None:
         """Connect to the USB serial port."""
-        return
+        self._connected = True
 
     def disconnect(self) -> None:
         """Disconnect from the USB serial port."""
-        return
+        self._connected = True
 
     def is_enabled(self) -> bool:
         """Read status of de-static bar power."""
+        assert self._connected
         return False
 
     def enable_power_for_one_second(self) -> None:
         """Enable power for just 1x second."""
+        assert self._connected
+
+    def wait_for_disabled(self, timeout: float = 2.0) -> None:
+        """Wait for disabled."""
         return
 
 
@@ -102,8 +118,18 @@ class DeStaticFixture(DeStaticFixtureBase):
     def enable_power_for_one_second(self) -> None:
         """Enable power for just 1x second."""
         self._port.write(FIXTURE_CMD_SET_ENABLE.encode("utf-8"))
-        sleep(0.1)
+        sleep(_DELAY_SECONDS)
         assert self.is_enabled()
+
+    def wait_for_disabled(self, timeout: float = 2.0) -> None:
+        """Wait for disabled."""
+        start = time()
+        while time() - start > timeout and self.is_enabled():
+            sleep(_DELAY_SECONDS)
+        assert not self.is_enabled(), (
+            f"timed out after {timeout} seconds "
+            f"waiting for de-static fixture to disable"
+        )
 
 
 def find_and_build(simulate: bool) -> DeStaticFixtureBase:
@@ -130,19 +156,21 @@ def find_and_build(simulate: bool) -> DeStaticFixtureBase:
 
 
 if __name__ == "__main__":
-    trigger_timestamp = 0.0
-    trigger_interval_seconds = 3.0
-
     bar = find_and_build(simulate=False)
     bar.connect()
+    start_time = time()
+
+    def _print(*args: Any) -> None:
+        print(round(time() - start_time, 2), *args)
+
     try:
         while True:
-            print(bar.is_enabled())
-            seconds_since_last_trigger = time() - trigger_timestamp
-            if seconds_since_last_trigger < trigger_interval_seconds:
-                continue
-            print("\nTRIGGER!!!!!!\n")
+            _print("is enabled?", bar.is_enabled())
+            _print("sending enable command...")
             bar.enable_power_for_one_second()
-            trigger_timestamp = time()
+            _print("is enabled?", bar.is_enabled())
+            bar.wait_for_disabled()
+            _print("is enabled?", bar.is_enabled())
+            sleep(1)
     finally:
         bar.disconnect()

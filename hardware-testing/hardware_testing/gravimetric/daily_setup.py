@@ -2,6 +2,7 @@
 import argparse
 from time import time, sleep
 
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.types import Point
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import StatusBarState, OT3Mount
@@ -14,7 +15,6 @@ from hardware_testing.gravimetric.measurement.record import (
 from hardware_testing.gravimetric.config import GANTRY_MAX_SPEED
 from hardware_testing.gravimetric.measurement.scale import Scale  # type: ignore[import]
 from hardware_testing.gravimetric import helpers
-from hardware_testing.gravimetric.__main__ import API_LEVEL
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
 TEST_NAME = "gravimetric-daily-setup"
@@ -251,7 +251,7 @@ if __name__ == "__main__":
     parser.add_argument("--skip-stability", action="store_true")
     args = parser.parse_args()
     _ctx = helpers.get_api_context(
-        API_LEVEL,  # type: ignore[attr-defined]
+        str(MAX_SUPPORTED_VERSION),
         is_simulating=args.simulate,
     )
     _hw = get_sync_hw_api(_ctx)

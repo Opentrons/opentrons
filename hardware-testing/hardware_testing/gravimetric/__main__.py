@@ -511,6 +511,7 @@ def build_photometric_cfg(
         reservoir=run_args.protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
         reservoir_slot=run_args.protocol_cfg.SLOT_RESERVOIR,  # type: ignore[attr-defined]
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
+        slot_de_static=run_args.protocol_cfg.SLOT_DE_STATIC,  # type: ignore[attr-defined]
         return_tip=return_tip,
         mix=mix,
         user_volumes=user_volumes,

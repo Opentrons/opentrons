@@ -10,6 +10,7 @@ from inspect import getsource
 from pathlib import Path
 from json import load as json_load
 
+from hardware_testing.drivers import de_static_fixture
 from hardware_testing.data import ui
 from opentrons import protocol_api
 from opentrons.protocols.api_support.deck_type import (
@@ -456,7 +457,7 @@ def _load_pipette(
     if pipette_mount in loaded_pipettes.keys():
         return loaded_pipettes[pipette_mount]
 
-    trash = ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
+    trash = ctx.load_trash_bin("A3")
     pipette = ctx.load_instrument(pip_name, pipette_mount)
     assert pipette.max_volume == pipette_volume, (
         f"expected {pipette_volume} uL pipette, "
@@ -595,3 +596,34 @@ def get_default_trials(increment: bool, kind: config.ConfigType, channels: int) 
         return 3
     else:
         return config.QC_DEFAULT_TRIALS[kind][channels]
+
+
+def de_static_attached_tip(
+    pipette: InstrumentContext,
+    well: Well,
+    fixture: de_static_fixture.DeStaticFixtureBase,
+    overdo_it: bool,
+) -> None:
+    def _reset_de_static_bar() -> None:
+        fixture.wait_for_disabled()
+        fixture.enable_power_for_one_second()
+
+    # move to TOP
+    pipette.move_to(well.top())
+    fixture.enable_power_for_one_second()
+
+    if overdo_it:
+        # move to BOTTOM
+        pipette.move_to(well.bottom(), speed=well.depth)
+        _reset_de_static_bar()
+        # move to TOP
+        pipette.move_to(well.top(), speed=well.depth)
+        _reset_de_static_bar()
+        # aspirate
+        pipette.aspirate(pipette.max_volume, well.top())
+        _reset_de_static_bar()
+        # dispense
+        pipette.dispense(pipette.max_volume, well.top())
+        _reset_de_static_bar()
+        # prepare to aspirate
+        pipette.prepare_to_aspirate()
