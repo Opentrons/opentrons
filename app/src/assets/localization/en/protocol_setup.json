@@ -180,7 +180,7 @@
   "module_name": "Module",
   "module_not_connected": "Not connected",
   "module_setup_step_ready": "Calibration ready",
-  "module_setup_step_title": "Deck hardware",
+  "module_setup_step_title": "Deck Hardware",
   "module_slot_location": "Slot {{slotName}}, {{moduleName}}",
   "modules": "Modules",
   "modules_connected": "{{count}} module attached",
