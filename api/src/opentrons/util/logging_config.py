@@ -91,10 +91,7 @@ def _host_config(level_value: int) -> Dict[str, Any]:
     }
 
 
-def _buildroot_config(level_value: int) -> Dict[str, Any]:
-    # Import systemd.journald here since it is generally unavailble on non
-    # linux systems and we probably don't want to use it on linux desktops
-    # either
+def _robot_config(level_value: int) -> Dict[str, Any]:
     sensor_log_filename = CONFIG["sensor_log_file"]
     return {
         "version": 1,
@@ -172,8 +169,8 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
 
 def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
     return {
-        SystemArchitecture.YOCTO: _buildroot_config,
-        SystemArchitecture.BUILDROOT: _buildroot_config,
+        SystemArchitecture.YOCTO: _robot_config,
+        SystemArchitecture.BUILDROOT: _robot_config,
         SystemArchitecture.HOST: _host_config,
     }[arch](level_value)
 
