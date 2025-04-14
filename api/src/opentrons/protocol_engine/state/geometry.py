@@ -1896,6 +1896,7 @@ class GeometryView:
             and not well_location.volumeOffset
         ):
             return initial_handling_height
+        volume: Optional[float] = None
         if isinstance(well_location, PickUpTipWellLocation):
             volume = 0.0
         elif isinstance(well_location, LiquidHandlingWellLocation):
