@@ -90,7 +90,14 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
       width="100%"
       minHeight={FLEX_MAX_CONTENT}
     >
-      <Flex height="100%" padding={SPACING.spacing12}>
+      <Flex
+        height="100%"
+        padding={
+          isZoomedIn
+            ? `${SPACING.spacing12} 0 ${SPACING.spacing12} ${SPACING.spacing12}`
+            : SPACING.spacing12
+        }
+      >
         <DraggableSidebar setTargetWidth={setTargetWidth} />
       </Flex>
       <Flex
@@ -100,7 +107,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
         paddingTop={showTimelineAlerts || isZoomedIn ? '0' : SPACING.spacing24}
         height="100%"
         position={POSITION_RELATIVE}
-        overflowY={'none'}
+        overflowY={OVERFLOW_AUTO}
       >
         <Flex
           width="100%"
@@ -175,10 +182,9 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
               {isZoomedIn ? null : (
                 <>
                   {/* avoid shifting the deck view container */}
-
                   <Flex
                     height={STEP_SUMMARY_HEIGHT}
-                    // opacity={formData == null ? 1 : 0}
+                    opacity={formData == null ? 1 : 0}
                   >
                     {activeItem?.selectionType ===
                     'TERMINAL_ITEM_SELECTION_TYPE' ? (

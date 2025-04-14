@@ -46,8 +46,6 @@ export const SlotInformation: FC<SlotInformationProps> = ({
   fixtures = [],
 }) => {
   const { t } = useTranslation('shared')
-  const breakPointSize = useDeckSetupWindowBreakPoint()
-  const pathLocation = useLocation()
   const isOffDeck = location === 'offDeck'
   const tcDisplayLocation =
     robotType === FLEX_ROBOT_TYPE
@@ -76,19 +74,12 @@ export const SlotInformation: FC<SlotInformationProps> = ({
         {liquids.length > 1 ? (
           <ListItem type="default" width="max-content">
             <ListItemDescriptor
-              changeFlexDirection={
-                breakPointSize === 'medium' &&
-                pathLocation.pathname === '/designer'
-              }
+              changeFlexDirection={false}
               type="default"
               content={
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
-                  textAlign={
-                    breakPointSize === 'medium'
-                      ? TYPOGRAPHY.textAlignLeft
-                      : TYPOGRAPHY.textAlignRight
-                  }
+                  textAlign={TYPOGRAPHY.textAlignRight}
                   css={LINE_CLAMP_TEXT_STYLE(2, true)}
                 >
                   {liquids.join(', ')}

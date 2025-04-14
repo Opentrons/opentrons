@@ -281,6 +281,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   <HighlightLabware
                     labwareOnDeck={labwareLoadedOnModule}
                     position={[0, 0, 0]}
+                    isZoomed={selectedZoomInSlot != null}
                   />
 
                   {isAdapter ? (
@@ -434,7 +435,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
-            <HighlightLabware labwareOnDeck={labware} position={slotPosition} />
+            <HighlightLabware
+              labwareOnDeck={labware}
+              position={slotPosition}
+              isZoomed={selectedZoomInSlot != null}
+            />
             {labwareIsAdapter ? (
               <AdapterControls
                 terminalItemId={terminalItemId}
@@ -518,7 +523,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
-            <HighlightLabware labwareOnDeck={labware} position={slotPosition} />
+            <HighlightLabware
+              labwareOnDeck={labware}
+              position={slotPosition}
+              isZoomed={selectedZoomInSlot != null}
+            />
             <LabwareControls
               hover={hover}
               itemId={slotOnDeck ?? ''}

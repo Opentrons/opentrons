@@ -9,10 +9,10 @@ import {
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 import { Module } from '@opentrons/components'
+import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getDesignerTab } from '../../../../file-data/selectors'
 import { LabwareOnDeck } from '../../../../components/organisms'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
@@ -21,12 +21,13 @@ import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../FixtureRender')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../components/organisms')
+vi.mock('../../../../file-data/selectors')
+vi.mock('../../../../ui/steps')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
@@ -51,7 +52,7 @@ describe('SelectedHoveredItems', () => {
       hoveredFixture: null,
       slotPosition: [0, 0, 0],
     }
-    vi.mocked(getDesignerTab).mockReturnValue('startingDeck')
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {},
       additionalEquipmentOnDeck: {},

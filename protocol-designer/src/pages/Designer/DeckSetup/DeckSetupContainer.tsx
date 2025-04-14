@@ -1,4 +1,4 @@
-import { useMemo, useState, Fragment, Dispatch, SetStateAction } from 'react'
+import { useMemo, useState, Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
 import {
@@ -40,10 +40,10 @@ import {
   animateZoom,
   getCutoutIdForAddressableArea,
   getSVGContainerWidth,
-  useDeckSetupWindowBreakPoint,
   zoomInOnCoordinate,
 } from './utils'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -56,8 +56,6 @@ import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60
-// Note (02/02/25:kk) the size is different from the design but the product team requested keep the current size
-const STARTING_DECK_VIEW_MIN_WIDTH = '75%'
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem' // for Protocol Steps
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
@@ -84,7 +82,6 @@ export function DeckSetupContainer(
   const { robotType, hoverSlot, setHoverSlot } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
-  const breakPointSize = useDeckSetupWindowBreakPoint()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
@@ -92,7 +89,6 @@ export function DeckSetupContainer(
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
-  console.log(zoomIn)
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
   ).filter(
@@ -201,15 +197,6 @@ export function DeckSetupContainer(
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
-
-  let containerPadding = '0'
-  if (!isZoomed) {
-    if (terminalItemId === '__initial_setup__') {
-      containerPadding = SPACING.spacing40
-    } else {
-      containerPadding = SPACING.spacing60
-    }
-  }
 
   const svgContainerWidth = getSVGContainerWidth(robotType, isZoomed)
 

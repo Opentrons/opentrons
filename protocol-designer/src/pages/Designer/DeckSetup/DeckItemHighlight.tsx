@@ -14,6 +14,7 @@ import {
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
+  getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 
@@ -31,6 +32,7 @@ export function DeckItemHighlight(
   const { t } = useTranslation('application')
   const hoveredDropdownSelection = useSelector(getHoveredDropdownItem)
   const selectedDropdownLocation = useSelector(getSelectedDropdownItem)
+  const terminalItemId = useSelector(getSelectedTerminalItemId)
 
   const isHovered =
     hoveredDropdownSelection?.id != null
@@ -40,7 +42,11 @@ export function DeckItemHighlight(
     selected => selected.id === itemId && selected.field === '2'
   )
 
-  if (slotPosition === null || (!isHovered && !isSelected)) {
+  if (
+    terminalItemId === '__initial_setup__' ||
+    slotPosition === null ||
+    (!isHovered && !isSelected)
+  ) {
     return null
   }
 
