@@ -1576,316 +1576,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "edfad9623f53264d713b6020c8a9e4e1",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 279.38,
-          "y": 255.24,
-          "z": 64.69
-        },
-        "tipDiameter": 5.23,
-        "tipLength": 51.099999999999994,
-        "tipVolume": 300.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "d605d706af7883c674712230de65b227",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 45.4,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -36.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 346.93,
-          "z": 43.05
-        },
-        "volume": 45.4
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToWell",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "31cbee488a586627c2f14e4ff31267fb",
-      "notes": [],
-      "params": {
-        "forceDirect": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 5.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 346.93,
-          "z": 84.85
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "766b897ca1ca77b7abd8f08158426aa9",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 10.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 5.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 346.93,
-          "z": 84.85
-        },
-        "volume": 10.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "4350e0ad040c51cc52b61277b5e2b39c",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 32.7,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -36.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 327.65,
-          "z": 43.05
-        },
-        "volume": 32.7
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToWell",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "708c94cef21aca228bc0da89fc3ce725",
-      "notes": [],
-      "params": {
-        "forceDirect": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 5.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 327.65,
-          "z": 84.85
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "09c1223bdf13aee9b67594ba819898e7",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 10.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 5.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 327.65,
-          "z": 84.85
-        },
-        "volume": 10.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "67ec30fc58a094ff2f68fe7f7731126f",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 32.699999999999996,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -36.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B2"
-      },
-      "result": {
-        "position": {
-          "x": 38.1,
-          "y": 327.65,
-          "z": 43.05
-        },
-        "volume": 32.699999999999996
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToAddressableAreaForDropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "38d6283a4e301637e33b8441fb3be449",
-      "notes": [],
-      "params": {
-        "addressableAreaName": "fixedTrash",
-        "alternateDropLocation": true,
-        "forceDirect": false,
-        "ignoreTipConfiguration": true,
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "pipetteId": "UUID"
-      },
-      "result": {
-        "position": {
-          "x": 363.89500000000004,
-          "y": 351.5,
-          "z": 82.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "11dc6f65cf3d35d4b8f6c3097521e3e8",
-      "notes": [],
-      "params": {
-        "pipetteId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -1896,7 +1586,33 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "BdbQuit [line 13]: ",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "bdb.BdbQuit",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "()",
+            "class": "BdbQuit",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_S_v2_16_P300S_None_verifyNoFloatingPointErrorInPipetting.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in pick_up_tip\n    move_to_location = move_to_location or well.top()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line N, in top\n    return Location(self._core.get_top(z_offset=z), self)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/well.py\", line N, in get_top\n    return self._engine_client.state.geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in trace_dispatch\n    return self.dispatch_line(frame)\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in dispatch_line\n    if self.quitting: raise BdbQuit\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "OT2_S_v2_16_P300S_None_verifyNoFloatingPointErrorInPipetting.py",
@@ -1932,7 +1648,7 @@
       "pipetteName": "p300_single_gen2"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

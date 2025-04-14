@@ -1363,7 +1363,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "PartialTipMovementNotAllowedError [line 20]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
+      "detail": "BdbQuit [line 20]: ",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -1372,10 +1372,14 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
-          "errorCode": "2004",
-          "errorInfo": {},
-          "errorType": "PartialTipMovementNotAllowedError",
+          "detail": "bdb.BdbQuit",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "()",
+            "class": "BdbQuit",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_16_P1000_96_TC_pipetteCollisionWithThermocyclerLidClips.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line N, in center\n    return Location(self._core.get_center(), self)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/well.py\", line N, in get_center\n    return self._engine_client.state.geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in trace_dispatch\n    return self.dispatch_line(frame)\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in dispatch_line\n    if self.quitting: raise BdbQuit\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

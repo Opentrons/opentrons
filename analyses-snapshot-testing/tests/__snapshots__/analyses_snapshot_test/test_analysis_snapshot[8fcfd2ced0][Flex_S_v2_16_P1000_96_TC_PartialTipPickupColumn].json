@@ -3582,150 +3582,6 @@
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "1b8d4199f5dd8297ce03f6cff8f1c134",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 181.38,
-          "z": 99.0
-        },
-        "tipDiameter": 5.58,
-        "tipLength": 47.4,
-        "tipVolume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "15eca5107357a5f36715b2ac90997dc5",
-      "notes": [],
-      "params": {
-        "flowRate": 160.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -9.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A4"
-      },
-      "result": {
-        "position": {
-          "x": 205.28,
-          "y": 181.18,
-          "z": 4.5
-        },
-        "volume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ddccee6754fe0092b9c66898d66b79a7",
-      "notes": [],
-      "params": {
-        "flowRate": 160.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 20.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -9.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A2"
-      },
-      "result": {
-        "position": {
-          "x": 23.28,
-          "y": 181.18,
-          "z": 4.5
-        },
-        "volume": 20.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToAddressableAreaForDropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "5287b77e909d217f4b05e5006cf9ff25",
-      "notes": [],
-      "params": {
-        "addressableAreaName": "movableTrashA3",
-        "alternateDropLocation": true,
-        "forceDirect": false,
-        "ignoreTipConfiguration": true,
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "pipetteId": "UUID"
-      },
-      "result": {
-        "position": {
-          "x": 466.25,
-          "y": 364.0,
-          "z": 40.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "b81364c35c04784c34f571446e64484c",
-      "notes": [],
-      "params": {
-        "pipetteId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -3736,7 +3592,33 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "BdbQuit [line 18]: ",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "bdb.BdbQuit",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "()",
+            "class": "BdbQuit",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_16_P1000_96_TC_PartialTipPickupColumn.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in pick_up_tip\n    move_to_location = move_to_location or well.top()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line N, in top\n    return Location(self._core.get_top(z_offset=z), self)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/well.py\", line N, in get_top\n    return self._engine_client.state.geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in trace_dispatch\n    return self.dispatch_line(frame)\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in dispatch_line\n    if self.quitting: raise BdbQuit\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "Flex_S_v2_16_P1000_96_TC_PartialTipPickupColumn.py",
@@ -3780,7 +3662,7 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

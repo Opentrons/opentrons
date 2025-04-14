@@ -1775,9 +1775,30 @@
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
+      "error": {
+        "createdAt": "TIMESTAMP",
+        "detail": "bdb.BdbQuit",
+        "errorCode": "4000",
+        "errorInfo": {
+          "args": "()",
+          "class": "BdbQuit",
+          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/pick_up_tip.py\", line N, in execute\n    move_result = await move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/movement_common.py\", line N, in move_to_well\n    position = await movement.move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/movement.py\", line N, in move_to_well\n    waypoints = self._state_store.motion.get_movement_waypoints_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/motion.py\", line N, in get_movement_waypoints_to_well\n    destination = self._geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in trace_dispatch\n    return self.dispatch_line(frame)\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in dispatch_line\n    if self.quitting: raise BdbQuit\n"
+        },
+        "errorType": "PythonException",
+        "id": "UUID",
+        "isDefined": false,
+        "wrappedErrors": []
+      },
       "id": "UUID",
       "key": "a78e5288-8306-4960-bf2a-86055d91f738",
-      "notes": [],
+      "notes": [
+        {
+          "longMessage": "Handling this command failure with FAIL_RUN.",
+          "noteKind": "debugErrorRecovery",
+          "shortMessage": "Handling this command failure with FAIL_RUN.",
+          "source": "execution"
+        }
+      ],
       "params": {
         "labwareId": "UUID",
         "pipetteId": "UUID",
@@ -1788,64 +1809,6 @@
             "z": 0.0
           },
           "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 14.38,
-          "y": 74.24,
-          "z": 64.69
-        },
-        "tipDiameter": 3.27,
-        "tipLength": 30.950000000000003,
-        "tipVolume": 20.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "error": {
-        "createdAt": "TIMESTAMP",
-        "detail": "Cannot aspirate 21.0 µL when only 20 is available in the tip.",
-        "errorCode": "4000",
-        "errorInfo": {
-          "attempted_aspirate_volume": 21.0,
-          "available_volume": 20,
-          "max_pipette_volume": 20,
-          "max_tip_volume": 20
-        },
-        "errorType": "InvalidAspirateVolumeError",
-        "id": "UUID",
-        "isDefined": false,
-        "wrappedErrors": []
-      },
-      "id": "UUID",
-      "key": "c2e4fa67-3c04-4d22-b3fa-5d61e956c488",
-      "notes": [
-        {
-          "longMessage": "Handling this command failure with FAIL_RUN.",
-          "noteKind": "debugErrorRecovery",
-          "shortMessage": "Handling this command failure with FAIL_RUN.",
-          "source": "execution"
-        }
-      ],
-      "params": {
-        "flowRate": 3.78,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 21.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 1.0
-          },
-          "origin": "bottom",
-          "volumeOffset": 0.0
         },
         "wellName": "A1"
       },
@@ -1861,15 +1824,14 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "Cannot aspirate 21.0 µL when only 20 is available in the tip.",
+      "detail": "bdb.BdbQuit",
       "errorCode": "4000",
       "errorInfo": {
-        "attempted_aspirate_volume": 21.0,
-        "available_volume": 20,
-        "max_pipette_volume": 20,
-        "max_tip_volume": 20
+        "args": "()",
+        "class": "BdbQuit",
+        "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/pick_up_tip.py\", line N, in execute\n    move_result = await move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/movement_common.py\", line N, in move_to_well\n    position = await movement.move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/movement.py\", line N, in move_to_well\n    waypoints = self._state_store.motion.get_movement_waypoints_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/motion.py\", line N, in get_movement_waypoints_to_well\n    destination = self._geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in trace_dispatch\n    return self.dispatch_line(frame)\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in dispatch_line\n    if self.quitting: raise BdbQuit\n"
       },
-      "errorType": "InvalidAspirateVolumeError",
+      "errorType": "PythonException",
       "id": "UUID",
       "isDefined": false,
       "wrappedErrors": []

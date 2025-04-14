@@ -4755,151 +4755,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "bb4e42ce3a347009d85098cb49c54446",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 14.38,
-          "y": 65.24,
-          "z": 64.69
-        },
-        "tipDiameter": 3.27,
-        "tipLength": 30.950000000000003,
-        "tipVolume": 20.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "3e2d6ccf28ac1864869f3fba1e6c918c",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well A1 has tip: False"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "adb87a628b0270e6b7ea03956c308caf",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well B1 has tip: False"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "d52723fce284549fc5363df14c8af77b",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well C1 has tip: True"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "1eb8c634a559f734e5bf0152943ccfc5",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well D1 has tip: True"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "3e38d3b5e3cfe9ddb63397a97e876ed4",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well E1 has tip: True"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "8c0f1de98d6cbf48fd9e76be1389b807",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well F1 has tip: True"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "560a90fcbfc35c9f895b03c1d49abd29",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well G1 has tip: True"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "eb9fed787fef1871ea9fbc3f506af0e6",
-      "notes": [],
-      "params": {
-        "message": "Tip rack in 1, well H1 has tip: True"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -4913,7 +4768,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "UnexpectedProtocolError [line 146]: Error 4000 GENERAL_ERROR (UnexpectedProtocolError): Cannot return tip to a tiprack while the pipette is configured for partial tip.",
+      "detail": "BdbQuit [line 143]: ",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -4922,10 +4777,14 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Cannot return tip to a tiprack while the pipette is configured for partial tip.",
+          "detail": "bdb.BdbQuit",
           "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "UnexpectedProtocolError",
+          "errorInfo": {
+            "args": "()",
+            "class": "BdbQuit",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_20_8_Overrides_InvalidConfigs_Override_return_tip_error.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in pick_up_tip\n    move_to_location = move_to_location or well.top()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line N, in top\n    return Location(self._core.get_top(z_offset=z), self)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/well.py\", line N, in get_top\n    return self._engine_client.state.geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    return Point(\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in trace_dispatch\n    return self.dispatch_line(frame)\n\n  File \"/usr/local/lib/python3.10/bdb.py\", line N, in dispatch_line\n    if self.quitting: raise BdbQuit\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
