@@ -5,9 +5,8 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { selectors } from '../../../labware-ingred/selectors'
-import { getDesignerTab, getFileMetadata } from '../../../file-data/selectors'
+import { getFileMetadata } from '../../../file-data/selectors'
 import { generateNewProtocol } from '../../../labware-ingred/actions'
-import { DeckSetupContainer } from '../DeckSetup'
 import { Designer } from '../index'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
 import { ProtocolSteps } from '../ProtocolSteps'
@@ -45,7 +44,6 @@ const render = () => {
 
 describe('Designer', () => {
   beforeEach(() => {
-    vi.mocked(getDesignerTab).mockReturnValue('startingDeck')
     vi.mocked(ProtocolSteps).mockReturnValue(<div>mock ProtocolSteps</div>)
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mockProtocolName',
@@ -60,9 +58,6 @@ describe('Designer', () => {
       labware: {},
       pipettes: {},
     })
-    vi.mocked(DeckSetupContainer).mockReturnValue(
-      <div>mock DeckSetupContainer</div>
-    )
     vi.mocked(LiquidsOverflowMenu).mockReturnValue(
       <div>mock LiquidsOverflowMenu</div>
     )
@@ -74,11 +69,9 @@ describe('Designer', () => {
 
   it('renders deck setup container and nav buttons', () => {
     render()
-    screen.getByText('mock DeckSetupContainer')
+    screen.getByText('mock ProtocolSteps')
     screen.getByText('mockProtocolName')
     screen.getByText('Edit protocol')
-    screen.getByText('Protocol steps')
-    screen.getByText('Protocol starting deck')
     screen.getByTestId('water-drop')
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
     expect(mockNavigate).toHaveBeenCalledWith('/overview')
@@ -102,12 +95,5 @@ describe('Designer', () => {
     })
     render()
     expect(vi.mocked(generateNewProtocol)).toHaveBeenCalled()
-  })
-
-  it('renders the protocol steps page', () => {
-    vi.mocked(getDesignerTab).mockReturnValue('protocolSteps')
-    render()
-    fireEvent.click(screen.getByText('Protocol steps'))
-    screen.getByText('mock ProtocolSteps')
   })
 })

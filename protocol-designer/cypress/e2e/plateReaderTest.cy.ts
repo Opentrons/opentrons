@@ -65,7 +65,6 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Armadillo 96 Well Plate'))
-    steps.add(SetupSteps.ProtocolStepsH())
     steps.add(SetupSteps.AddStep())
 
     // Move labware attempt to Plate Reader
