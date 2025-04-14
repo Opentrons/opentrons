@@ -61,6 +61,14 @@ describe('SelectedHoveredItems', () => {
       slotPosition: [0, 0, 0],
     }
     vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
+    vi.mocked(getAllLabwareDefs).mockReturnValue({
+      [mockAdapterURI]: {
+        ...fixture24Tuberack,
+        metadata: {
+          displayName: 'Fixture Opentrons Universal Flat Heater-Shaker Adapter',
+        },
+      } as any,
+    })
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {},
       additionalEquipmentOnDeck: {},
