@@ -652,9 +652,9 @@ describe('useModuleOverflowMenu', () => {
     )
     const { menuOverflowItemsByModuleType } = result.current
     const flexStackerMenu = menuOverflowItemsByModuleType.flexStackerModuleType
-    
+
     act(() => flexStackerMenu[0].onClick(false))
-    
+
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'flexStacker/prepareShuttle',
@@ -666,7 +666,6 @@ describe('useModuleOverflowMenu', () => {
 
     expect(flexStackerMenu[0].menuButtons).toHaveLength(1)
   })
-
 })
 
 describe('useIsHeaterShakerInProtocol', () => {
