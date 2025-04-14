@@ -1,7 +1,9 @@
 import logging
 from logging.config import dictConfig
+from logging.handlers import QueueHandler, QueueListener
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, cast
+from typing_extensions import override
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
@@ -10,6 +12,58 @@ if ARCHITECTURE is SystemArchitecture.YOCTO:
 else:
     # we don't use the sensor log on ot2 or host
     SENSOR_LOG_NAME = "unused"
+
+
+from queue import Queue
+
+# Note that this is an unbounded queue. Ideally, it would be bounded just big enough to
+# smooth over any temporary stalls in journald's ability to consume our messages.
+# Unfortunately, QueueHandler uses `queue.put_nowait()`, which would raise an exception
+# out of our log.debug() etc. statements when the queue gets full. We'd ideally have some
+# custom version of QueueHandler that handles that uses `queue.put()` or drops the message.
+# log_queue = SimpleQueue[object]()
+"""
+This should usually not be used directly. It's exposed so that consumers of this package
+that configure their own logging (i.e. robot-server) can inject their messages into
+the same queue and
+library
+"""
+
+
+log_queue = Queue[logging.LogRecord]()
+
+
+class CustomQueueHandler(QueueHandler):
+    """A logging.QueueHandler with some customizations.
+
+    - Allow extra
+    - Do not mangle records
+    - Block
+    """
+
+    def __init__(
+        self, *, queue: Queue[logging.LogRecord], syslog_identifier: str
+    ) -> None:
+        super().__init__(queue=queue)
+        # Double underscore because we're subclassing external code so we should try to
+        # avoid collisions with its attributes.
+        self.__syslog_identifier = syslog_identifier
+
+    @override
+    def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
+        """
+        - Allow extra
+        - Do not mangle records
+        """
+        record.__dict__.setdefault("SYSLOG_IDENTIFIER", self.__syslog_identifier)
+        return record
+
+    @override
+    def enqueue(self, record: logging.LogRecord) -> None:
+        # This cast is safe because we constrain the type of self.queue
+        # in our __init__() and nobody should mutate it after-the-fact, in practice.
+        queue = cast(Queue[logging.LogRecord], self.queue)
+        queue.put(record)
 
 
 def _host_config(level_value: int) -> Dict[str, Any]:
@@ -33,7 +87,7 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "level": level_value,
             },
             "serial": {
-                "class": "logging.handlers.RotatingFileHandler",
+                "class": "logging.handlers.RotatingFileHandler",  # NOTE
                 "formatter": "basic",
                 "filename": serial_log_filename,
                 "maxBytes": 1000000,
@@ -41,7 +95,7 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "backupCount": 3,
             },
             "api": {
-                "class": "logging.handlers.RotatingFileHandler",
+                "class": "logging.handlers.RotatingFileHandler",  # NOTE
                 "formatter": "basic",
                 "filename": api_log_filename,
                 "maxBytes": 1000000,
@@ -49,7 +103,7 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "backupCount": 5,
             },
             "sensor": {
-                "class": "logging.handlers.RotatingFileHandler",
+                "class": "logging.handlers.RotatingFileHandler",  # NOTE
                 "formatter": "basic",
                 "filename": sensor_log_filename,
                 "maxBytes": 1000000,
@@ -101,31 +155,33 @@ def _robot_config(level_value: int) -> Dict[str, Any]:
         },
         "handlers": {
             "api": {
-                "class": "systemd.journal.JournalHandler",
+                "class": CustomQueueHandler,
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api",
+                "syslog_identifier": "opentrons-api",
+                "queue": log_queue,
             },
             "serial": {
-                "class": "systemd.journal.JournalHandler",
+                "class": CustomQueueHandler,
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api-serial",
+                "syslog_identifier": "opentrons-api-serial",
             },
             "can_serial": {
-                "class": "systemd.journal.JournalHandler",
+                "class": CustomQueueHandler,
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api-serial-can",
+                "syslog_identifier": "opentrons-api-serial-can",
             },
             "usbbin_serial": {
-                "class": "systemd.journal.JournalHandler",
+                "class": CustomQueueHandler,
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api-serial-usbbin",
+                "syslog_identifier": "opentrons-api-serial-usbbin",
             },
+            # TODO
             "sensor": {
-                "class": "logging.handlers.RotatingFileHandler",
+                "class": "logging.handlers.RotatingFileHandler",  # NOTE
                 "formatter": "message_only",
                 "filename": sensor_log_filename,
                 "maxBytes": 1000000,
@@ -175,6 +231,9 @@ def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
     }[arch](level_value)
 
 
+_journal_shoveler: QueueListener | None = None
+
+
 def log_init(level_name: str) -> None:
     """
     Function that sets log levels and format strings. Checks for the
@@ -193,4 +252,13 @@ def log_init(level_name: str) -> None:
     level_value = logging._nameToLevel[ot_log_level]
 
     logging_config = _config(ARCHITECTURE, level_value)
+
+    # TODO
+    if ARCHITECTURE != SystemArchitecture.HOST:
+        # Conditional import: we only want to use systemd when we're on a robot.
+        from systemd.journal import JournalHandler  # type: ignore
+
+        global _journal_shoveler
+        _journal_shoveler = QueueListener(log_queue, JournalHandler())
+
     dictConfig(logging_config)
