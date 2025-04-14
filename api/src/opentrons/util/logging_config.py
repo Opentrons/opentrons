@@ -33,39 +33,6 @@ library
 log_queue = Queue[logging.LogRecord]()
 
 
-class CustomQueueHandler(QueueHandler):
-    """A logging.QueueHandler with some customizations.
-
-    - Allow extra
-    - Do not mangle records
-    - Block
-    """
-
-    def __init__(
-        self, *, queue: Queue[logging.LogRecord], syslog_identifier: str
-    ) -> None:
-        super().__init__(queue=queue)
-        # Double underscore because we're subclassing external code so we should try to
-        # avoid collisions with its attributes.
-        self.__syslog_identifier = syslog_identifier
-
-    @override
-    def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
-        """
-        - Allow extra
-        - Do not mangle records
-        """
-        record.__dict__.setdefault("SYSLOG_IDENTIFIER", self.__syslog_identifier)
-        return record
-
-    @override
-    def enqueue(self, record: logging.LogRecord) -> None:
-        # This cast is safe because we constrain the type of self.queue
-        # in our __init__() and nobody should mutate it after-the-fact, in practice.
-        queue = cast(Queue[logging.LogRecord], self.queue)
-        queue.put(record)
-
-
 def _host_config(level_value: int) -> Dict[str, Any]:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
@@ -155,29 +122,32 @@ def _robot_config(level_value: int) -> Dict[str, Any]:
         },
         "handlers": {
             "api": {
-                "class": CustomQueueHandler,
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
                 "syslog_identifier": "opentrons-api",
                 "queue": log_queue,
             },
             "serial": {
-                "class": CustomQueueHandler,
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
                 "syslog_identifier": "opentrons-api-serial",
+                "queue": log_queue,
             },
             "can_serial": {
-                "class": CustomQueueHandler,
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
                 "syslog_identifier": "opentrons-api-serial-can",
+                "queue": log_queue,
             },
             "usbbin_serial": {
-                "class": CustomQueueHandler,
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
                 "syslog_identifier": "opentrons-api-serial-usbbin",
+                "queue": log_queue,
             },
             # TODO
             "sensor": {
@@ -231,9 +201,6 @@ def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
     }[arch](level_value)
 
 
-_journal_shoveler: QueueListener | None = None
-
-
 def log_init(level_name: str) -> None:
     """
     Function that sets log levels and format strings. Checks for the
@@ -260,5 +227,9 @@ def log_init(level_name: str) -> None:
 
         global _journal_shoveler
         _journal_shoveler = QueueListener(log_queue, JournalHandler())
+        _journal_shoveler.start()
 
     dictConfig(logging_config)
+
+
+_journal_shoveler: QueueListener | None = None
