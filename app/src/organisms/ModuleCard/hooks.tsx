@@ -29,6 +29,7 @@ import type {
   TCDeactivateLidCreateCommand,
   TCOpenLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
+  FlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
@@ -237,6 +238,20 @@ export function useModuleOverflowMenu(
     })
   }
 
+  const homeShuttleCommand: FlexStackerPrepareShuttleCreateCommand = {
+    commandType: 'flexStacker/prepareShuttle',
+    params: {
+      moduleId: module.id,
+    },
+  }
+  const homeShuttle = (): void => {
+    createLiveCommand({
+      command: homeShuttleCommand,
+    }).catch((e: Error) => {
+      console.error(`error homing flex stacker shuttle: ${e.message}`)
+    })
+  }
+
   const sendBlockTempCommand =
     module.moduleType === THERMOCYCLER_MODULE_TYPE &&
     module.data.targetTemperature != null
@@ -371,11 +386,11 @@ export function useModuleOverflowMenu(
     ],
     flexStackerModuleType: [
       {
-        setSetting: t('overflow_menu_about'),
+        setSetting: t('overflow_menu_home_shuttle'),
         isSecondary: false,
-        isSettingDisabled: false,
-        menuButtons: [],
-        onClick: handleAboutClick,
+        isSettingDisabled: isDisabled,
+        menuButtons: [aboutModuleBtn],
+        onClick: homeShuttle,
       },
     ],
   }
