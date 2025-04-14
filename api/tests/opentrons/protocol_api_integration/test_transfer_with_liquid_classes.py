@@ -2059,3 +2059,61 @@ def test_water_transfer_with_multi_channel_pipette(
         )
         assert patched_aspirate.call_count == 2
         assert patched_dispense.call_count == 2
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+)
+def test_raises_no_tips_available_error(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should raise an error explaining that there aren't any tips available."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack1 = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_50ul", "D1"
+    )
+    tiprack2 = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_50ul", "D2"
+    )
+    pipette_50 = simulated_protocol_context.load_instrument(
+        "flex_1channel_50", mount="left", tip_racks=[tiprack1, tiprack2]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+    water = simulated_protocol_context.define_liquid_class("water")
+    expected_error_msg = (
+        "No tip available among the tipracks assigned for flex_1channel_50:"
+        " \\['Opentrons Flex 96 Tip Rack 50 µL in D1', 'Opentrons Flex 96 Tip Rack 50 µL in D2'\\]"
+    )
+    with pytest.raises(RuntimeError, match=expected_error_msg):
+        pipette_50.transfer_with_liquid_class(
+            liquid_class=water,
+            volume=160,
+            source=nest_plate.columns(),
+            dest=arma_plate.columns(),
+            new_tip="always",
+            trash_location=trash,
+        )
+    with pytest.raises(RuntimeError, match=f"{expected_error_msg}"):
+        pipette_50.distribute_with_liquid_class(
+            liquid_class=water,
+            volume=160,
+            source=nest_plate.wells()[-1],
+            dest=arma_plate.columns(),
+            new_tip="once",
+            trash_location=trash,
+        )
+    with pytest.raises(RuntimeError, match=f"{expected_error_msg}"):
+        pipette_50.consolidate_with_liquid_class(
+            liquid_class=water,
+            volume=50,
+            source=nest_plate.columns(),
+            dest=arma_plate.wells()[0],
+            new_tip="once",
+            trash_location=trash,
+        )
