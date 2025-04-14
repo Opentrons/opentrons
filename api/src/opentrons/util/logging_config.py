@@ -191,6 +191,9 @@ def log_init(level_name: str) -> None:
             f"Defaulting to {fallback_log_level}\n"
         )
         ot_log_level = fallback_log_level
+
+    # todo(mm, 2025-04-14): Use logging.getLevelNamesMapping() when we have Python >=3.11.
     level_value = logging._nameToLevel[ot_log_level]
+
     logging_config = _config(ARCHITECTURE, level_value)
     dictConfig(logging_config)
