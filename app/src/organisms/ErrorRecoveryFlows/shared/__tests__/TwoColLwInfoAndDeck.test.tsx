@@ -48,7 +48,12 @@ describe('TwoColLwInfoAndDeck', () => {
       },
       failedLabwareUtils: {
         relevantWellName: 'A1',
+        relevantPickUpTipWellName: 'A1',
         failedLabware: { location: 'C1' },
+        relevantPickUpTipLabware: { id: 'some-id' },
+        relevantPickUpTipLwLocs: {
+          displayNameCurrentLoc: 'Slot C1',
+        },
         failedLabwareLocations: {
           newLoc: {},
           currentLoc: {},
@@ -109,6 +114,21 @@ describe('TwoColLwInfoAndDeck', () => {
   it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE}`, () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Replace used tips in rack location A1 in Slot C1',
+        type: 'location',
+        bannerText:
+          "It's best to replace tips and select the last location used for tip pickup.",
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({

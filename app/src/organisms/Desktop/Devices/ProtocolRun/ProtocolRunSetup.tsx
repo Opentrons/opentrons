@@ -143,7 +143,8 @@ export function ProtocolRunSetup({
   }, [flexOffsetsApplied])
 
   const offsetsConfirmed = isFlex
-    ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
+    ? runHasStarted ||
+      (flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY))
     : !missingSteps.includes(LPC_STEP_KEY)
   const buildLPCIncompleteText = (): string | null => {
     if (isFlex) {
