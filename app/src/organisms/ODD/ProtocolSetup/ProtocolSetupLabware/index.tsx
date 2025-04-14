@@ -207,7 +207,7 @@ export function ProtocolSetupLabware({
                     onClick={setSelectedLabwareStack}
                   />
                 ))}
-                {offDeckItems?.forEach((item, index) => (
+                {offDeckItems?.map((item, index) => (
                   <RowLabware
                     key={index}
                     attachedProtocolModules={attachedProtocolModuleMatches}

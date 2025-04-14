@@ -1553,6 +1553,13 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         """
+        if volume == 0.0:
+            _log.info(
+                f"Transfer of {liquid_class.name} specified with a volume of 0uL."
+                f" Skipping."
+            )
+            return self
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1645,6 +1652,13 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         """
+        if volume == 0.0:
+            _log.info(
+                f"Distribution of {liquid_class.name} specified with a volume of 0uL."
+                f" Skipping."
+            )
+            return self
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1743,6 +1757,13 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         """
+        if volume == 0.0:
+            _log.info(
+                f"Consolidation of {liquid_class.name} specified with a volume of 0uL."
+                f" Skipping."
+            )
+            return self
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,

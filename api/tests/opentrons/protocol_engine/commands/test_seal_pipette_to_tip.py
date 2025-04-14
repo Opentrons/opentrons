@@ -38,7 +38,7 @@ from opentrons.protocol_engine.commands.seal_pipette_to_tip import (
 from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import OT3HardwareControlAPI
 
 from opentrons_shared_data.labware import load_definition
 
@@ -60,7 +60,7 @@ async def test_success(
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
     evotips_definition: LabwareDefinition,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: OT3HardwareControlAPI,
     pipetting: PipettingHandler,
 ) -> None:
     """A PickUpTip command should have an execution implementation."""
@@ -70,7 +70,7 @@ async def test_success(
         tip_handler=tip_handler,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
-        hardware_api=hardware_api,
+        hardware_api=ot3_hardware_api,
         pipetting=pipetting,
     )
 
@@ -146,7 +146,7 @@ async def test_no_tip_physically_missing_error(
     tip_handler: TipHandler,
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: OT3HardwareControlAPI,
     pipetting: PipettingHandler,
     evotips_definition: LabwareDefinition,
 ) -> None:
@@ -157,7 +157,7 @@ async def test_no_tip_physically_missing_error(
         tip_handler=tip_handler,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
-        hardware_api=hardware_api,
+        hardware_api=ot3_hardware_api,
         pipetting=pipetting,
     )
 
@@ -234,7 +234,7 @@ async def test_stall_error(
     tip_handler: TipHandler,
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: OT3HardwareControlAPI,
     pipetting: PipettingHandler,
     evotips_definition: LabwareDefinition,
 ) -> None:
@@ -245,7 +245,7 @@ async def test_stall_error(
         tip_handler=tip_handler,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
-        hardware_api=hardware_api,
+        hardware_api=ot3_hardware_api,
         pipetting=pipetting,
     )
 

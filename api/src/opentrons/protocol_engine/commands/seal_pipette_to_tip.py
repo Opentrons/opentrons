@@ -7,7 +7,7 @@ from opentrons.types import MountType
 from opentrons.protocol_engine.types import MotorAxis
 from typing_extensions import Literal
 
-from ..resources import ModelUtils
+from ..resources import ModelUtils, ensure_ot3_hardware
 from ..types import PickUpTipWellLocation, FluidKind, AspiratedFluid
 from .pipetting_common import (
     PipetteIdMixin,
@@ -157,6 +157,11 @@ class SealPipetteToTipImplementation(
         # retract cam : 11.05
         await self._gantry_mover.move_axes(
             axis_map={mount_axis: retract_distance}, speed=5.5, relative_move=True
+        )
+
+        ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
+        await ot3_hardware_api.update_axis_position_estimations(
+            self._gantry_mover.motor_axes_to_present_hardware_axes([mount_axis])
         )
 
     async def cam_action_relative_pickup_tip(
