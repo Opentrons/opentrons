@@ -102,8 +102,6 @@ function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
       <OffsetBannerContainer {...props} />
       <DefaultLocationOffset {...props} />
       <LocationSpecificOffsetsContainer {...props} />
-      {/* Accommodate scrolling on the ODD. */}
-      <Flex css={ODD_SCROLL_BUFFER} />
     </Flex>
   )
 }
@@ -114,12 +112,6 @@ export const LIST_CONTAINER_STYLE = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     gap: ${SPACING.spacing24};
-  }
-`
-
-const ODD_SCROLL_BUFFER = css`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: ${SPACING.spacing40};
   }
 `
 
