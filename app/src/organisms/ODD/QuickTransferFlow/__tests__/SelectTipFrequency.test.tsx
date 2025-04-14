@@ -54,6 +54,20 @@ describe('SelectTipFrequency', () => {
     screen.getByText('Per source well')
   })
 
+  it('renders once at the start of the transfer option only', () => {
+    props.state.sourceWells = []
+    props.state.destinationWells = []
+    props.state.path = 'single'
+    render(props)
+    screen.getByText('Once at the start of the transfer')
+  })
+
+  it('renders once at the start of the transfer option only', () => {
+    props.state.transferType = 'distribute'
+    render(props)
+    screen.getByText('Per destination well')
+  })
+
   it('should call mock function when tappin exit button', () => {
     render(props)
     fireEvent.click(screen.getByText('Exit'))
