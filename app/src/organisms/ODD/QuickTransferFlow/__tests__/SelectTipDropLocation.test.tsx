@@ -56,6 +56,7 @@ describe('SelectTipDropLocation', () => {
     screen.getByText('Exit')
     screen.getByText('Continue')
     screen.getByText('Trash bin in A3')
+    screen.getByText('Waste chute in C3')
   })
 
   it('should call mock function when tappin exit button', () => {
