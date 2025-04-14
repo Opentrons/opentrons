@@ -13,9 +13,6 @@ requirements = {
     "apiLevel": "2.22",
 }
 
-EVOSEP_TEMPORARY_OFFSET = 0
-H_TIP_IN_WELL = 0
-
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
@@ -88,12 +85,12 @@ def run(protocol: ProtocolContext) -> None:
         p1k_96.aspirate(15 + 2, sol_a.bottom(z=2))
         protocol.delay(seconds=1)
 
-        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+        p1k_96.move_to(evotip.top())
 
-        p1k_96.dispense(15, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 38))  # -36
+        p1k_96.dispense(15, evotip.top(z=-38))  # -36
         protocol.delay(seconds=1)
-        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 33), speed=0.5)  # -31
-        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET + 5))
+        p1k_96.move_to(evotip.top(z=-33), speed=0.5)  # -31
+        p1k_96.move_to(evotip.top(z=+5))
 
         p1k_96.return_tip()
 
@@ -102,12 +99,12 @@ def run(protocol: ProtocolContext) -> None:
         p1k_96.aspirate(20, sample.bottom(z=1))
         protocol.delay(seconds=1)
 
-        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+        p1k_96.move_to(evotip.top())
 
-        p1k_96.dispense(20, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - 28))  # -27
+        p1k_96.dispense(20, evotip.top(z=-28))  # -27
         protocol.delay(seconds=1)
-        p1k_96.move_to(evotip.top(EVOSEP_TEMPORARY_OFFSET - 23), speed=2)  # -22
-        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET + 5))
+        p1k_96.move_to(evotip.top(z=-23), speed=2)  # -22
+        p1k_96.move_to(evotip.top(z=5))
 
         # protocol.pause(' ')
 
@@ -125,26 +122,18 @@ def run(protocol: ProtocolContext) -> None:
         p1k_96.aspirate(150, sol_a.bottom(z=2))
         protocol.delay(seconds=1)
 
-        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+        p1k_96.move_to(evotip.top())
 
         p1k_96.flow_rate.dispense = 2
-        p1k_96.dispense(50, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H).move(Point(x=D)))
+        p1k_96.dispense(50, evotip.top(z=-H).move(Point(x=D)))
         p1k_96.flow_rate.dispense = 8
-        p1k_96.move_to(
-            evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H).move(Point(x=0)), speed=5
-        )
-        p1k_96.move_to(
-            evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H + 5).move(Point(x=0)), speed=5
-        )
-        p1k_96.dispense(
-            100, evotip.top(z=EVOSEP_TEMPORARY_OFFSET - H + 5).move(Point(x=0))
-        )
+        p1k_96.move_to(evotip.top(z=-H).move(Point(x=0)), speed=5)
+        p1k_96.move_to(evotip.top(z=-H + 5).move(Point(x=0)), speed=5)
+        p1k_96.dispense(100, evotip.top(z=-H + 5).move(Point(x=0)))
         protocol.delay(seconds=1)
 
-        # p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET-H))
-        p1k_96.move_to(evotip.top(z=EVOSEP_TEMPORARY_OFFSET))
+        p1k_96.move_to(evotip.top())
 
-        # p1k_96.move_to(tips_200.wells()[0].top(z=40))
         protocol.pause("Check for 3 distinct layers.")
 
         p1k_96.return_tip()
@@ -175,7 +164,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.pause("check tip alignment.")
 
         p1k_96.resin_tip_dispense(
-            location=sample_plate["A1"].bottom(), volume=300.0, rate=100.0
+            location=sample_plate["A1"].bottom(), volume=400.0, rate=100.0
         )
         protocol.delay(seconds=20)
         p1k_96.resin_tip_dispense(
