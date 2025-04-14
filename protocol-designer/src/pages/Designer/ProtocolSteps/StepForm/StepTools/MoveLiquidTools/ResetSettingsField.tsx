@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
+  FLEX_MAX_CONTENT,
+  JUSTIFY_CENTER,
   SPACING,
   StyledText,
   TertiaryButton,
@@ -24,8 +27,14 @@ export function ResetSettingsField(
       flexDirection={DIRECTION_COLUMN}
       padding={`0 ${SPACING.spacing16}`}
       paddingBottom={SPACING.spacing40}
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
     >
-      <TertiaryButton onClick={onClick} buttonType="white">
+      <TertiaryButton
+        onClick={onClick}
+        buttonType="white"
+        width={FLEX_MAX_CONTENT}
+      >
         <StyledText desktopStyle="captionSemiBold">
           {t(`protocol_steps:reset_settings`, { tab })}
         </StyledText>
