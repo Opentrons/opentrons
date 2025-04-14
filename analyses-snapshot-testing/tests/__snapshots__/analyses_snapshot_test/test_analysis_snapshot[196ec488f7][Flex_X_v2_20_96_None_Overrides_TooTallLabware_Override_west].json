@@ -1464,7 +1464,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "PartialTipMovementNotAllowedError [line 479]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Moving to Opentrons OT-2 96 Tip Rack 1000 µL in slot C2 with H12 nozzle partial configuration will result in collision with items in deck slot C1.",
+      "detail": "UnboundLocalError [line 479]: local variable 'volume' referenced before assignment",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -1473,10 +1473,15 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Moving to Opentrons OT-2 96 Tip Rack 1000 µL in slot C2 with H12 nozzle partial configuration will result in collision with items in deck slot C1.",
-          "errorCode": "2004",
-          "errorInfo": {},
-          "errorType": "PartialTipMovementNotAllowedError",
+          "detail": "UnboundLocalError: local variable 'volume' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'volume' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_20_96_None_Overrides_TooTallLabware_Override_west.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in pick_up_tip\n    move_to_location = move_to_location or well.top()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line N, in top\n    return Location(self._core.get_top(z_offset=z), self)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/well.py\", line N, in get_top\n    return self._engine_client.state.geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    offset_adjustment = self.get_well_offset_adjustment(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_offset_adjustment\n    if volume:\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

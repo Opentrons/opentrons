@@ -12220,744 +12220,23 @@
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "dd0d03a1-5e81-49d7-8105-3b1906046282",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 181.38,
-          "z": 110.0
-        },
-        "tipDiameter": 5.59,
-        "tipLength": 47.85,
-        "tipVolume": 200.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "78c85766-1162-491e-b184-5a81303e90fe",
-      "notes": [],
-      "params": {
-        "flowRate": 6.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 1.0
-          },
-          "origin": "bottom",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 391.88,
-          "y": 149.74,
-          "z": 5.85
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "2a7371d1-de5c-4eec-a8b3-cf4c0912997f",
-      "notes": [],
-      "params": {
-        "flowRate": 6.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.5
-          },
-          "origin": "bottom",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 74.24,
-          "z": 1.75
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToAddressableArea",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "023803de-fa5d-4fc9-9c90-d6669ca0e22f",
-      "notes": [],
-      "params": {
-        "addressableAreaName": "movableTrashA3",
-        "forceDirect": false,
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "pipetteId": "UUID",
-        "stayAtHighestPossibleZ": false
-      },
-      "result": {
-        "position": {
-          "x": 434.25,
-          "y": 364.0,
-          "z": 40.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "cd970c8b-6702-466d-801c-cc6f1754fe99",
-      "notes": [],
-      "params": {
-        "pipetteId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "b4d0cd8c-24ae-4726-a70d-cbaffe679bee",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 14.38,
-          "y": 181.38,
-          "z": 110.0
-        },
-        "tipDiameter": 5.59,
-        "tipLength": 47.85,
-        "tipVolume": 200.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "e455aaa3-b216-488a-9350-d48803f76f58",
-      "notes": [],
-      "params": {
-        "flowRate": 6.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 1.0
-          },
-          "origin": "bottom",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 391.88,
-          "y": 256.78499999999997,
-          "z": 5.82
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "836048ac-7025-4e72-8748-441b7930b9ca",
-      "notes": [],
-      "params": {
-        "flowRate": 6.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.5
-          },
-          "origin": "bottom",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 74.24,
-          "z": 1.75
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToAddressableArea",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ced579c2-1f4d-4104-956e-63d5ea4e2f11",
-      "notes": [],
-      "params": {
-        "addressableAreaName": "movableTrashA3",
-        "forceDirect": false,
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "pipetteId": "UUID",
-        "stayAtHighestPossibleZ": false
-      },
-      "result": {
-        "position": {
-          "x": 434.25,
-          "y": 364.0,
-          "z": 40.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "46535c9c-0f76-44f3-8bf6-8302df4c7587",
-      "notes": [],
-      "params": {
-        "pipetteId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "thermocycler/openLid",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "6c71c0d2-080f-4013-8c67-ca04b97cf708",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ba5c71eb-7e31-44f8-a269-5a73169d4301",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 395.38,
-          "z": 110.0
-        },
-        "tipDiameter": 5.59,
-        "tipLength": 47.85,
-        "tipVolume": 200.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "efafa14f-a822-4936-aa4b-f1816fbce0cf",
-      "notes": [],
-      "params": {
-        "flowRate": 6.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 200.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 1.0
-          },
-          "origin": "bottom",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 391.88,
-          "y": 149.74,
-          "z": 5.85
-        },
-        "volume": 200.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "331b1293-2ea7-4bec-8764-ce5e681076e8",
-      "notes": [],
-      "params": {
-        "flowRate": 6.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 200.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.5
-          },
-          "origin": "bottom",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 288.24,
-          "z": 1.55
-        },
-        "volume": 200.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveLabware",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "52dfeaa8-15a4-4f60-bad2-fc5f4e613505",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "newLocation": {
-          "moduleId": "UUID"
-        },
-        "strategy": "usingGripper"
-      },
-      "result": {
-        "eventualDestinationLocationSequence": [
-          {
-            "addressableAreaName": "thermocyclerModuleV2",
-            "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
-            "cutoutId": "cutoutB1",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "thermocyclerModuleV2Front"
-            ]
-          }
-        ],
-        "immediateDestinationLocationSequence": [
-          {
-            "addressableAreaName": "thermocyclerModuleV2",
-            "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
-            "cutoutId": "cutoutB1",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "thermocyclerModuleV2Front"
-            ]
-          }
-        ],
-        "originLocationSequence": [
-          {
-            "addressableAreaName": "B2",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutB2",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
-          }
-        ]
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "thermocycler/closeLid",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "0b39c9f9-feba-4c65-9738-1faf9d262bc1",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "thermocycler/setTargetBlockTemperature",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ccf7fe2a-afed-4cfc-b627-46f0ba33527a",
-      "notes": [],
-      "params": {
-        "celsius": 30.0,
-        "moduleId": "UUID"
-      },
-      "result": {
-        "targetBlockTemperature": 30.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "thermocycler/waitForBlockTemperature",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "0ac9eca4-cdf1-4bec-81e1-c4006efd6406",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "thermocycler/setTargetLidTemperature",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "8be969b0-0f50-4c25-afa9-7308d8192bc6",
-      "notes": [],
-      "params": {
-        "celsius": 80.0,
-        "moduleId": "UUID"
-      },
-      "result": {
-        "targetLidTemperature": 80.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "thermocycler/waitForLidTemperature",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "8555b372-ab4b-4ead-8751-3a1ad9f2d21e",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveLabware",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "f9a41767-e274-4251-89c5-ca1a60053924",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "newLocation": {
-          "labwareId": "UUID"
-        },
-        "strategy": "usingGripper"
-      },
-      "result": {
-        "eventualDestinationLocationSequence": [
-          {
-            "kind": "onLabware",
-            "labwareId": "UUID"
-          },
-          {
-            "addressableAreaName": "temperatureModuleV2D3",
-            "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
-            "cutoutId": "cutoutD3",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "temperatureModuleV2"
-            ]
-          }
-        ],
-        "immediateDestinationLocationSequence": [
-          {
-            "kind": "onLabware",
-            "labwareId": "UUID"
-          },
-          {
-            "addressableAreaName": "temperatureModuleV2D3",
-            "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
-            "cutoutId": "cutoutD3",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "temperatureModuleV2"
-            ]
-          }
-        ],
-        "originLocationSequence": [
-          {
-            "addressableAreaName": "D2",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutD2",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
-          }
-        ]
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "temperatureModule/setTargetTemperature",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "2a6ef56f-d5ba-4818-8f5d-8bca66ad2cb9",
-      "notes": [],
-      "params": {
-        "celsius": 50.0,
-        "moduleId": "UUID"
-      },
-      "result": {
-        "targetTemperature": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveLabware",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "6037a29b-2009-4262-9be5-ae440d2a9f92",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "newLocation": "offDeck",
-        "strategy": "manualMoveWithPause"
-      },
-      "result": {
-        "eventualDestinationLocationSequence": [
-          {
-            "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
-          }
-        ],
-        "immediateDestinationLocationSequence": [
-          {
-            "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
-          }
-        ],
-        "originLocationSequence": [
-          {
-            "kind": "onLabware",
-            "labwareId": "UUID"
-          },
-          {
-            "addressableAreaName": "A2",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutA2",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
-          }
-        ]
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveLabware",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "f179b3b6-eb5f-405c-ba97-e4a6511f7a90",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "newLocation": "offDeck",
-        "strategy": "manualMoveWithPause"
-      },
-      "result": {
-        "eventualDestinationLocationSequence": [
-          {
-            "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
-          }
-        ],
-        "immediateDestinationLocationSequence": [
-          {
-            "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
-          }
-        ],
-        "originLocationSequence": [
-          {
-            "kind": "onLabware",
-            "labwareId": "UUID"
-          },
-          {
-            "addressableAreaName": "C2",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutC2",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
-          }
-        ]
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveLabware",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
       "error": {
         "createdAt": "TIMESTAMP",
-        "detail": "Cannot move labware 'opentrons_flex_96_tiprack_200ul' when 200 µL tips are attached.",
+        "detail": "UnboundLocalError: local variable 'volume' referenced before assignment",
         "errorCode": "4000",
-        "errorInfo": {},
-        "errorType": "LabwareMovementNotAllowedError",
+        "errorInfo": {
+          "args": "(\"local variable 'volume' referenced before assignment\",)",
+          "class": "UnboundLocalError",
+          "name": "None",
+          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/pick_up_tip.py\", line N, in execute\n    move_result = await move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/movement_common.py\", line N, in move_to_well\n    position = await movement.move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/movement.py\", line N, in move_to_well\n    waypoints = self._state_store.motion.get_movement_waypoints_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/motion.py\", line N, in get_movement_waypoints_to_well\n    destination = self._geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    offset_adjustment = self.get_well_offset_adjustment(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_offset_adjustment\n    if volume:\n"
+        },
+        "errorType": "PythonException",
         "id": "UUID",
         "isDefined": false,
         "wrappedErrors": []
       },
       "id": "UUID",
-      "key": "702caca4-12c8-4f26-a68e-138134723f09",
+      "key": "dd0d03a1-5e81-49d7-8105-3b1906046282",
       "notes": [
         {
           "longMessage": "Handling this command failure with FAIL_RUN.",
@@ -12968,10 +12247,16 @@
       ],
       "params": {
         "labwareId": "UUID",
-        "newLocation": {
-          "labwareId": "UUID"
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
         },
-        "strategy": "usingGripper"
+        "wellName": "A1"
       },
       "startedAt": "TIMESTAMP",
       "status": "failed"
@@ -12985,10 +12270,15 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "Cannot move labware 'opentrons_flex_96_tiprack_200ul' when 200 µL tips are attached.",
+      "detail": "UnboundLocalError: local variable 'volume' referenced before assignment",
       "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "LabwareMovementNotAllowedError",
+      "errorInfo": {
+        "args": "(\"local variable 'volume' referenced before assignment\",)",
+        "class": "UnboundLocalError",
+        "name": "None",
+        "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/pick_up_tip.py\", line N, in execute\n    move_result = await move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/movement_common.py\", line N, in move_to_well\n    position = await movement.move_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/movement.py\", line N, in move_to_well\n    waypoints = self._state_store.motion.get_movement_waypoints_to_well(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/motion.py\", line N, in get_movement_waypoints_to_well\n    destination = self._geometry.get_well_position(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_position\n    offset_adjustment = self.get_well_offset_adjustment(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/geometry.py\", line N, in get_well_offset_adjustment\n    if volume:\n"
+      },
+      "errorType": "PythonException",
       "id": "UUID",
       "isDefined": false,
       "wrappedErrors": []
@@ -13051,7 +12341,9 @@
       "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
-      "location": "offDeck"
+      "location": {
+        "labwareId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
@@ -13085,7 +12377,9 @@
       "displayName": "Opentrons Flex 96 Tip Rack 200 µL (3)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
-      "location": "offDeck"
+      "location": {
+        "labwareId": "UUID"
+      }
     },
     {
       "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2",
@@ -13093,7 +12387,7 @@
       "id": "UUID",
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
       "location": {
-        "moduleId": "UUID"
+        "slotName": "B2"
       }
     },
     {
@@ -13102,7 +12396,7 @@
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
       "location": {
-        "labwareId": "UUID"
+        "slotName": "D2"
       }
     },
     {
