@@ -115,7 +115,7 @@ def generate_tof_baseline(
 
 
 def labware_detected(
-    histogram: Dict[int, List[int]],
+    histogram: Dict[int, List[float]],
     sensor: TOFSensor,
     bins: List[int],
     zones: List[int],
