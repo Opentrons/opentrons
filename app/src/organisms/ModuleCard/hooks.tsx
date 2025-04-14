@@ -113,20 +113,6 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const homeShuttleBtn = (
-    <>
-      <MenuItem
-        key={`home_shuttle_${String(module.moduleModel)}`}
-        data-testid={`home_shuttle_${String(module.moduleModel)}`}
-        onClick={() => {
-          homeShuttle()
-        }}
-      >
-        {t('overflow_menu_home_shuttle')}
-      </MenuItem>
-    </>
-  )
-
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle'
@@ -400,11 +386,11 @@ export function useModuleOverflowMenu(
     ],
     flexStackerModuleType: [
       {
-        setSetting: t('overflow_menu_about'),
+        setSetting: t('overflow_menu_home_shuttle'),
         isSecondary: false,
-        isSettingDisabled: false,
-        menuButtons: [homeShuttleBtn],
-        onClick: handleAboutClick,
+        isSettingDisabled: isDisabled,
+        menuButtons: [aboutModuleBtn],
+        onClick: homeShuttle,
       },
     ],
   }
