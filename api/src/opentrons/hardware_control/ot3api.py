@@ -246,6 +246,7 @@ class OT3API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
+        self._module_door_serial: str | None = None
         self._pause_manager = PauseManager()
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -280,6 +281,14 @@ class OT3API(
     @door_state.setter
     def door_state(self, door_state: DoorState) -> None:
         self._door_state = door_state
+
+    @property
+    def module_door_serial(self) -> str | None:
+        return self._module_door_serial
+
+    @module_door_serial.setter
+    def module_door_serial(self, module_serial: str | None = None) -> None:
+        self._module_door_serial = module_serial
 
     @property
     def gantry_load(self) -> GantryLoad:
@@ -320,15 +329,24 @@ class OT3API(
         async with self._backend.grab_pressure(instrument.channels, mount):
             yield
 
-    def _update_door_state(self, door_state: DoorState) -> None:
-        mod_log.info(f"Updating the window switch status: {door_state}")
-        self.door_state = door_state
-        for cb in self._callbacks:
-            hw_event = DoorStateNotification(new_state=door_state)
-            try:
-                cb(hw_event)
-            except Exception:
-                mod_log.exception("Errored during door state event callback")
+    def _update_door_state(
+        self, door_state: DoorState, module_serial: str | None = None
+    ) -> None:
+        mod_log.info(f"Updating the window or module switch status: {door_state}")
+        if self.door_state == DoorState.CLOSED or (
+            self.door_state == DoorState.OPEN
+            and self.module_door_serial == module_serial
+        ):
+            self.door_state = door_state
+            self.module_door_serial = module_serial
+            for cb in self._callbacks:
+                hw_event = DoorStateNotification(
+                    new_state=door_state, module_serial=module_serial
+                )
+                try:
+                    cb(hw_event)
+                except Exception:
+                    mod_log.exception("Errored during door state event callback")
 
     def _update_estop_state(self, event: HardwareEvent) -> "List[Future[None]]":
         if not isinstance(event, EstopStateNotification):

@@ -11,12 +11,14 @@ from opentrons.drivers.flex_stacker.types import (
     MoveParams,
     MoveResult,
     StackerAxis,
+    TOFSensor,
     HardwareRevision,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
     STALLGUARD_CONFIG,
+    TOF_DETECTION_CONFIG,
     FlexStackerDriver,
 )
 from opentrons.drivers.flex_stacker.abstract import AbstractFlexStackerDriver
@@ -44,6 +46,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleLabwareError,
     FlexStackerHopperLabwareError,
 )
+from opentrons_shared_data.module import load_tof_baseline_data
 
 log = logging.getLogger(__name__)
 
@@ -474,6 +477,35 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
 
+    async def labware_detected(self, axis: StackerAxis, direction: Direction) -> bool:
+        """Detect labware on the TOF sensor using the `baseline` method
+
+        NOTE: This method is still under development and is inconsistent when detecting
+        labware on the X axis in the Extended position. We can consistently detect
+        labware on the Z, but we need to do more data collection and testing
+        to validate this method.
+        """
+        sensor = TOFSensor.X if axis == StackerAxis.X else TOFSensor.Z
+        # The TOF Detection configs are the same for the Z sensor
+        direction = Direction.EXTEND if sensor == TOFSensor.Z else direction
+        baseline = load_tof_baseline_data(self.model())[sensor.value]
+        config = TOF_DETECTION_CONFIG[sensor][direction]
+
+        # Take a histogram reading and determine if labware was detected
+        histogram = await self._driver.get_tof_histogram(sensor)
+        for zone in config.zones:
+            raw_data = histogram.bins[zone]
+            baseline_data = baseline[zone]
+            for bin in config.bins:
+                # We need to ignore raw photon count below N photons as
+                # it becomes inconsistent to detect labware given false positives.
+                if raw_data[bin] < config.threshold:
+                    continue
+                delta = raw_data[bin] - baseline_data[bin]
+                if delta > 0:
+                    return True
+        return False
+
     async def verify_shuttle_location(self, expected: PlatformState) -> None:
         """Verify the shuttle is present and in the expected location."""
         await self._reader.read()
@@ -493,8 +525,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self, direction: Direction, labware_expected: bool
     ) -> None:
         """Check whether or not a labware is detected on the shuttle."""
-        # TODO: implement this function using tof sensor data
-        result = labware_expected
+        result = await self.labware_detected(StackerAxis.X, direction)
         if labware_expected != result:
             raise FlexStackerShuttleLabwareError(
                 self.device_info["serial"],
@@ -504,8 +535,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
     async def verify_hopper_labware_presence(self, labware_expected: bool) -> None:
         """Check whether or not a labware is detected inside the hopper."""
-        # TODO: implement this function using tof sensor data
-        result = labware_expected
+        result = await self.labware_detected(StackerAxis.Z, Direction.EXTEND)
         if labware_expected != result:
             raise FlexStackerHopperLabwareError(
                 self.device_info["serial"],

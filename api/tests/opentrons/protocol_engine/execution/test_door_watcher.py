@@ -97,6 +97,35 @@ async def test_event_forwarding(
         times=0,
     )
 
+    decoy.reset()
+
+    decoy.when(state_store.commands.get_is_running()).then_return(True)
+
+    input_event_module = DoorStateNotification(
+        new_state=DoorState.OPEN, module_serial="magical_module"
+    )
+    expected_action_to_forward_module = DoorChangeAction(
+        DoorState.OPEN, module_serial="magical_module"
+    )
+
+    await to_thread.run_sync(captured_handler, input_event_module)
+
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        action_dispatcher.dispatch(expected_action_to_forward_module),
+        times=1,
+    )
+
+    decoy.reset()
+    input_event_module = DoorStateNotification(
+        new_state=DoorState.CLOSED, module_serial="magical_module"
+    )
+    await to_thread.run_sync(captured_handler, input_event_module)
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        times=0,
+    )
+
 
 async def test_one_subscribe_one_unsubscribe(
     decoy: Decoy,

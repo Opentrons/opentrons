@@ -105,7 +105,9 @@ class DoorWatcher:
         if already_stopped:
             return
 
-        action = DoorChangeAction(door_state=event.new_state)
+        action = DoorChangeAction(
+            door_state=event.new_state, module_serial=event.module_serial
+        )
 
         if (
             self._state_store.commands.get_is_running()

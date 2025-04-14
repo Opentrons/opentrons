@@ -39,6 +39,7 @@
   "slotTransforms": {},
   "compatibleWith": ["thermocyclerModuleV1"],
   "incompatibleWithDecks": ["ot3_standard"],
+  "uniqueModuleData": {},
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",
