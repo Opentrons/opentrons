@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { 
-  StyledText, 
+import {
+  StyledText,
   COLORS,
   LegacyStyledText,
   TYPOGRAPHY,
   SPACING,
   Flex,
   WRAP,
-  DIRECTION_COLUMN
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 
@@ -23,18 +23,22 @@ export function FlexStackerModuleData(
   const { moduleData } = props
   const { t, i18n } = useTranslation(['device_details', 'shared'])
 
-  const shuttleDisplayStatus = 
-    moduleData.platformState === 'extended'
-      ? i18n.format(t('flex_stacker_extended'), 'capitalize')
-      : moduleData.platformState === 'retracted'
-      ? i18n.format(t('flex_stacker_retracted'), 'capitalize')
-      : i18n.format(t('shared:unknown'), 'capitalize')
-  
-  const doorDisplayStatus =
+  const shuttleDisplayStatus = i18n.format(
+    moduleData.platformState == 'extended'
+      ? t('flex_stacker_extended')
+      : moduleData.platformState == 'retracted'
+      ? t('flex_stacker_retracted')
+      : t('shared:unknown'),
+    'capitalize'
+  )
+
+  const doorDisplayStatus = i18n.format(
     moduleData.hopperDoorState === 'closed'
-      ? i18n.format(t('shared:closed'), 'capitalize')
-      : i18n.format(t('shared:open'), 'capitalize')
-  
+      ? t('shared:closed')
+      : t('shared:open'),
+    'capitalize'
+  )
+
   const ShuttleStatusLabelProps = {
     status: shuttleDisplayStatus,
     backgroundColor: COLORS.grey30,
@@ -42,7 +46,7 @@ export function FlexStackerModuleData(
     textColor: COLORS.grey60,
     pulse: false,
   }
-  
+
   switch (moduleData.platformState) {
     case 'extended':
     case 'retracted': {
@@ -58,7 +62,7 @@ export function FlexStackerModuleData(
       break
     }
   }
-  
+
   const DoorStatusLabelProps = {
     status: doorDisplayStatus,
     backgroundColor: COLORS.grey30,
@@ -66,13 +70,13 @@ export function FlexStackerModuleData(
     textColor: COLORS.grey60,
     pulse: false,
   }
-  
+
   if (moduleData.hopperDoorState === 'opened') {
     DoorStatusLabelProps.backgroundColor = COLORS.blue30
     DoorStatusLabelProps.iconColor = COLORS.blue60
     DoorStatusLabelProps.textColor = COLORS.blue60
   }
-      
+
   return (
     <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}>
       <Flex flexDirection={DIRECTION_COLUMN} data-testid="stacker_door_data">
