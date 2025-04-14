@@ -1359,6 +1359,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest: List[Tuple[Location, WellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1491,7 +1492,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
@@ -1682,6 +1683,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest: Tuple[Location, WellCore],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1764,7 +1766,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
