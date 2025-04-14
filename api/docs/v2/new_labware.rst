@@ -108,7 +108,7 @@ And this example loads an Opentrons Flex Tip Rack Lid onto a rack of 200 µL tip
         lid="opentrons_flex_tiprack_lid"
     )
 
-You might need multiple lids during your protocol. Use :py:meth:`.load_lid_stack` to stack up to five Opentrons Tough Auto-Sealing Lids on a deck slot, riser, or compatible adapter.
+You might need multiple lids during your protocol. Use :py:meth:`.ProtocolContext.load_lid_stack` to stack up to five Opentrons Tough Auto-Sealing Lids on a deck slot, or use :py:meth:`.Labware.load_lid_stack` to stack them on the riser or other compatible adapter.
 
 .. code-block:: python
 

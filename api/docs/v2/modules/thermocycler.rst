@@ -156,7 +156,14 @@ Use the following API load names for the auto-sealing lid and deck riser:
   * - Opentrons Flex Deck Riser
     - ``opentrons_flex_deck_riser``
 
-Load the riser directly onto the deck with :py:meth:`.ProtocolContext.load_adapter`. Load the auto-sealing lid onto a compatible location (the deck, the riser, or another lid) with the :py:meth:`.ProtocolContext.load_lid_stack` method. You can create a stack of up to five auto-sealing lids. If you try to stack more than five lids, the API will raise an error.
+Load the riser directly onto the deck with :py:meth:`.ProtocolContext.load_adapter`.
+
+You can load auto-sealing lids in a few ways:
+    - Load a single auto-sealing lid onto a compatible location (the deck, the riser, or another lid) with the appropriate ``load_labware()`` method.
+    - Use :py:meth:`.ProtocolContext.load_lid_stack` to create a stack of up to five auto-sealing lids directly on the deck.
+    - Use :py:meth:`.Labware.load_lid_stack` to create a stack of up to five auto-sealing lids on the riser.
+
+If you try to stack more than five lids, either by loading or moving them, the API will raise an error.
 
 Setting up the riser and preparing a lid to use on the Thermocycler generally consists of the following steps:
 
@@ -178,14 +185,11 @@ The following code sample shows how to perform these steps, using the riser and 
     # load a stack of three lids
     lid_stack = riser.load_lid_stack(
         load_name="opentrons_tough_pcr_auto_sealing_lid",
-        location=riser,
         quantity=3
     )
 
     # load plate on Thermocycler
-    plate = protocol.load_labware(
-        load_name="opentrons_96_wellplate_200ul_pcr_full_skirt", location=tc_mod
-    )
+    plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
 
     # move lid to PCR plate
     protocol.move_lid(
