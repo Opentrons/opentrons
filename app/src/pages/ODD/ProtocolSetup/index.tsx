@@ -507,7 +507,10 @@ function PrepareToRun({
       }
     } else if (isAnyNecessaryDefaultOffsetMissing) {
       return {
-        detail: t('num_missing_offsets', { num: numMissingLSOffsets }),
+        detail:
+          numMissingLSOffsets > 1
+            ? t('num_missing_offsets', { num: numMissingLSOffsets })
+            : t('one_missing_offset'),
         status: 'not ready',
       }
     } else {

@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { fixture96Plate, fixtureTiprackAdapter } from '@opentrons/shared-data'
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { LabwareOffsetTable } from '../LabwareOffsetTable'
+import { LegacyLabwareOffsetTable } from '../LegacyLabwareOffsetTable'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -54,8 +54,8 @@ const mockFourthCandidate: OffsetCandidate = {
   runCreatedAt: '2022-05-12T13:33:51.012179+00:00',
 }
 const render = () =>
-  renderWithProviders<ComponentProps<typeof LabwareOffsetTable>>(
-    <LabwareOffsetTable
+  renderWithProviders<ComponentProps<typeof LegacyLabwareOffsetTable>>(
+    <LegacyLabwareOffsetTable
       labwareDefinitions={[mockLabwareDef, mockAdapterDef]}
       offsetCandidates={[
         mockFirstCandidate,

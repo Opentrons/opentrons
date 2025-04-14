@@ -240,6 +240,7 @@
   "on_adapter": "on {{adapterName}}",
   "on_adapter_in_mod": "on {{adapterName}} in {{moduleName}}",
   "on_deck": "On deck",
+  "one_missing_offset": "1 missing offset",
   "opening": "Opening...",
   "parameters": "Parameters",
   "pipette_mismatch": "Pipette generation mismatch.",
