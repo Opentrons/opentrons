@@ -684,7 +684,7 @@ class Labware:
         version: Optional[int] = None,
     ) -> Labware:
         """
-        Load a stack of Lids onto a valid Deck Location or Adapter.
+        Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
 
         :param str load_name: A string to use for looking up a lid definition.
             You can find the ``load_name`` for any standard lid on the Opentrons
@@ -705,9 +705,7 @@ class Labware:
             leave this unspecified to let ``load_lid_stack()`` choose a version
             automatically.
 
-        :return: The initialized and loaded labware object representing the Lid Stack.
-
-        :meta private:
+        :return:  The initialized and loaded labware object representing the lid stack.
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
