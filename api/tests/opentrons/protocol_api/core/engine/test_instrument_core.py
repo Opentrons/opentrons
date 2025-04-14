@@ -2,7 +2,10 @@
 
 from typing import cast, Optional
 
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError,
+    CommandPreconditionViolated,
+)
 import pytest
 from decoy import Decoy
 from decoy import errors
@@ -2247,9 +2250,13 @@ def test_get_next_tip(
     subject: InstrumentCore,
 ) -> None:
     """It should return the next tip result."""
-    tip_racks = [decoy.mock(cls=LabwareCore)]
+    tip_racks = [decoy.mock(cls=LabwareCore), decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("other-tiprack-id")
+    decoy.when(tip_racks[1].labware_id).then_return("tiprack-id")
+    mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.get_name()).then_return("F00")
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
     expected_next_tip = NextTipInfo(labwareId="1234", tipStartingWell="BAR")
-    decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
@@ -2259,7 +2266,33 @@ def test_get_next_tip(
     ).then_return(GetNextTipResult(nextTipInfo=expected_next_tip))
     result = subject.get_next_tip(
         tip_racks=tip_racks,
-        starting_well="F00",
+        starting_well=mock_starting_well,
+    )
+    assert result == expected_next_tip
+
+
+def test_get_next_tip_no_starting_tip(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should return the next tip result with no starting tip."""
+    tip_racks = [decoy.mock(cls=LabwareCore), decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("other-tiprack-id")
+    decoy.when(tip_racks[1].labware_id).then_return("tiprack-id")
+    expected_next_tip = NextTipInfo(labwareId="1234", tipStartingWell="BAR")
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.GetNextTipParams(
+                pipetteId="abc123",
+                labwareIds=["other-tiprack-id", "tiprack-id"],
+                startingTipWell=None,
+            )
+        )
+    ).then_return(GetNextTipResult(nextTipInfo=expected_next_tip))
+    result = subject.get_next_tip(
+        tip_racks=tip_racks,
+        starting_well=None,
     )
     assert result == expected_next_tip
 
@@ -2272,6 +2305,9 @@ def test_get_next_tip_when_no_tip_available(
     """It should return None when there's no next tip available."""
     tip_racks = [decoy.mock(cls=LabwareCore)]
     decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
+    mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
+    decoy.when(mock_starting_well.get_name()).then_return("F00")
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
@@ -2285,9 +2321,42 @@ def test_get_next_tip_when_no_tip_available(
     )
     result = subject.get_next_tip(
         tip_racks=tip_racks,
-        starting_well="F00",
+        starting_well=mock_starting_well,
     )
     assert result is None
+
+
+def test_get_next_tip_raises_for_starting_tip_with_partial_config(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise if a NoTipAvailable is returned with the reason of partial config with starting tip."""
+    tip_racks = [decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
+    mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
+    decoy.when(mock_starting_well.get_name()).then_return("F00")
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.GetNextTipParams(
+                pipetteId="abc123", labwareIds=["tiprack-id"], startingTipWell="F00"
+            )
+        )
+    ).then_return(
+        GetNextTipResult(
+            nextTipInfo=NoTipAvailable(
+                noTipReason=NoTipReason.STARTING_TIP_WITH_PARTIAL
+            )
+        )
+    )
+    with pytest.raises(
+        CommandPreconditionViolated, match="tip tracking is not available"
+    ):
+        subject.get_next_tip(
+            tip_racks=tip_racks,
+            starting_well=mock_starting_well,
+        )
 
 
 def test_lpd_for_transfer_context_manager(

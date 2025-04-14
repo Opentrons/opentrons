@@ -1579,6 +1579,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
                 " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
             )
+
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.transfer_with_liquid_class(
@@ -1605,6 +1606,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
+                starting_tip=self.starting_tip._core
+                if self.starting_tip is not None
+                else None,
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1709,6 +1713,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
+                starting_tip=self.starting_tip._core
+                if self.starting_tip is not None
+                else None,
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1814,6 +1821,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
+                starting_tip=self.starting_tip._core
+                if self.starting_tip is not None
+                else None,
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )

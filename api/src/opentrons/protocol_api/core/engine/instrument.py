@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from contextlib import contextmanager
+from itertools import dropwhile
 from typing import (
     Optional,
     TYPE_CHECKING,
@@ -50,6 +51,10 @@ from opentrons.protocol_engine.types import (
     NextTipInfo,
 )
 from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types.automatic_tip_selection import (
+    NoTipAvailable,
+    NoTipReason,
+)
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -59,6 +64,7 @@ from opentrons_shared_data.pipette.types import (
 )
 from opentrons_shared_data.errors.exceptions import (
     UnsupportedHardwareCommand,
+    CommandPreconditionViolated,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import BlowoutLocation
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
@@ -1127,19 +1133,39 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         return result.liquidClassId
 
     def get_next_tip(
-        self, tip_racks: List[LabwareCore], starting_well: Optional[str]
+        self, tip_racks: List[LabwareCore], starting_well: Optional[WellCore]
     ) -> Optional[NextTipInfo]:
         """Get the next tip to pick up."""
+        if starting_well is not None:
+            # Drop tip racks until the one with the starting tip is reached (if any)
+            valid_tip_racks = list(
+                dropwhile(
+                    lambda tr: starting_well.labware_id != tr.labware_id, tip_racks
+                )
+            )
+        else:
+            valid_tip_racks = tip_racks
+
         result = self._engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
                 pipetteId=self._pipette_id,
-                labwareIds=[tip_rack.labware_id for tip_rack in tip_racks],
-                startingTipWell=starting_well,
+                labwareIds=[tip_rack.labware_id for tip_rack in valid_tip_racks],
+                startingTipWell=starting_well.get_name()
+                if starting_well is not None
+                else None,
             )
         )
-        return (
-            result.nextTipInfo if isinstance(result.nextTipInfo, NextTipInfo) else None
-        )
+        next_tip_info = result.nextTipInfo
+        if isinstance(next_tip_info, NoTipAvailable):
+            if next_tip_info.noTipReason == NoTipReason.STARTING_TIP_WITH_PARTIAL:
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available when using a partial pipette"
+                    " nozzle configuration and InstrumentContext.starting_tip."
+                    " Switch to a full configuration or set starting_tip to None."
+                )
+            return None
+        else:
+            return next_tip_info
 
     def transfer_with_liquid_class(  # noqa: C901
         self,
@@ -1149,6 +1175,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest: List[Tuple[Location, WellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1234,7 +1261,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
@@ -1344,6 +1371,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest: List[Tuple[Location, WellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1425,6 +1453,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 dest=dest,
                 new_tip=new_tip,
                 tip_racks=tip_racks,
+                starting_tip=starting_tip,
                 trash_location=trash_location,
                 return_tip=return_tip,
             )
@@ -1475,7 +1504,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
@@ -1667,6 +1696,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest: Tuple[Location, WellCore],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1749,7 +1779,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
