@@ -19,8 +19,7 @@ import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
 
 import type { ComponentProps } from 'react'
-import type * as OpentronsComponents from '@opentrons/components'
-import type * as OpentronsSharedData from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../step-forms/selectors')
@@ -29,14 +28,14 @@ vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../components/organisms')
 vi.mock('@opentrons/components', async importOriginal => {
-  const actual = await importOriginal<typeof OpentronsComponents>()
+  const actual = await importOriginal<typeof Module>()
   return {
     ...actual,
     Module: vi.fn(),
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof OpentronsSharedData>()
+  const actual = await importOriginal<typeof getAllLabwareDefs>()
   return {
     ...actual,
     getAllLabwareDefs: vi.fn(),
@@ -76,7 +75,7 @@ describe('SelectedHoveredItems', () => {
       labware: {
         labware: {
           id: 'mockId',
-          def: fixture24Tuberack as OpentronsSharedData.LabwareDefinition2,
+          def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: mockAdapterURI,
           slot: 'D3',
           pythonName: 'mockPythonName',
@@ -149,14 +148,14 @@ describe('SelectedHoveredItems', () => {
       labware: {
         labware: {
           id: 'mockId',
-          def: fixture24Tuberack as OpentronsSharedData.LabwareDefinition2,
+          def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: mockAdapterURI,
           slot: 'D3',
           pythonName: 'mockPythonName',
         },
         labware2: {
           id: 'mockId2',
-          def: fixture24Tuberack as OpentronsSharedData.LabwareDefinition2,
+          def: fixture24Tuberack as LabwareDefinition2,
           labwareDefURI: mockAdapterURI,
           slot: 'mockId',
           pythonName: 'mockPythonName',
