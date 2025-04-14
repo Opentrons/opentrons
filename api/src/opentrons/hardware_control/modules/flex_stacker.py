@@ -12,6 +12,7 @@ from opentrons.drivers.flex_stacker.types import (
     MoveResult,
     StackerAxis,
     TOFSensor,
+    HardwareRevision,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.flex_stacker.driver import (
@@ -453,6 +454,7 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.close_latch()
+        await self.verify_shuttle_location(PlatformState.EXTENDED)
         return True
 
     async def home_all(self, ignore_latch: bool = False) -> None:
@@ -507,10 +509,17 @@ class FlexStacker(mod_abc.AbstractModule):
     async def verify_shuttle_location(self, expected: PlatformState) -> None:
         """Verify the shuttle is present and in the expected location."""
         await self._reader.read()
+        # Validate the platform state matches, ignore EXTENDED checks on EVT
         if self.platform_state != expected:
-            raise FlexStackerShuttleMissingError(
-                self.device_info["serial"], expected, self.platform_state
-            )
+            if (
+                self.device_info["model"] == HardwareRevision.EVT.value
+                and expected == PlatformState.EXTENDED
+            ):
+                return
+            else:
+                raise FlexStackerShuttleMissingError(
+                    self.device_info["serial"], expected, self.platform_state
+                )
 
     async def verify_shuttle_labware_presence(
         self, direction: Direction, labware_expected: bool
