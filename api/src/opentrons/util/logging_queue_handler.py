@@ -24,9 +24,10 @@ class CustomQueueHandler(logging.handlers.QueueHandler):
         Args:
             queue: When this handler receives a log record, it will insert the message
                 into this queue.
-            extra: Extra data to attach to each handled log record, to be consumed by
-                whatever handler is on the consuming side of the queue. This corresponds
-                to the `extra` arg of `Logger.debug()`, etc.
+            extra: Extra data to attach to each log record, to be interpreted by
+                whatever handler is on the consuming side of the queue. (e.g. if that's
+                `systemd.journal.JournalHandler`, you could add a "SYSLOG_IDENTIFIER"
+                key here.) This corresponds to the `extra` arg of `Logger.debug()`.
         """
         super().__init__(queue=queue)
 
