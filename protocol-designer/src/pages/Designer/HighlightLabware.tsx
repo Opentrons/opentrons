@@ -23,7 +23,7 @@ export function HighlightLabware(
       : null
 
   const highlighted = hoveredLabware.includes(adapterId ?? labwareOnDeck.id)
-  console.log(isZoomed)
+
   if (!isZoomed) {
     return null
   }
