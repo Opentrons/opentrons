@@ -478,7 +478,7 @@ class GeometryView:
         Primarily this checks if there is not enough liquid in a well to do meniscus-relative static aspiration.
         """
         if well_location.origin == WellOrigin.MENISCUS:
-            assert pipette_id is not None
+            assert pipette_id is not None, "pipette id is None"
             lld_min_height = self._pipettes.get_current_tip_lld_settings(
                 pipette_id=pipette_id
             )
@@ -531,7 +531,6 @@ class GeometryView:
                     z_offset=offset.z,
                     pipette_id=pipette_id,
                 )
-
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
@@ -1854,8 +1853,12 @@ class GeometryView:
         # this function is only called by
         # HardwarePipetteHandler::aspirate/dispense while_tracking, and shouldn't
         # be reached in the case of a simulated liquid_probe
-        assert not isinstance(initial_handling_height, SimulatedProbeResult)
-        assert not isinstance(final_height, SimulatedProbeResult)
+        assert not isinstance(
+            initial_handling_height, SimulatedProbeResult
+        ), "Initial handling height got SimulatedProbeResult"
+        assert not isinstance(
+            final_height, SimulatedProbeResult
+        ), "final height is SimulatedProbeResult"
         return final_height - initial_handling_height
 
     def get_well_offset_adjustment(
