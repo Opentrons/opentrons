@@ -788,7 +788,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
 
         self._engine_client.execute_command(
-            cmd.EvotipSealPipetteParams(
+            cmd.SealPipetteToTipParams(
                 pipetteId=self._pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -824,7 +824,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_location=well_location,
         )
         self._engine_client.execute_command(
-            cmd.EvotipUnsealPipetteParams(
+            cmd.UnsealPipetteFromTipParams(
                 pipetteId=self._pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -873,7 +873,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_location=well_location,
         )
         self._engine_client.execute_command(
-            cmd.EvotipDispenseParams(
+            cmd.PressureDispenseParams(
                 pipetteId=self._pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -1115,9 +1115,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack=tiprack_uri,
             aspirate=transfer_properties.aspirate.as_shared_data_model(),
             singleDispense=transfer_properties.dispense.as_shared_data_model(),
-            multiDispense=transfer_properties.multi_dispense.as_shared_data_model()
-            if transfer_properties.multi_dispense
-            else None,
+            multiDispense=(
+                transfer_properties.multi_dispense.as_shared_data_model()
+                if transfer_properties.multi_dispense
+                else None
+            ),
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLiquidClassParams(
@@ -1325,9 +1327,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     transfer_properties=transfer_props,
                     transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
                     tip_contents=post_asp_tip_contents,
-                    add_final_air_gap=False
-                    if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                    else True,
+                    add_final_air_gap=(
+                        False
+                        if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                        else True
+                    ),
                     trash_location=trash_location,
                 )
             prev_src = step_source
@@ -1610,9 +1614,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
                         tip_contents=tip_contents,
-                        add_final_air_gap=False
-                        if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                        else True,
+                        add_final_air_gap=(
+                            False
+                            if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                            else True
+                        ),
                         trash_location=trash_location,
                     )
                 else:
@@ -1623,9 +1629,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
                         tip_contents=tip_contents,
-                        add_final_air_gap=False
-                        if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                        else True,
+                        add_final_air_gap=(
+                            False
+                            if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                            else True
+                        ),
                         trash_location=trash_location,
                         conditioning_volume=conditioning_vol,
                         disposal_volume=disposal_vol,
@@ -1817,9 +1825,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
                         tip_contents=tip_contents,
-                        volume_for_pipette_mode_configuration=total_dispense_volume
-                        if step_num == 0
-                        else None,
+                        volume_for_pipette_mode_configuration=(
+                            total_dispense_volume if step_num == 0 else None
+                        ),
                     )
             tip_contents = self.dispense_liquid_class(
                 volume=total_dispense_volume,
@@ -1828,9 +1836,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 transfer_properties=transfer_props,
                 transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
                 tip_contents=tip_contents,
-                add_final_air_gap=False
-                if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                else True,
+                add_final_air_gap=(
+                    False
+                    if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                    else True
+                ),
                 trash_location=trash_location,
             )
             prev_src = next_source
@@ -1881,9 +1891,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         aspirate_props = transfer_properties.aspirate
         tx_commons.check_valid_liquid_class_volume_parameters(
             aspirate_volume=volume,
-            air_gap=aspirate_props.retract.air_gap_by_volume.get_for_volume(volume)
-            if conditioning_volume is None
-            else 0,
+            air_gap=(
+                aspirate_props.retract.air_gap_by_volume.get_for_volume(volume)
+                if conditioning_volume is None
+                else 0
+            ),
             disposal_volume=0,  # Disposal volume is accounted for in aspirate vol
             max_volume=self.get_working_volume(),
         )
