@@ -116,7 +116,7 @@ class WellStore(HasState[WellState], HandlesActions):
                 del self._state.loaded_volumes[labware_id][well_name]
             else:
                 prev_loaded_vol_info = self._state.loaded_volumes[labware_id][well_name]
-                assert prev_loaded_vol_info.volume is not None, "volume info not loaded"
+                assert prev_loaded_vol_info.volume is not None
                 self._state.loaded_volumes[labware_id][well_name] = LoadedVolumeInfo(
                     volume=prev_loaded_vol_info.volume + volume_added,
                     last_loaded=prev_loaded_vol_info.last_loaded,
