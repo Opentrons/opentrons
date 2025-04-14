@@ -37,11 +37,8 @@ import type {
   DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { UseFormSetValue } from 'react-hook-form'
-import type {
-  WizardFixtureType,
-  WizardFormState,
-} from '../../../pages/Onboarding/types'
 import type { FormModules } from '../../../step-forms'
+import type { WizardFixtureType, WizardFormState } from '../types'
 import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
 
 interface DeckConfigurationEditingProps {

@@ -7,7 +7,8 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { AddMetadata } from '../AddMetadata'
 
 import type { ComponentProps } from 'react'
-import type { WizardFormState, WizardTileProps } from '../types'
+import type { WizardFormState } from '../../../components/organisms'
+import type { WizardTileProps } from '../types'
 
 const render = (props: ComponentProps<typeof AddMetadata>) => {
   return renderWithProviders(<AddMetadata {...props} />, {

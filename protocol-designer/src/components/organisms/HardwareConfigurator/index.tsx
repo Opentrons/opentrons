@@ -7,7 +7,7 @@ import {
   FLEX_SIMPLEST_DECK_CONFIG,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationEditing } from './util'
+import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
 import type {
   CutoutConfig,
   CutoutId,

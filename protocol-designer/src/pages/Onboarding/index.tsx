@@ -41,18 +41,18 @@ import { SelectHardware } from './SelectFlexHardware'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { NormalizedPipette } from '@opentrons/step-generation'
+import type {
+  ModuleModel,
+  ModuleType,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { BaseState } from '../../types'
 import type {
   FormPipette,
   FormPipettesByMount,
   PipetteOnDeck,
 } from '../../step-forms'
-import type {
-  ModuleModel,
-  ModuleType,
-  PipetteName,
-} from '@opentrons/shared-data'
-import type { WizardFormState } from './types'
+import type { WizardFormState } from '../../components/organisms'
 
 type WizardStep = 'basics' | 'modules' | 'metadata'
 const WIZARD_STEPS: WizardStep[] = ['basics', 'modules', 'metadata']

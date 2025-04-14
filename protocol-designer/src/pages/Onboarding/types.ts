@@ -1,28 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form'
-import type {
-  CutoutFixtureId,
-  CutoutId,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-  OT2CutoutId,
-} from '@opentrons/shared-data'
-import type { NewProtocolFields } from '../../load-file'
-import type { FormModules, FormPipettesByMount } from '../../step-forms'
-
-export type FixtureName = 'wasteChute' | 'trashBin' | 'stagingArea'
-export interface FixtureInfo {
-  cutoutId: CutoutId | OT2CutoutId
-  name: FixtureName
-  cutoutFixtureId: CutoutFixtureId
-}
-export type WizardFixtureType = Record<string, FixtureInfo>
-export interface WizardFormState {
-  fields: NewProtocolFields
-  pipettesByMount: FormPipettesByMount
-  modules: FormModules
-  hasGripper: boolean
-  fixtures: WizardFixtureType
-}
+import type { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { WizardFormState } from '../../components/organisms'
 
 export interface WizardTileProps extends UseFormReturn<WizardFormState> {
   proceed: (stepsForward?: number) => void

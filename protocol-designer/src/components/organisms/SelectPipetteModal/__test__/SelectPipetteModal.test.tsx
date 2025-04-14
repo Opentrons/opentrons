@@ -13,10 +13,8 @@ import { SelectPipetteModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type {
-  WizardFormState,
-  WizardTileProps,
-} from '../../../../pages/Onboarding/types'
+import type { WizardTileProps } from '../../../../pages/Onboarding/types'
+import type { WizardFormState } from '../../types'
 
 vi.mock('../../../../labware-defs/actions')
 vi.mock('../../../../pages/Onboarding/utils')

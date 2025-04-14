@@ -28,12 +28,9 @@ import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { WizardBody } from './WizardBody'
 import { BasicsButtons } from './BasicsButtons'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type {
-  Gen,
-  PipetteType,
-  WizardFixtureType,
-  WizardTileProps,
-} from './types'
+import type { WizardFixtureType } from '../../components/organisms'
+
+import type { Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
   const { setValue, proceed, watch } = props
@@ -126,6 +123,74 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       name: 'trashBin',
       cutoutFixtureId: 'fixedTrashSlot',
     },
+  }
+
+  const handlSelectWasteChute = (value: boolean): void => {
+    if (value) {
+      // If adding wasteChute, remove trashBin
+      const updatedFixtures = Object.fromEntries(
+        Object.entries(fixtures).filter(([_, val]) => val.name !== 'trashBin')
+      )
+      updatedFixtures[uuid()] = {
+        cutoutId: WASTE_CHUTE_CUTOUT,
+        name: 'wasteChute',
+        cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
+      }
+
+      setValue('fixtures', updatedFixtures)
+      //  remove any module that might already be in D3
+      const updatedModules = Object.fromEntries(
+        Object.entries(modules).filter(
+          ([_, value]) => value.cutoutId !== WASTE_CHUTE_CUTOUT
+        )
+      )
+      setValue('modules', updatedModules)
+    } else {
+      // If removing wasteChute, filter it out
+      const filteredFixtures =
+        fixtures != null
+          ? Object.fromEntries(
+              Object.entries(fixtures).filter(
+                ([_, val]) => val.name !== 'wasteChute'
+              )
+            )
+          : {}
+
+      filteredFixtures[uuid()] = {
+        cutoutId: 'cutoutA3',
+        name: 'trashBin',
+        cutoutFixtureId: 'trashBinAdapter',
+      }
+
+      setValue('fixtures', filteredFixtures)
+    }
+  }
+
+  const handleSelectThermocycler = (value: boolean): void => {
+    if (value) {
+      //   first remove anything that might have been placed previous in slot A1/B1
+      const updatedModules = Object.fromEntries(
+        Object.entries(modules).filter(
+          ([_, value]) => !['A1', 'B1'].includes(value.slot)
+        )
+      )
+      //  then add the thermocycler
+      updatedModules[uuid()] = {
+        model: THERMOCYCLER_MODULE_V2,
+        type: THERMOCYCLER_MODULE_TYPE,
+        slot: 'B1',
+        cutoutFixtureId: 'thermocyclerModuleV2Front',
+        cutoutId: 'cutoutB1',
+      }
+      setValue('modules', updatedModules)
+    } else {
+      const updatedModules = Object.fromEntries(
+        Object.entries(modules).filter(
+          ([_, value]) => value.type !== THERMOCYCLER_MODULE_TYPE
+        )
+      )
+      setValue('modules', updatedModules)
+    }
   }
 
   return (
@@ -324,30 +389,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 type="thermocycler"
                 header={t('are_you_using_thermocycler')}
                 onChange={value => {
-                  if (value) {
-                    //   first remove anything that might have been placed previous in slot A1/B1
-                    const updatedModules = Object.fromEntries(
-                      Object.entries(modules).filter(
-                        ([_, value]) => !['A1', 'B1'].includes(value.slot)
-                      )
-                    )
-                    //  then add the thermocycler
-                    updatedModules[uuid()] = {
-                      model: THERMOCYCLER_MODULE_V2,
-                      type: THERMOCYCLER_MODULE_TYPE,
-                      slot: 'B1',
-                      cutoutFixtureId: 'thermocyclerModuleV2Front',
-                      cutoutId: 'cutoutB1',
-                    }
-                    setValue('modules', updatedModules)
-                  } else {
-                    const updatedModules = Object.fromEntries(
-                      Object.entries(modules).filter(
-                        ([_, value]) => value.type !== THERMOCYCLER_MODULE_TYPE
-                      )
-                    )
-                    setValue('modules', updatedModules)
-                  }
+                  handleSelectThermocycler(value)
                 }}
                 isSelected={Object.values(modules).some(
                   mod => mod.type === THERMOCYCLER_MODULE_TYPE
@@ -357,46 +399,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 type="wasteChute"
                 header={t('are_you_using_waste_chute')}
                 onChange={value => {
-                  if (value) {
-                    // If adding wasteChute, remove trashBin
-                    const updatedFixtures = Object.fromEntries(
-                      Object.entries(fixtures).filter(
-                        ([_, val]) => val.name !== 'trashBin'
-                      )
-                    )
-                    updatedFixtures[uuid()] = {
-                      cutoutId: WASTE_CHUTE_CUTOUT,
-                      name: 'wasteChute',
-                      cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
-                    }
-
-                    setValue('fixtures', updatedFixtures)
-                    //  remove any module that might already be in D3
-                    const updatedModules = Object.fromEntries(
-                      Object.entries(modules).filter(
-                        ([_, value]) => value.cutoutId !== WASTE_CHUTE_CUTOUT
-                      )
-                    )
-                    setValue('modules', updatedModules)
-                  } else {
-                    // If removing wasteChute, filter it out
-                    const filteredFixtures =
-                      fixtures != null
-                        ? Object.fromEntries(
-                            Object.entries(fixtures).filter(
-                              ([_, val]) => val.name !== 'wasteChute'
-                            )
-                          )
-                        : {}
-
-                    filteredFixtures[uuid()] = {
-                      cutoutId: 'cutoutA3',
-                      name: 'trashBin',
-                      cutoutFixtureId: 'trashBinAdapter',
-                    }
-
-                    setValue('fixtures', filteredFixtures)
-                  }
+                  handlSelectWasteChute(value)
                 }}
                 isSelected={Object.values(fixtures).some(
                   fixture => fixture.name === 'wasteChute'

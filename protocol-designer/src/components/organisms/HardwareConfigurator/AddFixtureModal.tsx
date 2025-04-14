@@ -25,7 +25,7 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { useKitchen } from '../Kitchen/hooks'
-import { getAvailableOptions } from './util'
+import { getAvailableOptions } from './useDeckConfigurationEditing'
 
 import type { UseFormSetValue } from 'react-hook-form'
 import type { Dispatch, SetStateAction } from 'react'
@@ -38,11 +38,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModalProps } from '@opentrons/components'
 import type { FormModules } from '../../../step-forms'
-import type {
-  FixtureName,
-  WizardFixtureType,
-  WizardFormState,
-} from '../../../pages/Onboarding/types'
+import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId

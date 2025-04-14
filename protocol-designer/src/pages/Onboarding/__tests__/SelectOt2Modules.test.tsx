@@ -7,7 +7,8 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { SelectOt2Modules } from '../SelectOt2Modules'
 
 import type { ComponentProps } from 'react'
-import type { WizardFormState, WizardTileProps } from '../types'
+import type { WizardFormState } from '../../../components/organisms'
+import type { WizardTileProps } from '../types'
 
 vi.mock('../../../feature-flags/selectors')
 

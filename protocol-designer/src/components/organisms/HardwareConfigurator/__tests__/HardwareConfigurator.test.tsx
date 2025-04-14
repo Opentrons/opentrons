@@ -4,17 +4,15 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { DeckConfigurator } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { useDeckConfigurationEditing } from '../util'
+import { useDeckConfigurationEditing } from '../useDeckConfigurationEditing'
 import { HardwareConfigurator } from '..'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
-import type {
-  WizardFormState,
-  WizardTileProps,
-} from '../../../../pages/Onboarding/types'
+import type { WizardTileProps } from '../../../../pages/Onboarding/types'
+import type { WizardFormState } from '../../types'
 
-vi.mock('../util')
+vi.mock('../useDeckConfigurationEditing')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
