@@ -313,7 +313,6 @@ class GeometryView:
             child_definition=self._labware.get_definition(labware_id),
             parent=self._labware.get(labware_id).location,
         )
-
         return Point(
             parent_pos.x + offset_from_parent.x,
             parent_pos.y + offset_from_parent.y,
@@ -458,7 +457,6 @@ class GeometryView:
         """Get the calibrated origin of the labware."""
         origin_pos = self.get_labware_origin_position(labware_id)
         cal_offset = self._labware.get_labware_offset_vector(labware_id)
-
         return Point(
             x=origin_pos.x + cal_offset.x,
             y=origin_pos.y + cal_offset.y,
@@ -769,7 +767,6 @@ class GeometryView:
         """Get the slot name of the labware or the module that the labware is on."""
         labware = self._labware.get(labware_id)
         slot_name: Union[DeckSlotName, StagingSlotName]
-
         if isinstance(labware.location, DeckSlotLocation):
             slot_name = labware.location.slotName
         elif isinstance(labware.location, ModuleLocation):

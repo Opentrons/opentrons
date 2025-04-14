@@ -8,7 +8,6 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
 from opentrons.protocol_engine import (
-    WellLocation,
     WellOffset,
     DeckPoint,
     errors,
@@ -133,7 +132,7 @@ async def test_move_to_well_stall_defined_error(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            well_location=LiquidHandlingWellLocation(offset=WellOffset(x=1, y=2, z=3)),
             force_direct=True,
             minimum_z_height=4.56,
             speed=7.89,

@@ -2062,6 +2062,12 @@ def test_get_relative_well_location(
     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
+    decoy.when(subject.get_labware_origin_position("labware-id")).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
 
     result, _ = subject.get_relative_well_location(
         labware_id="labware-id",
@@ -2073,8 +2079,7 @@ def test_get_relative_well_location(
         ),
         location_type=WellLocationFunction.BASE,
     )
-
-    assert result == LiquidHandlingWellLocation(
+    assert result == WellLocation(
         origin=WellOrigin.TOP,
         offset=WellOffset.model_construct(
             x=cast(float, pytest.approx(7)),
@@ -2092,7 +2097,38 @@ def test_get_relative_liquid_handling_well_location(
     subject: GeometryView,
 ) -> None:
     """It should get the relative location of a well given an absolute position."""
-    (result, dynamic_liquid_tracking,) = subject.get_relative_well_location(
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="b",
+        definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
+    )
+    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position("3")
+    ).then_return(Point(1, 2, 3))
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(subject.get_labware_origin_position("labware-id")).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+
+    (result, dynamic_liquid_tracking) = subject.get_relative_well_location(
         labware_id="labware-id",
         well_name="B2",
         absolute_point=Point(x=0, y=0, z=-2),

@@ -309,7 +309,12 @@ def test_move_to_well(
             location_type=WellLocationFunction.LIQUID_HANDLING,
         )
     ).then_return(
-        (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
+        (
+            LiquidHandlingWellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            False,
+        )
     )
 
     subject.move_to(
