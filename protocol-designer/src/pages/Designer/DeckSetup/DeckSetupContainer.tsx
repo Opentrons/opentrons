@@ -92,7 +92,7 @@ export function DeckSetupContainer(
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
-
+  console.log(zoomIn)
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
   ).filter(
@@ -224,7 +224,7 @@ export function DeckSetupContainer(
         padding={SPACING.spacing60}
         justifyContent={JUSTIFY_CENTER}
         position="relative"
-        maxHeight={DECK_VIEW_CONTAINER_MAX_HEIGHT}
+        maxHeight={isZoomed ? '100%' : DECK_VIEW_CONTAINER_MAX_HEIGHT}
       >
         <Flex
           width="100%"

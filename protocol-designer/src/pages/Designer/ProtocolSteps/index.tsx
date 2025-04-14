@@ -28,7 +28,6 @@ import {
   getHoveredTerminalItemId,
   getActiveItem,
 } from '../../../ui/steps/selectors'
-import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../OffDeck'
 import { SubStepsToolbox } from './Timeline'
@@ -50,10 +49,13 @@ import { DeckSlot } from '../../../types'
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '5.5rem'
 
-export function ProtocolSteps(): JSX.Element {
+interface ProtocolStepsProps {
+  isZoomedIn: boolean
+}
+export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
+  const { isZoomedIn } = props
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
-  const zoomIn = useSelector(selectors.getZoomedInSlot)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selectedSubstep = useSelector(getSelectedSubstep)
@@ -80,7 +82,7 @@ export function ProtocolSteps(): JSX.Element {
   const showTimelineAlerts =
     hasTimelineErrors && activeItem?.id !== '__initial_setup__'
   const stepDetails = currentStep?.stepDetails ?? null
-  console.log(zoomIn.cutout)
+  console.log(isZoomedIn)
   return (
     <Flex
       backgroundColor={COLORS.grey10}
@@ -95,7 +97,7 @@ export function ProtocolSteps(): JSX.Element {
         flex="2.85"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
+        paddingTop={showTimelineAlerts || isZoomedIn ? '0' : SPACING.spacing24}
         height="100%"
         position={POSITION_RELATIVE}
         overflowY={OVERFLOW_AUTO}
@@ -109,52 +111,53 @@ export function ProtocolSteps(): JSX.Element {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing24}
-            width={CONTENT_MAX_WIDTH}
+            width={isZoomedIn ? '100%' : CONTENT_MAX_WIDTH}
             justifyContent={JUSTIFY_CENTER}
-            paddingY={SPACING.spacing120}
+            paddingY={isZoomedIn ? '0' : SPACING.spacing120}
             marginX="auto"
           >
-            {/* {zoomIn.cutout == null ? null : (
-            <> */}
-            {showTimelineAlerts ? (
-              <TimelineAlerts
-                justifyContent={JUSTIFY_CENTER}
-                width="100%"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing4}
-              />
-            ) : null}
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-              height="2.25rem"
-            >
-              {currentStep != null && hoveredTerminalItem == null ? (
-                <StyledText desktopStyle="headingSmallBold">
-                  {i18n.format(currentStep.stepName, 'titleCase')}
-                </StyledText>
-              ) : null}
-              {activeItem?.selectionType === 'TERMINAL_ITEM_SELECTION_TYPE' &&
-              currentHoveredStepId == null ? (
-                <StyledText desktopStyle="headingSmallBold">
-                  {t(activeItem.id)}
-                </StyledText>
-              ) : null}
+            {isZoomedIn ? null : (
+              <>
+                {showTimelineAlerts ? (
+                  <TimelineAlerts
+                    justifyContent={JUSTIFY_CENTER}
+                    width="100%"
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing4}
+                  />
+                ) : null}
+                <Flex
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  alignItems={ALIGN_CENTER}
+                  height="2.25rem"
+                >
+                  {currentStep != null && hoveredTerminalItem == null ? (
+                    <StyledText desktopStyle="headingSmallBold">
+                      {i18n.format(currentStep.stepName, 'titleCase')}
+                    </StyledText>
+                  ) : null}
+                  {activeItem?.selectionType ===
+                    'TERMINAL_ITEM_SELECTION_TYPE' &&
+                  currentHoveredStepId == null ? (
+                    <StyledText desktopStyle="headingSmallBold">
+                      {t(activeItem.id)}
+                    </StyledText>
+                  ) : null}
 
-              <ToggleGroup
-                selectedValue={deckView}
-                leftText={leftString}
-                rightText={rightString}
-                leftClick={() => {
-                  setDeckView(leftString)
-                }}
-                rightClick={() => {
-                  setDeckView(rightString)
-                }}
-              />
-            </Flex>
-            {/* </>
-          )} */}
+                  <ToggleGroup
+                    selectedValue={deckView}
+                    leftText={leftString}
+                    rightText={rightString}
+                    leftClick={() => {
+                      setDeckView(leftString)
+                    }}
+                    rightClick={() => {
+                      setDeckView(rightString)
+                    }}
+                  />
+                </Flex>
+              </>
+            )}
             <Flex
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing16}
@@ -169,24 +172,32 @@ export function ProtocolSteps(): JSX.Element {
               ) : (
                 <OffDeck />
               )}
-              {/* avoid shifting the deck view container */}
-              {activeItem?.selectionType === 'TERMINAL_ITEM_SELECTION_TYPE' ? (
-                <SlotDetailsContainer robotType={robotType} slot={hoverSlot} />
-              ) : (
-                <Flex
-                  height={STEP_SUMMARY_HEIGHT}
-                  opacity={formData == null ? 1 : 0}
-                >
-                  <StepSummary
-                    currentStep={currentStep}
-                    stepDetails={stepDetails}
-                  />
-                </Flex>
+              {isZoomedIn ? null : (
+                <>
+                  {/* avoid shifting the deck view container */}
+                  {activeItem?.selectionType ===
+                  'TERMINAL_ITEM_SELECTION_TYPE' ? (
+                    <SlotDetailsContainer
+                      robotType={robotType}
+                      slot={hoverSlot}
+                    />
+                  ) : (
+                    <Flex
+                      height={STEP_SUMMARY_HEIGHT}
+                      opacity={formData == null ? 1 : 0}
+                    >
+                      <StepSummary
+                        currentStep={currentStep}
+                        stepDetails={stepDetails}
+                      />
+                    </Flex>
+                  )}
+                </>
               )}
             </Flex>
           </Flex>
         </Flex>
-        {enableHotKeyDisplay && zoomIn.slot == null ? (
+        {enableHotKeyDisplay && !isZoomedIn ? (
           <HotKeyDisplay targetWidth={targetWidth} />
         ) : null}
       </Flex>

@@ -250,9 +250,9 @@ export function zoomInOnCoordinate(props: ZoomInOnCoordinateProps): string {
   const newWidth = width * zoomFactor
   const newHeight = height * zoomFactor
 
-  //  +125 and +50 to get the approximate center of the screen point
+  //  +20 to get the approximate center of the screen point
   const newMinX = x - newWidth / 2 + 20
-  const newMinY = y - newHeight / 2 + 50
+  const newMinY = y - newHeight / 2
 
   return `${newMinX} ${newMinY} ${newWidth} ${newHeight + 70}`
 }

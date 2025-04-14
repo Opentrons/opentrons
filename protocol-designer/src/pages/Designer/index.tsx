@@ -112,7 +112,7 @@ export function Designer(): JSX.Element {
           showLiquidOverflowMenu={showLiquidOverflowMenu}
         />
         <Flex height="100%" width="100%" overflowY={OVERFLOW_HIDDEN}>
-          <ProtocolSteps />
+          <ProtocolSteps isZoomedIn={zoomIn.slot != null} />
         </Flex>
       </Flex>
     </>
