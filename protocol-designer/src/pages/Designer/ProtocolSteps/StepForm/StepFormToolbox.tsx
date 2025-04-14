@@ -38,10 +38,11 @@ import {
   getCurrentFormIsPresaved,
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
+  getLabwareEntities,
   getPipetteEntities,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
-import { getDefaultLiquidClassesValues } from '../../../../steplist/formLevel/handleFormChange/utils'
+import { updateFieldsForLiquidClass } from '../../../../steplist/formLevel/handleFormChange/utils'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import {
   hoverSelection,
@@ -142,6 +143,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     false
   )
   const pipetteEntities = useSelector(getPipetteEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -170,6 +172,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const [confirmedFieldUpdates, setConfirmedFieldUpdates] = useState<
     Record<string, any>
   >({})
+
   const fieldsChangedRequiringConfirmation = FIELDS_REQUIRING_CONFIRMATION.filter(
     field => {
       // if field has been updated and confirmed in modal, check its most recent confirmed value
@@ -284,18 +287,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   })
 
   const handleUpdateLiquidClassValues = (): void => {
-    const liquidClassValues = getDefaultLiquidClassesValues(
-      formData,
+    updateFieldsForLiquidClass({
+      propsForFields,
+      rawForm: formData,
       pipetteEntities,
-      additionalEquipmentEntities
-    )
-    if (liquidClassValues != null) {
-      Object.entries(liquidClassValues).forEach(([field, value]) => {
-        if (field in propsForFields) {
-          propsForFields[field].updateValue(value)
-        }
-      })
-    }
+      labwareEntities,
+      additionalEquipmentEntities,
+    })
     setToolboxStep(toolboxStep + 1)
     setShowConfirmationModal(false)
     handleConfirmValues()
@@ -357,7 +355,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       if (isConfirmationRequired) {
         setShowConfirmationModal(true)
       } else {
-        handleUpdateLiquidClassValues()
+        if (!hasSeenAdvancedSettings) {
+          handleUpdateLiquidClassValues()
+        } else {
+          setToolboxStep(toolboxStep + 1)
+        }
       }
     } else if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
       if (!isErrorOnCurrentPage) {
