@@ -213,7 +213,6 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
                 t={t}
                 i18nKey={'ensure_nozzle_position_odd'}
                 values={{
-                  tip_type: t('calibration_probe'),
                   item_location: isLwTiprack
                     ? t('check_tip_location')
                     : t('check_well_location'),
@@ -303,7 +302,6 @@ function CheckLabwareContentDesktop(
               t={t}
               i18nKey={'ensure_nozzle_position_desktop'}
               values={{
-                tip_type: t('calibration_probe'),
                 item_location: isLwTiprack
                   ? t('check_tip_location')
                   : t('check_well_location'),
