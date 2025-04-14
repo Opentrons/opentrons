@@ -4,6 +4,7 @@ import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
 import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getDefaultPushOutVolume } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
+import { getMigratedLabwareDefinitions } from './utils/getMigratedLabwareDefinitions'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import type {
@@ -45,9 +46,13 @@ export const migrateFile = (
     (command): command is LoadLabwareCreateCommand =>
       command.commandType === 'loadLabware'
   )
+
+  const migratedLabwareDefinitions = getMigratedLabwareDefinitions({
+    labwareDefsByUri: labwareDefinitions,
+  })
   const equipmentLoadInfoFromCommands = getEquipmentLoadInfoFromCommands(
     commands,
-    labwareDefinitions
+    migratedLabwareDefinitions
   )
 
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
@@ -65,18 +70,18 @@ export const migrateFile = (
         ...rest
       } = form
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
-        labwareDefinitions,
+        migratedLabwareDefinitions,
         loadLabwareCommands,
         aspirate_labware as string,
         'aspirate'
       )
       const matchingDispenseLabwareWellDepth = getMigratedPositionFromTop(
-        labwareDefinitions,
+        migratedLabwareDefinitions,
         loadLabwareCommands,
         dispense_labware as string,
         'dispense'
       )
-      const tipRackDef = labwareDefinitions[form.tipRack]
+      const tipRackDef = migratedLabwareDefinitions[form.tipRack]
       const pipetteName =
         equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
         null
@@ -161,7 +166,7 @@ export const migrateFile = (
           liquidClassesSupported,
           ...rest
         } = form
-        const tipRackDef = labwareDefinitions[form.tipRack]
+        const tipRackDef = migratedLabwareDefinitions[form.tipRack]
         const pipetteName =
           equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
           null
@@ -177,7 +182,7 @@ export const migrateFile = (
               )
 
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
-          labwareDefinitions,
+          migratedLabwareDefinitions,
           loadLabwareCommands,
           labware as string,
           'mix'
@@ -228,8 +233,10 @@ export const migrateFile = (
     },
     {}
   )
+
   return {
     ...appData,
+    labwareDefinitions: migratedLabwareDefinitions,
     metadata: {
       ...appData.metadata,
       source: PROTOCOL_DESIGNER_SOURCE,

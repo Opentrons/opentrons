@@ -7,6 +7,7 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { Labware, Modules, Pipettes } from '../../../file-types'
+import { uuid } from '../../../utils'
 
 export interface EquipmentLoadInfoFromCommands {
   pipettes: Pipettes
@@ -45,34 +46,39 @@ export const getEquipmentLoadInfoFromCommands = (
   const labware = loadLabwareCommands.reduce<Labware>(
     (acc, loadLabware: LoadLabwareCreateCommand) => {
       const { params } = loadLabware
-      const {
-        displayName: nickName,
-        loadName,
-        version,
-        namespace,
-        labwareId,
-      } = params
-      const labwareDefURI = `${namespace}/${loadName}/${version}`
+      const { displayName: nickName, labwareId } = params
+      const matchingLabwareDefinition = Object.values(labwareDefinitions).find(
+        def =>
+          def.namespace === params.namespace &&
+          def.parameters.loadName === params.loadName
+      )
 
       if (labwareId == null) {
         console.error(
-          `expected to find a labwareId from loadLabware command but could not with labwareDefURI ${labwareDefURI}`
+          `expected to find a labwareId from loadLabware command but could not with loadname ${params.loadName}`
         )
       }
-      if (labwareDefinitions[labwareDefURI] == null) {
+      if (matchingLabwareDefinition != null) {
+        const {
+          metadata,
+          parameters,
+          version,
+          namespace,
+        } = matchingLabwareDefinition
+        const labwareDefURI = `${namespace}/${parameters.loadName}/${version}`
+        const id = `${uuid()}:${labwareDefURI}`
+        return {
+          ...acc,
+          [id]: {
+            displayName: nickName ?? metadata.displayName,
+            labwareDefURI,
+          },
+        }
+      } else {
         console.error(
-          `expected to find matching labware definition with loadname ${loadName} but could not`
+          `expected to find matching labware definition with loadname ${params.loadName} but could not`
         )
-      }
-      const id = labwareId ?? 'unknown id'
-      const displayName = labwareDefinitions[labwareDefURI].metadata.displayName
-
-      return {
-        ...acc,
-        [id]: {
-          displayName: nickName ?? displayName,
-          labwareDefURI,
-        },
+        return acc
       }
     },
     {}
