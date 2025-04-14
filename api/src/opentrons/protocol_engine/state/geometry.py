@@ -531,7 +531,6 @@ class GeometryView:
                     z_offset=offset.z,
                     pipette_id=pipette_id,
                 )
-        breakpoint()
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
