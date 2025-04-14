@@ -2,7 +2,10 @@
 
 from typing import cast, Optional
 
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError,
+    CommandPreconditionViolated,
+)
 import pytest
 from decoy import Decoy
 from decoy import errors
@@ -2292,6 +2295,38 @@ def test_get_next_tip_when_no_tip_available(
         starting_well=mock_starting_well,
     )
     assert result is None
+
+
+def test_get_next_tip_raises_for_starting_tip_with_partial_config(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise if a NoTipAvailable is returned with the reason of partial config with starting tip."""
+    tip_racks = [decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
+    mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.get_name()).then_return("F00")
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.GetNextTipParams(
+                pipetteId="abc123", labwareIds=["tiprack-id"], startingTipWell="F00"
+            )
+        )
+    ).then_return(
+        GetNextTipResult(
+            nextTipInfo=NoTipAvailable(
+                noTipReason=NoTipReason.STARTING_TIP_WITH_PARTIAL
+            )
+        )
+    )
+    with pytest.raises(
+        CommandPreconditionViolated, match="tip tracking is not available"
+    ):
+        subject.get_next_tip(
+            tip_racks=tip_racks,
+            starting_well=mock_starting_well,
+        )
 
 
 def test_lpd_for_transfer_context_manager(

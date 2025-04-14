@@ -50,6 +50,10 @@ from opentrons.protocol_engine.types import (
     NextTipInfo,
 )
 from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types.automatic_tip_selection import (
+    NoTipAvailable,
+    NoTipReason,
+)
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -59,6 +63,7 @@ from opentrons_shared_data.pipette.types import (
 )
 from opentrons_shared_data.errors.exceptions import (
     UnsupportedHardwareCommand,
+    CommandPreconditionViolated,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import BlowoutLocation
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
@@ -1139,9 +1144,17 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 else None,
             )
         )
-        return (
-            result.nextTipInfo if isinstance(result.nextTipInfo, NextTipInfo) else None
-        )
+        next_tip_info = result.nextTipInfo
+        if isinstance(next_tip_info, NoTipAvailable):
+            if next_tip_info.noTipReason == NoTipReason.STARTING_TIP_WITH_PARTIAL:
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available when using a partial pipette"
+                    " nozzle configuration and InstrumentContext.starting_tip."
+                    " Switch to a full configuration or set starting_tip to None."
+                )
+            return None
+        else:
+            return next_tip_info
 
     def transfer_with_liquid_class(  # noqa: C901
         self,
