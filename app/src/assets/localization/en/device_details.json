@@ -125,6 +125,7 @@
   "overflow_menu_lid_temp": "Set lid temperature",
   "overflow_menu_mod_temp": "Set module temperature",
   "overflow_menu_set_block_temp": "Set block temperature",
+  "overflow_menu_home_shuttle": "Home stacker shuttle",
   "pipette_cal_recommended": "Pipette Offset calibration recommended.",
   "pipette_calibrations_differ": "The attached pipettes have very different calibration values. When properly calibrated, the values should be similar.",
   "pipette_offset_calibration_needed": "Pipette Offset calibration needed.",
