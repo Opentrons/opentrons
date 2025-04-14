@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import {
   StyledText,
   COLORS,
-  LegacyStyledText,
   TYPOGRAPHY,
   SPACING,
   Flex,
@@ -78,27 +77,33 @@ export function FlexStackerModuleData(
   }
 
   return (
-    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}>
-      <Flex flexDirection={DIRECTION_COLUMN} data-testid="stacker_door_data">
-        <LegacyStyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey60}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          marginTop={SPACING.spacing8}
-        >
+    <Flex
+      flexWrap={WRAP}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid="stacker_door_data"
+        paddingTop={SPACING.spacing8}
+      >
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('flex_stacker_door_status')}
-        </LegacyStyledText>
+        </StyledText>
         <StatusLabel {...DoorStatusLabelProps} />
-        <LegacyStyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid="stacker_shuttle_data"
+        paddingTop={SPACING.spacing8}
+      >
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          marginTop={SPACING.spacing8}
         >
           {t('flex_stacker_shuttle_status')}
-        </LegacyStyledText>
+        </StyledText>
         <StatusLabel {...ShuttleStatusLabelProps} />
       </Flex>
     </Flex>
