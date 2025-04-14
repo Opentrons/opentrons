@@ -1,16 +1,23 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ComponentProps, Dispatch } from 'react'
 
 import {
   DIRECTION_COLUMN,
   Flex,
-  //   RadioButton,
+  RadioButton,
   SPACING,
-  //   StyledText,
-  //   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardState,
@@ -32,9 +39,31 @@ export function SelectTipDropLocation({
   dispatch,
 }: SelectTipDropLocationProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+  const [selectedTipDropLocation, setSelectedTipDropLocation] = useState<
+    CutoutConfig | undefined
+  >()
+
+  const tipDropLocationOptions = deckConfig.filter(
+    cutoutConfig =>
+      WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId) ||
+      TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
+  )
+  if (tipDropLocationOptions.length === 0) {
+    tipDropLocationOptions.push({
+      cutoutId: 'cutoutA3',
+      cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+    })
+  }
 
   const handleClickNext = (): void => {
-    // dispatch to set pipette path
+    dispatch({
+      type: 'SET_DROP_TIP_LOCATION',
+      location: selectedTipDropLocation ?? {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+      },
+    })
     onNext()
   }
 
@@ -47,8 +76,7 @@ export function SelectTipDropLocation({
         onClickButton={handleClickNext}
         secondaryButtonProps={exitButtonProps}
         top={SPACING.spacing8}
-        // if selected tip drop location is null
-        // buttonIsDisabled={selectedPipette == null}
+        buttonIsDisabled={selectedTipDropLocation == null}
       />
       <Flex
         marginTop={SPACING.spacing120}
@@ -56,7 +84,26 @@ export function SelectTipDropLocation({
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         gridGap={SPACING.spacing4}
       >
-        {/* radio buttons */}
+        {tipDropLocationOptions.map(option => (
+          <RadioButton
+            key={option.cutoutId}
+            isSelected={selectedTipDropLocation?.cutoutId === option.cutoutId}
+            onChange={() => {
+              setSelectedTipDropLocation(option)
+            }}
+            buttonValue={option.cutoutId}
+            buttonLabel={t(
+              `${
+                option.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+                  ? 'trashBin'
+                  : 'wasteChute'
+              }_location`,
+              {
+                slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[option.cutoutId],
+              }
+            )}
+          />
+        ))}
       </Flex>
     </Flex>
   )

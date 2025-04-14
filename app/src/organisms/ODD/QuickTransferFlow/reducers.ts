@@ -101,13 +101,12 @@ export function quickTransferWizardReducer(
         changeTip: action.changeTip,
       }
     }
-    // ToDo (kk:04/10/2025) uncomment this when add drop tip location
-    // case 'SET_DROP_TIP_LOCATION': {
-    //   return {
-    //     ...state,
-    //     dropTipLocation: action.location,
-    //   }
-    // }
+    case 'SET_DROP_TIP_LOCATION': {
+      return {
+        ...state,
+        dropTipLocation: action.location,
+      }
+    }
   }
 }
 
