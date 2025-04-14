@@ -44,10 +44,10 @@ import {
   TimelineAlerts,
 } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
-import { DeckSlot } from '../../../types'
+import type { DeckSlot } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
-const STEP_SUMMARY_HEIGHT = '5.5rem'
+const STEP_SUMMARY_HEIGHT = '14.7rem'
 
 interface ProtocolStepsProps {
   isZoomedIn: boolean
@@ -82,7 +82,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const showTimelineAlerts =
     hasTimelineErrors && activeItem?.id !== '__initial_setup__'
   const stepDetails = currentStep?.stepDetails ?? null
-  console.log(isZoomedIn)
+
   return (
     <Flex
       backgroundColor={COLORS.grey10}
@@ -100,7 +100,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
         paddingTop={showTimelineAlerts || isZoomedIn ? '0' : SPACING.spacing24}
         height="100%"
         position={POSITION_RELATIVE}
-        overflowY={OVERFLOW_AUTO}
+        overflowY={'none'}
       >
         <Flex
           width="100%"
@@ -113,7 +113,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
             gridGap={SPACING.spacing24}
             width={isZoomedIn ? '100%' : CONTENT_MAX_WIDTH}
             justifyContent={JUSTIFY_CENTER}
-            paddingY={isZoomedIn ? '0' : SPACING.spacing120}
+            paddingTop={isZoomedIn ? '0' : SPACING.spacing120}
             marginX="auto"
           >
             {isZoomedIn ? null : (
@@ -175,23 +175,24 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
               {isZoomedIn ? null : (
                 <>
                   {/* avoid shifting the deck view container */}
-                  {activeItem?.selectionType ===
-                  'TERMINAL_ITEM_SELECTION_TYPE' ? (
-                    <SlotDetailsContainer
-                      robotType={robotType}
-                      slot={hoverSlot}
-                    />
-                  ) : (
-                    <Flex
-                      height={STEP_SUMMARY_HEIGHT}
-                      opacity={formData == null ? 1 : 0}
-                    >
+
+                  <Flex
+                    height={STEP_SUMMARY_HEIGHT}
+                    // opacity={formData == null ? 1 : 0}
+                  >
+                    {activeItem?.selectionType ===
+                    'TERMINAL_ITEM_SELECTION_TYPE' ? (
+                      <SlotDetailsContainer
+                        robotType={robotType}
+                        slot={hoverSlot}
+                      />
+                    ) : (
                       <StepSummary
                         currentStep={currentStep}
                         stepDetails={stepDetails}
                       />
-                    </Flex>
-                  )}
+                    )}
+                  </Flex>
                 </>
               )}
             </Flex>
