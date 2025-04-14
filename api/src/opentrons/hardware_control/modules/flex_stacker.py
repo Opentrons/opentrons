@@ -168,6 +168,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self._poller = poller
         self._stacker_status = FlexStackerStatus.IDLE
         self._stall_detected = False
+        self._last_status_bar_event: Optional[StatusBarUpdateEvent] = None
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -564,6 +565,8 @@ class FlexStacker(mod_abc.AbstractModule):
     async def identify(self) -> None:
         """Identify the module."""
         await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.PULSE, reps=10)
+        if self._last_status_bar_event:
+            await self._handle_status_bar_event(self._last_status_bar_event)
 
 
 class FlexStackerReader(Reader):
