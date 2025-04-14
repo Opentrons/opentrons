@@ -108,7 +108,6 @@ def check_safe_for_pipette_movement(  # noqa: C901
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
     destination_cp = _get_critical_point_to_use(engine_state, labware_id)
-
     pipette_bounds_at_well_location = (
         engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id=pipette_id,
