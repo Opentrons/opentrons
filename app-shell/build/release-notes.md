@@ -14,7 +14,7 @@ Welcome to the v8.4.0 release of the Opentrons App! This release includes update
 
 ### New Features
 
-- Run Flex protocols with updated liquid handling commands, optimized for liquid class properties like viscosity.
+- Run Flex protocols with updated liquid handling commands, including pipetting relative to liquid meniscus.
 - During a protocol, use the Flex Gripper to remove lids from new tip racks on the deck.
 - Run protocols with stacked Opentrons Tough Auto-Sealing Lids.
 

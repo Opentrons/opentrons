@@ -9,14 +9,13 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 ---
 ## Opentrons Robot Software Changes in 8.4.0
 
-Welcome to the v8.4.0 release of the Opentrons robot software! This release includes updated liquid handling commands for Opentrons-verified liquid classes and other new features, improvements, and bug fixes. 
+Welcome to the v8.4.0 release of the Opentrons robot software! This release includes updated liquid handling commands for pipetting relative to a liquid meniscus, and other new features, improvements, and bug fixes.
 
 ### New Features
 
-- Use new ``transfer_liquid``, ``distribute_liquid``, and ``consolidate_liquid`` commands on Flex to optimize liquid handling based on Opentrons-verified liquid classes. 
-- Stack multiple Opentrons Tough Auto-Sealing Lids on the deck. 
-- Move Opentrons Tough Auto-Sealing Lids or remove tip rack lids with the Flex Gripper. 
-- Aspirate or dispense in a well based on the liquid meniscus. 
+- Stack multiple Opentrons Tough Auto-Sealing Lids on the deck.
+- Move Opentrons Tough Auto-Sealing Lids or remove tip rack lids with the Flex Gripper.
+- Aspirate or dispense in a well based on the liquid meniscus.
 
 ### Improvements
 
