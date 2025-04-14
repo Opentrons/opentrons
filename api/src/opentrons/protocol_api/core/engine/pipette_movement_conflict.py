@@ -100,10 +100,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
             partially_configured=True,
         )
     well_location_point = engine_state.geometry.get_well_position(
-        labware_id=labware_id,
-        well_name=well_name,
-        well_location=well_location,
-        pipette_id=pipette_id,
+        labware_id=labware_id, well_name=well_name, well_location=well_location
     )
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
