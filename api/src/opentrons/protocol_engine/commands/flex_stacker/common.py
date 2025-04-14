@@ -45,5 +45,5 @@ class FlexStackerLabwareRetrieveError(ErrorOccurrence):
         "flexStackerLabwareRetrieveFailed"
     ] = "flexStackerLabwareRetrieveFailed"
 
-    errorCode: str = ErrorCodes.STACKER_LABWARE_RETRIEVE_FAILED.value.code
-    detail: str = ErrorCodes.STACKER_LABWARE_RETRIEVE_FAILED.value.detail
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail

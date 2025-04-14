@@ -345,6 +345,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 FlexStackerStallError,
                 FlexStackerShuttleMissingError,
                 FlexStackerHopperLabwareError,
+                FlexStackerShuttleLabwareError,
             ) as e:
                 return self.handle_recoverable_error(e)
 
