@@ -6,34 +6,53 @@ from typing_extensions import override
 
 
 class CustomQueueHandler(logging.handlers.QueueHandler):
-    """A logging.QueueHandler with some customizations.
+    """A logging.QueueHandler with some customizations:
 
-    - Allow extra
-    - Do not mangle records
-    - Block
+    - Allow adding `extra` data to handled log records.
+
+    - Simplify and optimize for single-process use.
+
+    - If a new message comes in but the queue is full, block until it has room.
+      (The default QueueHandler drops records in a way we probably wouldn't notice.)
     """
 
     def __init__(
-        self, *, queue: Queue[logging.LogRecord], syslog_identifier: str | None = None
+        self, *, queue: Queue[logging.LogRecord], extra: dict[str, object] | None = None
     ) -> None:
+        """Construct the handler.
+
+        Args:
+            queue: When this handler receives a log record, it will insert the message
+                into this queue.
+            extra: Extra data to attach to each handled log record, to be consumed by
+                whatever handler is on the consuming side of the queue. This corresponds
+                to the `extra` arg of `Logger.debug()`, etc.
+        """
         super().__init__(queue=queue)
+
         # Double underscore because we're subclassing external code so we should try to
         # avoid collisions with its attributes.
-        self.__syslog_identifier = syslog_identifier
+        self.__extra = extra
 
     @override
     def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
-        """
-        - Allow extra
-        - Do not mangle records
-        """
-        if self.__syslog_identifier is not None:
-            record.__dict__.setdefault("SYSLOG_IDENTIFIER", self.__syslog_identifier)
+        """Called internally by the superclass before enqueueing a record."""
+
+        if self.__extra is not None:
+            # This looks questionable, but updating __dict__ is the documented behavior
+            # of `Logger.debug(msg, extra=...)`.
+            record.__dict__.update(self.__extra)
+
+        # We intentionally do *not* call `super().prepare(record)`. It's documented to
+        # mucks with the data in the LogRecord, apparently as part of supporting
+        # inter-process use. Since we don't need that, we can preserve the original
+        # data and also save some compute time.
         return record
 
     @override
     def enqueue(self, record: logging.LogRecord) -> None:
-        # This cast is safe because we constrain the type of self.queue
-        # in our __init__() and nobody should mutate it after-the-fact, in practice.
+        """Called internally by the superclass to enqueue a record."""
+        # This cast is safe because we constrain the type of `self.queue`
+        # in our `__init__()` and nobody should mutate it after-the-fact, in practice.
         queue = cast(Queue[logging.LogRecord], self.queue)
         queue.put(record)

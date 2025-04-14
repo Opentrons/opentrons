@@ -47,14 +47,14 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "formatter": "message_only",
                 "queue": log_queue,
-                "syslog_identifier": "uvicorn",
+                "extra": {"syslog_identifier": "uvicorn"},
             },
             "syslog_plus_unit_above_warn": {
                 "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.WARN,
                 "formatter": "message_only",
                 "queue": log_queue,
-                "syslog_identifier": "uvicorn",
+                "extra": {"syslog_identifier": "uvicorn"},
             },
             "unit_only_below_warn": {
                 "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
@@ -62,7 +62,7 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "formatter": "message_only",
                 "filters": ["records_below_warning"],
                 "queue": log_queue,
-                "syslog_identifier": "uvicorn",
+                "extra": {"syslog_identifier": "uvicorn"},
             },
         },
         "loggers": {
