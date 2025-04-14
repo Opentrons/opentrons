@@ -52,7 +52,6 @@ from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
-
 from opentrons.hardware_control.modules.types import PlatformState
 
 if TYPE_CHECKING:
@@ -378,17 +377,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     current_labware.location
                 )
             )
-            # If the current location is a module location, validate availability of said module
-            if isinstance(validated_current_loc, ModuleLocation):
-                module = self._state_view.modules.get(validated_current_loc.moduleId)
-                if (
-                    module is not None
-                    and module.model == ModuleModel.FLEX_STACKER_MODULE_V1
-                ):
-                    if module_location_error is None:
-                        module_location_error = (
-                            await self._labware_movement_stacker_validation(module.id)
-                        )
 
             if module_location_error:
                 return DefinedErrorData(
