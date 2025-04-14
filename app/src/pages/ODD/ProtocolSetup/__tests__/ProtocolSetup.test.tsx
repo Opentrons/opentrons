@@ -340,7 +340,7 @@ describe('ProtocolSetup', () => {
     screen.getByText('Instruments')
     screen.getByText('Deck hardware')
     screen.getByText('Labware & Liquids')
-    screen.getByText('Labware Position Check')
+    screen.getByText('Labware Offsets')
   })
 
   it('should play protocol when click play button', () => {
@@ -442,7 +442,7 @@ describe('ProtocolSetup', () => {
       vi.fn(() => <div>Mock ProtocolSetupOffsets</div>)
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware Position Check'))
+    fireEvent.click(screen.getByText('Labware Offsets'))
     expect(MockProtocolSetupOffsets).toHaveBeenCalled()
     screen.getByText(/Mock ProtocolSetupOffsets/)
   })
@@ -473,7 +473,7 @@ describe('ProtocolSetup', () => {
       })
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware Position Check'))
+    fireEvent.click(screen.getByText('Labware Offsets'))
     fireEvent.click(screen.getByText('Labware & Liquids'))
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
