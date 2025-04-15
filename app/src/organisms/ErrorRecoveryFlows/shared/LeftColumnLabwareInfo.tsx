@@ -62,38 +62,38 @@ export function LeftColumnLabwareInfo({
         },
       }
     } else {
-      return {
-        labwareName: failedLabwareNames.name ?? '',
-        labwareNickname: failedLabwareNames.nickName,
-        currentLocationProps: {
-          deckLabel: failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
-        },
+      switch (step) {
+        case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
+        case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
+          return {
+            labwareName: failedLabwareNames.name ?? '',
+            labwareNickname: failedLabwareNames.nickName,
+            currentLocationProps: {
+              deckLabel: displayNameCurrentLoc.toUpperCase(),
+            },
+          }
+        case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
+          return {
+            labwareName: failedLabwareNames.name ?? '',
+            labwareNickname: failedLabwareNames.nickName,
+            currentLocationProps: {
+              deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
+            },
+          }
+        default:
+          return {
+            labwareName: failedLabwareNames.name ?? '',
+            labwareNickname: failedLabwareNames.nickName,
+            currentLocationProps: {
+              deckLabel: failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
+            },
+          }
       }
     }
   }
 
-  const buildCurrentLocation = (): ComponentProps<
-    typeof InterventionContent
-  >['infoProps']['currentLocationProps'] => {
-    switch (step) {
-      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
-        return {
-          deckLabel: displayNameCurrentLoc.toUpperCase(),
-        }
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
-        return {
-          deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
-        }
-      default:
-        return {
-          deckLabel: displayNameCurrentLoc.toUpperCase(),
-        }
-    }
-  }
-
-  const buildQuntity = (): string | null => {
+  const buildQuantity = (): string | null => {
     switch (step) {
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
@@ -113,7 +113,7 @@ export function LeftColumnLabwareInfo({
       headline={title}
       infoProps={{
         layout: layout,
-        tagText: buildQuntity(),
+        tagText: buildQuantity(),
         subText: undefined, // where do we get the lid data from?
         type,
         newLocationProps: buildNewLocation(),

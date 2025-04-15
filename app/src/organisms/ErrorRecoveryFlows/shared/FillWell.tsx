@@ -24,6 +24,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element {
               well: failedLabwareUtils.relevantPickUpTipWellName,
             })}
             type="location"
+            layout="default"
           />
         </Flex>
         <Flex marginTop="1.742rem">

@@ -126,6 +126,7 @@ export function useFailedLabwareUtils({
       getFailedCmdRelevantLabware(
         protocolAnalysis,
         relevantPickUpTipCommand,
+        errorKind,
         runRecord
       ),
     [protocolAnalysis?.id, relevantPickUpTipCommand?.key]
@@ -143,6 +144,7 @@ export function useFailedLabwareUtils({
     failedLabware: relevantPickUpTipLabware,
     failedCommandByRunRecord,
     runRecord,
+    errorKind,
   })
 
   const relevantPickUpTipWellName = getRelevantWellName(
@@ -404,7 +406,7 @@ export function getFailedCmdRelevantLabware(
       protocolAnalysis != null
         ? getLoadedLabware(
             protocolAnalysis.labware,
-            recentRelevantFailedLabwareCmd?.params.labwareId || ''
+            (recentRelevantFailedLabwareCmd?.params.labwareId as string) ?? ''
           )?.displayName ?? null
         : null
     failedLWURI = runRecord?.data.labware.find(
