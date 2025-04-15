@@ -53,12 +53,6 @@ def subject(
     )
 
 
-@pytest.fixture
-def movement(decoy: Decoy) -> MovementHandler:
-    """Get a mock in the shape of a MovementHandler."""
-    return decoy.mock(cls=MovementHandler)
-
-
 @pytest.mark.parametrize(
     "location,stateupdateLabware,stateupdateWell",
     [
@@ -82,6 +76,7 @@ async def test_dispense_while_tracking_implementation(
     decoy: Decoy,
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
+    movement: MovementHandler,
     state_view: StateView,
     subject: DispenseWhileTrackingImplementation,
     location: CurrentPipetteLocation | None,
@@ -146,7 +141,7 @@ async def test_dispense_while_tracking_implementation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
     decoy.when(
-        await subject._movement.move_to_well(
+        await movement.move_to_well(
             pipette_id="pipette-id-abc",
             labware_id="funky-labware",
             well_name="funky-well",
@@ -225,6 +220,7 @@ async def test_overpressure_error(
     decoy: Decoy,
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
+    movement: MovementHandler,
     state_view: StateView,
     model_utils: ModelUtils,
     subject: DispenseWhileTrackingImplementation,
@@ -290,7 +286,7 @@ async def test_overpressure_error(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
     )
     decoy.when(
-        await subject._movement.move_to_well(
+        await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="funky-labware",
             well_name="funky-well",

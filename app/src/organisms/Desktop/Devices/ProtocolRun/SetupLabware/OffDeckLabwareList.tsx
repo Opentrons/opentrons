@@ -9,11 +9,15 @@ import {
 import { LabwareListItem } from './LabwareListItem'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { StackItem } from '/app/transformations/commands'
+import type {
+  StackItem,
+  LabwareDefinitionsByURI,
+} from '/app/transformations/commands'
 
 interface OffDeckLabwareListProps {
   labwareItems: StackItem[]
   isFlex: boolean
+  definitionsByURI: LabwareDefinitionsByURI
   setSelectedStack: Dispatch<
     SetStateAction<{ slotName: string; stack: StackItem[] } | null>
   >
@@ -21,7 +25,7 @@ interface OffDeckLabwareListProps {
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems, isFlex, setSelectedStack } = props
+  const { labwareItems, isFlex, definitionsByURI, setSelectedStack } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null
   return (
@@ -44,6 +48,7 @@ export function OffDeckLabwareList(
             slotName="offDeck"
             isFlex={isFlex}
             showLabwareSVG
+            definitionsByURI={definitionsByURI}
             onClick={() => {
               setSelectedStack({ slotName: 'offDeck', stack: [labwareItem] })
             }}
