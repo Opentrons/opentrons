@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
@@ -7,7 +7,7 @@ import mapValues from 'lodash/mapValues'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch, useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -34,11 +34,13 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
+import { toggleNewProtocolModal } from '../../navigation/actions'
 import { SelectOt2Modules } from './SelectOt2Modules'
 import { AddMetadata } from './AddMetadata'
 import { SelectBasics } from './SelectBasics'
 import { SelectHardware } from './SelectFlexHardware'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type {
@@ -322,6 +324,7 @@ export function Onboarding(): JSX.Element | null {
         proceed={proceed}
         goBack={goBack}
         analyticsStartTime={analyticsStartTime}
+        setCurrentStepIndex={setCurrentStepIndex}
       />
     </Box>
   )
@@ -333,6 +336,7 @@ interface CreateFileFormProps {
   goBack: () => void
   proceed: () => void
   analyticsStartTime: Date
+  setCurrentStepIndex: Dispatch<SetStateAction<number>>
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
@@ -342,14 +346,26 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     proceed,
     goBack,
     analyticsStartTime,
+    setCurrentStepIndex,
   } = props
+  const location = useLocation()
   const { ...formProps } = useForm<WizardFormState>({
     defaultValues: initialFormState,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
   })
-
+  const dispatch = useDispatch()
   const robotType = formProps.watch('fields').robotType
+
+  // for resetting the onboarding page back to empty and page 1 when you hit "create new"
+  //  from the nav bar
+  useEffect(() => {
+    if (location.state?.modalResetKey) {
+      formProps.reset()
+      setCurrentStepIndex(0)
+      dispatch(toggleNewProtocolModal(true))
+    }
+  }, [location.state?.modalResetKey])
 
   return (
     <form onSubmit={formProps.handleSubmit(() => {})}>

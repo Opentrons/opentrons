@@ -9,6 +9,7 @@ import {
   FLEX_MAX_CONTENT,
   Flex,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
@@ -38,12 +39,14 @@ import {
   getRobotStateTimeline,
   getRobotType,
 } from '../../../file-data/selectors'
-import { HotKeyDisplay } from '../../../components/molecules'
+import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
+import { HotKeyDisplay, LiquidButton } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
   TimelineAlerts,
 } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
+import type { Dispatch, SetStateAction } from 'react'
 import type { DeckSlot } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
@@ -51,9 +54,10 @@ const STEP_SUMMARY_HEIGHT = '14.7rem'
 
 interface ProtocolStepsProps {
   isZoomedIn: boolean
+  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
-  const { isZoomedIn } = props
+  const { isZoomedIn, showLiquidOverflowMenu } = props
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
@@ -86,7 +90,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      height="calc(100vh - 4rem)"
+      maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
       width="100%"
       minHeight={FLEX_MAX_CONTENT}
     >
@@ -104,7 +108,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
         flex="2.85"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        paddingTop={showTimelineAlerts || isZoomedIn ? '0' : SPACING.spacing24}
+        paddingTop={isZoomedIn ? '0' : SPACING.spacing12}
         height="100%"
         position={POSITION_RELATIVE}
         overflowY={OVERFLOW_AUTO}
@@ -115,12 +119,17 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
           overflow={OVERFLOW_AUTO}
           flexDirection={DIRECTION_COLUMN}
         >
+          {isZoomedIn ? null : (
+            <Flex justifyContent={JUSTIFY_END}>
+              <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
+            </Flex>
+          )}
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing24}
             width={isZoomedIn ? '100%' : CONTENT_MAX_WIDTH}
             justifyContent={JUSTIFY_CENTER}
-            paddingTop={isZoomedIn ? '0' : SPACING.spacing120}
+            paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
             marginX="auto"
           >
             {isZoomedIn ? null : (
@@ -211,7 +220,11 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
       {formData == null && selectedSubstep ? (
         <SubStepsToolbox stepId={selectedSubstep} />
       ) : null}
-      <Flex padding={SPACING.spacing12}>
+      <Flex
+        padding={
+          formData == null ? `0 ${SPACING.spacing12} 0 0` : SPACING.spacing12
+        }
+      >
         <StepForm />
       </Flex>
 
