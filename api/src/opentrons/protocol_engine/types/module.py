@@ -15,6 +15,8 @@ from typing import (
 
 from pydantic import BaseModel, Field
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -275,3 +277,12 @@ class StackerStoredLabwareGroup(BaseModel):
     primaryLabwareId: str
     adapterLabwareId: str | None
     lidLabwareId: str | None
+
+
+@dataclass
+class StackerPoolDefinition:
+    """Represents an internal configuraiton of stored labware."""
+
+    primaryLabwareDefinition: LabwareDefinition
+    adapterLabwareDefinition: LabwareDefinition | None
+    lidLabwareDefinition: LabwareDefinition | None

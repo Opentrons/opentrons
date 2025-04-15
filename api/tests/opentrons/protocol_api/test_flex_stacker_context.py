@@ -79,12 +79,27 @@ def test_get_serial_number(
     assert result == "12345"
 
 
+@pytest.mark.parametrize(
+    "message,count", [("hello", 2), ("hello", None), (None, 2), (None, None)]
+)
+def test_fill_old_args(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    subject: FlexStackerContext,
+    message: str | None,
+    count: int | None,
+) -> None:
+    """It should pass args to the core."""
+    subject.fill(message, count)  # type: ignore[arg-type]
+    decoy.verify(mock_core.fill(count, message))
+
+
 def test_fill(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
     """It should pass args to the core."""
-    subject.fill("hello", 2)
-    decoy.verify(mock_core.fill("hello", 2))
+    subject.fill(2, "hello")
+    decoy.verify(mock_core.fill(2, "hello"))
 
 
 def test_empty(

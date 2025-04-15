@@ -14,6 +14,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_api.core.engine.module_core import FlexStackerCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.protocol_api.core.engine import load_labware_params
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 
@@ -32,6 +33,12 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncFlexStackerHardware:
     return decoy.mock(name="SyncFlexStackerHardware")  # type: ignore[no-any-return]
 
 
+@pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
 @pytest.fixture(autouse=True)
 def patch_mock_load_labware_params(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
@@ -45,6 +52,7 @@ def patch_mock_load_labware_params(
 def subject(
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncFlexStackerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> FlexStackerCore:
     """Get a Flex Stacker Core test subject."""
     return FlexStackerCore(
@@ -52,6 +60,7 @@ def subject(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -59,6 +68,7 @@ def test_create(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncFlexStackerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should be able to create a Flex Stacker module core."""
     result = FlexStackerCore(
@@ -66,6 +76,7 @@ def test_create(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
     assert result.module_id == "1234"
