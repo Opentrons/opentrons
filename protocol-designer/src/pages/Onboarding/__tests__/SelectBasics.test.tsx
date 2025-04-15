@@ -12,7 +12,8 @@ import { getTiprackOptions } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type { WizardFormState, WizardTileProps } from '../types'
+import type { WizardFormState } from '../../../components/organisms'
+import type { WizardTileProps } from '../types'
 
 vi.mock('../../../labware-defs/selectors')
 vi.mock('../../../feature-flags/selectors')
@@ -37,7 +38,8 @@ const render = (props: ComponentProps<typeof SelectBasics>) => {
 }
 
 const values = {
-  additionalEquipment: [],
+  fixtures: {},
+  hasGripper: false,
   fields: {
     name: '',
     description: '',
@@ -51,7 +53,7 @@ const values = {
     },
     right: {},
   },
-  modules: null,
+  modules: {},
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
