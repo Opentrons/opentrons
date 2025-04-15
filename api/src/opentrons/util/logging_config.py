@@ -35,7 +35,7 @@ can do the same thing with their own logs, which is important to preserve orderi
 """
 
 
-def config_for_host(level_value: int) -> None:
+def _config_for_host(level_value: int) -> None:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
     sensor_log_filename = CONFIG["sensor_log_file"]
@@ -241,7 +241,7 @@ def _config(arch: SystemArchitecture, level_value: int) -> None:
     {
         SystemArchitecture.YOCTO: _config_for_robot,
         SystemArchitecture.BUILDROOT: _config_for_robot,
-        SystemArchitecture.HOST: config_for_host,
+        SystemArchitecture.HOST: _config_for_host,
     }[arch](level_value)
 
 
