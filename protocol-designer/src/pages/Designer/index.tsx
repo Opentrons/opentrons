@@ -14,7 +14,7 @@ import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal } from '../../components/organisms'
 import { getFileMetadata } from '../../file-data/selectors'
 import { selectors } from '../../labware-ingred/selectors'
-import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
+import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
 import { ProtocolSteps } from './ProtocolSteps'
 
 import type { CutoutId } from '@opentrons/shared-data'

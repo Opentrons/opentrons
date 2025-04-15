@@ -19,14 +19,15 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
-import { getLiquidEntities, getUnsavedForm } from '../../step-forms/selectors'
-import * as labwareIngredActions from '../../labware-ingred/actions'
+import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
+import {
+  getLiquidEntities,
+  getUnsavedForm,
+} from '../../../step-forms/selectors'
+import * as labwareIngredActions from '../../../labware-ingred/actions'
 
 import type { MouseEvent, RefObject } from 'react'
-import type { ThunkDispatch } from '../../types'
-
-const NAV_HEIGHT = '64px'
+import type { ThunkDispatch } from '../../../types'
 
 interface LiquidsOverflowMenuProps {
   onClose: () => void
@@ -53,7 +54,7 @@ export function LiquidsOverflowMenu(
           ? '23.4rem'
           : SPACING.spacing12
       }
-      top={`calc(${NAV_HEIGHT} + 3.1rem)`}
+      top={`calc(${NAV_BAR_HEIGHT_REM} + 3.1rem)`}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

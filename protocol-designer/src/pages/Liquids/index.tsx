@@ -7,7 +7,7 @@ import {
   DefineLiquidsModal,
 } from '../../components/organisms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { LiquidsOverflowMenu } from '../Designer/LiquidsOverflowMenu'
+import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
 
 export function Liquids(): JSX.Element {
   const navigate = useNavigate()

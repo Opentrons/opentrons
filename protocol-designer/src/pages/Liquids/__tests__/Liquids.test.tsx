@@ -5,14 +5,14 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { AssignLiquidsModal } from '../../../components/organisms'
-import { LiquidsOverflowMenu } from '../../Designer/LiquidsOverflowMenu'
+import { LiquidsOverflowMenu } from '../../../components/organisms/LiquidsOverflowMenu'
 import { Liquids } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../Designer/LiquidsOverflowMenu')
+vi.mock('../../../components/organisms/LiquidsOverflowMenu')
 vi.mock('../../../components/organisms')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('react-router-dom', async importOriginal => {
