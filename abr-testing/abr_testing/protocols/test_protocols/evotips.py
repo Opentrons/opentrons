@@ -37,16 +37,17 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    evotips_adapter = protocol.load_adapter("evotip_flex_96_tiprack_adapter", "C1")
+    evotips_adapter = protocol.load_adapter(
+        "ev_resin_tips_flex_96_tiprack_adapter", "C1"
+    )
     evosep_tips_labware = evotips_adapter.load_labware(
-        "evotip_flex_96_labware",
+        "ev_resin_tips_flex_96_labware",
     )
     evotip = evosep_tips_labware.wells()[0]
     gripper_repeats = protocol.params.gripper_repeats  # type: ignore[attr-defined]
     soak_seconds = protocol.params.soak_seconds  # type: ignore[attr-defined]
     gripper_only = protocol.params.gripper_only  # type: ignore[attr-defined]
-    short_adapter = protocol.load_adapter("evotip_flex_short_adapter", "B2")
-    soak_plate = short_adapter.load_labware("nest_1_reservoir_195ml")
+    short_adapter = protocol.load_adapter("ev_resin_tips_flex_short_adapter", "B2")
     sol_a_plate = protocol.load_labware("nest_1_reservoir_195ml", "C2", "Solvent A")
     sol_a = sol_a_plate.wells()[0]
 
@@ -140,13 +141,13 @@ def run(protocol: ProtocolContext) -> None:
 
         # ------------------------Soak tips Action ------------------------------
 
-        protocol.move_labware(evosep_tips_labware, soak_plate, True)
+        protocol.move_labware(evosep_tips_labware, short_adapter, True)
         protocol.delay(soak_seconds)
         protocol.move_labware(evosep_tips_labware, evotips_adapter, True)
     for i in range(gripper_repeats):
         protocol.move_labware(
             labware=evosep_tips_labware,
-            new_location=soak_plate,
+            new_location=short_adapter,
             use_gripper=True,
         )
         protocol.move_labware(
