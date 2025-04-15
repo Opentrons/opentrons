@@ -8,7 +8,7 @@
     ]
   },
   "metadata": {
-    "displayName": "Opentrons Flex Evotip Tiprack 96-Channel Adapter",
+    "displayName": "Opentrons Flex EV Resin Tips Tall Adapter for Third-party Evotips in Flex 96 Tip Rack Adapter",
     "displayCategory": "adapter",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -30,7 +30,7 @@
     "quirks": ["tiprackAdapterFor96Channel", "stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotip_flex_96_tiprack_adapter"
+    "loadName": "ev_resin_tips_flex_96_tiprack_adapter"
   },
   "namespace": "opentrons",
   "version": 1,

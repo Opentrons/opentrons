@@ -21,7 +21,7 @@
     ]
   },
   "metadata": {
-    "displayName": "Evotip Labware in Opentrons Flex Top Adapter",
+    "displayName": "Opentrons Flex EV Resin Tips Top Adapter with Third-party Evotips",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1009,7 +1009,7 @@
     "tipLength": 51.0,
     "tipOverlap": 10.0,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotip_flex_96_labware"
+    "loadName": "ev_resin_tips_flex_96_labware"
   },
   "namespace": "opentrons",
   "allowedRoles": ["labware"],
@@ -1048,17 +1048,17 @@
       "y": 0,
       "z": 22.5
     },
-    "evotip_flex_short_adapter": {
+    "ev_resin_tips_flex_short_adapter": {
       "x": 0,
       "y": 0,
       "z": 18.5
     },
-    "evotip_flex_96_tiprack_adapter": {
+    "ev_resin_tips_flex_96_tiprack_adapter": {
       "x": 0,
       "y": 0,
       "z": 71.78
     },
-    "evotip_flex_tall_adapter": {
+    "ev_resin_tips_flex_tall_adapter": {
       "x": 0,
       "y": 0,
       "z": 18.5
