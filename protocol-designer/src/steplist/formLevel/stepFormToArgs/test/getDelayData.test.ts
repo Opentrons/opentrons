@@ -9,12 +9,14 @@ describe('getMoveLiquidDelayData', () => {
       aspirate_delay_mmFromBottom: 2,
     }
     expect(
-      getMoveLiquidDelayData(
-        fields,
-        'aspirate_delay_checkbox',
-        'aspirate_delay_seconds',
-        'aspirate_delay_mmFromBottom'
-      )
+      getMoveLiquidDelayData({
+        hydratedFormData: fields,
+        secondsField: 'aspirate_delay_seconds',
+        xPositionField: 'aspirate_x_position',
+        yPositionField: 'aspirate_y_position',
+        zPositionField: 'aspirate_mmFromBottom',
+        checkboxField: 'aspirate_delay_checkbox',
+      })
     ).toBe(null)
   })
 
@@ -34,12 +36,14 @@ describe('getMoveLiquidDelayData', () => {
         aspirate_delay_mmFromBottom: offsetValue,
       }
       expect(
-        getMoveLiquidDelayData(
-          fields,
-          'aspirate_delay_checkbox',
-          'aspirate_delay_seconds',
-          'aspirate_delay_mmFromBottom'
-        )
+        getMoveLiquidDelayData({
+          hydratedFormData: fields,
+          secondsField: 'aspirate_delay_seconds',
+          xPositionField: 'aspirate_x_position',
+          yPositionField: 'aspirate_y_position',
+          zPositionField: 'aspirate_mmFromBottom',
+          checkboxField: 'aspirate_delay_checkbox',
+        })
       ).toBe(null)
     })
   })
@@ -48,32 +52,40 @@ describe('getMoveLiquidDelayData', () => {
     const fields: any = {
       aspirate_delay_checkbox: true,
       aspirate_delay_seconds: 30,
-      aspirate_delay_mmFromBottom: 2,
+      aspirate_x_position: 10,
+      aspirate_y_position: 10,
+      aspirate_mmFromBottom: 2,
     }
     expect(
-      getMoveLiquidDelayData(
-        fields,
-        'aspirate_delay_checkbox',
-        'aspirate_delay_seconds',
-        'aspirate_delay_mmFromBottom'
-      )
-    ).toEqual({ seconds: 30, mmFromBottom: 2 })
+      getMoveLiquidDelayData({
+        hydratedFormData: fields,
+        secondsField: 'aspirate_delay_seconds',
+        xPositionField: 'aspirate_x_position',
+        yPositionField: 'aspirate_y_position',
+        zPositionField: 'aspirate_mmFromBottom',
+        checkboxField: 'aspirate_delay_checkbox',
+      })
+    ).toEqual({ seconds: 30, mmFromBottom: 2, xOffset: 10, yOffset: 10 })
   })
 
   it('should allow mmFromBottom to be zero', () => {
     const fields: any = {
       aspirate_delay_checkbox: true,
       aspirate_delay_seconds: 30,
-      aspirate_delay_mmFromBottom: 0,
+      aspirate_mmFromBottom: 0,
+      aspirate_x_position: 10,
+      aspirate_y_position: 10,
     }
     expect(
-      getMoveLiquidDelayData(
-        fields,
-        'aspirate_delay_checkbox',
-        'aspirate_delay_seconds',
-        'aspirate_delay_mmFromBottom'
-      )
-    ).toEqual({ seconds: 30, mmFromBottom: 0 })
+      getMoveLiquidDelayData({
+        hydratedFormData: fields,
+        secondsField: 'aspirate_delay_seconds',
+        xPositionField: 'aspirate_x_position',
+        yPositionField: 'aspirate_y_position',
+        zPositionField: 'aspirate_mmFromBottom',
+        checkboxField: 'aspirate_delay_checkbox',
+      })
+    ).toEqual({ seconds: 30, mmFromBottom: 0, xOffset: 10, yOffset: 10 })
   })
 })
 

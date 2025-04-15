@@ -1139,12 +1139,22 @@ describe('consolidate single-channel', () => {
         volume: 100,
         // aspirate column
         preWetTip: true,
-        aspirateDelay: { seconds: 11, mmFromBottom: 15 },
+        aspirateDelay: {
+          seconds: 11,
+          mmFromBottom: 15,
+          xOffset: 0,
+          yOffset: 0,
+        },
         touchTipAfterAspirate: true,
         touchTipAfterAspirateOffsetMmFromTop: -14.5,
         aspirateAirGapVolume: 31,
         // dispense column
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: {
+          seconds: 12,
+          mmFromBottom: 14,
+          xOffset: 0,
+          yOffset: 0,
+        },
         mixInDestination: {
           volume: 36,
           times: 1,
@@ -1851,12 +1861,22 @@ describe('consolidate single-channel', () => {
         volume: 100,
         // aspirate column
         preWetTip: true,
-        aspirateDelay: { seconds: 11, mmFromBottom: 15 },
+        aspirateDelay: {
+          seconds: 11,
+          mmFromBottom: 15,
+          xOffset: 0,
+          yOffset: 0,
+        },
         touchTipAfterAspirate: true,
         touchTipAfterAspirateOffsetMmFromTop: -14.5,
         aspirateAirGapVolume: 31,
         // dispense column
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: {
+          seconds: 12,
+          mmFromBottom: 14,
+          xOffset: 0,
+          yOffset: 0,
+        },
         mixInDestination: {
           volume: 36,
           times: 1,
@@ -2498,7 +2518,288 @@ describe('consolidate single-channel', () => {
             seconds: 12,
           },
         },
-        // Blowout to dest
+        // Blowout to dest well
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: 3.3,
+              },
+            },
+          },
+        },
+        // Touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: -3.4,
+              },
+            },
+          },
+        },
+
+        // No Dispense > Air Gap here because we're re-using the tip
+        // for the next chunk
+
+        // Second chunk: source well A3
+        // pre-wet
+        {
+          commandType: 'aspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 100,
+            labwareId: 'sourcePlateId',
+            wellName: 'A3',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 3.1,
+              },
+            },
+            flowRate: 2.1,
+          },
+        },
+        {
+          commandType: 'waitForDuration',
+          key: expect.any(String),
+          params: {
+            seconds: 11,
+          },
+        },
+        {
+          commandType: 'dispense',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 100,
+            labwareId: 'sourcePlateId',
+            wellName: 'A3',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 3.1,
+              },
+            },
+            flowRate: 2.2,
+          },
+        },
+        {
+          commandType: 'waitForDuration',
+          key: expect.any(String),
+          params: {
+            seconds: 12,
+          },
+        },
+        // actual aspirate A3
+        {
+          commandType: 'aspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 100,
+            labwareId: 'sourcePlateId',
+            wellName: 'A3',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 3.1,
+              },
+            },
+            flowRate: 2.1,
+          },
+        },
+        {
+          commandType: 'moveToWell',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'sourcePlateId',
+            wellName: 'A3',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 15,
+              },
+            },
+          },
+        },
+        {
+          commandType: 'waitForDuration',
+          key: expect.any(String),
+          params: {
+            seconds: 11,
+          },
+        },
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'sourcePlateId',
+            wellName: 'A3',
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: -14.5,
+              },
+            },
+          },
+        },
+        // Aspirate > air gap: after aspirating from A3
+        {
+          commandType: 'moveToWell',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'sourcePlateId',
+            wellName: 'A3',
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 1,
+              },
+            },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            flowRate: 2.1,
+            pipetteId: 'p300SingleId',
+            volume: 31,
+          },
+        },
+        {
+          commandType: 'waitForDuration',
+          key: expect.any(String),
+          params: {
+            seconds: 11,
+          },
+        },
+        // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
+        {
+          commandType: 'dispense',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 131,
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 3.2,
+              },
+            },
+            flowRate: 2.2,
+          },
+        },
+        {
+          commandType: 'moveToWell',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 14,
+              },
+            },
+          },
+        },
+        {
+          commandType: 'waitForDuration',
+          key: expect.any(String),
+          params: {
+            seconds: 12,
+          },
+        },
+        // Mix (disp)
+        {
+          commandType: 'aspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 36,
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 3.2,
+              },
+            },
+            flowRate: 2.1,
+          },
+        },
+        {
+          commandType: 'waitForDuration',
+          key: expect.any(String),
+          params: {
+            seconds: 11,
+          },
+        },
+        {
+          commandType: 'dispense',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 36,
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 3.2,
+              },
+            },
+            flowRate: 2.2,
+          },
+        },
+        {
+          commandType: 'waitForDuration',
+          key: expect.any(String),
+          params: {
+            seconds: 12,
+          },
+        },
+        // Blowout to dest well
         {
           commandType: 'blowout',
           key: expect.any(String),
@@ -2608,12 +2909,22 @@ describe('consolidate single-channel', () => {
         volume: 100,
         // aspirate column
         preWetTip: true,
-        aspirateDelay: { seconds: 11, mmFromBottom: 15 },
+        aspirateDelay: {
+          seconds: 11,
+          mmFromBottom: 15,
+          xOffset: 0,
+          yOffset: 0,
+        },
         touchTipAfterAspirate: true,
         touchTipAfterAspirateOffsetMmFromTop: -14.5,
         aspirateAirGapVolume: 31,
         // dispense column
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: {
+          seconds: 12,
+          mmFromBottom: 14,
+          xOffset: 0,
+          yOffset: 0,
+        },
         mixInDestination: {
           volume: 36,
           times: 1,

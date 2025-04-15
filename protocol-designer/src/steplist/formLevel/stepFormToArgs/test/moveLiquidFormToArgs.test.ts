@@ -72,6 +72,8 @@ describe('move liquid step form -> command creator args', () => {
       aspirate_wellOrder_second: 't2b',
       aspirate_flowRate: null,
       aspirate_mmFromBottom: null,
+      aspirate_x_position: null,
+      aspirate_y_position: null,
       aspirate_touchTip_checkbox: false,
       aspirate_touchTip_mmFromTop: null,
       aspirate_mix_checkbox: false,
@@ -79,8 +81,6 @@ describe('move liquid step form -> command creator args', () => {
       aspirate_mix_times: null,
       aspirate_delay_checkbox: false,
       aspirate_delay_seconds: null,
-      aspirate_delay_mmFromBottom: null,
-
       dispense_labware: {
         id: 'destLabwareId',
         // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
@@ -92,6 +92,8 @@ describe('move liquid step form -> command creator args', () => {
       dispense_wellOrder_second: 'b2t',
       dispense_flowRate: null,
       dispense_mmFromBottom: null,
+      dispense_x_position: null,
+      dispense_y_position: null,
       dispense_touchTip_checkbox: false,
       dispense_touchTip_mmFromTop: null,
       dispense_mix_checkbox: false,
@@ -99,7 +101,6 @@ describe('move liquid step form -> command creator args', () => {
       dispense_mix_times: null,
       dispense_delay_checkbox: false,
       dispense_delay_seconds: null,
-      dispense_delay_mmFromBottom: null,
 
       aspirate_wells_grouped: false,
       preWetTip: false,
@@ -226,12 +227,16 @@ describe('move liquid step form -> command creator args', () => {
       formFields: {
         aspirate_delay_seconds: 11,
         aspirate_delay_mmFromBottom: null, // use default
+        aspirate_x_position: 10,
+        aspirate_y_position: 10,
       },
       expectedArgsUnchecked: { aspirateDelay: null },
       expectedArgsChecked: {
         aspirateDelay: {
           seconds: 11,
           mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
+          xOffset: 10,
+          yOffset: 10,
         },
       },
     },
@@ -239,10 +244,18 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'dispense_delay_checkbox',
       formFields: {
         dispense_delay_seconds: 11,
-        dispense_delay_mmFromBottom: 12,
+        dispense_x_position: 10,
+        dispense_y_position: 10,
       },
       expectedArgsUnchecked: { dispenseDelay: null },
-      expectedArgsChecked: { dispenseDelay: { seconds: 11, mmFromBottom: 12 } },
+      expectedArgsChecked: {
+        dispenseDelay: {
+          seconds: 11,
+          mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
+          xOffset: 10,
+          yOffset: 10,
+        },
+      },
     },
     // AIRGAP
     {

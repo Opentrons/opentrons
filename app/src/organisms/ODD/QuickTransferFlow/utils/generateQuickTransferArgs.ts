@@ -388,6 +388,8 @@ export function generateQuickTransferArgs(
         ? {
             seconds: quickTransferState.delayAspirate?.delayDuration,
             mmFromBottom: quickTransferState.delayAspirate.positionFromBottom,
+            xOffset: 0,
+            yOffset: 0,
           }
         : null,
     dispenseDelay:
@@ -395,6 +397,8 @@ export function generateQuickTransferArgs(
         ? {
             seconds: quickTransferState.delayDispense?.delayDuration,
             mmFromBottom: quickTransferState.delayDispense.positionFromBottom,
+            xOffset: 0,
+            yOffset: 0,
           }
         : null,
     aspirateAirGapVolume: quickTransferState.airGapAspirate ?? null,
@@ -425,6 +429,26 @@ export function generateQuickTransferArgs(
         commandCreatorFnName: 'transfer',
         sourceWells,
         destWells,
+        aspirateDelay:
+          quickTransferState.delayAspirate != null
+            ? {
+                seconds: quickTransferState.delayAspirate?.delayDuration,
+                mmFromBottom:
+                  quickTransferState.delayAspirate.positionFromBottom,
+                xOffset: 0,
+                yOffset: 0,
+              }
+            : null,
+        dispenseDelay:
+          quickTransferState.delayDispense != null
+            ? {
+                seconds: quickTransferState.delayDispense?.delayDuration,
+                mmFromBottom:
+                  quickTransferState.delayDispense.positionFromBottom,
+                xOffset: 0,
+                yOffset: 0,
+              }
+            : null,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {

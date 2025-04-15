@@ -12,6 +12,7 @@ import type { IconName } from '@opentrons/components'
 import type {
   LabwareLocation,
   NozzleConfigurationStyle,
+  PositionReference,
 } from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
@@ -300,6 +301,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   aspirate_submerge_mmFromBottom: number | null
   aspirate_submerge_x_position: number | null
   aspirate_submerge_y_position: number | null
+  aspirate_submerge_position_reference: PositionReference
   aspirate_touchTip_mmFromEdge?: number | null
   aspirate_touchTip_mmFromTop?: number | null
   aspirate_touchTip_speed?: number | null
@@ -330,6 +332,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_submerge_mmFromBottom: number | null
   dispense_submerge_x_position: number | null
   dispense_submerge_y_position: number | null
+  dispense_submerge_position_reference: PositionReference
   dispense_touchTip_mmFromEdge?: number | null
   dispense_touchTip_mmFromTop?: number | null
   dispense_touchTip_speed?: number | null
@@ -507,14 +510,24 @@ export type ReferenceFields =
   | 'dispense_retract_position_reference'
   | 'mix_position_reference'
 
-export type DelayCheckboxFields =
+export type DelayCheckboxBaseFields =
   | 'aspirate_delay_checkbox'
   | 'dispense_delay_checkbox'
-
-export type DelaySecondFields =
+export type DelayCheckboxMoveLiquidFields =
+  | DelayCheckboxBaseFields
+  | 'aspirate_submerge_delay_seconds'
+  | 'aspirate_retract_delay_seconds'
+  | 'dispense_submerge_delay_seconds'
+  | 'dispense_retract_delay_seconds'
+export type DelaySecondsBaseFields =
   | 'aspirate_delay_seconds'
   | 'dispense_delay_seconds'
-
+export type DelaySecondsMoveLiquidFields =
+  | DelaySecondsBaseFields
+  | 'aspirate_submerge_delay_seconds'
+  | 'dispense_submerge_delay_seconds'
+  | 'aspirate_retract_delay_seconds'
+  | 'dispense_retract_delay_seconds'
 export function getIsTouchTipField(fieldName: StepFieldName): boolean {
   const touchTipFields = [
     'aspirate_touchTip_mmFromTop',
