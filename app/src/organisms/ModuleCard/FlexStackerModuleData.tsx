@@ -22,14 +22,18 @@ export function FlexStackerModuleData(
   const { moduleData } = props
   const { t, i18n } = useTranslation(['device_details', 'shared'])
 
-  const shuttleDisplayStatus = i18n.format(
-    moduleData.platformState === 'extended'
-      ? t('flex_stacker_extended')
-      : moduleData.platformState === 'retracted'
-      ? t('flex_stacker_retracted')
-      : t('shared:unknown'),
-    'capitalize'
-  )
+  const getShuttleStatusText = (): string => {
+    switch (moduleData.platformState) {
+      case 'extended':
+        return t('flex_stacker_extended')
+      case 'retracted':
+        return t('flex_stacker_retracted')
+      default:
+        return t('shared:unknown')
+    }
+  }
+
+  const shuttleDisplayStatus = i18n.format(getShuttleStatusText(), 'capitalize')
 
   const doorDisplayStatus = i18n.format(
     moduleData.hopperDoorState === 'closed'
