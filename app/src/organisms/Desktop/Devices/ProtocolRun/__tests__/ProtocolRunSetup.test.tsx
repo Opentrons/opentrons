@@ -323,14 +323,14 @@ describe('ProtocolRunSetup', () => {
       vi.clearAllMocks()
     })
 
-    it('renders calibration ready if robot is Flex and modules are calibrated', () => {
+    it('renders proper copy if robot is Flex and modules are calibrated', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: true })
 
       render()
-      expect(screen.getAllByText('Calibration ready').length).toEqual(2)
+      expect(screen.getAllByText('Instruments attached').length).toEqual(1)
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {

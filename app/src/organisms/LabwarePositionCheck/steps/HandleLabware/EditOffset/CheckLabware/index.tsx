@@ -208,7 +208,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
               </StyledText>
               <Trans
                 t={t}
-                i18nKey={'ensure_nozzle_position_odd'}
+                i18nKey={'ensure_probe_position_odd'}
                 values={{
                   item_location: isLwTiprack
                     ? t('check_tip_location')
@@ -297,7 +297,7 @@ function CheckLabwareContentDesktop(
             </StyledText>
             <Trans
               t={t}
-              i18nKey={'ensure_nozzle_position_desktop'}
+              i18nKey={'ensure_probe_position_desktop'}
               values={{
                 item_location: isLwTiprack
                   ? t('check_tip_location')

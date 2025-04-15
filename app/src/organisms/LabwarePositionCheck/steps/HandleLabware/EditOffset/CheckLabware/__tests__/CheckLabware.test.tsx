@@ -21,7 +21,6 @@ import {
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
 } from '/app/redux/protocol-runs'
 import { getIsOnDevice } from '/app/redux/config'
-import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -80,7 +79,6 @@ describe('CheckLabware', () => {
   let mockHandleJog: Mock
   let mockResetJog: Mock
   let mockHandleResetLwModulesOnDeck: Mock
-  let mockMakeSuccessSnackbar: Mock
   let props: ComponentProps<typeof CheckLabware>
 
   beforeEach(() => {
@@ -99,7 +97,6 @@ describe('CheckLabware', () => {
       })
     mockResetJog = vi.fn().mockResolvedValue(undefined)
     mockHandleResetLwModulesOnDeck = vi.fn().mockResolvedValue(undefined)
-    mockMakeSuccessSnackbar = vi.fn()
 
     props = {
       runId: 'test-run-id',
@@ -148,9 +145,6 @@ describe('CheckLabware', () => {
     } as any)
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_EDIT_OFFSET_SUBSTEP',
-    } as any)
-    vi.mocked(useLPCSnackbars).mockReturnValue({
-      makeSuccessSnackbar: mockMakeSuccessSnackbar,
     } as any)
   })
 
@@ -234,6 +228,5 @@ describe('CheckLabware', () => {
     primaryButton.click()
 
     expect(props.handleAddConfirmedWorkingVector).toHaveBeenCalled()
-    expect(mockMakeSuccessSnackbar).toHaveBeenCalled()
   })
 })

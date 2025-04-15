@@ -251,7 +251,7 @@ describe('useInitLPCStore', () => {
         lastStepIndices: null,
         currentSubstep: null,
       },
-      ui: { showDefaultOffsetInfoBanner: true },
+      ui: { showDefaultOffsetInfoBanner: true, showSnackbar: null },
     })
     expect(sortRunRecordOffsets).toHaveBeenCalledWith(
       MOCK_RUN_RECORD.data.labwareOffsets
