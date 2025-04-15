@@ -92,7 +92,7 @@ enum MixLocators {
   AspWellOrder = '[data-testid="WellsOrderField_ListButton_aspirate"]',
   ResetToDefault = 'button:contains("Reset to default")',
   PrimaryOrderDropdown = 'div[tabindex="0"].sc-bqWxrE jKLbYH iFjNDq',
-  CancelAspSettings = 'button:contains("Done")',
+  CancelAspSettings = 'button:contains("Back to overview")',
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
   YpositionInput = '[id="TipPositionModal_y_custom_input"]',
