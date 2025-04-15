@@ -233,18 +233,17 @@ class ConicalFrustum(BaseModel):
         )
         while abs(volume_at_y - target_volume) > 0.005:
             target_above_last_two_guesses = volume_at_y > target_volume and volume_at_y > volume_at_prev_y
+            target_between_last_two_guesses = (volume_at_y < target_volume and volume_at_y > volume_at_prev_y) or (volume_at_y > target_volume and volume_at_y < volume_at_prev_y)
+            target_below_last_two_guesses = volume_at_y < target_volume and volume_at_y < volume_at_prev_y
             if target_above_last_two_guesses:
                 y = round(
                     (total_height + y) / 2, 3
                 )
             
-            target_between_last_two_guesses = (volume_at_y < target_volume and volume_at_y > volume_at_prev_y) or \
-            (volume_at_y > target_volume and volume_at_y < volume_at_prev_y)
             elif target_between_last_two_guesses:
                 y = round(
                    (y + prev_y) / 2, 3
                 )
-            target_below_last_two_guesses = volume_at_y < target_volume and volume_at_y < volume_at_prev_y
             elif target_below_last_two_guesses:
                 y = round(
                     (y / 2), 3
