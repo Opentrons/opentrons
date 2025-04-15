@@ -21,7 +21,6 @@ from .command import (
     SuccessData,
     DefinedErrorData,
 )
-from ..errors import LabwareIsTipRackError
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -70,16 +69,9 @@ class MoveToWellImplementation(
         labware_id = params.labwareId
         well_name = params.wellName
         well_location = params.wellLocation
-
+        # TODO(cm): implement move_to_well with meniscus + volume offset
         if well_location.volumeOffset and well_location.volumeOffset != 0:
             raise ValueError("volume offset not supported with MoveToWell")
-        if (
-            self._state_view.labware.is_tiprack(labware_id)
-            and well_location.volumeOffset
-        ):
-            raise LabwareIsTipRackError(
-                "Cannot specify a WellLocation with a volumeOffset with movement to a tip rack"
-            )
 
         move_result = await move_to_well(
             model_utils=self._model_utils,

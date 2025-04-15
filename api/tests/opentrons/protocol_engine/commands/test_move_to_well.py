@@ -10,7 +10,6 @@ from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedErro
 from opentrons.protocol_engine import (
     WellOffset,
     DeckPoint,
-    errors,
 )
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import update_types
@@ -114,7 +113,7 @@ async def test_move_to_well_with_tip_rack_and_volume_offset(
 
     decoy.when(mock_state_view.labware.is_tiprack("123")).then_return(True)
 
-    with pytest.raises(errors.LabwareIsTipRackError):
+    with pytest.raises(ValueError):
         await subject.execute(data)
 
 
