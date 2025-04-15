@@ -21,7 +21,7 @@ export const SettingsIcon = (): JSX.Element => {
   const metadata = useSelector(getFileMetadata)
 
   const handleNavigate = (): void => {
-    if (metadata?.created != null && location.pathname === '/settings') {
+    if (location.pathname === '/settings') {
       navigate(-1)
     } else if (location.pathname !== '/settings') {
       navigate('/settings')

@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  useOnClickOutside,
-} from '@opentrons/components'
+import { useOnClickOutside } from '@opentrons/components'
 import {
   AssignLiquidsModal,
   DefineLiquidsModal,
-  DesignerNavigation,
 } from '../../components/organisms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { LiquidsOverflowMenu } from '../Designer/LiquidsOverflowMenu'
@@ -58,10 +53,7 @@ export function Liquids(): JSX.Element {
         />
       ) : null}
 
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <DesignerNavigation showLiquidOverflowMenu={showLiquidOverflowMenu} />
-        <AssignLiquidsModal />
-      </Flex>
+      <AssignLiquidsModal />
     </>
   )
 }

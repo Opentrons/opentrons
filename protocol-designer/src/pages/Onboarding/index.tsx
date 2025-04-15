@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
@@ -7,7 +7,7 @@ import mapValues from 'lodash/mapValues'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch, useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -60,6 +60,7 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { WizardFormState } from './types'
+import { toggleNewProtocolModal } from '../../navigation/actions'
 
 type WizardStep = 'basics' | 'modules' | 'fixtures' | 'metadata'
 const WIZARD_STEPS: WizardStep[] = ['basics', 'modules', 'fixtures', 'metadata']
@@ -142,7 +143,7 @@ export function Onboarding(): JSX.Element | null {
   )
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const [wizardSteps, setWizardSteps] = useState<WizardStep[]>(WIZARD_STEPS)
-
+  console.log('currentStepIndex', currentStepIndex)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const createProtocolFile = (values: WizardFormState): void => {
@@ -363,6 +364,7 @@ export function Onboarding(): JSX.Element | null {
         setWizardSteps={setWizardSteps}
         goBack={goBack}
         analyticsStartTime={analyticsStartTime}
+        setCurrentStepIndex={setCurrentStepIndex}
       />
     </Box>
   )
@@ -375,6 +377,7 @@ interface CreateFileFormProps {
   proceed: () => void
   setWizardSteps: Dispatch<SetStateAction<WizardStep[]>>
   analyticsStartTime: Date
+  setCurrentStepIndex: Dispatch<SetStateAction<number>>
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
@@ -385,13 +388,15 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     goBack,
     analyticsStartTime,
     setWizardSteps,
+    setCurrentStepIndex,
   } = props
+  const location = useLocation()
   const { ...formProps } = useForm<WizardFormState>({
     defaultValues: initialFormState,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
   })
-
+  const dispatch = useDispatch()
   const handleProceedRobotType = (robotType: string): void => {
     if (robotType === OT2_ROBOT_TYPE) {
       setWizardSteps(WIZARD_STEPS_OT2)
@@ -399,6 +404,16 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       setWizardSteps(WIZARD_STEPS)
     }
   }
+
+  // for resetting the onboarding page back to empty and page 1 when you hit "create new"
+  //  from the nav bar
+  useEffect(() => {
+    if (location.state?.modalResetKey) {
+      formProps.reset()
+      setCurrentStepIndex(0)
+      dispatch(toggleNewProtocolModal(true))
+    }
+  }, [location.state?.modalResetKey])
 
   return (
     <form onSubmit={formProps.handleSubmit(() => {})}>

@@ -4,10 +4,7 @@ import { screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import {
-  AssignLiquidsModal,
-  DesignerNavigation,
-} from '../../../components/organisms'
+import { AssignLiquidsModal } from '../../../components/organisms'
 import { LiquidsOverflowMenu } from '../../Designer/LiquidsOverflowMenu'
 import { Liquids } from '..'
 
@@ -45,9 +42,6 @@ describe('Liquids', () => {
     vi.mocked(AssignLiquidsModal).mockReturnValue(
       <div>mock AssignLiquidsModal</div>
     )
-    vi.mocked(DesignerNavigation).mockReturnValue(
-      <div>mock DesignerNavigation</div>
-    )
     vi.mocked(LiquidsOverflowMenu).mockReturnValue(
       <div>mock LiquidsOverflowMenu</div>
     )
@@ -58,9 +52,8 @@ describe('Liquids', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/designer')
   })
 
-  it('renders nav and assign liquids modal', () => {
+  it('renders assign liquids modal', () => {
     render()
-    screen.getByText('mock DesignerNavigation')
     screen.getByText('mock AssignLiquidsModal')
   })
 })
