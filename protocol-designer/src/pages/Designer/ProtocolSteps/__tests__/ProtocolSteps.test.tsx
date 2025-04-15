@@ -8,14 +8,11 @@ import {
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
 import {
+  getActiveItem,
   getSelectedStepId,
   getSelectedSubstep,
-  getSelectedTerminalItemId,
 } from '../../../../ui/steps/selectors'
-import {
-  getDesignerTab,
-  getRobotStateTimeline,
-} from '../../../../file-data/selectors'
+import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
 import { DeckSetupContainer } from '../../DeckSetup'
 import { OffDeck } from '../../OffDeck'
@@ -40,7 +37,7 @@ vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
 vi.mock('../Timeline/utils')
 const render = () => {
-  return renderWithProviders(<ProtocolSteps />, {
+  return renderWithProviders(<ProtocolSteps isZoomedIn={false} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -65,7 +62,6 @@ const MOCK_STEP_FORMS = {
 describe('ProtocolSteps', () => {
   beforeEach(() => {
     vi.mocked(getUserOS).mockReturnValue('Mac OS')
-    vi.mocked(getDesignerTab).mockReturnValue('protocolSteps')
     vi.mocked(getRobotStateTimeline).mockReturnValue({
       timeline: [],
       errors: [],
@@ -76,7 +72,10 @@ describe('ProtocolSteps', () => {
     vi.mocked(DeckSetupContainer).mockReturnValue(
       <div>mock DeckSetupContainer</div>
     )
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue(null)
+    vi.mocked(getActiveItem).mockReturnValue({
+      selectionType: 'SINGLE_STEP_SELECTION_TYPE',
+      id: '0522fde8-25a3-4840-b84a-af7282bd80d5',
+    })
     vi.mocked(OffDeck).mockReturnValue(<div>mock OffDeck</div>)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
     vi.mocked(getSelectedSubstep).mockReturnValue(null)

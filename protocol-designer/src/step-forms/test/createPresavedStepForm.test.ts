@@ -276,6 +276,7 @@ describe('createPresavedStepForm', () => {
         liquidClass: 'none',
         pushOut_checkbox: null,
         pushOut_volume: null,
+        mix_position_reference: null,
       })
     })
   })

@@ -1,7 +1,6 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
@@ -13,7 +12,6 @@ import { Aspirate } from '../../Aspirate'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/redux-resources/analytics')
 vi.mock('../../Aspirate/AspirateSettingItem')
 vi.mock('../../Aspirate/AspirateSettingDetail')
 vi.mock('../../Aspirate/hooks/useAspirateSettingsConfig')
@@ -92,8 +90,6 @@ const mockAspirateSettingsItems = [
   },
 ] as any
 
-let mockTrackEventWithRobotSerial: any
-
 describe('Aspirate', () => {
   let props: ComponentProps<typeof Aspirate>
 
@@ -166,12 +162,6 @@ describe('Aspirate', () => {
     vi.mocked(useAspirateSettingsConfig).mockReturnValue(
       mockAspirateSettingsItems
     )
-    mockTrackEventWithRobotSerial = vi.fn(
-      () => new Promise(resolve => resolve({}))
-    )
-    vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
-      trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
-    })
   })
 
   it('renders mock components and reset button', () => {

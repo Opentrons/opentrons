@@ -19,19 +19,20 @@ import {
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
-import type { DeckSetupTabType } from '../types'
 
 const STANDARD_X_WIDTH = '127.76px'
 const STANDARD_Y_HEIGHT = '85.48px'
 
-export function OffDeck(props: DeckSetupTabType): JSX.Element {
-  const { tab } = props
+export function OffDeck(): JSX.Element {
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
+  const terminalItemId = useSelector(getSelectedTerminalItemId)
+
   const dispatch = useDispatch()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
@@ -166,7 +167,7 @@ export function OffDeck(props: DeckSetupTabType): JSX.Element {
         </Flex>
       ) : (
         <OffDeckDetails
-          tab={tab}
+          terminalItemId={terminalItemId}
           addLabware={() => {
             dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
           }}

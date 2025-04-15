@@ -1,7 +1,6 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
@@ -12,7 +11,6 @@ import { Dispense } from '../../Dispense'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/redux-resources/analytics')
 vi.mock('../../Dispense/DispenseSettingItem')
 vi.mock('../../Dispense/DispenseSettingDetail')
 vi.mock('../../Dispense/hooks/useAspirateSettingsConfig')
@@ -22,8 +20,6 @@ const render = (props: ComponentProps<typeof Dispense>) => {
     i18nInstance: i18n,
   })
 }
-
-let mockTrackEventWithRobotSerial: any
 
 describe('Dispense', () => {
   let props: ComponentProps<typeof Dispense>
@@ -94,12 +90,6 @@ describe('Dispense', () => {
     vi.mocked(DispenseSettingDetail).mockReturnValue(
       <div>mock DispenseSettingDetail</div>
     )
-    mockTrackEventWithRobotSerial = vi.fn(
-      () => new Promise(resolve => resolve({}))
-    )
-    vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
-      trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
-    })
   })
 
   it('renders mock components and reset button', () => {
