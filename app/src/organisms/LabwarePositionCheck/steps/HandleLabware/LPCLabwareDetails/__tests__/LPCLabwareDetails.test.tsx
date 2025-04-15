@@ -110,13 +110,11 @@ describe('LPCLabwareDetails', () => {
   let props: ComponentProps<typeof LPCLabwareDetails>
   let mockDispatch: Mock
   let mockSaveWorkingOffsets: Mock
-  let mockToggleInfoBanner: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     mockSaveWorkingOffsets = vi.fn(() => Promise.resolve('mock-data'))
-    mockToggleInfoBanner = vi.fn()
 
     props = {
       ...mockLPCContentProps,
@@ -124,12 +122,6 @@ describe('LPCLabwareDetails', () => {
         saveWorkingOffsets: mockSaveWorkingOffsets,
         isSavingWorkingOffsetsLoading: false,
       } as any,
-      bannerUtils: {
-        defaultOffsetInfoBanner: {
-          toggleBanner: mockToggleInfoBanner,
-          showBanner: false,
-        },
-      },
     }
 
     vi.mocked(getIsOnDevice).mockReturnValue(false)
@@ -192,35 +184,5 @@ describe('LPCLabwareDetails', () => {
     expect(mockDispatch).toHaveBeenCalledTimes(2)
     expect(applyWorkingOffsets).toHaveBeenCalledWith(props.runId, 'mock-data')
     expect(goBackEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
-  })
-
-  it('shows the hardcoded InlineNotification when there is a hardcoded offset present', () => {
-    vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => true)
-
-    render(props)
-
-    screen.getByText(
-      'Hardcoded offsets must be changed in your Python protocol'
-    )
-  })
-
-  it('should render the info banner when show banner is true and allow for the user to dismiss it', () => {
-    vi.mocked(getIsOnDevice).mockReturnValue(true)
-
-    render({
-      ...props,
-      bannerUtils: {
-        defaultOffsetInfoBanner: {
-          toggleBanner: mockToggleInfoBanner,
-          showBanner: true,
-        },
-      },
-    })
-
-    const notification = screen.getByTestId('inline-notification')
-    expect(notification).toBeInTheDocument()
-    expect(notification.getAttribute('data-heading')).toBe(
-      'The default offset is used for all placements of the labware unless a manual adjustment is made to specific slot location.'
-    )
   })
 })

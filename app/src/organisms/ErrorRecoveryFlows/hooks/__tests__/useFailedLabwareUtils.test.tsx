@@ -430,22 +430,6 @@ describe('getFailedLabwareQuantity', () => {
   })
 })
 
-const TestWrapper = (props: GetRelevantLwLocationsParams) => {
-  const displayLocation = useRelevantFailedLwLocations(props)
-  return (
-    <>
-      <div>{`Current Loc: ${displayLocation.displayNameCurrentLoc}`}</div>
-      <div>{`New Loc: ${displayLocation.displayNameNewLoc}`}</div>
-    </>
-  )
-}
-
-const render = (props: ComponentProps<typeof TestWrapper>) => {
-  return renderWithProviders(<TestWrapper {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
-
 describe('useRelevantFailedLwLocations', () => {
   const mockRunRecord = {
     data: {
@@ -467,16 +451,6 @@ describe('useRelevantFailedLwLocations', () => {
     const mockFailedCommand = {
       commandType: 'aspirate',
     } as any
-
-    render({
-      failedLabware: mockFailedLabware,
-      failedCommandByRunRecord: mockFailedCommand,
-      runRecord: mockRunRecord,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
-    })
-
-    screen.getByText('Current Loc: Slot D1')
-    screen.getByText('New Loc: null')
 
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
@@ -500,16 +474,6 @@ describe('useRelevantFailedLwLocations', () => {
       },
     } as any
 
-    render({
-      failedLabware: mockFailedLabware,
-      failedCommandByRunRecord: mockFailedCommand,
-      runRecord: mockRunRecord,
-      errorKind: ERROR_KINDS.STALL_WHILE_STACKING,
-    })
-
-    screen.getByText('Current Loc: Stacker D')
-    screen.getByText('New Loc: Slot D1')
-
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
         failedLabware: mockFailedLabware,
@@ -518,8 +482,6 @@ describe('useRelevantFailedLwLocations', () => {
         errorKind: ERROR_KINDS.STALL_WHILE_STACKING,
       })
     )
-
-    console.log('result: ', result)
 
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
     expect(result.current.newLoc).toStrictEqual({ moduleId: 'module-id' })
@@ -532,16 +494,6 @@ describe('useRelevantFailedLwLocations', () => {
         newLocation: { slotName: 'C2' },
       },
     } as any
-
-    render({
-      failedLabware: mockFailedLabware,
-      failedCommandByRunRecord: mockFailedCommand,
-      runRecord: mockRunRecord,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
-    })
-
-    screen.getByText('Current Loc: Slot D1')
-    screen.getByText('New Loc: Slot C2')
 
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
@@ -584,6 +536,7 @@ describe('getFailedCmdRelevantLabware', () => {
     const result = getFailedCmdRelevantLabware(
       mockProtocolAnalysis,
       mockCommand,
+      'GRIPPER_ERROR',
       mockRunRecord
     )
 
