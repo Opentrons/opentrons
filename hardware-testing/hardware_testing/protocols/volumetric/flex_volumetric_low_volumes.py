@@ -116,7 +116,7 @@ DILUENT_LABWARE = "nest_12_reservoir_15ml"
 #        Corning plate to be stackable with it
 DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
 PLATE_LID_LOAD_NAME = "plate_lid"
-DE_STATIC_LOAD_NAME = "de_static_bar"
+DE_STATIC_LOAD_NAME = "de_static_fixture"
 
 # global so we don't need to pass it around everywhere
 _test_volumes: List[float] = []

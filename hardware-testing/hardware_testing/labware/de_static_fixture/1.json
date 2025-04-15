@@ -8,7 +8,7 @@
     "links": ["https://www.mcmaster.com/2246K32/"]
   },
   "metadata": {
-    "displayName": "De-Static Bar",
+    "displayName": "De-Static Fixture",
     "displayCategory": "other",
     "displayVolumeUnits": "mL",
     "tags": []
@@ -16,16 +16,16 @@
   "dimensions": {
     "xDimension": 128.0,
     "yDimension": 86.0,
-    "zDimension": 120.0
+    "zDimension": 130.0
   },
   "wells": {
     "A1": {
-      "depth": 50.0,
+      "depth": 60.0,
       "shape": "rectangular",
       "xDimension": 10.0,
       "yDimension": 86.0,
       "totalLiquidVolume": 0.0,
-      "x": 25.0,
+      "x": 15.0,
       "y": 43.0,
       "z": 70.0
     }
@@ -45,7 +45,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
-    "loadName": "de_static_bar"
+    "loadName": "de_static_fixture"
   },
   "namespace": "custom_beta",
   "version": 1,
