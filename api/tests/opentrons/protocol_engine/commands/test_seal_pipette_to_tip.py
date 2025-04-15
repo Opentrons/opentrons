@@ -1,4 +1,4 @@
-"""Test evotip seal commands."""
+"""Test pipette seal commands."""
 
 import pytest
 from datetime import datetime
@@ -30,15 +30,15 @@ from opentrons.protocol_engine.types import TipGeometry, FluidKind, AspiratedFlu
 
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.evotip_seal_pipette import (
-    EvotipSealPipetteParams,
-    EvotipSealPipetteResult,
-    EvotipSealPipetteImplementation,
+from opentrons.protocol_engine.commands.seal_pipette_to_tip import (
+    SealPipetteToTipParams,
+    SealPipetteToTipResult,
+    SealPipetteToTipImplementation,
 )
 from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import OT3HardwareControlAPI
 
 from opentrons_shared_data.labware import load_definition
 
@@ -60,17 +60,17 @@ async def test_success(
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
     evotips_definition: LabwareDefinition,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: OT3HardwareControlAPI,
     pipetting: PipettingHandler,
 ) -> None:
     """A PickUpTip command should have an execution implementation."""
-    subject = EvotipSealPipetteImplementation(
+    subject = SealPipetteToTipImplementation(
         state_view=state_view,
         movement=movement,
         tip_handler=tip_handler,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
-        hardware_api=hardware_api,
+        hardware_api=ot3_hardware_api,
         pipetting=pipetting,
     )
 
@@ -111,7 +111,7 @@ async def test_success(
     ).then_return(TipGeometry(length=42, diameter=5, volume=300))
 
     result = await subject.execute(
-        EvotipSealPipetteParams(
+        SealPipetteToTipParams(
             pipetteId="pipette-id",
             labwareId="labware-id",
             wellName="A3",
@@ -120,7 +120,7 @@ async def test_success(
     )
 
     assert result == SuccessData(
-        public=EvotipSealPipetteResult(
+        public=SealPipetteToTipResult(
             tipLength=42,
             tipVolume=300,
             tipDiameter=5,
@@ -146,18 +146,18 @@ async def test_no_tip_physically_missing_error(
     tip_handler: TipHandler,
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: OT3HardwareControlAPI,
     pipetting: PipettingHandler,
     evotips_definition: LabwareDefinition,
 ) -> None:
     """It should not return a TipPhysicallyMissingError even though evotips do not sit high enough on the pipette to be detected by the tip sensor."""
-    subject = EvotipSealPipetteImplementation(
+    subject = SealPipetteToTipImplementation(
         state_view=state_view,
         movement=movement,
         tip_handler=tip_handler,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
-        hardware_api=hardware_api,
+        hardware_api=ot3_hardware_api,
         pipetting=pipetting,
     )
 
@@ -202,13 +202,13 @@ async def test_no_tip_physically_missing_error(
     )
 
     result = await subject.execute(
-        EvotipSealPipetteParams(
+        SealPipetteToTipParams(
             pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
         )
     )
 
     assert result == SuccessData(
-        public=EvotipSealPipetteResult(
+        public=SealPipetteToTipResult(
             tipLength=42,
             tipVolume=300,
             tipDiameter=5,
@@ -234,18 +234,18 @@ async def test_stall_error(
     tip_handler: TipHandler,
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: OT3HardwareControlAPI,
     pipetting: PipettingHandler,
     evotips_definition: LabwareDefinition,
 ) -> None:
     """It should return a TipPhysicallyMissingError if the HW API indicates that."""
-    subject = EvotipSealPipetteImplementation(
+    subject = SealPipetteToTipImplementation(
         state_view=state_view,
         movement=movement,
         tip_handler=tip_handler,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
-        hardware_api=hardware_api,
+        hardware_api=ot3_hardware_api,
         pipetting=pipetting,
     )
 
@@ -282,7 +282,7 @@ async def test_stall_error(
     )
 
     result = await subject.execute(
-        EvotipSealPipetteParams(
+        SealPipetteToTipParams(
             pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
         )
     )
