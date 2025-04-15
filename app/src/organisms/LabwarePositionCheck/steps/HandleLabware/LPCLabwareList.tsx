@@ -18,6 +18,7 @@ import {
   DIRECTION_ROW,
   DISPLAY_FLEX,
   RadioButton,
+  NO_WRAP,
 } from '@opentrons/components'
 
 import {
@@ -208,6 +209,7 @@ const TEXT_CONTAINER_STYLE = css`
 
 const SUBTEXT_STYLE = css`
   color: ${COLORS.grey60};
+  text-wrap: ${NO_WRAP};
 `
 
 const ICON_STYLE = css`

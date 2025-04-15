@@ -14,7 +14,7 @@ from opentrons.protocol_engine import LabwareOffset, StateSummary
 from robot_server.persistence.database import sqlite_rowid, sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
 from robot_server.persistence.pydantic import json_to_pydantic
-from robot_server.persistence.tables import schema_9
+from robot_server.persistence.tables import schema_09
 
 from ._util import copy_contents
 from .._folder_migrator import Migration
@@ -28,7 +28,7 @@ class Migration8to9(Migration):  # noqa: D101
         with sql_engine_ctx(
             dest_dir / DB_FILE
         ) as engine, engine.begin() as transaction:
-            schema_9.labware_offset_table.create(transaction)
+            schema_09.labware_offset_table.create(transaction)
             _import_labware_offsets_from_runs(transaction)
 
 
@@ -36,8 +36,8 @@ def _import_labware_offsets_from_runs(connection: sqlalchemy.engine.Connection) 
     """Seed the new labware_offset table with records scraped from existing runs."""
     raw_state_summaries = (
         connection.execute(
-            sqlalchemy.select(schema_9.run_table.c.state_summary).where(
-                schema_9.run_table.c.state_summary.is_not(None)
+            sqlalchemy.select(schema_09.run_table.c.state_summary).where(
+                schema_09.run_table.c.state_summary.is_not(None)
             )
             # Be careful to preserve order.
             # Offsets from newer runs should shadow offsets from older runs.
@@ -58,7 +58,7 @@ def _import_labware_offsets_from_runs(connection: sqlalchemy.engine.Connection) 
         for labware_offset in state_summary.labwareOffsets:
             converted = _pydantic_labware_offset_to_sql(labware_offset)
             connection.execute(
-                sqlalchemy.insert(schema_9.labware_offset_table).values(converted)
+                sqlalchemy.insert(schema_09.labware_offset_table).values(converted)
             )
 
 
