@@ -388,8 +388,6 @@ export function generateQuickTransferArgs(
         ? {
             seconds: quickTransferState.delayAspirate?.delayDuration,
             mmFromBottom: quickTransferState.delayAspirate.positionFromBottom,
-            xOffset: 0,
-            yOffset: 0,
           }
         : null,
     dispenseDelay:
@@ -397,8 +395,6 @@ export function generateQuickTransferArgs(
         ? {
             seconds: quickTransferState.delayDispense?.delayDuration,
             mmFromBottom: quickTransferState.delayDispense.positionFromBottom,
-            xOffset: 0,
-            yOffset: 0,
           }
         : null,
     aspirateAirGapVolume: quickTransferState.airGapAspirate ?? null,
