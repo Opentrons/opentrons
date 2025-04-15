@@ -44,11 +44,12 @@ export type DisplayLocationParams =
 // detailLevel applies to nested labware. If 'full', return copy that includes the actual peripheral that nests the
 // labware, ex, "in module XYZ in slot C1".
 // If 'slot-only', return only the slot name, ex "in slot C1".
+// pass in 'slot-only'
 export function getLabwareDisplayLocation(
   params: DisplayLocationParams
 ): string {
   const { t, isOnDevice = false, location } = params
-  console.log("location: ", location)
+  console.log('location: ', location)
   const locationResult = Array.isArray(location)
     ? getLabwareLocationFromSequence({
         ...params,
@@ -61,7 +62,7 @@ export function getLabwareDisplayLocation(
   if (locationResult == null) {
     return ''
   }
-  console.log("locationResult: ", locationResult)
+  console.log('locationResult: ', locationResult)
 
   const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
   const slotName =

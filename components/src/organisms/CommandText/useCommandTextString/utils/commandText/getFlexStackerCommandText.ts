@@ -27,6 +27,9 @@ export const KEYS_BY_COMMAND_TYPE: {
   'flexStacker/fill': 'flex_stacker_fill',
 }
 
+
+// inStackerHopperLocation -> colum location
+// onModule -> slot name (C4)
 type HandledCommands = Extract<
   RunTimeCommand,
   { commandType: keyof typeof KEYS_BY_COMMAND_TYPE }
@@ -98,8 +101,8 @@ GetFlexStackerCommandText): string => {
       return (
         t('flex_stacker_set_stored_labware_with_quantity_and_location', {
           quantity: command.params.initialCount,
-          slotName,
-          primaryDefinitionDisplayName:
+          stackerColumn: slotName,
+          labwareAndLidDisplayNames:
             command.result?.primaryLabwareDefinition.metadata.displayName,
         }) +
         (command.result?.lidLabwareDefinition != null
@@ -111,11 +114,20 @@ GetFlexStackerCommandText): string => {
       )
     }
   } else if (command.commandType === 'flexStacker/fill') {
+    const slotName = getLabwareDisplayLocation({
+      loadedLabwares: commandTextData?.labware ?? [],
+      location: { moduleId: command.params?.moduleId },
+      robotType,
+      allRunDefs,
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
     if (primaryDefinitionDisplayName != null) {
       return (
         t('flex_stacker_fill_with_quantity_and_labware', {
           quantity: command.params.count,
-          primaryDefinitionDisplayName,
+          stackerColumn: slotName,
+          labwareAndLidDisplayNames: primaryDefinitionDisplayName,
         }) +
         (command.result?.lidLabwareURI != null
           ? t('with_lid_name', {
@@ -137,7 +149,7 @@ GetFlexStackerCommandText): string => {
     })
     if (primaryDefinitionDisplayName != null && slotName != null) {
       return t('flex_stacker_empty_from_location', {
-        slotName,
+        stackerColumn: slotName,
       })
     }
   }
