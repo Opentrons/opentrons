@@ -334,35 +334,38 @@ The ``display_color`` parameter accepts a hex color code, which adds a color to 
 Labeling Wells and Reservoirs
 =============================
 
-This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate each labware with a particular liquid: 
+This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate wells in each labware with a particular liquid: 
 
 .. code-block:: python
 
         ## load entire well plate with greenWater
-        well_plate.load_liquid(
-            wells=()[0],
+        plate.load_liquid(
+            wells=plate.wells(), # using accessor
             volume=50,
-            liquid="greenWater"
+            liquid=greenWater
         )
 
         ## load entire reservoir with blueWater
         reservoir.load_liquid(
-            wells=[A1],
+            wells=[A1], # using list of well names
             volume=50,
-            liquid="blueWater"
+            liquid=blueWater
         )
 
 ``load_liquid`` makes it easy to load an entire well plate with a single command. Let's say you only need to load liquid in a few wells, or want to load multiple liquids or volumes in the same labware. 
 
 .. code-block:: python
 
-    well_plate.load_liquid_by_well({'A1': 200, 'A2': 100, 'A3': 50}, greenWater)
-    well_plate.load_liquid_by_well({'B1': 200, 'B2': 100, 'B3': 50}, blueWater)
+    plate.load_liquid_by_well({'A1': 200, 'A2': 100, 'A3': 50}, greenWater)
+    plate.load_liquid_by_well({'B1': 200, 'B2': 100, 'B3': 50}, blueWater)
 
 
 You can also use :py:meth:`.Labware.load_empty` to label individual wells or an entire labware as empty at the beginning of your protocol. 
         
-.. versionadded:: 2.23
+.. versionadded:: 2.14
+    Use ``Well.load_liquid()`` to label liquid in individual wells. 
+.. versionchanged:: 2.22
+    Use ``Labware.load_liquid``, ``Labware.load_liquid_by_well``, or ``Labware.load_empty`` to label liquid in individual wells or an entire labware. 
 
 This information is available after you import your protocol to the app or send it to Flex. A summary of liquids appears on the protocol detail page, and well-by-well detail is available on the run setup page (under Initial Liquid Setup in the app, or under Liquids on Flex).
 
