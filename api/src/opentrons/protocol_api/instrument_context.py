@@ -42,7 +42,7 @@ from ..protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
     TransferTipPolicyV2Type,
 )
-from ..protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from ..protocol_engine.types import LiquidTrackingType
 
 _DEFAULT_ASPIRATE_CLEARANCE = 1.0
 _DEFAULT_DISPENSE_CLEARANCE = 1.0

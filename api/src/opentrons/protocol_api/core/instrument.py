@@ -11,7 +11,7 @@ from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from ..disposal_locations import TrashBin, WasteChute
 from .well import WellCoreType

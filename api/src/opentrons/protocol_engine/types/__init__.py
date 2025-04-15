@@ -117,6 +117,8 @@ from .well_position import (
     LiquidHandlingWellLocation,
     PickUpTipWellLocation,
     DropTipWellLocation,
+    WellLocationType,
+    WellLocationFunction,
 )
 from .instrument import (
     LoadedPipette,
@@ -132,6 +134,7 @@ from .liquid_level_detection import (
     ProbedVolumeInfo,
     WellInfoSummary,
     WellLiquidInfo,
+    LiquidTrackingType,
 )
 from .liquid_handling import FlowRates
 from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
@@ -259,6 +262,8 @@ __all__ = [
     "LiquidHandlingWellLocation",
     "PickUpTipWellLocation",
     "DropTipWellLocation",
+    "WellLocationType",
+    "WellLocationFunction",
     # Execution
     "EngineStatus",
     "PostRunHardwareState",
@@ -274,6 +279,7 @@ __all__ = [
     "ProbedVolumeInfo",
     "WellInfoSummary",
     "WellLiquidInfo",
+    "LiquidTrackingType",
     # Liquid handling
     "FlowRates",
     # Labware movement
