@@ -73,5 +73,7 @@ export interface QuickTransferWizardState {
   transferType?: TransferType
   volume?: number
   path?: PathOption // this has been added
+  changeTip?: ChangeTipOptions // this has been added
+  dropTipLocation?: CutoutConfig // this has been added
 }
 ```
