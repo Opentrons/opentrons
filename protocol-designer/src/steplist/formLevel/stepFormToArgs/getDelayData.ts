@@ -7,31 +7,18 @@ import type {
   HydratedMixFormData,
   DelaySecondsBaseFields,
   DelaySecondsMoveLiquidFields,
+  DelayXPositionFields,
+  DelayYPositionFields,
+  DelayZPositionFields,
+  DelayPositionReferenceFields,
 } from '../../../form-types'
 export function getMoveLiquidDelayData(args: {
   hydratedFormData: HydratedMoveLiquidFormData
   secondsField: DelaySecondsMoveLiquidFields
-  xPositionField:
-    | 'aspirate_x_position'
-    | 'dispense_x_position'
-    | 'aspirate_submerge_x_position'
-    | 'dispense_submerge_x_position'
-    | 'aspirate_retract_x_position'
-    | 'dispense_retract_x_position'
-  yPositionField:
-    | 'aspirate_y_position'
-    | 'dispense_y_position'
-    | 'aspirate_submerge_y_position'
-    | 'dispense_submerge_y_position'
-    | 'aspirate_retract_y_position'
-    | 'dispense_retract_y_position'
-  zPositionField:
-    | 'aspirate_mmFromBottom'
-    | 'dispense_mmFromBottom'
-    | 'aspirate_submerge_mmFromBottom'
-    | 'dispense_submerge_mmFromBottom'
-    | 'aspirate_retract_mmFromBottom'
-    | 'dispense_retract_mmFromBottom'
+  xPositionField: DelayXPositionFields
+  yPositionField: DelayYPositionFields
+  zPositionField: DelayZPositionFields
+  positionReferenceField: DelayPositionReferenceFields
   checkboxField?: DelayCheckboxMoveLiquidFields
 }): InnerDelayArgs | null {
   const {

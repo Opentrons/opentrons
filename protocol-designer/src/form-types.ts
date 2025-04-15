@@ -528,6 +528,34 @@ export type DelaySecondsMoveLiquidFields =
   | 'dispense_submerge_delay_seconds'
   | 'aspirate_retract_delay_seconds'
   | 'dispense_retract_delay_seconds'
+export type DelayXPositionFields =
+  | 'aspirate_x_position'
+  | 'dispense_x_position'
+  | 'aspirate_submerge_x_position'
+  | 'dispense_submerge_x_position'
+  | 'aspirate_retract_x_position'
+  | 'dispense_retract_x_position'
+export type DelayYPositionFields =
+  | 'aspirate_y_position'
+  | 'dispense_y_position'
+  | 'aspirate_submerge_y_position'
+  | 'dispense_submerge_y_position'
+  | 'aspirate_retract_y_position'
+  | 'dispense_retract_y_position'
+export type DelayZPositionFields =
+  | 'aspirate_mmFromBottom'
+  | 'dispense_mmFromBottom'
+  | 'aspirate_submerge_mmFromBottom'
+  | 'dispense_submerge_mmFromBottom'
+  | 'aspirate_retract_mmFromBottom'
+  | 'dispense_retract_mmFromBottom'
+export type DelayPositionReferenceFields =
+  | 'aspirate_position_reference'
+  | 'dispense_position_reference'
+  | 'aspirate_submerge_position_reference'
+  | 'dispense_submerge_position_reference'
+  | 'aspirate_retract_position_reference'
+  | 'dispense_retract_position_reference'
 export function getIsTouchTipField(fieldName: StepFieldName): boolean {
   const touchTipFields = [
     'aspirate_touchTip_mmFromTop',

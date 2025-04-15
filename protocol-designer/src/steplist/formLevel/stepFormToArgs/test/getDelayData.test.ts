@@ -16,6 +16,7 @@ describe('getMoveLiquidDelayData', () => {
         yPositionField: 'aspirate_y_position',
         zPositionField: 'aspirate_mmFromBottom',
         checkboxField: 'aspirate_delay_checkbox',
+        positionReferenceField: 'aspirate_position_reference',
       })
     ).toBe(null)
   })
@@ -43,6 +44,7 @@ describe('getMoveLiquidDelayData', () => {
           yPositionField: 'aspirate_y_position',
           zPositionField: 'aspirate_mmFromBottom',
           checkboxField: 'aspirate_delay_checkbox',
+          positionReferenceField: 'aspirate_position_reference',
         })
       ).toBe(null)
     })
@@ -63,6 +65,7 @@ describe('getMoveLiquidDelayData', () => {
         xPositionField: 'aspirate_x_position',
         yPositionField: 'aspirate_y_position',
         zPositionField: 'aspirate_mmFromBottom',
+        positionReferenceField: 'aspirate_position_reference',
         checkboxField: 'aspirate_delay_checkbox',
       })
     ).toEqual({ seconds: 30, mmFromBottom: 2, xOffset: 10, yOffset: 10 })
@@ -83,6 +86,7 @@ describe('getMoveLiquidDelayData', () => {
         xPositionField: 'aspirate_x_position',
         yPositionField: 'aspirate_y_position',
         zPositionField: 'aspirate_mmFromBottom',
+        positionReferenceField: 'aspirate_position_reference',
         checkboxField: 'aspirate_delay_checkbox',
       })
     ).toEqual({ seconds: 30, mmFromBottom: 0, xOffset: 10, yOffset: 10 })
