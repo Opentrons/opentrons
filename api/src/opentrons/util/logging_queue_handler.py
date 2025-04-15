@@ -1,3 +1,6 @@
+# noqa: D100
+
+
 import logging.handlers
 import logging
 from queue import Queue
@@ -6,7 +9,7 @@ from typing_extensions import override
 
 
 class CustomQueueHandler(logging.handlers.QueueHandler):
-    """A logging.QueueHandler with some customizations:
+    """A logging.QueueHandler with some customizations.
 
     - Allow adding `extra` data to handled log records.
 
@@ -25,9 +28,9 @@ class CustomQueueHandler(logging.handlers.QueueHandler):
             queue: When this handler receives a log record, it will insert the message
                 into this queue.
             extra: Extra data to attach to each log record, to be interpreted by
-                whatever handler is on the consuming side of the queue. (e.g. if that's
+                whatever handler is on the consuming side of the queue. e.g. if that's
                 `systemd.journal.JournalHandler`, you could add a "SYSLOG_IDENTIFIER"
-                key here.) This corresponds to the `extra` arg of `Logger.debug()`.
+                key here. This corresponds to the `extra` arg of `Logger.debug()`.
         """
         super().__init__(queue=queue)
 
@@ -38,14 +41,13 @@ class CustomQueueHandler(logging.handlers.QueueHandler):
     @override
     def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
         """Called internally by the superclass before enqueueing a record."""
-
         if self.__extra is not None:
             # This looks questionable, but updating __dict__ is the documented behavior
             # of `Logger.debug(msg, extra=...)`.
             record.__dict__.update(self.__extra)
 
         # We intentionally do *not* call `super().prepare(record)`. It's documented to
-        # mucks with the data in the LogRecord, apparently as part of supporting
+        # muck with the data in the LogRecord, apparently as part of supporting
         # inter-process use. Since we don't need that, we can preserve the original
         # data and also save some compute time.
         return record

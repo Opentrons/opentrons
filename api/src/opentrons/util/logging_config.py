@@ -1,9 +1,8 @@
 import logging
 from logging.config import dictConfig
-from logging.handlers import QueueHandler, QueueListener
+from logging.handlers import QueueListener
 import sys
-from typing import Any, Dict, cast
-from typing_extensions import override
+from queue import Queue
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
@@ -14,30 +13,32 @@ else:
     SENSOR_LOG_NAME = "unused"
 
 
-from queue import Queue
+log_queue = Queue[logging.LogRecord](
+    # We want this big enough to smooth over any temporary stalls in journald's ability
+    # to consume our records--but bounded, so if we consistently outpace journald for
+    # some reason, we don't leak memory or get latency from buffer bloat.
+    # 50000 is basically an arbitrary guess.
+    maxsize=50000
+)
+"""A buffer through which log records will pass.
 
-# Note that this is an unbounded queue. Ideally, it would be bounded just big enough to
-# smooth over any temporary stalls in journald's ability to consume our messages.
-# Unfortunately, QueueHandler uses `queue.put_nowait()`, which would raise an exception
-# out of our log.debug() etc. statements when the queue gets full. We'd ideally have some
-# custom version of QueueHandler that handles that uses `queue.put()` or drops the message.
-# log_queue = SimpleQueue[object]()
+This is intended to work around problems when our logs are going to journald:
+we think journald can block for a while when it flushes records to the filesystem,
+and the backpressure from that will cause calls like `log.debug()` to block and
+interfere with timing-sensitive hardware control.
+https://github.com/Opentrons/opentrons/issues/18034
+
+`log_init()` will configure all the logs that this package knows about to pass through
+this queue. This queue is exposed so consumers of this package (i.e. robot-server)
+can do the same thing with their own logs, which is important to preserve ordering.
 """
-This should usually not be used directly. It's exposed so that consumers of this package
-that configure their own logging (i.e. robot-server) can inject their messages into
-the same queue and
-library
-"""
 
 
-log_queue = Queue[logging.LogRecord]()
-
-
-def _host_config(level_value: int) -> Dict[str, Any]:
+def config_for_host(level_value: int) -> None:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
     sensor_log_filename = CONFIG["sensor_log_file"]
-    return {
+    config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
@@ -111,10 +112,17 @@ def _host_config(level_value: int) -> Dict[str, Any]:
         },
     }
 
+    dictConfig(config)
 
-def _robot_config(level_value: int) -> Dict[str, Any]:
+
+def _config_for_robot(level_value: int) -> None:
+    # Import systemd.journald here since it is generally unavailble on non
+    # linux systems and we probably don't want to use it on linux desktops
+    # either
+    from systemd.journal import JournalHandler  # type: ignore
+
     sensor_log_filename = CONFIG["sensor_log_file"]
-    return {
+    config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
@@ -192,12 +200,31 @@ def _robot_config(level_value: int) -> Dict[str, Any]:
         },
     }
 
+    # Start draining from the queue and sending messages to journald.
+    # Then, stash the queue listener in a global variable so it doesn't get garbage-collected.
+    # I don't know if we actually need to do this, but let's not find out the hard way.
+    global _queue_listener
+    if _queue_listener is not None:
+        # In case this log init function was called multiple times for some reason.
+        _queue_listener.stop()
+    _queue_listener = QueueListener(log_queue, JournalHandler())
+    _queue_listener.start()
 
-def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
-    return {
-        SystemArchitecture.YOCTO: _robot_config,
-        SystemArchitecture.BUILDROOT: _robot_config,
-        SystemArchitecture.HOST: _host_config,
+    dictConfig(config)
+
+    # TODO(2025-04-15): We need some kind of log_deinit() function to call
+    # queue_listener.stop() before the process ends. Not doing that means we're
+    # dropping some records when the process shuts down.
+
+
+_queue_listener: QueueListener | None = None
+
+
+def _config(arch: SystemArchitecture, level_value: int) -> None:
+    {
+        SystemArchitecture.YOCTO: _config_for_robot,
+        SystemArchitecture.BUILDROOT: _config_for_robot,
+        SystemArchitecture.HOST: config_for_host,
     }[arch](level_value)
 
 
@@ -218,18 +245,4 @@ def log_init(level_name: str) -> None:
     # todo(mm, 2025-04-14): Use logging.getLevelNamesMapping() when we have Python >=3.11.
     level_value = logging._nameToLevel[ot_log_level]
 
-    logging_config = _config(ARCHITECTURE, level_value)
-
-    # TODO
-    if ARCHITECTURE != SystemArchitecture.HOST:
-        # Conditional import: we only want to use systemd when we're on a robot.
-        from systemd.journal import JournalHandler  # type: ignore
-
-        global _journal_shoveler
-        _journal_shoveler = QueueListener(log_queue, JournalHandler())
-        _journal_shoveler.start()
-
-    dictConfig(logging_config)
-
-
-_journal_shoveler: QueueListener | None = None
+    _config(ARCHITECTURE, level_value)
