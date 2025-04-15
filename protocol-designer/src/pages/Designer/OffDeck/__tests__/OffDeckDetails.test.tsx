@@ -44,7 +44,7 @@ describe('OffDeckDetails', () => {
 
   beforeEach(() => {
     props = {
-      tab: 'startingDeck',
+      terminalItemId: '__initial_setup__',
       addLabware: vi.fn(),
     }
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)

@@ -37,7 +37,13 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 
 const render = () => {
-  return renderWithProviders(<DeckSetupContainer tab="startingDeck" />)[0]
+  return renderWithProviders(
+    <DeckSetupContainer
+      setHoverSlot={vi.fn()}
+      hoverSlot={null}
+      robotType={FLEX_ROBOT_TYPE}
+    />
+  )[0]
 }
 
 describe('DeckSetupContainer', () => {

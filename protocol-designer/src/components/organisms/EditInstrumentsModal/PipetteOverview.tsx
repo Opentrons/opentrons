@@ -66,7 +66,7 @@ export function PipetteOverview({
   rightPipette,
   gripper,
 }: PipetteOverviewProps): JSX.Element {
-  const { t } = useTranslation(['create_new_protocol', 'protocol_overview'])
+  const { t } = useTranslation(['onboarding', 'protocol_overview'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities

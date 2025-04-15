@@ -26,7 +26,7 @@ interface PipetteInfoItemProps {
 
 export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
   const { mount, pipetteName, tiprackDefURIs, editClick, cleanForm } = props
-  const { t, i18n } = useTranslation('create_new_protocol')
+  const { t, i18n } = useTranslation('onboarding')
   const allLabware = useSelector(getLabwareDefsByURI)
   const is96Channel = pipetteName === 'p1000_96'
 

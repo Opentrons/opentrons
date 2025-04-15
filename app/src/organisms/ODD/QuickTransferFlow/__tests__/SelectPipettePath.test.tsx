@@ -26,7 +26,10 @@ describe('SelectPipettePath', () => {
         buttonText: 'Exit',
         onClick: vi.fn(),
       },
-      state: {},
+      state: {
+        sourceWells: ['A1'],
+        destinationWells: ['A1'],
+      } as any,
       dispatch: vi.fn(),
     }
   })
@@ -38,6 +41,34 @@ describe('SelectPipettePath', () => {
     screen.getByText('Continue')
   })
 
+  it('should render single transfer when transfer is 1:1', () => {
+    render(props)
+    screen.getByText('Single transfers')
+  })
+
+  it('should render single transfer when transfer is n:n', () => {
+    props.state.sourceWells = ['A1', 'A2']
+    props.state.destinationWells = ['A1', 'A2']
+    render(props)
+    screen.getByText('Single transfers')
+  })
+
+  it('should render sinle transfer when transfer is 1:n', () => {
+    props.state.sourceWells = ['A1']
+    props.state.destinationWells = ['A1', 'A2']
+    render(props)
+    screen.getByText('Single transfers')
+    screen.getByText('Multi-dispense')
+  })
+
+  it('should render sinle transfer when transfer is n:1', () => {
+    props.state.sourceWells = ['A1', 'A2']
+    props.state.destinationWells = ['A1']
+    render(props)
+    screen.getByText('Single transfers')
+    screen.getByText('Multi-aspirate')
+  })
+
   it('should call mock function when tappin exit button', () => {
     render(props)
     fireEvent.click(screen.getByText('Exit'))
@@ -46,7 +77,9 @@ describe('SelectPipettePath', () => {
 
   it('should call mock function when tappin continue button', () => {
     render(props)
+    fireEvent.click(screen.getByText('Single transfers'))
     fireEvent.click(screen.getByText('Continue'))
+    expect(props.dispatch).toHaveBeenCalled()
     expect(props.onNext).toHaveBeenCalled()
   })
 })

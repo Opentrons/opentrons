@@ -13,7 +13,6 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
-  Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getFileMetadata } from '../../../file-data/selectors'
@@ -25,18 +24,18 @@ import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { useKitchen } from '../Kitchen/hooks'
 import { LiquidButton } from '../../molecules/LiquidButton'
 
-import type { StyleProps, TabProps } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
 interface DesignerNavigationProps {
   hasZoomInSlot?: boolean
-  tabs?: TabProps[]
   hasTrashEntity?: boolean
   showLiquidOverflowMenu?: (liquidOverflowMenu: boolean) => void
 }
+// Note: this component will be depracted in Flex Stacker prep work
+// and instead, we will have 1 unified nav bar component
 // Note: this navigation is used in design page and liquids page
 export function DesignerNavigation({
   hasZoomInSlot,
-  tabs = [],
   hasTrashEntity,
   showLiquidOverflowMenu,
 }: DesignerNavigationProps): JSX.Element {
@@ -48,8 +47,6 @@ export function DesignerNavigation({
   const dispatch = useDispatch()
   const isLiquidsPage = location.pathname === '/liquids'
 
-  const showProtocolEditButtons = !(hasZoomInSlot === true || isLiquidsPage)
-
   let metadataText = t('edit_protocol')
   if (isLiquidsPage) {
     metadataText = t('add_liquid')
@@ -57,10 +54,8 @@ export function DesignerNavigation({
     metadataText = t('add_hardware_labware')
   }
   return (
-    <NavContainer showShadow={!showProtocolEditButtons}>
-      {showProtocolEditButtons ? <Tabs tabs={tabs} /> : null}
-
-      <MetadataContainer showProtocolEditButtons={showProtocolEditButtons}>
+    <NavContainer>
+      <MetadataContainer showProtocolEditButtons={false}>
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
           css={LINE_CLAMP_TEXT_STYLE(1)}

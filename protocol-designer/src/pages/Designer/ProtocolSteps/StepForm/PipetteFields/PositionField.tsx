@@ -180,7 +180,11 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     )
   }
 
-  const isRetract = prefixMap[prefix] === 'retract'
+  const referencePosition =
+    referenceField != null ? propsForFields[referenceField].value : null
+  const referencePositionText = t(
+    `protocol_steps:reference_positions.${referencePosition}`
+  )
 
   return (
     <>
@@ -215,9 +219,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
             <StyledText desktopStyle="bodyDefaultRegular">
               {xField != null && yField != null
                 ? t(
-                    isRetract
-                      ? 'protocol_steps:well_position_xyz'
-                      : 'protocol_steps:well_position',
+                    isNested
+                      ? 'protocol_steps:well_position_with_reference_nested'
+                      : 'protocol_steps:well_position_with_reference',
                     {
                       x:
                         propsForFields[xField].value != null
@@ -228,6 +232,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
                           ? Number(propsForFields[yField].value)
                           : 0,
                       z: zValue,
+                      reference: referencePositionText,
                     }
                   )
                 : t('protocol_steps:well_position_z_only', {

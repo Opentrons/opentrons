@@ -163,6 +163,21 @@ const mockTCLidHeating = {
   usbPort: { hub: 1, port: 1, path: '/dev/ot_module_thermocycler0' },
 } as any
 
+const mockFlexStacker = {
+  id: 'flexstacker_id',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  serialNumber: 'flex123',
+  hardwareRevision: 'flex_stacker_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: false,
+  data: {
+    platformState: 'extended',
+    hopperDoorState: 'closed',
+  },
+  usbPort: { hub: 1, port: 3, path: '/dev/ot_module_flexstacker0' },
+} as any
+
 describe('useLatchControls', () => {
   const store: Store<any> = createStore(vi.fn(), {})
   let mockCreateLiveCommand = vi.fn()
@@ -610,6 +625,46 @@ describe('useModuleOverflowMenu', () => {
         },
       },
     })
+  })
+
+  it('should create a live command for flex stacker when home shuttle button is clicked', () => {
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
+      children,
+    }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () =>
+        useModuleOverflowMenu(
+          mockFlexStacker,
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          false,
+          false
+        ),
+      {
+        wrapper,
+      }
+    )
+    const { menuOverflowItemsByModuleType } = result.current
+    const flexStackerMenu = menuOverflowItemsByModuleType.flexStackerModuleType
+
+    act(() => flexStackerMenu[0].onClick(false))
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'flexStacker/prepareShuttle',
+        params: {
+          moduleId: mockFlexStacker.id,
+        },
+      },
+    })
+
+    expect(flexStackerMenu[0].menuButtons).toHaveLength(1)
   })
 })
 
