@@ -76,6 +76,7 @@
   "labware_offset": "Labware Offset",
   "labware_offset_data": "Labware Offset Data",
   "labware_offsets_deleted_warning": "Once you begin Labware Position Check, previously created Labware Offsets will be discarded.",
+  "labware_offsets_saved": "{{labware}} offsets saved",
   "labware_offsets_summary_labware": "Labware",
   "labware_offsets_summary_location": "Location",
   "labware_offsets_summary_offset": "Labware Offset Data",

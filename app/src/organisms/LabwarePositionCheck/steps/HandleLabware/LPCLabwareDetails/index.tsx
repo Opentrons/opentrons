@@ -25,6 +25,7 @@ import {
 } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 import { getIsOnDevice } from '/app/redux/config'
 import { OffsetBannerContainer } from './OffsetBannerContainer'
+import { useLPCToasts } from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -40,6 +41,7 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
   const selectedLwName = useSelector(selectSelectedLwDisplayName(runId))
   const workingOffsetsByUri = useSelector(selectWorkingOffsetsByUri(runId))
+  const { makeSuccessToast } = useLPCToasts()
   const doWorkingOffsetsExist = Object.keys(workingOffsetsByUri).length > 0
 
   const onHeaderGoBack = (): void => {
@@ -59,6 +61,10 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
       void saveWorkingOffsets().then(updatedOffsetData => {
         dispatch(applyWorkingOffsets(runId, updatedOffsetData))
         dispatch(goBackEditOffsetSubstep(runId))
+
+        if (isOnDevice) {
+          makeSuccessToast(selectedLwName)
+        }
       })
     }
   }
