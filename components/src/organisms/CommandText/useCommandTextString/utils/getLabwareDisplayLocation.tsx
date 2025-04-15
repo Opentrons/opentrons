@@ -48,6 +48,7 @@ export function getLabwareDisplayLocation(
   params: DisplayLocationParams
 ): string {
   const { t, isOnDevice = false, location } = params
+  console.log("location: ", location)
   const locationResult = Array.isArray(location)
     ? getLabwareLocationFromSequence({
         ...params,
@@ -60,6 +61,7 @@ export function getLabwareDisplayLocation(
   if (locationResult == null) {
     return ''
   }
+  console.log("locationResult: ", locationResult)
 
   const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
   const slotName =
