@@ -13,10 +13,8 @@ import { SelectPipetteModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type {
-  WizardFormState,
-  WizardTileProps,
-} from '../../../../pages/Onboarding/types'
+import type { WizardTileProps } from '../../../../pages/Onboarding/types'
+import type { WizardFormState } from '../../types'
 
 vi.mock('../../../../labware-defs/actions')
 vi.mock('../../../../pages/Onboarding/utils')
@@ -41,7 +39,8 @@ const render = (props: ComponentProps<typeof SelectPipetteModal>) => {
 }
 
 const values = {
-  additionalEquipment: [],
+  fixtures: {},
+  hasGripper: false,
   fields: {
     name: '',
     description: '',
@@ -52,7 +51,7 @@ const values = {
     left: { pipetteName: 'p1000_single_flex', tiprackDefURI: ['mockDefUri'] },
     right: {},
   },
-  modules: null,
+  modules: {},
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
@@ -117,7 +116,8 @@ describe('SelectPipetteModal', () => {
     })
 
     const values = {
-      additionalEquipment: [],
+      fixtures: {},
+      hasGripper: false,
       fields: {
         name: '',
         description: '',
@@ -131,7 +131,7 @@ describe('SelectPipetteModal', () => {
           tiprackDefURI: ['mockDefUri'],
         },
       },
-      modules: null,
+      modules: {},
     } as WizardFormState
 
     props = {

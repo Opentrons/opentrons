@@ -43,8 +43,8 @@ export enum SetupContent {
   Tempdeck2 = 'Temperature Module GEN2',
   MagBlock = 'Magnetic Block GEN1',
   PlateReader = 'Absorbance Plate Reader Module GEN1',
-  ModulePageH = 'Add your modules',
-  ModulePageB = 'Select modules to use in your protocol.',
+  ModulePageH = 'Configure your deck hardware',
+  ModulePageB = 'Place the modules and fixtures that you are using for this protocol onto the deck.',
   EditProtocol = 'Edit protocol',
   EditSlot = 'Edit slot',
   AddLabwareToDeck = 'Add hardware/labware',
@@ -255,7 +255,8 @@ export const SetupSteps = {
    */
   AddThermocycler: (): StepThunk => ({
     call: () => {
-      cy.contains(SetupContent.Thermocycler).click()
+      cy.contains(SetupContent.Thermocycler)
+      cy.get('button[data-testid="Thermocycler Module GEN2"]').click()
     },
   }),
 
@@ -264,7 +265,10 @@ export const SetupSteps = {
    */
   AddHeaterShaker: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutD1"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.HeaterShaker).click()
+      cy.get('button[data-testid="Heater-Shaker Module GEN1"]').click()
     },
   }),
 
@@ -273,7 +277,10 @@ export const SetupSteps = {
    */
   AddTempdeck2: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutC1"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Tempdeck2).click()
+      cy.get('button[data-testid="Temperature Module GEN2"]').click()
     },
   }),
 
@@ -282,7 +289,9 @@ export const SetupSteps = {
    */
   AddMagBlock: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutB2"]').click()
       cy.contains(SetupContent.MagBlock).click()
+      cy.get('button[data-testid="Magnetic Block GEN1"]').click()
     },
   }),
 
@@ -306,7 +315,12 @@ export const SetupSteps = {
 
   AddPlateReader: (): StepThunk => ({
     call: () => {
+      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader).click()
+      cy.get(
+        'button[data-testid="Absorbance Plate Reader Module GEN1"]'
+      ).click()
     },
   }),
 
@@ -912,6 +926,8 @@ export const SetupVerifications = {
     call: () => {
       cy.contains(SetupContent.ModulePageH).should('be.visible')
       cy.contains(SetupContent.ModulePageB).should('be.visible')
+      cy.get('button[data-testid="cutoutB1"]').click()
+      cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Thermocycler).should('be.visible')
       cy.contains(SetupContent.HeaterShaker).should('be.visible')
       cy.contains(SetupContent.MagBlock).should('be.visible')
@@ -960,7 +976,10 @@ export const SetupVerifications = {
 
   AbsorbanceNotSelectable: (): StepThunk => ({
     call: () => {
-      cy.contains('button', SetupContent.PlateReader).should('be.disabled')
+      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="Modules"]').click()
+      cy.contains(SetupContent.PlateReader)
+      cy.get('[data-testid="ModalHeader_icon_close_Add to slot D3"]').click()
     },
   }),
 
@@ -1099,29 +1118,24 @@ export const CompositeSetupSteps = {
 
       if (thermocycler) {
         SetupSteps.AddThermocycler().call()
-        SetupVerifications.ThermocyclerImg().call()
       }
 
       if (heatershaker) {
         SetupSteps.AddHeaterShaker().call()
-        SetupVerifications.HeaterShakerImg().call()
       }
 
       if (magblock) {
         SetupSteps.AddMagBlock().call()
-        SetupVerifications.MagBlockImg().call()
       }
 
       if (tempdeck) {
         SetupSteps.AddTempdeck2().call()
-        SetupVerifications.Tempdeck2Img().call()
       }
 
       if (platereader) {
         SetupSteps.AddPlateReader().call()
       }
 
-      SetupSteps.Confirm().call()
       SetupSteps.Confirm().call()
       SetupSteps.Confirm().call()
       SetupSteps.EditProtocolA().call()

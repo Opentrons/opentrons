@@ -1253,6 +1253,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        mix_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1354,6 +1358,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: undefined,
         },
         pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        mix_position_reference: {
           isIndeterminate: false,
           value: undefined,
         },

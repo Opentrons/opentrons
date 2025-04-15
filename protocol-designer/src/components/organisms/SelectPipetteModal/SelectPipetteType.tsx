@@ -36,7 +36,7 @@ export function SelectPipetteType(props: SelectPipetteTypeProps): JSX.Element {
     pipetteType,
     setValue,
   } = props
-  const { t } = useTranslation('create_new_protocol')
+  const { t } = useTranslation('onboarding')
   const handleSelectPipetteType = (value: PipetteType): void => {
     setPipetteType(value)
     setPipetteGen('flex')
