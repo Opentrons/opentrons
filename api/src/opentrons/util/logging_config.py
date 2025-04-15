@@ -13,13 +13,14 @@ else:
     SENSOR_LOG_NAME = "unused"
 
 
-log_queue = Queue[logging.LogRecord](
-    # We want this big enough to smooth over any temporary stalls in journald's ability
-    # to consume our records--but bounded, so if we consistently outpace journald for
-    # some reason, we don't leak memory or get latency from buffer bloat.
-    # 50000 is basically an arbitrary guess.
-    maxsize=50000
-)
+# We want this big enough to smooth over any temporary stalls in journald's ability
+# to consume our records--but bounded, so if we consistently outpace journald for
+# some reason, we don't leak memory or get latency from buffer bloat.
+# 50000 is basically an arbitrary guess.
+_LOG_QUEUE_SIZE = 50000
+
+
+log_queue = Queue[logging.LogRecord](maxsize=_LOG_QUEUE_SIZE)
 """A buffer through which log records will pass.
 
 This is intended to work around problems when our logs are going to journald:
@@ -123,7 +124,7 @@ def _config_for_robot(level_value: int) -> None:
 
     sensor_log_filename = CONFIG["sensor_log_file"]
 
-    sensor_log_queue = Queue[logging.LogRecord](maxsize=log_queue.maxsize)
+    sensor_log_queue = Queue[logging.LogRecord](maxsize=_LOG_QUEUE_SIZE)
 
     config = {
         "version": 1,
