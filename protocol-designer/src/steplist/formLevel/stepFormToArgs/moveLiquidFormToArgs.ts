@@ -162,52 +162,34 @@ export const moveLiquidFormToArgs = (
   const aspirateDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'aspirate_delay_seconds',
-    xPositionField: 'aspirate_x_position',
-    yPositionField: 'aspirate_y_position',
     zPositionField: 'aspirate_mmFromBottom',
-    positionReferenceField: 'aspirate_position_reference',
     checkboxField: 'aspirate_delay_checkbox',
   })
   const dispenseDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'dispense_delay_seconds',
-    xPositionField: 'dispense_x_position',
-    yPositionField: 'dispense_y_position',
     zPositionField: 'dispense_mmFromBottom',
-    positionReferenceField: 'dispense_position_reference',
     checkboxField: 'dispense_delay_checkbox',
   })
   const aspirateSubmergeDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'aspirate_submerge_delay_seconds',
-    xPositionField: 'aspirate_submerge_x_position',
-    yPositionField: 'aspirate_submerge_y_position',
     zPositionField: 'aspirate_submerge_mmFromBottom',
-    positionReferenceField: 'aspirate_submerge_position_reference',
   })
   const dispenseSubmergeDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'dispense_submerge_delay_seconds',
-    xPositionField: 'dispense_submerge_x_position',
-    yPositionField: 'dispense_submerge_y_position',
     zPositionField: 'dispense_submerge_mmFromBottom',
-    positionReferenceField: 'dispense_submerge_position_reference',
   })
   const aspirateRetractDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'aspirate_retract_delay_seconds',
-    xPositionField: 'aspirate_retract_x_position',
-    yPositionField: 'aspirate_retract_y_position',
     zPositionField: 'aspirate_retract_mmFromBottom',
-    positionReferenceField: 'aspirate_retract_position_reference',
   })
   const dispenseRetractDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'dispense_retract_delay_seconds',
-    xPositionField: 'dispense_retract_x_position',
-    yPositionField: 'dispense_retract_y_position',
     zPositionField: 'dispense_retract_mmFromBottom',
-    positionReferenceField: 'dispense_retract_position_reference',
   })
   const blowoutLocation =
     (hydratedFormData.blowout_checkbox && hydratedFormData.blowout_location) ||

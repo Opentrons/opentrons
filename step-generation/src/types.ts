@@ -223,8 +223,6 @@ export interface InnerMixArgs {
 export interface InnerDelayArgs {
   seconds: number
   mmFromBottom: number
-  xOffset: number
-  yOffset: number
 }
 
 interface CommonArgs {

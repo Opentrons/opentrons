@@ -235,8 +235,6 @@ describe('move liquid step form -> command creator args', () => {
         aspirateDelay: {
           seconds: 11,
           mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
-          xOffset: 10,
-          yOffset: 10,
         },
       },
     },
@@ -252,8 +250,6 @@ describe('move liquid step form -> command creator args', () => {
         dispenseDelay: {
           seconds: 11,
           mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
-          xOffset: 10,
-          yOffset: 10,
         },
       },
     },

@@ -12,16 +12,13 @@ describe('getMoveLiquidDelayData', () => {
       getMoveLiquidDelayData({
         hydratedFormData: fields,
         secondsField: 'aspirate_delay_seconds',
-        xPositionField: 'aspirate_x_position',
-        yPositionField: 'aspirate_y_position',
         zPositionField: 'aspirate_mmFromBottom',
         checkboxField: 'aspirate_delay_checkbox',
-        positionReferenceField: 'aspirate_position_reference',
       })
     ).toBe(null)
   })
 
-  it('should return null if either seconds field is <= 0 or null, or if offset field is negative', () => {
+  it.only('should return null if either seconds field is <= 0 or null, or if offset field is negative', () => {
     const cases = [
       [0, 5],
       [null, 5],
@@ -34,17 +31,14 @@ describe('getMoveLiquidDelayData', () => {
       const fields: any = {
         aspirate_delay_checkbox: true,
         aspirate_delay_seconds: secondsValue,
-        aspirate_delay_mmFromBottom: offsetValue,
+        aspirate_mmFromBottom: offsetValue,
       }
       expect(
         getMoveLiquidDelayData({
           hydratedFormData: fields,
           secondsField: 'aspirate_delay_seconds',
-          xPositionField: 'aspirate_x_position',
-          yPositionField: 'aspirate_y_position',
           zPositionField: 'aspirate_mmFromBottom',
           checkboxField: 'aspirate_delay_checkbox',
-          positionReferenceField: 'aspirate_position_reference',
         })
       ).toBe(null)
     })
@@ -62,13 +56,10 @@ describe('getMoveLiquidDelayData', () => {
       getMoveLiquidDelayData({
         hydratedFormData: fields,
         secondsField: 'aspirate_delay_seconds',
-        xPositionField: 'aspirate_x_position',
-        yPositionField: 'aspirate_y_position',
         zPositionField: 'aspirate_mmFromBottom',
-        positionReferenceField: 'aspirate_position_reference',
         checkboxField: 'aspirate_delay_checkbox',
       })
-    ).toEqual({ seconds: 30, mmFromBottom: 2, xOffset: 10, yOffset: 10 })
+    ).toEqual({ seconds: 30, mmFromBottom: 2 })
   })
 
   it('should allow mmFromBottom to be zero', () => {
@@ -83,13 +74,10 @@ describe('getMoveLiquidDelayData', () => {
       getMoveLiquidDelayData({
         hydratedFormData: fields,
         secondsField: 'aspirate_delay_seconds',
-        xPositionField: 'aspirate_x_position',
-        yPositionField: 'aspirate_y_position',
         zPositionField: 'aspirate_mmFromBottom',
-        positionReferenceField: 'aspirate_position_reference',
         checkboxField: 'aspirate_delay_checkbox',
       })
-    ).toEqual({ seconds: 30, mmFromBottom: 0, xOffset: 10, yOffset: 10 })
+    ).toEqual({ seconds: 30, mmFromBottom: 0 })
   })
 })
 

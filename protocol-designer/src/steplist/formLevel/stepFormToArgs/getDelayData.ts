@@ -1,4 +1,4 @@
-import { getDefaultMmFromEdge } from '../../../components/organisms/TipPositionModal/utils'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../constants'
 import type { InnerDelayArgs } from '@opentrons/step-generation'
 import type {
   DelayCheckboxBaseFields,
@@ -7,56 +7,26 @@ import type {
   HydratedMixFormData,
   DelaySecondsBaseFields,
   DelaySecondsMoveLiquidFields,
-  DelayXPositionFields,
-  DelayYPositionFields,
   DelayZPositionFields,
-  DelayPositionReferenceFields,
 } from '../../../form-types'
 export function getMoveLiquidDelayData(args: {
   hydratedFormData: HydratedMoveLiquidFormData
   secondsField: DelaySecondsMoveLiquidFields
-  xPositionField: DelayXPositionFields
-  yPositionField: DelayYPositionFields
   zPositionField: DelayZPositionFields
-  positionReferenceField: DelayPositionReferenceFields
+
   checkboxField?: DelayCheckboxMoveLiquidFields
 }): InnerDelayArgs | null {
-  const {
-    hydratedFormData,
-    checkboxField,
-    secondsField,
-    xPositionField,
-    yPositionField,
-    zPositionField,
-  } = args
+  const { hydratedFormData, checkboxField, secondsField, zPositionField } = args
   const checkbox =
-    checkboxField != null ? hydratedFormData[checkboxField] : true
-  const seconds = hydratedFormData[secondsField]
-  let mmFromBottom: number | undefined
-  const xOffset = hydratedFormData[xPositionField]
-  const yOffset = hydratedFormData[yPositionField]
-  const mmFromBottomFormValue = hydratedFormData[zPositionField]
+    checkboxField != null ? hydratedFormData[checkboxField] ?? false : true
+  const seconds = hydratedFormData[secondsField] ?? 0
+  const mmFromBottom =
+    hydratedFormData[zPositionField] ?? DEFAULT_MM_OFFSET_FROM_BOTTOM
 
-  if (typeof mmFromBottomFormValue === 'number') {
-    mmFromBottom = mmFromBottomFormValue
-  } else if (mmFromBottomFormValue === null) {
-    mmFromBottom = getDefaultMmFromEdge({
-      name: zPositionField,
-    })
-  }
-  if (
-    checkbox &&
-    typeof seconds === 'number' &&
-    seconds > 0 &&
-    typeof mmFromBottom === 'number' &&
-    typeof xOffset === 'number' &&
-    typeof yOffset === 'number'
-  ) {
+  if (checkbox && mmFromBottom > 0 && seconds > 0) {
     return {
       seconds,
-      mmFromBottom,
-      xOffset,
-      yOffset,
+      mmFromBottom, // TODO (nd: 04/15/2025) remove once compound creators are finished. We no longer need the individual positions for a delay
     }
   }
 
