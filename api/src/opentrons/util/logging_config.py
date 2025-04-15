@@ -1,6 +1,6 @@
 import logging
 from logging.config import dictConfig
-from logging.handlers import QueueListener
+from logging.handlers import QueueListener, RotatingFileHandler
 import sys
 from queue import Queue
 
@@ -122,6 +122,9 @@ def _config_for_robot(level_value: int) -> None:
     from systemd.journal import JournalHandler  # type: ignore
 
     sensor_log_filename = CONFIG["sensor_log_file"]
+
+    sensor_log_queue = Queue[logging.LogRecord](maxsize=log_queue.maxsize)
+
     config = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -157,23 +160,11 @@ def _config_for_robot(level_value: int) -> None:
                 "extra": {"SYSLOG_IDENTIFIER": "opentrons-api-serial-usbbin"},
                 "queue": log_queue,
             },
-            # Sensor logs are a special one-off thing that go to their own file instead of journald.
-            # We need to apply the same queue workaround that we do for the journald logs.
-            # Here, though, we can define everything inline with dictconfig's special handling for
-            # QueueHandler because we don't care about any of customizations in CustomQueueHandler.
-            "sensor_rotatingfilehandler": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "formatter": "message_only",
-                "filename": sensor_log_filename,
-                "maxBytes": 1000000,
+            "sensor": {
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
-                "backupCount": 3,
-            },
-            "sensor_queuehandler": {
-                "class": "logging.handlers.QueueHandler",
-                "queue": Queue(maxsize=log_queue.maxsize),
-                "handlers": ["sensor_rotatingfilehandler"],
                 "formatter": "message_only",
+                "queue": sensor_log_queue,
             },
         },
         "loggers": {
@@ -201,7 +192,7 @@ def _config_for_robot(level_value: int) -> None:
                 "propagate": False,
             },
             SENSOR_LOG_NAME: {
-                "handlers": ["sensor_queuehandler"],
+                "handlers": ["sensor"],
                 "level": logging.DEBUG,
                 "propagate": False,
             },
@@ -219,6 +210,21 @@ def _config_for_robot(level_value: int) -> None:
     _queue_listener = QueueListener(log_queue, JournalHandler())
     _queue_listener.start()
 
+    # Sensor logs are a special one-off thing that go to their own file instead of journald.
+    # We apply the same QueueListener performance workaround for basically the same reasons.
+    sensor_rotating_file_handler = RotatingFileHandler(
+        filename=sensor_log_filename, maxBytes=1000000, backupCount=3
+    )
+    sensor_rotating_file_handler.setLevel(logging.DEBUG)
+    sensor_rotating_file_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    global _sensor_queue_listener
+    if _sensor_queue_listener is not None:
+        _sensor_queue_listener.stop()
+    _sensor_queue_listener = QueueListener(
+        sensor_log_queue, sensor_rotating_file_handler
+    )
+    _sensor_queue_listener.start()
+
     dictConfig(config)
 
     # TODO(2025-04-15): We need some kind of log_deinit() function to call
@@ -227,6 +233,7 @@ def _config_for_robot(level_value: int) -> None:
 
 
 _queue_listener: QueueListener | None = None
+_sensor_queue_listener: QueueListener | None = None
 
 
 def _config(arch: SystemArchitecture, level_value: int) -> None:
