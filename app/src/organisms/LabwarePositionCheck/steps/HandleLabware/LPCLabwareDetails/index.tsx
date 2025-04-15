@@ -143,4 +143,13 @@ const DESKTOP_CONTENT_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing24};
   gap: ${SPACING.spacing24};
   overflow-y: auto;
+
+  & > *:not(:last-child) {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  & > *:last-child {
+    flex-shrink: 0;
+  }
 `
