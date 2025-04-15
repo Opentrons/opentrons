@@ -3,8 +3,7 @@ import { getValidCustomLabware } from '/app/redux/custom-labware'
 import { getAllDefinitions } from '../utils'
 import type { LabwareSort, LabwareFilter, LabwareDefAndDate } from '../types'
 
-const LABWARE_LOADNAME_BLOCKLIST: string[] = [
-]
+const LABWARE_LOADNAME_BLOCKLIST: string[] = []
 
 export function useAllLabware(
   sortBy: LabwareSort,
@@ -19,10 +18,10 @@ export function useAllLabware(
   customLabwareList.forEach(customLabware =>
     'definition' in customLabware
       ? fullLabwareList.push({
-        modified: customLabware.modified,
-        definition: customLabware.definition,
-        filename: customLabware.filename,
-      })
+          modified: customLabware.modified,
+          definition: customLabware.definition,
+          filename: customLabware.filename,
+        })
       : null
   )
   const sortLabware = (a: LabwareDefAndDate, b: LabwareDefAndDate): number => {
