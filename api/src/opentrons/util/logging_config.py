@@ -55,7 +55,7 @@ def config_for_host(level_value: int) -> None:
                 "level": level_value,
             },
             "serial": {
-                "class": "logging.handlers.RotatingFileHandler",  # NOTE
+                "class": "logging.handlers.RotatingFileHandler",
                 "formatter": "basic",
                 "filename": serial_log_filename,
                 "maxBytes": 1000000,
@@ -63,7 +63,7 @@ def config_for_host(level_value: int) -> None:
                 "backupCount": 3,
             },
             "api": {
-                "class": "logging.handlers.RotatingFileHandler",  # NOTE
+                "class": "logging.handlers.RotatingFileHandler",
                 "formatter": "basic",
                 "filename": api_log_filename,
                 "maxBytes": 1000000,
@@ -71,7 +71,7 @@ def config_for_host(level_value: int) -> None:
                 "backupCount": 5,
             },
             "sensor": {
-                "class": "logging.handlers.RotatingFileHandler",  # NOTE
+                "class": "logging.handlers.RotatingFileHandler",
                 "formatter": "basic",
                 "filename": sensor_log_filename,
                 "maxBytes": 1000000,
