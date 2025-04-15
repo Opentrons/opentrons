@@ -1,8 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { screen, renderHook } from '@testing-library/react'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
+import { renderHook } from '@testing-library/react'
 
 import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -16,9 +13,6 @@ import {
   getFailedLabwareQuantity,
 } from '../useFailedLabwareUtils'
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
-
-import type { ComponentProps } from 'react'
-import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')
@@ -202,7 +196,6 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
         } as any,
         runCommands,
       })
-      console.log('result::', result)
       expect(result).toStrictEqual(failedRetrieveCommand)
     })
   })
@@ -245,7 +238,6 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
         },
       } as any,
     })
-    console.log('result: ', result)
     expect(result).toBeNull()
   })
 })
