@@ -78,7 +78,7 @@ LOAD_NAME_SRC_RESERVOIRS: Dict[str, float] = {
 #       to shared-data in a separate pull-request, and modify the
 #       Corning plate to be stackable with it
 DST_LABWARE = "stackable_corning_96_wellplate_360ul_flat"
-DE_STATIC_LOAD_NAME = "de_static_bar"
+DE_STATIC_LOAD_NAME = "de_static_fixture"
 
 LOAD_NAME_SRC_LABWARE_BY_CHANNELS = {
     1: {  # 1ch pipette
