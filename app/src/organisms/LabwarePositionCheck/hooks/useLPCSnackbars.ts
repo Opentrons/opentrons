@@ -53,11 +53,7 @@ export function useLPCSnackbars(runId: string): UseLPCSnackbarsResult {
         )
 
       if (!doesLSMatchDefault) {
-        if (vectorExists) {
-          return t('applied_location_offset_adjusted')
-        } else {
-          return t('applied_location_offset_added')
-        }
+        return t('applied_location_offset_adjusted')
       } else {
         return null
       }
