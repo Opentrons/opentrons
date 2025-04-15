@@ -19,6 +19,7 @@ import {
   UPDATE_LPC_DECK,
   UPDATE_LPC_LABWARE,
   TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
+  CLEAR_SNACKBAR_STATUS,
 } from '../constants'
 
 import type {
@@ -50,6 +51,7 @@ import type {
   UpdateLPCLabwareAction,
   SavedOffsets,
   ToggleDefaultOffsetInfoBanner,
+  ClearSnackbarStatus,
 } from '../types'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
@@ -100,10 +102,11 @@ export const setInitialPosition = (
 
 export const setFinalPosition = (
   runId: string,
+  isOnDevice: boolean,
   params: PositionParams
 ): FinalPositionAction => ({
   type: SET_FINAL_POSITION,
-  payload: { ...params, runId },
+  payload: { ...params, runId, isOnDevice },
 })
 
 export const resetLocationSpecificOffsetToDefault = (
@@ -208,5 +211,10 @@ export const toggleDefaultOffsetInfoBanner = (
   runId: string
 ): ToggleDefaultOffsetInfoBanner => ({
   type: TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
+  payload: { runId },
+})
+
+export const clearSnackbarStatus = (runId: string): ClearSnackbarStatus => ({
+  type: CLEAR_SNACKBAR_STATUS,
   payload: { runId },
 })

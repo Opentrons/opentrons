@@ -48,7 +48,8 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
     case Constants.SOURCE_OFFSETS_FROM_RUN:
     case Constants.SOURCE_OFFSETS_FROM_DATABASE:
     case Constants.UPDATE_CONFLICT_TIMESTAMP:
-    case Constants.TOGGLE_DEFAULT_OFFSET_INFO_BANNER: {
+    case Constants.TOGGLE_DEFAULT_OFFSET_INFO_BANNER:
+    case Constants.CLEAR_SNACKBAR_STATUS: {
       const runId = action.payload.runId
       const currentRunState = state[runId] || { lpc: undefined }
       const nextLpcState = LPCReducer(currentRunState.lpc, action)

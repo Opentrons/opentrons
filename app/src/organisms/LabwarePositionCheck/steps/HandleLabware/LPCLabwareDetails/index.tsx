@@ -16,6 +16,7 @@ import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
   selectSelectedLwDisplayName,
+  selectSnackbarStatus,
   selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
@@ -25,7 +26,10 @@ import {
 } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 import { getIsOnDevice } from '/app/redux/config'
 import { OffsetBannerContainer } from './OffsetBannerContainer'
-import { useLPCToasts } from '/app/organisms/LabwarePositionCheck/hooks'
+import {
+  useLPCSnackbars,
+  useLPCToasts,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -34,6 +38,7 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const { isSavingWorkingOffsetsLoading, saveWorkingOffsets } = commandUtils
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()
+
   const [showUnsavedOffsetsDesktop, setShowUnsavedOffsetsDesktop] = useState(
     false
   )
@@ -41,8 +46,14 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
   const selectedLwName = useSelector(selectSelectedLwDisplayName(runId))
   const workingOffsetsByUri = useSelector(selectWorkingOffsetsByUri(runId))
+  const snackbarStatus = useSelector(selectSnackbarStatus(runId))
   const { makeSuccessToast } = useLPCToasts()
+  const { makeSuccessSnackbar } = useLPCSnackbars(runId)
   const doWorkingOffsetsExist = Object.keys(workingOffsetsByUri).length > 0
+
+  if (snackbarStatus != null) {
+    makeSuccessSnackbar(snackbarStatus)
+  }
 
   const onHeaderGoBack = (): void => {
     if (doWorkingOffsetsExist) {
