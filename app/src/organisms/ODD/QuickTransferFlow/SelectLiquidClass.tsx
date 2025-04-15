@@ -1,17 +1,18 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ComponentProps, Dispatch } from 'react'
 
 import {
   DIRECTION_COLUMN,
   Flex,
-  //   RadioButton,
+  RadioButton,
   SPACING,
   StyledText,
-  //   StyledText,
-  //   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import type { LiquidClass } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardState,
@@ -33,6 +34,22 @@ export function SelectLiquidClass({
   dispatch,
 }: SelectLiquidClassProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const [selectedLiquidClass, setSelectedLiquidClass] = useState<any>()
+
+  const liquidClasses = getAllLiquidClassDefs()
+
+  const noLiquidClass: LiquidClass = {
+    byPipette: [],
+    description: t('default'),
+    displayName: t('do_not_use_liquid_class'),
+    liquidClassName: 'none',
+    namespace: 'opentrons',
+    schemaVersion: 1,
+  }
+
+  const liquidClassOptions = [noLiquidClass, ...Object.values(liquidClasses)]
+
+  console.log('liquidClassOptions', liquidClassOptions)
 
   const handleClickNext = (): void => {
     // dispatch to set pipette path
@@ -48,19 +65,33 @@ export function SelectLiquidClass({
         onClickButton={handleClickNext}
         secondaryButtonProps={exitButtonProps}
         top={SPACING.spacing8}
-        // if selected liquid class is null
-        // buttonIsDisabled={selectedPipette == null}
+        buttonIsDisabled={selectedLiquidClass == null}
       />
       <Flex
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         gridGap={SPACING.spacing4}
+        width="100%"
       >
         <StyledText oddStyle="level4HeaderRegular">
           {t('apply_predefined_settings')}
         </StyledText>
         {/* radio buttons */}
+        {liquidClassOptions.map(option => (
+          <RadioButton
+            key={option.liquidClassName}
+            isSelected={
+              selectedLiquidClass?.liquidClassName === option.liquidClassName
+            }
+            buttonLabel={option.displayName}
+            buttonValue={option.liquidClassName}
+            buttonSubLabel={{ label: option.description, align: 'vertical' }}
+            onChange={() => {
+              setSelectedLiquidClass(option)
+            }}
+          />
+        ))}
       </Flex>
     </Flex>
   )

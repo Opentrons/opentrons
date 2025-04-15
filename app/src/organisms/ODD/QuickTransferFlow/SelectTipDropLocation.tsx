@@ -83,6 +83,7 @@ export function SelectTipDropLocation({
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         gridGap={SPACING.spacing4}
+        width="100%"
       >
         {tipDropLocationOptions.map(option => (
           <RadioButton

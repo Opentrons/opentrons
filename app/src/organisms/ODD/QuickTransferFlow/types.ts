@@ -2,6 +2,7 @@ import type { Mount } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   LabwareDefinition2,
+  LiquidClass,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
@@ -27,6 +28,7 @@ export interface QuickTransferWizardState {
   path?: PathOption
   changeTip?: ChangeTipOptions
   dropTipLocation?: CutoutConfig
+  liquidClass?: LiquidClass
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
