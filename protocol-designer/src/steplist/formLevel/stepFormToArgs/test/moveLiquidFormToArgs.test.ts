@@ -72,8 +72,6 @@ describe('move liquid step form -> command creator args', () => {
       aspirate_wellOrder_second: 't2b',
       aspirate_flowRate: null,
       aspirate_mmFromBottom: null,
-      aspirate_x_position: null,
-      aspirate_y_position: null,
       aspirate_touchTip_checkbox: false,
       aspirate_touchTip_mmFromTop: null,
       aspirate_mix_checkbox: false,
@@ -81,6 +79,7 @@ describe('move liquid step form -> command creator args', () => {
       aspirate_mix_times: null,
       aspirate_delay_checkbox: false,
       aspirate_delay_seconds: null,
+
       dispense_labware: {
         id: 'destLabwareId',
         // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
@@ -92,8 +91,6 @@ describe('move liquid step form -> command creator args', () => {
       dispense_wellOrder_second: 'b2t',
       dispense_flowRate: null,
       dispense_mmFromBottom: null,
-      dispense_x_position: null,
-      dispense_y_position: null,
       dispense_touchTip_checkbox: false,
       dispense_touchTip_mmFromTop: null,
       dispense_mix_checkbox: false,
@@ -226,9 +223,7 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'aspirate_delay_checkbox',
       formFields: {
         aspirate_delay_seconds: 11,
-        aspirate_delay_mmFromBottom: null, // use default
-        aspirate_x_position: 10,
-        aspirate_y_position: 10,
+        aspirate_mmFromBottom: null, // use default
       },
       expectedArgsUnchecked: { aspirateDelay: null },
       expectedArgsChecked: {
@@ -242,16 +237,10 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'dispense_delay_checkbox',
       formFields: {
         dispense_delay_seconds: 11,
-        dispense_x_position: 10,
-        dispense_y_position: 10,
+        dispense_mmFromBottom: 12,
       },
       expectedArgsUnchecked: { dispenseDelay: null },
-      expectedArgsChecked: {
-        dispenseDelay: {
-          seconds: 11,
-          mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
-        },
-      },
+      expectedArgsChecked: { dispenseDelay: { seconds: 11, mmFromBottom: 12 } },
     },
     // AIRGAP
     {
