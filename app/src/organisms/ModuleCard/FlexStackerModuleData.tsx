@@ -23,9 +23,9 @@ export function FlexStackerModuleData(
   const { t, i18n } = useTranslation(['device_details', 'shared'])
 
   const shuttleDisplayStatus = i18n.format(
-    moduleData.platformState == 'extended'
+    moduleData.platformState === 'extended'
       ? t('flex_stacker_extended')
-      : moduleData.platformState == 'retracted'
+      : moduleData.platformState === 'retracted'
       ? t('flex_stacker_retracted')
       : t('shared:unknown'),
     'capitalize'
