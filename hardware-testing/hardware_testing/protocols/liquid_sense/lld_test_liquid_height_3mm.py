@@ -29,11 +29,11 @@ VOLUMES_3MM_TOP_BOTTOM = {
     "nest_96_wellplate_200ul_flat": [259.8, 96.3, 0.0],
     "opentrons_96_wellplate_200ul_pcr_full_skirt": [150.2, 14.3, 0.0],
     "nest_96_wellplate_2ml_deep": [2060.4, 118.3, 0.0],
-    "nest_12_reservoir_15ml": [13236.1, 1219.0, 0.0],
+    "nest_12_reservoir_15ml": [13687.8, 1260.6, 0.0],
     "nest_96_wellplate_100ul_pcr_full_skirt": [150.8, 15.5, 0.0],
     "appliedbiosystemsmicroamp_384_wellplate_40ul": [26.2, 7.44, 0.0],
     "thermoscientificnunc_96_wellplate_1300ul": [1155.1, 73.5, 0.0],
-    "thermoscientificnunc_96_wellplate_2000ul": [1768.0, 73.5, 0.0],
+    "thermoscientificnunc_96_wellplate_2000ul": [1828.4, 76.0, 0.0],
     "biorad_96_wellplate_200ul_pcr": [161.2, 71.32, 17.9, 0.0],
     "nest_1_reservoir_290ml": [16570.4, 271690.5, 0.0],
     "corning_12_wellplate_6.9ml_flat": [5654.8, 1156.3, 0.0],
@@ -472,9 +472,12 @@ def _test_for_finding_liquid_height(  # noqa: C901
         # save data
         trial_data = [trial_counter, volume, height, tip_z_error, corrected_height]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
-
-    avg = sum(all_corrected_heights) / len(all_corrected_heights)
-    error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
+    if len(all_corrected_heights) > 0:
+        avg = sum(all_corrected_heights) / len(all_corrected_heights)
+        error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
+    else:
+        avg = 0.0
+        error_mm = 0.0
     error_percent = error_mm / avg if avg else 0.0
     _write_line_to_csv(ctx, ["average", str(round(avg, 3))])
     _write_line_to_csv(ctx, ["error (mm)", str(round(error_mm, 3))])
