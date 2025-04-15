@@ -115,7 +115,6 @@ async def test_aspirate_while_tracking_implementation(
             pipette_id="pipette-id-abc",
         )
     ).then_return(2)
-
     decoy.when(
         state_view.geometry.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id-abc"
@@ -161,7 +160,7 @@ async def test_aspirate_while_tracking_implementation(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-123.0,
+            operation_volume=None,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -193,7 +192,12 @@ async def test_aspirate_while_tracking_implementation(
                 pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                     pipette_id="pipette-id-abc",
                     fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=123),
-                )
+                ),
+                liquid_operated=update_types.LiquidOperatedUpdate(
+                    labware_id="funky-labware",
+                    well_names=["A3", "A4"],
+                    volume_added=-246.0,
+                ),
             ),
         )
 
@@ -296,7 +300,7 @@ async def test_aspirate_raises_volume_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-50.0,
+            operation_volume=None,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -347,10 +351,9 @@ async def test_overpressure_error(
             pipette_id="pipette-id-abc",
         )
     ).then_return(2)
-
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
-            stateupdateLabware, stateupdateWell, "pipette-id-abc"
+        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
+            "funky-labware", "funky-well", "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
     well_location = LiquidHandlingWellLocation(
@@ -401,7 +404,7 @@ async def test_overpressure_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-50.0,
+            operation_volume=None,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -413,7 +416,7 @@ async def test_overpressure_error(
                 id=error_id,
                 createdAt=error_timestamp,
                 wrappedErrors=[matchers.Anything()],
-                errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                errorInfo={"retryLocation": (4, 5, 6)},
             ),
             state_update=update_types.StateUpdate(
                 liquid_operated=update_types.LiquidOperatedUpdate(
@@ -432,11 +435,16 @@ async def test_overpressure_error(
                 id=error_id,
                 createdAt=error_timestamp,
                 wrappedErrors=[matchers.Anything()],
-                errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                errorInfo={"retryLocation": (4, 5, 6)},
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                     pipette_id="pipette-id-abc"
-                )
+                ),
+                liquid_operated=update_types.LiquidOperatedUpdate(
+                    labware_id="funky-labware",
+                    well_names=["A3", "A4"],
+                    volume_added=update_types.CLEAR,
+                ),
             ),
         )
