@@ -1,7 +1,6 @@
 """Test dispense-in-place commands."""
 
 from datetime import datetime
-from dataclasses import fields
 
 import pytest
 from decoy import Decoy, matchers
@@ -174,7 +173,7 @@ async def test_dispense_while_tracking_implementation(
                 liquid_operated=update_types.LiquidOperatedUpdate(
                     labware_id=stateupdateLabware,
                     well_names=["A3", "A4"],
-                    volume_added=68,
+                    volume_added=84,
                 ),
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id-abc", ready_to_aspirate=False
