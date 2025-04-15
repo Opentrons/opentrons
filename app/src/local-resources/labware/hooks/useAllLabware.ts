@@ -3,13 +3,7 @@ import { getValidCustomLabware } from '/app/redux/custom-labware'
 import { getAllDefinitions } from '../utils'
 import type { LabwareSort, LabwareFilter, LabwareDefAndDate } from '../types'
 
-// labware to filter out from the labware tab of the desktop app
-// TODO (sb:1/14/25) remove evotips from blocklist before public launch
-const LABWARE_LOADNAME_BLOCKLIST = [
-  'evotips_flex_96_tiprack_adapter',
-  'evotips_opentrons_96_labware',
-  'evotips_tiprack_adapter',
-  'evotips_reservoir_adapter',
+const LABWARE_LOADNAME_BLOCKLIST: string[] = [
 ]
 
 export function useAllLabware(
@@ -25,10 +19,10 @@ export function useAllLabware(
   customLabwareList.forEach(customLabware =>
     'definition' in customLabware
       ? fullLabwareList.push({
-          modified: customLabware.modified,
-          definition: customLabware.definition,
-          filename: customLabware.filename,
-        })
+        modified: customLabware.modified,
+        definition: customLabware.definition,
+        filename: customLabware.filename,
+      })
       : null
   )
   const sortLabware = (a: LabwareDefAndDate, b: LabwareDefAndDate): number => {
