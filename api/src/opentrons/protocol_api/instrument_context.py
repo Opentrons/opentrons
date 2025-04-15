@@ -1641,8 +1641,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param new_tip: When to pick up and drop tips during the command.
             Defaults to ``"once"``.
 
-              - ``"once"`` or ``"per source"``: Use one tip for the entire command.
-              - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
+              - ``"once"``: Use one tip for the entire command.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
@@ -1677,9 +1676,14 @@ class InstrumentContext(publisher.CommandPublisher):
                 f"Source should be a single well (or resolve to a single transfer for multi-channel) "
                 f"but received {transfer_args.sources_list}."
             )
-        if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
-            raise RuntimeError(
-                'Tip transfer policy "per source" incompatible with distribute.'
+        if transfer_args.tip_policy not in [
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.NEVER,
+        ]:
+            raise ValueError(
+                f"Incompatible `new_tip` value of {new_tip}."
+                f" `distribute_with_liquid_class()` only supports `new_tip` values of"
+                f" 'once' and 'never'."
             )
 
         verified_source = transfer_args.sources_list[0]
@@ -1704,7 +1708,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=well), well._core)
                     for well in transfer_args.destinations_list
                 ],
-                new_tip=transfer_args.tip_policy,
+                new_tip=transfer_args.tip_policy,  # type: ignore[arg-type]
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
@@ -1746,8 +1750,6 @@ class InstrumentContext(publisher.CommandPublisher):
             Defaults to ``"once"``.
 
               - ``"once"``: Use one tip for the entire command.
-              - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
-              - ``"per source"``: Not available when consolidating.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
@@ -1782,9 +1784,14 @@ class InstrumentContext(publisher.CommandPublisher):
                 f"Destination should be a single well (or resolve to a single transfer for multi-channel) "
                 f"but received {transfer_args.destinations_list}."
             )
-        if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
-            raise RuntimeError(
-                'Tip transfer policy "per source" incompatible with consolidate.'
+        if transfer_args.tip_policy not in [
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.NEVER,
+        ]:
+            raise ValueError(
+                f"Incompatible `new_tip` value of {new_tip}."
+                f" `consolidate_with_liquid_class()` only supports `new_tip` values of"
+                f" 'once' and 'never'."
             )
 
         verified_dest = transfer_args.destinations_list[0]
@@ -1809,7 +1816,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     types.Location(types.Point(), labware=verified_dest),
                     verified_dest._core,
                 ),
-                new_tip=transfer_args.tip_policy,
+                new_tip=transfer_args.tip_policy,  # type: ignore[arg-type]
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
