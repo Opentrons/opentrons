@@ -3,15 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
-  BORDERS,
   Btn,
   COLORS,
-  CURSOR_DEFAULT,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
+  FixtureOption,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Modal,
   SPACING,
@@ -54,12 +50,9 @@ import {
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import { TertiaryButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
-import type { MouseEventHandler } from 'react'
 import type {
   CutoutConfig,
   CutoutId,
@@ -459,37 +452,6 @@ export function AddFixtureModal({
   )
 }
 
-const FIXTURE_BUTTON_STYLE_ODD = css`
-  background-color: ${COLORS.grey35};
-  cursor: ${CURSOR_DEFAULT};
-  border-radius: ${BORDERS.borderRadius16};
-  box-shadow: none;
-
-  &:focus {
-    background-color: ${COLORS.grey40};
-    box-shadow: none;
-  }
-
-  &:hover {
-    border: none;
-    box-shadow: none;
-    background-color: ${COLORS.grey35};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.grey35};
-  }
-
-  &:active {
-    background-color: ${COLORS.grey40};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.grey35};
-    color: ${COLORS.grey50};
-  }
-`
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   color: ${COLORS.grey50};
@@ -498,43 +460,3 @@ const GO_BACK_BUTTON_STYLE = css`
     opacity: 70%;
   }
 `
-
-interface FixtureOptionProps {
-  onClickHandler: MouseEventHandler
-  optionName: string
-  buttonText: string
-  isOnDevice: boolean
-}
-export function FixtureOption(props: FixtureOptionProps): JSX.Element {
-  const { onClickHandler, optionName, buttonText, isOnDevice } = props
-  return isOnDevice ? (
-    <Btn
-      onClick={props.onClickHandler}
-      display="flex"
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      flexDirection={DIRECTION_ROW}
-      alignItems={ALIGN_CENTER}
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      css={FIXTURE_BUTTON_STYLE_ODD}
-    >
-      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {props.optionName}
-      </LegacyStyledText>
-      <LegacyStyledText as="p">{props.buttonText}</LegacyStyledText>
-    </Btn>
-  ) : (
-    <Flex
-      flexDirection={DIRECTION_ROW}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-      backgroundColor={COLORS.grey20}
-      borderRadius={BORDERS.borderRadius4}
-    >
-      <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
-        {optionName}
-      </LegacyStyledText>
-      <TertiaryButton onClick={onClickHandler}>{buttonText}</TertiaryButton>
-    </Flex>
-  )
-}

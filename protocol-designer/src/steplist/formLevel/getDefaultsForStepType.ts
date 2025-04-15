@@ -38,6 +38,7 @@ export function getDefaultsForStepType(
         mix_touchTip_mmFromTop: null,
         mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        mix_position_reference: null,
         mix_x_position: 0,
         mix_y_position: 0,
         nozzles: null,

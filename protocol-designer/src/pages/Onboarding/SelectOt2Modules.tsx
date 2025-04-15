@@ -4,98 +4,74 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   ListItem,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getModuleDisplayName,
   getModuleType,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { uuid } from '../../../utils'
-import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
-import { WizardBody } from '../../../pages/Onboarding/WizardBody'
-import {
-  DEFAULT_SLOT_MAP_FLEX,
-  DEFAULT_SLOT_MAP_OT2,
-  FLEX_SUPPORTED_MODULE_MODELS,
-  OT2_SUPPORTED_MODULE_MODELS,
-} from '../../../pages/Onboarding/constants'
-import { HandleEnter } from '../../atoms'
-import { PDListItemCustomize as ListItemCustomize } from '../../../pages/Onboarding/PDListItemCustomize'
-import { AddModuleEmptySelectorButton } from './AddModuleEmptySelectorButton'
+import { uuid } from '../../utils'
+import { ModuleDiagram } from './ModuleDiagram'
+import { WizardBody } from './WizardBody'
+import { DEFAULT_SLOT_MAP_OT2, OT2_SUPPORTED_MODULE_MODELS } from './constants'
+import { HandleEnter } from '../../components/atoms'
+import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { FormModule } from '../../../step-forms'
-import type { WizardTileProps } from '../../../pages/Onboarding/types'
+import type { FormModule } from '../../step-forms'
+import type { WizardTileProps } from './types'
+import type { OT2ModuleType } from './ModuleDiagram'
 
-export function SelectModules(props: WizardTileProps): JSX.Element | null {
+export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
-  const fields = watch('fields')
+  const { t } = useTranslation(['onboarding', 'shared'])
   const modules = watch('modules')
-  const additionalEquipment = watch('additionalEquipment')
-  const robotType = fields.robotType
-  const supportedModules =
-    robotType === FLEX_ROBOT_TYPE
-      ? FLEX_SUPPORTED_MODULE_MODELS
-      : OT2_SUPPORTED_MODULE_MODELS
+  const supportedModules = OT2_SUPPORTED_MODULE_MODELS
   const filteredSupportedModules = supportedModules.filter(
     moduleModel =>
-      !(
-        modules != null &&
-        Object.values(modules).some(module =>
-          robotType === FLEX_ROBOT_TYPE
-            ? module.model === moduleModel
-            : module.type === getModuleType(moduleModel)
-        )
+      !Object.values(modules).some(
+        module => module.type === getModuleType(moduleModel)
       )
   )
-  const hasGripper = additionalEquipment.some(aE => aE === 'gripper')
 
-  const handleAddModule = (
-    moduleModel: ModuleModel,
-    hasNoAvailableSlots: boolean
-  ): void => {
+  const handleAddModule = (moduleModel: ModuleModel): void => {
     setValue('modules', {
       ...modules,
       [uuid()]: {
         model: moduleModel,
         type: getModuleType(moduleModel),
-        slot:
-          robotType === FLEX_ROBOT_TYPE
-            ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-            : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
+        slot: DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
       },
     })
   }
 
   const handleRemoveModule = (moduleType: ModuleType): void => {
-    const updatedModules =
-      modules != null
-        ? Object.fromEntries(
-            Object.entries(modules).filter(
-              ([key, value]) => value.type !== moduleType
-            )
-          )
-        : {}
+    const updatedModules = Object.fromEntries(
+      Object.entries(modules).filter(
+        ([key, value]) => value.type !== moduleType
+      )
+    )
     setValue('modules', updatedModules)
   }
 
   return (
     <HandleEnter onEnter={proceed}>
       <WizardBody
-        robotType={robotType}
+        robotType={OT2_ROBOT_TYPE}
         stepNumber={2}
         subStepNumber={4}
         header={t('add_modules')}
         goBack={() => {
           goBack(1)
-          setValue('modules', null)
         }}
         proceed={() => {
           proceed(1)
@@ -103,11 +79,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-            {filteredSupportedModules.length > 0 ||
-            !(
-              filteredSupportedModules.length === 1 &&
-              filteredSupportedModules[0] === 'absorbanceReaderV1'
-            ) ? (
+            {filteredSupportedModules.length > 0 ? (
               <StyledText desktopStyle="headingSmallBold">
                 {t('which_modules')}
               </StyledText>
@@ -116,26 +88,24 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
               {filteredSupportedModules
                 .sort((moduleA, moduleB) => moduleA.localeCompare(moduleB))
                 .map(moduleModel => (
-                  <AddModuleEmptySelectorButton
-                    key={moduleModel}
-                    moduleModel={moduleModel}
-                    areSlotsAvailable={true}
-                    hasGripper={hasGripper}
-                    handleAddModule={handleAddModule}
-                    tooltipText={t('add_gripper_for_absorbance_reader')}
-                  />
+                  <Flex width={FLEX_MAX_CONTENT} key={moduleModel}>
+                    <EmptySelectorButton
+                      disabled={false}
+                      textAlignment={TYPOGRAPHY.textAlignLeft}
+                      iconName="plus"
+                      text={getModuleDisplayName(moduleModel)}
+                      onClick={() => {
+                        handleAddModule(moduleModel)
+                      }}
+                    />
+                  </Flex>
                 ))}
             </Flex>
-            {modules != null && Object.keys(modules).length > 0 ? (
+            {Object.keys(modules).length > 0 ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing12}
-                paddingTop={
-                  filteredSupportedModules.length === 1 &&
-                  filteredSupportedModules[0] === 'absorbanceReaderV1'
-                    ? 0
-                    : SPACING.spacing32
-                }
+                paddingTop={SPACING.spacing32}
               >
                 <StyledText desktopStyle="headingSmallBold">
                   {t('modules_added')}
@@ -163,7 +133,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                       []
                     )
                     .map(module => (
-                      <ListItem type="default" key={`${module.model}`}>
+                      <ListItem type="default" key={module.model}>
                         <ListItemCustomize
                           linkText={t('remove')}
                           onClick={() => {
@@ -180,7 +150,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                               height="3.625rem"
                             >
                               <ModuleDiagram
-                                type={module.type}
+                                type={module.type as OT2ModuleType}
                                 model={module.model}
                               />
                             </Flex>

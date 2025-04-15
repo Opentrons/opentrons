@@ -19,7 +19,7 @@ interface SelectPipetteGenProps {
 
 export function SelectPipetteGen(props: SelectPipetteGenProps): JSX.Element {
   const { setPipetteGen, setPipetteVolume, pipetteGen } = props
-  const { t } = useTranslation('create_new_protocol')
+  const { t } = useTranslation('onboarding')
 
   return (
     <Flex

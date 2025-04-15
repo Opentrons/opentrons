@@ -90,6 +90,12 @@
   "pipette_path": "Pipette path",
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",
+  "reference_positions": {
+    "well-top": "well top",
+    "well-bottom": "well bottom",
+    "well-center": "well center",
+    "liquid-meniscus": "liquid meniscus"
+  },
   "rename": "Rename",
   "rename_error": "Oops! Your step name is too long.",
   "reset_settings": "Reset {{tab}} settings",
@@ -149,7 +155,7 @@
   "timeline": "Timeline",
   "tiprack": "Tiprack",
   "tip_handling": "Tip handling",
-  "tip_position": "{{prefix}} position",
+  "tip_position": "{{prefix}} tip position",
   "touch_tip_position": "Touch tip position from top",
   "valid_range": "Valid range between {{min}} - {{max}} {{unit}}",
   "view_details": "View details",
@@ -157,6 +163,8 @@
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",
   "well_position": "Well position: X {{x}} Y {{y}} Z {{z}} (mm)",
+  "well_position_with_reference": "Well position: X {{x}} Y {{y}} Z {{z}} (mm) from {{reference}}",
+  "well_position_with_reference_nested": "Well position (x,y,z): {{x}}mm, {{y}}mm, {{z}}mm from {{reference}}",
   "well_position_z_only": "Well position: Z {{z}} (mm)",
   "well_position_xyz": "Well position (x,y,z): {{x}}mm, {{y}}mm, {{z}}mm",
   "unknown_module": "Unknown module"
