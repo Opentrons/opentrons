@@ -59,6 +59,8 @@ Use the :py:meth:`~.Well.meniscus` method to aspirate relative to the meniscus o
 
 The liquid meniscus changes when you aspirate liquid from a well. Set ``target="end"`` to ensure the pipette stays submerged while aspirating. For more information, see :ref:`well-meniscus`.
 
+``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` to specify starting liquid volumes.
+
 .. versionadded:: 2.23
 
 See also:
@@ -127,6 +129,8 @@ Use the :py:meth:`~.Well.meniscus` method to dispense at the meniscus of liquid 
     pipette.dispense(200, location=plate["B1"].meniscus(target="start", z=-1)) #dispenses 1 mm below the liquid meniscus
 
 The liquid meniscus changes when you dispense liquid into a well. Set ``target`` to the starting position of the liquid within a well to ensure the pipette begins the dispense at the liquid meniscus. For more information, see :ref:`well-meniscus`.
+
+``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` to specify starting liquid volumes.
 
 .. versionadded:: 2.23
 
@@ -349,10 +353,12 @@ You can also require liquid presence for all aspirations performed with a given 
 
 .. versionadded:: 2.20
 
+.. _measure-liquids:
+
 Measure Liquids
 ===============
 
-The :py:meth:`~.InstrumentContext.measure_liquid_height` method tells a Flex pipette to measure the height of liquid relative to the bottom of a well. When ``measure_liquid_height()`` finds an empty well, it raises and error and pauses the protocol to let you resove the problem. 
+The :py:meth:`~.InstrumentContext.measure_liquid_height` method tells a Flex pipette to measure the height of liquid relative to the bottom of a well. When ``measure_liquid_height()`` finds an empty well, it raises and error and pauses the protocol to let you resolve the problem. 
 
 ``measure_liquid_height()`` is a standalone method that records the height of liquid in a well during a protocol. You can use the liquid height to aspirate or dispense from, or move to, the liquid meniscus, either immediately after or later in your protocol.
 

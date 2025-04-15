@@ -95,7 +95,7 @@ Let's look at the :py:meth:`~.Well.meniscus` method. It returns a position at th
 
 The liquid meniscus in a well changes during aspirating or dispensing, so you'll also need to specify a ``target`` position relative to the meniscus. Each position target is useful in different scenarios: 
 
-- Set ``target= "start"`` to target the existing liquid meniscus in the destination well before an aspirate or dispense. 
+- Set ``target= "start"`` to target the existing liquid meniscus in the destination well before a dispense. 
 - Set ``target= "end"`` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
 
 .. note::
