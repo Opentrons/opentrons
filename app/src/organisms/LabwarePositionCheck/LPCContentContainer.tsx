@@ -20,6 +20,7 @@ import {
   COLORS,
   Link,
   StyledText,
+  truncateString,
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
@@ -101,6 +102,7 @@ export function LPCContentContainer(
               {...rest}
               css={CHILD_NAV_STYLE}
               buttonIsDisabled={rest.buttonIsDisabled}
+              header={truncateString(rest.header, 40)}
             />
           </Flex>
           <Flex css={contentStyle ?? ODD_CHILDREN_CONTAINER_STYLE}>

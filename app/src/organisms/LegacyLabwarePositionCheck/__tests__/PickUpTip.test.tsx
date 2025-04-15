@@ -118,7 +118,9 @@ describe('PickUpTip', () => {
       name: 'Pick up tip from tip rack in Slot D1',
     })
     screen.getByText(
-      "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
+      nestedTextMatcher(
+        "Ensure that the pipette nozzle furthest from you is centered and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
+      )
     )
     screen.getByRole('link', { name: 'Need help?' })
   })
@@ -140,7 +142,7 @@ describe('PickUpTip', () => {
     })
     screen.getByText(
       nestedTextMatcher(
-        "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
+        "Ensure that the pipette nozzle furthest from you is centered and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
       )
     )
   })

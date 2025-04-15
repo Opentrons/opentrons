@@ -88,6 +88,7 @@ export function useInitLPCStore({
         },
         ui: {
           showDefaultOffsetInfoBanner: true,
+          showSnackbar: null,
         },
       }
 

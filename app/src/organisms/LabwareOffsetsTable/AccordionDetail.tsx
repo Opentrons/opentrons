@@ -43,6 +43,7 @@ export function AccordionDetail({
     }
   }
 
+  let isMissingOffset = false
   const buildColThreeTag = (): OffsetTagProps => {
     if (isHardcoded) {
       return { kind: 'hardcoded' }
@@ -51,12 +52,13 @@ export function AccordionDetail({
     } else if (defaultExistingOffset?.vector != null) {
       return { kind: 'vector', ...defaultExistingOffset.vector }
     } else {
+      isMissingOffset = true
       return { kind: 'noOffset' }
     }
   }
 
   return (
-    <Flex css={deckLabelContainerStyle(buildColThreeTag())}>
+    <Flex css={deckLabelContainerStyle(buildColThreeTag(), isMissingOffset)}>
       <DeckInfoLabelTextTag
         colOneDeckInfoLabels={[
           <LabwareOffsetsDeckInfoLabels
@@ -73,15 +75,16 @@ export function AccordionDetail({
 }
 
 const deckLabelContainerStyle = (
-  tagProps: OffsetTagProps
+  tagProps: OffsetTagProps,
+  isMisingOffset: boolean
 ): FlattenSimpleInterpolation => css`
-  background-color: ${COLORS.white};
+  background-color: ${isMisingOffset ? COLORS.yellow20 : COLORS.white};
   border-radius: ${BORDERS.borderRadius4};
   padding-right: ${tagProps.kind === 'vector' ? '' : '2.188rem'};
   text-wrap: ${NO_WRAP};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.grey20};
+    background-color: ${isMisingOffset ? COLORS.yellow20 : COLORS.grey20};
     border-radius: ${BORDERS.borderRadius8};
     padding-right: 0;
   }

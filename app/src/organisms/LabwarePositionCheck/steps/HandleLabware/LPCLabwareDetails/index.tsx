@@ -16,6 +16,7 @@ import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
   selectSelectedLwDisplayName,
+  selectSnackbarStatus,
   selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
@@ -25,6 +26,10 @@ import {
 } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 import { getIsOnDevice } from '/app/redux/config'
 import { OffsetBannerContainer } from './OffsetBannerContainer'
+import {
+  useLPCSnackbars,
+  useLPCToasts,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -33,6 +38,7 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const { isSavingWorkingOffsetsLoading, saveWorkingOffsets } = commandUtils
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()
+
   const [showUnsavedOffsetsDesktop, setShowUnsavedOffsetsDesktop] = useState(
     false
   )
@@ -40,7 +46,14 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
   const selectedLwName = useSelector(selectSelectedLwDisplayName(runId))
   const workingOffsetsByUri = useSelector(selectWorkingOffsetsByUri(runId))
+  const snackbarStatus = useSelector(selectSnackbarStatus(runId))
+  const { makeSuccessToast } = useLPCToasts()
+  const { makeSuccessSnackbar } = useLPCSnackbars(runId)
   const doWorkingOffsetsExist = Object.keys(workingOffsetsByUri).length > 0
+
+  if (snackbarStatus != null) {
+    makeSuccessSnackbar(snackbarStatus)
+  }
 
   const onHeaderGoBack = (): void => {
     if (doWorkingOffsetsExist) {
@@ -59,6 +72,10 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
       void saveWorkingOffsets().then(updatedOffsetData => {
         dispatch(applyWorkingOffsets(runId, updatedOffsetData))
         dispatch(goBackEditOffsetSubstep(runId))
+
+        if (isOnDevice) {
+          makeSuccessToast(selectedLwName)
+        }
       })
     }
   }
@@ -102,8 +119,6 @@ function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
       <OffsetBannerContainer {...props} />
       <DefaultLocationOffset {...props} />
       <LocationSpecificOffsetsContainer {...props} />
-      {/* Accommodate scrolling on the ODD. */}
-      <Flex css={ODD_SCROLL_BUFFER} />
     </Flex>
   )
 }
@@ -114,12 +129,6 @@ export const LIST_CONTAINER_STYLE = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     gap: ${SPACING.spacing24};
-  }
-`
-
-const ODD_SCROLL_BUFFER = css`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: ${SPACING.spacing40};
   }
 `
 
@@ -134,4 +143,13 @@ const DESKTOP_CONTENT_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing24};
   gap: ${SPACING.spacing24};
   overflow-y: auto;
+
+  & > *:not(:last-child) {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  & > *:last-child {
+    flex-shrink: 0;
+  }
 `

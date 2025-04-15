@@ -12,3 +12,11 @@ export const selectShowDefaultOffsetInfoBanner = (
       state.protocolRuns[runId]?.lpc?.ui.showDefaultOffsetInfoBanner,
     showBanner => showBanner ?? true
   )
+
+export const selectSnackbarStatus = (
+  runId: string
+): Selector<State, LPCUiState['showSnackbar'] | null> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.ui.showSnackbar,
+    showSnackbar => showSnackbar ?? null
+  )
