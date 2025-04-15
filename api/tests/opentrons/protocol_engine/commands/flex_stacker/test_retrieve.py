@@ -347,7 +347,7 @@ async def test_retrieve_primary_and_lid(
                 offset_ids_by_id={"labware-id": None, "lid-id": None},
                 display_names_by_id={
                     "labware-id": "Opentrons Flex 96 Filter Tip Rack 50 µL",
-                    "lid-id": "Opentrons Flex Tip Rack Lid",
+                    "lid-id": "Opentrons Flex Tiprack Lid",
                 },
                 definitions_by_id={
                     "labware-id": flex_50uL_tiprack,
@@ -678,7 +678,7 @@ async def test_retrieve_primary_adapter_and_lid(
                 display_names_by_id={
                     "labware-id": "Opentrons Flex 96 Filter Tip Rack 50 µL",
                     "adapter-id": "Opentrons Flex 96 Tip Rack Adapter",
-                    "lid-id": "Opentrons Flex Tip Rack Lid",
+                    "lid-id": "Opentrons Flex Tiprack Lid",
                 },
                 definitions_by_id={
                     "labware-id": flex_50uL_tiprack,
