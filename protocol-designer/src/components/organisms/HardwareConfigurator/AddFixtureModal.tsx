@@ -37,13 +37,17 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModalProps } from '@opentrons/components'
-import type { FormModules } from '../../../step-forms'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  FormModules,
+  ModuleOnDeck,
+} from '../../../step-forms'
 import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
   closeModal: () => void
-  modules: FormModules
+  modules: FormModules | AllTemporalPropertiesForTimelineFrame['modules']
   fixtures: WizardFixtureType
   deckConfig: DeckConfiguration
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>

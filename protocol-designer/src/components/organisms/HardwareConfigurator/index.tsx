@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { DeckConfigurator } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_SIMPLEST_DECK_CONFIG,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
-  FLEX_SIMPLEST_DECK_CONFIG,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
@@ -13,18 +13,26 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { WizardTileProps } from '../../../pages/Onboarding/types'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  FormModules,
+} from '../../../step-forms'
+import type { WizardFixtureType } from '../types'
 
-export function HardwareConfigurator(props: WizardTileProps): JSX.Element {
-  const { watch, setValue } = props
-  const fixtures = watch('fixtures')
-  const modules = watch('modules')
-  const hasGripper = watch('hasGripper')
+interface HardwareConfiguratorProps {
+  setValue: (type: 'fixtures' | 'modules', value: any) => void
+  modules: FormModules | AllTemporalPropertiesForTimelineFrame['modules']
+  hasGripper: boolean
+  fixtures: WizardFixtureType
+}
+export function HardwareConfigurator(
+  props: HardwareConfiguratorProps
+): JSX.Element {
+  const { modules, setValue, hasGripper, fixtures } = props
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const simpleDeckConfig: DeckConfiguration = FLEX_SIMPLEST_DECK_CONFIG.filter(
-    deckConfig => {
-      const cutoutId = deckConfig.cutoutId
+    ({ cutoutId }) => {
       const hasModule = Object.values(modules).some(
         module =>
           getCutoutIdFromAddressableArea(module.slot, deckDef) === cutoutId
@@ -51,9 +59,10 @@ export function HardwareConfigurator(props: WizardTileProps): JSX.Element {
         cutoutId: 'cutoutA1',
         cutoutFixtureId: 'thermocyclerModuleV2Rear',
       }
-      return hasThermocycler
-        ? [defaultModuleConfig, thermocyclerA1Config]
-        : [defaultModuleConfig]
+      return [
+        defaultModuleConfig,
+        ...(hasThermocycler ? [thermocyclerA1Config] : []),
+      ]
     }
   )
   const additionalEquipmentConfig: DeckConfiguration = Object.values(

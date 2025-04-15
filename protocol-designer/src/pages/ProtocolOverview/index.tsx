@@ -55,6 +55,7 @@ import {
 import { ScrubberContainer } from './ScrubberContainer'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
+import { HardwareInfo } from './HardwareInfo'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
@@ -331,6 +332,11 @@ export function ProtocolOverview(): JSX.Element {
               pipettesOnDeck={pipettesOnDeck}
               additionalEquipment={additionalEquipment}
               setShowEditInstrumentsModal={setShowEditInstrumentsModal}
+            />
+            <HardwareInfo
+              robotType={robotType}
+              modules={Object.values(modulesOnDeck)}
+              additionalEquipment={additionalEquipmentOnDeck}
             />
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}

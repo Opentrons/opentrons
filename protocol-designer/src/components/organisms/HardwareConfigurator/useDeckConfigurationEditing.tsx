@@ -37,7 +37,10 @@ import type {
   DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { FormModules } from '../../../step-forms'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  FormModules,
+} from '../../../step-forms'
 import type { WizardFixtureType, WizardFormState } from '../types'
 import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
 
@@ -52,8 +55,8 @@ interface DeckConfigurationEditingProps {
 export function useDeckConfigurationEditing(
   deckConfig: DeckConfiguration,
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>,
-  setValue: UseFormSetValue<WizardFormState>,
-  modules: FormModules,
+  setValue: (type: 'fixtures' | 'modules', value: any) => void,
+  modules: FormModules | AllTemporalPropertiesForTimelineFrame['modules'],
   fixtures: WizardFixtureType,
   hasGripper: boolean
 ): DeckConfigurationEditingProps {
@@ -72,36 +75,24 @@ export function useDeckConfigurationEditing(
       cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
       cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
     const tcCutouts = ['cutoutA1', 'cutoutB1']
+
     //  remove any fixtures from that cutoutId
-    if (
-      Object.values(fixtures).some(fixture => fixture.cutoutId === cutoutId)
-    ) {
-      const filteredFixtures = Object.fromEntries(
-        Object.entries(fixtures).filter(
-          ([_, fixture]) => fixture.cutoutId !== cutoutId
-        )
+    const filteredFixtures = Object.fromEntries(
+      Object.entries(fixtures).filter(
+        ([_, fixture]) => fixture.cutoutId !== cutoutId
       )
-      setValue('fixtures', filteredFixtures)
-    }
+    )
+    setValue('fixtures', filteredFixtures)
+
     //  remove any modules from that cutoutId
-    if (
-      Object.values(modules).some(
-        module =>
-          module.cutoutId === cutoutId ||
-          //  special-casing for thermocycler since deck config adds to both cutouts
-          (thermocyclerCutoutFixtureId &&
-            tcCutouts.includes(module.cutoutId ?? 'cutoutA1'))
+    const fixturedModules = Object.fromEntries(
+      Object.entries(modules).filter(([_, module]) =>
+        thermocyclerCutoutFixtureId
+          ? !tcCutouts.includes(module.cutoutId ?? 'cutoutA1')
+          : module.cutoutId !== cutoutId
       )
-    ) {
-      const fixturedModules = Object.fromEntries(
-        Object.entries(modules).filter(([_, module]) =>
-          thermocyclerCutoutFixtureId
-            ? !tcCutouts.includes(module.cutoutId ?? 'cutoutA1')
-            : module.cutoutId !== cutoutId
-        )
-      )
-      setValue('modules', fixturedModules)
-    }
+    )
+    setValue('modules', fixturedModules)
 
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
     if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {

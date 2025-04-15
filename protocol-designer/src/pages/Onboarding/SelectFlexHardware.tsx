@@ -8,9 +8,11 @@ import { WizardBody } from './WizardBody'
 import type { WizardTileProps } from './types'
 
 export function SelectHardware(props: WizardTileProps): JSX.Element | null {
-  const { goBack, proceed, watch } = props
+  const { goBack, proceed, watch, setValue } = props
   const { makeSnackbar } = useKitchen()
   const fixtures = watch('fixtures')
+  const modules = watch('modules')
+  const hasGripper = watch('hasGripper')
   const { t } = useTranslation(['onboarding', 'shared'])
   const hasTrash = Object.values(fixtures).some(
     fixture => fixture.name === 'trashBin' || fixture.name === 'wasteChute'
@@ -38,7 +40,12 @@ export function SelectHardware(props: WizardTileProps): JSX.Element | null {
         }}
         proceed={handleProceed}
       >
-        <HardwareConfigurator {...props} />
+        <HardwareConfigurator
+          setValue={setValue}
+          fixtures={fixtures}
+          modules={modules}
+          hasGripper={hasGripper}
+        />
       </WizardBody>
     </HandleEnter>
   )
