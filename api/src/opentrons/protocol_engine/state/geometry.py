@@ -80,6 +80,8 @@ from ..types import (
     AreaType,
     labware_location_is_off_deck,
     labware_location_is_system,
+    WellLocationType,
+    WellLocationFunction,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -311,7 +313,6 @@ class GeometryView:
             child_definition=self._labware.get_definition(labware_id),
             parent=self._labware.get(labware_id).location,
         )
-
         return Point(
             parent_pos.x + offset_from_parent.x,
             parent_pos.y + offset_from_parent.y,
@@ -456,20 +457,15 @@ class GeometryView:
         """Get the calibrated origin of the labware."""
         origin_pos = self.get_labware_origin_position(labware_id)
         cal_offset = self._labware.get_labware_offset_vector(labware_id)
-
         return Point(
             x=origin_pos.x + cal_offset.x,
             y=origin_pos.y + cal_offset.y,
             z=origin_pos.z + cal_offset.z,
         )
 
-    WellLocations = Union[
-        WellLocation, LiquidHandlingWellLocation, PickUpTipWellLocation
-    ]
-
     def validate_well_position(
         self,
-        well_location: WellLocations,
+        well_location: WellLocationType,
         z_offset: float,
         pipette_id: Optional[str] = None,
     ) -> None:
@@ -483,29 +479,29 @@ class GeometryView:
                 pipette_id=pipette_id
             )
             if z_offset < lld_min_height:
-                if isinstance(well_location, PickUpTipWellLocation):
+                if isinstance(well_location, LiquidHandlingWellLocation):
                     raise OperationLocationNotInWellError(
                         f"Specifying {well_location.origin} with a height offset of {well_location.offset.z} results in a height of {z_offset} mm; the minimum allowed height for liquid tracking is {lld_min_height} mm"
                     )
                 else:
                     raise OperationLocationNotInWellError(
-                        f"Specifying {well_location.origin} with a height offset of {well_location.offset.z} results in a height of {z_offset} mm; the minimum allowed height for liquid tracking is {lld_min_height} mm"
+                        f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location that could be below the bottom of the well"
                     )
         elif z_offset < 0:
-            if isinstance(well_location, PickUpTipWellLocation):
+            if isinstance(well_location, LiquidHandlingWellLocation):
                 raise OperationLocationNotInWellError(
-                    f"Specifying {well_location.origin} with an offset of {well_location.offset.z} results in a location below the bottom of the well"
+                    f"Specifying {well_location.origin} with an offset of {well_location.offset} and a volume offset of {well_location.volumeOffset} results in an operation location below the bottom of the well"
                 )
             else:
                 raise OperationLocationNotInWellError(
-                    f"Specifying {well_location.origin} with an offset of {well_location.offset.z} and a volume offset of {well_location.volumeOffset} results in a location below the bottom of the well"
+                    f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location below the bottom of the well"
                 )
 
     def get_well_position(
         self,
         labware_id: str,
         well_name: str,
-        well_location: Optional[WellLocations] = None,
+        well_location: Optional[WellLocationType] = None,
         operation_volume: Optional[float] = None,
         pipette_id: Optional[str] = None,
     ) -> Point:
@@ -531,7 +527,6 @@ class GeometryView:
                     z_offset=offset.z,
                     pipette_id=pipette_id,
                 )
-
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
@@ -553,25 +548,14 @@ class GeometryView:
             z=parent_pos.z + origin_offset.z + well_def.z + well_def.depth,
         )
 
-    def get_relative_well_location(
+    def _get_relative_liquid_handling_well_location(
         self,
         labware_id: str,
         well_name: str,
         absolute_point: Point,
-    ) -> WellLocation:
-        """Given absolute position, get relative location of a well in a labware."""
-        well_absolute_point = self.get_well_position(labware_id, well_name)
-        delta = absolute_point - well_absolute_point
-
-        return WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
-
-    def get_relative_liquid_handling_well_location(
-        self,
-        labware_id: str,
-        well_name: str,
-        absolute_point: Point,
+        delta: Point,
         meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
-    ) -> Tuple[LiquidHandlingWellLocation, bool]:
+    ) -> Tuple[WellLocationType, bool]:
         """Given absolute position, get relative location of a well in a labware."""
         dynamic_liquid_tracking = False
         if meniscus_tracking:
@@ -579,29 +563,50 @@ class GeometryView:
                 origin=WellOrigin.MENISCUS,
                 offset=WellOffset(x=0, y=0, z=absolute_point.z),
             )
+            # TODO(cm): handle operationVolume being a float other than 0
             if meniscus_tracking == MeniscusTrackingTarget.END:
                 location.volumeOffset = "operationVolume"
             elif meniscus_tracking == MeniscusTrackingTarget.DYNAMIC:
                 dynamic_liquid_tracking = True
         else:
-            well_absolute_point = self.get_well_position(labware_id, well_name)
-            delta = absolute_point - well_absolute_point
             location = LiquidHandlingWellLocation(
                 offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
             )
         return location, dynamic_liquid_tracking
 
-    def get_relative_pick_up_tip_well_location(
+    def get_relative_well_location(
         self,
         labware_id: str,
         well_name: str,
         absolute_point: Point,
-    ) -> PickUpTipWellLocation:
+        location_type: WellLocationFunction,
+        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
+    ) -> Tuple[WellLocationType, bool]:
         """Given absolute position, get relative location of a well in a labware."""
         well_absolute_point = self.get_well_position(labware_id, well_name)
         delta = absolute_point - well_absolute_point
-
-        return PickUpTipWellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
+        match location_type:
+            case WellLocationFunction.BASE | WellLocationFunction.DROP_TIP:
+                return (
+                    WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)),
+                    False,
+                )
+            case WellLocationFunction.PICK_UP_TIP:
+                return (
+                    PickUpTipWellLocation(
+                        offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
+                    ),
+                    False,
+                )
+            case WellLocationFunction.LIQUID_HANDLING:
+                return self._get_relative_liquid_handling_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=absolute_point,
+                    delta=delta,
+                    meniscus_tracking=meniscus_tracking,
+                )
+        return NotImplemented
 
     def get_well_height(
         self,
@@ -762,7 +767,6 @@ class GeometryView:
         """Get the slot name of the labware or the module that the labware is on."""
         labware = self._labware.get(labware_id)
         slot_name: Union[DeckSlotName, StagingSlotName]
-
         if isinstance(labware.location, DeckSlotLocation):
             slot_name = labware.location.slotName
         elif isinstance(labware.location, ModuleLocation):
@@ -1866,7 +1870,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
-        well_location: WellLocations,
+        well_location: WellLocationType,
         well_depth: float,
         operation_volume: Optional[float] = None,
     ) -> LiquidTrackingType:
@@ -1889,12 +1893,16 @@ class GeometryView:
             and not well_location.volumeOffset
         ):
             return initial_handling_height
+        volume: Optional[float] = None
         if isinstance(well_location, PickUpTipWellLocation):
             volume = 0.0
-        elif isinstance(well_location.volumeOffset, float):
-            volume = well_location.volumeOffset
-        elif well_location.volumeOffset == "operationVolume":
-            volume = operation_volume or 0.0
+        elif isinstance(well_location, LiquidHandlingWellLocation):
+            if well_location.volumeOffset == "operationVolume":
+                volume = operation_volume or 0.0
+            else:
+                if not isinstance(well_location.volumeOffset, float):
+                    raise ValueError("Invalid volume offset.")
+                volume = well_location.volumeOffset
 
         if volume:
             liquid_height_after = self.get_well_height_after_liquid_handling(
@@ -2002,7 +2010,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
-        well_location: WellLocations,
+        well_location: WellLocationType,
         well_depth: float,
     ) -> LiquidTrackingType:
         """Return the handling height for a labware well (with reference to the well bottom)."""
@@ -2114,7 +2122,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
-        well_location: WellLocations,
+        well_location: WellLocationType,
         volume: float,
     ) -> None:
         """Raise InvalidDispenseVolumeError if planned dispense volume will overflow well."""

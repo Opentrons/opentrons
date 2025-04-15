@@ -42,7 +42,7 @@ from ..protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
     TransferTipPolicyV2Type,
 )
-from ..protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from ..protocol_engine.types import LiquidTrackingType
 
 _DEFAULT_ASPIRATE_CLEARANCE = 1.0
 _DEFAULT_DISPENSE_CLEARANCE = 1.0
@@ -1553,6 +1553,13 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         """
+        if volume == 0.0:
+            _log.info(
+                f"Transfer of {liquid_class.name} specified with a volume of 0uL."
+                f" Skipping."
+            )
+            return self
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1572,6 +1579,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
                 " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
             )
+
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.transfer_with_liquid_class(
@@ -1598,6 +1606,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
+                starting_tip=self.starting_tip._core
+                if self.starting_tip is not None
+                else None,
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1645,6 +1656,13 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         """
+        if volume == 0.0:
+            _log.info(
+                f"Distribution of {liquid_class.name} specified with a volume of 0uL."
+                f" Skipping."
+            )
+            return self
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1695,6 +1713,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
+                starting_tip=self.starting_tip._core
+                if self.starting_tip is not None
+                else None,
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
@@ -1743,6 +1764,13 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         """
+        if volume == 0.0:
+            _log.info(
+                f"Consolidation of {liquid_class.name} specified with a volume of 0uL."
+                f" Skipping."
+            )
+            return self
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1793,6 +1821,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
                 ],
+                starting_tip=self.starting_tip._core
+                if self.starting_tip is not None
+                else None,
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
             )
