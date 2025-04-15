@@ -7,7 +7,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, volume, flowRate } = args
+  const { pipetteId, volume, flowRate, pushOut } = args
 
   const commands = [
     {
@@ -17,6 +17,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
         pipetteId,
         volume,
         flowRate,
+        ...(pushOut != null ? { pushOut } : {}),
       },
     },
   ]

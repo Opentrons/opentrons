@@ -37,6 +37,17 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
+// The labware fixtures use namespace "fixture", with is treated as custom labware.
+// Modify the labware fixtures to change them to the "opentrons" namespace.
+const opentrons96Plate = {
+  ...fixture96Plate,
+  namespace: 'opentrons',
+} as LabwareDefinition2
+const opentronsTiprackAdapter = {
+  ...fixtureTiprackAdapter,
+  namespace: 'opentrons',
+} as LabwareDefinition2
+
 describe('pythonMetadata', () => {
   it('should generate metadata section', () => {
     expect(
@@ -75,7 +86,7 @@ describe('pythonRequirements', () => {
       `
 requirements = {
     "robotType": "OT-2",
-    "apiLevel": "2.23",
+    "apiLevel": "2.24",
 }`.trimStart()
     )
 
@@ -83,7 +94,7 @@ requirements = {
       `
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.24",
 }`.trimStart()
     )
   })
@@ -121,8 +132,8 @@ const labwareId5 = 'labwareId5'
 const mockLabwareEntities: LabwareEntities = {
   [labwareId1]: {
     id: labwareId1,
-    labwareDefURI: 'fixture/fixture_flex_96_tiprack_adapter/1',
-    def: fixtureTiprackAdapter as LabwareDefinition2,
+    labwareDefURI: 'opentrons/fixture_flex_96_tiprack_adapter/1',
+    def: opentronsTiprackAdapter,
     pythonName: 'adapter_1',
   },
   [labwareId2]: {
@@ -133,14 +144,14 @@ const mockLabwareEntities: LabwareEntities = {
   },
   [labwareId3]: {
     id: labwareId3,
-    labwareDefURI: 'fixture/fixture_96_plate/1',
-    def: fixture96Plate as LabwareDefinition2,
+    labwareDefURI: 'opentrons/fixture_96_plate/1',
+    def: opentrons96Plate,
     pythonName: 'well_plate_1',
   },
   [labwareId4]: {
     id: labwareId4,
-    labwareDefURI: 'fixture/fixture_96_plate/1',
-    def: fixture96Plate as LabwareDefinition2,
+    labwareDefURI: 'opentrons/fixture_96_plate/1',
+    def: opentrons96Plate as LabwareDefinition2,
     pythonName: 'well_plate_2',
   },
   [labwareId5]: {
@@ -202,14 +213,12 @@ describe('getLoadAdapters', () => {
 # Load Adapters:
 adapter_1 = magnetic_block_1.load_adapter(
     "fixture_flex_96_tiprack_adapter",
-    namespace="fixture",
+    namespace="opentrons",
     version=1,
 )
-adapter_2 = protocol.load_adapter(
-    "fixture_flex_96_tiprack_adapter",
+adapter_2 = protocol.load_adapter_from_definition(
+    CUSTOM_LABWARE["fixture/fixture_flex_96_tiprack_adapter/1"],
     location="B2",
-    namespace="fixture",
-    version=1,
 )`.trimStart()
     )
   })
@@ -230,20 +239,18 @@ describe('getLoadLabware', () => {
 well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
-    namespace="fixture",
+    namespace="opentrons",
     version=1,
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
-    namespace="fixture",
+    namespace="opentrons",
     version=1,
 )
-well_plate_3 = protocol.load_labware(
-    "fixture_96_plate",
+well_plate_3 = protocol.load_labware_from_definition(
+    CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
     location="C2",
     label="sample plate",
-    namespace="fixture",
-    version=1,
 )`.trimStart()
     )
   })

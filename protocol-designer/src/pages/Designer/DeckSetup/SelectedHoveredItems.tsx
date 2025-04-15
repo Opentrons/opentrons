@@ -1,11 +1,11 @@
 import { useSelector } from 'react-redux'
 import { Module } from '@opentrons/components'
 import {
+  getAllLabwareDefs,
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { selectors } from '../../../labware-ingred/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { ModuleLabel } from './ModuleLabel'
@@ -49,7 +49,7 @@ export const SelectedHoveredItems = (
     selectedNestedLabwareDefUri,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
-  const defs = getOnlyLatestDefs()
+  const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware, modules } = deckSetup
   const matchingSelectedLabwareOnDeck = Object.values(labware).find(labware => {

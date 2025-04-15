@@ -419,6 +419,14 @@ from .pressure_dispense import (
     PressureDispenseCommandType,
 )
 
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",

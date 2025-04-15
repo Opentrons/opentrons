@@ -33,7 +33,7 @@ enum MixContent {
   WasteChute = 'Waste chute',
   AspFlowRate = 'Aspirate flow rate',
   AspWellOrder = 'Aspirate well order',
-  MixTipPosition = 'Mix position',
+  MixTipPosition = 'Mix tip position',
   AdvancedPipSettings = 'Advanced pipetting settings',
   Delay = 'Delay',
   DelayDuration = 'Delay duration',
@@ -73,6 +73,8 @@ enum MixContent {
   StepNotes = 'Step Notes',
   CypressTest = 'Cypress Mix Test',
   TouchTipFromTop = 'Touch tip position from top',
+  PushOut = 'Push out',
+  PushOutVolume = 'Push out volume',
 }
 
 enum MixLocators {
@@ -109,6 +111,7 @@ enum MixLocators {
   // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
   StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
+  PushOutVolumeInput = '[name="pushOut_volume"]',
 }
 
 /**
@@ -240,6 +243,25 @@ export const MixSteps = {
         .should('have.prop', 'value')
       cy.get(MixLocators.DelaySecondsInput)
         .eq(1)
+        .type('{selectAll}{backspace}5')
+    },
+  }),
+
+  PushOut: (): StepThunk => ({
+    call: () => {
+      cy.contains(MixContent.PushOut).should('exist').should('be.visible')
+      cy.get(MixLocators.Checkbox)
+        .should('exist')
+        .should('be.visible')
+        .eq(0)
+        .click()
+      cy.contains(MixContent.PushOutVolume).should('exist').should('be.visible')
+      cy.get(MixLocators.PushOutVolumeInput)
+        .should('exist')
+        .should('be.visible')
+        .should('have.prop', 'value')
+      cy.get(MixLocators.PushOutVolumeInput)
+        .eq(0)
         .type('{selectAll}{backspace}5')
     },
   }),

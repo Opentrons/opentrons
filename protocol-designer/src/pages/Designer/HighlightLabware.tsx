@@ -1,7 +1,6 @@
 import { useSelector } from 'react-redux'
 import { getLabwareEntities } from '../../step-forms/selectors'
 import { getHoveredStepLabware } from '../../ui/steps'
-import { getDesignerTab } from '../../file-data/selectors'
 import { LabwareLabel } from './LabwareLabel'
 import type { CoordinateTuple } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../step-forms'
@@ -9,15 +8,15 @@ import type { LabwareOnDeck } from '../../step-forms'
 interface HighlightLabwareProps {
   labwareOnDeck: LabwareOnDeck
   position: CoordinateTuple
+  isZoomed: boolean
 }
 
 export function HighlightLabware(
   props: HighlightLabwareProps
 ): JSX.Element | null {
-  const { labwareOnDeck, position } = props
+  const { labwareOnDeck, position, isZoomed } = props
   const labwareEntities = useSelector(getLabwareEntities)
   const hoveredLabware = useSelector(getHoveredStepLabware)
-  const tab = useSelector(getDesignerTab)
   const adapterId =
     labwareEntities[labwareOnDeck.slot] != null
       ? labwareEntities[labwareOnDeck.slot].id
@@ -25,7 +24,7 @@ export function HighlightLabware(
 
   const highlighted = hoveredLabware.includes(adapterId ?? labwareOnDeck.id)
 
-  if (tab === 'protocolSteps') {
+  if (!isZoomed) {
     return null
   }
   if (highlighted) {

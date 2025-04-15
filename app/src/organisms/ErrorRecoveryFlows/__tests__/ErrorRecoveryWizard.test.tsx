@@ -193,6 +193,11 @@ describe('ErrorRecoveryContent', () => {
     MANUAL_REPLACE_AND_RETRY,
     MANUAL_MOVE_AND_SKIP,
     HOME_AND_RETRY,
+    HOPPER_MANUAL_LOAD_AND_RETRY,
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY,
   } = RECOVERY_MAP
 
   let props: ComponentProps<typeof ErrorRecoveryContent>
@@ -383,6 +388,84 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_MOVE_LW_AND_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
 
   it(`returns appropriate view when the route is ${MANUAL_REPLACE_AND_RETRY.ROUTE}`, () => {

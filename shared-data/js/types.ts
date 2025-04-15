@@ -716,7 +716,7 @@ export interface Liquid {
 }
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
-type LiquidHandlingPropertyByVolume = number[][]
+export type LiquidHandlingPropertyByVolume = number[][]
 export type PositionReference =
   | typeof WELL_BOTTOM
   | typeof WELL_CENTER
@@ -727,7 +727,7 @@ type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {
   duration: number
 }
-interface DelayProperties {
+export interface DelayProperties {
   enable: boolean
   params?: DelayParams
 }
@@ -736,7 +736,7 @@ interface TouchTipParams {
   mmToEdge: number
   speed: number
 }
-interface TouchTipProperties {
+export interface TouchTipProperties {
   enable: boolean
   params?: TouchTipParams
 }
@@ -745,7 +745,7 @@ interface MixParams {
   repetitions: number
   volume: number
 }
-interface MixProperties {
+export interface MixProperties {
   enable: boolean
   params?: MixParams
 }
@@ -753,11 +753,11 @@ interface BlowoutParams {
   location: BlowoutLocation
   flowRate: number
 }
-interface BlowoutProperties {
+export interface BlowoutProperties {
   enable: boolean
   params?: BlowoutParams
 }
-interface Submerge {
+export interface Submerge {
   positionReference: PositionReference
   offset: Coordinates
   speed: number
@@ -771,8 +771,8 @@ interface BaseRetract {
   touchTip: TouchTipProperties
   delay: DelayProperties
 }
-type RetractAspirate = BaseRetract
-interface RetractDispense extends BaseRetract {
+export type RetractAspirate = BaseRetract
+export interface RetractDispense extends BaseRetract {
   blowout: BlowoutProperties
 }
 interface BaseLiquidHandlingProperties<RetractType> {
@@ -794,11 +794,12 @@ export interface SingleDispenseProperties
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-export interface MultiDispenseProperties {
+export interface MultiDispenseProperties
+  extends BaseLiquidHandlingProperties<RetractDispense> {
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }
-interface ByTipTypeSetting {
+export interface ByTipTypeSetting {
   tiprack: string
   aspirate: AspirateProperties
   singleDispense: SingleDispenseProperties

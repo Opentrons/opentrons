@@ -33,17 +33,16 @@ import {
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
-import type { DeckSetupTabType } from '../types'
+import type { DeckSetupTerminalIdType } from '../types'
 
 const OFF_DECK_MAP_WIDTH = '41.625rem'
-const OFF_DECK_MAP_HEIGHT = '44rem'
 const OFF_DECK_MAP_HEIGHT_FOR_STEP = '30.3rem'
 const ZERO_SLOT_POSITION: CoordinateTuple = [0, 0, 0]
-interface OffDeckDetailsProps extends DeckSetupTabType {
+interface OffDeckDetailsProps extends DeckSetupTerminalIdType {
   addLabware: () => void
 }
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
-  const { addLabware, tab } = props
+  const { addLabware, terminalItemId } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoverSlot, setHoverSlot] = useState<DeckSlotId | null>(null)
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
@@ -58,7 +57,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
-  const containerWidth = tab === 'startingDeck' ? '100vw' : '75vw'
+  const containerWidth = '75vw'
 
   const stepDetailsContainerWidth = `calc(((${containerWidth} - ${OFF_DECK_MAP_WIDTH}) / 2) - (${SPACING.spacing24}  * 3))`
   const paddingRight = `calc((100% - ${OFF_DECK_MAP_WIDTH}) / 2)`
@@ -86,11 +85,9 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
       <Flex
         flex="0 0 auto"
         width={OFF_DECK_MAP_WIDTH}
-        height={
-          tab === 'startingDeck'
-            ? OFF_DECK_MAP_HEIGHT
-            : OFF_DECK_MAP_HEIGHT_FOR_STEP
-        }
+        height="100%"
+        maxHeight={OFF_DECK_MAP_HEIGHT_FOR_STEP}
+        minHeight={OFF_DECK_MAP_HEIGHT_FOR_STEP}
         alignItems={ALIGN_CENTER}
         borderRadius={SPACING.spacing12}
         padding={`${SPACING.spacing16} ${SPACING.spacing40}`}
@@ -109,7 +106,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
           </StyledText>
         </Flex>
         <LabwareWrapper>
-          {tab === 'startingDeck' ? (
+          {terminalItemId === '__initial_setup__' ? (
             <Flex width="9.5625rem" height="6.375rem">
               <EmptySelectorButton
                 onClick={addLabware}
@@ -167,7 +164,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                         slotBoundingBox={xyzDimensions}
                         slotPosition={ZERO_SLOT_POSITION}
                         labwareId={lw.id}
-                        tab={tab}
+                        terminalItemId={terminalItemId}
                       />
                     </>
                   )}

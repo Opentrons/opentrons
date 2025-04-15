@@ -20,7 +20,7 @@ export function ConfirmDeleteStagingAreaModal(
   props: ConfirmDeleteStagingAreaModalProps
 ): JSX.Element {
   const { onClose, onConfirm } = props
-  const { t, i18n } = useTranslation(['create_new_protocol', 'shared'])
+  const { t, i18n } = useTranslation(['onboarding', 'shared'])
 
   return createPortal(
     <HandleEnter onEnter={onConfirm}>

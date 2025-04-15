@@ -156,7 +156,9 @@ const stepFormHelperMap: {
       timesRequired,
       aspirateDelayDurationRequired,
       dispenseDelayDurationRequired,
-      blowoutLocationRequired
+      blowoutLocationRequired,
+      pushOutVolumeOutOfRange,
+      pushOutVolumeRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

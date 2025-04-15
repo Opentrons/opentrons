@@ -86,6 +86,7 @@ export function EmptyConfigFixture(
         onClick={() => {
           handleClickAdd(fixtureLocation)
         }}
+        data-testid={fixtureLocation}
       >
         <Icon name="add" color={COLORS.blue50} size="2rem" />
       </Btn>

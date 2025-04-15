@@ -390,6 +390,8 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_y_position?: number | null
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
   times?: number | null
   liquidClass?: string | null
 }
@@ -503,6 +505,7 @@ export type ReferenceFields =
   | 'dispense_submerge_position_reference'
   | 'aspirate_retract_position_reference'
   | 'dispense_retract_position_reference'
+  | 'mix_position_reference'
 
 export type DelayCheckboxFields =
   | 'aspirate_delay_checkbox'

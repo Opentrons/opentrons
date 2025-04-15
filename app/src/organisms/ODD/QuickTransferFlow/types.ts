@@ -4,7 +4,14 @@ import type {
   LabwareDefinition2,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
-import type { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
+import type {
+  ACTIONS,
+  CONSOLIDATE,
+  DISTRIBUTE,
+  TRANSFER,
+  ASPIRATE_SETTING_OPTIONS,
+  DISPENSE_SETTING_OPTIONS,
+} from './constants'
 
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs
@@ -16,6 +23,10 @@ export interface QuickTransferWizardState {
   destinationWells?: string[]
   transferType?: TransferType
   volume?: number
+  // Note added for liquid classes in Quick Transfer
+  path?: PathOption
+  changeTip?: ChangeTipOptions
+  dropTipLocation?: CutoutConfig
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -26,6 +37,15 @@ export type ChangeTipOptions =
   | 'perSource'
 export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
+export type AspirateSettingOption = typeof ASPIRATE_SETTING_OPTIONS[keyof typeof ASPIRATE_SETTING_OPTIONS]
+export type DispenseSettingOption = typeof DISPENSE_SETTING_OPTIONS[keyof typeof DISPENSE_SETTING_OPTIONS]
+export interface SettingItem {
+  option: string
+  copy: string
+  value: string
+  enabled: boolean
+  onClick: () => void
+}
 
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs
@@ -84,6 +104,9 @@ export type QuickTransferWizardAction =
   | SetDestLabwareAction
   | SetDestWellsAction
   | SetVolumeAction
+  | SetPipettePath
+  | SetChangeTip
+  | SetDropTipLocation
 
 export type QuickTransferSummaryAction =
   | SetAspirateFlowRateAction

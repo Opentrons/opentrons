@@ -1245,6 +1245,18 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        mix_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1338,6 +1350,18 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         liquidClassesSupported: { isIndeterminate: false },
         liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        mix_position_reference: {
           isIndeterminate: false,
           value: undefined,
         },

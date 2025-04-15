@@ -10,7 +10,12 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import type { RecoveryRouteStepMetadata, RouteStep, StepOrder } from './types'
+import type {
+  ErrorKind,
+  RecoveryRouteStepMetadata,
+  RouteStep,
+  StepOrder,
+} from './types'
 
 // Server-defined error types.
 // (Values for the .error.errorType property of a run command.)
@@ -22,6 +27,8 @@ export const DEFINED_ERROR_TYPES = {
   GRIPPER_MOVEMENT: 'gripperMovement',
   STALL_OR_COLLISION: 'stallOrCollision',
   STACKER_STALL: 'flexStackerStallOrCollision',
+  HOPPER_LABWARE_MISSING: 'flexStackerHopperLabwareFailed',
+  SHUTTLE_MISSING: 'flexStackerShuttleMissing',
 }
 
 // Client-defined error-handling flows.
@@ -36,7 +43,15 @@ export const ERROR_KINDS = {
   GRIPPER_ERROR: 'GRIPPER_ERROR',
   STALL_OR_COLLISION: 'STALL_OR_COLLISION',
   STALL_WHILE_STACKING: 'STALL_WHILE_STACKING',
+  LABWARE_MISSING_IN_HOPPER: 'LABWARE_MISSING_IN_HOPPER',
+  SHUTTLE_MISSING: 'SHUTTLE_MISSING',
 } as const
+
+export const STACKER_ERROR_KINDS: ErrorKind[] = [
+  ERROR_KINDS.STALL_WHILE_STACKING,
+  ERROR_KINDS.SHUTTLE_MISSING,
+  ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+]
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.
@@ -194,6 +209,31 @@ export const RECOVERY_MAP = {
       SKIP: 'skip',
     },
   },
+  HOPPER_MANUAL_LOAD_AND_RETRY: {
+    ROUTE: 'hopper-manual-load-in-stacker-and-retry',
+    STEPS: {
+      CONFIRM_RETRY: 'confirm-retry',
+      RETRY: 'retry',
+    },
+  },
+  HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP: {
+    ROUTE: 'hopper-manual-load-in-shuttle-and-skip',
+    STEPS: {
+      HOOPER_MANUAL_REPLACE: 'hooper-manual-replace',
+      CONFIRM_RETRY: 'confirm-retry',
+      SKIP: 'skip',
+    },
+  },
+  LOAD_LABWARE_SHUTTLE_AND_RETRY: {
+    ROUTE: 'load-shuttle-and-retry',
+    STEPS: {
+      PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
+      CLOSE_DOOR_AND_HOME: 'close-door-and-home',
+      MANUAL_REPLACE: 'manual-load-shuttle',
+      CONFIRM_RETRY: 'confirm-retry',
+      RETRY: 'retry',
+    },
+  },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_STEP: {
     ROUTE: 'retry-step',
@@ -259,6 +299,9 @@ const {
   SKIP_STEP_WITH_NEW_TIPS,
   SKIP_STEP_WITH_SAME_TIPS,
   HOME_AND_RETRY,
+  LOAD_LABWARE_SHUTTLE_AND_RETRY,
+  HOPPER_MANUAL_LOAD_AND_RETRY,
+  HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -339,6 +382,22 @@ export const STEP_ORDER: StepOrder = {
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP,
+  ],
+  [LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE]: [
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CONFIRM_RETRY,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.RETRY,
+  ],
+  [HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE]: [
+    HOPPER_MANUAL_LOAD_AND_RETRY.STEPS.CONFIRM_RETRY,
+    HOPPER_MANUAL_LOAD_AND_RETRY.STEPS.RETRY,
+  ],
+  [HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE]: [
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE,
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY,
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.SKIP,
   ],
   [ERROR_WHILE_RECOVERING.ROUTE]: [
     ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,
@@ -512,6 +571,38 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: false,
     },
     [MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: false },
+  },
+  [HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE]: {
+    [HOPPER_MANUAL_LOAD_AND_RETRY.STEPS.CONFIRM_RETRY]: {
+      allowDoorOpen: true,
+    },
+    [HOPPER_MANUAL_LOAD_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
+  },
+  [HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE]: {
+    [HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE]: {
+      allowDoorOpen: false,
+    },
+    [HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY]: {
+      allowDoorOpen: false,
+    },
+    [HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.SKIP]: {
+      allowDoorOpen: false,
+    },
+  },
+  [LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE]: {
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING]: {
+      allowDoorOpen: true,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME]: {
+      allowDoorOpen: true,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE]: {
+      allowDoorOpen: false,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.CONFIRM_RETRY]: {
+      allowDoorOpen: false,
+    },
+    [LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
   },
   [REFILL_AND_RESUME.ROUTE]: {},
   [RETRY_STEP.ROUTE]: {

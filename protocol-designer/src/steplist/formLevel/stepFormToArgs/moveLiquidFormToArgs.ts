@@ -80,6 +80,8 @@ export const moveLiquidFormToArgs = (
     aspirate_y_position,
     dispense_y_position,
     blowout_z_offset,
+    pushOut_checkbox,
+    pushOut_volume,
   } = hydratedFormData
   let sourceWells = getOrderedWells(
     hydratedFormData.aspirate_wells,
@@ -278,6 +280,7 @@ export const moveLiquidFormToArgs = (
         destWells,
         mixBeforeAspirate,
         mixInDestination,
+        pushOut: pushOut_checkbox ? pushOut_volume : 0,
       }
       return transferStepArguments
     }
@@ -291,6 +294,7 @@ export const moveLiquidFormToArgs = (
         mixInDestination,
         sourceWells,
         destWell: destWells != null ? destWells[0] : null,
+        pushOut: pushOut_checkbox ? pushOut_volume : 0,
       }
       return consolidateStepArguments
     }
@@ -307,6 +311,7 @@ export const moveLiquidFormToArgs = (
         // cannot distribute into a waste chute so if destWells is null
         // there is an error
         destWells: destWells ?? [],
+        pushOut: pushOut_checkbox ? pushOut_volume : 0,
       }
       return distributeStepArguments
     }

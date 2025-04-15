@@ -72,6 +72,8 @@ export interface UseRecoveryCommandsResult {
   moveLabwareWithoutPause: () => Promise<CommandData[]>
   /* A non-terminal recovery-command */
   homeAll: () => Promise<CommandData[]>
+  /* A non-terminal recovery-command */
+  homeShuttle: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -316,6 +318,15 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([HOME_ALL])
   }, [chainRunRecoveryCommands])
 
+  const homeShuttle = useCallback((): Promise<CommandData[]> => {
+    const homeShuttleCommand = buildHomeShuttle(unvalidatedFailedCommand)
+    if (homeShuttleCommand == null) {
+      return Promise.reject(new Error('Invalid use of home shuttle command'))
+    } else {
+      return chainRunRecoveryCommands([homeShuttleCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
       unvalidatedFailedCommand
@@ -339,6 +350,7 @@ export function useRecoveryCommands({
     skipFailedCommand,
     ignoreErrorKindThisRun,
     homeAll,
+    homeShuttle,
   }
 }
 
@@ -384,6 +396,26 @@ export const HOME_EXCEPT_PLUNGERS: CreateCommand = {
 export const HOME_ALL: CreateCommand = {
   commandType: 'home',
   params: {},
+}
+
+const buildHomeShuttle = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'flexStacker/prepareShuttle',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
 }
 
 const buildMoveLabwareWithoutPause = (

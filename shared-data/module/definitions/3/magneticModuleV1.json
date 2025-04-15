@@ -35,6 +35,7 @@
   "slotTransforms": {},
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot3_standard"],
+  "uniqueModuleData": {},
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

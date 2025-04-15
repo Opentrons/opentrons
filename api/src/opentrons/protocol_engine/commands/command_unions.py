@@ -17,6 +17,7 @@ from .movement_common import StallOrCollisionError
 from .flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerHopperError,
 )
 
 from . import absorbance_reader
@@ -403,6 +404,14 @@ from .unseal_pipette_from_tip import (
     UnsealPipetteFromTipCreate,
     UnsealPipetteFromTipResult,
     UnsealPipetteFromTipCommandType,
+)
+
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
 )
 
 Command = Annotated[
@@ -929,6 +938,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
     DefinedErrorData[FlexStackerShuttleError],
+    DefinedErrorData[FlexStackerHopperError],
 ]
 
 
