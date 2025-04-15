@@ -40,6 +40,7 @@ import {
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
 import { SelectModules } from '../../components/organisms/SelectModules'
+import { toggleNewProtocolModal } from '../../navigation/actions'
 import { AddMetadata } from './AddMetadata'
 import { getTrashSlot } from './utils'
 import { SelectBasics } from './SelectBasics'
@@ -60,7 +61,6 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { WizardFormState } from './types'
-import { toggleNewProtocolModal } from '../../navigation/actions'
 
 type WizardStep = 'basics' | 'modules' | 'fixtures' | 'metadata'
 const WIZARD_STEPS: WizardStep[] = ['basics', 'modules', 'fixtures', 'metadata']
@@ -143,7 +143,7 @@ export function Onboarding(): JSX.Element | null {
   )
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const [wizardSteps, setWizardSteps] = useState<WizardStep[]>(WIZARD_STEPS)
-  console.log('currentStepIndex', currentStepIndex)
+
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const createProtocolFile = (values: WizardFormState): void => {

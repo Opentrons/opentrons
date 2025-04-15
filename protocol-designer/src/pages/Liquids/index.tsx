@@ -53,7 +53,7 @@ export function Liquids(): JSX.Element {
         />
       ) : null}
 
-      <AssignLiquidsModal />
+      <AssignLiquidsModal showLiquidOverflowMenu={showLiquidOverflowMenu} />
     </>
   )
 }

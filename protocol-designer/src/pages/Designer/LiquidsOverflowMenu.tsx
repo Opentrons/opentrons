@@ -20,7 +20,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
-import { getLiquidEntities } from '../../step-forms/selectors'
+import { getLiquidEntities, getUnsavedForm } from '../../step-forms/selectors'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 
 import type { MouseEvent, RefObject } from 'react'
@@ -38,6 +38,7 @@ export function LiquidsOverflowMenu(
   props: LiquidsOverflowMenuProps
 ): JSX.Element {
   const { onClose, showLiquidsModal, overflowWrapperRef } = props
+  const formData = useSelector(getUnsavedForm)
   const location = useLocation()
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
@@ -47,8 +48,12 @@ export function LiquidsOverflowMenu(
     <Flex
       position={POSITION_ABSOLUTE}
       zIndex={12}
-      right={location.pathname === '/liquids' ? SPACING.spacing12 : '3.125rem'}
-      top={`calc(${NAV_HEIGHT} - 6px)`}
+      right={
+        formData != null || location.pathname === '/liquids'
+          ? '23.4rem'
+          : SPACING.spacing12
+      }
+      top={`calc(${NAV_HEIGHT} + 3.1rem)`}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
