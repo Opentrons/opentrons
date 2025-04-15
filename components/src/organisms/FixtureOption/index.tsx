@@ -40,7 +40,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       backgroundColor={COLORS.grey20}
       borderRadius={BORDERS.borderRadius4}
     >
-      <StyledText css={TYPOGRAPHY.pSemiBold}>{optionName}</StyledText>
+      <StyledText desktopStyle="bodyDefaultSemiBold">{optionName}</StyledText>
       <TertiaryButton
         buttonType="primary"
         onClick={onClickHandler}

@@ -14,15 +14,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getCutoutDisplayName,
   ABSORBANCE_READER_V1,
-  SINGLE_CENTER_CUTOUTS,
-  WASTE_CHUTE_CUTOUT,
+  getCutoutDisplayName,
   getFixtureDisplayName,
-  MAGNETIC_BLOCK_V1,
   getModuleType,
+  MAGNETIC_BLOCK_V1,
   MODULE_MODELS,
+  SINGLE_CENTER_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { useKitchen } from '../Kitchen/hooks'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
@@ -269,7 +269,12 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           marginTop="1.44rem"
           marginBottom="0.56rem"
         >
-          <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
+          <StyledText
+            css={GO_BACK_BUTTON_STYLE}
+            desktopStyle="bodyDefaultRegular"
+          >
+            {t('go_back')}
+          </StyledText>
         </Btn>
       ) : null}
     </Modal>
