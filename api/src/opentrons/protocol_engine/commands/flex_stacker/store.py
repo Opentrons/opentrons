@@ -13,7 +13,10 @@ from ..command import (
     SuccessData,
     DefinedErrorData,
 )
-from ..flex_stacker.common import FlexStackerStallOrCollisionError
+from ..flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+)
 from ...errors import (
     ErrorOccurrence,
     CannotPerformModuleAction,
@@ -27,7 +30,10 @@ from ...types import (
     InStackerHopperLocation,
 )
 
-from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+)
 from opentrons.calibration_storage.helpers import uri_from_details
 
 
@@ -94,7 +100,8 @@ class StoreResult(BaseModel):
 
 _ExecuteReturn = Union[
     SuccessData[StoreResult],
-    DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerStallOrCollisionError]
+    | DefinedErrorData[FlexStackerShuttleError],
 ]
 
 
@@ -198,6 +205,20 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         except FlexStackerStallError as e:
             return DefinedErrorData(
                 public=FlexStackerStallOrCollisionError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=e,
+                        )
+                    ],
+                ),
+            )
+        except FlexStackerShuttleMissingError as e:
+            return DefinedErrorData(
+                public=FlexStackerShuttleError(
                     id=self._model_utils.generate_id(),
                     createdAt=self._model_utils.get_timestamp(),
                     wrappedErrors=[

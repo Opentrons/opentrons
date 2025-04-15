@@ -8,13 +8,6 @@ import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-import {
-  getLoadedLabware,
-  getLabwareDisplayLocation,
-} from '@opentrons/components'
-import { ERROR_KINDS } from '../constants'
-import { getErrorKind } from '../utils'
-
 import type {
   DisplayLocationSlotOnlyParams,
   WellGroup,
@@ -28,10 +21,20 @@ import type {
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
   MoveLabwareRunTimeCommand,
+  FlexStackerRetrieveRunTimeCommand,
   LabwareLocation,
+  LoadedModule,
 } from '@opentrons/shared-data'
+
+import {
+  getLoadedLabware,
+  getLabwareDisplayLocation,
+} from '@opentrons/components'
+import { ERROR_KINDS } from '../constants'
+import { getErrorKind } from '../utils'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
+import type { ErrorKind } from '../types'
 
 interface UseFailedLabwareUtilsProps {
   failedCommand: FailedCommandBySource | null
@@ -70,6 +73,8 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   relevantPickUpTipWellName: string | null
   /* Names of the labware from which the last tip was picked up before failure, if any. */
   relevantPickUpTipLwNames: LabwareNames
+  /* Details relating to the labware quantity in the stacker. */
+  labwareQuantity: string | null
 }
 
 /** Utils for labware relating to the failedCommand.
@@ -80,6 +85,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
  *
  * Depending on the error kind, the information provided by the failed command may overlap with the information
  * provided by the relevant pickup tip command.
+ * For stacker errors the labware is the labware set by flexStacker/setStoredLabwre.
  */
 export function useFailedLabwareUtils({
   failedCommand,
@@ -89,6 +95,8 @@ export function useFailedLabwareUtils({
   runRecord,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
+  const errorKind = getErrorKind(failedCommand)
+
   const recentRelevantFailedLabwareCmd = useMemo(
     () =>
       getRelevantFailedLabwareCmdFrom({
@@ -108,9 +116,10 @@ export function useFailedLabwareUtils({
       getFailedCmdRelevantLabware(
         protocolAnalysis,
         recentRelevantFailedLabwareCmd,
+        errorKind,
         runRecord
       ),
-    [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key]
+    [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key, errorKind]
   )
   const relevantPickUpTipCmdDetails = useMemo(
     () =>
@@ -145,7 +154,14 @@ export function useFailedLabwareUtils({
     failedLabware,
     failedCommandByRunRecord,
     runRecord,
+    errorKind,
   })
+
+  const labwareQuantity = getFailedLabwareQuantity(
+    runCommands,
+    recentRelevantFailedLabwareCmd,
+    errorKind
+  )
 
   return {
     ...tipSelectionUtils,
@@ -162,6 +178,7 @@ export function useFailedLabwareUtils({
       name: relevantPickUpTipCmdDetails?.name ?? undefined,
       nickName: relevantPickUpTipCmdDetails?.nickname ?? undefined,
     },
+    labwareQuantity,
   }
 }
 
@@ -171,6 +188,7 @@ type FailedCommandRelevantLabware =
   | Omit<LiquidProbeRunTimeCommand, 'result'>
   | Omit<PickUpTipRunTimeCommand, 'result'>
   | Omit<MoveLabwareRunTimeCommand, 'result'>
+  | Omit<FlexStackerRetrieveRunTimeCommand, 'result'>
   | null
 
 interface RelevantFailedLabwareCmd {
@@ -196,8 +214,8 @@ export function getRelevantFailedLabwareCmdFrom({
       return getRelevantPickUpTipCommand(failedCommandByRunRecord, runCommands)
     case ERROR_KINDS.GRIPPER_ERROR:
       return failedCommandByRunRecord as MoveLabwareRunTimeCommand
-    case ERROR_KINDS.GENERAL_ERROR:
-      return null
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+      return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
         `useFailedLabwareUtils: No labware associated with error kind ${errorKind}. Handle case explicitly.`
@@ -313,32 +331,95 @@ function useTipSelectionUtils(
   }
 }
 
+export function getFailedLabwareQuantity(
+  runCommands: CommandsData | undefined,
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
+  errorKind: ErrorKind
+): string | null {
+  if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING && runCommands != null) {
+    const failedCommandIndex = runCommands?.data.findIndex(
+      x => x.id === recentRelevantFailedLabwareCmd?.id
+    )
+    const commandsBeforefailedCmd = runCommands?.data.slice(
+      0,
+      failedCommandIndex ?? 0
+    )
+    const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
+      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+    )
+    const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
+      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+    )
+    const itemsToCheck = commandsBeforefailedCmd?.slice(
+      setStoredLabwareLastIndex ?? 0,
+      failedCommandIndex ?? 0
+    )
+
+    if (
+      setStoredLabwareLast != null &&
+      'initialCount' in setStoredLabwareLast.params
+    ) {
+      const total = setStoredLabwareLast?.params.initialCount ?? 0
+      const retreiveCmds =
+        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/retrieve')
+          .length ?? 0
+      const storeCmds =
+        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
+          .length ?? 0
+      return 'Quantity: ' + (total - retreiveCmds + storeCmds)
+    } else {
+      return 'Quantity: 0'
+    }
+  }
+  return null
+}
+
 // Get the name of the relevant labware relevant to the failed command, if any.
 export function getFailedCmdRelevantLabware(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
+  errorKind: ErrorKind,
   runRecord?: Run
 ): { name: string | null; nickname: string | null } | null {
   const lwDefsByURI = getLoadedLabwareDefinitionsByUri(
     protocolAnalysis?.commands ?? []
   )
-  const labwareNickname =
-    protocolAnalysis != null
-      ? getLoadedLabware(
-          protocolAnalysis.labware,
-          recentRelevantFailedLabwareCmd?.params.labwareId || ''
-        )?.displayName ?? null
-      : null
-  const failedLWURI = runRecord?.data.labware.find(
-    labware => labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
-  )?.definitionUri
-  if (failedLWURI != null && Object.keys(lwDefsByURI).includes(failedLWURI)) {
-    return {
-      name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
-      nickname: labwareNickname,
-    }
-  } else {
-    return null
+  let labwareNickname, failedLWURI
+  switch (errorKind) {
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+      for (const key in lwDefsByURI) {
+        if (lwDefsByURI.hasOwnProperty(key)) {
+          labwareNickname = getLabwareDisplayName(lwDefsByURI[key])
+          break
+        }
+      }
+      return {
+        name: labwareNickname ?? '',
+        nickname: labwareNickname ?? null,
+      }
+    default:
+      labwareNickname =
+        protocolAnalysis != null
+          ? getLoadedLabware(
+              protocolAnalysis.labware,
+              recentRelevantFailedLabwareCmd?.params.labwareId || ''
+            )?.displayName ?? null
+          : null
+      failedLWURI = runRecord?.data.labware.find(
+        labware =>
+          labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
+      )?.definitionUri
+      if (
+        failedLWURI != null &&
+        Object.keys(lwDefsByURI).includes(failedLWURI)
+      ) {
+        return {
+          name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
+          nickname: labwareNickname,
+        }
+      } else {
+        return null
+      }
   }
 }
 
@@ -362,7 +443,7 @@ export function getRelevantWellName(
   if (
     failedPipetteInfo == null ||
     recentRelevantPickUpTipCmd == null ||
-    recentRelevantPickUpTipCmd.commandType === 'moveLabware'
+    !('wellName' in recentRelevantPickUpTipCmd.params)
   ) {
     return ''
   }
@@ -386,27 +467,49 @@ export type GetRelevantLwLocationsParams = Pick<
 > & {
   failedLabware: UseFailedLabwareUtilsResult['failedLabware']
   failedCommandByRunRecord: FailedCommandBySource['byRunRecord'] | null
+  errorKind: ErrorKind
 }
 
 export function useRelevantFailedLwLocations({
   failedLabware,
   failedCommandByRunRecord,
   runRecord,
+  errorKind,
 }: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
   const { t } = useTranslation('protocol_command_text')
 
+  const loadedModules = runRecord?.data?.modules ?? []
   const BASE_DISPLAY_PARAMS: Omit<DisplayLocationSlotOnlyParams, 'location'> = {
     loadedLabwares: runRecord?.data?.labware ?? [],
-    loadedModules: runRecord?.data?.modules ?? [],
+    loadedModules,
     robotType: FLEX_ROBOT_TYPE,
     t,
     detailLevel: 'slot-only',
     isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.
   }
 
+  let location
+  switch (errorKind) {
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+      if (
+        failedCommandByRunRecord?.params != null &&
+        'moduleId' in failedCommandByRunRecord?.params
+      ) {
+        location = {
+          moduleId: failedCommandByRunRecord?.params.moduleId,
+        }
+      } else {
+        location = null
+      }
+      break
+    default:
+      location = failedLabware?.location ?? null
+      break
+  }
+
   const displayNameCurrentLoc = getLabwareDisplayLocation({
     ...BASE_DISPLAY_PARAMS,
-    location: failedLabware?.location ?? null,
+    location: location,
   })
 
   const getNewLocation = (): Pick<
@@ -421,6 +524,21 @@ export function useRelevantFailedLwLocations({
             location: failedCommandByRunRecord.params.newLocation,
           }),
           newLoc: failedCommandByRunRecord.params.newLocation,
+        }
+      case 'flexStacker/retrieve':
+      case 'flexStacker/store':
+        return {
+          displayNameNewLoc: getLabwareDisplayLocation({
+            ...BASE_DISPLAY_PARAMS,
+            location:
+              loadedModules.find(
+                (m: LoadedModule) =>
+                  m.id === failedCommandByRunRecord?.params.moduleId
+              )?.location ?? 'offDeck',
+          }),
+          newLoc: {
+            moduleId: failedCommandByRunRecord?.params.moduleId,
+          },
         }
       default:
         return {

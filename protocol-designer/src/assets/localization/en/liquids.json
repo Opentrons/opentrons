@@ -1,7 +1,7 @@
 {
   "add_liquid": "Add liquid",
   "add": "Add",
-  "apply_liquid_classes": "Apply liquid class settings for this transfer",
+  "apply_liquid_classes": "Apply liquid class settings for this {{command}}",
   "assigned_liquid": "Assigned to {{liquidName}}",
   "clear_selected_wells": "Clear selected wells",
   "clear_wells": "Clear wells",
@@ -25,11 +25,13 @@
   "liquids_added": "Liquids added",
   "liquids": "Liquids",
   "microliters": "µL",
+  "mix": "mix",
   "name": "Name",
   "no_liquids_added": "No liquids added",
   "no_liquids_defined": "No liquids defined",
   "save": "Save",
   "save_or_cancel": "Save or cancel changes to proceed",
   "select_wells_to_add": "Select wells to add liquid",
+  "transfer": "transfer",
   "well": "Well"
 }

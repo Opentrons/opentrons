@@ -28,6 +28,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    recoveryMap,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -36,6 +37,8 @@ export function TwoColLwInfoAndDeck(
     MANUAL_REPLACE_AND_RETRY,
     HOME_AND_RETRY,
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
+    MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
@@ -43,6 +46,7 @@ export function TwoColLwInfoAndDeck(
     relevantPickUpTipLabware,
   } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
+  const { step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
@@ -77,6 +81,14 @@ export function TwoColLwInfoAndDeck(
           })
         }
       }
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return t('ensure_stacker_has_labware')
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
+          return t('load_labware_into_labware_shuttle')
+        } else {
+          return t('ensure_stacker_has_labware')
+        }
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -85,7 +97,7 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
-  const buildBannerText = (): string => {
+  const buildBannerText = (): string | null => {
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
       case MANUAL_REPLACE_AND_RETRY.ROUTE:
@@ -98,6 +110,14 @@ export function TwoColLwInfoAndDeck(
           ? t('replace_tips_and_select_loc_partial_tip')
           : t('replace_tips_and_select_location')
       }
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return t('make_sure_loaded_correct_number_of_labware_stacker')
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
+          return null
+        } else {
+          return t('make_sure_loaded_correct_number_of_labware_stacker')
+        }
       default:
         console.error(
           `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -114,7 +134,20 @@ export function TwoColLwInfoAndDeck(
         return 'location-arrow-location'
       default:
       case MANUAL_REPLACE_AND_RETRY.ROUTE:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return 'location'
+    }
+  }
+
+  const buildLayoutType = (): ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['layout'] => {
+    switch (selectedRecoveryOption) {
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return 'stacked'
+      default:
+        return 'default'
     }
   }
 
@@ -195,6 +228,7 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
+          layout={buildLayoutType()}
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>

@@ -4,7 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from itertools import chain
 import logging
-from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple
+from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple, List
 from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (

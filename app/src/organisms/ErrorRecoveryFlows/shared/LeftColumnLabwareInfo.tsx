@@ -7,8 +7,9 @@ import type { RecoveryContentProps } from '../types'
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
   type: ComponentProps<typeof InterventionContent>['infoProps']['type']
+  layout: ComponentProps<typeof InterventionContent>['infoProps']['layout']
   /* Renders a warning InlineNotification if provided. */
-  bannerText?: string
+  bannerText?: string | null
 }
 // TODO(jh, 06-12-24): EXEC-500 & EXEC-501.
 // The left column component adjacent to RecoveryDeckMap/TipSelection.
@@ -16,6 +17,7 @@ export function LeftColumnLabwareInfo({
   title,
   failedLabwareUtils,
   type,
+  layout,
   bannerText,
   recoveryMap,
 }: LeftColumnLabwareInfoProps): JSX.Element {
@@ -25,8 +27,13 @@ export function LeftColumnLabwareInfo({
     relevantPickUpTipLwNames,
     failedLabwareLocations,
     relevantPickUpTipLwLocs,
+    labwareQuantity,
   } = failedLabwareUtils
-  const { displayNameNewLoc } = failedLabwareLocations
+  const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
+  const {
+    MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
+  } = RECOVERY_MAP
 
   const buildNewLocation = (): ComponentProps<
     typeof InterventionContent
@@ -64,11 +71,46 @@ export function LeftColumnLabwareInfo({
     }
   }
 
+  const buildCurrentLocation = (): ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['currentLocationProps'] => {
+    switch (step) {
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
+        return {
+          deckLabel: displayNameCurrentLoc.toUpperCase(),
+        }
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        return {
+          deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
+        }
+      default:
+        return {
+          deckLabel: displayNameCurrentLoc.toUpperCase(),
+        }
+    }
+  }
+
+  const buildQuntity = (): string | null => {
+    switch (step) {
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
+        return labwareQuantity
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        return null
+      default:
+        return labwareQuantity
+    }
+  }
+
+  // build info props
   return (
     <InterventionContent
       headline={title}
       infoProps={{
-        layout: 'default',
+        layout: layout,
+        tagText: buildQuntity(),
+        subText: undefined, // where do we get the lid data from?
         type,
         newLocationProps: buildNewLocation(),
         ...buildInfoNames(),
