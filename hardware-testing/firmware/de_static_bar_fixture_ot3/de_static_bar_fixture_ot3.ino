@@ -6,36 +6,49 @@
 #define PIN_STATE_OFF (LOW)
 #define ON_TIME_MS (1000)
 
+#define PIN_INPUT_PULL_UP (8)
+#define PIN_INPUT_GND (9)
+#define BUTTON_STATE_PRESSED (LOW)
+#define BUTTON_STATE_UNPRESSED (HIGH)
+#define BUTTON_UPDATE_MS (20)
+
 String TRIGGER = "enable";
 uint8_t trigger_idx = 0;
 unsigned long triggered_timestamp = 0;
+uint8_t button_state = BUTTON_STATE_UNPRESSED;
+unsigned long button_timestamp = 0;
 
-bool is_scary_static_bar_timer_running() {
-  if (!triggered_timestamp) {
+bool is_enabled() {
+  unsigned long now = millis();
+  if (now < ON_TIME_MS) {
     return false;
   }
-  return (millis() - triggered_timestamp < ON_TIME_MS);
+  return (now - triggered_timestamp < ON_TIME_MS);
 }
 
-void turn_on_the_scary_static_bar_timer() {
-  digitalWrite(PIN_OUTLET, PIN_STATE_ON);
-  triggered_timestamp = millis();
+bool button_loop() {
+    uint8_t new_button_state = digitalRead(PIN_INPUT_PULL_UP);
+    uint8_t prev_button_state = button_state;
+    button_state = new_button_state;
+    if (new_button_state == BUTTON_STATE_UNPRESSED || prev_button_state == BUTTON_STATE_PRESSED) {
+        return false;
+    }
+    unsigned long now = millis();
+    unsigned long time_diff = (now - button_timestamp);
+    button_timestamp = now;
+    if (time_diff < BUTTON_UPDATE_MS) {
+        return false;
+    }
+    return true;
 }
 
-void empty_serial_buffer() {
-  while (Serial.available()) {
-    Serial.read();
-    delay(2);
-  }
-}
-
-bool check_serial_for_trigger() {
+bool serial_loop() {
   if (!Serial.available()) {
     return false;
   }
   char c = Serial.read();
   if (c == '?') {
-    if (is_scary_static_bar_timer_running()) {
+    if (is_enabled()) {
       Serial.println("on");
     } else {
       Serial.println("off");
@@ -48,7 +61,10 @@ bool check_serial_for_trigger() {
   }
   if (trigger_idx == TRIGGER.length()) {
     trigger_idx = 0;
-    empty_serial_buffer();
+    while (Serial.available()) {
+      Serial.read();
+      delay(2);
+    }
     return true;
   } else {
     return false;
@@ -57,18 +73,23 @@ bool check_serial_for_trigger() {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(PIN_OUTLET, OUTPUT);
+  pinMode(PIN_OUTLET, OUTPUT);  // red LEDs
+  pinMode(PIN_INPUT_PULL_UP, INPUT_PULLUP);  // momentary button, pressing drops pin to LOW
+  pinMode(PIN_INPUT_GND, OUTPUT);
+  digitalWrite(PIN_INPUT_GND, LOW);
 }
 
 void loop() {
-  // if the timer is OFF, always explicitely write the GPIO to OFF
-  // to be on the safe side of things...
-  if (!is_scary_static_bar_timer_running()) {
-    digitalWrite(PIN_OUTLET, PIN_STATE_OFF);
+  bool serial_trigger = serial_loop();  // run each loop
+  bool button_trigger = button_loop();  // run each loop
+  if (is_enabled()) {
+    return;  // ignore triggers while enabled
   }
-  // if timer is currently OFF and trigger is received, turn timer ON
-  // else if timer is currently ON, empty the serial buffer (ignoring messages)
-  if (check_serial_for_trigger() && !is_scary_static_bar_timer_running()) {
-    turn_on_the_scary_static_bar_timer();
+  if (serial_trigger || button_trigger) {
+    digitalWrite(PIN_OUTLET, PIN_STATE_ON);  // enable
+    triggered_timestamp = millis();
+  }
+  else {
+    digitalWrite(PIN_OUTLET, PIN_STATE_OFF);  // disable
   }
 }
