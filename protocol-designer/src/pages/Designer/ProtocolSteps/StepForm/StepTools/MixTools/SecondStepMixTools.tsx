@@ -162,6 +162,7 @@ export function SecondStepMixTools({
               zField="mix_mmFromBottom"
               xField="mix_x_position"
               yField="mix_y_position"
+              referenceField="mix_position_reference"
               labwareId={
                 formData[getLabwareFieldForPositioningField('mix_mmFromBottom')]
               }

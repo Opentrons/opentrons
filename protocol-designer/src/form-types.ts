@@ -505,6 +505,7 @@ export type ReferenceFields =
   | 'dispense_submerge_position_reference'
   | 'aspirate_retract_position_reference'
   | 'dispense_retract_position_reference'
+  | 'mix_position_reference'
 
 export type DelayCheckboxFields =
   | 'aspirate_delay_checkbox'
