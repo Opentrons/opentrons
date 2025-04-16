@@ -18,7 +18,7 @@ describe('getMoveLiquidDelayData', () => {
     ).toBe(null)
   })
 
-  it.only('should return null if either seconds field is <= 0 or null, or if offset field is negative', () => {
+  it('should return null if either seconds field is <= 0 or null, or if offset field is negative', () => {
     const cases = [
       [0, 5],
       [null, 5],
