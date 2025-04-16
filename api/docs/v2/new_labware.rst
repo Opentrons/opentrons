@@ -364,7 +364,7 @@ You can also use :py:meth:`.Labware.load_empty` to label individual wells or an 
         
 .. versionadded:: 2.14
     Use ``Well.load_liquid()`` to label liquid in individual wells. 
-.. versionchanged:: 2.22
+.. versionadded:: 2.22
     Use ``Labware.load_liquid``, ``Labware.load_liquid_by_well``, or ``Labware.load_empty`` to label liquid in individual wells or an entire labware. 
 
 This information is available after you import your protocol to the app or send it to Flex. A summary of liquids appears on the protocol detail page, and well-by-well detail is available on the run setup page (under Initial Liquid Setup in the app, or under Liquids on Flex).
