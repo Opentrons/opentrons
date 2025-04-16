@@ -9,13 +9,13 @@ import type {
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
 } from '../../../form-types'
-export function getMoveLiquidDelayData(args: {
+
+export const getMoveLiquidDelayData = (args: {
   hydratedFormData: HydratedMoveLiquidFormData
   secondsField: DelaySecondsMoveLiquidFields
   zPositionField: DelayZPositionFields
-
   checkboxField?: DelayCheckboxMoveLiquidFields
-}): InnerDelayArgs | null {
+}): InnerDelayArgs | null => {
   const { hydratedFormData, checkboxField, secondsField, zPositionField } = args
   const checkbox =
     checkboxField != null ? hydratedFormData[checkboxField] ?? false : true
@@ -32,11 +32,12 @@ export function getMoveLiquidDelayData(args: {
 
   return null
 }
-export function getMixDelayData(
+
+export const getMixDelayData = (
   hydratedFormData: HydratedMixFormData,
   checkboxField: DelayCheckboxBaseFields,
   secondsField: DelaySecondsBaseFields
-): number | null {
+): number | null => {
   const checkbox = hydratedFormData[checkboxField]
   const seconds = hydratedFormData[secondsField]
 
