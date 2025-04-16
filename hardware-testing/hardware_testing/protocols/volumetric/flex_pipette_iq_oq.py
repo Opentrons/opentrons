@@ -320,7 +320,7 @@ def load_liquid_dye(
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     if ctx.params.use_waste_chute:  # type: ignore[attr-defined]
-        ctx.load_waste_chute(SLOTS["trash"])
+        ctx.load_waste_chute()
     else:
         ctx.load_trash_bin(SLOTS["trash"])
 
