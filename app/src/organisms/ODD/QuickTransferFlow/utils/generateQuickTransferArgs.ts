@@ -428,7 +428,7 @@ export function generateQuickTransferArgs(
         aspirateDelay:
           quickTransferState.delayAspirate != null
             ? {
-                seconds: quickTransferState.delayAspirate?.delayDuration,
+                seconds: quickTransferState.delayAspirate.delayDuration,
                 mmFromBottom:
                   quickTransferState.delayAspirate.positionFromBottom,
               }
@@ -436,7 +436,7 @@ export function generateQuickTransferArgs(
         dispenseDelay:
           quickTransferState.delayDispense != null
             ? {
-                seconds: quickTransferState.delayDispense?.delayDuration,
+                seconds: quickTransferState.delayDispense.delayDuration,
                 mmFromBottom:
                   quickTransferState.delayDispense.positionFromBottom,
               }
