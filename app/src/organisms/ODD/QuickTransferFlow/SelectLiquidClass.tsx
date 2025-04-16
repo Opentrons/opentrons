@@ -9,7 +9,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
+} from '@opentrons/shared-data'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { LiquidClass } from '@opentrons/shared-data'
@@ -48,12 +51,37 @@ export function SelectLiquidClass({
   }
 
   const liquidClassOptions = [noLiquidClass, ...Object.values(liquidClasses)]
-
-  console.log('liquidClassOptions', liquidClassOptions)
-
   const handleClickNext = (): void => {
-    // dispatch to set pipette path
+    dispatch({ type: 'SET_LIQUID_CLASS', liquidClass: selectedLiquidClass })
     onNext()
+  }
+
+  console.log(liquidClassOptions)
+  const checkTipRackExist = (tipTypes: string[], target: string): boolean => {
+    return tipTypes.some(item => {
+      const parts = item.split('/')
+      return parts.length === 3 && parts[1] === target
+    })
+  }
+
+  const checkCompatibility = (liquid: LiquidClass): boolean => {
+    const { liquidClassName, byPipette } = liquid
+    if (liquidClassName === 'none') return false
+    if (state?.pipette === undefined || state?.tipRack === undefined)
+      return true
+    const pipetteModels = byPipette.map(pipette => pipette.pipetteModel)
+    const tipTypes = byPipette.flatMap(pipette =>
+      pipette.byTipType.map(tipType => tipType.tiprack)
+    )
+
+    const attachedPipetteModel: string = getFlexNameConversion(state?.pipette)
+    const isPipetteCompatible = pipetteModels.includes(attachedPipetteModel)
+    const isTipRackCompatible = checkTipRackExist(
+      tipTypes,
+      state.tipRack.parameters.loadName
+    )
+
+    return isPipetteCompatible && isTipRackCompatible
   }
 
   return (
@@ -90,6 +118,7 @@ export function SelectLiquidClass({
             onChange={() => {
               setSelectedLiquidClass(option)
             }}
+            disabled={checkCompatibility(option)}
           />
         ))}
       </Flex>

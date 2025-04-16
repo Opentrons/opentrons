@@ -91,6 +91,7 @@ export interface QuickTransferSummaryState {
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
+  liquidClass: LiquidClass
 }
 
 export type TransferType =
@@ -109,6 +110,7 @@ export type QuickTransferWizardAction =
   | SetPipettePath
   | SetChangeTip
   | SetDropTipLocation
+  | SetLiquidClassAction
 
 export type QuickTransferSummaryAction =
   | SetAspirateFlowRateAction
@@ -205,6 +207,12 @@ interface SetDropTipLocation {
   type: typeof ACTIONS.SET_DROP_TIP_LOCATION
   location: CutoutConfig
 }
+
+interface SetLiquidClassAction {
+  type: typeof ACTIONS.SET_LIQUID_CLASS
+  liquidClass: LiquidClass
+}
+
 interface SelectPipetteAction {
   type: typeof ACTIONS.SELECT_PIPETTE
   mount: Mount
