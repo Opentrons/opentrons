@@ -73,7 +73,6 @@ export function getLabwareLocationFromSequence(
     locationSequence,
     detailLevel = 'full',
   } = params
-  console.log('locationSequence: ', locationSequence)
   return locationSequence.reduce<LocationResult>(
     (acc, sequenceItem, index) => {
       if (sequenceItem.kind === 'notOnDeck') {

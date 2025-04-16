@@ -41,7 +41,6 @@ const getLabwareDisplayName = (labwareUri: string, allRunDefs: any): string => {
     (def: LabwareDefinition2 | LabwareDefinition3) =>
       getLabwareDefURI(def) === labwareUri
   )
-  // const currentLabwareDef = getAllLabwareDefs()[labwareUri]
   return currentLabwareDef?.metadata.displayName ?? null
 }
 

@@ -88,27 +88,18 @@ export function getLabwareDisplayLocation(
         case THERMOCYCLER_MODULE_V2:
           return t('slot', { slot_name: 'A1+B1' })
         case FLEX_STACKER_MODULE_V1:
-          if (slotName === 'D3') {
-            return t('stacker_display_name', { stacker_slot: 'A' })
-          } else if (slotName === 'C3') {
-            return t('stacker_display_name', { stacker_slot: 'B' })
-          } else if (slotName === 'B3') {
-            return t('stacker_display_name', { stacker_slot: 'C' })
-          } else return t('stacker_display_name', { stacker_slot: 'D' })
-
+          return t('stacker_display_name', {
+            stacker_slot: getSlotColumn(slotName),
+          })
         default:
           return t('slot', { slot_name: slotName })
       }
     } else {
       switch (moduleModel) {
         case FLEX_STACKER_MODULE_V1:
-          if (slotName === 'D3') {
-            return t('stacker_column_display_name', { stacker_slot: 'A' })
-          } else if (slotName === 'C3') {
-            return t('stacker_column_display_name', { stacker_slot: 'B' })
-          } else if (slotName === 'B3') {
-            return t('stacker_column_display_name', { stacker_slot: 'C' })
-          } else return t('stacker_column_display_name', { stacker_slot: 'D' })
+          return t('stacker_column_display_name', {
+            stacker_slot: getSlotColumn(slotName),
+          })
         default:
           return isOnDevice
             ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
@@ -144,6 +135,16 @@ export function getLabwareDisplayLocation(
   } else {
     return ''
   }
+}
+
+function getSlotColumn(slotName: string): string {
+  if (slotName === 'D3') {
+    return 'D'
+  } else if (slotName === 'C3') {
+    return 'C'
+  } else if (slotName === 'B3') {
+    return 'B'
+  } else return 'A'
 }
 
 // Sometimes we don't want to show the actual slotName, so we special case the text here.
