@@ -1,14 +1,13 @@
 import mapValues from 'lodash/mapValues'
+import { getAllLabwareDefs } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
-import { getOnlyLatestDefs } from '../../labware-defs'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
-import {
-  getAllLabwareDefs,
-  type LabwareDefinition2,
-  type LabwareDefinitionsByUri,
-  type LoadLiquidCreateCommand,
-  type ProtocolFileV6,
+import type {
+  LabwareDefinition2,
+  LabwareDefinitionsByUri,
+  LoadLiquidCreateCommand,
+  ProtocolFileV6,
 } from '@opentrons/shared-data'
 import type {
   LoadPipetteCreateCommand,
