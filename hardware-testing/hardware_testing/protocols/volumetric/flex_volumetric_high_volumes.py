@@ -156,28 +156,24 @@ def _get_aspirate_mode_for_well(well: Well) -> _AspirateMode:
 
 
 def _legacy_src_dest_from_liquid_class_props(
-        pipette: InstrumentContext, src_well: Well, dest_wells: List[Well], cls_in_use: LiquidClass
+    pipette: InstrumentContext,
+    src_well: Well,
+    dest_wells: List[Well],
+    cls_in_use: LiquidClass,
 ) -> Tuple[Location, List[Location]]:
     cls_props = cls_in_use.get_for(pipette, pipette.tip_racks[0])
-    print(1)
-    input(Well.__repr__(dest_wells[0]))
     assert (
-            cls_props.aspirate.position_reference
-            == cls_props.dispense.position_reference
-            == PositionReference.LIQUID_MENISCUS
+        cls_props.aspirate.position_reference
+        == cls_props.dispense.position_reference
+        == PositionReference.LIQUID_MENISCUS
     )
     _src_loc = src_well.meniscus(
         target=DEFAULT_TIP_MENISCUS_TARGET, z=cls_props.aspirate.offset.z
     )
     _dest_wells: List[Location] = [
-        w.meniscus(
-            target=DEFAULT_TIP_MENISCUS_TARGET,
-            z=cls_props.dispense.offset.z
-        )
+        w.meniscus(target=DEFAULT_TIP_MENISCUS_TARGET, z=cls_props.dispense.offset.z)
         for w in dest_wells
     ]
-    print(2)
-    input(Well.__repr__(_dest_wells[0].labware))  # FIXME: wtf is LabwareLike ???
     return _src_loc, _dest_wells
 
 
@@ -258,7 +254,7 @@ class _TestTrial:
             _pick_up_tip_and_zero_min_height(ctx, pipette)
 
         if ctx.params.use_liquid_classes:
-            pipette.transfer_liquid(
+            pipette.transfer_with_liquid_class(
                 add_liquid_class,
                 volume=self.ul_to_add / pipette.channels,
                 source=src,
@@ -267,28 +263,18 @@ class _TestTrial:
             )
         else:
             # NOTE: use liquid-class properties to control legacy behavior
-            print(0)
-            input(Well.__repr__(self.test_well))
             src_loc, dest_loc_list = _legacy_src_dest_from_liquid_class_props(
                 pipette, src, [self.test_well], add_liquid_class
             )
-            print(3)
-            input(Well.__repr__(dest_loc_list[0].labware))
             assert len(dest_loc_list) == 1, f"{len(dest_loc_list)}"
             dest_loc = dest_loc_list[0]
-            assert cast(Well, dest_loc.labware) == self.test_well, f"{dest_loc.labware} != {self.test_well}"
-            print(dest_loc.labware)
-            print(self.test_well)
-            print_count = 0
-            while self.test_well.current_liquid_volume() < self.ul_to_add:
-                ul = min(self.ul_to_add / pipette.channels, pipette.max_volume)
-                if print_count < 3:
-                    print_count += 1
-                    print(f"dispensing {ul} ul into {dest_loc.labware} "
-                          f"(current liquid volume is {dest_loc.labware.current_liquid_volume()} ul)")
-                pipette.aspirate(ul, src_loc)
-                pipette.dispense(ul, dest_loc)
+            remains_ul = self.ul_to_add - self.test_well.current_liquid_volume()
+            while remains_ul > 0.0:
+                ul_per_channel = min(remains_ul / pipette.channels, pipette.max_volume)
+                pipette.aspirate(ul_per_channel, src_loc)
+                pipette.dispense(ul_per_channel, dest_loc)
                 pipette.prepare_to_aspirate()
+                remains_ul = self.ul_to_add - self.test_well.current_liquid_volume()
         pipette.drop_tip()
 
         # REMOVE DYE FROM TEST-LABWARE
@@ -304,7 +290,7 @@ class _TestTrial:
 
         # MULTI-DISPENSE TO PLATE
         if ctx.params.use_liquid_classes:
-            pipette.distribute_liquid(
+            pipette.distribute_with_liquid_class(
                 remove_liquid_class,
                 volume=self.dispense_ul,
                 source=self.test_well,
@@ -779,7 +765,7 @@ def run(ctx: ProtocolContext) -> None:
     if channels == 96:
         dests = [dests]
     for dest in dests:
-        pipette.distribute_liquid(
+        pipette.distribute_with_liquid_class(
             water_cls,
             volume=shared_dispense_ul,
             source=water_src_well,
