@@ -30,6 +30,8 @@ const render = (props: ComponentProps<typeof HardwareConfigurator>) => {
 const values = {
   fixtures: {},
   hasGripper: false,
+  hasThermocycler: false,
+  hasWasteChute: false,
   fields: {
     name: '',
     description: '',
