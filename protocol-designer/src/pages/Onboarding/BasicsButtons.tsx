@@ -43,7 +43,7 @@ export function BasicsButtons(props: BasicButtonsProps): JSX.Element {
             }}
           />
           <RadioButton
-            id={`${type}_no`}
+            id={`BasicsButtons_${type}_no`}
             buttonLabel={t('no')}
             buttonValue="no"
             isSelected={isSelected === false}

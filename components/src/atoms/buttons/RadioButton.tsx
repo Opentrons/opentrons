@@ -122,6 +122,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel
+        data-testid={id}
         tabIndex={0}
         isLarge={isLarge}
         maxLines={maxLines}
