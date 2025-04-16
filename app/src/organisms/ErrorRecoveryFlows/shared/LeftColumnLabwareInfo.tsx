@@ -1,8 +1,8 @@
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { ComponentProps } from 'react'
 import type { RecoveryContentProps } from '../types'
-import { RECOVERY_MAP } from '../constants'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
@@ -20,15 +20,16 @@ export function LeftColumnLabwareInfo({
   layout,
   bannerText,
   recoveryMap,
-}: LeftColumnLabwareInfoProps): JSX.Element | null {
+}: LeftColumnLabwareInfoProps): JSX.Element {
+  const { step, route } = recoveryMap
   const {
-    failedLabwareName,
-    failedLabwareNickname,
+    failedLabwareNames,
+    relevantPickUpTipLwNames,
     failedLabwareLocations,
+    relevantPickUpTipLwLocs,
     labwareQuantity,
   } = failedLabwareUtils
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
-  const { step } = recoveryMap
   const {
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
@@ -42,28 +43,57 @@ export function LeftColumnLabwareInfo({
       ? { deckLabel: displayNameNewLoc.toUpperCase() }
       : undefined
 
-  const buildCurrentLocation = (): ComponentProps<
-    typeof InterventionContent
-  >['infoProps']['currentLocationProps'] => {
-    switch (step) {
-      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
-        return {
-          deckLabel: displayNameCurrentLoc.toUpperCase(),
-        }
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
-        return {
-          deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
-        }
-      default:
-        return {
-          deckLabel: displayNameCurrentLoc.toUpperCase(),
-        }
+  const buildInfoNames = (): {
+    labwareName: string
+    labwareNickname: string | undefined
+    currentLocationProps: { deckLabel: string }
+  } => {
+    if (
+      route === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE &&
+      (step ===
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS ||
+        step === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS)
+    ) {
+      return {
+        labwareName: relevantPickUpTipLwNames.name ?? '',
+        labwareNickname: relevantPickUpTipLwNames.nickName,
+        currentLocationProps: {
+          deckLabel: relevantPickUpTipLwLocs.displayNameCurrentLoc.toUpperCase(),
+        },
+      }
+    } else {
+      switch (step) {
+        case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
+        case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
+          return {
+            labwareName: failedLabwareNames.name ?? '',
+            labwareNickname: failedLabwareNames.nickName,
+            currentLocationProps: {
+              deckLabel: displayNameCurrentLoc.toUpperCase(),
+            },
+          }
+        case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
+          return {
+            labwareName: failedLabwareNames.name ?? '',
+            labwareNickname: failedLabwareNames.nickName,
+            currentLocationProps: {
+              deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
+            },
+          }
+        default:
+          return {
+            labwareName: failedLabwareNames.name ?? '',
+            labwareNickname: failedLabwareNames.nickName,
+            currentLocationProps: {
+              deckLabel: failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
+            },
+          }
+      }
     }
   }
 
-  const buildQuntity = (): string | null => {
+  const buildQuantity = (): string | null => {
     switch (step) {
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
@@ -83,13 +113,11 @@ export function LeftColumnLabwareInfo({
       headline={title}
       infoProps={{
         layout: layout,
-        tagText: buildQuntity(),
+        tagText: buildQuantity(),
         subText: undefined, // where do we get the lid data from?
         type,
-        labwareName: failedLabwareName ?? '',
-        labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: buildCurrentLocation(),
         newLocationProps: buildNewLocation(),
+        ...buildInfoNames(),
       }}
       notificationProps={
         bannerText ? { type: 'alert', heading: bannerText } : undefined

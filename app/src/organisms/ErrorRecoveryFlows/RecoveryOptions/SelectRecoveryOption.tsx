@@ -62,35 +62,54 @@ export function SelectRecoveryOptionHome({
   useCurrentTipStatus(determineTipStatus)
 
   return (
-    <RecoverySingleColumnContentWrapper
-      footerDetails={{
-        primaryBtnOnClick: () => {
-          analytics.reportActionSelectedEvent(selectedRoute)
-          setSelectedRecoveryOption(selectedRoute)
-          void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-        },
-      }}
-    >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
-          oddStyle="level4HeaderSemiBold"
-          desktopStyle="headingSmallBold"
-          css={ODD_SECTION_TITLE_STYLE}
-        >
-          {t('choose_a_recovery_action')}
-        </StyledText>
-        <RecoveryOptions
-          validRecoveryOptions={validRecoveryOptions}
-          setSelectedRoute={setSelectedRoute}
-          selectedRoute={selectedRoute}
-          getRecoveryOptionCopy={getRecoveryOptionCopy}
-          errorKind={errorKind}
-          isOnDevice={isOnDevice}
-        />
-      </Flex>
-    </RecoverySingleColumnContentWrapper>
+    <Flex css={CONTAINER_STYLE}>
+      <RecoverySingleColumnContentWrapper
+        css={CONTENT_WRAPPER_OVERRIDE_STYLE}
+        footerDetails={{
+          primaryBtnOnClick: () => {
+            analytics.reportActionSelectedEvent(selectedRoute)
+            setSelectedRecoveryOption(selectedRoute)
+            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+          },
+          isSticky: true,
+        }}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText
+            oddStyle="level4HeaderSemiBold"
+            desktopStyle="headingSmallBold"
+            css={ODD_SECTION_TITLE_STYLE}
+          >
+            {t('choose_a_recovery_action')}
+          </StyledText>
+          <RecoveryOptions
+            validRecoveryOptions={validRecoveryOptions}
+            setSelectedRoute={setSelectedRoute}
+            selectedRoute={selectedRoute}
+            getRecoveryOptionCopy={getRecoveryOptionCopy}
+            errorKind={errorKind}
+            isOnDevice={isOnDevice}
+          />
+        </Flex>
+      </RecoverySingleColumnContentWrapper>
+    </Flex>
   )
 }
+
+const CONTAINER_STYLE = css`
+  width: 100%;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
+
+const CONTENT_WRAPPER_OVERRIDE_STYLE = css`
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing12};
+  }
+`
 
 interface RecoveryOptionsProps {
   validRecoveryOptions: RecoveryRoute[]
@@ -202,7 +221,8 @@ export const STALL_OR_COLLISION_OPTIONS: RecoveryRoute[] = [
 ]
 
 export const NO_LIQUID_DETECTED_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+  RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+  RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
   RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]

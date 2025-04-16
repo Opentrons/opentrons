@@ -18,6 +18,7 @@ import {
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC_DECK,
   UPDATE_LPC_LABWARE,
+  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
 } from '../constants'
 
 import type {
@@ -48,6 +49,7 @@ import type {
   LPCLabwareInfo,
   UpdateLPCLabwareAction,
   SavedOffsets,
+  ToggleDefaultOffsetInfoBanner,
 } from '../types'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
@@ -200,4 +202,11 @@ export const updateConflictTimestamp = (
 ): UpdateConflictTimestampAction => ({
   type: UPDATE_CONFLICT_TIMESTAMP,
   payload: { runId, info },
+})
+
+export const toggleDefaultOffsetInfoBanner = (
+  runId: string
+): ToggleDefaultOffsetInfoBanner => ({
+  type: TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
+  payload: { runId },
 })
