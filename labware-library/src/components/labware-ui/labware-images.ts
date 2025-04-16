@@ -477,12 +477,14 @@ export const labwareImages: Record<string, string[]> = {
   opentrons_flex_deck_riser: [
     new URL('../../images/opentrons_flex_deck_riser.png', import.meta.url).href,
   ],
-  evotip_flex_tall_adapter: [
-    new URL('../../images/opentrons_evotip_tall_adapter.png', import.meta.url)
+  ev_resin_tips_flex_tall_adapter: [
+    new URL('../../images/ev_resin_tips_flex_tall_adapter.png', import.meta.url)
       .href,
   ],
-  evotip_flex_short_adapter: [
-    new URL('../../images/opentrons_evotip_short_adapter.png', import.meta.url)
-      .href,
+  ev_resin_tips_flex_short_adapter: [
+    new URL(
+      '../../images/ev_resin_tips_flex_short_adapter.png',
+      import.meta.url
+    ).href,
   ],
 }
