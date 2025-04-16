@@ -95,7 +95,6 @@ export function useERUtils({
   // Note that pageLength: 999 is ok only because we fetch this on mount. We use 999 because it should hopefully
   // provide the commands necessary for ER without taxing the server too heavily. This is NOT intended for produciton!
   const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
-    cursor: 0,
     pageLength: 999,
   })
 
