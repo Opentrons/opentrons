@@ -116,6 +116,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     stepCountStr,
     currentStepContents,
   } = useRunProgressCopy({
+    runId,
     runStatus,
     robotType,
     currentStepNumber,

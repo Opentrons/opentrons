@@ -1,4 +1,4 @@
-"""Test evotip unseal commands."""
+"""Test pipette unseal commands."""
 
 from datetime import datetime
 
@@ -15,10 +15,10 @@ from opentrons.protocol_engine import (
     DeckPoint,
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.evotip_unseal_pipette import (
-    EvotipUnsealPipetteParams,
-    EvotipUnsealPipetteResult,
-    EvotipUnsealPipetteImplementation,
+from opentrons.protocol_engine.commands.unseal_pipette_from_tip import (
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipImplementation,
 )
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.errors.exceptions import TipAttachedError
@@ -62,7 +62,7 @@ def mock_model_utils(decoy: Decoy) -> ModelUtils:
 
 def test_drop_tip_params_defaults() -> None:
     """A drop tip should use a `WellOrigin.DROP_TIP` by default."""
-    default_params = EvotipUnsealPipetteParams.model_validate(
+    default_params = UnsealPipetteFromTipParams.model_validate(
         {"pipetteId": "abc", "labwareId": "def", "wellName": "ghj"}
     )
 
@@ -73,7 +73,7 @@ def test_drop_tip_params_defaults() -> None:
 
 def test_drop_tip_params_default_origin() -> None:
     """A drop tip should drop a `WellOrigin.DROP_TIP` by default even if an offset is given."""
-    default_params = EvotipUnsealPipetteParams.model_validate(
+    default_params = UnsealPipetteFromTipParams.model_validate(
         {
             "pipetteId": "abc",
             "labwareId": "def",
@@ -92,7 +92,7 @@ def evotips_definition() -> LabwareDefinition:
     """A fixturee of the evotips definition."""
     # TODO (chb 2025-01-29): When we migrate all labware to v3 we can clean this up
     return labware_definition_type_adapter.validate_python(
-        load_definition("evotip_flex_96_labware", 1)
+        load_definition("ev_resin_tips_flex_96_labware", 1)
     )
 
 
@@ -106,7 +106,7 @@ async def test_drop_tip_implementation(
     evotips_definition: LabwareDefinition,
 ) -> None:
     """A DropTip command should have an execution implementation."""
-    subject = EvotipUnsealPipetteImplementation(
+    subject = UnsealPipetteFromTipImplementation(
         state_view=mock_state_view,
         movement=mock_movement_handler,
         tip_handler=mock_tip_handler,
@@ -114,7 +114,7 @@ async def test_drop_tip_implementation(
         gantry_mover=gantry_mover,
     )
 
-    params = EvotipUnsealPipetteParams(
+    params = UnsealPipetteFromTipParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
@@ -154,7 +154,7 @@ async def test_drop_tip_implementation(
     result = await subject.execute(params)
 
     assert result == SuccessData(
-        public=EvotipUnsealPipetteResult(position=DeckPoint(x=111, y=222, z=333)),
+        public=UnsealPipetteFromTipResult(position=DeckPoint(x=111, y=222, z=333)),
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
@@ -192,8 +192,8 @@ async def test_tip_attached_error(
     gantry_mover: GantryMover,
     evotips_definition: LabwareDefinition,
 ) -> None:
-    """A Evotip Unseal command should have an execution implementation."""
-    subject = EvotipUnsealPipetteImplementation(
+    """An unseal command should have an execution implementation."""
+    subject = UnsealPipetteFromTipImplementation(
         state_view=mock_state_view,
         movement=mock_movement_handler,
         tip_handler=mock_tip_handler,
@@ -201,7 +201,7 @@ async def test_tip_attached_error(
         gantry_mover=gantry_mover,
     )
 
-    params = EvotipUnsealPipetteParams(
+    params = UnsealPipetteFromTipParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
@@ -264,8 +264,8 @@ async def test_stall_error(
     gantry_mover: GantryMover,
     evotips_definition: LabwareDefinition,
 ) -> None:
-    """A DropTip command should have an execution implementation."""
-    subject = EvotipUnsealPipetteImplementation(
+    """An unseal command should have an execution implementation."""
+    subject = UnsealPipetteFromTipImplementation(
         state_view=mock_state_view,
         movement=mock_movement_handler,
         tip_handler=mock_tip_handler,
@@ -273,7 +273,7 @@ async def test_stall_error(
         gantry_mover=gantry_mover,
     )
 
-    params = EvotipUnsealPipetteParams(
+    params = UnsealPipetteFromTipParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",

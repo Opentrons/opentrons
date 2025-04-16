@@ -144,16 +144,20 @@ def get_deck_slot_for_cutout_id(cutout_id: str) -> DeckSlotName:
     """Get the corresponding deck slot for an addressable area."""
     try:
         return CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
-    except KeyError:
-        raise CutoutDoesNotExistError(f"Could not find data for cutout {cutout_id}")
+    except KeyError as e:
+        raise CutoutDoesNotExistError(
+            f"Could not find data for cutout {cutout_id}"
+        ) from e
 
 
 def get_cutout_id_by_deck_slot_name(slot_name: DeckSlotName) -> str:
     """Get the Cutout ID of a given Deck Slot by Deck Slot Name."""
     try:
         return DECK_SLOT_TO_CUTOUT_MAP[slot_name]
-    except KeyError:
-        raise SlotDoesNotExistError(f"Could not find data for slot {slot_name.value}")
+    except KeyError as e:
+        raise SlotDoesNotExistError(
+            f"Could not find data for slot {slot_name.value}"
+        ) from e
 
 
 def get_labware_hosting_addressable_area_name_for_cutout_and_cutout_fixture(

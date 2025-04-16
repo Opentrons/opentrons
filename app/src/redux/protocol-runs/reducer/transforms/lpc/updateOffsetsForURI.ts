@@ -14,24 +14,17 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type {
-  ClearSelectedLabwareWorkingOffsetsAction,
   DefaultOffsetDetails,
-  FinalPositionAction,
-  InitialPositionAction,
   LocationSpecificOffsetDetails,
   LocationSpecificOffsetLocationDetails,
   LPCWizardState,
   LwGeometryDetails,
-  ResetLocationSpecificOffsetToDefaultAction,
 } from '../../../types'
-
-type PositionAction = InitialPositionAction | FinalPositionAction
-type ResetPositionAction = ResetLocationSpecificOffsetToDefaultAction
-
-type UpdateOffsetsAction =
-  | PositionAction
-  | ResetPositionAction
-  | ClearSelectedLabwareWorkingOffsetsAction
+import type {
+  UpdateOffsetsAction,
+  PositionAction,
+  ResetPositionAction,
+} from './types'
 
 // Handle vector position updates, only updating the appropriate working/existing offsets.
 export function updateOffsetsForURI(

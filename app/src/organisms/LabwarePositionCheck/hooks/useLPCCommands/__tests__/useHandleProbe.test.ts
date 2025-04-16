@@ -201,4 +201,17 @@ describe('useHandleProbeCommands', () => {
     expect(mockChainLPCCommands).toHaveBeenCalled()
     expect(mockOnSuccess).toHaveBeenCalled()
   })
+
+  it('should support toggling the unableToDetectProbe status', () => {
+    const { result, rerender } = renderHook(() =>
+      useHandleProbeCommands(mockProps)
+    )
+
+    expect(result.current.unableToDetect).toBe(false)
+    result.current.toggleUnableToDetectProbe()
+
+    rerender()
+
+    expect(result.current.unableToDetect).toBe(true)
+  })
 })

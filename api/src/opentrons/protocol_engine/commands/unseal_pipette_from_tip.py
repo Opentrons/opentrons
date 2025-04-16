@@ -1,4 +1,4 @@
-"""Unseal evotip resin tip command request, result, and implementation models."""
+"""Unseal tip from pipette command request, result, and implementation models."""
 
 from __future__ import annotations
 
@@ -32,10 +32,10 @@ if TYPE_CHECKING:
     from ..execution import MovementHandler, TipHandler, GantryMover
 
 
-EvotipUnsealPipetteCommandType = Literal["evotipUnsealPipette"]
+UnsealPipetteFromTipCommandType = Literal["unsealPipetteFromTip"]
 
 
-class EvotipUnsealPipetteParams(PipetteIdMixin):
+class UnsealPipetteFromTipParams(PipetteIdMixin):
     """Payload required to drop a tip in a specific well."""
 
     labwareId: str = Field(..., description="Identifier of labware to use.")
@@ -46,19 +46,19 @@ class EvotipUnsealPipetteParams(PipetteIdMixin):
     )
 
 
-class EvotipUnsealPipetteResult(DestinationPositionResult):
+class UnsealPipetteFromTipResult(DestinationPositionResult):
     """Result data from the execution of a DropTip command."""
 
     pass
 
 
 _ExecuteReturn = (
-    SuccessData[EvotipUnsealPipetteResult] | DefinedErrorData[StallOrCollisionError]
+    SuccessData[UnsealPipetteFromTipResult] | DefinedErrorData[StallOrCollisionError]
 )
 
 
-class EvotipUnsealPipetteImplementation(
-    AbstractCommandImpl[EvotipUnsealPipetteParams, _ExecuteReturn]
+class UnsealPipetteFromTipImplementation(
+    AbstractCommandImpl[UnsealPipetteFromTipParams, _ExecuteReturn]
 ):
     """Drop tip command implementation."""
 
@@ -77,7 +77,7 @@ class EvotipUnsealPipetteImplementation(
         self._model_utils = model_utils
         self._gantry_mover = gantry_mover
 
-    async def execute(self, params: EvotipUnsealPipetteParams) -> _ExecuteReturn:
+    async def execute(self, params: UnsealPipetteFromTipParams) -> _ExecuteReturn:
         """Move to and drop a tip using the requested pipette."""
         pipette_id = params.pipetteId
         labware_id = params.labwareId
@@ -122,33 +122,33 @@ class EvotipUnsealPipetteImplementation(
         )
 
         return SuccessData(
-            public=EvotipUnsealPipetteResult(position=move_result.public.position),
+            public=UnsealPipetteFromTipResult(position=move_result.public.position),
             state_update=move_result.state_update.set_fluid_unknown(
                 pipette_id=pipette_id
             ).update_pipette_tip_state(pipette_id=params.pipetteId, tip_geometry=None),
         )
 
 
-class EvotipUnsealPipette(
+class UnsealPipetteFromTip(
     BaseCommand[
-        EvotipUnsealPipetteParams, EvotipUnsealPipetteResult, StallOrCollisionError
+        UnsealPipetteFromTipParams, UnsealPipetteFromTipResult, StallOrCollisionError
     ]
 ):
-    """Evotip unseal command model."""
+    """Unseal pipette command model."""
 
-    commandType: EvotipUnsealPipetteCommandType = "evotipUnsealPipette"
-    params: EvotipUnsealPipetteParams
-    result: Optional[EvotipUnsealPipetteResult] = None
+    commandType: UnsealPipetteFromTipCommandType = "unsealPipetteFromTip"
+    params: UnsealPipetteFromTipParams
+    result: Optional[UnsealPipetteFromTipResult] = None
 
     _ImplementationCls: Type[
-        EvotipUnsealPipetteImplementation
-    ] = EvotipUnsealPipetteImplementation
+        UnsealPipetteFromTipImplementation
+    ] = UnsealPipetteFromTipImplementation
 
 
-class EvotipUnsealPipetteCreate(BaseCommandCreate[EvotipUnsealPipetteParams]):
-    """Evotip unseal command creation request model."""
+class UnsealPipetteFromTipCreate(BaseCommandCreate[UnsealPipetteFromTipParams]):
+    """Unseal pipette command creation request model."""
 
-    commandType: EvotipUnsealPipetteCommandType = "evotipUnsealPipette"
-    params: EvotipUnsealPipetteParams
+    commandType: UnsealPipetteFromTipCommandType = "unsealPipetteFromTip"
+    params: UnsealPipetteFromTipParams
 
-    _CommandCls: Type[EvotipUnsealPipette] = EvotipUnsealPipette
+    _CommandCls: Type[UnsealPipetteFromTip] = UnsealPipetteFromTip

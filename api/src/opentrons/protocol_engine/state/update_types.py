@@ -18,8 +18,8 @@ from opentrons.protocol_engine.types import (
     AspiratedFluid,
     LiquidClassRecord,
     ABSMeasureMode,
+    LiquidTrackingType,
 )
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
 from opentrons.types import MountType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType

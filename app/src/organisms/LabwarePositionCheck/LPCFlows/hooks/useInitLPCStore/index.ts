@@ -86,6 +86,10 @@ export function useInitLPCStore({
           lastStepIndices: null,
           currentSubstep: null,
         },
+        ui: {
+          showDefaultOffsetInfoBanner: true,
+          showSnackbar: null,
+        },
       }
 
       dispatch(updateLPC(runId, initialState))

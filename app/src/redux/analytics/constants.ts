@@ -122,3 +122,10 @@ export const ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS: 'languageUpdatedDe
 
 export const ANALYTICS_LPC_ANALYSIS_KIND: 'analytics:lpcAnalysisKind' =
   'analytics:lpcAnalysisKind'
+
+/**
+ * Module Actions Analytics
+ */
+
+export const ANALYTICS_MODULE_COMMAND_COMPLETED = 'moduleEventCompleted'
+export const ANALYTICS_MODULE_COMMAND_ERROR = 'moduleCommandError'

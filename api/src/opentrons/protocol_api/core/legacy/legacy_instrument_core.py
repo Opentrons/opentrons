@@ -22,7 +22,7 @@ from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
 
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from ...disposal_locations import TrashBin, WasteChute
 from ..instrument import AbstractInstrument
@@ -438,32 +438,6 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
                 location=location, mount=location_cache_mount
             )
 
-    def evotip_seal(
-        self,
-        location: types.Location,
-        well_core: LegacyWellCore,
-        in_place: Optional[bool] = False,
-    ) -> None:
-        """This will never be called because it was added in API 2.22."""
-        assert False, "evotip_seal only supported in API 2.22 & later"
-
-    def evotip_unseal(
-        self, location: types.Location, well_core: WellCore, home_after: Optional[bool]
-    ) -> None:
-        """This will never be called because it was added in API 2.22."""
-        assert False, "evotip_unseal only supported in API 2.22 & later"
-
-    def evotip_dispense(
-        self,
-        location: types.Location,
-        well_core: WellCore,
-        volume: Optional[float] = None,
-        flow_rate: Optional[float] = None,
-        push_out: Optional[float] = None,
-    ) -> None:
-        """This will never be called because it was added in API 2.22."""
-        assert False, "evotip_dispense only supported in API 2.22 & later"
-
     def get_mount(self) -> types.Mount:
         """Get the mount this pipette is attached to."""
         return self._mount
@@ -632,6 +606,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -646,6 +621,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -660,6 +636,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         dest: Tuple[types.Location, LegacyWellCore],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
