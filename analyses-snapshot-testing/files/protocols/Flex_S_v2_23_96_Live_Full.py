@@ -1,5 +1,5 @@
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
-metadata = {"protocolName": "96 Channel Full Config Live Test"}
+metadata = {"protocolName": "96 Channel Full Config Live Test NEVER"}
 
 
 def comment_tip_rack_status(ctx, tip_rack):
@@ -168,7 +168,7 @@ def run(ctx):
     liquid_class_name = ctx.params.liquid_class
     liquid_class = ctx.define_liquid_class(liquid_class_name)
     volume = 105
-    new_tip = "once"
+    new_tip = "never"
 
     ctx.comment(f"This test uses the liquid class: {liquid_class_name}.")
     ctx.comment(f"It will transfer, consolidate, and distribute liquid using the 96 channel pipette.")
@@ -219,6 +219,8 @@ def run(ctx):
     for dest in destinations:
         dest.load_empty(wells=dest.wells())
 
+    pipette_96.pick_up_tip()
+
     pipette_96.transfer_with_liquid_class(
         liquid_class=liquid_class,
         volume=volume,
@@ -259,3 +261,5 @@ def run(ctx):
 
     for dest in destinations:
         color_wells_with_liquid(dest, filled)
+
+    pipette_96.return_tip()

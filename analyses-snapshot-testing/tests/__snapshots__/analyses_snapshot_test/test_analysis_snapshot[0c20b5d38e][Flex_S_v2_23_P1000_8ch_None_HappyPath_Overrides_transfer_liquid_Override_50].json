@@ -5922,7 +5922,7 @@
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
-        "flowRate": 1.0,
+        "flowRate": 318.0,
         "pipetteId": "UUID",
         "volume": 1.0
       },
@@ -5987,7 +5987,7 @@
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
-        "flowRate": 1.0,
+        "flowRate": 318.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 1.0
@@ -6107,7 +6107,7 @@
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
-        "flowRate": 1.0,
+        "flowRate": 318.0,
         "pipetteId": "UUID",
         "volume": 1.0
       },
@@ -6231,7 +6231,7 @@
               "y": 0,
               "z": 2
             },
-            "positionReference": "well-top",
+            "positionReference": "well-bottom",
             "preWet": false,
             "retract": {
               "airGapByVolume": [
@@ -6707,7 +6707,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": -24.85
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -6718,23 +6718,9 @@
         "position": {
           "x": 23.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 6.55
         }
       },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "fdc37ed07a5fafbd9393af1999468c43",
-      "notes": [],
-      "params": {
-        "seconds": 0.0
-      },
-      "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -6743,7 +6729,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e8ac97b143c0fc48254c76426d643f30",
+      "key": "2a41c82bd6d40c67f90708c2c4f25258",
       "notes": [],
       "params": {
         "correctionVolume": -2.1799999999999997,
@@ -6762,7 +6748,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4f77b99618c348c77fd21fea075ede0b",
+      "key": "34a1318105b9baeef7f7a50a5d792904",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -6776,7 +6762,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3d0e8ff9e16c41b580189a65aecf47fd",
+      "key": "9170717f47e9662ec2bc5d9963c4ca0c",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -6809,7 +6795,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "78ccf22bd4a7946eff7f7290b89bc29e",
+      "key": "af0fc980b451ee29939b3286cf709fe5",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -6823,11 +6809,11 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6c3622c3e269b9b78d56fdda32831c8d",
+      "key": "cee9e5fafbd8fd52f069d77da1085c9d",
       "notes": [],
       "params": {
         "correctionVolume": -2.1,
-        "flowRate": 5.0,
+        "flowRate": 8.333333333333334,
         "pipetteId": "UUID",
         "volume": 5.0
       },
@@ -6842,7 +6828,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1edbba26721682a66d3819c5d8ce473f",
+      "key": "506f6bd2a253043ce96ac50bf3a3d9c4",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -6856,7 +6842,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "80e912fbf58e796a0af9122407052950",
+      "key": "b33cb64da3be6fed4aaafab03d682df5",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -6888,11 +6874,11 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "25eafc93cba7aee065a0a340c09eafb3",
+      "key": "280bffbb82f7e2601b0ac80d21a35f1e",
       "notes": [],
       "params": {
         "correctionVolume": -2.1,
-        "flowRate": 5.0,
+        "flowRate": 125.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 5.0
@@ -6908,7 +6894,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4bc09ab0631e06b19c4a92c5cab2b75c",
+      "key": "279dfa7fecf37f80a22ed7fbe2dcf7e3",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -6922,7 +6908,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "19ea29ed5c0e064fbc6a97fa1da81f4d",
+      "key": "75d5ce027c7e724ef8934ba611eed5bb",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -6955,7 +6941,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3c8b6b6a1f2f9db8bba7c975cbd4767d",
+      "key": "bd22794bbf9db7eccdf285ca62f9b56d",
       "notes": [],
       "params": {
         "correctionVolume": -2.1799999999999997,
@@ -6975,7 +6961,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "02076da52f69b63e6c606bdcd8a96aaa",
+      "key": "27afc42252948a5050774e47027d3796",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -6989,7 +6975,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5d4e0ec335bb9715092e003fc6146ae5",
+      "key": "200dd48a29b7ed5fc721ba5cd1e46806",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7022,7 +7008,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "602d8c85c619691e6c4637806f9d96f5",
+      "key": "a9229b2a095abfd444028ade1a2b44d6",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -7036,7 +7022,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1a29448d9b0ccc443878dab8d7f2a446",
+      "key": "192511fde537e20f28f4295331f96d5f",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -7050,11 +7036,11 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "127bcd725ecfd3778e41e542e1c898da",
+      "key": "9cd04eddde058792cdbe8538031052d4",
       "notes": [],
       "params": {
         "correctionVolume": -2.1,
-        "flowRate": 5.0,
+        "flowRate": 8.333333333333334,
         "pipetteId": "UUID",
         "volume": 5.0
       },
@@ -7069,7 +7055,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "01c7bdcb1c76589b9e945dea5c5d1a85",
+      "key": "c6c6b18d50da0a18e9c1b2023ed97c4b",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7083,7 +7069,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "57f4bd24ee63307215b7c9f3a6b20ccf",
+      "key": "7ced0a26be638d35c980e30727db830e",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -7112,7 +7098,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0ccf9908c936df5f04211a14851da3f7",
+      "key": "f75d2cd68fa0dbc1cd025d2800ef9b43",
       "notes": [],
       "params": {
         "homeAfter": false,
@@ -7127,7 +7113,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6bbbfb8305aa6ba32923b39967ee6ddb",
+      "key": "83e6b334bfd8492178dc88343b73e3f5",
       "notes": [],
       "params": {
         "liquidClassRecord": {
@@ -7464,7 +7450,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cb1607e009ffa6bd7acf06a5bd6e5b27",
+      "key": "63bd78adf38784b6c0d6936e3a03dd79",
       "notes": [],
       "params": {
         "labwareIds": [
@@ -7488,7 +7474,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "707c2fea5f4c642253999f3066bc33d7",
+      "key": "b0cec0fa588daf845aaba25af1f1dd5c",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -7521,7 +7507,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2d65244a33ef852fa7d1ff8def895b47",
+      "key": "7922c86022249b3aa0b6b9cec473fbf2",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -7553,7 +7539,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6d975a831930450fd535a1fb5cd53940",
+      "key": "0ed1dda695b7341eb327d01e7b2feeb5",
       "notes": [],
       "params": {
         "pipetteId": "UUID",
@@ -7569,7 +7555,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f0049fa330c1209dc28bdb8f4e9076c5",
+      "key": "e20492b3d0e8b7d4ec966b05d20eecf4",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -7583,7 +7569,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "52d44acc4443b22fd7b278e0f33b28b6",
+      "key": "00685ff3cec7de119ac0bac29cbf98c4",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -7615,7 +7601,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6aa7c06741a017ba28f176549bda902b",
+      "key": "018f28e824940c701273925ce2f665ee",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7648,7 +7634,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "054cfce73aa17c7bd075bec6bed49da3",
+      "key": "b3616dfb2096cbc3e8c32722409db3ba",
       "notes": [],
       "params": {
         "correctionVolume": -0.14,
@@ -7667,7 +7653,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "778bba82b75636a2761c2179dbc4b3a0",
+      "key": "5e557224df35df6e11e9353bfdca9ff2",
       "notes": [],
       "params": {
         "seconds": 2.0
@@ -7681,7 +7667,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e32613915df6253e282dd965458af725",
+      "key": "1659f95b791fd9f1f2ec6ff3b0011cea",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7714,7 +7700,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b4ca8e991affdbb3ada0a6666361ae9a",
+      "key": "0273c5f59fa682d50c891e955fde81da",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -7746,7 +7732,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d1369ba07e01da839c88bfbf1aba8486",
+      "key": "3e4f51bdc5132ecb483df6a9d5a85263",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7779,7 +7765,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c092d5d7edadb9f021ba0ed538c5f7c4",
+      "key": "d145b1509f6b8110f83a45c278977c98",
       "notes": [],
       "params": {
         "correctionVolume": -0.14,
@@ -7799,7 +7785,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "67fe9d0905abcf7442fd60205cc5ed34",
+      "key": "d58c4e00533ddd10f60fdbaa71098781",
       "notes": [],
       "params": {
         "seconds": 1.0
@@ -7813,7 +7799,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "aa45ff762157b77b1fe59ba51945b8d6",
+      "key": "414cf658585aa440413379c7879c1fec",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7846,7 +7832,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d4a067d9034a30bd3985a79e55cf9fc8",
+      "key": "e8c1e2d485e477a46913c0c77e032ce9",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -7860,7 +7846,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "27d4a6108a5f7b78079966f2036edf7b",
+      "key": "648efca3344660f726e3543dde363788",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -7889,7 +7875,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "69db3654c7307dfdf19885c7b62ff8de",
+      "key": "96e5411c47010b459664bbedfbaa0738",
       "notes": [],
       "params": {
         "homeAfter": false,
@@ -8330,7 +8316,7 @@
           "y": 0,
           "z": 2
         },
-        "positionReference": "well-top",
+        "positionReference": "well-bottom",
         "preWet": false,
         "retract": {
           "airGapByVolume": [
