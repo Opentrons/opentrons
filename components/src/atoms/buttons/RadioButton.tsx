@@ -46,6 +46,7 @@ interface RadioButtonProps extends StyleProps {
   // TODO wire up the error state for the radio button
   error?: string | null
   buttonSubLabel?: RadioButtonSubLabel
+  testid?: string
 }
 
 // used for ODD and helix
@@ -67,6 +68,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     maxLines = 1,
     setHovered,
     setNoHover,
+    testid,
   } = props
   const isLarge = radioButtonType === 'large'
 
@@ -122,7 +124,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel
-        data-testid={id}
+        data-testid={testid}
         tabIndex={0}
         isLarge={isLarge}
         maxLines={maxLines}

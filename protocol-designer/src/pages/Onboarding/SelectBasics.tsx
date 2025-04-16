@@ -25,8 +25,8 @@ import {
 } from '@opentrons/shared-data'
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
+import { BasicsButtons } from '../../components/molecules'
 import { WizardBody } from './WizardBody'
-import { BasicsButtons } from './BasicsButtons'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { WizardFixtureType } from '../../components/organisms'
 
@@ -391,7 +391,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 onChange={value => {
                   setValue('hasGripper', value)
                 }}
-                isSelected={hasGripper}
+                selected={hasGripper}
               />
               {hasGripper != null ? (
                 <Flex
@@ -404,7 +404,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                     onChange={value => {
                       handleSelectThermocycler(value)
                     }}
-                    isSelected={hasThermocycer}
+                    selected={hasThermocycer}
                   />
                   {hasThermocycer != null ? (
                     <BasicsButtons
@@ -413,7 +413,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                       onChange={value => {
                         handlSelectWasteChute(value)
                       }}
-                      isSelected={hasWasteChute}
+                      selected={hasWasteChute}
                     />
                   ) : null}
                 </Flex>
