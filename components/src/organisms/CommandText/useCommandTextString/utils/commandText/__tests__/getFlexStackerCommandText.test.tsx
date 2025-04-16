@@ -8,14 +8,14 @@ import {
   getFlexStackerCommandText,
   KEYS_BY_COMMAND_TYPE,
 } from '../getFlexStackerCommandText'
-import { getAllLabwareDefs } from '@opentrons/shared-data'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
 
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getLabwareDisplayLocation')
 
 const baseCommandData = {
-  allRunDefs: {},
+  allRunDefs: [{ metadata: { displayName: 'tip rack' } }, { metadata: { displayName: 'plate' } }],
   robotType: 'OT-2',
   commandTextData: {
     commands: [],
@@ -44,10 +44,7 @@ const render = (command: any) => {
 
 describe('getPipettingCommandText', () => {
   beforeEach(() => {
-    vi.mocked(getAllLabwareDefs).mockReturnValue({
-      'tiprack-uri': { metadata: { displayName: 'tip rack' } },
-      'plate-uri': { metadata: { displayName: 'plate' } },
-    } as any)
+    vi.mocked(getLabwareDefURI).mockReturnValue('tiprack-uri')
     vi.mocked(getLabwareDisplayLocation).mockReturnValue('Slot 1')
   })
 
