@@ -352,7 +352,7 @@ async def test_overpressure_error(
         )
     ).then_return(2)
     decoy.when(
-        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
             "funky-labware", "funky-well", "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
