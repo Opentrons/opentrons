@@ -12,7 +12,6 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
     BlowoutLocation,
 )
-from opentrons_shared_data.pipette.types import LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
 
 from opentrons.protocol_api._liquid_properties import (
     Submerge,
@@ -124,6 +123,26 @@ class TransferComponentsExecutor:
         tip_state: TipState,
         transfer_type: TransferType,
     ) -> None:
+        """Create a TransferComponentsExecutor instance.
+
+        One instance should be created to execute all the steps inside each of the
+        liquid class' transfer components- aspirate, dispense and multi-dispense.
+        The state of the TransferComponentsExecutor instance is expected to be valid
+        only for the component it was created.
+
+        For example, if we want to execute all the steps (submerge, dispense, retract, etc)
+        related to the 'dispense' component of a liquid-class based transfer, the class
+        will be used to initialize info about the dispense by assigning values
+        to class attributes as follows-
+        - target_location: the dispense location
+        - target_well: the well associated with dispense location
+        - tip_state: the state of the tip before dispense component steps are executed
+        - transfer_type: whether the dispense component is being called as a part of a
+                        1-to-1 transfer or a consolidation or a distribution
+
+        These attributes will remain the same throughout the component's execution,
+        except `tip_state`, which will keep updating as fluids are handled.
+        """
         self._instrument = instrument_core
         self._transfer_properties = transfer_properties
         self._target_location = target_location
@@ -140,7 +159,6 @@ class TransferComponentsExecutor:
         self,
         submerge_properties: Submerge,
         post_submerge_action: Literal["aspirate", "dispense"],
-        volume_for_pipette_mode_configuration: Optional[float],
     ) -> None:
         """Execute submerge steps.
 
@@ -153,41 +171,42 @@ class TransferComponentsExecutor:
         """
         submerge_start_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
+            well_volume_difference=0,
             position_reference=submerge_properties.start_position.position_reference,
             offset=submerge_properties.start_position.offset,
         )
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
         )
-        prep_before_moving_to_submerge = (
-            post_submerge_action == "aspirate"
-            and volume_for_pipette_mode_configuration is not None
-        )
-        if prep_before_moving_to_submerge:
-            # Move to the tip probe start position
-            self._instrument.move_to(
-                location=Location(
-                    point=self._target_well.get_top(
-                        LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z
-                    ),
-                    labware=self._target_location.labware,
-                ),
-                well_core=self._target_well,
-                force_direct=False,
-                minimum_z_height=None,
-                speed=None,
-            )
-            self._remove_air_gap(location=submerge_start_location)
-            if (
-                self._transfer_type != TransferType.MANY_TO_ONE
-                and self._instrument.get_liquid_presence_detection()
-            ):
-                self._instrument.liquid_probe_with_recovery(
-                    well_core=self._target_well, loc=submerge_start_location
-                )
-            # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
-            self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
-            self._instrument.prepare_to_aspirate()
+        # prep_before_moving_to_submerge = (
+        #     post_submerge_action == "aspirate"
+        #     and volume_for_pipette_mode_configuration is not None
+        # )
+        # if prep_before_moving_to_submerge:
+        #     # Move to the tip probe start position
+        #     self._instrument.move_to(
+        #         location=Location(
+        #             point=self._target_well.get_top(
+        #                 LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z
+        #             ),
+        #             labware=self._target_location.labware,
+        #         ),
+        #         well_core=self._target_well,
+        #         force_direct=False,
+        #         minimum_z_height=None,
+        #         speed=None,
+        #     )
+        #     self._remove_air_gap(location=submerge_start_location)
+        #     if (
+        #         self._transfer_type != TransferType.MANY_TO_ONE
+        #         and self._instrument.get_liquid_presence_detection()
+        #     ):
+        #         self._instrument.liquid_probe_with_recovery(
+        #             well_core=self._target_well, loc=submerge_start_location
+        #         )
+        #     # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
+        #     self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
+        #     self._instrument.prepare_to_aspirate()
         tx_utils.raise_if_location_inside_liquid(
             location=submerge_start_location,
             well_location=self._target_location,
@@ -205,8 +224,7 @@ class TransferComponentsExecutor:
             minimum_z_height=None,
             speed=None,
         )
-        if not prep_before_moving_to_submerge:
-            self._remove_air_gap(location=submerge_start_location)
+        self._remove_air_gap(location=submerge_start_location)
         self._instrument.move_to(
             location=self._target_location,
             well_core=self._target_well,
@@ -340,6 +358,7 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.aspirate.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
+            well_volume_difference=0,
             position_reference=retract_props.end_position.position_reference,
             offset=retract_props.end_position.offset,
         )
@@ -437,6 +456,7 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.dispense.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
+            well_volume_difference=0,
             position_reference=retract_props.end_position.position_reference,
             offset=retract_props.end_position.offset,
         )
@@ -579,6 +599,7 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.multi_dispense.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
+            well_volume_difference=0,
             position_reference=retract_props.end_position.position_reference,
             offset=retract_props.end_position.offset,
         )
@@ -836,10 +857,18 @@ class TransferComponentsExecutor:
 
 def absolute_point_from_position_reference_and_offset(
     well: WellCore,
+    well_volume_difference: float,
     position_reference: PositionReference,
     offset: Coordinate,
 ) -> Point:
-    """Return the absolute point, given the well, the position reference and offset."""
+    """Return the absolute point, given the well, the position reference and offset.
+
+    If using meniscus as the position reference, well_volume_difference should be specified.
+    `well_volume_difference` is the expected *difference* in well volume we want to consider
+    when estimating the height of the liquid meniscus after an aspirate/ dispense.
+    So, for liquid height estimation after an aspirate, well_volume_difference is
+    expected to be a -ve value while for a dispense, it will be a +ve value.
+    """
     match position_reference:
         case PositionReference.WELL_TOP:
             reference_point = well.get_top(0)
@@ -848,11 +877,16 @@ def absolute_point_from_position_reference_and_offset(
         case PositionReference.WELL_CENTER:
             reference_point = well.get_center()
         case PositionReference.LIQUID_MENISCUS:
-            meniscus_point = well.get_meniscus()
-            if not isinstance(meniscus_point, Point):
-                reference_point = well.get_center()
+            estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
+                operation_volume=well_volume_difference,
+            )
+            if isinstance(estimated_liquid_height, (float, int)):
+                reference_point = well.get_bottom(z_offset=estimated_liquid_height)
             else:
-                reference_point = meniscus_point
+                # If estimated liquid height gives a SimulatedProbeResult then
+                # assume meniscus is at well center.
+                # Will this cause more harm than good? Is there a better alternative to this?
+                reference_point = well.get_center()
         case _:
             raise ValueError(f"Unknown position reference {position_reference}")
     return reference_point + Point(offset.x, offset.y, offset.z)
