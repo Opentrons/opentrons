@@ -27,6 +27,7 @@
   "no_labware": "No labware",
   "no_liquids_defined": "Edit protocol to define liquids",
   "no_liquids": "No liquids",
+  "no_modules_added": "No modules added",
   "no_steps": "Edit protocol to define steps",
   "number_of_steps": "Number of steps",
   "protocol_metadata": "Protocol Metadata",

@@ -113,7 +113,7 @@ export function HardwareInfo({
             ))}
         </Flex>
       ) : (
-        <InfoScreen content={'no modules selected'} />
+        <InfoScreen content={t('no_modules_added')} />
       )}
     </Flex>
   )
