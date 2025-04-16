@@ -115,6 +115,7 @@ describe('form casting', () => {
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,
+      mix_position_reference: 'well-bottom',
     }
 
     expect(_castForm(input)).toEqual({

@@ -132,6 +132,8 @@ describe('generateRobotStateTimeline', () => {
           xOffset: 0,
           yOffset: 0,
           finalPushOut: 0,
+          zOffset: 0,
+          positionReference: 'well-bottom',
         },
       },
     }
