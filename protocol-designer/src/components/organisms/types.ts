@@ -19,4 +19,7 @@ export interface WizardFormState {
   modules: FormModules
   hasGripper: boolean | null
   fixtures: WizardFixtureType
+  //  used purely for the SelectBasics form buttons
+  hasThermocycler: boolean | null
+  hasWasteChute: boolean | null
 }

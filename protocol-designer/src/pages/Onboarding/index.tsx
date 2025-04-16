@@ -86,6 +86,8 @@ const initialFormState: WizardFormState = {
   modules: {},
   hasGripper: null,
   fixtures: {},
+  hasThermocycler: null,
+  hasWasteChute: null,
 }
 
 const pipetteValidationShape = Yup.object().shape({

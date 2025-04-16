@@ -47,9 +47,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const fixtures = watch('fixtures')
   const modules = watch('modules')
   const hasGripper = watch('hasGripper')
-
-  const [thermocycler, setThermocycler] = useState<boolean | null>(null)
-  const [wasteChute, setWasteChute] = useState<boolean | null>(null)
+  const hasThermocycer = watch('hasThermocycler')
+  const hasWasteChute = watch('hasWasteChute')
 
   const robotType = fields?.robotType
   const has96Channel = pipettesByMount.left.pipetteName === 'p1000_96'
@@ -68,9 +67,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const isDisabled =
     robotType == null ||
     noPipette ||
-    hasGripper == null ||
-    thermocycler == null ||
-    wasteChute == null
+    (robotType === FLEX_ROBOT_TYPE &&
+      (hasGripper == null || hasThermocycer == null || hasWasteChute == null))
 
   const resetPipetteFields = (): void => {
     setPipetteType(null)
@@ -104,7 +102,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
   useEffect(() => {
     handleScrollToBottom()
-  }, [hasGripper, thermocycler, wasteChute])
+  }, [hasGripper, hasThermocycer, hasWasteChute])
 
   const handleSwapMounts = (): void => {
     const leftPipetteName = pipettesByMount.left.pipetteName
@@ -135,7 +133,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
   const handlSelectWasteChute = (value: boolean): void => {
     if (value) {
-      setWasteChute(true)
       // If adding wasteChute, remove trashBin
       const updatedFixtures = Object.fromEntries(
         Object.entries(fixtures).filter(([_, val]) => val.name !== 'trashBin')
@@ -155,7 +152,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       )
       setValue('modules', updatedModules)
     } else {
-      setWasteChute(false)
       // If removing wasteChute, filter it out
       const filteredFixtures =
         fixtures != null
@@ -174,11 +170,11 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
       setValue('fixtures', filteredFixtures)
     }
+    setValue('hasWasteChute', value)
   }
 
   const handleSelectThermocycler = (value: boolean): void => {
     if (value) {
-      setThermocycler(true)
       //   first remove anything that might have been placed previous in slot A1/B1
       const updatedModules = Object.fromEntries(
         Object.entries(modules).filter(
@@ -195,7 +191,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       }
       setValue('modules', updatedModules)
     } else {
-      setThermocycler(false)
       const updatedModules = Object.fromEntries(
         Object.entries(modules).filter(
           ([_, value]) => value.type !== THERMOCYCLER_MODULE_TYPE
@@ -203,6 +198,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       )
       setValue('modules', updatedModules)
     }
+    setValue('hasThermocycler', value)
   }
 
   return (
@@ -408,16 +404,16 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                     onChange={value => {
                       handleSelectThermocycler(value)
                     }}
-                    isSelected={thermocycler}
+                    isSelected={hasThermocycer}
                   />
-                  {thermocycler != null ? (
+                  {hasThermocycer != null ? (
                     <BasicsButtons
                       type="wasteChute"
                       header={t('are_you_using_waste_chute')}
                       onChange={value => {
                         handlSelectWasteChute(value)
                       }}
-                      isSelected={wasteChute}
+                      isSelected={hasWasteChute}
                     />
                   ) : null}
                 </Flex>
