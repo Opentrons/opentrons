@@ -84,6 +84,12 @@ export function SelectLiquidClass({
     return isPipetteCompatible && isTipRackCompatible
   }
 
+  const handleClick = (option: LiquidClass): void => {
+    if (checkCompatibility(option)) {
+      console.log('handleClick')
+    }
+  }
+
   return (
     <Flex>
       <ChildNavigation
@@ -116,9 +122,14 @@ export function SelectLiquidClass({
             buttonValue={option.liquidClassName}
             buttonSubLabel={{ label: option.description, align: 'vertical' }}
             onChange={() => {
+              console.log('onChange')
               setSelectedLiquidClass(option)
             }}
-            disabled={checkCompatibility(option)}
+            onClick={() => {
+              handleClick(option)
+            }}
+            // disabled={checkCompatibility(option)}
+            ariaDisabled={checkCompatibility(option)}
           />
         ))}
       </Flex>
