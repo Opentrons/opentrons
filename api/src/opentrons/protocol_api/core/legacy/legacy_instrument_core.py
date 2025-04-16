@@ -367,6 +367,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
+        check_for_movement_conflicts: bool = False,
     ) -> None:
         """Move the instrument.
 
@@ -376,6 +377,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             force_direct: Force a direct movement instead of an arc.
             minimum_z_height: Set a minimum travel height for a movement arc.
             speed: Override the travel speed in mm/s.
+            check_for_movement_conflicts: Not used in legacy implementation
 
         Raises:
             LabwareHeightError: An item on the deck is taller than

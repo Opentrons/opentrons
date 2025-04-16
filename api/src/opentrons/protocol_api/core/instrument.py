@@ -190,6 +190,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
+        check_for_movement_conflicts: bool,
     ) -> None:
         ...
 
