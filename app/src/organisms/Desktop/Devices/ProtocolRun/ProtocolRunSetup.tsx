@@ -143,7 +143,8 @@ export function ProtocolRunSetup({
   }, [flexOffsetsApplied])
 
   const offsetsConfirmed = isFlex
-    ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
+    ? runHasStarted ||
+      (flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY))
     : !missingSteps.includes(LPC_STEP_KEY)
   const buildLPCIncompleteText = (): string | null => {
     if (isFlex) {
@@ -230,7 +231,9 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: ROBOT_CALIBRATION_STEP_KEY,
         complete: calibrationStatusRobot.complete,
-        completeText: t('calibration_ready'),
+        completeText: isFlex
+          ? t('instruments_attached')
+          : t('calibration_ready'),
         missingHardware: isMissingPipette,
         incompleteText: t('calibration_needed'),
         missingHardwareText: t('action_needed'),
@@ -259,10 +262,9 @@ export function ProtocolRunSetup({
           calibrationStatusModules.complete &&
           !isMissingModule &&
           !isFixtureMismatch,
-        completeText:
-          isFlex && hasModules
-            ? t('calibration_ready')
-            : t('deck_hardware_ready'),
+        completeText: isFlex
+          ? t('modules_and_fixtures_ready')
+          : t('modules_ready'),
         incompleteText:
           isFlex && hasModules ? t('calibration_needed') : t('action_needed'),
         missingHardware: isMissingModule || isFixtureMismatch,

@@ -18,6 +18,7 @@ export interface UseLPCHeaderCommandsResult {
   handleNavToDetachProbe: () => void
   handleCloseAndHome: () => void
   handleCloseWithoutHome: () => void
+  handleUnableToDetectProbe: () => void
 }
 
 // Wraps core LPC command functionality, since the header component reuses many of the same commands.
@@ -36,6 +37,7 @@ export function useLPCHeaderCommands({
     handleCloseNoHome,
     handleHomeAndClose,
     handleProbeAttachment,
+    toggleUnableToDetectProbe,
   } = LPCHandlerUtils
 
   const handleProceed = (): void => {
@@ -79,5 +81,6 @@ export function useLPCHeaderCommands({
     handleNavToDetachProbe,
     handleCloseAndHome,
     handleCloseWithoutHome,
+    handleUnableToDetectProbe: toggleUnableToDetectProbe,
   }
 }

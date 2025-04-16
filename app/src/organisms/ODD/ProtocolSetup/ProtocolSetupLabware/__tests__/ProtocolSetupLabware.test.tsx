@@ -16,6 +16,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis/getProtocolModulesInfo'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 import { ProtocolSetupLabware } from '..'
 import {
@@ -51,6 +52,7 @@ vi.mock('/app/transformations/commands', async importOriginal => {
 vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/analysis/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
+vi.mock('/app/redux-resources/analytics/hooks')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()
@@ -79,6 +81,9 @@ const render = () => {
 
 describe('ProtocolSetupLabware', () => {
   beforeEach(() => {
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
     mockCreateLiveCommand.mockResolvedValue(null)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -212,7 +217,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useModulesQuery).mockReturnValue(
       mockUseModulesQueryOpening as any
     )
-
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Opening...')
@@ -231,7 +235,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useModulesQuery).mockReturnValue(
       mockUseModulesQueryUnknown as any
     )
-
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Open')

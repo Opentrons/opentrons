@@ -21,10 +21,10 @@ from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.evotip_dispense import (
-    EvotipDispenseParams,
-    EvotipDispenseResult,
-    EvotipDispenseImplementation,
+from opentrons.protocol_engine.commands.pressure_dispense import (
+    PressureDispenseParams,
+    PressureDispenseResult,
+    PressureDispenseImplementation,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state.state import StateView
@@ -38,7 +38,7 @@ def evotips_definition() -> LabwareDefinition:
     """A fixturee of the evotips definition."""
     # TODO (chb 2025-01-29): When we migrate all labware to v3 we can clean this up
     return labware_definition_type_adapter.validate_python(
-        load_definition("evotip_flex_96_labware", 1)
+        load_definition("ev_resin_tips_flex_96_labware", 1)
     )
 
 
@@ -50,9 +50,9 @@ def subject(
     model_utils: ModelUtils,
     movement: MovementHandler,
     **kwargs: object,
-) -> EvotipDispenseImplementation:
+) -> PressureDispenseImplementation:
     """Build a command implementation."""
-    return EvotipDispenseImplementation(
+    return PressureDispenseImplementation(
         pipetting=pipetting,
         state_view=state_view,
         gantry_mover=gantry_mover,
@@ -61,13 +61,13 @@ def subject(
     )
 
 
-async def test_evotip_dispense_implementation(
+async def test_pressure_dispense_implementation(
     decoy: Decoy,
     movement: MovementHandler,
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
     state_view: StateView,
-    subject: EvotipDispenseImplementation,
+    subject: PressureDispenseImplementation,
     evotips_definition: LabwareDefinition,
 ) -> None:
     """It should dispense in place."""
@@ -75,7 +75,7 @@ async def test_evotip_dispense_implementation(
         origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
     )
 
-    data = EvotipDispenseParams(
+    data = PressureDispenseParams(
         pipetteId="pipette-id-abc123",
         labwareId="labware-id-abc123",
         wellName="A3",
@@ -124,7 +124,7 @@ async def test_evotip_dispense_implementation(
     result = await subject.execute(data)
 
     assert result == SuccessData(
-        public=EvotipDispenseResult(volume=100),
+        public=PressureDispenseResult(volume=100),
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id-abc123",

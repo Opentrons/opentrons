@@ -61,7 +61,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -76,7 +76,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
@@ -91,7 +91,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
@@ -106,7 +106,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -121,7 +121,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -136,7 +136,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
@@ -151,7 +151,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -166,7 +166,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(null)
+      useHandleClientAppliedOffsets(true, null)
     })
 
     expect(mockClearClientData).toHaveBeenCalled()
@@ -181,10 +181,18 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(null)
+      useHandleClientAppliedOffsets(true, null)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
+
+  it('should not dispatch if the robot is not a Flex', () => {
+    renderHook(() => {
+      useHandleClientAppliedOffsets(false, null)
+    })
+
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })

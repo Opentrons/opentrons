@@ -109,11 +109,6 @@ class AspirateWhileTrackingImplementation(
         current_location = self._state_view.pipettes.get_current_location()
 
         state_update = StateUpdate()
-        current_well = CurrentWell(
-            pipette_id=params.pipetteId,
-            labware_id=params.labwareId,
-            well_name=params.wellName,
-        )
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
@@ -121,7 +116,6 @@ class AspirateWhileTrackingImplementation(
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
-            current_well=current_well,
             operation_volume=-params.volume,
         )
         state_update.append(move_result.state_update)

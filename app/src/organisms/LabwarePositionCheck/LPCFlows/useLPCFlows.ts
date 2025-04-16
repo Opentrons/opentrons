@@ -23,13 +23,13 @@ import {
   useUpdateLabwareInfo,
   useMonitorMaintenanceRunForDeletion,
 } from './hooks'
+import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   LegacySupportLPCFlowsProps,
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
-import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -97,9 +97,9 @@ export function useLPCFlows({
   })
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
-  useUpdateDeckConfig(runId, deckConfig)
-  useUpdateLabwareInfo(runId, maintenanceRunId, labwareInfo)
-  useHandleClientAppliedOffsets(runId)
+  useUpdateDeckConfig(isFlex, runId, deckConfig)
+  useUpdateLabwareInfo(isFlex, runId, maintenanceRunId, labwareInfo)
+  useHandleClientAppliedOffsets(isFlex, runId)
   useInitLPCStore({
     runId,
     runRecord,
@@ -109,7 +109,7 @@ export function useLPCFlows({
     labwareDefs,
     labwareInfo,
     deckConfig,
-    robotType,
+    isFlex,
     flexStoredOffsets: flexOffsets,
   })
 
