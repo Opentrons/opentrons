@@ -105,7 +105,7 @@ export function useERUtils({
         protocolAnalysis?.commands ?? [],
         failedCommand?.byRunRecord ?? null
       ),
-    [protocolAnalysis != null, failedCommand]
+    [protocolAnalysis, failedCommand]
   )
 
   const analytics = useRecoveryAnalytics()
