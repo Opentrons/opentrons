@@ -1174,8 +1174,10 @@ export const pushOutVolumeOutOfRange = (
 export const conditioningVolumeRequired = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  const { conditioning_checkbox, conditioning_volume } = fields
-  return conditioning_checkbox && !conditioning_volume
+  const { conditioning_checkbox, conditioning_volume, path } = fields
+  return conditioning_checkbox &&
+    !conditioning_volume &&
+    path === 'multiDispense'
     ? CONDITIONING_VOLUME_REQUIRED
     : null
 }
@@ -1185,6 +1187,7 @@ export const conditioningVolumeOutOfRange = (
   labwareEntities?: LabwareEntities
 ): FormError | null => {
   const {
+    path,
     conditioning_checkbox,
     conditioning_volume,
     pipette,
@@ -1193,7 +1196,11 @@ export const conditioningVolumeOutOfRange = (
     disposalVolume_volume,
     tipRack,
   } = fields
-  if (pipette == null || conditioning_volume == null) {
+  if (
+    pipette == null ||
+    conditioning_volume == null ||
+    path !== 'multiDispense'
+  ) {
     return null
   }
   const maxConditioningVolume = getMaxConditioningVolume({

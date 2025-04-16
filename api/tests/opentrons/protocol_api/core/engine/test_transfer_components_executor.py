@@ -78,20 +78,32 @@ def patch_mock_raise_if_location_inside_liquid(
 """
 
 
+@pytest.mark.parametrize(
+    argnames=[
+        "air_gap_volume",
+        "air_gap_flow_rate_by_vol",
+        "expected_air_gap_flow_rate",
+    ],
+    argvalues=[(0.123, 123, 123), (1.23, 0.123, 1.23)],
+)
 def test_submerge_without_lpd(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     sample_transfer_props: TransferProperties,
+    air_gap_volume: float,
+    air_gap_flow_rate_by_vol: float,
+    expected_air_gap_flow_rate: float,
 ) -> None:
     """Should perform the expected submerge steps."""
     source_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 4)
     well_bottom_point = Point(4, 5, 6)
-    air_gap_removal_flow_rate = (
-        sample_transfer_props.dispense.flow_rate_by_volume.get_for_volume(123)
+    air_gap_correction_by_vol = 0.321
+    sample_transfer_props.dispense.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.dispense.correction_by_volume.get_for_volume(123)
+    sample_transfer_props.dispense.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
     )
 
     subject = TransferComponentsExecutor(
@@ -101,7 +113,9 @@ def test_submerge_without_lpd(
         target_well=source_well,
         tip_state=TipState(
             ready_to_aspirate=True,
-            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(liquid=0, air_gap=123),
+            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(
+                liquid=0, air_gap=air_gap_volume
+            ),
         ),
         transfer_type=TransferType.ONE_TO_ONE,
     )
@@ -126,12 +140,12 @@ def test_submerge_without_lpd(
         mock_instrument_core.dispense(
             location=Location(Point(x=2, y=4, z=7), labware=None),
             well_core=None,
-            volume=123,
+            volume=air_gap_volume,
             rate=1,
-            flow_rate=air_gap_removal_flow_rate,
+            flow_rate=expected_air_gap_flow_rate,
             in_place=True,
             push_out=0,
-            correction_volume=air_gap_correction_vol,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.5),
         mock_instrument_core.configure_for_volume(123),
@@ -173,12 +187,16 @@ def test_submerge_with_lpd(
     source_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 4)
     well_bottom_point = Point(4, 5, 6)
-    air_gap_removal_flow_rate = (
-        sample_transfer_props.dispense.flow_rate_by_volume.get_for_volume(123)
+    air_gap_flow_rate_by_vol = 1234
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.dispense.flow_rate_by_volume.set_for_volume(
+        123, air_gap_flow_rate_by_vol
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.dispense.correction_by_volume.get_for_volume(123)
+    sample_transfer_props.dispense.correction_by_volume.set_for_volume(
+        123, air_gap_correction_by_vol
     )
+
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
         transfer_properties=sample_transfer_props,
@@ -213,10 +231,10 @@ def test_submerge_with_lpd(
             well_core=None,
             volume=123,
             rate=1,
-            flow_rate=air_gap_removal_flow_rate,
+            flow_rate=air_gap_flow_rate_by_vol,
             in_place=True,
             push_out=0,
-            correction_volume=air_gap_correction_vol,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.5),
         mock_instrument_core.liquid_probe_with_recovery(
@@ -621,23 +639,36 @@ def test_pre_wet_disabled(
     )
 
 
+@pytest.mark.parametrize(
+    argnames=[
+        "air_gap_volume",
+        "air_gap_flow_rate_by_vol",
+        "expected_air_gap_flow_rate",
+    ],
+    argvalues=[(0.123, 123, 123), (1.23, 0.123, 1.23)],
+)
 def test_retract_after_aspiration(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     sample_transfer_props: TransferProperties,
+    air_gap_volume: float,
+    air_gap_flow_rate_by_vol: float,
+    expected_air_gap_flow_rate: float,
 ) -> None:
     """It should execute steps to retract from well after an aspiration."""
     source_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
+    air_gap_correction_by_vol = 0.321
 
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(40)
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        40, air_gap_volume
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
+    )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
     )
 
     subject = TransferComponentsExecutor(
@@ -688,8 +719,8 @@ def test_retract_after_aspiration(
         ),
         mock_instrument_core.air_gap_in_place(
             volume=air_gap_volume,
-            flow_rate=air_gap_volume,
-            correction_volume=air_gap_correction_vol,
+            flow_rate=expected_air_gap_flow_rate,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
     )
@@ -739,18 +770,23 @@ def test_retract_after_aspiration_without_touch_tip_and_delay(
     source_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        40, air_gap_volume
+    )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
+    )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
 
     sample_transfer_props.aspirate.retract.touch_tip.enabled = False
     sample_transfer_props.aspirate.retract.delay.enabled = False
 
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(40)
-    )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
-    )
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
         transfer_properties=sample_transfer_props,
@@ -780,8 +816,8 @@ def test_retract_after_aspiration_without_touch_tip_and_delay(
         ),
         mock_instrument_core.air_gap_in_place(
             volume=air_gap_volume,
-            flow_rate=air_gap_volume,
-            correction_volume=air_gap_correction_vol,
+            flow_rate=air_gap_flow_rate_by_vol,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
     )
@@ -796,15 +832,19 @@ def test_retract_after_aspiration_for_consolidate(
     source_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
 
     decoy.when(mock_instrument_core.get_current_volume()).then_return(12.3)
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(12.3)
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        12.3, air_gap_volume
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
+    )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
     )
 
     subject = TransferComponentsExecutor(
@@ -846,8 +886,8 @@ def test_retract_after_aspiration_for_consolidate(
         ),
         mock_instrument_core.air_gap_in_place(
             volume=air_gap_volume,
-            flow_rate=air_gap_volume,
-            correction_volume=air_gap_correction_vol,
+            flow_rate=air_gap_flow_rate_by_vol,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
     )
@@ -899,14 +939,20 @@ def test_retract_after_dispense_with_blowout_in_source(
     dest_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(0)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0, air_gap_volume
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
     )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
+
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
         transfer_properties=sample_transfer_props,
@@ -950,8 +996,8 @@ def test_retract_after_dispense_with_blowout_in_source(
         ),
         mock_instrument_core.air_gap_in_place(
             volume=air_gap_volume,
-            flow_rate=air_gap_volume,
-            correction_volume=air_gap_correction_vol,
+            flow_rate=air_gap_flow_rate_by_vol,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
         mock_instrument_core.set_flow_rate(blow_out=100),
@@ -981,8 +1027,8 @@ def test_retract_after_dispense_with_blowout_in_source(
             and [
                 mock_instrument_core.air_gap_in_place(  # type: ignore[func-returns-value]
                     volume=air_gap_volume,
-                    flow_rate=air_gap_volume,
-                    correction_volume=air_gap_correction_vol,
+                    flow_rate=air_gap_flow_rate_by_vol,
+                    correction_volume=air_gap_correction_by_vol,
                 ),
                 mock_instrument_core.delay(0.2),  # type: ignore[func-returns-value]
             ]
@@ -1006,14 +1052,20 @@ def test_retract_after_dispense_with_blowout_in_destination(
     dest_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(0)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0, air_gap_volume
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
     )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
+
     sample_transfer_props.dispense.retract.blowout.location = (
         BlowoutLocation.DESTINATION
     )
@@ -1076,8 +1128,8 @@ def test_retract_after_dispense_with_blowout_in_destination(
             and [
                 mock_instrument_core.air_gap_in_place(  # type: ignore[func-returns-value]
                     volume=air_gap_volume,
-                    flow_rate=air_gap_volume,
-                    correction_volume=air_gap_correction_vol,
+                    flow_rate=air_gap_flow_rate_by_vol,
+                    correction_volume=air_gap_correction_by_vol,
                 ),
                 mock_instrument_core.delay(0.2),  # type: ignore[func-returns-value]
             ]
@@ -1105,14 +1157,20 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
     trash_location = Location(Point(7, 8, 9), labware=trash_well)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(0)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0, air_gap_volume
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
     )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
+
     sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
 
     subject = TransferComponentsExecutor(
@@ -1158,8 +1216,8 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
         ),
         mock_instrument_core.air_gap_in_place(
             volume=air_gap_volume,
-            flow_rate=air_gap_volume,
-            correction_volume=air_gap_correction_vol,
+            flow_rate=air_gap_flow_rate_by_vol,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
         mock_instrument_core.set_flow_rate(blow_out=100),
@@ -1188,8 +1246,8 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
             and [
                 mock_instrument_core.air_gap_in_place(  # type: ignore[func-returns-value]
                     volume=air_gap_volume,
-                    flow_rate=air_gap_volume,
-                    correction_volume=air_gap_correction_vol,
+                    flow_rate=air_gap_flow_rate_by_vol,
+                    correction_volume=air_gap_correction_by_vol,
                 ),
                 mock_instrument_core.delay(0.2),  # type: ignore[func-returns-value]
             ]
@@ -1215,14 +1273,20 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
     trash_location = decoy.mock(cls=TrashBin)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(0)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0, air_gap_volume
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
     )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
+
     sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
 
     subject = TransferComponentsExecutor(
@@ -1267,8 +1331,8 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
         ),
         mock_instrument_core.air_gap_in_place(
             volume=air_gap_volume,
-            flow_rate=air_gap_volume,
-            correction_volume=air_gap_correction_vol,
+            flow_rate=air_gap_flow_rate_by_vol,
+            correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
         mock_instrument_core.set_flow_rate(blow_out=100),
@@ -1282,8 +1346,8 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
             and [
                 mock_instrument_core.air_gap_in_place(  # type: ignore[func-returns-value]
                     volume=air_gap_volume,
-                    flow_rate=air_gap_volume,
-                    correction_volume=air_gap_correction_vol,
+                    flow_rate=air_gap_flow_rate_by_vol,
+                    correction_volume=air_gap_correction_by_vol,
                 ),
                 mock_instrument_core.delay(0.2),  # type: ignore[func-returns-value]
             ]
@@ -1362,14 +1426,20 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
     dest_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
     sample_transfer_props.multi_dispense.retract.touch_tip.enabled = True  # type: ignore[union-attr]
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(0)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0, air_gap_volume
     )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
     )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
+
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
         transfer_properties=sample_transfer_props,
@@ -1426,8 +1496,8 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
                 mock_instrument_core.air_gap_in_place(
                     # type: ignore[func-returns-value]
                     volume=air_gap_volume,
-                    flow_rate=air_gap_volume,
-                    correction_volume=air_gap_correction_vol,
+                    flow_rate=air_gap_flow_rate_by_vol,
+                    correction_volume=air_gap_correction_by_vol,
                 ),
                 mock_instrument_core.delay(0.2),  # type: ignore[func-returns-value]
             ]
@@ -1468,16 +1538,23 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
     source_well = decoy.mock(cls=WellCore)
     dest_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0, air_gap_volume
+    )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
+    )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
+
     sample_transfer_props.multi_dispense.retract.touch_tip.enabled = True  # type: ignore[union-attr]
     sample_transfer_props.multi_dispense.retract.blowout.enabled = True  # type: ignore[union-attr]
-    air_gap_volume = (
-        sample_transfer_props.aspirate.retract.air_gap_by_volume.get_for_volume(0)
-    )
-    air_gap_correction_vol = (
-        sample_transfer_props.aspirate.correction_by_volume.get_for_volume(
-            air_gap_volume
-        )
-    )
+
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
         transfer_properties=sample_transfer_props,
@@ -1552,8 +1629,8 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
                 mock_instrument_core.air_gap_in_place(
                     # type: ignore[func-returns-value]
                     volume=air_gap_volume,
-                    flow_rate=air_gap_volume,
-                    correction_volume=air_gap_correction_vol,
+                    flow_rate=air_gap_flow_rate_by_vol,
+                    correction_volume=air_gap_correction_by_vol,
                 ),
                 mock_instrument_core.delay(0.2),  # type: ignore[func-returns-value]
             ]

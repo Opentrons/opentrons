@@ -43,7 +43,7 @@ export function ProtocolSetupOffsets(
       {showLPC ? (
         <LPCFlows {...lpcProps} />
       ) : (
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} width="100vw">
           <SetupOffsetsHeader {...props} />
           <SetupOffsetsTable {...props} />
           <FloatingActionButton
