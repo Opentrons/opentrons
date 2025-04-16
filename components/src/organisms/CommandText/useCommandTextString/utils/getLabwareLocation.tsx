@@ -63,8 +63,7 @@ export type GetLabwareLocationFromSequenceParams =
   | SequenceSlotOnlyParams
   | SequenceFullParams
 
-
-// we need to add a inStackerHopperLocation kind and return a column only 
+// we need to add a inStackerHopperLocation kind and return a column only
 export function getLabwareLocationFromSequence(
   params: GetLabwareLocationFromSequenceParams
 ): LocationResult {
@@ -107,12 +106,9 @@ export function getLabwareLocationFromSequence(
         const slotName = getSlotFromAddressableAreaName(
           sequenceItem.addressableAreaName as AddressableAreaName
         )
-        console.log("slotName: ", slotName)
         const moduleModel = getModuleModelFromAddressableArea(
           sequenceItem.addressableAreaName as AddressableAreaName
         )
-        console.log("moduleModel: ", moduleModel)
-
         return {
           ...acc,
           slotName,

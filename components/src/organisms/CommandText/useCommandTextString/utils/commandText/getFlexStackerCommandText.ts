@@ -27,7 +27,6 @@ export const KEYS_BY_COMMAND_TYPE: {
   'flexStacker/fill': 'flex_stacker_fill',
 }
 
-
 // inStackerHopperLocation -> colum location
 // onModule -> slot name (C4)
 type HandledCommands = Extract<
@@ -89,7 +88,7 @@ GetFlexStackerCommandText): string => {
       loadedLabwares: commandTextData?.labware ?? [],
       location: { moduleId: command.params?.moduleId },
       robotType,
-      allRunDefs,
+      detailLevel: 'slot-only',
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
@@ -118,7 +117,7 @@ GetFlexStackerCommandText): string => {
       loadedLabwares: commandTextData?.labware ?? [],
       location: { moduleId: command.params?.moduleId },
       robotType,
-      allRunDefs,
+      detailLevel: 'slot-only',
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
@@ -143,7 +142,7 @@ GetFlexStackerCommandText): string => {
       loadedLabwares: commandTextData?.labware ?? [],
       location: { moduleId: command.params?.moduleId },
       robotType,
-      allRunDefs,
+      detailLevel: 'slot-only',
       loadedModules: commandTextData?.modules ?? [],
       t,
     })

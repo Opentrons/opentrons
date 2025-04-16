@@ -44,7 +44,6 @@ export type DisplayLocationParams =
 // detailLevel applies to nested labware. If 'full', return copy that includes the actual peripheral that nests the
 // labware, ex, "in module XYZ in slot C1".
 // If 'slot-only', return only the slot name, ex "in slot C1".
-// pass in 'slot-only'
 export function getLabwareDisplayLocation(
   params: DisplayLocationParams
 ): string {
@@ -103,16 +102,21 @@ export function getLabwareDisplayLocation(
           return t('slot', { slot_name: slotName })
       }
     } else {
-      return isOnDevice
-        ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
-        : t('module_in_slot', {
-            count: getOccludedSlotCountForModule(
-              getModuleType(moduleModel),
-              params.robotType
-            ),
-            module: getModuleDisplayName(moduleModel),
-            slot_name: slotName,
-          })
+      switch (moduleModel) {
+        case FLEX_STACKER_MODULE_V1:
+          return t('slot', { slot_name: slotName })
+        default:
+          return isOnDevice
+            ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
+            : t('module_in_slot', {
+                count: getOccludedSlotCountForModule(
+                  getModuleType(moduleModel),
+                  params.robotType
+                ),
+                module: getModuleDisplayName(moduleModel),
+                slot_name: slotName,
+              })
+      }
     }
   }
   // Adapter locations
