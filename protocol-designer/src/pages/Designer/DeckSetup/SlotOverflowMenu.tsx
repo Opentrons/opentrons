@@ -271,6 +271,7 @@ export function SlotOverflowMenu(
         }}
       >
         <MenuItem
+          data-testid="SlotOverflowMenu_openTools"
           onClick={() => {
             addEquipment(location)
             setShowMenuList(false)

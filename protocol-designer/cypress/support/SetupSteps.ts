@@ -47,8 +47,8 @@ export enum SetupContent {
   ModulePageB = 'Place the modules and fixtures that you are using for this protocol onto the deck.',
   EditProtocol = 'Edit protocol',
   EditSlot = 'Edit slot',
-  AddLabwareToDeck = 'Add hardware/labware',
-  EditHardwareLabwareOnDeck = 'Edit hardware/labware',
+  AddLabwareToDeck = 'Add labware',
+  EditHardwareLabwareOnDeck = 'Edit labware',
   LabwareH = 'Labware',
   WellPlatesCat = 'Well plates',
   AddLiquid = 'Add liquid',
@@ -383,7 +383,7 @@ export const SetupSteps = {
    */
   AddHardwareLabware: (): StepThunk => ({
     call: () => {
-      cy.contains(SetupContent.AddLabwareToDeck).click({ force: true })
+      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
     },
   }),
 
@@ -392,7 +392,7 @@ export const SetupSteps = {
    */
   EditHardwareLabwareOnDeck: (): StepThunk => ({
     call: () => {
-      cy.contains(SetupContent.EditHardwareLabwareOnDeck).click()
+      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
     },
   }),
 
@@ -427,8 +427,6 @@ export const SetupSteps = {
   ChoseDeckSlotWithLabware: (deckslot: string): StepThunk => ({
     call: () => {
       chooseDeckSlot(deckslot)
-        .find('.Box-sc-8ozbhb-0.kIDovv')
-        .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
     },
@@ -1156,7 +1154,6 @@ export const CompositeSetupSteps = {
       )
       SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
       SetupSteps.AddHardwareLabware().call()
-      SetupSteps.ClickLabwareHeader().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
     },
