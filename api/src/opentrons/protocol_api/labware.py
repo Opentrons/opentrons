@@ -327,9 +327,7 @@ class Well:
         :param float volume: The volume of liquid to load, in µL.
 
         .. deprecated:: 2.22
-
-        In API version 2.22 and later, use :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`,
-            or :py:meth:`.Labware.load_empty` to load liquid into a well.
+            Use :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, or :py:meth:`.Labware.load_empty` instead.
 
         """
         self._core.load_liquid(
