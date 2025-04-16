@@ -17,6 +17,6 @@ export interface WizardFormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
   modules: FormModules
-  hasGripper: boolean
+  hasGripper: boolean | null
   fixtures: WizardFixtureType
 }

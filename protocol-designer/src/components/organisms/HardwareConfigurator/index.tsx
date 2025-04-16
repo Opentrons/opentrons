@@ -82,7 +82,7 @@ export function HardwareConfigurator(props: WizardTileProps): JSX.Element {
     setValue,
     modules,
     fixtures,
-    hasGripper
+    hasGripper ?? false
   )
 
   return (

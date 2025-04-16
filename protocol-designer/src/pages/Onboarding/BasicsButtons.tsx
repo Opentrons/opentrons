@@ -11,7 +11,7 @@ import {
 
 interface BasicButtonsProps {
   header: string
-  isSelected: boolean
+  isSelected: boolean | null
   onChange: (value: boolean) => void
   type: 'gripper' | 'wasteChute' | 'thermocycler'
   subHeader?: string
@@ -37,7 +37,7 @@ export function BasicsButtons(props: BasicButtonsProps): JSX.Element {
             id={`${type}_yes`}
             buttonLabel={t('yes')}
             buttonValue="yes"
-            isSelected={isSelected}
+            isSelected={isSelected === true}
             onChange={() => {
               onChange(true)
             }}
@@ -46,7 +46,7 @@ export function BasicsButtons(props: BasicButtonsProps): JSX.Element {
             id={`${type}_no`}
             buttonLabel={t('no')}
             buttonValue="no"
-            isSelected={!isSelected}
+            isSelected={isSelected === false}
             onChange={() => {
               onChange(false)
             }}
