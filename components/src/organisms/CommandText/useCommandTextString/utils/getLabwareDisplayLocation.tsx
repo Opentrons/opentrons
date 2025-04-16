@@ -104,7 +104,13 @@ export function getLabwareDisplayLocation(
     } else {
       switch (moduleModel) {
         case FLEX_STACKER_MODULE_V1:
-          return t('slot', { slot_name: slotName })
+          if (slotName === 'D3') {
+            return t('stacker_column_display_name', { stacker_slot: 'A' })
+          } else if (slotName === 'C3') {
+            return t('stacker_column_display_name', { stacker_slot: 'B' })
+          } else if (slotName === 'B3') {
+            return t('stacker_column_display_name', { stacker_slot: 'C' })
+          } else return t('stacker_column_display_name', { stacker_slot: 'D' })
         default:
           return isOnDevice
             ? `${getModuleDisplayName(moduleModel)}, ${slotName}`

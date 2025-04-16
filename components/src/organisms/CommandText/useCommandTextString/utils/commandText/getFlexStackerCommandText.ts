@@ -6,7 +6,7 @@ import type {
   FlexStackerEmptyRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { getAllLabwareDefs } from '@opentrons/shared-data'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 import { getLabwareDisplayLocation } from '../../utils/getLabwareDisplayLocation'
 
@@ -36,8 +36,11 @@ type HandledCommands = Extract<
 
 type GetFlexStackerCommandText = HandlesCommands<HandledCommands>
 
-const getLabwareDisplayName = (labwareUri: string): string => {
-  const currentLabwareDef = getAllLabwareDefs()[labwareUri]
+const getLabwareDisplayName = (labwareUri: string, allRunDefs: any): string => {
+  const currentLabwareDef = allRunDefs.find(
+    def => getLabwareDefURI(def) === labwareUri
+  )
+  // const currentLabwareDef = getAllLabwareDefs()[labwareUri]
   return currentLabwareDef?.metadata.displayName ?? null
 }
 
@@ -51,7 +54,10 @@ export const getFlexStackerCommandText = ({
 GetFlexStackerCommandText): string => {
   const primaryDefinitionDisplayName =
     command.result !== undefined && 'primaryLabwareURI' in command?.result
-      ? getLabwareDisplayName(command?.result.primaryLabwareURI)
+      ? getLabwareDisplayName(
+          command?.result.primaryLabwareURI,
+          allRunDefs ?? []
+        )
       : null
   if (command.commandType === 'flexStacker/retrieve') {
     const slotName = getLabwareDisplayLocation({
@@ -134,7 +140,8 @@ GetFlexStackerCommandText): string => {
         (command.result?.lidLabwareURI != null
           ? t('with_lid_name', {
               lidDisplayName: getLabwareDisplayName(
-                command.result?.lidLabwareURI
+                command.result?.lidLabwareURI,
+                allRunDefs ?? []
               ),
             })
           : '')
@@ -155,14 +162,5 @@ GetFlexStackerCommandText): string => {
       })
     }
   }
-  console.log(
-    'KEYS_BY_COMMAND_TYPE[command.commandType]:',
-    KEYS_BY_COMMAND_TYPE[command.commandType]
-  )
-  console.log(
-    't(KEYS_BY_COMMAND_TYPE[command.commandType]):',
-    t(KEYS_BY_COMMAND_TYPE[command.commandType])
-  )
-
   return t('branded:' + KEYS_BY_COMMAND_TYPE[command.commandType])
 }
