@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+  WELL_BOTTOM,
+} from '@opentrons/shared-data'
+import {
   getInitialRobotStateStandard,
   makeContext,
   DEFAULT_PIPETTE,
@@ -8,7 +13,6 @@ import {
   DEST_LABWARE,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StepArgsAndErrorsById } from '../../steplist'
@@ -133,7 +137,7 @@ describe('generateRobotStateTimeline', () => {
           yOffset: 0,
           finalPushOut: 0,
           zOffset: 0,
-          positionReference: 'well-bottom',
+          positionReference: WELL_BOTTOM,
         },
       },
     }
