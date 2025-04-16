@@ -56,8 +56,6 @@ describe('SelectedHoveredItems', () => {
       deckDef: getDeckDefFromRobotType(FLEX_ROBOT_TYPE),
       robotType: FLEX_ROBOT_TYPE,
       hoveredLabware: null,
-      hoveredModule: null,
-      hoveredFixture: null,
       slotPosition: [0, 0, 0],
     }
     vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
@@ -178,10 +176,5 @@ describe('SelectedHoveredItems', () => {
         'Fixture Opentrons Universal Flat Heater-Shaker Adapter'
       )
     ).toHaveLength(2)
-  })
-  it('renders nothing when there is a hovered module but selected fixture', () => {
-    props.hoveredModule = HEATERSHAKER_MODULE_V1
-    render(props)
-    expect(screen.queryByText('mock FixtureRender')).not.toBeInTheDocument()
   })
 })

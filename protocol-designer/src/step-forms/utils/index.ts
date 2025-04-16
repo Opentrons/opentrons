@@ -12,7 +12,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
-import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
+import { SPAN7_8_10_11_SLOT } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
@@ -159,21 +159,7 @@ export function denormalizePipetteEntities(
     {}
   )
 }
-/** deprecated */
-export const getSlotIdsBlockedBySpanning = (
-  initialDeckSetup: InitialDeckSetup
-): DeckSlot[] => {
-  const loadedThermocycler = values(initialDeckSetup.modules).find(
-    ({ type }: ModuleOnDeck) => type === THERMOCYCLER_MODULE_TYPE
-  )
-  if (loadedThermocycler != null) {
-    return loadedThermocycler.slot === SPAN7_8_10_11_SLOT
-      ? ['7', '8', '10', '11']
-      : ['A1', 'B1']
-  }
 
-  return []
-}
 export const getSlotIdsBlockedBySpanningForThermocycler = (
   initialDeckSetup: InitialDeckSetup,
   robotType: RobotType
@@ -210,17 +196,12 @@ export const getSlotIsEmpty = (
   ) {
     return false
   } else if (
-    slot === SPAN7_8_10_11_SLOT &&
-    TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
+    Object.values(initialDeckSetup.additionalEquipmentOnDeck).some(
+      ae =>
+        (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
+        ae.location.includes(slot)
+    )
   ) {
-    // special "spanning slot" is not empty if there's anything in the slots that it spans,
-    // even when there's no spanning labware/module (eg thermocycler) on the deck
-    return false
-  } else if (getSlotIdsBlockedBySpanning(initialDeckSetup).includes(slot)) {
-    // if a slot is being blocked by a spanning labware/module (eg thermocycler), it's not empty
-    return false
-    //  don't allow duplicating into the trash slot.
-  } else if (slot === '12') {
     return false
   }
 
