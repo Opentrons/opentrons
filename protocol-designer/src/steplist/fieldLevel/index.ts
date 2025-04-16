@@ -63,7 +63,6 @@ const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
   id: string
 ): LabwareOrAdditionalEquipmentEntity | null => {
-  console.log(state.labwareEntities[id], id)
   if (state.labwareEntities[id] != null) {
     const labwareDisallowsTouchTip =
       state.labwareEntities[id]?.def.parameters.quirks?.includes(

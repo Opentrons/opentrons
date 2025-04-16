@@ -47,6 +47,7 @@ import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 import { StepsInfo } from './StepsInfo'
 import { StartingDeck } from './StartingDeck'
+import { HardwareInfo } from './HardwareInfo'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
@@ -55,7 +56,6 @@ import {
 import { ScrubberContainer } from './ScrubberContainer'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
-import { HardwareInfo } from './HardwareInfo'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'

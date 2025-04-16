@@ -17,6 +17,7 @@ import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { FlexHardware } from './FlexHardware'
 import { Ot2Modules } from './Ot2Modules'
+import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 
 export function Hardware(): JSX.Element {
   const { t } = useTranslation([
@@ -44,7 +45,7 @@ export function Hardware(): JSX.Element {
   return (
     <Flex
       padding={SPACING.spacing16}
-      height="calc(100vh - 4rem)"
+      height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
       width="100%"
       backgroundColor={COLORS.grey10}
     >
