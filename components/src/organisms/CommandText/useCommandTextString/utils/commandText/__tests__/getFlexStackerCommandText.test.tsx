@@ -26,7 +26,7 @@ const baseCommandData = {
 } as any
 
 function TestWrapper({ command }: { command: any }): JSX.Element {
-  const { t } = useTranslation('protocol_command_text')
+  const { t } = useTranslation(['protocol_command_text', 'branded'])
   const text = getFlexStackerCommandText({
     command,
     ...baseCommandData,

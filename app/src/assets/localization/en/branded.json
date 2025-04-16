@@ -81,5 +81,15 @@
   "view_latest_release_notes_at": "View latest release notes at {{url}}",
   "want_to_help_out": "Want to help out Opentrons?",
   "welcome_title": "Welcome to your Opentrons Flex!",
-  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration."
+  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration.",
+  "flex_stacker_empty": "Manually empty all labware from Flex Stacker",
+  "flex_stacker_empty_from_location": "Manually empty all labware from Flex {{stackerColumn}}",
+  "flex_stacker_fill": "Fill Flex Stacker",
+  "flex_stacker_fill_with_quantity_and_labware": "Fill Flex {{stackerColumn}} with {{quantity}} {{labwareAndLidDisplayNames}}",
+  "flex_stacker_retrieve": "Retrieve from Flex Stacker",
+  "flex_stacker_set_stored_labware": "Set stored labware in Flex Stacker",
+  "flex_stacker_set_stored_labware_with_quantity_and_location": "Configure Flex {{stackerColumn}} with {{quantity}} {{labwareAndLidDisplayNames}}",
+  "flex_stacker_store": "Store into Flex Stacker",
+  "store_labware_from_slot_to_stacker": "Store {{primaryDefinitionDisplayName}} from {{slotName}} to Flex Stacker",
+  "retrieve_labware_from_stacker_to": "Retrieve {{primaryDefinitionDisplayName}} from Flex Stacker to {{slotName}}"
 }

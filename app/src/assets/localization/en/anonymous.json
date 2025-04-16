@@ -81,5 +81,15 @@
   "view_latest_release_notes_at": "Please contact support for release notes.",
   "want_to_help_out": "Want to help out?",
   "welcome_title": "Welcome!",
-  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Don't use Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration."
+  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Don't use Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration.",
+  "flex_stacker_empty": "Manually empty all labware from Robot Stacker",
+  "flex_stacker_empty_from_location": "Manually empty all labware from Robot {{stackerColumn}}",
+  "flex_stacker_fill": "Fill Robot Stacker",
+  "flex_stacker_fill_with_quantity_and_labware": "Fill Robot {{stackerColumn}} with {{quantity}} {{labwareAndLidDisplayNames}}",
+  "flex_stacker_retrieve": "Retrieve from Robot Stacker",
+  "flex_stacker_set_stored_labware": "Set stored labware in Robot Stacker",
+  "flex_stacker_set_stored_labware_with_quantity_and_location": "Configure Robot {{stackerColumn}} with {{quantity}} {{labwareAndLidDisplayNames}}",
+  "flex_stacker_store": "Store into Robot Stacker",
+  "store_labware_from_slot_to_stacker": "Store {{primaryDefinitionDisplayName}} from {{slotName}} to Robot Stacker",
+  "retrieve_labware_from_stacker_to": "Retrieve {{primaryDefinitionDisplayName}} from Robot Stacker to {{slotName}}"
 }

@@ -53,7 +53,7 @@ export function useCommandTextString(
   params: UseCommandTextStringParams
 ): GetCommandTextResult {
   const { command } = params
-  const { t } = useTranslation('protocol_command_text')
+  const { t } = useTranslation(['protocol_command_text', 'branded'])
 
   const fullParams = { ...params, t }
 

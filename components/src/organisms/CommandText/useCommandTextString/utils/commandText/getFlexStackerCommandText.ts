@@ -63,7 +63,7 @@ GetFlexStackerCommandText): string => {
       t,
     })
     if (primaryDefinitionDisplayName != null && slotName != null) {
-      return t('retrieve_labware_from_stacker_to', {
+      return t('branded:retrieve_labware_from_stacker_to', {
         primaryDefinitionDisplayName,
         slotName,
       })
@@ -78,7 +78,7 @@ GetFlexStackerCommandText): string => {
       t,
     })
     if (primaryDefinitionDisplayName != null && slotName != null) {
-      return t('store_labware_from_slot_to_stacker', {
+      return t('branded:store_labware_from_slot_to_stacker', {
         primaryDefinitionDisplayName,
         slotName,
       })
@@ -98,12 +98,15 @@ GetFlexStackerCommandText): string => {
       slotName != null
     ) {
       return (
-        t('flex_stacker_set_stored_labware_with_quantity_and_location', {
-          quantity: command.params.initialCount,
-          stackerColumn: slotName,
-          labwareAndLidDisplayNames:
-            command.result?.primaryLabwareDefinition.metadata.displayName,
-        }) +
+        t(
+          'branded:flex_stacker_set_stored_labware_with_quantity_and_location',
+          {
+            quantity: command.params.initialCount,
+            stackerColumn: slotName,
+            labwareAndLidDisplayNames:
+              command.result?.primaryLabwareDefinition.metadata.displayName,
+          }
+        ) +
         (command.result?.lidLabwareDefinition != null
           ? t('with_lid_name', {
               lidDisplayName:
@@ -123,7 +126,7 @@ GetFlexStackerCommandText): string => {
     })
     if (primaryDefinitionDisplayName != null) {
       return (
-        t('flex_stacker_fill_with_quantity_and_labware', {
+        t('branded:flex_stacker_fill_with_quantity_and_labware', {
           quantity: command.params.count,
           stackerColumn: slotName,
           labwareAndLidDisplayNames: primaryDefinitionDisplayName,
@@ -147,10 +150,19 @@ GetFlexStackerCommandText): string => {
       t,
     })
     if (primaryDefinitionDisplayName != null && slotName != null) {
-      return t('flex_stacker_empty_from_location', {
+      return t('branded:flex_stacker_empty_from_location', {
         stackerColumn: slotName,
       })
     }
   }
-  return t(KEYS_BY_COMMAND_TYPE[command.commandType])
+  console.log(
+    'KEYS_BY_COMMAND_TYPE[command.commandType]:',
+    KEYS_BY_COMMAND_TYPE[command.commandType]
+  )
+  console.log(
+    't(KEYS_BY_COMMAND_TYPE[command.commandType]):',
+    t(KEYS_BY_COMMAND_TYPE[command.commandType])
+  )
+
+  return t('branded:' + KEYS_BY_COMMAND_TYPE[command.commandType])
 }
