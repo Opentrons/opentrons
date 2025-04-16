@@ -133,6 +133,11 @@ def add_parameters(params: ParameterContext) -> None:
         variable_name="use_gripper",
         default=False,
     )
+    params.add_bool(
+        display_name="use_waste_chute",
+        variable_name="use_waste_chute",
+        default=True,
+    )
 
     well_choices = [f"{r}{c}" for c in range(1, 13) for r in "ABCDEFGH"]
     red_dyes = [d for d in DYE_CONFIGS.keys() if d != "diluent"]
@@ -314,7 +319,10 @@ def load_liquid_dye(
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-    ctx.load_trash_bin(SLOTS["trash"])
+    if ctx.params.use_waste_chute:  # type: ignore[attr-defined]
+        ctx.load_waste_chute(SLOTS["trash"])
+    else:
+        ctx.load_trash_bin(SLOTS["trash"])
 
     # PIPETTES
     test_pipette = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
@@ -378,7 +386,7 @@ def run(ctx: ProtocolContext) -> None:
                 if "A" in w.well_name  # new column
             ]
             source_wells = diluent_wells_by_volume[ul][: len(dest_columns)]
-            pip_for_dil.transfer_liquid(
+            pip_for_dil.transfer_with_liquid_class(
                 liquid_class=diluent_class,
                 volume=DYE_READER_IDEAL_UL - ul,
                 source=source_wells,
@@ -393,11 +401,11 @@ def run(ctx: ProtocolContext) -> None:
         dest = dye_wells_by_volume[ul]
         if test_class:
             if len(dest) > len(source):
-                test_pipette.distribute_liquid(
+                test_pipette.distribute_with_liquid_class(
                     test_class, ul, source, dest, new_tip="always"
                 )
             else:
-                test_pipette.transfer_liquid(
+                test_pipette.transfer_with_liquid_class(
                     test_class, ul, source, dest, new_tip="always"
                 )
         else:
