@@ -32,7 +32,7 @@ import type {
 import type { CheckLabwareStep } from './types'
 
 const LPC_HELP_LINK_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 
 const TILE_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
