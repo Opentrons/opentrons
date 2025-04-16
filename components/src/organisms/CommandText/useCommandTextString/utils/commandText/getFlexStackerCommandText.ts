@@ -5,6 +5,8 @@ import type {
   FlexStackerFillRunTimeCommand,
   FlexStackerEmptyRunTimeCommand,
   RunTimeCommand,
+  LabwareDefinition3,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
@@ -36,7 +38,8 @@ type GetFlexStackerCommandText = HandlesCommands<HandledCommands>
 
 const getLabwareDisplayName = (labwareUri: string, allRunDefs: any): string => {
   const currentLabwareDef = allRunDefs.find(
-    def => getLabwareDefURI(def) === labwareUri
+    (def: LabwareDefinition2 | LabwareDefinition3) =>
+      getLabwareDefURI(def) === labwareUri
   )
   // const currentLabwareDef = getAllLabwareDefs()[labwareUri]
   return currentLabwareDef?.metadata.displayName ?? null

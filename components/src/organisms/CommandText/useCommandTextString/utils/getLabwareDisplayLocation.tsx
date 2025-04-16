@@ -61,7 +61,6 @@ export function getLabwareDisplayLocation(
   if (locationResult == null) {
     return ''
   }
-  console.log('locationResult: ', locationResult)
 
   const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
   const slotName =

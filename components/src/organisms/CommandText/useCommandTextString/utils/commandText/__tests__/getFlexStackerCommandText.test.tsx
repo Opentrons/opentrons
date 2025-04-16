@@ -15,7 +15,10 @@ vi.mock('@opentrons/shared-data')
 vi.mock('../../getLabwareDisplayLocation')
 
 const baseCommandData = {
-  allRunDefs: [{ metadata: { displayName: 'tip rack' } }, { metadata: { displayName: 'plate' } }],
+  allRunDefs: [
+    { metadata: { displayName: 'tip rack' } },
+    { metadata: { displayName: 'plate' } },
+  ],
   robotType: 'OT-2',
   commandTextData: {
     commands: [],
