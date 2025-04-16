@@ -28,7 +28,7 @@ import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { WizardBody } from './WizardBody'
 import { BasicsButtons } from './BasicsButtons'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { WizardFixtureType } from '../../components/organisms'
+import type { Fixtures } from '../../components/organisms'
 
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
@@ -110,14 +110,14 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('pipettesByMount.right.tiprackDefURI', leftTiprackDefURI)
   }
 
-  const flexTrashFixture: WizardFixtureType = {
+  const flexTrashFixture: Fixtures = {
     [uuid()]: {
       cutoutId: 'cutoutA3',
       name: 'trashBin',
       cutoutFixtureId: 'trashBinAdapter',
     },
   }
-  const ot2TrashFixture: WizardFixtureType = {
+  const ot2TrashFixture: Fixtures = {
     [uuid()]: {
       cutoutId: 'cutout12',
       name: 'trashBin',

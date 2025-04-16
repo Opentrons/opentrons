@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { UseFormSetValue } from 'react-hook-form'
 import {
   ABSORBANCE_READER_CUTOUTS,
   ABSORBANCE_READER_V1,
@@ -10,6 +11,7 @@ import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  MODULE_MODELS,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -35,14 +37,15 @@ import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
+  ModuleModel,
 } from '@opentrons/shared-data'
-import type { UseFormSetValue } from 'react-hook-form'
+import type { FormModules } from '../../../step-forms'
+import type { Fixtures, WizardFormState } from '../types'
 import type {
-  AllTemporalPropertiesForTimelineFrame,
-  FormModules,
-} from '../../../step-forms'
-import type { WizardFixtureType, WizardFormState } from '../types'
-import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
+  CutoutConfigExtended,
+  ModuleMore,
+  OptionStage,
+} from './AddFixtureModal'
 
 interface DeckConfigurationEditingProps {
   addFixtureToCutout: (cutoutId: CutoutId) => void
@@ -55,10 +58,15 @@ interface DeckConfigurationEditingProps {
 export function useDeckConfigurationEditing(
   deckConfig: DeckConfiguration,
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>,
-  setValue: (type: 'fixtures' | 'modules', value: any) => void,
-  modules: FormModules | AllTemporalPropertiesForTimelineFrame['modules'],
-  fixtures: WizardFixtureType,
-  hasGripper: boolean
+  modules:
+    | FormModules
+    | {
+        [x: string]: ModuleMore
+      },
+  fixtures: Fixtures,
+  hasGripper: boolean,
+  setValue?: UseFormSetValue<WizardFormState>,
+  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
 ): DeckConfigurationEditingProps {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
@@ -82,7 +90,7 @@ export function useDeckConfigurationEditing(
         ([_, fixture]) => fixture.cutoutId !== cutoutId
       )
     )
-    setValue('fixtures', filteredFixtures)
+    setValue?.('fixtures', filteredFixtures)
 
     //  remove any modules from that cutoutId
     const fixturedModules = Object.fromEntries(
@@ -92,7 +100,7 @@ export function useDeckConfigurationEditing(
           : module.cutoutId !== cutoutId
       )
     )
-    setValue('modules', fixturedModules)
+    setValue?.('modules', fixturedModules)
 
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
     if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
@@ -136,6 +144,21 @@ export function useDeckConfigurationEditing(
           : cutoutConfig
       )
     }
+    let type = 'stagingAreaAndMagneticBlock' as CutoutConfigExtended['type']
+    if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
+      type = cutoutFixtureId as ModuleModel
+    } else {
+      if (cutoutFixtureId === 'trashBinAdapter') {
+        type = 'trashBin'
+      } else if (cutoutFixtureId === 'wasteChuteRightAdapterNoCover') {
+        type = 'wasteChute'
+      } else if (thermocyclerCutoutFixtureId) {
+        type = 'thermocyclerModuleV2'
+      } else {
+        type = 'stagingArea'
+      }
+    }
+    updateInitialDeckState?.([{ cutoutId, cutoutFixtureId, type }])
     setUpdatedDeckConfig(newDeckConfig)
   }
 
@@ -155,6 +178,7 @@ export function useDeckConfigurationEditing(
           setUpdatedDeckConfig={setUpdatedDeckConfig}
           setValue={setValue}
           hasGripper={hasGripper}
+          updateInitialDeckState={updateInitialDeckState}
         />
       ) : null,
   }

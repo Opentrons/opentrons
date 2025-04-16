@@ -1,27 +1,46 @@
 import { useSelector } from 'react-redux'
-import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { useNavigate } from 'react-router-dom'
+import { getFileMetadata, getRobotType } from '../../file-data/selectors'
+import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { FlexHardware } from './FlexHardware'
+import { Ot2Modules } from './Ot2Modules'
 
 export function Hardware(): JSX.Element {
-  const { t } = useTranslation('protocol_overview')
+  const { t } = useTranslation([
+    'protocol_steps',
+    'protocol_overview',
+    'starting_deck_state',
+    'shared',
+  ])
   const fileMetadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
+  const { makeSnackbar } = useKitchen()
   const robotType = useSelector(getRobotType)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
+  const hasTrash = Object.values(additionalEquipmentEntities).some(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+
   const protocolName =
     fileMetadata.protocolName != null && fileMetadata.protocolName !== ''
       ? fileMetadata.protocolName
-      : t('untitled_protocol')
+      : t('protocol_overview:untitled_protocol')
+
   return (
     <Flex
       padding={SPACING.spacing16}
@@ -35,32 +54,38 @@ export function Hardware(): JSX.Element {
         height="100%"
         width="100%"
         flexDirection={DIRECTION_COLUMN}
-        padding="24px 40px"
-        gridGap="40px"
+        padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
+        gridGap={SPACING.spacing40}
+        overflowY="auto"
       >
-        <Flex justifyContent="space-between">
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <StyledText desktopStyle="headingSmallBold">
             {protocolName}
           </StyledText>
           <PrimaryButton
             onClick={() => {
-              navigate('/overview')
+              if (hasTrash) {
+                navigate('/overview')
+              } else {
+                makeSnackbar(t('starting_deck_state:trash_required'))
+              }
             }}
           >
-            Save
+            {t('shared:save')}
           </PrimaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <StyledText desktopStyle="displayBold">
             {robotType === FLEX_ROBOT_TYPE
-              ? 'Edit your deck hardware'
-              : 'Edit modules'}
+              ? t('edit_hardware')
+              : t('edit_modules')}
           </StyledText>
           <StyledText desktopStyle="headingLargeRegular" color={COLORS.grey60}>
             {robotType === FLEX_ROBOT_TYPE
-              ? 'Place the modules and fixtures that you are using for this protocol onto the deck.'
-              : 'Place the modules that you are using for this protocol onto the deck.'}
+              ? t('place_hardware')
+              : t('place_modules')}
           </StyledText>
+          {robotType === FLEX_ROBOT_TYPE ? <FlexHardware /> : <Ot2Modules />}
         </Flex>
       </Flex>
     </Flex>

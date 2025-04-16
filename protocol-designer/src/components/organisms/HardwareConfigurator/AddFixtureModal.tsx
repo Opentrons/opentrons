@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { uuid } from '@opentrons/step-generation'
+import { ModuleEntity, uuid } from '@opentrons/step-generation'
 import {
   Btn,
   COLORS,
@@ -27,8 +27,8 @@ import {
 import { useKitchen } from '../Kitchen/hooks'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
-import type { UseFormSetValue } from 'react-hook-form'
 import type { Dispatch, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfig,
   CutoutId,
@@ -37,22 +37,27 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModalProps } from '@opentrons/components'
-import type {
-  AllTemporalPropertiesForTimelineFrame,
-  FormModules,
-  ModuleOnDeck,
-} from '../../../step-forms'
-import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
+import type { FormModules } from '../../../step-forms'
+import type { Fixtures, WizardFormState } from '../types'
+import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
 
+export interface ModuleMore extends ModuleEntity {
+  cutoutId: CutoutId
+}
 interface AddFixtureModalProps {
   cutoutId: CutoutId
   closeModal: () => void
-  modules: FormModules | AllTemporalPropertiesForTimelineFrame['modules']
-  fixtures: WizardFixtureType
+  modules:
+    | FormModules
+    | {
+        [x: string]: ModuleMore
+      }
+  fixtures: Fixtures
   deckConfig: DeckConfiguration
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>
-  setValue: UseFormSetValue<WizardFormState>
   hasGripper: boolean
+  setValue?: UseFormSetValue<WizardFormState>
+  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
 }
 export type OptionStage =
   | 'modulesOrFixtures'
@@ -61,7 +66,7 @@ export type OptionStage =
   | 'wasteChuteOptions'
 
 export interface CutoutConfigExtended extends CutoutConfig {
-  type?: FixtureName | ModuleModel | 'stagingAreaAndMagneticBlock'
+  type?: DeckFixture | ModuleModel | 'stagingAreaAndMagneticBlock'
 }
 
 const FIXTURES = ['wasteChute', 'trashBin', 'stagingArea']
@@ -79,6 +84,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     setUpdatedDeckConfig,
     setValue,
     hasGripper,
+    updateInitialDeckState,
   } = props
   const { t, i18n } = useTranslation('shared')
   const { makeSnackbar } = useKitchen()
@@ -217,7 +223,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           },
         }
 
-        setValue('modules', updatedModules)
+        setValue?.('modules', updatedModules)
       }
       if (newFixture != null) {
         const filteredFixtures = Object.fromEntries(
@@ -226,20 +232,21 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           )
         )
 
-        const updatedFixtures: WizardFixtureType = {
+        const updatedFixtures: Fixtures = {
           ...filteredFixtures,
           [uuid()]: {
             name:
               newFixture.type === 'stagingAreaAndMagneticBlock'
                 ? 'stagingArea'
-                : (newFixture.type as FixtureName),
+                : (newFixture.type as DeckFixture),
             cutoutFixtureId: newFixture.cutoutFixtureId,
             cutoutId: newFixture.cutoutId,
           },
         }
-        setValue('fixtures', updatedFixtures)
+        setValue?.('fixtures', updatedFixtures)
       }
       setUpdatedDeckConfig(newDeckConfig)
+      updateInitialDeckState?.(addedCutoutConfigs)
       closeModal()
     }
   }

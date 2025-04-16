@@ -6,6 +6,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InfoScreen,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
   ListItemDescriptor,
@@ -34,14 +35,14 @@ export function HardwareInfo({
   robotType,
   additionalEquipment,
   modules,
-}: InstrumentsInfoProps): JSX.Element | null {
+}: InstrumentsInfoProps): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const navigate = useNavigate()
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const tCSlot = isFlex ? 'A1, B1' : '7,8,10,11'
   const additionalEquipmentLength = Object.keys(additionalEquipment).length
 
-  return modules.length > 0 || (additionalEquipmentLength > 0 && isFlex) ? (
+  return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <StyledText desktopStyle="headingSmallBold">
@@ -61,34 +62,10 @@ export function HardwareInfo({
           </Btn>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        {modules.map(module => (
-          <ListItem type="default" key={`HardwareInfo_${module.id}`}>
-            <ListItemDescriptor
-              type="large"
-              description={
-                <Flex minWidth="13.75rem">
-                  <StyledText
-                    desktopStyle="bodyDefaultRegular"
-                    color={COLORS.grey60}
-                  >
-                    {module.type === THERMOCYCLER_MODULE_TYPE
-                      ? tCSlot
-                      : module.slot}
-                  </StyledText>
-                </Flex>
-              }
-              content={
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {getModuleDisplayName(module.model)}
-                </StyledText>
-              }
-            />
-          </ListItem>
-        ))}
-        {isFlex &&
-          Object.values(additionalEquipment).map(ae => (
-            <ListItem type="default" key={`ProtocolOverview_${ae.id}`}>
+      {modules.length > 0 || (additionalEquipmentLength > 0 && isFlex) ? (
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          {modules.map(module => (
+            <ListItem type="default" key={`HardwareInfo_${module.id}`}>
               <ListItemDescriptor
                 type="large"
                 description={
@@ -97,19 +74,47 @@ export function HardwareInfo({
                       desktopStyle="bodyDefaultRegular"
                       color={COLORS.grey60}
                     >
-                      {ae.location.replace('cutout', '')}
+                      {module.type === THERMOCYCLER_MODULE_TYPE
+                        ? tCSlot
+                        : module.slot}
                     </StyledText>
                   </Flex>
                 }
                 content={
                   <StyledText desktopStyle="bodyDefaultRegular">
-                    {t(`shared:${ae.name}`)}
+                    {getModuleDisplayName(module.model)}
                   </StyledText>
                 }
               />
             </ListItem>
           ))}
-      </Flex>
+          {isFlex &&
+            Object.values(additionalEquipment).map(ae => (
+              <ListItem type="default" key={`ProtocolOverview_${ae.id}`}>
+                <ListItemDescriptor
+                  type="large"
+                  description={
+                    <Flex minWidth="13.75rem">
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
+                        color={COLORS.grey60}
+                      >
+                        {ae.location.replace('cutout', '')}
+                      </StyledText>
+                    </Flex>
+                  }
+                  content={
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t(`shared:${ae.name}`)}
+                    </StyledText>
+                  }
+                />
+              </ListItem>
+            ))}
+        </Flex>
+      ) : (
+        <InfoScreen content={'no modules selected'} />
+      )}
     </Flex>
-  ) : null
+  )
 }

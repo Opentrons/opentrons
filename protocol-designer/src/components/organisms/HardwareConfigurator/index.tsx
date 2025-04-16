@@ -13,38 +13,45 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type {
-  AllTemporalPropertiesForTimelineFrame,
-  FormModules,
-} from '../../../step-forms'
-import type { WizardFixtureType } from '../types'
+import type { FormModules } from '../../../step-forms'
+import type { Fixtures, WizardFormState } from '../types'
+import type { UseFormSetValue } from 'react-hook-form'
+import type { CutoutConfigExtended, ModuleMore } from './AddFixtureModal'
 
 interface HardwareConfiguratorProps {
-  setValue: (type: 'fixtures' | 'modules', value: any) => void
-  modules: FormModules | AllTemporalPropertiesForTimelineFrame['modules']
+  modules:
+    | FormModules
+    | {
+        [x: string]: ModuleMore
+      }
   hasGripper: boolean
-  fixtures: WizardFixtureType
+  fixtures: Fixtures
+  setValue?: UseFormSetValue<WizardFormState>
+  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
 }
 export function HardwareConfigurator(
   props: HardwareConfiguratorProps
 ): JSX.Element {
-  const { modules, setValue, hasGripper, fixtures } = props
+  const {
+    modules,
+    setValue,
+    hasGripper,
+    fixtures,
+    updateInitialDeckState,
+  } = props
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const simpleDeckConfig: DeckConfiguration = FLEX_SIMPLEST_DECK_CONFIG.filter(
     ({ cutoutId }) => {
       const hasModule = Object.values(modules).some(
-        module =>
-          getCutoutIdFromAddressableArea(module.slot, deckDef) === cutoutId
+        module => module.cutoutId === cutoutId
       )
-
       const hasFixture = Object.values(fixtures).some(
         fixture => fixture.cutoutId === cutoutId
       )
       return !hasModule && !hasFixture
     }
   )
-
   const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
     (module): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
@@ -53,7 +60,9 @@ export function HardwareConfigurator(
           module.slot,
           deckDef
         ) as CutoutId,
-        cutoutFixtureId: module.cutoutFixtureId ?? 'singleStandardSlot',
+        cutoutFixtureId: hasThermocycler
+          ? 'thermocyclerModuleV2Front'
+          : module.cutoutFixtureId ?? 'singleStandardSlot',
       }
       const thermocyclerA1Config: CutoutConfig = {
         cutoutId: 'cutoutA1',
@@ -88,10 +97,11 @@ export function HardwareConfigurator(
   } = useDeckConfigurationEditing(
     updatedDeckConfig,
     setUpdatedDeckConfig,
-    setValue,
     modules,
     fixtures,
-    hasGripper
+    hasGripper,
+    setValue,
+    updateInitialDeckState
   )
 
   return (
