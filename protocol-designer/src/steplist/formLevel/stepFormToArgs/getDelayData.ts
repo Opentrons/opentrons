@@ -23,7 +23,7 @@ export const getMoveLiquidDelayData = (args: {
   const mmFromBottom =
     hydratedFormData[zPositionField] ?? DEFAULT_MM_OFFSET_FROM_BOTTOM
 
-  if (checkbox && mmFromBottom > 0 && seconds > 0) {
+  if (checkbox && mmFromBottom >= 0 && seconds > 0) {
     return {
       seconds,
       mmFromBottom, // TODO (nd: 04/15/2025) remove once compound creators are finished. We no longer need the individual positions for a delay
