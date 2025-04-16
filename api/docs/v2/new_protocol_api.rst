@@ -29,6 +29,7 @@ Labware
 .. autoclass:: opentrons.protocol_api.Labware
    :members:
    :exclude-members: next_tip, use_tips, previous_tip, return_tips
+
 ..
    The trailing ()s at the end of TrashBin and WasteChute here hide the __init__()
    signatures, since users should never construct these directly.
