@@ -75,6 +75,8 @@ describe('form casting', () => {
       pushOut_checkbox: false,
       conditioning_checkbox: false,
       conditioning_volume: null,
+      aspirate_submerge_position_reference: 'well-bottom',
+      dispense_submerge_position_reference: 'well-bottom',
     }
     expect(_castForm(input)).toEqual({
       ...input,
