@@ -747,6 +747,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
+        check_for_movement_conflicts: bool = True,
     ) -> None:
         if well_core is not None:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -765,6 +766,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             assert isinstance(well_location, LiquidHandlingWellLocation)
             if well_location.volumeOffset and well_location.volumeOffset != 0:
                 raise ValueError("volume offset not supported with move_to")
+            if check_for_movement_conflicts:
+                pipette_movement_conflict.check_safe_for_pipette_movement(
+                    engine_state=self._engine_client.state,
+                    pipette_id=self._pipette_id,
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    well_location=well_location,
+                )
             self._engine_client.execute_command(
                 cmd.MoveToWellParams(
                     pipetteId=self._pipette_id,

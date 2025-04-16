@@ -255,6 +255,7 @@ def test_move_to(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
+            check_for_movement_conflicts=False,
         ),
         times=1,
     )
@@ -276,6 +277,7 @@ def test_move_to_well(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
+            check_for_movement_conflicts=False,
         ),
         times=1,
     )

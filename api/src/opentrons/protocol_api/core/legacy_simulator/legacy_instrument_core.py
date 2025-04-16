@@ -325,6 +325,7 @@ class LegacyInstrumentCoreSimulator(
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
+        check_for_movement_conflicts: bool = False  # Not used in this implementation
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
         if isinstance(location, (TrashBin, WasteChute)):

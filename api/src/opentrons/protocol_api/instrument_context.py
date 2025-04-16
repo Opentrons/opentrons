@@ -1907,6 +1907,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     force_direct=force_direct,
                     minimum_z_height=minimum_z_height,
                     speed=speed,
+                    check_for_movement_conflicts=False,
                 )
             else:
                 if publish:
@@ -1925,6 +1926,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     force_direct=force_direct,
                     minimum_z_height=minimum_z_height,
                     speed=speed,
+                    check_for_movement_conflicts=False,
                 )
 
         return self
