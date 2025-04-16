@@ -64,7 +64,6 @@ export type GetLabwareLocationFromSequenceParams =
   | SequenceSlotOnlyParams
   | SequenceFullParams
 
-// we need to add a inStackerHopperLocation kind and return a column only
 export function getLabwareLocationFromSequence(
   params: GetLabwareLocationFromSequenceParams
 ): LocationResult {
