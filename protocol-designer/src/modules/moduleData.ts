@@ -121,18 +121,17 @@ export function getAllModuleSlotsByTypeOt2(
 
   if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     slot = supportedSlotOption
-  }
-  if (moduleType === HEATERSHAKER_MODULE_TYPE) {
+  } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
     slot = supportedSlotOption.concat(
       HEATER_SHAKER_SLOTS_OT2.filter(
         s => s.value !== supportedSlotOption[0].value
       )
     )
+  } else {
+    const allOtherSlots = ALL_MODULE_SLOTS_OT2.filter(
+      s => s.value !== supportedSlotOption[0].value
+    )
+    slot = supportedSlotOption.concat(allOtherSlots)
   }
-  const allOtherSlots = ALL_MODULE_SLOTS_OT2.filter(
-    s => s.value !== supportedSlotOption[0].value
-  )
-  slot = supportedSlotOption.concat(allOtherSlots)
-
   return slot
 }
