@@ -138,13 +138,7 @@ export function getLabwareDisplayLocation(
 }
 
 function getSlotColumn(slotName: string): string {
-  if (slotName === 'D3') {
-    return 'D'
-  } else if (slotName === 'C3') {
-    return 'C'
-  } else if (slotName === 'B3') {
-    return 'B'
-  } else return 'A'
+  return slotName.charAt(0)
 }
 
 // Sometimes we don't want to show the actual slotName, so we special case the text here.
