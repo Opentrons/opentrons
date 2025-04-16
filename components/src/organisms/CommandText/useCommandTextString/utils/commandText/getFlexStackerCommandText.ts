@@ -103,8 +103,6 @@ GetFlexStackerCommandText): string => {
       command.result != undefined &&
       'primaryLabwareDefinition' in command.result &&
       slotName != null
-      'primaryLabwareDefinition' in command?.result &&
-      slotName != null
     ) {
       return (
         t(
