@@ -35,6 +35,7 @@ describe('FlexStackerModuleData', () => {
     screen.getByTestId('stacker_shuttle_data')
 
     const doorLabel = screen.getByText('Closed')
+    expect(doorLabel)
     expect(doorLabel).toHaveStyle('backgroundColor: COLORS.grey30')
 
     const shuttleLabel = screen.getByText('Extended')
@@ -45,6 +46,7 @@ describe('FlexStackerModuleData', () => {
     props.moduleData.hopperDoorState = 'opened'
     render(props)
     const doorLabel = screen.getByText('Open')
+    expect(doorLabel)
     expect(doorLabel).toHaveStyle('backgroundColor: COLORS.grey30')
   })
 
@@ -52,6 +54,7 @@ describe('FlexStackerModuleData', () => {
     props.moduleData.platformState = 'retracted'
     render(props)
     const shuttleLabel = screen.getByText('In stacker')
+    expect(shuttleLabel)
     expect(shuttleLabel).toHaveStyle('backgroundColor: COLORS.blue30')
   })
 
@@ -59,6 +62,7 @@ describe('FlexStackerModuleData', () => {
     props.moduleData.platformState = 'missing'
     render(props)
     const shuttleLabel = screen.getByText('Unknown')
+    expect(shuttleLabel)
     expect(shuttleLabel).toHaveStyle('backgroundColor: COLORS.red30')
   })
 })
