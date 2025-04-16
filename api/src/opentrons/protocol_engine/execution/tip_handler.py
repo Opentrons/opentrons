@@ -266,9 +266,24 @@ class HardwareTipHandler(TipHandler):
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
         )
+        follow_singular_sensor = None
+        if self._state_view.pipettes.get_channels(pipette_id) == 96:
+            nozzle_configuration = self._state_view.pipettes.get_nozzle_configuration(
+                pipette_id=pipette_id
+            )
+            if nozzle_configuration.configuration == NozzleConfigurationType.COLUMN:
+                if nozzle_configuration.back_left == "A1":
+                    follow_singular_sensor = InstrumentProbeType.PRIMARY
+                else:
+                    follow_singular_sensor = InstrumentProbeType.SECONDARY
+
         if do_not_ignore_tip_presence:
             try:
-                await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+                await self.verify_tip_presence(
+                    pipette_id,
+                    TipPresenceStatus.PRESENT,
+                    follow_singular_sensor=follow_singular_sensor,
+                )
             except TipNotAttachedError as e:
                 raise PickUpTipTipNotAttachedError(tip_geometry=tip_geometry) from e
 
