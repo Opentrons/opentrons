@@ -67,7 +67,7 @@ export function Hardware(): JSX.Element {
               if (hasTrash) {
                 navigate('/overview')
               } else {
-                makeSnackbar(t('starting_deck_state:trash_required'))
+                makeSnackbar(t('starting_deck_state:trash_required') as string)
               }
             }}
           >

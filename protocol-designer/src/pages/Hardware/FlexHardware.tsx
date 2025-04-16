@@ -1,14 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
-  FlexModuleCutoutFixtureId,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
-import { FixtureName, HardwareConfigurator } from '../../components/organisms'
+import { HardwareConfigurator } from '../../components/organisms'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
@@ -24,6 +23,7 @@ import { FIXTURES } from '../Designer/DeckSetup/constants'
 import type {
   CutoutFixtureId,
   CutoutId,
+  FlexModuleCutoutFixtureId,
   ModuleModel,
 } from '@opentrons/shared-data'
 import type {
@@ -32,7 +32,7 @@ import type {
 } from '../../components/organisms/HardwareConfigurator/AddFixtureModal'
 import type { ThunkDispatch } from '../../types'
 import type { DeckFixture } from '../../step-forms/actions/additionalItems'
-import type { Fixtures } from '../../components/organisms'
+import type { Fixtures, FixtureName } from '../../components/organisms'
 
 export function FlexHardware(): JSX.Element {
   const initialDeckSetup = useSelector(getInitialDeckSetup)

@@ -5,7 +5,6 @@ import { getInitialDeckSetup } from '../../step-forms/selectors'
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   DeckFromLayers,
   DIRECTION_COLUMN,
@@ -39,7 +38,7 @@ import {
   ModuleEmptySelectorButtons,
 } from '../../components/organisms'
 import { createModule } from '../../step-forms/actions'
-import { ModuleDiagram, OT2ModuleType } from '../Onboarding/ModuleDiagram'
+import { ModuleDiagram } from '../Onboarding/ModuleDiagram'
 import { FixedTrashText } from '../../components/molecules'
 import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../modules'
 import { SlotWarning } from '../Designer/DeckSetup/SlotWarning'
@@ -52,6 +51,7 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { OT2ModuleType } from '../Onboarding/ModuleDiagram'
 import type { ThunkDispatch } from '../../types'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
@@ -173,7 +173,7 @@ export function Ot2Modules(): JSX.Element {
                     label={
                       module.type === THERMOCYCLER_MODULE_TYPE
                         ? undefined
-                        : 'Deck slot'
+                        : t('protocol_overview:deck_slot')
                     }
                     leftHeaderItem={
                       <Flex

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { ModuleEntity, uuid } from '@opentrons/step-generation'
+import { uuid } from '@opentrons/step-generation'
 import {
   Btn,
   COLORS,
@@ -29,6 +29,7 @@ import { getAvailableOptions } from './useDeckConfigurationEditing'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
+import type { ModuleEntity } from '@opentrons/step-generation'
 import type {
   CutoutConfig,
   CutoutId,

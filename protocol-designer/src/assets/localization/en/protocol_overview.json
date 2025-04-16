@@ -4,6 +4,7 @@
   "author": "Organization/Author",
   "created": "Date created",
   "deck_hardware": "Deck hardware",
+  "deck_slot": "Deck slot",
   "conflict_on_slot": "Cannot move to this slot due to a module conflict",
   "description": "Description",
   "edit_protocol": "Edit protocol",

@@ -6,7 +6,8 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { getModuleDisplayName, ModuleModel } from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 interface ModuleEmptSelectorButtonProps {
   modules: ModuleModel[]

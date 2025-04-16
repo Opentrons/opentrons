@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { UseFormSetValue } from 'react-hook-form'
 import {
   ABSORBANCE_READER_CUTOUTS,
   ABSORBANCE_READER_V1,
@@ -32,6 +31,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
 import { AddFixtureModal } from './AddFixtureModal'
+import type { UseFormSetValue } from 'react-hook-form'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutFixtureId,
@@ -96,7 +96,7 @@ export function useDeckConfigurationEditing(
     const fixturedModules = Object.fromEntries(
       Object.entries(modules).filter(([_, module]) =>
         thermocyclerCutoutFixtureId
-          ? !tcCutouts.includes(module.cutoutId ?? 'cutoutA1')
+          ? !tcCutouts.includes((module.cutoutId as CutoutId) ?? 'cutoutA1')
           : module.cutoutId !== cutoutId
       )
     )
