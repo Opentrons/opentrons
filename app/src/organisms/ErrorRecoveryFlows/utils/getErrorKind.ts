@@ -63,6 +63,9 @@ export function getErrorKind(
     } else if (errorType === DEFINED_ERROR_TYPES.SHUTTLE_MISSING) {
       return ERROR_KINDS.SHUTTLE_MISSING
     }
+    else if (errorType === DEFINED_ERROR_TYPES.LABWARE_MISSING_IN_SHUTTLE) {
+      return ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE
+    }
   }
 
   return ERROR_KINDS.GENERAL_ERROR

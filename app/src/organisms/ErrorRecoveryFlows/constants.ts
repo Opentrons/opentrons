@@ -29,6 +29,7 @@ export const DEFINED_ERROR_TYPES = {
   STACKER_STALL: 'flexStackerStallOrCollision',
   HOPPER_LABWARE_MISSING: 'flexStackerHopperLabwareFailed',
   SHUTTLE_MISSING: 'flexStackerShuttleMissing',
+  LABWARE_MISSING_IN_SHUTTLE: 'flexStackerLabwareRetrieveFailed'
 }
 
 // Client-defined error-handling flows.
@@ -45,12 +46,14 @@ export const ERROR_KINDS = {
   STALL_WHILE_STACKING: 'STALL_WHILE_STACKING',
   LABWARE_MISSING_IN_HOPPER: 'LABWARE_MISSING_IN_HOPPER',
   SHUTTLE_MISSING: 'SHUTTLE_MISSING',
+  LABWARE_MISSING_IN_SHUTTLE: 'LABWARE_MISSING_IN_SHUTTLE'
 } as const
 
 export const STACKER_ERROR_KINDS: ErrorKind[] = [
   ERROR_KINDS.STALL_WHILE_STACKING,
   ERROR_KINDS.SHUTTLE_MISSING,
   ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+  ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE
 ]
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
@@ -208,6 +211,24 @@ export const RECOVERY_MAP = {
   },
   HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP: {
     ROUTE: 'hopper-manual-load-in-shuttle-and-skip',
+    STEPS: {
+      HOOPER_MANUAL_REPLACE: 'hooper-manual-replace',
+      CONFIRM_RETRY: 'confirm-retry',
+      SKIP: 'skip',
+    },
+  },
+  REPLACE_LABWARE_IN_HOOPER_AND_RETRY: {
+    ROUTE: 'replace-labware-in-stacker-and-retry',
+    STEPS: {
+      EMPTY_STACKER: 'empty-stacker',
+      PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
+      CONFIRM_LABWARE_IN_LATCH: 'confirm-labware-in-latch',
+      RELEASE_FROM_LATCH: 'release-labware-from-latch',
+      RETRY: 'retry',
+    },
+  },
+  MANUAL_LOAD_ON_SHUTTLE_AND_SKIP: {
+    ROUTE: 'manual-load-in-shuttle-and-skip',
     STEPS: {
       HOOPER_MANUAL_REPLACE: 'hooper-manual-replace',
       CONFIRM_RETRY: 'confirm-retry',

@@ -28,6 +28,7 @@ export function ManualReplaceLwAndRetry(
     HOPPER_MANUAL_LOAD_AND_RETRY,
     HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
     ROBOT_IN_MOTION,
+    REPLACE_LABWARE_IN_HOOPER_AND_RETRY
   } = RECOVERY_MAP
 
   const { t } = useTranslation('error_recovery')
@@ -92,9 +93,11 @@ export function ManualReplaceLwAndRetry(
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
         return <TwoColLwInfoAndDeck {...props} />
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.EMPTY_STACKER:
         return <TwoColTextAndImage {...props} />
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
         return (
           <TwoColTextAndFailedStepNextStep
             {...props}
