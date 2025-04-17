@@ -206,10 +206,12 @@ def tip_on_left_side_96(back_left_nozzle: str) -> bool:
     left_most_column = int(back_left_nozzle[1:])
     return left_most_column == 1
 
+
 def tip_on_right_side_96(front_right_nozzle: str) -> bool:
     """Return if there is a tip on the left edge of the 96 channel."""
     right_most_column = int(front_right_nozzle[1:])
     return right_most_column == 12
+
 
 class HardwareTipHandler(TipHandler):
     """Pick up and drop tips, using the Hardware API."""
@@ -266,8 +268,7 @@ class HardwareTipHandler(TipHandler):
                 tip_presence_supported = True
             case 8:
                 tip_presence_supported = (
-                    nozzle_configuration.tip_count
-                    >= supported_partial_nozzle_minimum
+                    nozzle_configuration.tip_count >= supported_partial_nozzle_minimum
                 )
             case 96:
                 tip_presence_supported = (
