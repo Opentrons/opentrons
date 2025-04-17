@@ -119,7 +119,11 @@ export function useGripperRelease({
   doorStatusUtils,
   recoveryMap,
 }: UseGripperReleaseProps): number {
-  const { releaseGripperJaws, homeExceptPlungers } = recoveryCommands
+  const {
+    releaseGripperJaws,
+    releaseLabwareLatch,
+    homeExceptPlungers,
+  } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     proceedToRouteAndStep,
@@ -180,7 +184,26 @@ export function useGripperRelease({
           if (intervalId != null) {
             clearInterval(intervalId)
           }
-          if (recoveryMap.route === 
+          if (
+            recoveryMap.route ===
+            RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+          ) {
+            void releaseLabwareLatch().then(() => {
+              if (isDoorOpen) {
+                return handleMotionRouting(false).then(() => {
+                  proceedToDoorStep()
+                })
+              }
+
+              return handleMotionRouting(true)
+                .then(() => homeExceptPlungers())
+                .then(() => handleMotionRouting(false))
+                .then(() => {
+                  proceedToValidNextStep()
+                })
+            })
+          }
+        } else {
           void releaseGripperJaws().then(() => {
             if (isDoorOpen) {
               return handleMotionRouting(false).then(() => {

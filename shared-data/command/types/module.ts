@@ -70,6 +70,7 @@ export type ModuleCreateCommand =
   | FlexStackerFillCreateCommand
   | FlexStackerEmptyCreateCommand
   | FlexStackerPrepareShuttleCreateCommand
+  | FlexStackerOpenLatch
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -466,6 +467,14 @@ export interface FlexStackerPrepareShuttleCreateCommand
   params: {
     moduleId: string
     ignoreLatch?: boolean
+  }
+}
+
+// TODO(tz, 4-17-2025): move under unsafe domain when BE has moved as well
+export interface FlexStackerOpenLatch extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/openLatch'
+  params: {
+    moduleId: string
   }
 }
 

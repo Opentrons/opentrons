@@ -67,6 +67,8 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   releaseGripperJaws: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
+  releaseLabwareLatch: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
   homeExceptPlungers: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   moveLabwareWithoutPause: () => Promise<CommandData[]>
@@ -307,6 +309,10 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
 
+  const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
+    return chainRunRecoveryCommands([RELEASE_LABWARE_LATCH])
+  }, [chainRunRecoveryCommands])
+
   const homeExceptPlungers = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_EXCEPT_PLUNGERS])
   }, [chainRunRecoveryCommands])
@@ -342,6 +348,7 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     releaseGripperJaws,
+    releaseLabwareLatch,
     homeExceptPlungers,
     moveLabwareWithoutPause,
     skipFailedCommand,
@@ -374,6 +381,14 @@ export const HOME_PIPETTE_Z_AXES: CreateCommand = {
 export const RELEASE_GRIPPER_JAW: CreateCommand = {
   commandType: 'unsafe/ungripLabware',
   params: {},
+  intent: 'fixit',
+}
+
+export const RELEASE_LABWARE_LATCH: CreateCommand = {
+  commandType: 'flexStacker/openLatch',
+  params: {
+    moduleId: 'switch with actual',
+  },
   intent: 'fixit',
 }
 

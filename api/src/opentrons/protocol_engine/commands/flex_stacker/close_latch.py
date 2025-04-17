@@ -62,7 +62,7 @@ class CloseLatch(BaseCommand[CloseLatchParams, CloseLatchResult, ErrorOccurrence
 
     _ImplementationCls: Type[CloseLatchImpl] = CloseLatchImpl
 
-
+# TODO(tz, 4-17-2025): move under unsafe domain when BE has moved as well
 class CloseLatchCreate(BaseCommandCreate[CloseLatchParams]):
     """A request to execute a Flex Stacker CloseLatch command."""
 
