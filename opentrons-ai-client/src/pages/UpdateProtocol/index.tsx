@@ -340,7 +340,7 @@ export function UpdateProtocol(): JSX.Element {
           justifyContent={JUSTIFY_END}
         >
           <LargeButton
-          // TODO: fix this disabled increment logic
+            // TODO: fix this disabled increment logic
             disabled={false}
             buttonText={t('submit_prompt')}
             onClick={processDataAndNavigateToChat}

@@ -246,13 +246,13 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         type: 'application/json',
       })
       const url = URL.createObjectURL(blob)
-    
+
       // Use a temporary anchor
       const anchor = document.createElement('a')
       anchor.href = url
       anchor.download = 'protocol.json'
       anchor.click()
-    
+
       URL.revokeObjectURL(url)
     }
     const lastCodeBlock = document.querySelector(`#${chatId}`)

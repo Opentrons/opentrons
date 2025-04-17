@@ -21,7 +21,10 @@ import {
   updateProtocolChatAtom,
 } from '../../resources/atoms'
 
-import { ProtocolSectionsContainer, sections } from '../../organisms/ProtocolSectionsContainer'
+import {
+  ProtocolSectionsContainer,
+  sections,
+} from '../../organisms/ProtocolSectionsContainer'
 import {
   generateChatPrompt,
   generatePromptPreviewData,
