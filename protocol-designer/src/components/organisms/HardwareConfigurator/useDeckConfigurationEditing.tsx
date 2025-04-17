@@ -43,7 +43,7 @@ import type { FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type {
   CutoutConfigExtended,
-  ModuleExtended,
+  InitialDeckStateModules,
   OptionStage,
 } from './AddFixtureModal'
 
@@ -58,11 +58,7 @@ interface DeckConfigurationEditingProps {
 export function useDeckConfigurationEditing(
   deckConfig: DeckConfiguration,
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>,
-  modules:
-    | FormModules
-    | {
-        [x: string]: ModuleExtended
-      },
+  modules: FormModules | InitialDeckStateModules,
   fixtures: Fixtures,
   hasGripper: boolean,
   setValue?: UseFormSetValue<WizardFormState>,

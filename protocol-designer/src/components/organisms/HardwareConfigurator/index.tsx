@@ -18,14 +18,14 @@ import type {
 import type { FormModule, FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { CutoutConfigExtended, ModuleExtended } from './AddFixtureModal'
+import type {
+  CutoutConfigExtended,
+  InitialDeckStateModules,
+  ModuleExtended,
+} from './AddFixtureModal'
 
 interface HardwareConfiguratorProps {
-  modules:
-    | FormModules
-    | {
-        [x: string]: ModuleExtended
-      }
+  modules: FormModules | InitialDeckStateModules
   hasGripper: boolean
   fixtures: Fixtures
   setValue?: UseFormSetValue<WizardFormState>

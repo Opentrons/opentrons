@@ -44,14 +44,14 @@ import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId
 }
+export interface InitialDeckStateModules {
+  [moduleId: string]: ModuleExtended
+}
+
 interface AddFixtureModalProps {
   cutoutId: CutoutId
   closeModal: () => void
-  modules:
-    | FormModules
-    | {
-        [x: string]: ModuleExtended
-      }
+  modules: FormModules | InitialDeckStateModules
   fixtures: Fixtures
   deckConfig: DeckConfiguration
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>

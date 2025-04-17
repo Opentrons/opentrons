@@ -23,7 +23,7 @@ import type {
   CutoutId,
   FlexModuleCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { ModuleExtended } from '../../components/organisms/HardwareConfigurator/AddFixtureModal'
+import type { InitialDeckStateModules } from '../../components/organisms/HardwareConfigurator/AddFixtureModal'
 import type { ThunkDispatch } from '../../types'
 import type { Fixtures, FixtureName } from '../../components/organisms'
 
@@ -78,29 +78,30 @@ export function FlexHardware(): JSX.Element {
     {}
   )
 
-  const modules: {
-    [x: string]: ModuleExtended
-  } = Object.values(moduleOnDeck).reduce((acc, onDeckModule) => {
-    let cutoutFixtureId = onDeckModule.model as FlexModuleCutoutFixtureId
-    if (
-      onDeckModule.type === MAGNETIC_BLOCK_TYPE &&
-      Object.values(additionalEquipmentOnDeck).some(
-        ae =>
-          ae.name === 'stagingArea' && ae.location.includes(onDeckModule.slot)
-      )
-    ) {
-      cutoutFixtureId = STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
-    }
-    const module = {
-      [uuid()]: {
-        ...onDeckModule,
-        cutoutId: getCutoutIdForSlotName(onDeckModule.slot, deckDef),
-        cutoutFixtureId,
-      },
-    }
+  const modules: InitialDeckStateModules = Object.values(moduleOnDeck).reduce(
+    (acc, onDeckModule) => {
+      let cutoutFixtureId = onDeckModule.model as FlexModuleCutoutFixtureId
+      if (
+        onDeckModule.type === MAGNETIC_BLOCK_TYPE &&
+        Object.values(additionalEquipmentOnDeck).some(
+          ae =>
+            ae.name === 'stagingArea' && ae.location.includes(onDeckModule.slot)
+        )
+      ) {
+        cutoutFixtureId = STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+      }
+      const module = {
+        [uuid()]: {
+          ...onDeckModule,
+          cutoutId: getCutoutIdForSlotName(onDeckModule.slot, deckDef),
+          cutoutFixtureId,
+        },
+      }
 
-    return { ...acc, ...module }
-  }, {})
+      return { ...acc, ...module }
+    },
+    {}
+  )
 
   return (
     <HardwareConfigurator

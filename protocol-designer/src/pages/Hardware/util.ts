@@ -22,57 +22,59 @@ import type { DeckFixture } from '../../step-forms/actions/additionalItems'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 
 export const updateInitialDeckState = (
-  value: CutoutConfigExtended[],
+  values: CutoutConfigExtended[],
   initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
   dispatch: ThunkDispatch<any>
 ): void => {
   const { additionalEquipmentOnDeck, modules: moduleOnDeck } = initialDeckSetup
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  value.forEach(val => {
-    if (val.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
+  values.forEach(value => {
+    if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
       return
     }
     const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
-      ae => ae.name === (val.type as DeckFixture)
+      ae => ae.name === (value.type as DeckFixture)
     )
     const matchingModule = Object.values(moduleOnDeck).find(
       module =>
-        module.model === (val.type as ModuleModel) &&
-        getCutoutIdForSlotName(module.slot, deckDef) === val.cutoutId
+        module.model === (value.type as ModuleModel) &&
+        getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
-    if (FIXTURES.includes(val.type as DeckFixture)) {
+    if (FIXTURES.includes(value.type as DeckFixture)) {
       if (matchingFixture != null) {
         dispatch(deleteDeckFixture(matchingFixture.id))
       } else {
-        dispatch(createDeckFixture(val.type as DeckFixture, val.cutoutId))
+        dispatch(createDeckFixture(value.type as DeckFixture, value.cutoutId))
       }
-    } else if (val.type === 'stagingAreaAndMagneticBlock') {
+    } else if (value.type === 'stagingAreaAndMagneticBlock') {
       const matchingStagingArea = Object.values(additionalEquipmentOnDeck).find(
-        ae => ae.name === 'stagingArea' && ae.location === val.cutoutId
+        ae => ae.name === 'stagingArea' && ae.location === value.cutoutId
       )
       if (matchingStagingArea != null) {
         dispatch(deleteDeckFixture(matchingStagingArea.id))
       } else {
-        dispatch(createDeckFixture('stagingArea' as DeckFixture, val.cutoutId))
+        dispatch(
+          createDeckFixture('stagingArea' as DeckFixture, value.cutoutId)
+        )
       }
       const matchingModuleForAboveStaging = Object.values(moduleOnDeck).find(
         module =>
           module.model === MAGNETIC_BLOCK_V1 &&
-          val.cutoutId.includes(module.slot)
+          value.cutoutId.includes(module.slot)
       )
       if (matchingModuleForAboveStaging != null) {
         dispatch(deleteModule({ moduleId: matchingModuleForAboveStaging.id }))
       } else {
         dispatch(
           createModule({
-            slot: val.cutoutId.split('cutout')[1],
+            slot: value.cutoutId.split('cutout')[1],
             model: MAGNETIC_BLOCK_V1,
             type: MAGNETIC_BLOCK_TYPE,
           })
         )
       }
-    } else if (val.type === 'stagingAreaAndWasteChute') {
+    } else if (value.type === 'stagingAreaAndWasteChute') {
       const matchingFixtures = Object.values(additionalEquipmentOnDeck).filter(
         ae =>
           ae.name === 'wasteChute' ||
@@ -94,11 +96,11 @@ export const updateInitialDeckState = (
       if (matchingModule != null) {
         dispatch(deleteModule({ moduleId: matchingModule.id }))
       } else {
-        const type = getModuleType(val.type as ModuleModel)
-        const model = val.type as ModuleModel
+        const type = getModuleType(value.type as ModuleModel)
+        const model = value.type as ModuleModel
         dispatch(
           createModule({
-            slot: val.cutoutId.split('cutout')[1],
+            slot: value.cutoutId.split('cutout')[1],
             model,
             type,
           })

@@ -55,11 +55,12 @@ export function Hardware(): JSX.Element {
         height="100%"
         width="100%"
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
-        gridGap={SPACING.spacing40}
         overflowY="auto"
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
+        >
           <StyledText desktopStyle="headingSmallBold">
             {protocolName}
           </StyledText>
@@ -75,7 +76,11 @@ export function Hardware(): JSX.Element {
             {t('shared:save')}
           </PrimaryButton>
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+          padding={SPACING.spacing80}
+        >
           <StyledText desktopStyle="displayBold">
             {robotType === FLEX_ROBOT_TYPE
               ? t('edit_hardware')
