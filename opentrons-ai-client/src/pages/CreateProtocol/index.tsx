@@ -37,7 +37,7 @@ import type { DisplayModules } from '../../organisms/ModulesSection'
 import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 
 export interface CreateProtocolFormData {
-  protocol_format: 'pd' | 'python'
+  protocol_format: 'Protocol Designer' | 'Python'
   application: {
     scientificApplication: string
     otherApplication: string
