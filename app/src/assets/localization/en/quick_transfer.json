@@ -154,6 +154,8 @@
   "touch_tip": "Touch tip",
   "transfer_analysis_failed": "quick transfer analysis failed",
   "transfer_name": "Transfer Name",
+  "transfer_pipette_path_incompatible": "The selected pipette path is incompatible with this liquid class",
+  "transfer_volumes_incompatible": "Transfer volumes of 10 µL or less are incompatible with liquid classes",
   "trashBin_location": "Trash bin in {{slotName}}",
   "trashBin": "Trash bin",
   "tubeRack": "Tube racks",

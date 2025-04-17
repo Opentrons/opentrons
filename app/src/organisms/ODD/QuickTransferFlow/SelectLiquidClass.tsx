@@ -39,7 +39,6 @@ export function SelectLiquidClass({
 }: SelectLiquidClassProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [selectedLiquidClass, setSelectedLiquidClass] = useState<LiquidClass>()
-  const [incompatibleItem, setIncompatibleItem] = useState<string>('')
   const { makeSnackbar } = useToaster()
 
   const liquidClasses = getAllLiquidClassDefs()
@@ -62,7 +61,7 @@ export function SelectLiquidClass({
     onNext()
   }
 
-  console.log(liquidClassOptions)
+  // console.log(liquidClassOptions)
 
   const checkTipRackExist = (tipTypes: string[], target: string): boolean => {
     return tipTypes.some(item => {
@@ -74,11 +73,31 @@ export function SelectLiquidClass({
   /**
    * return true if pipette/tipRack is incompatible with liquid class
    */
-  const checkCompatibility = (liquid: LiquidClass): boolean => {
+  interface Compatibility {
+    pipetteInCompatible?: boolean
+    tipRackICompatible?: boolean
+    pipettePathInCompatible?: boolean
+    volumeInCompatible?: boolean
+    inCompatible: boolean
+  }
+  const checkCompatibility = (liquid: LiquidClass): Compatibility => {
     const { liquidClassName, byPipette } = liquid
-    if (liquidClassName === 'none') return false
-    if (state?.pipette === undefined || state?.tipRack === undefined)
-      return true
+    if (liquidClassName === 'none') {
+      return { inCompatible: false }
+    }
+    if (
+      state?.pipette === undefined ||
+      state?.tipRack === undefined ||
+      state.path === undefined ||
+      state.volume === undefined
+    ) {
+      return { inCompatible: true }
+    }
+
+    if (state.volume <= 10) {
+      return { inCompatible: true, volumeInCompatible: true }
+    }
+
     const pipetteModels = byPipette.map(pipette => pipette.pipetteModel)
     const tipTypes = byPipette.flatMap(pipette =>
       pipette.byTipType.map(tipType => tipType.tiprack)
@@ -90,21 +109,66 @@ export function SelectLiquidClass({
       tipTypes,
       state.tipRack.parameters.loadName
     )
-
-    if (isPipetteCompatible === false) {
-      setIncompatibleItem(state.pipette?.displayName)
+    let isPathCompatible = false
+    isPathCompatible = byPipette.some(pipette => {
+      // Check if *any* tip type within this pipette config matches the tiprack AND the required path parameter
+      return pipette.byTipType.some(tipType => {
+        // Check if the tiprack load name matches
+        if (tipType.tiprack === state?.tipRack?.parameters.loadName) {
+          switch (state.path) {
+            case 'single':
+              // For 'single' path, check if 'singleDispense' property is defined
+              return tipType.singleDispense !== undefined
+            case 'multiDispense':
+              // For 'multiDispense' path, check if 'multiDispense' property is defined
+              return tipType.multiDispense !== undefined
+            default:
+              return true
+          }
+        }
+      })
+    })
+    // if (state.path === 'multiDispense') {
+    //   isPathCompatible = byPipette.some(pipette =>
+    //     pipette.byTipType.some(
+    //       tipType =>
+    //         tipType.tiprack === state?.tipRack?.parameters.loadName &&
+    //         tipType.multiDispense !== undefined
+    //     )
+    //   )
+    // }
+    return {
+      pipetteInCompatible: !isPipetteCompatible,
+      tipRackICompatible: !isTipRackCompatible,
+      pipettePathInCompatible: !isPathCompatible,
+      inCompatible:
+        !isPipetteCompatible && !isTipRackCompatible && !isPathCompatible,
     }
-
-    return !isPipetteCompatible && !isTipRackCompatible
   }
 
   const handleClick = (option: LiquidClass): void => {
-    if (checkCompatibility(option)) {
-      makeSnackbar(
-        t('compatibility_error', {
-          pipetteOrLabware: incompatibleItem,
-        }) as string
-      )
+    const {
+      inCompatible,
+      pipetteInCompatible,
+      tipRackICompatible,
+      pipettePathInCompatible,
+      volumeInCompatible,
+    } = checkCompatibility(option)
+    if (inCompatible === true) {
+      if (volumeInCompatible === true) {
+        makeSnackbar(t('transfer_volumes_incompatible') as string)
+      } else if (pipetteInCompatible === true) {
+        makeSnackbar(t('transfer_pipette_path_incompatible') as string)
+      } else if (
+        pipettePathInCompatible === true ||
+        tipRackICompatible === true
+      ) {
+        makeSnackbar(
+          t('compatibility_error', {
+            pipetteOrLabware: state.pipette?.displayName,
+          }) as string
+        )
+      }
     }
   }
 
@@ -146,8 +210,7 @@ export function SelectLiquidClass({
             onClick={() => {
               handleClick(option)
             }}
-            // disabled={checkCompatibility(option)}
-            ariaDisabled={checkCompatibility(option)}
+            ariaDisabled={checkCompatibility(option).inCompatible}
           />
         ))}
       </Flex>
