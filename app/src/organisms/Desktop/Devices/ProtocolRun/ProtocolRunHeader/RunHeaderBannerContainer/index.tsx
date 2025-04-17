@@ -52,15 +52,19 @@ export function RunHeaderBannerContainer(
   const { analysisErrorModalUtils } = runHeaderModalContainerUtils
 
   const { t } = useTranslation(['run_details', 'shared'])
-  const isDoorOpen = useIsDoorOpen(robotName)
+  const doorStatus = useIsDoorOpen(robotName)
 
   const {
     showRunCanceledBanner,
     showDoorOpenBeforeRunBanner,
     showDoorOpenDuringRunBanner,
+    showStackerDoorOpenBeforeRunBanner,
+    showStackerDoorOpenDuringRunBanner,
+    showUnconfiguredStackerDoorOpenBeforeRunBanner,
+    showUnconfiguredStackerDoorOpenDuringRunBanner,
   } = getShowGenericRunHeaderBanners({
     runStatus,
-    isDoorOpen,
+    doorStatus,
     enteredER,
   })
 
@@ -80,12 +84,33 @@ export function RunHeaderBannerContainer(
       ) : null}
       {showDoorOpenBeforeRunBanner ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('shared:close_robot_door')}
+          {t('shared:close_robot_door' + doorStatus.isDoorOpen + doorStatus.moduleDoorLocation)}
+        </Banner>
+      ) : null}
+      {showUnconfiguredStackerDoorOpenBeforeRunBanner ? (
+        <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
+          {t('shared:close_unconfigured_stacker_door', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          })}
+        </Banner>
+      ) : null}
+      {showStackerDoorOpenBeforeRunBanner ? (
+        <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
+          {t('shared:close_stacker_door', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          })}
         </Banner>
       ) : null}
       {showDoorOpenDuringRunBanner ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
           {t('close_door_to_resume_run')}
+        </Banner>
+      ) : null}
+      {showStackerDoorOpenDuringRunBanner ? (
+        <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
+          {t('TBD_CLOSE_STACKER_DOOR_DURING_RUN', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          })}
         </Banner>
       ) : null}
       {terminalBannerType != null ? (
