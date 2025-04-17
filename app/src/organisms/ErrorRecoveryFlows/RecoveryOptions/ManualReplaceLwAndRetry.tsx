@@ -38,12 +38,16 @@ export function ManualReplaceLwAndRetry(
 
   const primaryBtnOnClick = (): Promise<void> => {
     return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
-      if (route === LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE) {
-        void homeShuttle().then(() => {
+      switch (route) {
+        case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+        case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+          void homeShuttle().then(() => {
+            proceedToRouteAndStep(route, buildNextStep())
+          })
+          break
+        default:
           proceedToRouteAndStep(route, buildNextStep())
-        })
-      } else {
-        proceedToRouteAndStep(route, buildNextStep())
+          break
       }
     })
   }
