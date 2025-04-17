@@ -6,6 +6,8 @@ import {
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
 import type {
@@ -13,16 +15,16 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { FormModules } from '../../../step-forms'
+import type { FormModule, FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { CutoutConfigExtended, ModuleMore } from './AddFixtureModal'
+import type { CutoutConfigExtended, ModuleExtended } from './AddFixtureModal'
 
 interface HardwareConfiguratorProps {
   modules:
     | FormModules
     | {
-        [x: string]: ModuleMore
+        [x: string]: ModuleExtended
       }
   hasGripper: boolean
   fixtures: Fixtures
@@ -53,20 +55,22 @@ export function HardwareConfigurator(
     }
   )
   const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
-    (module): DeckConfiguration => {
+    (module: FormModule | ModuleExtended): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
       const defaultModuleConfig: CutoutConfig = {
         cutoutId: getCutoutIdFromAddressableArea(
-          module.slot as string,
+          module.slot,
           deckDef
         ) as CutoutId,
         cutoutFixtureId: hasThermocycler
-          ? 'thermocyclerModuleV2Front'
-          : module.cutoutFixtureId ?? 'singleStandardSlot',
+          ? THERMOCYCLER_V2_FRONT_FIXTURE
+          : 'cutoutFixtureId' in module
+          ? module.cutoutFixtureId ?? 'singleStandardSlot'
+          : 'singleStandardSlot',
       }
       const thermocyclerA1Config: CutoutConfig = {
         cutoutId: 'cutoutA1',
-        cutoutFixtureId: 'thermocyclerModuleV2Rear',
+        cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
       }
       return [
         defaultModuleConfig,

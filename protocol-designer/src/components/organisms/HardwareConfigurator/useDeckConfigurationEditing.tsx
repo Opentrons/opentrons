@@ -43,7 +43,7 @@ import type { FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type {
   CutoutConfigExtended,
-  ModuleMore,
+  ModuleExtended,
   OptionStage,
 } from './AddFixtureModal'
 
@@ -61,7 +61,7 @@ export function useDeckConfigurationEditing(
   modules:
     | FormModules
     | {
-        [x: string]: ModuleMore
+        [x: string]: ModuleExtended
       },
   fixtures: Fixtures,
   hasGripper: boolean,
@@ -154,8 +154,12 @@ export function useDeckConfigurationEditing(
         type = 'wasteChute'
       } else if (thermocyclerCutoutFixtureId) {
         type = 'thermocyclerModuleV2'
-      } else {
+      } else if (cutoutFixtureId === 'stagingAreaRightSlot') {
         type = 'stagingArea'
+      } else if (
+        cutoutFixtureId === 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+      ) {
+        type = 'stagingAreaAndWasteChute'
       }
     }
     updateInitialDeckState?.([{ cutoutId, cutoutFixtureId, type }])
@@ -306,7 +310,10 @@ export const getAvailableOptions = (
       {
         cutoutId,
         cutoutFixtureId: fixture,
-        type: 'wasteChute',
+        type:
+          fixture === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+            ? 'wasteChute'
+            : 'stagingAreaAndWasteChute',
       },
     ])
   }

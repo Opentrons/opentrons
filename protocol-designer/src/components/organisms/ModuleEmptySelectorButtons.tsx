@@ -13,9 +13,9 @@ interface ModuleEmptSelectorButtonProps {
   modules: ModuleModel[]
   addModule: (moduleModel: ModuleModel) => void
 }
-export const ModuleEmptySelectorButtons = (
+export function ModuleEmptySelectorButtons(
   props: ModuleEmptSelectorButtonProps
-): JSX.Element => {
+): JSX.Element {
   const { modules, addModule } = props
   return (
     <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>

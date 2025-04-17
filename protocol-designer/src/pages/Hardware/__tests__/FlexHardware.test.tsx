@@ -1,5 +1,10 @@
 import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { DeckConfigurator } from '@opentrons/components'
+import {
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+} from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import {
@@ -7,7 +12,6 @@ import {
   getInitialDeckSetup,
 } from '../../../step-forms/selectors'
 import { FlexHardware } from '../FlexHardware'
-import { DeckConfigurator } from '@opentrons/components'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
@@ -30,8 +34,8 @@ describe('FlexHardware', () => {
       pipettes: {},
       modules: {
         temp: {
-          model: 'temperatureModuleV1',
-          type: 'temperatureModuleType',
+          model: TEMPERATURE_MODULE_V1,
+          type: TEMPERATURE_MODULE_TYPE,
           id: 'temp',
           pythonName: 'mockPythonName',
           moduleState: {} as any,

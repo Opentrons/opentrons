@@ -29,7 +29,6 @@ import { getAvailableOptions } from './useDeckConfigurationEditing'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { ModuleEntity } from '@opentrons/step-generation'
 import type {
   CutoutConfig,
   CutoutId,
@@ -38,11 +37,11 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModalProps } from '@opentrons/components'
-import type { FormModules } from '../../../step-forms'
+import type { FormModules, ModuleOnDeck } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
 
-export interface ModuleMore extends ModuleEntity {
+export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId
 }
 interface AddFixtureModalProps {
@@ -51,13 +50,16 @@ interface AddFixtureModalProps {
   modules:
     | FormModules
     | {
-        [x: string]: ModuleMore
+        [x: string]: ModuleExtended
       }
   fixtures: Fixtures
   deckConfig: DeckConfiguration
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>
   hasGripper: boolean
+  //  used for setting the value in react-hook-form for the onboarding flow
   setValue?: UseFormSetValue<WizardFormState>
+  //  used for updating the initialDeckState in redux in overview and
+  //  starting deck state
   updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
 }
 export type OptionStage =
@@ -67,10 +69,19 @@ export type OptionStage =
   | 'wasteChuteOptions'
 
 export interface CutoutConfigExtended extends CutoutConfig {
-  type?: DeckFixture | ModuleModel | 'stagingAreaAndMagneticBlock'
+  type?:
+    | DeckFixture
+    | ModuleModel
+    | 'stagingAreaAndMagneticBlock'
+    | 'stagingAreaAndWasteChute'
 }
 
-const FIXTURES = ['wasteChute', 'trashBin', 'stagingArea']
+const FIXTURES = [
+  'wasteChute',
+  'trashBin',
+  'stagingArea',
+  'stagingAreaAndWasteChute',
+]
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
@@ -171,7 +182,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       //  block thermocycler from being added if there is something in slot A1
     } else if (
       addedCutoutConfigs.some(
-        cutoutConfig => cutoutConfig.type === 'thermocyclerModuleV2'
+        cutoutConfig => cutoutConfig.type === THERMOCYCLER_MODULE_V2
       ) &&
       (Object.values(modules).some(module => module.cutoutId === 'cutoutA1') ||
         Object.values(fixtures).some(
@@ -229,8 +240,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       }
       if (newFixture != null) {
         const isStagingAreaAndWasteChute =
-          newFixture.cutoutFixtureId ===
-          'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+          newFixture.type === 'stagingAreaAndWasteChute'
 
         const filteredFixtures = Object.fromEntries(
           Object.entries(fixtures).filter(
@@ -243,22 +253,23 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           additionalFixture = {
             [uuid()]: {
               name: 'stagingArea',
-              cutoutFixtureId: 'stagingAreaRightSlot',
+              cutoutFixtureId: newFixture.cutoutFixtureId,
               cutoutId: 'cutoutD3',
             },
           }
+        }
+        let name = newFixture.type as DeckFixture
+        if (newFixture.type === 'stagingAreaAndMagneticBlock') {
+          name = 'stagingArea'
+        } else if (newFixture.type === 'stagingAreaAndWasteChute') {
+          name = 'wasteChute'
         }
 
         const updatedFixtures: Fixtures = {
           ...filteredFixtures,
           [uuid()]: {
-            name:
-              newFixture.type === 'stagingAreaAndMagneticBlock'
-                ? 'stagingArea'
-                : (newFixture.type as DeckFixture),
-            cutoutFixtureId: isStagingAreaAndWasteChute
-              ? 'wasteChuteRightAdapterNoCover'
-              : newFixture.cutoutFixtureId,
+            name,
+            cutoutFixtureId: newFixture.cutoutFixtureId,
             cutoutId: newFixture.cutoutId,
           },
           ...additionalFixture,

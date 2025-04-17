@@ -1,5 +1,9 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+} from '@opentrons/shared-data'
 import { DeckFromLayers, DropdownMenu } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
@@ -58,7 +62,11 @@ describe('Ot2Modules', () => {
     screen.getByText('Temperature Module GEN1')
     screen.getByText('Thermocycler Module GEN2')
     fireEvent.click(screen.getByText('Thermocycler Module GEN1'))
-    expect(vi.mocked(createModule)).toHaveBeenCalled()
+    expect(vi.mocked(createModule)).toHaveBeenCalledWith({
+      slot: '7',
+      model: THERMOCYCLER_MODULE_V1,
+      type: THERMOCYCLER_MODULE_TYPE,
+    })
     screen.getByText('mock DeckFromLayers')
   })
   it('should render a temperature module on slot 1 and removing it calls the deleteModule action', () => {
@@ -80,6 +88,6 @@ describe('Ot2Modules', () => {
     render()
     screen.getByText('Deck slot')
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
-    expect(vi.mocked(deleteModule)).toHaveBeenCalled()
+    expect(vi.mocked(deleteModule)).toHaveBeenCalledWith({ moduleId: 'temp' })
   })
 })
