@@ -177,7 +177,7 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
     case ERROR_KINDS.SHUTTLE_MISSING:
       return SHUTTLE_MISSING_OPTIONS
     case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
-        return LABWARE_MISSING_IN_SHUTTLE_OPTIONS
+      return LABWARE_MISSING_IN_SHUTTLE_OPTIONS
   }
 }
 

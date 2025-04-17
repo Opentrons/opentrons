@@ -28,7 +28,7 @@ export function ManualReplaceLwAndRetry(
     HOPPER_MANUAL_LOAD_AND_RETRY,
     HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
     ROBOT_IN_MOTION,
-    REPLACE_LABWARE_IN_HOOPER_AND_RETRY
+    REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
   } = RECOVERY_MAP
 
   const { t } = useTranslation('error_recovery')
