@@ -3,14 +3,10 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   Box,
   COLORS,
-  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  FONT_WEIGHT_REGULAR,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
-  WRAP,
 } from '@opentrons/components'
 
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
