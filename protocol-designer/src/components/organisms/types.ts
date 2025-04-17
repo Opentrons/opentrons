@@ -17,6 +17,9 @@ export interface WizardFormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
   modules: FormModules
-  hasGripper: boolean
   fixtures: Fixtures
+  hasGripper: boolean | null
+  //  used purely for the SelectBasics form buttons
+  hasThermocycler: boolean | null
+  hasWasteChute: boolean | null
 }

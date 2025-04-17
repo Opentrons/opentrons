@@ -11,14 +11,14 @@ import {
 
 interface BasicButtonsProps {
   header: string
-  isSelected: boolean
+  selected: boolean | null
   onChange: (value: boolean) => void
   type: 'gripper' | 'wasteChute' | 'thermocycler'
   subHeader?: string
 }
 
 export function BasicsButtons(props: BasicButtonsProps): JSX.Element {
-  const { header, onChange, isSelected, type, subHeader } = props
+  const { header, onChange, selected, type, subHeader } = props
   const { t } = useTranslation('shared')
 
   return (
@@ -35,18 +35,20 @@ export function BasicsButtons(props: BasicButtonsProps): JSX.Element {
         <Flex gridGap={SPACING.spacing4}>
           <RadioButton
             id={`${type}_yes`}
+            testid={`BasicsButtons_${type}_yes`}
             buttonLabel={t('yes')}
             buttonValue="yes"
-            isSelected={isSelected}
+            isSelected={selected === true}
             onChange={() => {
               onChange(true)
             }}
           />
           <RadioButton
             id={`${type}_no`}
+            testid={`BasicsButtons_${type}_no`}
             buttonLabel={t('no')}
             buttonValue="no"
-            isSelected={!isSelected}
+            isSelected={selected === false}
             onChange={() => {
               onChange(false)
             }}

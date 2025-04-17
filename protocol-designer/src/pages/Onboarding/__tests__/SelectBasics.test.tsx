@@ -54,6 +54,8 @@ const values = {
     right: {},
   },
   modules: {},
+  hasThermocycler: false,
+  hasWasteChute: false,
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {

@@ -99,7 +99,7 @@ export function HardwareConfigurator(
     setUpdatedDeckConfig,
     modules,
     fixtures,
-    hasGripper,
+    hasGripper ?? false,
     setValue,
     updateInitialDeckState
   )

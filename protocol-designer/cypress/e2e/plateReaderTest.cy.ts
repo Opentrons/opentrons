@@ -32,6 +32,8 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupVerifications.OnStep3())
     steps.add(SetupSteps.NoGripper())
+    steps.add(SetupSteps.NoThermocycler())
+    steps.add(SetupSteps.NoWasteChute())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.AbsorbanceNotSelectable())
     steps.add(SetupSteps.GoBack())
