@@ -65,6 +65,7 @@ export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 export const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
 // NOTE: in the negative Z direction, to go down from top
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
+export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE = 0
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 export const DEFAULT_DELAY_SECONDS = 1
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
