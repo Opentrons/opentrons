@@ -4,10 +4,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  BORDERS,
+  Box,
   Btn,
+  COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
+  JUSTIFY_CENTER,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
@@ -139,7 +146,7 @@ export const TimelineToolbox = ({
         </Flex>
       }
       titlePadding={SPACING.spacing12}
-      childrenPadding={SPACING.spacing12}
+      childrenPadding="0px"
       confirmButton={
         formData != null ? undefined : (
           <AddStepButton hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON} />
@@ -151,28 +158,65 @@ export const TimelineToolbox = ({
         gridGap={SPACING.spacing4}
         width="100%"
       >
-        <StyledText
-          desktopStyle="bodyLargeSemiBold"
-          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+        <Flex
+          gridGap={SPACING.spacing8}
+          padding={SPACING.spacing12}
+          flexDirection={DIRECTION_COLUMN}
         >
-          {t('timeline')}
-        </StyledText>
-        <TerminalItemStep
-          id={START_TERMINAL_ITEM_ID}
-          sidebarWidth={sidebarWidth}
-        />
-        <DraggableSteps
-          orderedStepIds={orderedStepIds}
-          reorderSteps={(stepIds: StepIdType[]) => {
-            dispatch(steplistActions.reorderSteps(stepIds))
-          }}
-          sidebarWidth={sidebarWidth}
-        />
-        <PresavedStep sidebarWidth={sidebarWidth} />
-        <TerminalItemStep
-          id={END_TERMINAL_ITEM_ID}
-          sidebarWidth={sidebarWidth}
-        />
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {'deck hardware'}
+          </StyledText>
+          <Box
+            role="button"
+            onClick={() => {}}
+            padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
+            borderRadius={BORDERS.borderRadius8}
+            width="100%"
+            backgroundColor={COLORS.blue20}
+            cursor={CURSOR_POINTER}
+          >
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_CENTER}
+              width="100%"
+            >
+              <Icon
+                size="1.7rem"
+                name="deck-map"
+                color={COLORS.black90}
+                minWidth="1.25rem"
+              />
+            </Flex>
+          </Box>
+        </Flex>
+        <Divider />
+        <Flex
+          padding={SPACING.spacing12}
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+        >
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('timeline')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            <TerminalItemStep
+              id={START_TERMINAL_ITEM_ID}
+              sidebarWidth={sidebarWidth}
+            />
+            <DraggableSteps
+              orderedStepIds={orderedStepIds}
+              reorderSteps={(stepIds: StepIdType[]) => {
+                dispatch(steplistActions.reorderSteps(stepIds))
+              }}
+              sidebarWidth={sidebarWidth}
+            />
+            <PresavedStep sidebarWidth={sidebarWidth} />
+            <TerminalItemStep
+              id={END_TERMINAL_ITEM_ID}
+              sidebarWidth={sidebarWidth}
+            />
+          </Flex>
+        </Flex>
       </Flex>
     </Toolbox>
   )
