@@ -33,6 +33,8 @@ describe('The Redesigned Create Protocol Landing Page', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupVerifications.OnStep3())
     steps.add(SetupSteps.YesGripper())
+    steps.add(SetupSteps.NoThermocycler())
+    steps.add(SetupSteps.NoWasteChute())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.Step4Verification())
     steps.add(SetupSteps.AddThermocycler())

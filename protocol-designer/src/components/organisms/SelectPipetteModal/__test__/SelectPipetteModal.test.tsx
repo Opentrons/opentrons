@@ -41,6 +41,8 @@ const render = (props: ComponentProps<typeof SelectPipetteModal>) => {
 const values = {
   fixtures: {},
   hasGripper: false,
+  hasThermocycler: false,
+  hasWasteChute: false,
   fields: {
     name: '',
     description: '',

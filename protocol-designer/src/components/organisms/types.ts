@@ -12,11 +12,14 @@ export interface FixtureInfo {
   name: FixtureName
   cutoutFixtureId: CutoutFixtureId
 }
-export type WizardFixtureType = Record<string, FixtureInfo>
+export type Fixtures = Record<string, FixtureInfo>
 export interface WizardFormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
   modules: FormModules
-  hasGripper: boolean
-  fixtures: WizardFixtureType
+  fixtures: Fixtures
+  hasGripper: boolean | null
+  //  used purely for the SelectBasics form buttons
+  hasThermocycler: boolean | null
+  hasWasteChute: boolean | null
 }

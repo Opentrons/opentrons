@@ -313,6 +313,24 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Click "No" for thermocycler.
+   */
+  NoThermocycler: (): StepThunk => ({
+    call: () => {
+      cy.get('[data-testid="BasicsButtons_thermocycler_no"]').click()
+    },
+  }),
+
+  /**
+   * Click "No" for wasteChute.
+   */
+  NoWasteChute: (): StepThunk => ({
+    call: () => {
+      cy.get('[data-testid="BasicsButtons_wasteChute_no"]').click()
+    },
+  }),
+
   AddPlateReader: (): StepThunk => ({
     call: () => {
       cy.get('button[data-testid="cutoutD3"]').click()
@@ -1111,6 +1129,8 @@ export const CompositeSetupSteps = {
       UniversalSteps.Snapshot().call()
       SetupVerifications.OnStep3().call()
       SetupSteps.YesGripper().call()
+      SetupSteps.NoThermocycler().call()
+      SetupSteps.NoWasteChute().call()
       SetupSteps.Confirm().call()
       SetupVerifications.Step4Verification().call()
 
