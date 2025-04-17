@@ -19,23 +19,34 @@ from typing import (
     List,
     Dict,
     Optional,
-    Union,
     Tuple,
     cast,
     Sequence,
     Mapping,
+    Union,
+    Literal,
 )
 
-from opentrons_shared_data.labware.types import LabwareDefinition, LabwareParameters
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareParameters2,
+    LabwareParameters3,
+)
 
-from opentrons.types import Location, Point, NozzleMapInterface
+from opentrons.types import (
+    Location,
+    Point,
+    NozzleMapInterface,
+    MeniscusTrackingTarget,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
     UnsupportedAPIError,
 )
-
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -49,7 +60,10 @@ from . import validation
 from ._liquid import Liquid
 from ._types import OffDeckType
 from .core import well_grid
-from .core.engine import ENGINE_CORE_API_VERSION, SET_OFFSET_RESTORED_API_VERSION
+from .core.engine import (
+    ENGINE_CORE_API_VERSION,
+    SET_OFFSET_RESTORED_API_VERSION,
+)
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
 from .core.core_map import LoadedCoreMap
@@ -248,16 +262,21 @@ class Well:
         return Location(self._core.get_center(), self)
 
     @requires_version(2, 21)
-    def meniscus(self, z: float = 0.0) -> Location:
+    def meniscus(
+        self, z: float = 0.0, target: Literal["start", "end", "dynamic"] = "end"
+    ) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
             negative offsets are lower.
-        :return: A :py:class:`~opentrons.types.Location` that indicates location is meniscus and that holds the ``z`` offset in its point.z field.
+        :param target: The relative position of the liquid meniscus inside the well to target when performing a liquid handling operation.
 
-        :meta private:
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the liquid meniscus, plus a target position and ``z`` offset as specified.
+
         """
         return Location(
-            point=Point(x=0, y=0, z=z), labware=self, _ot_internal_is_meniscus=True
+            point=Point(x=0, y=0, z=z),
+            labware=self,
+            _meniscus_tracking=MeniscusTrackingTarget(target),
         )
 
     @requires_version(2, 8)
@@ -307,14 +326,43 @@ class Well:
         :param Liquid liquid: The liquid to load into the well.
         :param float volume: The volume of liquid to load, in µL.
 
-        .. TODO: flag as deprecated in 2.22 docs
-            In API version 2.22 and later, use :py:meth:`~Labware.load_liquid`, :py:meth:`~Labware.load_liquid_by_well`,
-            or :py:meth:`~Labware.load_empty` to load liquid into a well.
+        .. deprecated:: 2.22
+            Use :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, or :py:meth:`.Labware.load_empty` instead.
+
         """
         self._core.load_liquid(
             liquid=liquid,
             volume=volume,
         )
+
+    @requires_version(2, 21)
+    def current_liquid_height(self) -> LiquidTrackingType:
+        """Get the current liquid height in a well."""
+        return self._core.current_liquid_height()
+
+    @requires_version(2, 21)
+    def current_liquid_volume(self) -> LiquidTrackingType:
+        """Get the current liquid volume in a well."""
+        return self._core.get_liquid_volume()
+
+    @requires_version(2, 21)
+    def estimate_liquid_height_after_pipetting(
+        self,
+        operation_volume: float,
+    ) -> LiquidTrackingType:
+        """Check the height of the liquid within a well.
+
+        :returns: The height, in mm, of the liquid from the deck.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
+
+        projected_final_height = self._core.estimate_liquid_height_after_pipetting(
+            operation_volume=operation_volume,
+        )
+        return projected_final_height
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
@@ -509,7 +557,7 @@ class Labware:
 
     @property
     @requires_version(2, 0)
-    def parameters(self) -> "LabwareParameters":
+    def parameters(self) -> "LabwareParameters2 | LabwareParameters3":
         """Internal properties of a labware including type and quirks."""
         return self._core.get_parameters()
 
@@ -636,7 +684,7 @@ class Labware:
         version: Optional[int] = None,
     ) -> Labware:
         """
-        Load a stack of Lids onto a valid Deck Location or Adapter.
+        Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
 
         :param str load_name: A string to use for looking up a lid definition.
             You can find the ``load_name`` for any standard lid on the Opentrons
@@ -657,7 +705,7 @@ class Labware:
             leave this unspecified to let ``load_lid_stack()`` choose a version
             automatically.
 
-        :return: The initialized and loaded labware object representing the Lid Stack.
+        :return:  The initialized and loaded labware object representing the lid stack.
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
@@ -712,18 +760,25 @@ class Labware:
 
         .. list-table::
             :header-rows: 1
+            :widths: 1 5
 
             * - API level
               - Offset behavior
             * - 2.12–2.13
               - Offsets only apply to the exact :py:class:`.Labware` instance.
+
+                If your protocol has multiple instances of the same type of labware,
+                you must either use ``set_offset()`` on all of them or none of them.
             * - 2.14–2.17
               - ``set_offset()`` is not available, and the API raises an error.
-            * - 2.18 and newer
+            * - 2.18--2.22
               -
                 - Offsets apply to any labware of the same type, in the same on-deck location.
                 - Offsets can't be set on labware that is currently off-deck.
                 - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
+            * - 2.23 and newer
+              -
+                On Flex, offsets can apply to all labware of the same type, regardless of their on-deck location.
 
         .. note::
 
@@ -1215,22 +1270,15 @@ class Labware:
     ) -> None:
         """Mark several wells as containing the same amount of liquid.
 
-        This method should be called at the beginning of a protocol, soon after loading the labware and before
-        liquid handling operations begin. It is a base of information for liquid tracking functionality. If a well in a labware
-        has not been named in a call to :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
-        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked.
-
-        For example, to load 10µL of a liquid named ``water`` (defined with :py:meth:`~ProtocolContext.define_liquid`)
-        into all the wells of a labware, you could call ``labware.load_liquid(labware.wells(), 10, water)``.
-
-        If you want to load different volumes of liquid into different wells, use :py:meth:`~Labware.load_liquid_by_well`.
-
-        If you want to mark the well as containing no liquid, use :py:meth:`~Labware.load_empty`.
+        This method should be called at the beginning of a protocol, soon after loading labware and before
+        liquid handling operations begin. Loading liquids is required for liquid tracking functionality. If a well
+        hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
+        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
 
         :param wells: The wells to load the liquid into.
-        :type wells: List of well names or list of Well objects, for instance from :py:meth:`~Labware.wells`.
+        :type wells: List of string well names or list of :py:class:`.Well` objects (e.g., from :py:meth:`~Labware.wells`).
 
-        :param volume: The volume of liquid to load into each well, in 10µL.
+        :param volume: The volume of liquid to load into each well.
         :type volume: float
 
         :param liquid: The liquid to load into each well, previously defined by :py:meth:`~ProtocolContext.define_liquid`
@@ -1266,18 +1314,9 @@ class Labware:
     ) -> None:
         """Mark several wells as containing unique volumes of liquid.
 
-        This method should be called at the beginning of a protocol, soon after loading the labware and before
-        liquid handling operations begin. It is a base of information for liquid tracking functionality. If a well in a labware
-        has not been named in a call to :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
-        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked.
-
-        For example, to load a decreasing amount of of a liquid named ``water`` (defined with :py:meth:`~ProtocolContext.define_liquid`)
-        into each successive well of a row, you could call
-        ``labware.load_liquid_by_well({'A1': 1000, 'A2': 950, 'A3': 900, ..., 'A12': 600}, water)``
-
-        If you want to load the same volume of a liquid into multiple wells, it is often easier to use :py:meth:`~Labware.load_liquid`.
-
-        If you want to mark the well as containing no liquid, use :py:meth:`~Labware.load_empty`.
+        This method should be called at the beginning of a protocol, soon after loading labware and before
+        liquid handling begins. Loading liquids is required for liquid tracking functionality. If a well hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
+        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
 
         :param volumes: A dictionary of well names (or :py:class:`Well` objects, for instance from ``labware['A1']``)
         :type wells: Dict[Union[str, Well], float]
@@ -1313,12 +1352,9 @@ class Labware:
     def load_empty(self, wells: Sequence[Union[Well, str]]) -> None:
         """Mark several wells as empty.
 
-        This method should be called at the beginning of a protocol, soon after loading the labware and before liquid handling
-        operations begin. It is a base of information for liquid tracking functionality. If a well in a labware has not been named
-        in a call to :py:meth:`Labware.load_empty`, :py:meth:`Labware.load_liquid`, or :py:meth:`Labware.load_liquid_by_well`, the
-        volume it contains is unknown and the well's liquid will not be tracked.
-
-        For instance, to mark all wells in the labware as empty, you can call ``labware.load_empty(labware.wells())``.
+        This method should be called at the beginning of a protocol, after loading the labware and before liquid handling
+        begins. Loading liquids is required for liquid tracking functionality. If a well in a labware hasn't been assigned a starting volume with :py:meth:`Labware.load_empty`, :py:meth:`Labware.load_liquid`, or :py:meth:`Labware.load_liquid_by_well`, the
+        volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
 
         :param wells: The list of wells to mark empty. To mark all wells as empty, pass ``labware.wells()``. You can also specify
                       wells by their names (for instance, ``labware.load_empty(['A1', 'A2'])``).
@@ -1417,7 +1453,7 @@ def next_available_tip(
 # TODO(mc, 2022-11-09): implementation detail, move somewhere else
 # only used in old calibration flows by robot-server
 def load_from_definition(
-    definition: "LabwareDefinition",
+    definition: "LabwareDefinition2",
     parent: Location,
     label: Optional[str] = None,
     api_level: Optional[APIVersion] = None,
@@ -1461,8 +1497,8 @@ def load(
     label: Optional[str] = None,
     namespace: Optional[str] = None,
     version: int = 1,
-    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
-    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    bundled_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
+    extra_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
     api_level: Optional[APIVersion] = None,
 ) -> Labware:
     """
@@ -1499,5 +1535,15 @@ def load(
         bundled_defs=bundled_defs,
         extra_defs=extra_defs,
     )
+
+    # The legacy `load_from_definition()` function that we're calling only supports
+    # schemaVersion==2 labware. Fortunately, when robot-server calls this function,
+    # we only expect it to try to load schemaVersion==2 labware, so we never expect
+    # this ValueError to be raised in practice.
+    if definition["schemaVersion"] != 2:
+        raise ValueError(
+            f"{namespace}/{load_name}/{version} has schema {definition['schemaVersion']}."
+            " Only schema 2 is supported."
+        )
 
     return load_from_definition(definition, parent, label, api_level)

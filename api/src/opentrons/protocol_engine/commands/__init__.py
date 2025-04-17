@@ -14,6 +14,7 @@ and/or schema generation.
 """
 
 from . import absorbance_reader
+from . import flex_stacker
 from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
@@ -60,6 +61,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_while_tracking import (
+    AspirateWhileTracking,
+    AspirateWhileTrackingParams,
+    AspirateWhileTrackingCreate,
+    AspirateWhileTrackingResult,
+    AspirateWhileTrackingCommandType,
+)
+
 from .aspirate_in_place import (
     AspirateInPlace,
     AspirateInPlaceParams,
@@ -90,6 +99,14 @@ from .dispense import (
     DispenseCreate,
     DispenseResult,
     DispenseCommandType,
+)
+
+from .dispense_while_tracking import (
+    DispenseWhileTracking,
+    DispenseWhileTrackingParams,
+    DispenseWhileTrackingCreate,
+    DispenseWhileTrackingResult,
+    DispenseWhileTrackingCommandType,
 )
 
 from .dispense_in_place import (
@@ -380,26 +397,26 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
-from .evotip_seal_pipette import (
-    EvotipSealPipette,
-    EvotipSealPipetteParams,
-    EvotipSealPipetteCreate,
-    EvotipSealPipetteResult,
-    EvotipSealPipetteCommandType,
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipParams,
+    SealPipetteToTipCreate,
+    SealPipetteToTipResult,
+    SealPipetteToTipCommandType,
 )
-from .evotip_unseal_pipette import (
-    EvotipUnsealPipette,
-    EvotipUnsealPipetteParams,
-    EvotipUnsealPipetteCreate,
-    EvotipUnsealPipetteResult,
-    EvotipUnsealPipetteCommandType,
+from .unseal_pipette_from_tip import (
+    UnsealPipetteFromTip,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipCommandType,
 )
-from .evotip_dispense import (
-    EvotipDispense,
-    EvotipDispenseParams,
-    EvotipDispenseCreate,
-    EvotipDispenseResult,
-    EvotipDispenseCommandType,
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseParams,
+    PressureDispenseCreate,
+    PressureDispenseResult,
+    PressureDispenseCommandType,
 )
 
 __all__ = [
@@ -435,6 +452,12 @@ __all__ = [
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # aspirate while tracking command models
+    "AspirateWhileTracking",
+    "AspirateWhileTrackingCreate",
+    "AspirateWhileTrackingParams",
+    "AspirateWhileTrackingResult",
+    "AspirateWhileTrackingCommandType",
     # aspirate in place command models
     "AspirateInPlace",
     "AspirateInPlaceCreate",
@@ -459,6 +482,12 @@ __all__ = [
     "DispenseParams",
     "DispenseResult",
     "DispenseCommandType",
+    # dispense while tracking command models
+    "DispenseWhileTracking",
+    "DispenseWhileTrackingCreate",
+    "DispenseWhileTrackingParams",
+    "DispenseWhileTrackingResult",
+    "DispenseWhileTrackingCommandType",
     # dispense in place command models
     "DispenseInPlace",
     "DispenseInPlaceCreate",
@@ -636,6 +665,7 @@ __all__ = [
     # hardware control command models
     # hardware module command bundles
     "absorbance_reader",
+    "flex_stacker",
     "heater_shaker",
     "magnetic_module",
     "temperature_module",
@@ -692,22 +722,22 @@ __all__ = [
     "TryLiquidProbeCreate",
     "TryLiquidProbeResult",
     "TryLiquidProbeCommandType",
-    # evotip seal command bundle
-    "EvotipSealPipette",
-    "EvotipSealPipetteParams",
-    "EvotipSealPipetteCreate",
-    "EvotipSealPipetteResult",
-    "EvotipSealPipetteCommandType",
-    # evotip unseal command bundle
-    "EvotipUnsealPipette",
-    "EvotipUnsealPipetteParams",
-    "EvotipUnsealPipetteCreate",
-    "EvotipUnsealPipetteResult",
-    "EvotipUnsealPipetteCommandType",
-    # evotip dispense command bundle
-    "EvotipDispense",
-    "EvotipDispenseParams",
-    "EvotipDispenseCreate",
-    "EvotipDispenseResult",
-    "EvotipDispenseCommandType",
+    # seal command bundle
+    "SealPipetteToTip",
+    "SealPipetteToTipParams",
+    "SealPipetteToTipCreate",
+    "SealPipetteToTipResult",
+    "SealPipetteToTipCommandType",
+    # unseal command bundle
+    "UnsealPipetteFromTip",
+    "UnsealPipetteFromTipParams",
+    "UnsealPipetteFromTipCreate",
+    "UnsealPipetteFromTipResult",
+    "UnsealPipetteFromTipCommandType",
+    # pressure dispense command bundle
+    "PressureDispense",
+    "PressureDispenseParams",
+    "PressureDispenseCreate",
+    "PressureDispenseResult",
+    "PressureDispenseCommandType",
 ]

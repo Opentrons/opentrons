@@ -76,7 +76,7 @@ describe('pipette data accessors', () => {
         backlashDistance: 0.1,
         channels: 1,
         displayCategory: 'FLEX',
-        displayName: 'Flex 1-Channel 1000 μL',
+        displayName: 'Flex 1-Channel 1000 µL',
         dropTipConfigurations: { plungerEject: { current: 1, speed: 15 } },
         liquids: {
           default: {
@@ -86,11 +86,9 @@ describe('pipette data accessors', () => {
               'opentrons/opentrons_flex_96_tiprack_1000ul/1',
               'opentrons/opentrons_flex_96_tiprack_200ul/1',
               'opentrons/opentrons_flex_96_tiprack_50ul/1',
-              'opentrons/opentrons_flex_96_tiprack_20ul/1',
               'opentrons/opentrons_flex_96_filtertiprack_1000ul/1',
               'opentrons/opentrons_flex_96_filtertiprack_200ul/1',
               'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-              'opentrons/opentrons_flex_96_filtertiprack_20ul/1',
             ],
             minVolume: 5,
             maxVolume: 1000,
@@ -176,9 +174,7 @@ describe('pipette data accessors', () => {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
       defaultTipracks: [
         'opentrons/opentrons_flex_96_tiprack_50ul/1',
-        'opentrons/opentrons_flex_96_tiprack_20ul/1',
         'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-        'opentrons/opentrons_flex_96_filtertiprack_20ul/1',
       ],
       maxVolume: 50,
       minVolume: 5,
@@ -259,9 +255,7 @@ describe('pipette data accessors', () => {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
       defaultTipracks: [
         'opentrons/opentrons_flex_96_tiprack_50ul/1',
-        'opentrons/opentrons_flex_96_tiprack_20ul/1',
         'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-        'opentrons/opentrons_flex_96_filtertiprack_20ul/1',
       ],
       maxVolume: 30,
       minVolume: 1,

@@ -6,12 +6,15 @@ from decoy import Decoy, matchers
 from typing import Dict, ContextManager, Optional, OrderedDict
 from contextlib import nullcontext as does_not_raise
 
-from opentrons.types import Mount, MountType, Point
+from opentrons.types import Mount, MountType, Point, NozzleConfigurationType
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import TipStateType
+from opentrons.hardware_control.types import (
+    TipStateType,
+    TipScrapeType,
+    InstrumentProbeType,
+)
 from opentrons.hardware_control.protocols.types import OT2RobotType, FlexRobotType
 
-from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
 from opentrons.protocol_engine.resources import LabwareDataProvider
@@ -19,6 +22,10 @@ from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+)
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
 )
 from opentrons.protocol_engine.execution.tip_handler import (
     HardwareTipHandler,
@@ -44,6 +51,12 @@ def mock_state_view(decoy: Decoy) -> StateView:
 
 
 @pytest.fixture
+def mock_nozzle_map(decoy: Decoy) -> NozzleMap:
+    """Get a mock in the shape of a NozzleMap."""
+    return decoy.mock(cls=NozzleMap)
+
+
+@pytest.fixture
 def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
     """Get a mock LabwareDataProvider."""
     return decoy.mock(cls=LabwareDataProvider)
@@ -52,7 +65,7 @@ def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
 @pytest.fixture
 def tip_rack_definition() -> LabwareDefinition:
     """Get a tip rack defintion value object."""
-    return LabwareDefinition.model_construct(namespace="test", version=42)  # type: ignore[call-arg]
+    return LabwareDefinition2.model_construct(namespace="test", version=42)  # type: ignore[call-arg]
 
 
 MOCK_MAP = NozzleMap.build(
@@ -109,6 +122,7 @@ async def test_flex_pick_up_tip_state(
     decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
         MountType.LEFT
     )
+    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(1)
     decoy.when(mock_state_view.pipettes.get_serial_number("pipette-id")).then_return(
         "pipette-serial"
     )
@@ -181,6 +195,7 @@ async def test_pick_up_tip(
     decoy.when(mock_state_view.labware.get_definition("labware-id")).then_return(
         tip_rack_definition
     )
+    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(1)
 
     decoy.when(mock_state_view.pipettes.get_serial_number("pipette-id")).then_return(
         "pipette-serial"
@@ -258,7 +273,10 @@ async def test_drop_tip(
 
     decoy.verify(
         await mock_hardware_api.tip_drop_moves(
-            mount=Mount.RIGHT, ignore_plunger=False, home_after=True
+            mount=Mount.RIGHT,
+            ignore_plunger=False,
+            home_after=True,
+            scrape_type=TipScrapeType.NONE,
         )
     )
     decoy.verify(mock_hardware_api.remove_tip(mount=Mount.RIGHT))
@@ -572,5 +590,194 @@ async def test_verify_tip_presence_on_ot3(
             )
         )
 
+    except ImportError:
+        pass
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "pipette_channels",
+        "style",
+        "channels_in_nozzle_map",
+        "back_left_nozzle",
+        "front_right_nozzle",
+        "expected_tip_presence_supported",
+        "expected_follow_singular_sensor",
+    ],
+    argvalues=[
+        [
+            1,
+            NozzleConfigurationType.SINGLE,
+            1,
+            "A1",
+            "A1",
+            True,
+            None,
+        ],
+        [
+            8,
+            NozzleConfigurationType.COLUMN,
+            8,
+            "A1",
+            "H1",
+            True,
+            None,
+        ],
+        [
+            8,
+            NozzleConfigurationType.SINGLE,
+            1,
+            "A1",
+            "A1",
+            False,
+            None,
+        ],
+        [
+            8,
+            NozzleConfigurationType.COLUMN,
+            3,
+            "A1",
+            "C1",
+            False,
+            None,
+        ],
+        [
+            8,
+            NozzleConfigurationType.COLUMN,
+            4,
+            "A1",
+            "D1",
+            True,
+            None,
+        ],
+        [
+            96,
+            NozzleConfigurationType.SINGLE,
+            1,
+            "A1",
+            "A1",
+            False,
+            None,
+        ],
+        [
+            96,
+            NozzleConfigurationType.COLUMN,
+            8,
+            "A1",
+            "H1",
+            True,
+            InstrumentProbeType.PRIMARY,
+        ],
+        [
+            96,
+            NozzleConfigurationType.COLUMN,
+            3,
+            "A1",
+            "C1",
+            False,
+            None,
+        ],
+        [
+            96,
+            NozzleConfigurationType.COLUMN,
+            8,
+            "A12",
+            "H12",
+            True,
+            InstrumentProbeType.SECONDARY,
+        ],
+        [
+            96,
+            NozzleConfigurationType.ROW,
+            12,
+            "A1",
+            "A12",
+            True,
+            None,
+        ],
+        [
+            96,
+            NozzleConfigurationType.ROW,
+            8,
+            "A5",
+            "A12",
+            True,
+            InstrumentProbeType.SECONDARY,
+        ],
+        [
+            96,
+            NozzleConfigurationType.ROW,
+            8,
+            "A1",
+            "A8",
+            True,
+            InstrumentProbeType.PRIMARY,
+        ],
+        [
+            96,
+            NozzleConfigurationType.ROW,
+            3,
+            "A1",
+            "A3",
+            False,
+            None,
+        ],
+        [
+            96,
+            NozzleConfigurationType.ROW,
+            3,
+            "A10",
+            "A12",
+            False,
+            None,
+        ],
+    ],
+)
+async def test_tip_presence_config(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_nozzle_map: NozzleMap,
+    mock_labware_data_provider: LabwareDataProvider,
+    pipette_channels: int,
+    style: NozzleConfigurationType,
+    channels_in_nozzle_map: int,
+    back_left_nozzle: str,
+    front_right_nozzle: str,
+    expected_tip_presence_supported: bool,
+    expected_follow_singular_sensor: Optional[InstrumentProbeType],
+) -> None:
+    """It should check for tip presence when supported and use only one sensor in certain configs."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        ot3_hardware_api = decoy.mock(cls=OT3API)
+        decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
+
+        subject = HardwareTipHandler(
+            state_view=mock_state_view,
+            hardware_api=ot3_hardware_api,
+            labware_data_provider=mock_labware_data_provider,
+        )
+        decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+            MountType.LEFT
+        )
+
+        decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(
+            pipette_channels
+        )
+        decoy.when(mock_nozzle_map.tip_count).then_return(channels_in_nozzle_map)
+        decoy.when(mock_nozzle_map.configuration).then_return(style)
+        decoy.when(mock_nozzle_map.back_left).then_return(back_left_nozzle)
+        decoy.when(mock_nozzle_map.front_right).then_return(front_right_nozzle)
+
+        decoy.when(
+            mock_state_view.pipettes.get_nozzle_configuration("pipette-id")
+        ).then_return(mock_nozzle_map)
+        (
+            tip_presence_supported,
+            follow_singular_sensor,
+        ) = subject.get_tip_presence_config("pipette-id")
+        assert tip_presence_supported == expected_tip_presence_supported
+        assert follow_singular_sensor == expected_follow_singular_sensor
     except ImportError:
         pass

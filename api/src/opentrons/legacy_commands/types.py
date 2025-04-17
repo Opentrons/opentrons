@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocol_api.labware import Well
     from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+    from opentrons.protocol_api._liquid import LiquidClass
 
 from opentrons.types import Location
 
@@ -43,6 +44,9 @@ TOUCH_TIP: Final = "command.TOUCH_TIP"
 RETURN_TIP: Final = "command.RETURN_TIP"
 MOVE_TO: Final = "command.MOVE_TO"
 MOVE_TO_DISPOSAL_LOCATION: Final = "command.MOVE_TO_DISPOSAL_LOCATION"
+TRANSFER_WITH_LIQUID_CLASS: Final = "command.TRANSFER_WITH_LIQUID_CLASS"
+DISTRIBUTE_WITH_LIQUID_CLASS: Final = "command.DISTRIBUTE_WITH_LIQUID_CLASS"
+CONSOLIDATE_WITH_LIQUID_CLASS: Final = "command.CONSOLIDATE_WITH_LIQUID_CLASS"
 SEAL: Final = "command.SEAL"
 UNSEAL: Final = "command.UNSEAL"
 PRESSURIZE: Final = "command.PRESSURIZE"
@@ -472,8 +476,9 @@ class TouchTipCommand(TypedDict):
     payload: TouchTipCommandPayload
 
 
-class AirGapCommandPayload(TextOnlyPayload):
-    pass
+class AirGapCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    volume: Union[float, None]
+    height: Union[float, None]
 
 
 class AirGapCommand(TypedDict):
@@ -537,6 +542,28 @@ class MoveToDisposalLocationCommand(TypedDict):
 
 class MoveLabwareCommandPayload(TextOnlyPayload):
     pass
+
+
+class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    liquid_class: LiquidClass
+    volume: float
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+
+
+class TransferWithLiquidClassCommand(TypedDict):
+    name: Literal["command.TRANSFER_WITH_LIQUID_CLASS"]
+    payload: LiquidClassCommandPayload
+
+
+class DistributeWithLiquidClassCommand(TypedDict):
+    name: Literal["command.DISTRIBUTE_WITH_LIQUID_CLASS"]
+    payload: LiquidClassCommandPayload
+
+
+class ConsolidateWithLiquidClassCommand(TypedDict):
+    name: Literal["command.CONSOLIDATE_WITH_LIQUID_CLASS"]
+    payload: LiquidClassCommandPayload
 
 
 class SealCommandPayload(TextOnlyPayload):
@@ -621,6 +648,9 @@ Command = Union[
     MoveToCommand,
     MoveToDisposalLocationCommand,
     MoveLabwareCommand,
+    TransferWithLiquidClassCommand,
+    DistributeWithLiquidClassCommand,
+    ConsolidateWithLiquidClassCommand,
     SealCommand,
     UnsealCommand,
     PressurizeCommand,
@@ -673,6 +703,7 @@ CommandPayload = Union[
     MoveToCommandPayload,
     MoveToDisposalLocationCommandPayload,
     MoveLabwareCommandPayload,
+    LiquidClassCommandPayload,
     SealCommandPayload,
     UnsealCommandPayload,
     PressurizeCommandPayload,

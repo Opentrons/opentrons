@@ -35,9 +35,13 @@ export function TwoColLwInfoAndDeck(
     MANUAL_MOVE_AND_SKIP,
     MANUAL_REPLACE_AND_RETRY,
     HOME_AND_RETRY,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { relevantWellName, failedLabware } = failedLabwareUtils
+  const {
+    relevantPickUpTipWellName,
+    relevantPickUpTipLabware,
+  } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
@@ -48,7 +52,7 @@ export function TwoColLwInfoAndDeck(
 
   const {
     displayNameCurrentLoc: slot,
-  } = failedLabwareUtils.failedLabwareLocations
+  } = failedLabwareUtils.relevantPickUpTipLwLocs
 
   const buildTitle = (): string => {
     switch (selectedRecoveryOption) {
@@ -58,6 +62,7 @@ export function TwoColLwInfoAndDeck(
         return t('manually_replace_lw_on_deck')
       case HOME_AND_RETRY.ROUTE:
       case RETRY_NEW_TIPS.ROUTE:
+      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE: {
         // Only special case the "full" 96-channel nozzle config.
         if (
@@ -67,7 +72,7 @@ export function TwoColLwInfoAndDeck(
           return t('replace_with_new_tip_rack', { slot })
         } else {
           return t('replace_used_tips_in_rack_location', {
-            location: relevantWellName,
+            location: relevantPickUpTipWellName,
             slot,
           })
         }
@@ -87,7 +92,8 @@ export function TwoColLwInfoAndDeck(
         return t('ensure_lw_is_accurately_placed')
       case RETRY_NEW_TIPS.ROUTE:
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
-      case HOME_AND_RETRY.ROUTE: {
+      case HOME_AND_RETRY.ROUTE:
+      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE: {
         return isPartialTipConfigValid
           ? t('replace_tips_and_select_loc_partial_tip')
           : t('replace_tips_and_select_location')
@@ -124,7 +130,7 @@ export function TwoColLwInfoAndDeck(
           ...restUtils
         } = deckMapUtils
 
-        const failedLwId = failedLabware?.id ?? ''
+        const failedLwId = relevantPickUpTipLabware?.id ?? ''
 
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null

@@ -1,12 +1,18 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Union, overload
+from typing import TYPE_CHECKING, List, Sequence, Union, overload
 
 
-from .helpers import stringify_location, stringify_disposal_location, listify
+from .helpers import (
+    stringify_location,
+    stringify_disposal_location,
+    stringify_well_list,
+    listify,
+)
 from . import types as command_types
 
 from opentrons.types import Location
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api._liquid import LiquidClass
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -234,9 +240,25 @@ def touch_tip(instrument: InstrumentContext) -> command_types.TouchTipCommand:
     }
 
 
-def air_gap() -> command_types.AirGapCommand:
-    text = "Air gap"
-    return {"name": command_types.AIR_GAP, "payload": {"text": text}}
+def air_gap(
+    instrument: InstrumentContext,
+    volume: float | None,
+    height: float | None,
+) -> command_types.AirGapCommand:
+    text = (
+        "Air gap"
+        + (f" of {volume} uL" if volume is not None else "")
+        + (f" at height {height}" if height is not None else "")
+    )
+    return {
+        "name": command_types.AIR_GAP,
+        "payload": {
+            "instrument": instrument,
+            "volume": volume,
+            "height": height,
+            "text": text,
+        },
+    }
 
 
 def return_tip() -> command_types.ReturnTipCommand:
@@ -298,6 +320,81 @@ def move_to_disposal_location(
     return {
         "name": command_types.MOVE_TO_DISPOSAL_LOCATION,
         "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
+def transfer_with_liquid_class(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+) -> command_types.TransferWithLiquidClassCommand:
+    text = (
+        "Transferring "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+    )
+    return {
+        "name": command_types.TRANSFER_WITH_LIQUID_CLASS,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
+    }
+
+
+def distribute_with_liquid_class(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+) -> command_types.DistributeWithLiquidClassCommand:
+    text = (
+        "Distributing "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+    )
+    return {
+        "name": command_types.DISTRIBUTE_WITH_LIQUID_CLASS,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
+    }
+
+
+def consolidate_with_liquid_class(
+    instrument: InstrumentContext,
+    liquid_class: LiquidClass,
+    volume: float,
+    source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    destination: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+) -> command_types.ConsolidateWithLiquidClassCommand:
+    text = (
+        "Consolidating "
+        + f"{volume} uL of {liquid_class.display_name} liquid class from "
+        + f"{stringify_well_list(source)} to {stringify_well_list(destination)}"
+    )
+    return {
+        "name": command_types.CONSOLIDATE_WITH_LIQUID_CLASS,
+        "payload": {
+            "instrument": instrument,
+            "liquid_class": liquid_class,
+            "volume": volume,
+            "source": source,
+            "destination": destination,
+            "text": text,
+        },
     }
 
 

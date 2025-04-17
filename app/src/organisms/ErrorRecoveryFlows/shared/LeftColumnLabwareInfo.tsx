@@ -1,4 +1,5 @@
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { ComponentProps } from 'react'
 import type { RecoveryContentProps } from '../types'
@@ -16,13 +17,16 @@ export function LeftColumnLabwareInfo({
   failedLabwareUtils,
   type,
   bannerText,
-}: LeftColumnLabwareInfoProps): JSX.Element | null {
+  recoveryMap,
+}: LeftColumnLabwareInfoProps): JSX.Element {
+  const { step, route } = recoveryMap
   const {
-    failedLabwareName,
-    failedLabwareNickname,
+    failedLabwareNames,
+    relevantPickUpTipLwNames,
     failedLabwareLocations,
+    relevantPickUpTipLwLocs,
   } = failedLabwareUtils
-  const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
+  const { displayNameNewLoc } = failedLabwareLocations
 
   const buildNewLocation = (): ComponentProps<
     typeof InterventionContent
@@ -31,17 +35,43 @@ export function LeftColumnLabwareInfo({
       ? { deckLabel: displayNameNewLoc.toUpperCase() }
       : undefined
 
+  const buildInfoNames = (): {
+    labwareName: string
+    labwareNickname: string | undefined
+    currentLocationProps: { deckLabel: string }
+  } => {
+    if (
+      route === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE &&
+      (step ===
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS ||
+        step === RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS)
+    ) {
+      return {
+        labwareName: relevantPickUpTipLwNames.name ?? '',
+        labwareNickname: relevantPickUpTipLwNames.nickName,
+        currentLocationProps: {
+          deckLabel: relevantPickUpTipLwLocs.displayNameCurrentLoc.toUpperCase(),
+        },
+      }
+    } else {
+      return {
+        labwareName: failedLabwareNames.name ?? '',
+        labwareNickname: failedLabwareNames.nickName,
+        currentLocationProps: {
+          deckLabel: failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
+        },
+      }
+    }
+  }
+
   return (
     <InterventionContent
       headline={title}
       infoProps={{
+        layout: 'default',
         type,
-        labwareName: failedLabwareName ?? '',
-        labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: {
-          deckLabel: displayNameCurrentLoc.toUpperCase(),
-        },
         newLocationProps: buildNewLocation(),
+        ...buildInfoNames(),
       }}
       notificationProps={
         bannerText ? { type: 'alert', heading: bannerText } : undefined

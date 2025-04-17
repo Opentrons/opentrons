@@ -1,4 +1,5 @@
 """Can messenger class."""
+
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
@@ -347,7 +348,11 @@ class CanMessenger:
         listener: MessageListenerCallback,
         filter: Optional[MessageListenerCallbackFilter] = None,
     ) -> None:
-        """Add a message listener."""
+        """Add a message listener.
+
+        Will not leak listener objects if called multiple times with the same-by-identity
+        function; it will overwrite the old entry each time in that case.
+        """
         self._listeners[listener] = listener, filter
 
     def remove_listener(self, listener: MessageListenerCallback) -> None:
@@ -363,7 +368,11 @@ class CanMessenger:
                 return
             except BaseException:
                 log.exception("Exception in read")
+                await asyncio.sleep(0)
                 continue
+            else:
+                log.error("read task finished, this should not happen")
+                await asyncio.sleep(0)
 
     async def _read_task(self) -> None:
         """Read task."""

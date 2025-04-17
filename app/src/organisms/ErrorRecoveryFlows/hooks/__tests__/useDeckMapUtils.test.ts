@@ -7,9 +7,9 @@ import {
   TEMPERATURE_MODULE_V2,
   getModuleDef2,
 } from '@opentrons/shared-data'
-
+import { getLabwareLocation } from '@opentrons/components'
 import { mockPickUpTipLabware } from '../../__fixtures__'
-import { getLabwareLocation } from '/app/local-resources/labware'
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 import {
   getIsLabwareMatch,
   getSlotNameAndLwLocFrom,
@@ -31,7 +31,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getModuleDef2: vi.fn(),
   }
 })
-vi.mock('/app/local-resources/labware')
+vi.mock('@opentrons/components')
 
 describe('getRunCurrentModulesOnDeck', () => {
   const mockLabwareDef: LabwareDefinition2 = {
@@ -131,16 +131,50 @@ describe('getRunCurrentLabwareOnDeck', () => {
     labwareLocation: { slotName: 'A1' },
     slotName: 'A1',
   }
+
+  const mockPickUpTipLabwareA1 = {
+    ...mockPickUpTipLabware,
+    location: { slotName: 'A1' },
+  }
+
+  const mockPickUpTipLabwareT1 = {
+    ...mockPickUpTipLabware,
+    location: { slotName: 'D1' },
+  }
+
   const mockFailedLabwareUtils = {
-    failedLabware: { ...mockPickUpTipLabware, location: { slotName: 'A1' } },
+    failedLabware: mockPickUpTipLabwareA1,
+    relevantPickUpTipLabware: mockPickUpTipLabwareT1,
   } as any
 
-  it('should return a valid RunCurrentLabwareOnDeck with a labware highlight if the labware is the pickUpTipLabware', () => {
+  const defaultRecoveryMap = {
+    route: '',
+    step: '',
+  } as any
+
+  beforeEach(() => {
+    vi.mocked(getLabwareLocation).mockImplementation(params => {
+      // @ts-expect-error Fine for testing purposes.
+      if (params.location?.slotName === 'A1') {
+        return { slotName: 'A1' }
+      }
+
+      // @ts-expect-error Fine for testing purposes.
+      if (params.location?.slotName === 'D1') {
+        return { slotName: 'D1' }
+      }
+
+      return null
+    })
+  })
+
+  it('should return a valid RunCurrentLabwareOnDeck with a labware highlight if the labware is the failedLabware', () => {
     vi.mocked(getLabwareLocation).mockReturnValue({ slotName: 'A1' })
     const result = getRunCurrentLabwareOnDeck({
       currentLabwareInfo: [mockCurrentLabwareInfo],
       runRecord: {} as any,
       failedLabwareUtils: mockFailedLabwareUtils,
+      recoveryMap: defaultRecoveryMap,
     })
 
     expect(result).toEqual([
@@ -164,9 +198,56 @@ describe('getRunCurrentLabwareOnDeck', () => {
       },
       runRecord: {} as any,
       currentLabwareInfo: [mockCurrentLabwareInfo],
+      recoveryMap: defaultRecoveryMap,
     })
 
     expect(result[0].highlight).toBeNull()
+  })
+
+  it(`should use relevantPickUpTipLabware for ${RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS} step`, () => {
+    const labwareInT1 = {
+      labwareDef: mockLabwareDef,
+      labwareLocation: { slotName: 'D1' },
+      slotName: 'D1',
+    }
+
+    const result = getRunCurrentLabwareOnDeck({
+      currentLabwareInfo: [labwareInT1],
+      runRecord: {} as any,
+      failedLabwareUtils: mockFailedLabwareUtils,
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
+      },
+    })
+
+    expect(result).toEqual([
+      {
+        labwareLocation: { slotName: 'D1' },
+        definition: mockLabwareDef,
+        highlight: 'D1',
+      },
+    ])
+  })
+
+  it('should use failedLabware for steps other than MANUAL_FILL_AND_RETRY_NEW_TIPS REPLACE_TIPS', () => {
+    const result = getRunCurrentLabwareOnDeck({
+      currentLabwareInfo: [mockCurrentLabwareInfo],
+      runRecord: {} as any,
+      failedLabwareUtils: mockFailedLabwareUtils,
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.MANUAL_FILL,
+      },
+    })
+
+    expect(result).toEqual([
+      {
+        labwareLocation: { slotName: 'A1' },
+        definition: mockLabwareDef,
+        highlight: 'A1',
+      },
+    ])
   })
 })
 
