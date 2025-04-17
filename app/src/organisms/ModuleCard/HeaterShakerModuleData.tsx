@@ -1,15 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
-  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
-  WRAP,
 } from '@opentrons/components'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import type {
@@ -18,6 +16,12 @@ import type {
   TemperatureStatus,
 } from '/app/redux/modules/api-types'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
+
+import {
+  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_HEADER_TEXT_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+} from './constants'
 
 interface HeaterShakerModuleDataProps {
   moduleData: HeaterShakerModule['data']
@@ -79,28 +83,24 @@ export const HeaterShakerModuleData = (
       case 'idle_open':
       case 'idle_unknown': {
         return (
-          <LegacyStyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {t('open', { ns: 'shared' })}
-          </LegacyStyledText>
+          </StyledText>
         )
       }
       case 'closing':
       case 'idle_closed': {
         if (isShaking) {
           return (
-            <LegacyStyledText
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-            >
+            <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
               {t('closed_and_locked', { ns: 'heater_shaker' })}
-            </LegacyStyledText>
+            </StyledText>
           )
         } else {
           return (
-            <LegacyStyledText
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-            >
+            <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
               {t('closed', { ns: 'heater_shaker' })}
-            </LegacyStyledText>
+            </StyledText>
           )
         }
       }
@@ -110,114 +110,91 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}>
+    <>
       {showTemperatureData && (
         <Flex
-          flexDirection={DIRECTION_COLUMN}
+          css={MODULE_INFO_SUB_CONTAINTER_STYLE}
           data-testid="heater_shaker_module_data_temp"
         >
-          <LegacyStyledText
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.grey60}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing8}
-          >
+          <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
             {t('heater')}
-          </LegacyStyledText>
+          </StyledText>
           <StatusLabel
             status={moduleData.temperatureStatus}
             {...getStatusLabelProps(moduleData.temperatureStatus)}
           />
-          <LegacyStyledText
-            title="heater_target_temp"
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            marginBottom={SPACING.spacing2}
-          >
-            {t(
-              moduleData.targetTemperature != null ? 'target_temp' : 'na_temp',
-              {
-                temp: moduleData.targetTemperature,
-              }
-            )}
-          </LegacyStyledText>
-          <LegacyStyledText
-            title="heater_temp"
-            fontSize={TYPOGRAPHY.fontSizeH6}
-          >
-            {t('current_temp', { temp: moduleData.currentTemperature })}
-          </LegacyStyledText>
+          <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+            <StyledText
+              title="heater_target_temp"
+              css={MODULE_INFO_DETAIL_TEXT_STYLE}
+            >
+              {t(
+                moduleData.targetTemperature != null
+                  ? 'target_temp'
+                  : 'na_temp',
+                {
+                  temp: moduleData.targetTemperature,
+                }
+              )}
+            </StyledText>
+            <StyledText title="heater_temp" css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+              {t('current_temp', { temp: moduleData.currentTemperature })}
+            </StyledText>
+          </Flex>
         </Flex>
       )}
       <Flex
-        flexDirection={DIRECTION_COLUMN}
+        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
         data-testid="heater_shaker_module_data_shaker"
       >
-        <LegacyStyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey60}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          marginTop={SPACING.spacing8}
-        >
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('shaker')}
-        </LegacyStyledText>
+        </StyledText>
         <StatusLabel
           status={moduleData.speedStatus}
           {...getStatusLabelProps(moduleData.speedStatus)}
         />
 
-        <LegacyStyledText
+        <StyledText
           title="shaker_target_speed"
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          marginBottom={SPACING.spacing2}
+          css={MODULE_INFO_DETAIL_TEXT_STYLE}
         >
           {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
             speed: moduleData.targetSpeed,
           })}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           title="shaker_current_speed"
-          fontSize={TYPOGRAPHY.fontSizeH6}
+          css={MODULE_INFO_DETAIL_TEXT_STYLE}
         >
           {t('current_speed', { speed: moduleData.currentSpeed })}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
-
       <Flex
-        flexDirection={DIRECTION_ROW}
+        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
         data-testid="heater_shaker_module_data_latch"
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.grey60}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing8}
-            title="latch_status"
-          >
-            {t('labware_latch', { ns: 'heater_shaker' })}
-          </LegacyStyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            marginTop={SPACING.spacing4}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            fontSize={TYPOGRAPHY.fontSizeH6}
-          >
-            {isShaking && (
-              <Icon
-                paddingBottom="3px"
-                paddingRight={SPACING.spacing4}
-                name="closed-locked"
-                data-testid="HeaterShakerModuleData_latch_lock"
-                size={SIZE_1}
-              />
-            )}
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE} title="latch_status">
+          {t('labware_latch', { ns: 'heater_shaker' })}
+        </StyledText>
+        <Flex
+          css={MODULE_INFO_SUB_CONTAINTER_STYLE}
+          flexDirection={DIRECTION_ROW}
+        >
+          {isShaking && (
+            <Icon
+              paddingBottom="3px"
+              paddingRight={SPACING.spacing4}
+              name="closed-locked"
+              data-testid="HeaterShakerModuleData_latch_lock"
+              size={SIZE_1}
+            />
+          )}
+          <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
             {getLatchStatus(moduleData.labwareLatchStatus)}
-          </Flex>
+          </StyledText>
         </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }

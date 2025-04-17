@@ -12,7 +12,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
+  StyledText,
   ModuleIcon,
   OverflowBtn,
   SPACING,
@@ -77,6 +77,11 @@ import type { State, Dispatch } from '/app/redux/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
 import { FlexStackerModuleData } from './FlexStackerModuleData'
+import {
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+  MODULE_INFO_HEADER_TEXT_STYLE,
+  MODULE_INFO_SUB_CONTAINTER_STYLE,
+} from './constants'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -331,6 +336,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
             paddingLeft={SPACING.spacing8}
+            gridGap={SPACING.spacing8}
           >
             <ErrorInfo attachedModule={module} />
             {latestRequest != null && latestRequest.status === FAILURE && (
@@ -341,10 +347,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               />
             )}
             {attachPipetteRequired != null &&
-            calibratePipetteRequired != null &&
-            updatePipetteFWRequired != null &&
-            requireModuleCalibration &&
-            !isPending ? (
+              calibratePipetteRequired != null &&
+              updatePipetteFWRequired != null &&
+              requireModuleCalibration &&
+              !isPending ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="calibration"
@@ -359,9 +365,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             ) : null}
             {/* Calibration performs firmware updates, so only show calibration if both true. */}
             {!requireModuleCalibration &&
-            module.hasAvailableUpdate &&
-            showFWBanner &&
-            !isPending ? (
+              module.hasAvailableUpdate &&
+              showFWBanner &&
+              !isPending ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="firmware"
@@ -384,9 +390,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     i18nKey="hot_to_the_touch"
                     components={{
                       bold: <strong />,
-                      block: (
-                        <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP} />
-                      ),
+                      block: <StyledText fontSize={TYPOGRAPHY.fontSizeP} />,
                     }}
                   />
                 </Banner>
@@ -405,54 +409,51 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   aria-label="ot-spinner"
                   color={COLORS.grey60}
                 />
-                <LegacyStyledText marginLeft={SPACING.spacing8}>
+                <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             ) : (
-              <>
-                <LegacyStyledText
+              <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+                <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.grey60}
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  fontSize={TYPOGRAPHY.fontSizeH6}
-                  paddingBottom={SPACING.spacing4}
+                  css={MODULE_INFO_HEADER_TEXT_STYLE}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                  slotName != null
+                    slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
                   {module?.usbPort !== null
                     ? t('usb_port', {
-                        port: module?.usbPort?.port,
-                        hubPort:
-                          module?.usbPort?.hubPort != null
-                            ? `.${module.usbPort.hubPort}`
-                            : '',
-                      })
+                      port: module?.usbPort?.port,
+                      hubPort:
+                        module?.usbPort?.hubPort != null
+                          ? `.${module.usbPort.hubPort}`
+                          : '',
+                    })
                     : t('usb_port_not_connected')}
-                </LegacyStyledText>
+                </StyledText>
                 <Flex
-                  paddingBottom={SPACING.spacing4}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
-                  fontSize={TYPOGRAPHY.fontSizeP}
                 >
                   <ModuleIcon
                     moduleType={module.moduleType}
                     size="1rem"
-                    marginRight={SPACING.spacing2}
+                    marginTop={SPACING.spacing2}
+                    marginRight={SPACING.spacing4}
                     color={COLORS.grey60}
                   />
-                  <LegacyStyledText>
+                  <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
                     {getModuleDisplayName(module.moduleModel)}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
-              </>
+              </Flex>
             )}
             <Flex
               opacity={isPending ? '50%' : '100%'}
               flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing8}
             >
               {moduleData}
             </Flex>

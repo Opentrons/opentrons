@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, COLORS } from '@opentrons/components'
+import { StyledText, COLORS, Flex } from '@opentrons/components'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
+import {
+  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+} from './constants'
 
 interface AbsorbanceReaderProps {
   moduleData: AbsorbanceReaderModule['data']
@@ -43,16 +47,16 @@ export const AbsorbanceReaderData = (
       : i18n.format(t('shared:open'), 'capitalize')
 
   return (
-    <>
+    <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
       <StatusLabel {...StatusLabelProps} />
       <StyledText
-        desktopStyle="bodyDefaultRegular"
+        css={MODULE_INFO_DETAIL_TEXT_STYLE}
         data-testid="abs_module_data"
       >
         {t('abs_reader_lid_status', {
           status: lidDisplayStatus,
         })}
       </StyledText>
-    </>
+    </Flex>
   )
 }

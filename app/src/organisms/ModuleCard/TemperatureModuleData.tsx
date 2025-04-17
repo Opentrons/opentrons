@@ -1,14 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
-  DIRECTION_COLUMN,
   Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import type { TemperatureStatus } from '/app/redux/modules/api-types'
+import {
+  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+} from './constants'
 
 interface TemperatureModuleProps {
   moduleStatus: TemperatureStatus
@@ -48,7 +49,7 @@ export const TemperatureModuleData = (
   }
 
   return (
-    <>
+    <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE} data-testid="temp_module_data">
       <StatusLabel
         status={moduleStatus}
         backgroundColor={backgroundColor}
@@ -56,20 +57,14 @@ export const TemperatureModuleData = (
         textColor={textColor}
         pulse={pulse}
       />
-      <Flex
-        fontSize={TYPOGRAPHY.fontSizeCaption}
-        flexDirection={DIRECTION_COLUMN}
-        data-testid="temp_module_data"
-      >
-        <LegacyStyledText marginBottom={SPACING.spacing2}>
-          {t(targetTemp == null ? 'na_temp' : 'target_temp', {
-            temp: targetTemp,
-          })}
-        </LegacyStyledText>
-        <LegacyStyledText>
-          {t('current_temp', { temp: currentTemp })}
-        </LegacyStyledText>
-      </Flex>
-    </>
+      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+        {t(targetTemp == null ? 'na_temp' : 'target_temp', {
+          temp: targetTemp,
+        })}
+      </StyledText>
+      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+        {t('current_temp', { temp: currentTemp })}
+      </StyledText>
+    </Flex>
   )
 }

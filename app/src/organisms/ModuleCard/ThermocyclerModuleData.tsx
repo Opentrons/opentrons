@@ -8,12 +8,17 @@ import {
   Flex,
   FONT_WEIGHT_REGULAR,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
+import {
+  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_HEADER_TEXT_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+} from './constants'
 
 interface ThermocyclerModuleProps {
   data: ThermocyclerData
@@ -68,21 +73,14 @@ export const ThermocyclerModuleData = (
   }
 
   return (
-    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}>
+    <>
       <Flex
-        flexDirection={DIRECTION_COLUMN}
+        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
         data-testid="thermocycler_module_data_lid"
-        gridColumn="1/4"
       >
-        <LegacyStyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey60}
-          fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING.spacing8}
-        >
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('tc_lid')}
-        </LegacyStyledText>
-
+        </StyledText>
         <Flex flexDirection={DIRECTION_ROW}>
           <Box marginRight={SPACING.spacing4}>
             <StatusLabel
@@ -101,58 +99,50 @@ export const ThermocyclerModuleData = (
             id="lidTempStatus"
           />
         </Flex>
-        <LegacyStyledText
-          title="lid_target_temp"
-          fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginBottom={SPACING.spacing2}
-        >
-          {t(data.lidTargetTemperature == null ? 'na_temp' : 'target_temp', {
-            temp: data.lidTargetTemperature,
-          })}
-        </LegacyStyledText>
-        <LegacyStyledText
-          title="lid_temp"
-          fontSize={TYPOGRAPHY.fontSizeCaption}
-        >
-          {t('current_temp', { temp: data.lidTemperature })}
-        </LegacyStyledText>
+        <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+          <StyledText
+            css={MODULE_INFO_DETAIL_TEXT_STYLE}
+            title="lid_target_temp"
+          >
+            {t(data.lidTargetTemperature == null ? 'na_temp' : 'target_temp', {
+              temp: data.lidTargetTemperature,
+            })}
+          </StyledText>
+          <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE} title="lid_temp">
+            {t('current_temp', { temp: data.lidTemperature })}
+          </StyledText>
+        </Flex>
       </Flex>
       <Flex
-        flexDirection={DIRECTION_COLUMN}
+        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
         data-testid="thermocycler_module_data_block"
-        gridColumn="5/8"
       >
-        <LegacyStyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey60}
-          fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING.spacing8}
-        >
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('tc_block')}
-        </LegacyStyledText>
+        </StyledText>
         <StatusLabel
           status={data.status}
           {...getStatusLabelProps(data.status)}
           key="blockStatus"
           id="blockStatus"
         />
-        <LegacyStyledText
-          title="tc_target_temp"
-          fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginBottom={SPACING.spacing2}
-        >
-          {t(data.targetTemperature == null ? 'na_temp' : 'target_temp', {
-            temp: data.targetTemperature,
-          })}
-        </LegacyStyledText>
-        <LegacyStyledText
-          title="tc_current_temp"
-          fontSize={TYPOGRAPHY.fontSizeCaption}
-        >
-          {t('current_temp', { temp: data.currentTemperature })}
-        </LegacyStyledText>
+        <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+          <StyledText
+            css={MODULE_INFO_DETAIL_TEXT_STYLE}
+            title="tc_target_temp"
+          >
+            {t(data.targetTemperature == null ? 'na_temp' : 'target_temp', {
+              temp: data.targetTemperature,
+            })}
+          </StyledText>
+          <StyledText
+            css={MODULE_INFO_DETAIL_TEXT_STYLE}
+            title="tc_current_temp"
+          >
+            {t('current_temp', { temp: data.currentTemperature })}
+          </StyledText>
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }

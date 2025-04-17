@@ -1,16 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import {
-  StyledText,
-  COLORS,
-  TYPOGRAPHY,
-  SPACING,
-  Flex,
-  WRAP,
-  DIRECTION_COLUMN,
-} from '@opentrons/components'
+import { StyledText, COLORS, Flex } from '@opentrons/components'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import type { FlexStackerModule } from '/app/redux/modules/types'
+
+import {
+  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_HEADER_TEXT_STYLE,
+} from './constants'
 
 interface FlexStackerModuleProps {
   moduleData: FlexStackerModule['data']
@@ -81,35 +78,25 @@ export function FlexStackerModuleData(
   }
 
   return (
-    <Flex
-      flexWrap={WRAP}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}
-    >
+    <>
       <Flex
-        flexDirection={DIRECTION_COLUMN}
+        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
         data-testid="stacker_door_data"
-        paddingTop={SPACING.spacing8}
       >
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_door_status')}
         </StyledText>
         <StatusLabel {...DoorStatusLabelProps} />
       </Flex>
       <Flex
-        flexDirection={DIRECTION_COLUMN}
+        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
         data-testid="stacker_shuttle_data"
-        paddingTop={SPACING.spacing8}
       >
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_shuttle_status')}
         </StyledText>
         <StatusLabel {...ShuttleStatusLabelProps} />
       </Flex>
-    </Flex>
+    </>
   )
 }
