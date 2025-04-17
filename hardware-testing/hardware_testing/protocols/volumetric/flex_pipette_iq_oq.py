@@ -74,11 +74,14 @@ TRIALS_BY_PIPETTE_BY_TIP = {
 }
 
 # fmt: off
+# FIXME: create plate stack, to reduce number of slots in use (and increase plates)
+# FIXME: move all tip-racks to deck-slots, so that they are accessible by pipette
+# FIXME: discuss with SW how to handle more tip-racks from off-deck (eg: stacker)
 SLOTS = {
-    "tips_diluent": "A1",   "diluent":  "A2",   "tips_2":   "A3",
-    "plate_0":      "B1",   "dye_0":    "B2",   "tips_1":   "B3",
-    "plate_1":      "C1",   "dye_1":    "C2",   "tips_0":   "C3",
-    "plate_2":      "D1",   "dye_2":    "D2",   "trash":    "D3",
+    "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "empty":            "A4",
+    "plate_0":      "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_3":           "B4",
+    "plate_1":      "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_2":           "C4",
+    "plate_2":      "D1",   "dye_2":    "D2",   "trash":    "D3",   "__inaccessible__": "D4",
 }
 # fmt: on
 
@@ -154,26 +157,33 @@ def load_tip_racks(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     diluent_pipette: Optional[InstrumentContext],
-) -> int:
+) -> Tuple[int, List[Labware]]:
     """Load tip racks based on supplied pipettes and runtime parameters."""
     tip_ul_str = str(ctx.params.tips).split("_")[-1]  # type: ignore[attr-defined]
     tip_ul_int = int(tip_ul_str.replace("ul", ""))
     trials_list = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul_int]
     num_tips_needed = sum(trials_list) * pipette.channels
+    num_racks_needed = ceil(num_tips_needed / 96)
+    available_rack_slot_names = [s for n, s in SLOTS.keys() for i in range(10) if f"tips_{i}" in n]
+    assert num_racks_needed <= len(available_rack_slot_names), \
+        f"protocol requires {num_racks_needed}, " \
+        f"but {len(available_rack_slot_names)} are available"
+    accessible_rack_slot_names = [s for s in available_rack_slot_names if "4" not in s]
     if pipette.channels == 96:
         rack_ln = "opentrons_flex_96_tiprack_adapter"
         tips_ln = ctx.params.tips  # type: ignore[attr-defined]
         pipette.tip_racks = [
-            ctx.load_adapter(rack_ln, SLOTS[f"tips_{i}"]).load_labware(tips_ln)
-            for i in range(ceil(num_tips_needed / 96))
+            ctx.load_adapter(rack_ln, s).load_labware(tips_ln)
+            for s in accessible_rack_slot_names
+            if "4" not in s
         ]
         ctx.load_adapter(rack_ln, SLOTS["tips_diluent"]).load_labware(
             "opentrons_flex_96_filtertiprack_200ul"
         )
     else:
         pipette.tip_racks = [
-            ctx.load_labware(ctx.params.tips, SLOTS[f"tips_{i}"])  # type: ignore[attr-defined]
-            for i in range(ceil(num_tips_needed / 96))
+            ctx.load_labware(ctx.params.tips, s)  # type: ignore[attr-defined]
+            for s in accessible_rack_slot_names
         ]
         assert diluent_pipette is not None
         diluent_pipette.tip_racks = [
@@ -181,7 +191,12 @@ def load_tip_racks(
                 "opentrons_flex_96_filtertiprack_200ul", SLOTS["tips_diluent"]
             )
         ]
-    return tip_ul_int
+    inaccessible_racks = [
+        ctx.load_labware(ctx.params.tips, SLOTS[f"tips_{i}"])
+        for i in range(num_racks_needed)
+        if SLOTS[f"tips_{i}"] not in accessible_rack_slot_names
+    ]
+    return tip_ul_int, inaccessible_racks
 
 
 def load_labware(
@@ -331,7 +346,7 @@ def run(ctx: ProtocolContext) -> None:
         diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
 
     # LABWARE
-    tip_ul = load_tip_racks(ctx, test_pipette, diluent_pipette)
+    tip_ul, inaccessible_racks = load_tip_racks(ctx, test_pipette, diluent_pipette)
     max_possible_ul = (
         DYE_SHAKER_MAX_UL if test_pipette.channels == 96 else test_pipette.max_volume
     )
