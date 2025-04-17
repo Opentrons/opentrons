@@ -12,7 +12,6 @@ import {
   DIRECTION_COLUMN,
   Divider,
   Flex,
-  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_CENTER,
   OVERFLOW_WRAP_ANYWHERE,
@@ -51,7 +50,7 @@ import { DraggableSteps } from './DraggableSteps'
 import type { StepIdType } from '../../../../form-types'
 import type { ThunkDispatch } from '../../../../types'
 
-const SIDEBAR_MIN_WIDTH_FOR_ICON = 179
+const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 interface TimelineToolboxProps {
   sidebarWidth: number
 }
@@ -119,6 +118,11 @@ export const TimelineToolbox = ({
     }
   }
 
+  const name =
+    protocolName != null && protocolName !== ''
+      ? protocolName
+      : t('protocol_overview:untitled_protocol')
+
   return (
     <Toolbox
       position={POSITION_RELATIVE}
@@ -128,12 +132,12 @@ export const TimelineToolbox = ({
       title={
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
-            desktopStyle="bodyLargeSemiBold"
+            desktopStyle="bodyDefaultSemiBold"
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
           >
-            {protocolName != null && protocolName !== ''
-              ? protocolName
-              : t('protocol_overview:untitled_protocol')}
+            {isSidebarWidthSmall
+              ? truncateString(name, Math.floor(sidebarWidth / 10))
+              : name}
           </StyledText>
           <Btn css={LINK_BUTTON_STYLE} onClick={handleGoBack}>
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
@@ -163,8 +167,10 @@ export const TimelineToolbox = ({
           padding={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}
         >
-          <StyledText desktopStyle="bodyLargeSemiBold">
-            {'deck hardware'}
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {isSidebarWidthSmall
+              ? truncateString('deck hardware', Math.floor(sidebarWidth / 10)) // scale with width
+              : 'deck hardware'}
           </StyledText>
           <Box
             role="button"
@@ -195,7 +201,7 @@ export const TimelineToolbox = ({
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
         >
-          <StyledText desktopStyle="bodyLargeSemiBold">
+          <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('timeline')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -220,4 +226,12 @@ export const TimelineToolbox = ({
       </Flex>
     </Toolbox>
   )
+}
+
+function truncateString(text: string, maxLength: number): string {
+  const dots = '...'
+  if (text.length <= maxLength) return text
+  if (maxLength <= dots.length) return dots.slice(0, maxLength)
+
+  return text.slice(0, maxLength - dots.length) + dots
 }
