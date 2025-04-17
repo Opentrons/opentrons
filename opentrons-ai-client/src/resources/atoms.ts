@@ -26,8 +26,9 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
   labware: [],
   liquids: [],
   steps: [],
-  fake: false,
+  fake: true,
   fake_id: 0,
+  fake_key: 'pdv8protocol',
 })
 
 /** CreateProtocolChatAtom is for the prefilled userprompt when navigating to the chat page from Update Protocol page */

@@ -19,7 +19,10 @@ import {
   StyledText,
   DIRECTION_ROW,
   OVERFLOW_AUTO,
+  Box,
 } from '@opentrons/components'
+
+import smallLogo from '../../assets/images/opentrons_logo_small.svg'
 
 import type { ChatData } from '../../resources/types'
 import { useAtom } from 'jotai'
@@ -57,22 +60,136 @@ const StyledIcon = styled(Icon)`
   color: ${COLORS.blue50};
 `
 
-const ProtocolContentBadge = styled(Flex)`
-  background-color: ${COLORS.blue50};
-  color: ${COLORS.white};
-  border-radius: ${BORDERS.borderRadius4};
-  padding: ${SPACING.spacing4} ${SPACING.spacing8};
-  font-size: ${TYPOGRAPHY.fontSize32};
-  margin-top: ${SPACING.spacing12};
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.2s;
+// const ProtocolContentBadge = styled(Flex)`
+//   background-color: ${COLORS.blue50};
+//   color: ${COLORS.white};
+//   border-radius: ${BORDERS.borderRadius4};
+//   padding: ${SPACING.spacing4} ${SPACING.spacing8};
+//   font-size: ${TYPOGRAPHY.fontSize32};
+//   margin-top: ${SPACING.spacing12};
+//   display: inline-flex;
+//   align-items: center;
+//   cursor: pointer;
+//   transition: background-color 0.2s;
 
-  &:hover {
-    background-color: ${COLORS.blue60};
-  }
+//   &:hover {
+//     background-color: ${COLORS.blue60};
+//   }
+// `
+
+// export const ProtocolContentBadge = (): JSX.Element => {
+//   return (
+//     <Flex
+//       // eslint-disable-next-line opentrons/no-margins-inline
+//       marginX={SPACING.spacing16}
+//       backgroundColor="lightBlue"
+//       borderRadius={BORDERS.borderRadius4}
+//     >
+//       <Flex backgroundColor='red'>
+//         <img src={smallLogo} />
+//       </Flex>
+//       <Flex
+//         flexDirection={DIRECTION_ROW}
+//         justifyContent={JUSTIFY_FLEX_END}
+//         gridGap={SPACING.spacing20}
+//         paddingTop={SPACING.spacing12}
+//       >
+//         <HoverShadow
+//           onClick={() => {
+//             setInputFieldToCorrespondingRequest()
+//           }}
+//         >
+//           <StyledIcon size={SPACING.spacing20} name="reload" />
+//         </HoverShadow>
+//         <HoverShadow
+//           onClick={() => {
+//             setShowFeedbackModal(true)
+//           }}
+//         >
+//           <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
+//         </HoverShadow>
+//         <HoverShadow
+//           onClick={async () => {
+//             await handleClickCopy()
+//           }}
+//         >
+//           <StyledIcon size={SPACING.spacing20} name={'content-copy'} />
+//         </HoverShadow>
+//         <HoverShadow
+//           onClick={() => {
+//             handleFileDownload()
+//           }}
+//         >
+//           <StyledIcon size={SPACING.spacing20} name="download" />
+//         </HoverShadow>
+//       </Flex>
+//     </Flex>
+//   )
+// }
+
+const OuterContainer = styled.div`
+  background-color: #e5e7eb; // Light gray background
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 16px;
 `
+
+const FileContainer = styled.div`
+  background-color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+`
+
+const IconWrapper = styled.div`
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const FileName = styled.span`
+  font-size: 14px;
+  color: #111827;
+  margin-right: auto;
+`
+
+export const ProtocolContentBadge = (props: {
+  onClick: () => void
+  handleFileDownload: () => void
+}): JSX.Element => {
+  const { onClick, handleFileDownload } = props
+  return (
+    <OuterContainer>
+      <FileContainer onClick={onClick}>
+        <IconWrapper>
+          <img src={smallLogo} alt="Opentrons logo" width="24" height="24" />
+        </IconWrapper>
+        <FileName>protocol.json</FileName>
+        <HoverShadow onClick={() => null}>
+          <StyledIcon size={SPACING.spacing20} name="reload" />
+        </HoverShadow>
+        <HoverShadow onClick={() => null}>
+          <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
+        </HoverShadow>
+        <HoverShadow onClick={() => null}>
+          <StyledIcon size={SPACING.spacing20} name="content-copy" />
+        </HoverShadow>
+        <HoverShadow onClick={() => handleFileDownload()}>
+          <StyledIcon size={SPACING.spacing20} name="download" />
+        </HoverShadow>
+      </FileContainer>
+    </OuterContainer>
+  )
+}
 
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -124,6 +241,20 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleFileDownload = (): void => {
+    if (protocol_content) {
+      const blob = new Blob([JSON.stringify(protocol_content, null, 2)], {
+        type: 'application/json',
+      })
+      const url = URL.createObjectURL(blob)
+    
+      // Use a temporary anchor
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = 'protocol.json'
+      anchor.click()
+    
+      URL.revokeObjectURL(url)
+    }
     const lastCodeBlock = document.querySelector(`#${chatId}`)
     const code = lastCodeBlock?.textContent?.trim() ?? ''
     // Don't proceed if code is empty, no need to download as a python file
@@ -216,23 +347,21 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         {!isUser && protocol_content && (
           <>
             <ProtocolContentBadge
-              onClick={() => { setShowProtocolContent(!showProtocolContent); }}
-            >
-              <StyledIcon
-                size={SPACING.spacing16}
-                name={showProtocolContent ? 'chevron-down' : 'chevron-right'}
-                marginRight={SPACING.spacing4}
-              />
-              PD JSON
-            </ProtocolContentBadge>
+              onClick={() => {
+                setShowProtocolContent(!showProtocolContent)
+              }}
+              handleFileDownload={handleFileDownload}
+            ></ProtocolContentBadge>
 
             {showProtocolContent && (
-              <CodeWrapper>{protocol_content}</CodeWrapper>
+              <CodeWrapper>
+                {JSON.stringify(protocol_content, null, 2)}
+              </CodeWrapper>
             )}
           </>
         )}
 
-        {!isUser ? (
+        {!isUser && !protocol_content ? (
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_FLEX_END}

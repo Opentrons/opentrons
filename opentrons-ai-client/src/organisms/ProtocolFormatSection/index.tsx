@@ -1,27 +1,23 @@
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-} from '@opentrons/components'
+import { Banner, DIRECTION_COLUMN, Flex, SIZE_3, SPACING } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
 
-export const PD = 'pd'
-export const PYTHON = 'python'
+export const PD = 'Protocol Designer'
+export const PYTHON = 'Python'
 export const PROTOCOL_FORMAT = 'protocol_format'
 
 export function ProtocolFormatSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const robotRadioButtons = [
     {
-      id: PD,
-      buttonLabel: t('pd_protocol'),
-      buttonValue: PD,
-    },
-    {
       id: PYTHON,
       buttonLabel: t('python_protocol'),
       buttonValue: PYTHON,
+    },
+    {
+      id: PD,
+      buttonLabel: t('pd_protocol'),
+      buttonValue: PD,
     },
   ]
 
@@ -38,7 +34,9 @@ export function ProtocolFormatSection(): JSX.Element | null {
         defaultValue={PYTHON}
         rules={{ required: true }}
       />
-
+      <Banner type="informing" marginBottom={SPACING.spacing16} height={SIZE_3}>
+        {t('pd_prompt_warning')}
+      </Banner>
     </Flex>
   )
 }

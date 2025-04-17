@@ -350,7 +350,8 @@ export function generateChatPrompt(
     ),
     liquids: values.liquids,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake: false,
+    fake: true,
+    fake_key: 'pdv8protocol',
     fake_id: 0,
   })
 

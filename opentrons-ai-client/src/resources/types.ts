@@ -31,6 +31,7 @@ export interface CreatePrompt {
   steps: string[]
   fake?: boolean
   fake_id?: number
+  fake_key?: string,
 }
 
 export type UpdateOptions =

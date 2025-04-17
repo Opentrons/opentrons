@@ -19,6 +19,7 @@
   "opentrons_ot2_label": "Opentrons OT-2",
   "opentrons_ot2": "Opentrons OT-2",
   "pd_protocol": "Protocol Designer protocol",
+  "pd_prompt_warning": "Not all prompts will be possible to output to Protocol Designer.",
   "python_protocol": "Python protocol",
   "instruments_pipettes_title": "What pipettes would you like to use?",
   "two_pipettes_label": "1-Channel or 8-Channel pipettes",

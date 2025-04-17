@@ -131,8 +131,8 @@ export function InputPrompt(): JSX.Element {
           : {
               message: watchUserPrompt,
               history: chatHistory,
-              fake: false,
-              chat_options: isUpdateOrCreateRequest ? 'create' : 'update'
+              fake: true,
+              chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
             },
       }
 
