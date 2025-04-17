@@ -398,7 +398,7 @@ def run(ctx: ProtocolContext) -> None:
     # TRANSFER DYE
     for ul in volumes:
         source = dye_wells_by_volume[ul]
-        dest = dye_wells_by_volume[ul]
+        dest = dest_wells_by_volume[ul]
         if test_class:
             if len(dest) > len(source):
                 test_pipette.distribute_with_liquid_class(
