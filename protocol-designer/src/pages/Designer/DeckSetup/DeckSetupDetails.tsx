@@ -3,10 +3,8 @@ import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Module } from '@opentrons/components'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAddressableAreaFromSlotId,
-  getAreSlotsVerticallyAdjacent,
   getLabwareHasQuirk,
   getModuleDef2,
   getPositionFromSlotId,
@@ -20,6 +18,7 @@ import {
   getSlotIsEmpty,
 } from '../../../step-forms'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getSlotsWithCollisions } from '../../../components/organisms/utils'
 import { getStagingAreaAddressableAreas } from '../../../utils'
 import { editSlotInfo } from '../../../labware-ingred/actions'
 import { getRobotType } from '../../../file-data/selectors'
@@ -46,7 +45,6 @@ import type {
   ThermocyclerModuleState,
 } from '@opentrons/step-generation'
 import type {
-  AddressableArea,
   AddressableAreaName,
   CutoutId,
   DeckDefinition,
@@ -584,30 +582,5 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         />
       ) : null}
     </>
-  )
-}
-
-const getSlotsWithCollisions = (
-  deckDef: DeckDefinition,
-  allModules: ModuleOnDeck[]
-): AddressableAreaName[] => {
-  return deckDef.locations.addressableAreas.reduce(
-    (acc: AddressableAreaName[], aa: AddressableArea) => {
-      const modulesWithCollisionsOnDeck = allModules.filter(module =>
-        MODULES_WITH_COLLISION_ISSUES.includes(module.model)
-      )
-      if (modulesWithCollisionsOnDeck.length === 0) {
-        return acc
-      }
-
-      const hasCollision = modulesWithCollisionsOnDeck.some(module =>
-        getAreSlotsVerticallyAdjacent(module.slot, aa.id)
-      )
-      if (hasCollision) {
-        return [...acc, aa.id]
-      }
-      return acc
-    },
-    []
   )
 }

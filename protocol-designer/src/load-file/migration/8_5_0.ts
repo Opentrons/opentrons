@@ -1,6 +1,9 @@
 import floor from 'lodash/floor'
 import { getPipetteSpecsV2, WELL_BOTTOM } from '@opentrons/shared-data'
-import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
+import {
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+  PROTOCOL_DESIGNER_SOURCE,
+} from '../../constants'
 import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getDefaultPushOutVolume } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
@@ -124,8 +127,8 @@ export const migrateFile = (
           dispense_submerge_speed: null,
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
-          aspirate_touchTip_mmFromEdge: 0, // this field and the following were previously not configurable and defaulted to 0mm
-          dispense_touchTip_mmFromEdge: 0,
+          aspirate_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE, // this field and the following were previously not configurable and defaulted to 0mm
+          dispense_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
           aspirate_position_reference: WELL_BOTTOM,
           aspirate_retract_position_reference: WELL_BOTTOM,
           aspirate_submerge_mmFromBottom: null,
