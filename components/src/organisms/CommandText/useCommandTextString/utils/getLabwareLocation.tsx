@@ -6,6 +6,7 @@ import {
   getModuleModelFromAddressableArea,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
+  FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
@@ -72,7 +73,6 @@ export function getLabwareLocationFromSequence(
     locationSequence,
     detailLevel = 'full',
   } = params
-
   return locationSequence.reduce<LocationResult>(
     (acc, sequenceItem, index) => {
       if (sequenceItem.kind === 'notOnDeck') {
@@ -111,7 +111,10 @@ export function getLabwareLocationFromSequence(
         return {
           ...acc,
           slotName,
-          moduleModel: moduleModel ?? undefined,
+          moduleModel:
+            moduleModel === FLEX_STACKER_MODULE_V1
+              ? undefined
+              : moduleModel ?? undefined,
         }
       } else if (sequenceItem.kind === 'onModule') {
         const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
@@ -120,10 +123,15 @@ export function getLabwareLocationFromSequence(
         } else {
           return {
             ...acc,
-            moduleModel,
+            moduleModel:
+              moduleModel === FLEX_STACKER_MODULE_V1
+                ? undefined
+                : moduleModel ?? undefined,
           }
         }
-      } else if (detailLevel === 'full') {
+      }
+      // TODO(tz, 4-16-25): add inHooperLocation when logic is merged
+      else if (detailLevel === 'full') {
         const { allRunDefs } = params as SequenceFullParams
         if (sequenceItem.kind === 'onLabware' && acc.adapterName == null) {
           if (!Array.isArray(loadedLabwares)) {
