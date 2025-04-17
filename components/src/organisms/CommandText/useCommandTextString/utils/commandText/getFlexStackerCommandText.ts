@@ -68,7 +68,7 @@ GetFlexStackerCommandText): string => {
       loadedModules: commandTextData?.modules ?? [],
       t,
     })
-    if (primaryDefinitionDisplayName != null && slotName != null) {
+    if (primaryDefinitionDisplayName !== null && slotName != null) {
       return t('branded:retrieve_labware_from_stacker_to', {
         primaryDefinitionDisplayName,
         slotName,
