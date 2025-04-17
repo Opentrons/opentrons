@@ -1138,7 +1138,9 @@ export const aspirateTouchTipMmFromEdgeRequired = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
   const { aspirate_touchTip_checkbox, aspirate_touchTip_mmFromEdge } = fields
-  return aspirate_touchTip_checkbox && !aspirate_touchTip_mmFromEdge
+  return aspirate_touchTip_checkbox &&
+    !aspirate_touchTip_mmFromEdge &&
+    aspirate_touchTip_mmFromEdge !== 0
     ? ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED
     : null
 }
@@ -1146,7 +1148,9 @@ export const dispenseTouchTipMmFromEdgeRequired = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
   const { dispense_touchTip_checkbox, dispense_touchTip_mmFromEdge } = fields
-  return dispense_touchTip_checkbox && !dispense_touchTip_mmFromEdge
+  return dispense_touchTip_checkbox &&
+    !dispense_touchTip_mmFromEdge &&
+    dispense_touchTip_mmFromEdge !== 0
     ? DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED
     : null
 }
