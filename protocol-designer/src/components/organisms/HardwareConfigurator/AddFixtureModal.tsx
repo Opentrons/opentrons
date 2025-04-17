@@ -196,6 +196,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           (cutoutConfig.type != null && FIXTURES.includes(cutoutConfig.type)) ||
           cutoutConfig.type === 'stagingAreaAndMagneticBlock'
       )
+
       if (newModule != null) {
         const filteredModules = Object.fromEntries(
           Object.entries(modules).filter(
@@ -227,11 +228,26 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         setValue?.('modules', updatedModules)
       }
       if (newFixture != null) {
+        const isStagingAreaAndWasteChute =
+          newFixture.cutoutFixtureId ===
+          'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+
         const filteredFixtures = Object.fromEntries(
           Object.entries(fixtures).filter(
             ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
           )
         )
+
+        let additionalFixture: Fixtures | undefined
+        if (isStagingAreaAndWasteChute) {
+          additionalFixture = {
+            [uuid()]: {
+              name: 'stagingArea',
+              cutoutFixtureId: 'stagingAreaRightSlot',
+              cutoutId: 'cutoutD3',
+            },
+          }
+        }
 
         const updatedFixtures: Fixtures = {
           ...filteredFixtures,
@@ -240,9 +256,12 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
               newFixture.type === 'stagingAreaAndMagneticBlock'
                 ? 'stagingArea'
                 : (newFixture.type as DeckFixture),
-            cutoutFixtureId: newFixture.cutoutFixtureId,
+            cutoutFixtureId: isStagingAreaAndWasteChute
+              ? 'wasteChuteRightAdapterNoCover'
+              : newFixture.cutoutFixtureId,
             cutoutId: newFixture.cutoutId,
           },
+          ...additionalFixture,
         }
         setValue?.('fixtures', updatedFixtures)
       }
