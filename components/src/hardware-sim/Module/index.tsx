@@ -1,5 +1,6 @@
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -22,6 +23,7 @@ import {
 import { RobotCoordsForeignObject } from '../Deck'
 import { multiplyMatrices } from '../utils'
 import { HeaterShaker } from './HeaterShaker'
+import { FlexStacker } from './FlexStacker'
 import { MagneticBlock } from './MagneticBlock'
 import { MagneticModule } from './MagneticModule'
 import { PlateReader } from './PlateReader'
@@ -147,7 +149,9 @@ export const Module = (props: Props): JSX.Element => {
   const rotationCenterY = (footprintYDimension ?? yDimension) / 2
 
   const orientationTransform =
-    orientation === 'left' || moduleType === ABSORBANCE_READER_TYPE
+    orientation === 'left' ||
+    moduleType === ABSORBANCE_READER_TYPE ||
+    moduleType === FLEX_STACKER_MODULE_TYPE
       ? 'rotate(0, 0, 0)'
       : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
@@ -207,6 +211,8 @@ export const Module = (props: Props): JSX.Element => {
     )
   } else if (moduleType === ABSORBANCE_READER_TYPE) {
     moduleViz = <PlateReader />
+  } else if (moduleType === FLEX_STACKER_MODULE_TYPE) {
+    moduleViz = <FlexStacker />
   }
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>

@@ -1,3 +1,4 @@
+import partition from 'lodash/partition'
 import { Fragment } from 'react'
 
 import {
@@ -74,6 +75,21 @@ export interface ModuleOnDeck {
   highlightShadowLabware?: boolean
   stacked?: boolean
 }
+export interface StackerOnDeck {
+  stackerLocation: ModuleLocation
+  shuttleLabwareDef?: LabwareDefinition2 | null
+  shuttleLabwareWellFill?: WellFill
+  hopperLabwareDef?: LabwareDefinition2 | null
+  hopperLabwareWellFill?: WellFill
+  innerProps?: ComponentProps<typeof Module>['innerProps']
+  /** generic prop to render self-positioned children for each module */
+  moduleChildren?: ReactNode
+  onLabwareClick?: () => void
+  highlightLabware?: boolean
+  highlightShadowLabware?: boolean
+  stacked?: boolean
+}
+
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
@@ -149,9 +165,20 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       fixture.cutoutId === WASTE_CHUTE_CUTOUT
   )
 
+  const [singleLocationModules, stackerModules] = partition(
+    modulesOnDeck,
+    module => module.moduleModel !== FLEX_STACKER_MODULE_V1
+  )
+
   return (
     <RobotCoordinateSpace
-      viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+      viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
+        deckDef.cornerOffsetFromOrigin[1]
+      } ${
+        stackerModules.length > 0
+          ? deckDef.dimensions[0] + 220
+          : deckDef.dimensions[0]
+      } ${deckDef.dimensions[1]}`}
       animated={animatedSVG}
       {...svgProps}
     >
@@ -170,7 +197,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 stagingAreaFixtures.length > 0 ||
                 wasteChuteStagingAreaFixtures.length > 0 ||
                 modulesOnDeck.findIndex(
-                  module => module.moduleModel === 'absorbanceReaderV1'
+                  module =>
+                    module.moduleModel === 'absorbanceReaderV1' ||
+                    module.moduleModel === 'flexStackerModuleV1'
                 ) >= 0
               }
             />
@@ -245,7 +274,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       )}
       <>
         {/* render modules, nested labware, and overlays */}
-        {modulesOnDeck.map(
+        {singleLocationModules.map(
           ({
             moduleModel,
             moduleLocation,
@@ -291,6 +320,87 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 ) : null}
                 {moduleChildren}
               </Module>
+            ) : null
+          }
+        )}
+        {stackerModules.map(
+          ({
+            moduleModel,
+            moduleLocation,
+            nestedLabwareDef,
+            nestedLabwareWellFill,
+            innerProps,
+            moduleChildren,
+            onLabwareClick,
+            highlightLabware,
+            highlightShadowLabware,
+          }) => {
+            const slotPosition = getPositionFromSlotId(
+              moduleLocation.slotName,
+              deckDef
+            )
+            const moduleDef = getModuleDef2(moduleModel)
+            return slotPosition != null ? (
+              <>
+                <StagingAreaFixture
+                  cutoutId={
+                    `cutout${moduleLocation.slotName}` as StagingAreaLocation
+                  }
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
+                />
+                <Module
+                  key={`${moduleModel} ${moduleLocation.slotName}`}
+                  def={moduleDef}
+                  x={slotPosition[0] + 170}
+                  y={slotPosition[1] - 6}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slotPosition[0]
+                  )}
+                  innerProps={innerProps}
+                >
+                  {nestedLabwareDef != null ? (
+                    <g
+                      cursor={onLabwareClick != null ? 'pointer' : ''}
+                      transform="translate(178.5, 7)"
+                    >
+                      <LabwareRender
+                        definition={nestedLabwareDef}
+                        onLabwareClick={onLabwareClick}
+                        wellFill={nestedLabwareWellFill}
+                        shouldRotateAdapterOrientation={
+                          inferModuleOrientationFromXCoordinate(
+                            slotPosition[0]
+                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                        }
+                        highlight={highlightLabware}
+                        highlightShadow={highlightShadowLabware}
+                      />
+                    </g>
+                  ) : null}
+                  {nestedLabwareDef != null ? (
+                    <g
+                      cursor={onLabwareClick != null ? 'pointer' : ''}
+                      transform="translate(0,7)"
+                    >
+                      <LabwareRender
+                        definition={nestedLabwareDef}
+                        onLabwareClick={onLabwareClick}
+                        wellFill={nestedLabwareWellFill}
+                        shouldRotateAdapterOrientation={
+                          inferModuleOrientationFromXCoordinate(
+                            slotPosition[0]
+                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                        }
+                        highlight={highlightLabware}
+                        highlightShadow={highlightShadowLabware}
+                      />
+                    </g>
+                  ) : null}
+                  {moduleChildren}
+                </Module>
+              </>
             ) : null
           }
         )}
