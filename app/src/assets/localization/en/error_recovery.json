@@ -38,6 +38,8 @@
   "gripper_errors_occur_when": "Gripper errors occur when the gripper stalls or collides with another object on the deck and are usually caused by improperly placed labware or inaccurate labware offsets",
   "gripper_releasing_labware": "Gripper releasing labware",
   "gripper_will_release_in_s": "Gripper will release labware in {{seconds}} seconds",
+  "latch_releasing_labware": "Latch releasing labware",
+  "latch_will_release_in_s": "Latch will release labware in {{seconds}} seconds",
   "home_and_retry": "Home gantry and retry step",
   "home_gantry": "Home gantry",
   "home_now": "Home now",

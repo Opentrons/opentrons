@@ -9,6 +9,7 @@ import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import { RECOVERY_MAP } from '../../constants'
 
 vi.mock('/app/assets/videos/error-recovery/Gripper_Release.webm', () => ({
   default: 'mocked-animation-path.webm',
@@ -36,10 +37,26 @@ describe('ReleaseLabware', () => {
     }
   })
 
-  it('renders appropriate copy', () => {
+  it('renders gripper copy', () => {
     render(props)
 
     screen.getByText('Release labware from gripper')
+    screen.getByText(
+      'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
+    )
+    screen.getByText('The labware will be released from its current height.')
+  })
+
+  it('renders latch copy', () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
+      step:
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS
+          .CONFIRM_LABWARE_IN_LATCH,
+    }
+    render(props)
+
+    screen.getByText('Release labware from latch')
     screen.getByText(
       'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
     )

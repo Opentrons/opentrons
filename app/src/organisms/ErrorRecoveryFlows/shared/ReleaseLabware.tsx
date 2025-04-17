@@ -33,7 +33,21 @@ export function ReleaseLabware({
   const buildPrimaryOnClick = (): void => {
     // Because the actual release command is executed on a delay, the execution behavior is deferred to the
     // motion route.
-    void handleMotionRouting(true, RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE)
+    console.log('route: ', route)
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+        void handleMotionRouting(
+          true,
+          RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+        )
+        break
+      default:
+        void handleMotionRouting(
+          true,
+          RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE
+        )
+        break
+    }
   }
 
   const buildTitle = (): string => {

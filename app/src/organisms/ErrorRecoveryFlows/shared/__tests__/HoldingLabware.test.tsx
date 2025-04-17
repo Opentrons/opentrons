@@ -42,10 +42,22 @@ describe('HoldingLabware', () => {
     }
   })
 
-  it('renders appropriate title copy', () => {
+  it('renders appropriate gripper title copy', () => {
     render(props)
 
     screen.getByText('First, is the gripper holding labware?')
+  })
+
+  it('renders appropriate latch title copy', () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
+      step:
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS
+          .CONFIRM_LABWARE_IN_LATCH,
+    }
+    render(props)
+
+    screen.getByText('Is there labware stuck on the stacker latch?')
   })
 
   HOLDING_LABWARE_OPTIONS.forEach(option => {
@@ -120,6 +132,38 @@ describe('HoldingLabware', () => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
         RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
+      )
+    })
+  })
+
+  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE}`, async () => {
+    render({
+      ...props,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption:
+          RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
+      } as any,
+    })
+
+    fireEvent.click(screen.getAllByLabelText('No')[0])
+    clickButtonLabeled('Continue')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(true)
+    })
+
+    await waitFor(() => {
+      expect(mockHomeExceptPlungers).toHaveBeenCalled()
+    })
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    })
+
+    await waitFor(() => {
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
+        RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE
       )
     })
   })

@@ -31,11 +31,20 @@ export function RecoveryInProgress({
     ROBOT_PICKING_UP_TIPS,
     ROBOT_SKIPPING_STEP,
     ROBOT_RELEASING_LABWARE,
+    ROBOT_RELEASING_LABWARE_LATCH,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
 
   const gripperReleaseCountdown = useGripperRelease({
+    recoveryMap,
+    recoveryCommands,
+    routeUpdateActions,
+    doorStatusUtils,
+    currentRecoveryOptionUtils,
+  })
+
+  const latchReleaseCountdown = useGripperRelease({
     recoveryMap,
     recoveryCommands,
     routeUpdateActions,
@@ -64,6 +73,15 @@ export function RecoveryInProgress({
           })
         } else {
           return t('gripper_releasing_labware')
+        }
+      }
+      case ROBOT_RELEASING_LABWARE_LATCH.ROUTE: {
+        if (latchReleaseCountdown > 0) {
+          return t('latch_will_release_in_s', {
+            seconds: latchReleaseCountdown,
+          })
+        } else {
+          return t('latch_releasing_labware')
         }
       }
       default:
@@ -153,38 +171,45 @@ export function useGripperRelease({
     }
   }
 
+  const startTimer = (intervalId): void => {
+    intervalId = setInterval(() => {
+      setCountdown(prevCountdown => {
+        const updatedCountdown = prevCountdown - 1
+
+        if (updatedCountdown === 0) {
+          if (intervalId != null) {
+            clearInterval(intervalId)
+          }
+          if (recoveryMap.route === 
+          void releaseGripperJaws().then(() => {
+            if (isDoorOpen) {
+              return handleMotionRouting(false).then(() => {
+                proceedToDoorStep()
+              })
+            }
+
+            return handleMotionRouting(true)
+              .then(() => homeExceptPlungers())
+              .then(() => handleMotionRouting(false))
+              .then(() => {
+                proceedToValidNextStep()
+              })
+          })
+        }
+
+        return updatedCountdown
+      })
+    }, 1000)
+  }
+
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null
 
-    if (recoveryMap.route === RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE) {
-      intervalId = setInterval(() => {
-        setCountdown(prevCountdown => {
-          const updatedCountdown = prevCountdown - 1
-
-          if (updatedCountdown === 0) {
-            if (intervalId != null) {
-              clearInterval(intervalId)
-            }
-
-            void releaseGripperJaws().then(() => {
-              if (isDoorOpen) {
-                return handleMotionRouting(false).then(() => {
-                  proceedToDoorStep()
-                })
-              }
-
-              return handleMotionRouting(true)
-                .then(() => homeExceptPlungers())
-                .then(() => handleMotionRouting(false))
-                .then(() => {
-                  proceedToValidNextStep()
-                })
-            })
-          }
-
-          return updatedCountdown
-        })
-      }, 1000)
+    switch (recoveryMap.route) {
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+        startTimer(intervalId)
+        break
     }
 
     return () => {
