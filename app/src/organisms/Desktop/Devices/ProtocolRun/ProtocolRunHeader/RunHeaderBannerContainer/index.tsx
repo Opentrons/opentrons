@@ -84,7 +84,7 @@ export function RunHeaderBannerContainer(
       ) : null}
       {showDoorOpenBeforeRunBanner ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('shared:close_robot_door' + doorStatus.isDoorOpen + doorStatus.moduleDoorLocation)}
+          {t('shared:close_robot_door')}
         </Banner>
       ) : null}
       {showUnconfiguredStackerDoorOpenBeforeRunBanner ? (
@@ -106,9 +106,14 @@ export function RunHeaderBannerContainer(
           {t('close_door_to_resume_run')}
         </Banner>
       ) : null}
+      {showUnconfiguredStackerDoorOpenDuringRunBanner ? (
+        <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
+          {t('close_unconfigured_stacker_to_resume_run')}
+        </Banner>
+      ) : null}
       {showStackerDoorOpenDuringRunBanner ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('TBD_CLOSE_STACKER_DOOR_DURING_RUN', {
+          {t('close_stacker_to_resume_run', {
             module_door_location: doorStatus.moduleDoorLocation,
           })}
         </Banner>

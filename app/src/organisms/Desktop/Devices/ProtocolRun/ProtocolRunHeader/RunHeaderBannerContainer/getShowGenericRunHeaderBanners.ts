@@ -64,7 +64,7 @@ export function getShowGenericRunHeaderBanners({
     doorStatus.moduleDoorLocation === null
 
   const showUnconfiguredStackerDoorOpenDuringRunBanner =
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR&&
+    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
     doorStatus.moduleDoorLocation === NOT_CONFIGURED
 
   const showStackerDoorOpenDuringRunBanner =
