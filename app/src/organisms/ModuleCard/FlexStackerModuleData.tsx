@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, COLORS, Flex } from '@opentrons/components'
-import { StatusLabel } from '/app/atoms/StatusLabel'
+import { StyledText, Flex, Chip } from '@opentrons/components'
 
 import type { FlexStackerModule } from '/app/redux/modules/types'
 
@@ -30,8 +29,10 @@ export function FlexStackerModuleData(
     }
   }
 
-  const shuttleDisplayStatus = i18n.format(getShuttleStatusText(), 'capitalize')
-
+  const shuttleDisplayStatus = i18n.format(
+    getShuttleStatusText(),
+    'capitalize'
+  )
   const doorDisplayStatus = i18n.format(
     moduleData.hopperDoorState === 'closed'
       ? t('shared:closed')
@@ -39,44 +40,9 @@ export function FlexStackerModuleData(
     'capitalize'
   )
 
-  const ShuttleStatusLabelProps = {
-    status: shuttleDisplayStatus,
-    backgroundColor: COLORS.grey30,
-    iconColor: COLORS.grey60,
-    textColor: COLORS.grey60,
-    pulse: false,
-  }
-
-  switch (moduleData.platformState) {
-    case 'extended':
-    case 'retracted': {
-      ShuttleStatusLabelProps.backgroundColor = COLORS.blue30
-      ShuttleStatusLabelProps.iconColor = COLORS.blue60
-      ShuttleStatusLabelProps.textColor = COLORS.blue60
-      break
-    }
-    case 'missing': {
-      ShuttleStatusLabelProps.backgroundColor = COLORS.red30
-      ShuttleStatusLabelProps.iconColor = COLORS.red60
-      ShuttleStatusLabelProps.textColor = COLORS.red60
-      break
-    }
-  }
-
-  const DoorStatusLabelProps = {
-    status: doorDisplayStatus,
-    backgroundColor: COLORS.grey30,
-    iconColor: COLORS.grey60,
-    textColor: COLORS.grey60,
-    pulse: false,
-  }
-
-  if (moduleData.hopperDoorState === 'opened') {
-    DoorStatusLabelProps.backgroundColor = COLORS.blue30
-    DoorStatusLabelProps.iconColor = COLORS.blue60
-    DoorStatusLabelProps.textColor = COLORS.blue60
-  }
-
+  const doorType = moduleData.hopperDoorState === 'opened' ? 'info' : 'neutral'
+  const shuttleType =
+    moduleData.platformState === 'missing' ? 'error' : 'info'
   return (
     <>
       <Flex
@@ -86,7 +52,13 @@ export function FlexStackerModuleData(
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_door_status')}
         </StyledText>
-        <StatusLabel {...DoorStatusLabelProps} />
+        <Chip
+          data-testid="stacker_door_label"
+          text={doorDisplayStatus}
+          chipSize="small"
+          type={doorType}
+          hasIcon={false}
+        />
       </Flex>
       <Flex
         css={MODULE_INFO_SUB_CONTAINTER_STYLE}
@@ -95,7 +67,13 @@ export function FlexStackerModuleData(
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_shuttle_status')}
         </StyledText>
-        <StatusLabel {...ShuttleStatusLabelProps} />
+        <Chip
+          data-testid="stacker_shuttle_label"
+          text={shuttleDisplayStatus}
+          chipSize="small"
+          type={shuttleType}
+          iconName='connection-status'
+        />
       </Flex>
     </>
   )

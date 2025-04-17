@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -34,35 +35,36 @@ describe('FlexStackerModuleData', () => {
     screen.getByTestId('stacker_door_data')
     screen.getByTestId('stacker_shuttle_data')
 
-    const doorLabel = screen.getByText('Closed')
-    expect(doorLabel)
-    expect(doorLabel).toHaveStyle('backgroundColor: COLORS.grey30')
+    const doorChip = screen.getByTestId('stacker_door_label')
+    expect(doorChip).toHaveTextContent('Closed')
+    expect(doorChip).toHaveStyle(`background-color: ${COLORS.black90}${COLORS.opacity20HexCode}`)
 
-    const shuttleLabel = screen.getByText('Extended')
-    expect(shuttleLabel).toHaveStyle('backgroundColor: COLORS.blue30')
+    const shuttleChip = screen.getByTestId('stacker_shuttle_label')
+    expect(shuttleChip).toHaveTextContent('Extended')
+    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.blue35}`)
   })
 
   it('applies correct styles for door when opened', () => {
     props.moduleData.hopperDoorState = 'opened'
     render(props)
-    const doorLabel = screen.getByText('Open')
-    expect(doorLabel)
-    expect(doorLabel).toHaveStyle('backgroundColor: COLORS.grey30')
+    const doorChip = screen.getByTestId('stacker_door_label')
+    expect(doorChip).toHaveTextContent('Open')
+    expect(doorChip).toHaveStyle(`background-color: ${COLORS.blue35}`)
   })
 
   it('applies correct styles for shuttle when retracted', () => {
     props.moduleData.platformState = 'retracted'
     render(props)
-    const shuttleLabel = screen.getByText('In stacker')
-    expect(shuttleLabel)
-    expect(shuttleLabel).toHaveStyle('backgroundColor: COLORS.blue30')
+    const shuttleChip = screen.getByTestId('stacker_shuttle_label')
+    expect(shuttleChip).toHaveTextContent('In stacker')
+    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.blue35}`)
   })
 
   it('applies correct styles for shuttle when missing', () => {
     props.moduleData.platformState = 'missing'
     render(props)
-    const shuttleLabel = screen.getByText('Unknown')
-    expect(shuttleLabel)
-    expect(shuttleLabel).toHaveStyle('backgroundColor: COLORS.red30')
+    const shuttleChip = screen.getByTestId('stacker_shuttle_label')
+    expect(shuttleChip).toHaveTextContent('Unknown')
+    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.red35}`)
   })
 })

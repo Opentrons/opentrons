@@ -181,7 +181,7 @@ const WEB_MEDIUM_TEXT_STYLE = css`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 const WEB_SMALL_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeLabel};
-  line-height: ${TYPOGRAPHY.lineHeight12};
+  font-size: ${TYPOGRAPHY.fontSizeP};
+  line-height: ${TYPOGRAPHY.lineHeight16};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
