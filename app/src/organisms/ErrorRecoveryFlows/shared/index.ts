@@ -19,7 +19,7 @@ export { RecoveryRadioGroup } from './RecoveryRadioGroup'
 export { GripperReleaseLabware } from './GripperReleaseLabware'
 export { RetryStepInfo } from './RetryStepInfo'
 export { SkipStepInfo } from './SkipStepInfo'
-export { GripperIsHoldingLabware } from './GripperIsHoldingLabware'
+export { HoldingLabware } from './HoldingLabware'
 export { RecoveryDoorOpenSpecial } from './RecoveryDoorOpenSpecial'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'

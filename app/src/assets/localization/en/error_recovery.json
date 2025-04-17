@@ -146,5 +146,6 @@
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
   "replace_labware_in_stacker_and_retry": "Replace labware in stacker and retry step",
   "empty_stacker_of_labware_above_latch": "Empty stacker of labware above latch",
-  "empty_stacker_of_labware_above_latch_labware_stuck": "<block>Empty the stacker of all labware above the latch.</block><block>Labware stuck on the latch will be retrieved later in recovery.</block>"
+  "empty_stacker_of_labware_above_latch_labware_stuck": "<block>Empty the stacker of all labware above the latch.</block><block>Labware stuck on the latch will be retrieved later in recovery.</block>",
+  "is_there_labware_stuck_on_the_stacker_latch": "Is there labware stuck on the stacker latch?"
 }

@@ -2,7 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
 import { RECOVERY_MAP } from '../constants'
 import {
-  GripperIsHoldingLabware,
+  HoldingLabware,
   GripperReleaseLabware,
   TwoColLwInfoAndDeck,
   TwoColTextAndFailedStepNextStep,
@@ -69,6 +69,9 @@ export function ManualReplaceLwAndRetry(
         case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
           return RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS
             .MANUAL_REPLACE
+        case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+          return REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS
+            .CONFIRM_LABWARE_IN_LATCH
         default:
           return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
       }
@@ -85,7 +88,8 @@ export function ManualReplaceLwAndRetry(
   const buildContent = (): JSX.Element => {
     switch (step) {
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE:
-        return <GripperIsHoldingLabware {...props} />
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH:
+        return <HoldingLabware {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE:
         return <GripperReleaseLabware {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME:

@@ -6,17 +6,14 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/__fixtures__'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-import {
-  GripperIsHoldingLabware,
-  HOLDING_LABWARE_OPTIONS,
-} from '../GripperIsHoldingLabware'
+import { HoldingLabware, HOLDING_LABWARE_OPTIONS } from '../HoldingLabware'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
 
-const render = (props: ComponentProps<typeof GripperIsHoldingLabware>) => {
-  return renderWithProviders(<GripperIsHoldingLabware {...props} />, {
+const render = (props: ComponentProps<typeof HoldingLabware>) => {
+  return renderWithProviders(<HoldingLabware {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -26,8 +23,8 @@ let mockProceedNextStep: Mock
 let mockHandleMotionRouting: Mock
 let mockHomeExceptPlungers: Mock
 
-describe('GripperIsHoldingLabware', () => {
-  let props: ComponentProps<typeof GripperIsHoldingLabware>
+describe('HoldingLabware', () => {
+  let props: ComponentProps<typeof HoldingLabware>
   beforeEach(() => {
     mockProceedToRouteAndStep = vi.fn(() => Promise.resolve())
     mockProceedNextStep = vi.fn(() => Promise.resolve())
