@@ -19,7 +19,6 @@ import {
   StyledText,
   DIRECTION_ROW,
   OVERFLOW_AUTO,
-  Box,
 } from '@opentrons/components'
 
 import smallLogo from '../../assets/images/opentrons_logo_small.svg'
@@ -59,73 +58,6 @@ const HoverShadow = styled(Flex)`
 const StyledIcon = styled(Icon)`
   color: ${COLORS.blue50};
 `
-
-// const ProtocolContentBadge = styled(Flex)`
-//   background-color: ${COLORS.blue50};
-//   color: ${COLORS.white};
-//   border-radius: ${BORDERS.borderRadius4};
-//   padding: ${SPACING.spacing4} ${SPACING.spacing8};
-//   font-size: ${TYPOGRAPHY.fontSize32};
-//   margin-top: ${SPACING.spacing12};
-//   display: inline-flex;
-//   align-items: center;
-//   cursor: pointer;
-//   transition: background-color 0.2s;
-
-//   &:hover {
-//     background-color: ${COLORS.blue60};
-//   }
-// `
-
-// export const ProtocolContentBadge = (): JSX.Element => {
-//   return (
-//     <Flex
-//       // eslint-disable-next-line opentrons/no-margins-inline
-//       marginX={SPACING.spacing16}
-//       backgroundColor="lightBlue"
-//       borderRadius={BORDERS.borderRadius4}
-//     >
-//       <Flex backgroundColor='red'>
-//         <img src={smallLogo} />
-//       </Flex>
-//       <Flex
-//         flexDirection={DIRECTION_ROW}
-//         justifyContent={JUSTIFY_FLEX_END}
-//         gridGap={SPACING.spacing20}
-//         paddingTop={SPACING.spacing12}
-//       >
-//         <HoverShadow
-//           onClick={() => {
-//             setInputFieldToCorrespondingRequest()
-//           }}
-//         >
-//           <StyledIcon size={SPACING.spacing20} name="reload" />
-//         </HoverShadow>
-//         <HoverShadow
-//           onClick={() => {
-//             setShowFeedbackModal(true)
-//           }}
-//         >
-//           <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
-//         </HoverShadow>
-//         <HoverShadow
-//           onClick={async () => {
-//             await handleClickCopy()
-//           }}
-//         >
-//           <StyledIcon size={SPACING.spacing20} name={'content-copy'} />
-//         </HoverShadow>
-//         <HoverShadow
-//           onClick={() => {
-//             handleFileDownload()
-//           }}
-//         >
-//           <StyledIcon size={SPACING.spacing20} name="download" />
-//         </HoverShadow>
-//       </Flex>
-//     </Flex>
-//   )
-// }
 
 const OuterContainer = styled.div`
   background-color: #e5e7eb; // Light gray background
@@ -183,7 +115,7 @@ export const ProtocolContentBadge = (props: {
         <HoverShadow onClick={() => null}>
           <StyledIcon size={SPACING.spacing20} name="content-copy" />
         </HoverShadow>
-        <HoverShadow onClick={() => handleFileDownload()}>
+        <HoverShadow onClick={handleFileDownload}>
           <StyledIcon size={SPACING.spacing20} name="download" />
         </HoverShadow>
       </FileContainer>

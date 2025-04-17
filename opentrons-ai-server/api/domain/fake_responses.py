@@ -1,14 +1,15 @@
-from typing import List
 import json
 from pathlib import Path
+from typing import Any, Dict, List, cast
 
 from pydantic import BaseModel
 
 from api.models.chat_response import ChatResponse
 
 
-def load_json_fixture(name: str) -> dict:
-    return json.loads(Path(f"api/domain/fixtures/{name}.json").read_text())
+def load_json_fixture(name: str) -> Dict[str, Any]:
+    data = json.loads(Path(f"api/domain/fixtures/{name}.json").read_text())
+    return cast(Dict[str, Any], data)
 
 
 class FakeResponse(BaseModel):

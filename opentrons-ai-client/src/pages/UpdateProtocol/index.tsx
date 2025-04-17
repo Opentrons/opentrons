@@ -105,7 +105,7 @@ export function UpdateProtocol(): JSX.Element {
   const { t }: { t: (key: string) => string } = useTranslation(
     'protocol_generator'
   )
-  const [headerState, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
+  const [, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
   const [updateType, setUpdateType] = useState<DropdownOption | null>(null)
   const [detailsValue, setDetailsValue] = useState<string>('')
   const [, setUpdateProtocolChatAtom] = useAtom(updateProtocolChatAtom)
