@@ -44,7 +44,7 @@ export function SelectHardware(props: WizardTileProps): JSX.Element | null {
           setValue={setValue}
           fixtures={fixtures}
           modules={modules}
-          hasGripper={hasGripper}
+          hasGripper={hasGripper ?? false}
         />
       </WizardBody>
     </HandleEnter>
