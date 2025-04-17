@@ -37,6 +37,7 @@ import opentrons.protocol_engine.execution.pipetting as PE_pipetting
 from opentrons.protocol_engine.notes import CommandNoteAdder
 
 from opentrons.protocol_engine import StateView
+from opentrons.protocol_engine.types import LabwareOffset
 from opentrons.protocol_api.core.engine import pipette_movement_conflict
 
 
@@ -471,6 +472,12 @@ def _get_tag_from_pipette(
     else:
         pipette_tag += "-qc"
     return pipette_tag
+
+
+def _get_offsets_from_ctx(ctx: ProtocolContext) -> List[LabwareOffset]:
+    state = ctx._core._engine_client._transport._engine.state_view  # type: ignore[attr-defined]
+    ctx_offsets = state._labware_store._state.labware_offsets_by_id
+    return [_o for _o in ctx_offsets.values()]
 
 
 def _load_tipracks(

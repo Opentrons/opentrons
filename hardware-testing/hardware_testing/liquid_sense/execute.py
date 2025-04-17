@@ -6,9 +6,13 @@ from typing import Dict, Any, List, Tuple, Optional
 from .report import store_tip_results, store_trial, store_baseline_trial
 from opentrons.config.types import LiquidProbeSettings
 from .__main__ import RunArgs
-from hardware_testing.gravimetric.workarounds import get_sync_hw_api
+from hardware_testing.gravimetric.workarounds import (
+    get_sync_hw_api,
+    get_latest_offset_for_labware,
+)
 from hardware_testing.gravimetric.helpers import (
     _jog_to_find_liquid_height,
+    _get_offsets_from_ctx,
 )
 from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
 from hardware_testing.gravimetric.tips import get_unused_tips
@@ -33,6 +37,8 @@ from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+
+from opentrons.protocol_api.labware import SET_OFFSET_RESTORED_API_VERSION
 
 try:
     from abr_testing.automation import google_sheets_tool
@@ -104,6 +110,10 @@ def _load_tipracks(
             )
         else:
             tipracks.append(ctx.load_labware(ls[1], location=ls[0], adapter=adapter))
+    if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        for tiprack in tipracks:
+            offset = get_latest_offset_for_labware(_get_offsets_from_ctx(ctx), tiprack)
+            tiprack.set_offset(offset.x, offset.y, offset.z)
     return tipracks
 
 
@@ -120,6 +130,11 @@ def _load_dial_indicator(run_args: RunArgs) -> Labware:
     dial_labware = run_args.ctx.load_labware(
         dial_labware_name, location=slot_dial, namespace="custom_beta"
     )
+    if run_args.ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        offset = get_latest_offset_for_labware(
+            _get_offsets_from_ctx(run_args.ctx), dial_labware
+        )
+        dial_labware.set_offset(offset.x, offset.y, offset.z)
     return dial_labware
 
 
@@ -142,6 +157,11 @@ def _load_test_well(run_args: RunArgs) -> Labware:
     labware_on_scale = run_args.ctx.load_labware(
         labware_on_scale, location=slot_scale, namespace=namespace
     )
+    if run_args.ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        offset = get_latest_offset_for_labware(
+            _get_offsets_from_ctx(run_args.ctx), labware_on_scale
+        )
+        labware_on_scale.set_offset(offset.x, offset.y, offset.z)
     return labware_on_scale
 
 
