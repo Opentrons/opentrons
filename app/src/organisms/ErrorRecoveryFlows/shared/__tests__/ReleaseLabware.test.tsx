@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { GripperReleaseLabware } from '../GripperReleaseLabware'
+import { ReleaseLabware } from '../ReleaseLabware'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/__fixtures__'
@@ -14,14 +14,14 @@ vi.mock('/app/assets/videos/error-recovery/Gripper_Release.webm', () => ({
   default: 'mocked-animation-path.webm',
 }))
 
-const render = (props: ComponentProps<typeof GripperReleaseLabware>) => {
-  return renderWithProviders(<GripperReleaseLabware {...props} />, {
+const render = (props: ComponentProps<typeof ReleaseLabware>) => {
+  return renderWithProviders(<ReleaseLabware {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('GripperReleaseLabware', () => {
-  let props: ComponentProps<typeof GripperReleaseLabware>
+describe('ReleaseLabware', () => {
+  let props: ComponentProps<typeof ReleaseLabware>
   let mockHandleMotionRouting: Mock
 
   beforeEach(() => {

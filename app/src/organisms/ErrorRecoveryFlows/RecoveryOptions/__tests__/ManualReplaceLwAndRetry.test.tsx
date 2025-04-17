@@ -13,7 +13,7 @@ vi.mock('../../shared', async importOriginal => {
   return {
     ...mod,
     HoldingLabware: vi.fn(() => <div>MOCK_GRIPPER_IS_HOLDING_LABWARE</div>),
-    GripperReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
+    ReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
     TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
     RetryStepInfo: vi.fn(() => <div>MOCK_RETRY_STEP_INFO</div>),
     RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
@@ -61,7 +61,7 @@ describe('ManualReplaceLwAndRetry', () => {
     screen.getByText('MOCK_GRIPPER_IS_HOLDING_LABWARE')
   })
 
-  it(`renders GripperReleaseLabware for ${RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE} step`, () => {
+  it(`renders ReleaseLabware for ${RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE} step`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE
     render(props)

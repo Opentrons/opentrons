@@ -3,7 +3,7 @@ import { LegacyStyledText } from '@opentrons/components'
 import { RECOVERY_MAP } from '../constants'
 import {
   HoldingLabware,
-  GripperReleaseLabware,
+  ReleaseLabware,
   TwoColLwInfoAndDeck,
   TwoColTextAndFailedStepNextStep,
   RetryStepInfo,
@@ -91,7 +91,8 @@ export function ManualReplaceLwAndRetry(
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH:
         return <HoldingLabware {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE:
-        return <GripperReleaseLabware {...props} />
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.RELEASE_FROM_LATCH:
+        return <ReleaseLabware {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME:
         return <RecoveryDoorOpenSpecial {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:

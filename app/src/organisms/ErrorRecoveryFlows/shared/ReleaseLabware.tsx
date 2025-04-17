@@ -21,10 +21,13 @@ import gripperReleaseAnimation from '/app/assets/videos/error-recovery/Gripper_R
 import type { JSX } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function GripperReleaseLabware({
+export function ReleaseLabware({
   routeUpdateActions,
+  recoveryMap,
 }: RecoveryContentProps): JSX.Element {
   const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
+  const { route } = recoveryMap
+  const { REPLACE_LABWARE_IN_HOOPER_AND_RETRY } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const buildPrimaryOnClick = (): void => {
@@ -33,6 +36,14 @@ export function GripperReleaseLabware({
     void handleMotionRouting(true, RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE)
   }
 
+  const buildTitle = (): string => {
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+        return t('release_labware_from_latch')
+      default:
+        return t('release_labware_from_gripper')
+    }
+  }
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
@@ -41,7 +52,7 @@ export function GripperReleaseLabware({
             oddStyle="level4HeaderSemiBold"
             desktopStyle="headingSmallBold"
           >
-            {t('release_labware_from_gripper')}
+            {buildTitle()}
           </StyledText>
           <StyledText
             oddStyle="bodyTextRegular"

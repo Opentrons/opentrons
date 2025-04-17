@@ -10,7 +10,7 @@ import type { ComponentProps } from 'react'
 
 vi.mock('../../shared', () => ({
   HoldingLabware: vi.fn(() => <div>MOCK_GRIPPER_IS_HOLDING_LABWARE</div>),
-  GripperReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
+  ReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
   TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
   SkipStepInfo: vi.fn(() => <div>MOCK_SKIP_STEP_INFO</div>),
   RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
@@ -43,7 +43,7 @@ describe('ManualMoveLwAndSkip', () => {
     screen.getByText('MOCK_GRIPPER_IS_HOLDING_LABWARE')
   })
 
-  it(`renders GripperReleaseLabware for ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE} step`, () => {
+  it(`renders ReleaseLabware for ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE} step`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE
     render(props)
