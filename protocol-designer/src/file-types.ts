@@ -1,4 +1,5 @@
 import type {
+  LabwareDefinition2,
   ModuleModel,
   PipetteName,
   ProtocolFile,
@@ -38,7 +39,11 @@ export interface PDMetadata {
 }
 
 export interface DesignerApplication {
-  designerApplication: { version: string; name: string; data: PDMetadata }
+  designerApplication: {
+    version: string
+    name: string
+    data: PDMetadata
+  }
 }
 
 export interface PythonDesignerApplication extends DesignerApplication {
@@ -46,6 +51,7 @@ export interface PythonDesignerApplication extends DesignerApplication {
     model: RobotType
   }
   metadata: FileMetadataFields
+  labwareDefinitions?: Record<string, LabwareDefinition2>
 }
 
 export interface PDPythonFile {
@@ -55,7 +61,9 @@ export interface PDPythonFile {
 
 export type PDProtocolFile = ProtocolFile<PDMetadata>
 
-export function getPDMetadata(file: PDProtocolFile): PDMetadata {
+export function getPDMetadata(
+  file: PDProtocolFile | PythonDesignerApplication
+): PDMetadata {
   const metadata = file.designerApplication?.data
 
   if (!metadata) {

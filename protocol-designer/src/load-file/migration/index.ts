@@ -15,7 +15,10 @@ import { migrateFile as migrateFileEightTwo } from './8_2_0'
 import { migrateFile as migrateFileEightTwoPointTwo } from './8_2_2'
 import { migrateFile as migrateFileEightFive } from './8_5_0'
 
-import type { PDProtocolFile } from '../../file-types'
+import type {
+  PDProtocolFile,
+  PythonDesignerApplication,
+} from '../../file-types'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string
@@ -65,12 +68,12 @@ const allMigrationsByVersion: MigrationsByVersion = {
 export const migration = (
   file: any
 ): {
-  file: PDProtocolFile
+  file: PDProtocolFile | PythonDesignerApplication
   didMigrate: boolean
   migrationsRan: string[]
 } => {
   const designerApplication =
-    file.designerApplication || file['designer-application']
+    file.designerApplication || file['designer-application'] || file
   // NOTE: default exists because any protocol that doesn't include the application version
   // key will be treated as the oldest migrateable version ('1.0.0')
   const applicationVersion: string =

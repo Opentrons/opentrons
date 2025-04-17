@@ -3,7 +3,7 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { saveFile, savePythonFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
-import type { PDProtocolFile, PDPythonFile } from '../file-types'
+import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type {
   FileUploadErrorType,
@@ -29,7 +29,7 @@ export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
 })
 // expects valid, parsed JSON protocol.
 export const loadFileAction = (
-  payload: PDProtocolFile | PDPythonFile
+  payload: PDProtocolFile | PythonDesignerApplication
 ): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migration(payload),
@@ -89,7 +89,24 @@ export const loadProtocolFile = (
           const designerApplicationString = designerApplication[1]
           const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
 
-          dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
+          const customLabware = result.match(
+            /=\s*json\.loads\s*\("""([\s\S]*?)"""\)/m
+          )
+          let customLabwareJson
+          if (customLabware != null && customLabware[1]) {
+            const customLabwareString = customLabware[1]
+            customLabwareJson = JSON.parse(customLabwareString)
+          }
+          dispatch(
+            loadFileAction(
+              (customLabwareJson != null
+                ? {
+                    ...designerApplicationJson,
+                    labwareDefinitions: customLabwareJson,
+                  }
+                : designerApplicationJson) as PythonDesignerApplication
+            )
+          )
         } else {
           fileError('INVALID_PYTHON_FILE')
         }
