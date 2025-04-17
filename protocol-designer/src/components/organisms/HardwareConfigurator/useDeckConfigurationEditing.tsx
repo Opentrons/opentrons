@@ -27,7 +27,7 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 import { AddFixtureModal } from './AddFixtureModal'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -285,7 +285,7 @@ export const getAvailableOptions = (
     }
   } else if (optionStage === 'wasteChuteOptions') {
     availableOptions = [
-      WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
     ].map(fixture => [
       {
