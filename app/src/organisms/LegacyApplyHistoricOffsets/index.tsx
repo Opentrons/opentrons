@@ -36,7 +36,7 @@ import type {
 } from '@opentrons/shared-data'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
   labwareDisplayName: string
