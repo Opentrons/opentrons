@@ -206,6 +206,10 @@ def tip_on_left_side_96(back_left_nozzle: str) -> bool:
     left_most_column = int(back_left_nozzle[1:])
     return left_most_column == 1
 
+def tip_on_right_side_96(front_right_nozzle: str) -> bool:
+    """Return if there is a tip on the left edge of the 96 channel."""
+    right_most_column = int(front_right_nozzle[1:])
+    return right_most_column == 12
 
 class HardwareTipHandler(TipHandler):
     """Pick up and drop tips, using the Hardware API."""
@@ -251,7 +255,7 @@ class HardwareTipHandler(TipHandler):
 
         unsupported_layout_types_96 = [NozzleConfigurationType.SINGLE]
         # NOTE: (09-20-2024) Current on multi-channel pipettes, utilizing less than 4 nozzles risks false positives on the tip presence sensor
-        multi_chan_supported_partial_nozzle_minimum = 4
+        supported_partial_nozzle_minimum = 4
 
         nozzle_configuration = self._state_view.pipettes.get_nozzle_configuration(
             pipette_id=pipette_id
@@ -263,21 +267,26 @@ class HardwareTipHandler(TipHandler):
             case 8:
                 tip_presence_supported = (
                     nozzle_configuration.tip_count
-                    >= multi_chan_supported_partial_nozzle_minimum
+                    >= supported_partial_nozzle_minimum
                 )
             case 96:
                 tip_presence_supported = (
                     nozzle_configuration.configuration
                     not in unsupported_layout_types_96
+                    and nozzle_configuration.tip_count
+                    >= supported_partial_nozzle_minimum
                 )
                 if (
                     nozzle_configuration.configuration != NozzleConfigurationType.FULL
                     and tip_presence_supported
                 ):
-                    if tip_on_left_side_96(nozzle_configuration.back_left):
-                        follow_singular_sensor = InstrumentProbeType.PRIMARY
-                    else:
-                        follow_singular_sensor = InstrumentProbeType.SECONDARY
+                    use_left = tip_on_left_side_96(nozzle_configuration.back_left)
+                    use_right = tip_on_right_side_96(nozzle_configuration.front_right)
+                    if not (use_left and use_right):
+                        if use_left:
+                            follow_singular_sensor = InstrumentProbeType.PRIMARY
+                        else:
+                            follow_singular_sensor = InstrumentProbeType.SECONDARY
             case _:
                 raise ValueError("Unknown pipette type.")
 
