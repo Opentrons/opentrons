@@ -6,12 +6,6 @@ import {
 import type { AbsorbanceReaderArgs } from '@opentrons/step-generation'
 import type { HydratedAbsorbanceReaderFormData } from '../../../form-types'
 
-// TODO (nd: 1/15/2025) replace with actual form data once UI is
-const DUMMY_INITIALIZATION = {
-  wavelengths: [420, 600],
-  referenceWavelength: 200,
-}
-
 export const absorbanceReaderFormToArgs = (
   hydratedFormData: HydratedAbsorbanceReaderFormData
 ): AbsorbanceReaderArgs | null => {
@@ -20,31 +14,49 @@ export const absorbanceReaderFormToArgs = (
     fileName,
     lidOpen,
     moduleId,
-    // mode,
-    // referenceWavelength,
-    // wavelengths,
+    mode,
+    referenceWavelength,
+    referenceWavelengthActive,
+    wavelengths,
+    stepDetails,
+    stepName,
   } = hydratedFormData
+
+  const baseValues = { description: stepDetails, name: stepName }
   const lidAction = lidOpen
     ? 'absorbanceReaderOpenLid'
     : 'absorbanceReaderCloseLid'
   switch (absorbanceReaderFormType) {
     case ABSORBANCE_READER_INITIALIZE:
+      const rawWavelengths =
+        (mode === 'single' ? [wavelengths[0]] : wavelengths) ?? // only take first wavelength in single mode
+        []
       return {
-        module: moduleId,
-        mode: 'multi', // TODO (nd: 1/16/2025): reflect actual `mode` form field
+        moduleId,
         commandCreatorFnName: 'absorbanceReaderInitialize',
-        ...DUMMY_INITIALIZATION,
+        measureMode: mode,
+        sampleWavelengths: rawWavelengths?.map(wavelength =>
+          parseFloat(wavelength)
+        ),
+        ...(mode === 'single' &&
+        referenceWavelengthActive &&
+        referenceWavelength != null
+          ? { referenceWavelength: parseFloat(referenceWavelength) }
+          : {}),
+        ...baseValues,
       }
     case ABSORBANCE_READER_READ:
       return {
-        module: moduleId,
+        moduleId,
         commandCreatorFnName: 'absorbanceReaderRead',
-        fileName,
+        fileName: fileName ?? null,
+        ...baseValues,
       }
     case ABSORBANCE_READER_LID:
       return {
-        module: moduleId,
+        moduleId,
         commandCreatorFnName: lidAction,
+        ...baseValues,
       }
     default:
       return null

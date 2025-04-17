@@ -103,7 +103,7 @@ export function tipVolumeExceeded(args: {
 }): CommandCreatorError {
   const { volume, maxVolume, actionName } = args
   return {
-    message: `This step tries to ${actionName} ${volume}μL, but the tip can only hold ${maxVolume}μL.`,
+    message: `This step tries to ${actionName} ${volume}µL, but the tip can only hold ${maxVolume}µL.`,
     type: 'TIP_VOLUME_EXCEEDED',
   }
 }
@@ -118,7 +118,7 @@ export function pipetteVolumeExceeded(args: {
   const message =
     disposalVolume != null
       ? `Attemped to ${actionName} volume + disposal volume greater than pipette max volume (${volume} + ${disposalVolume} > ${maxVolume})`
-      : `This step tries to ${actionName} ${volume}μL, but the tip can only hold ${maxVolume}μL.`
+      : `This step tries to ${actionName} ${volume}µL, but the tip can only hold ${maxVolume}µL.`
   return {
     message,
     type: 'PIPETTE_VOLUME_EXCEEDED',
@@ -170,6 +170,14 @@ export const absorbanceReaderNoInitialization = (): CommandCreatorError => {
     type: 'ABSORBANCE_READER_NO_INITIALIZATION',
     message:
       'This step tries to read labware without initializing the Plate Reader first. Initialize the Plate Reader module or remove this step in order to proceed.',
+  }
+}
+
+export const absorbanceReaderNoGripper = (): CommandCreatorError => {
+  return {
+    type: 'ABSORBANCE_READER_NO_GRIPPER',
+    message:
+      'This step involves opening or closing the Absorbance Plate Reader lid with a gripper. Add a gripper or remove step to proceed.',
   }
 }
 

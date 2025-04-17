@@ -12,12 +12,14 @@ import type { IconName } from '@opentrons/components'
 import type {
   LabwareLocation,
   NozzleConfigurationStyle,
+  PositionReference,
 } from '@opentrons/shared-data'
 import type {
-  AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
+  TrashBinEntity,
+  WasteChuteEntity,
 } from '@opentrons/step-generation'
 export type StepIdType = string
 export type StepFieldName = string
@@ -32,8 +34,15 @@ export type StepFieldName = string
 // | 'aspirate_mix_times'
 // | 'aspirate_mix_volume'
 // | 'aspirate_mmFromBottom'
+// | 'aspirate_retract_delay_seconds'
+// | 'aspirate_retract_mmFromBottom'
+// | 'aspirate_retract_speed'
+// | 'aspirate_retract_x_position'
+// | 'aspirate_retract_y_position'
+// | 'aspirate_submerge_delay_seconds'
+// | 'aspirate_submerge_speed'
 // | 'aspirate_touchTip_checkbox'
-// | 'aspirate_touchTip_mmFromBottom'
+// | 'aspirate_touchTip_mmFromTop'
 // | 'aspirate_wellOrder_first'
 // | 'aspirate_wellOrder_second'
 // | 'aspirate_wells_grouped'
@@ -51,8 +60,15 @@ export type StepFieldName = string
 // | 'dispense_mix_times'
 // | 'dispense_mix_volume'
 // | 'dispense_mmFromBottom'
+// | 'dispense_retract_delay_seconds'
+// | 'dispense_retract_mmFromBottom'
+// | 'dispense_retract_speed'
+// | 'dispense_retract_x_position'
+// | 'dispense_retract_y_position'
+// | 'dispense_submerge_delay_seconds'
+// | 'dispense_submerge_speed'
 // | 'dispense_touchTip_checkbox'
-// | 'dispense_touchTip_mmFromBottom'
+// | 'dispense_touchTip_mmFromTop'
 // | 'dispense_wellOrder_first'
 // | 'dispense_wellOrder_second'
 // | 'dispense_wells'
@@ -66,7 +82,7 @@ export type StepFieldName = string
 // | 'labwareLocationUpdate'
 // | 'message'
 // | 'mix_mmFromBottom'
-// | 'mix_touchTip_mmFromBottom'
+// | 'mix_touchTip_mmFromTop'
 // | 'mix_x_position
 // | 'mix_y_position
 // | 'newLocation'
@@ -175,19 +191,7 @@ export interface BlowoutFields {
 export interface ChangeTipFields {
   changeTip?: ChangeTipOptions
 }
-export type MixForm = AnnotationFields &
-  BlowoutFields &
-  ChangeTipFields & {
-    id: StepIdType
-    stepType: 'mix'
-    labware?: string
-    pipette?: string
-    times?: string
-    touchTip?: boolean
-    volume?: string
-    wells?: string[]
-  }
-export type PauseForm = AnnotationFields & {
+export type HydratedPauseFormData = AnnotationFields & {
   stepType: 'pause'
   id: StepIdType
   pauseAction?:
@@ -197,11 +201,11 @@ export type PauseForm = AnnotationFields & {
   pauseMessage?: string
   pauseTemperature?: string
   pauseTime?: string
+  moduleId?: string
 }
-// TODO: separate field values from from metadata
 export interface FormData {
   stepType: StepType
-  id: StepIdType // TODO: form value processing to ensure type
+  id: StepIdType
   [key: string]: any
 }
 export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
@@ -229,105 +233,148 @@ export type BlankForm = AnnotationFields & {
   id: StepIdType
 }
 
-export interface HydratedMoveLiquidFormData {
+export interface LabwareEntityWithTouchTip extends LabwareEntity {
+  isTouchTipAllowed: boolean
+}
+
+interface WasteChuteEntityWithTouchTip extends WasteChuteEntity {
+  isTouchTipAllowed: boolean
+  name: 'wasteChute'
+}
+
+interface TrashBinEntityWithTouchTip extends TrashBinEntity {
+  isTouchTipAllowed: boolean
+  name: 'trashBin'
+}
+
+export type LabwareOrAdditionalEquipmentEntity =
+  | LabwareEntityWithTouchTip
+  | WasteChuteEntityWithTouchTip
+  | TrashBinEntityWithTouchTip
+
+export interface HydratedMoveLiquidFormData extends AnnotationFields {
   id: string
   stepType: 'moveLiquid'
-  stepName: string
-  fields: {
-    aspirate_airGap_checkbox: boolean
-    aspirate_delay_checkbox: boolean
-    aspirate_labware: LabwareEntity
-    aspirate_mix_checkbox: boolean
-    aspirate_touchTip_checkbox: boolean
-    aspirate_wellOrder_first: WellOrderOption
-    aspirate_wellOrder_second: WellOrderOption
-    aspirate_wells: string[]
-    blowout_checkbox: boolean
-    changeTip: ChangeTipOptions
-    dispense_airGap_checkbox: boolean
-    dispense_delay_checkbox: boolean
-    dispense_labware: LabwareEntity | AdditionalEquipmentEntity
-    dispense_mix_checkbox: boolean
-    dispense_touchTip_checkbox: boolean
-    dispense_wellOrder_first: WellOrderOption
-    dispense_wellOrder_second: WellOrderOption
-    dispense_wells: string[]
-    disposalVolume_checkbox: boolean
-    dropTip_location: string
-    nozzles: NozzleConfigurationStyle | null
-    path: PathOption
-    pipette: PipetteEntity
-    tipRack: string
-    volume: number
-    aspirate_airGap_volume?: number | null
-    aspirate_delay_mmFromBottom?: number | null
-    aspirate_delay_seconds?: number | null
-    aspirate_flowRate?: number | null
-    aspirate_mix_times?: number | null
-    aspirate_mix_volume?: number | null
-    aspirate_mmFromBottom?: number | null
-    aspirate_touchTip_mmFromBottom?: number | null
-    aspirate_wells_grouped?: boolean | null
-    aspirate_x_position?: number | null
-    aspirate_y_position?: number | null
-    blowout_flowRate?: number | null
-    blowout_location?: string | null
-    blowout_z_offset?: number | null
-    dispense_airGap_volume?: number | null
-    dispense_delay_mmFromBottom?: number | null
-    dispense_delay_seconds?: number | null
-    dispense_flowRate?: number | null
-    dispense_mix_times?: number | null
-    dispense_mix_volume?: number | null
-    dispense_mmFromBottom?: number | null
-    dispense_touchTip_mmFromBottom?: number | null
-    dispense_x_position?: number | null
-    dispense_y_position?: number | null
-    disposalVolume_volume?: number | null
-    dropTip_wellNames?: string[] | null
-    pickUpTip_location?: string | null
-    pickUpTip_wellNames?: string[] | null
-    preWetTip?: boolean | null
-  }
-  description?: string | null
+  aspirate_airGap_checkbox: boolean
+  aspirate_delay_checkbox: boolean
+  aspirate_labware: LabwareEntity
+  aspirate_mix_checkbox: boolean
+  aspirate_touchTip_checkbox: boolean
+  aspirate_wellOrder_first: WellOrderOption
+  aspirate_wellOrder_second: WellOrderOption
+  aspirate_wells: string[]
+  blowout_checkbox: boolean
+  changeTip: ChangeTipOptions
+  dispense_airGap_checkbox: boolean
+  dispense_delay_checkbox: boolean
+  dispense_labware: LabwareOrAdditionalEquipmentEntity
+  dispense_mix_checkbox: boolean
+  dispense_touchTip_checkbox: boolean
+  dispense_wellOrder_first: WellOrderOption
+  dispense_wellOrder_second: WellOrderOption
+  dispense_wells: string[]
+  disposalVolume_checkbox: boolean
+  dropTip_location: string
+  liquidClassesSupported: boolean
+  nozzles: NozzleConfigurationStyle | null
+  path: PathOption
+  pipette: PipetteEntity
+  tipRack: string
+  volume: number
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
+  aspirate_airGap_volume?: number | null
+  aspirate_delay_mmFromBottom?: number | null
+  aspirate_delay_seconds?: number | null
+  aspirate_flowRate?: number | null
+  aspirate_mix_times?: number | null
+  aspirate_mix_volume?: number | null
+  aspirate_mmFromBottom?: number | null
+  aspirate_retract_delay_seconds?: number | null
+  aspirate_retract_mmFromBottom?: number | null
+  aspirate_retract_speed?: number | null
+  aspirate_retract_x_position?: number | null
+  aspirate_retract_y_position?: number | null
+  aspirate_retract_position_reference: PositionReference
+  aspirate_submerge_delay_seconds?: number | null
+  aspirate_submerge_speed?: number | null
+  aspirate_submerge_mmFromBottom: number | null
+  aspirate_submerge_x_position: number | null
+  aspirate_submerge_y_position: number | null
+  aspirate_submerge_position_reference: PositionReference
+  aspirate_touchTip_mmFromEdge?: number | null
+  aspirate_touchTip_mmFromTop?: number | null
+  aspirate_touchTip_speed?: number | null
+  aspirate_wells_grouped?: boolean | null
+  aspirate_x_position?: number | null
+  aspirate_y_position?: number | null
+  aspirate_position_reference: PositionReference
+  blowout_flowRate?: number | null
+  blowout_location?: string | null
+  blowout_z_offset?: number | null
+  conditioning_checkbox: boolean | null
+  conditioning_volume: number | null
+  dispense_airGap_volume?: number | null
+  dispense_delay_mmFromBottom?: number | null
+  dispense_delay_seconds?: number | null
+  dispense_flowRate?: number | null
+  dispense_mix_times?: number | null
+  dispense_mix_volume?: number | null
+  dispense_mmFromBottom?: number | null
+  dispense_retract_delay_seconds?: number | null
+  dispense_retract_mmFromBottom?: number | null
+  dispense_retract_speed?: number | null
+  dispense_retract_x_position?: number | null
+  dispense_retract_y_position?: number | null
+  dispense_retract_position_reference: PositionReference
+  dispense_submerge_delay_seconds?: number | null
+  dispense_submerge_speed?: number | null
+  dispense_submerge_mmFromBottom: number | null
+  dispense_submerge_x_position: number | null
+  dispense_submerge_y_position: number | null
+  dispense_submerge_position_reference: PositionReference
+  dispense_touchTip_mmFromEdge?: number | null
+  dispense_touchTip_mmFromTop?: number | null
+  dispense_touchTip_speed?: number | null
+  dispense_x_position?: number | null
+  dispense_y_position?: number | null
+  dispense_position_reference: PositionReference
+  disposalVolume_volume?: number | null
+  dropTip_wellNames?: string[] | null
+  pickUpTip_location?: string | null
+  pickUpTip_wellNames?: string[] | null
+  preWetTip?: boolean | null
+  liquidClass?: string | null
 }
 
-export interface HydratedMoveLabwareFormData {
+export interface HydratedMoveLabwareFormData extends AnnotationFields {
   id: string
   stepType: 'moveLabware'
-  stepName: string
-  fields: {
-    labware: LabwareEntity
-    newLocation: LabwareLocation
-    useGripper: boolean
-  }
-  description?: string | null
+  labware: LabwareEntity
+  newLocation: LabwareLocation
+  useGripper: boolean
 }
 
-export interface HydratedCommentFormData {
+export interface HydratedCommentFormData extends AnnotationFields {
   id: string
   stepType: 'comment'
-  stepName: string
-  fields: {
-    message: string
-  }
-  stepDetails?: string | null
+  message: string
 }
 
-export interface HydratedMixFormDataLegacy {
+export interface HydratedMixFormData extends AnnotationFields {
   aspirate_delay_checkbox: boolean
   blowout_checkbox: boolean
   changeTip: ChangeTipOptions
   dispense_delay_checkbox: boolean
   dropTip_location: string
   id: string
-  labware: LabwareEntity
+  labware: LabwareEntityWithTouchTip
+  liquidClassesSupported: boolean
   mix_touchTip_checkbox: boolean
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
   nozzles: NozzleConfigurationStyle | null
   pipette: PipetteEntity
-  stepName: string
   stepType: 'mix'
   tipRack: string
   volume: number
@@ -341,32 +388,34 @@ export interface HydratedMixFormDataLegacy {
   dispense_flowRate?: number | null
   dropTip_wellNames?: string[] | null
   mix_mmFromBottom?: number | null
-  mix_touchTip_mmFromBottom?: number | null
+  mix_touchTip_mmFromTop?: number | null
   mix_x_position?: number | null
   mix_y_position?: number | null
+  mix_position_reference: PositionReference
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
-  stepDetails?: string | null
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
   times?: number | null
+  liquidClass?: string | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {
   engageHeight: string | null
   id: string
   magnetAction: MagnetAction
-  moduleId: string | null
+  moduleId: string
   stepDetails: string | null
   stepType: 'magnet'
 }
-export interface HydratedTemperatureFormData {
+export interface HydratedTemperatureFormData extends AnnotationFields {
   id: string
   moduleId: string | null
   setTemperature: 'true' | 'false'
-  stepDetails: string | null
   stepType: 'temperature'
   targetTemperature: string | null
 }
-export interface HydratedHeaterShakerFormData {
+export interface HydratedHeaterShakerFormData extends AnnotationFields {
   heaterShakerSetTimer: boolean | null
   heaterShakerTimer: string | null
   id: string
@@ -374,10 +423,30 @@ export interface HydratedHeaterShakerFormData {
   moduleId: string
   setHeaterShakerTemperature: boolean
   setShake: boolean
-  stepDetails: string | null
   stepType: 'heaterShaker'
   targetHeaterShakerTemperature: string | null
   targetSpeed: string | null
+}
+
+export interface HydratedThermocyclerFormData extends AnnotationFields {
+  id: string
+  stepType: 'thermocycler'
+  blockIsActive: boolean
+  blockIsActiveHold: boolean
+  blockTargetTemp: string | null
+  blockTargetTempHold: string | null
+  lidIsActive: boolean
+  lidIsActiveHold: boolean
+  lidOpen: boolean
+  lidOpenHold: boolean
+  lidTargetTemp: string | null
+  lidTargetTempHold: string | null
+  moduleId: string
+  orderedProfileItems: string[]
+  profileItemsById: Record<string, ProfileItem>
+  profileTargetLidTemp: string | null
+  profileVolume: string | null
+  thermocyclerFormType: 'thermocyclerState' | 'thermocyclerProfile'
 }
 
 export type AbsorbanceReaderFormType =
@@ -385,59 +454,114 @@ export type AbsorbanceReaderFormType =
   | typeof ABSORBANCE_READER_READ
   | typeof ABSORBANCE_READER_LID
 
-export interface HydratedAbsorbanceReaderFormData {
+export interface HydratedAbsorbanceReaderFormData extends AnnotationFields {
+  stepType: 'absorbanceReader'
+  id: string
   absorbanceReaderFormType: AbsorbanceReaderFormType | null
   fileName: string | null
   lidOpen: boolean | null
   mode:
     | typeof ABSORBANCE_READER_INITIALIZE_MODE_MULTI
     | typeof ABSORBANCE_READER_INITIALIZE_MODE_SINGLE
-    | null
   moduleId: string
-  referenceWavelength: number | null
-  wavelengths: number[] | null
+  referenceWavelength: string | null
+  referenceWavelengthActive: boolean
+  wavelengths: string[]
 }
-// TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields
-// inside `fields` key, but deprecating transfer/consolidate/distribute is a pre-req
-export type HydratedMoveLiquidFormDataLegacy = AnnotationFields &
-  HydratedMoveLiquidFormData['fields'] & {
-    id: string
-    stepType: 'moveLiquid'
-  }
+
 // fields used in TipPositionInput
 export type TipZOffsetFields =
   | 'aspirate_mmFromBottom'
   | 'dispense_mmFromBottom'
   | 'mix_mmFromBottom'
-  | 'aspirate_touchTip_mmFromBottom'
-  | 'dispense_touchTip_mmFromBottom'
+  | 'aspirate_touchTip_mmFromTop'
+  | 'dispense_touchTip_mmFromTop'
   | 'aspirate_delay_mmFromBottom'
   | 'dispense_delay_mmFromBottom'
-  | 'mix_touchTip_mmFromBottom'
+  | 'mix_touchTip_mmFromTop'
+  | 'aspirate_retract_mmFromBottom'
+  | 'dispense_retract_mmFromBottom'
+  | 'aspirate_submerge_mmFromBottom'
+  | 'dispense_submerge_mmFromBottom'
 
 export type TipYOffsetFields =
   | 'aspirate_y_position'
   | 'dispense_y_position'
   | 'mix_y_position'
+  | 'aspirate_retract_y_position'
+  | 'dispense_retract_y_position'
+  | 'aspirate_submerge_y_position'
+  | 'dispense_submerge_y_position'
 
 export type TipXOffsetFields =
   | 'aspirate_x_position'
   | 'dispense_x_position'
   | 'mix_x_position'
+  | 'aspirate_retract_x_position'
+  | 'dispense_retract_x_position'
+  | 'aspirate_submerge_x_position'
+  | 'dispense_submerge_x_position'
 
-export type DelayCheckboxFields =
+export type ReferenceFields =
+  | 'aspirate_position_reference'
+  | 'dispense_position_reference'
+  | 'aspirate_submerge_position_reference'
+  | 'dispense_submerge_position_reference'
+  | 'aspirate_retract_position_reference'
+  | 'dispense_retract_position_reference'
+  | 'mix_position_reference'
+
+export type DelayCheckboxBaseFields =
   | 'aspirate_delay_checkbox'
   | 'dispense_delay_checkbox'
-
-export type DelaySecondFields =
+export type DelayCheckboxMoveLiquidFields =
+  | DelayCheckboxBaseFields
+  | 'aspirate_submerge_delay_seconds'
+  | 'aspirate_retract_delay_seconds'
+  | 'dispense_submerge_delay_seconds'
+  | 'dispense_retract_delay_seconds'
+export type DelaySecondsBaseFields =
   | 'aspirate_delay_seconds'
   | 'dispense_delay_seconds'
-
+export type DelaySecondsMoveLiquidFields =
+  | DelaySecondsBaseFields
+  | 'aspirate_submerge_delay_seconds'
+  | 'aspirate_retract_delay_seconds'
+  | 'dispense_submerge_delay_seconds'
+  | 'dispense_retract_delay_seconds'
+export type DelayXPositionFields =
+  | 'aspirate_x_position'
+  | 'aspirate_submerge_x_position'
+  | 'aspirate_retract_x_position'
+  | 'dispense_x_position'
+  | 'dispense_submerge_x_position'
+  | 'dispense_retract_x_position'
+export type DelayYPositionFields =
+  | 'aspirate_y_position'
+  | 'aspirate_submerge_y_position'
+  | 'aspirate_retract_y_position'
+  | 'dispense_y_position'
+  | 'dispense_submerge_y_position'
+  | 'dispense_retract_y_position'
+export type DelayZPositionFields =
+  | 'aspirate_mmFromBottom'
+  | 'aspirate_submerge_mmFromBottom'
+  | 'aspirate_retract_mmFromBottom'
+  | 'dispense_mmFromBottom'
+  | 'dispense_submerge_mmFromBottom'
+  | 'dispense_retract_mmFromBottom'
+export type DelayPositionReferenceFields =
+  | 'aspirate_position_reference'
+  | 'aspirate_submerge_position_reference'
+  | 'aspirate_retract_position_reference'
+  | 'dispense_position_reference'
+  | 'dispense_submerge_position_reference'
+  | 'dispense_retract_position_reference'
 export function getIsTouchTipField(fieldName: StepFieldName): boolean {
   const touchTipFields = [
-    'aspirate_touchTip_mmFromBottom',
-    'dispense_touchTip_mmFromBottom',
-    'mix_touchTip_mmFromBottom',
+    'aspirate_touchTip_mmFromTop',
+    'dispense_touchTip_mmFromTop',
+    'mix_touchTip_mmFromTop',
   ]
   return touchTipFields.includes(fieldName)
 }
@@ -451,7 +575,14 @@ export function getIsDelayPositionField(fieldName: string): boolean {
 }
 export type CountPerStepType = Partial<Record<StepType, number>>
 
-//  TODO: get real HydratedFormData type
-export interface HydratedFormdata {
-  [key: string]: any
-}
+export type HydratedFormData =
+  | HydratedAbsorbanceReaderFormData
+  | HydratedCommentFormData
+  | HydratedHeaterShakerFormData
+  | HydratedMagnetFormData
+  | HydratedMixFormData
+  | HydratedMoveLabwareFormData
+  | HydratedMoveLiquidFormData
+  | HydratedPauseFormData
+  | HydratedTemperatureFormData
+  | HydratedThermocyclerFormData

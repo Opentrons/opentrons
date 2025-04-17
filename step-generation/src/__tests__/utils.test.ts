@@ -279,6 +279,7 @@ describe('makeInitialRobotState', () => {
               spec: fixtureP10SingleV2Specs,
               tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
               tiprackLabwareDef: [fixtureTiprack10ul],
+              pythonName: 'mockPythonName',
             },
             p300MultiId: {
               id: 'p300MultiId',
@@ -286,6 +287,7 @@ describe('makeInitialRobotState', () => {
               spec: fixtureP300MultiV2Specs,
               tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
               tiprackLabwareDef: [fixtureTiprack300ul],
+              pythonName: 'mockPythonName',
             },
           },
           moduleEntities: {
@@ -293,6 +295,7 @@ describe('makeInitialRobotState', () => {
               id: 'someTempModuleId',
               model: TEMPERATURE_MODULE_V1,
               type: TEMPERATURE_MODULE_TYPE,
+              pythonName: 'mockPythonName',
             },
           },
           labwareEntities: {
@@ -300,24 +303,32 @@ describe('makeInitialRobotState', () => {
               id: 'somePlateId',
               labwareDefURI: getLabwareDefURI(fixture96Plate),
               def: fixture96Plate,
+              pythonName: 'mockPythonName',
             },
             tiprack10Id: {
               id: 'tiprack10Id',
               labwareDefURI: getLabwareDefURI(fixtureTiprack10ul),
               def: fixtureTiprack10ul,
+              pythonName: 'mockPythonName',
             },
             tiprack300Id: {
               id: 'tiprack300Id',
               labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
               def: fixtureTiprack300ul,
+              pythonName: 'mockPythonName',
             },
             fixedTrash: {
               id: FIXED_TRASH_ID,
               labwareDefURI: getLabwareDefURI(fixtureTrash),
               def: fixtureTrash,
+              pythonName: 'mockPythonName',
             },
           },
-          additionalEquipmentEntities: {},
+          wasteChuteEntities: {},
+          trashBinEntities: {},
+          stagingAreaEntities: {},
+          gripperEntities: {},
+          liquidEntities: {},
         },
         labwareLocations: {
           somePlateId: { slot: '1' },
@@ -369,7 +380,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -390,7 +401,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -411,7 +422,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -432,7 +443,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -454,7 +465,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 20,
@@ -475,7 +486,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 30,
@@ -496,7 +507,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 20,
@@ -517,7 +528,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -538,7 +549,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 20,
         lidTargetTemp: null,
@@ -559,7 +570,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 20,
         lidTargetTemp: null,
@@ -579,7 +590,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 40,
         lidTargetTemp: null,
@@ -599,7 +610,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -803,6 +814,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
         id: 'labwareId',
         labwareDefURI: 'some_uri',
         def: fakeLabwareDef,
+        pythonName: 'mockPythonName',
       },
     }
   })
@@ -937,6 +949,7 @@ describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () =>
       id: 'fixture96PlateId',
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
+      pythonName: 'mockPythonName',
     }
   })
 
@@ -955,6 +968,7 @@ describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () =>
       id: 'fixtureTiprack10ulId',
       labwareDefURI: getLabwareDefURI(fixtureTiprack10ul),
       def: fixtureTiprack10ul,
+      pythonName: 'mockPythonName',
     }
     expect(
       getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(

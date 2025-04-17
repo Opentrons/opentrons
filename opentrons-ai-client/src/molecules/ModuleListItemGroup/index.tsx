@@ -59,9 +59,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
-  [ABSORBANCE_READER_TYPE]: [
-    'opentrons_flex_lid_absorbance_plate_reader_module',
-  ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 
 export function ModuleListItemGroup(): JSX.Element | null {
@@ -96,7 +94,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
               )
 
               return (
-                <ListItem type="noActive" key={module.type}>
+                <ListItem type="default" key={module.type}>
                   <ListItemCustomize
                     label={
                       adapters != null && adapters.length > 0
@@ -108,6 +106,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                       adapters != null && adapters.length > 0
                         ? {
                             title: (null as unknown) as string,
+                            width: '13rem',
                             currentOption: {
                               name:
                                 getDefDisplayName(

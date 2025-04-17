@@ -1,6 +1,8 @@
 import {
+  getFlexNameConversion,
   getLabwareDisplayName,
   getPipetteSpecsV2,
+  splitLabwareDefURI,
 } from '@opentrons/shared-data'
 import type { PipetteName } from '@opentrons/shared-data'
 import { OTHER } from '../../organisms/ApplicationSection'
@@ -94,6 +96,7 @@ export function generatePromptPreviewLabwareLiquidsItems(
   const items: string[] = []
   const defs = getOnlyLatestDefs()
 
+  // Add all labware items
   labwares?.forEach(labware => {
     items.push(
       `${labware.count} x ${
@@ -102,9 +105,22 @@ export function generatePromptPreviewLabwareLiquidsItems(
     )
   })
 
-  liquids?.forEach(liquid => {
-    items.push(liquid)
-  })
+  // Only add liquids if there are any
+  if (
+    liquids &&
+    liquids.length > 0 &&
+    liquids.some(liquid => liquid.trim() !== '')
+  ) {
+    // Add a special item that will force a line break by taking up 100% width
+    items.push('__LINE_BREAK__')
+
+    // Add all liquid items
+    liquids.forEach(liquid => {
+      if (liquid.trim() !== '') {
+        items.push(liquid)
+      }
+    })
+  }
 
   return items.filter(Boolean)
 }
@@ -116,7 +132,83 @@ export function generatePromptPreviewStepsItems(
   const { steps } = watch()
 
   if (steps === undefined || steps?.length === 0) return []
-  if (typeof steps === 'string') return [steps]
+
+  if (typeof steps === 'string') {
+    // If string is empty, return empty array
+    if (steps.trim() === '') return []
+
+    // Split the string by line
+    const lines = steps.split('\n')
+    const result: string[] = []
+    let currentStep = ''
+    let isFirstLineInCurrentStep = true
+    let lastLineWasNumberedStep = false
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim()
+
+      // Check if this line starts a new numbered step (like "1." or "2)")
+      const isNumberedStep = /^\d+[.)]/.test(line)
+
+      // Check if this line is a bullet point
+      const isBulletPoint = /^[-*•]/.test(line)
+
+      // A new step starts if:
+      // 1. It's a numbered step OR
+      // 2. It's a bullet point that's not immediately after a numbered step OR
+      // 3. It's the first line
+      const isNewStepLine =
+        isNumberedStep ||
+        (isBulletPoint && !lastLineWasNumberedStep) ||
+        (i === 0 && line !== '')
+
+      // Update tracking for whether the last line was a numbered step
+      // This helps us keep dashed points with their parent numbered step
+      if (isNumberedStep) {
+        lastLineWasNumberedStep = true
+      } else if (!isBulletPoint) {
+        lastLineWasNumberedStep = false
+      }
+
+      // If empty line and we have content, finalize current step
+      if (line === '' && currentStep !== '') {
+        result.push(currentStep.trim())
+        currentStep = ''
+        isFirstLineInCurrentStep = true
+        lastLineWasNumberedStep = false
+        continue
+      }
+
+      // Skip empty lines otherwise
+      if (line === '') continue
+
+      // Start a new step or add to current step
+      if (isNewStepLine) {
+        // If we already have content, push it as a completed step
+        if (currentStep !== '') {
+          result.push(currentStep.trim())
+        }
+        currentStep = line
+        isFirstLineInCurrentStep = false
+      } else {
+        // This is a continuation of the current step (created with Shift+Enter)
+        // Add a line break to preserve formatting
+        if (!isFirstLineInCurrentStep) {
+          currentStep += '\n' + line
+        } else {
+          currentStep += line
+          isFirstLineInCurrentStep = false
+        }
+      }
+    }
+
+    // Add the last step if there's content
+    if (currentStep.trim() !== '') {
+      result.push(currentStep.trim())
+    }
+
+    return result
+  }
 
   return steps.filter(Boolean)
 }
@@ -159,26 +251,63 @@ export function generateChatPrompt(
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
   ) => void
 ): string {
-  const defs = getOnlyLatestDefs()
-
   const robotType = t(values.instruments.robot)
   const scientificApplication = `- ${t(
     values.application.scientificApplication
   )}`
   const description = `- ${values.application.description}`
+
+  // we need to do this nonsense to convert pipette names to api load names
+  // this data does not yet live in  pipette defs, but hopefully aill within 6 months
+  // of writing this comment. https://opentrons.atlassian.net/browse/EXEC-1426
+  let leftPipetteApiLoadName: string | null = null
+  let rightPipetteApiLoadName: string | null = null
+
+  const leftPipetteName = values.instruments.leftPipette
+  const rightPipetteName = values.instruments.rightPipette
+
+  if (leftPipetteName && leftPipetteName !== NO_PIPETTES) {
+    const leftPipetteSpecs = getPipetteSpecsV2(leftPipetteName as PipetteName)
+    if (leftPipetteSpecs != null) {
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
+      }
+    }
+  }
+  if (rightPipetteName && rightPipetteName !== NO_PIPETTES) {
+    const rightPipetteSpecs = getPipetteSpecsV2(rightPipetteName as PipetteName)
+    if (rightPipetteSpecs != null) {
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
+      }
+    }
+  }
+  const leftPipettePromptName =
+    leftPipetteApiLoadName ?? values.instruments.leftPipette
+  const rightPipettePromptName =
+    rightPipetteApiLoadName ?? values.instruments.rightPipette
+
+  const mounts: string[] =
+    values.instruments.pipettes === TWO_PIPETTES
+      ? [
+          values.instruments.leftPipette !== NO_PIPETTES
+            ? `left pipette ${leftPipettePromptName}`
+            : '',
+          values.instruments.rightPipette !== NO_PIPETTES
+            ? `right pipette ${rightPipettePromptName}`
+            : '',
+        ].filter(Boolean)
+      : [values.instruments.pipettes]
+
   const pipetteMounts =
     values.instruments.pipettes === TWO_PIPETTES
       ? [
           values.instruments.leftPipette !== NO_PIPETTES &&
-            `- ${
-              getPipetteSpecsV2(values.instruments.leftPipette as PipetteName)
-                ?.displayName
-            } ${t('mounted_left')}`,
+            `- ${leftPipettePromptName} ${t('mounted_left')}`,
           values.instruments.rightPipette !== NO_PIPETTES &&
-            `- ${
-              getPipetteSpecsV2(values.instruments.rightPipette as PipetteName)
-                ?.displayName
-            } ${t('mounted_right')}`,
+            `- ${rightPipettePromptName} ${t('mounted_right')}`,
         ]
           .filter(Boolean)
           .join('\n')
@@ -191,15 +320,15 @@ export function generateChatPrompt(
   const modules = values.modules
     .map(
       module =>
-        `- ${module.name}${
-          module.adapter?.name != null ? ` with ${module.adapter.name}` : ''
+        `- ${module.model}${
+          module.adapter?.name != null ? ` with ${module.adapter.value}` : ''
         }`
     )
     .join('\n')
   const labwares = values.labwares
     .map(
       labware =>
-        `- ${getLabwareDisplayName(defs[labware.labwareURI])} x ${
+        `- ${splitLabwareDefURI(labware.labwareURI).loadName} x ${
           labware.count
         }`
     )
@@ -218,18 +347,6 @@ export function generateChatPrompt(
   )}:\n${modules}\n\n${t('labware_section_title')}:\n${labwares}\n\n${t(
     'liquid_section_title'
   )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
-
-  const mounts: string[] =
-    values.instruments.pipettes === TWO_PIPETTES
-      ? [
-          values.instruments.leftPipette !== NO_PIPETTES
-            ? `left pipette ${values.instruments.leftPipette}`
-            : '',
-          values.instruments.rightPipette !== NO_PIPETTES
-            ? `right pipette ${values.instruments.rightPipette}`
-            : '',
-        ].filter(Boolean)
-      : [values.instruments.pipettes]
 
   setCreateProtocolChatAtom({
     prompt,

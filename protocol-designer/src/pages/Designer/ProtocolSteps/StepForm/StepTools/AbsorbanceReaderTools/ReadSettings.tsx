@@ -5,15 +5,21 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { InputStepFormField } from '../../../../../../molecules'
+import { InputStepFormField } from '../../../../../../components/molecules'
+import { getFormErrorsMappedToField } from '../../utils'
+import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName } from '../../types'
 
 interface ReadSettingsProps {
   propsForFields: FieldPropsByName
+  visibleFormErrors: StepFormErrors
 }
 
 export function ReadSettings(props: ReadSettingsProps): JSX.Element {
-  const { propsForFields } = props
+  const { propsForFields, visibleFormErrors } = props
+
+  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
+
   const { t } = useTranslation('form')
   return (
     <Flex
@@ -24,16 +30,18 @@ export function ReadSettings(props: ReadSettingsProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('export_settings')}
+          {t('step_edit_form.absorbanceReader.export_settings.title')}
         </StyledText>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('export_detail')}
+          {t('step_edit_form.absorbanceReader.export_settings.description')}
         </StyledText>
       </Flex>
       <InputStepFormField
         padding="0"
         {...propsForFields.fileName}
-        title={t('exported_file_name')}
+        title={t('step_edit_form.field.absorbanceReader.fileName')}
+        errorToShow={mappedErrorsToField.fileName?.title}
+        showTooltip={false}
       />
     </Flex>
   )

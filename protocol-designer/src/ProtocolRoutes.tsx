@@ -2,10 +2,10 @@ import { Route, Navigate, Routes, useNavigate } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Box } from '@opentrons/components'
 import {
-  CreateNewProtocolWizard,
   Designer,
   Landing,
   Liquids,
+  Onboarding,
   ProtocolOverview,
   Settings,
 } from './pages'
@@ -15,7 +15,7 @@ import {
   Kitchen,
   LabwareUploadModal,
   Navigation,
-} from './organisms'
+} from './components/organisms'
 import { ProtocolDesignerAppFallback } from './resources/ProtocolDesignerAppFallback'
 
 import type { RouteProps } from './types'
@@ -40,7 +40,7 @@ const pdRoutes: RouteProps[] = [
     path: '/designer',
   },
   {
-    Component: CreateNewProtocolWizard,
+    Component: Onboarding,
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',
@@ -73,7 +73,7 @@ export function ProtocolRoutes(): JSX.Element {
     >
       <Navigation />
       <Kitchen>
-        <Box width="100%">
+        <Box width="100%" height="100%">
           <GateModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />

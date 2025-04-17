@@ -17,6 +17,7 @@ import type {
 } from '../types'
 
 const moduleId = 'absorbanceReaderId'
+const gripperId = 'mockGripperId'
 vi.mock('../robotStateSelectors')
 
 describe('absorbanceReaderCloseLid', () => {
@@ -28,6 +29,10 @@ describe('absorbanceReaderCloseLid', () => {
       id: moduleId,
       type: ABSORBANCE_READER_TYPE,
       model: ABSORBANCE_READER_V1,
+      pythonName: 'mock_absorbance_plate_reader_1',
+    }
+    invariantContext.gripperEntities[gripperId] = {
+      id: gripperId,
     }
     robotState = getInitialRobotStateStandard(invariantContext)
     robotState.modules[moduleId] = {
@@ -42,12 +47,10 @@ describe('absorbanceReaderCloseLid', () => {
       {} as AbsorbanceReaderState
     )
   })
-  it.only('creates absorbance reader close lid command', () => {
-    const module = moduleId
+  it('creates absorbance reader close lid command', () => {
     const result = absorbanceReaderCloseLid(
       {
-        module,
-        commandCreatorFnName: 'absorbanceReaderCloseLid',
+        moduleId,
       },
       invariantContext,
       robotState
@@ -58,19 +61,18 @@ describe('absorbanceReaderCloseLid', () => {
           commandType: 'absorbanceReader/closeLid',
           key: expect.any(String),
           params: {
-            moduleId: module,
+            moduleId,
           },
         },
       ],
+      python: 'mock_absorbance_plate_reader_1.close_lid()',
     })
   })
   it('creates returns error if bad module state', () => {
-    const module = moduleId
     vi.mocked(absorbanceReaderStateGetter).mockReturnValue(null)
     const result = absorbanceReaderCloseLid(
       {
-        module,
-        commandCreatorFnName: 'absorbanceReaderCloseLid',
+        moduleId,
       },
       invariantContext,
       robotState
@@ -78,6 +80,20 @@ describe('absorbanceReaderCloseLid', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'MISSING_MODULE',
+    })
+  })
+  it('creates returns error if no gripper', () => {
+    invariantContext.gripperEntities = {}
+    const result = absorbanceReaderCloseLid(
+      {
+        moduleId,
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'ABSORBANCE_READER_NO_GRIPPER',
     })
   })
 })

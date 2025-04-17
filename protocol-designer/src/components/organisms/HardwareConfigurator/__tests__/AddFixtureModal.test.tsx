@@ -1,0 +1,54 @@
+import { describe, beforeEach, it, vi, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { AddFixtureModal } from '../AddFixtureModal'
+
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof AddFixtureModal>) => {
+  return renderWithProviders(<AddFixtureModal {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('AddFixtureModal', () => {
+  let props: ComponentProps<typeof AddFixtureModal>
+
+  beforeEach(() => {
+    props = {
+      cutoutId: 'cutoutA1',
+      closeModal: vi.fn(),
+      modules: {},
+      fixtures: {},
+      deckConfig: [
+        { cutoutId: 'cutoutA1', cutoutFixtureId: 'magneticBlockV1' },
+      ],
+      setUpdatedDeckConfig: vi.fn(),
+      setValue: vi.fn(),
+      hasGripper: false,
+    }
+  })
+
+  it('should render the fixture modal and clicking on the fixtures can select the trash bin', () => {
+    render(props)
+    screen.getByText('Add to slot A1')
+    screen.getByText('Fixtures')
+    fireEvent.click(screen.getAllByText('Select options')[0])
+    screen.getByText('Trash bin')
+    fireEvent.click(screen.getByText('Add'))
+    expect(props.setValue).toHaveBeenCalled()
+  })
+  it('should render the fixture modal and clicking on the modules can select the thermocycler', () => {
+    render(props)
+    screen.getByText('Add to slot A1')
+    screen.getByText('Modules')
+    fireEvent.click(screen.getAllByText('Select options')[1])
+    screen.getByText('Thermocycler Module GEN2')
+    screen.getByText('Magnetic Block GEN1')
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Temperature Module GEN2')
+    fireEvent.click(screen.getAllByText('Add')[1])
+    expect(props.setValue).toHaveBeenCalled()
+  })
+})

@@ -29,8 +29,12 @@ import type {
   MAGNETIC_BLOCK_V1,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_MODULE_TYPE,
+  WELL_BOTTOM,
+  WELL_CENTER,
+  WELL_TOP,
+  LIQUID_MENISCUS,
 } from './constants'
-import type { RunTimeCommand, LabwareLocation } from '../command/types'
+import type { RunTimeCommand, LoadedLabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
 import type { CommandAnnotation } from '../commandAnnotation/types'
@@ -126,6 +130,7 @@ export interface LabwareParameters {
   isTiprack: boolean
   tipLength?: number
   isMagneticModuleCompatible: boolean
+  isDeckSlotCompatible?: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
 }
@@ -259,10 +264,14 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  stackLimit?: number
+  compatibleParentLabware?: string[]
+  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
 export interface LabwareDefinition3 {
   version: number
+  $otSharedSchema: '#/labware/schemas/3'
   schemaVersion: 3
   namespace: string
   metadata: LabwareMetadata
@@ -276,6 +285,8 @@ export interface LabwareDefinition3 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  stackLimit?: number
+  compatibleParentLabware?: string[]
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
@@ -501,6 +512,13 @@ export interface FlowRateSpec {
   max: number
 }
 
+interface PlungerPositionsConfiguration {
+  top: number
+  bottom: number
+  blowout: number
+  drop: number
+}
+
 interface pressAndCamConfigurationValues {
   speed: number
   distance: number
@@ -536,12 +554,8 @@ export interface PipetteV2GeneralSpecs {
     run: number
   }
   plungerPositionsConfigurations: {
-    default: {
-      top: number
-      bottom: number
-      blowout: number
-      drop: number
-    }
+    default: PlungerPositionsConfiguration
+    lowVolumeDefault?: PlungerPositionsConfiguration
   }
   availableSensors: {
     sensors: string[]
@@ -682,7 +696,7 @@ export interface LoadedLabware {
   id: string
   loadName: string
   definitionUri: string
-  location: LabwareLocation
+  location: LoadedLabwareLocation
   offsetId?: string
   displayName?: string
 }
@@ -702,17 +716,18 @@ export interface Liquid {
 }
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
-type LiquidHandlingPropertyByVolume = number[][]
-type PositionReference =
-  | 'well-bottom'
-  | 'well-top'
-  | 'well-center'
-  | 'liquid-meniscus'
+export type LiquidHandlingPropertyByVolume = number[][]
+export type PositionReference =
+  | typeof WELL_BOTTOM
+  | typeof WELL_CENTER
+  | typeof WELL_TOP
+  | typeof LIQUID_MENISCUS
+
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {
   duration: number
 }
-interface DelayProperties {
+export interface DelayProperties {
   enable: boolean
   params?: DelayParams
 }
@@ -721,7 +736,7 @@ interface TouchTipParams {
   mmFromEdge: number
   speed: number
 }
-interface TouchTipProperties {
+export interface TouchTipProperties {
   enable: boolean
   params?: TouchTipParams
 }
@@ -730,7 +745,7 @@ interface MixParams {
   repetitions: number
   volume: number
 }
-interface MixProperties {
+export interface MixProperties {
   enable: boolean
   params?: MixParams
 }
@@ -738,11 +753,11 @@ interface BlowoutParams {
   location: BlowoutLocation
   flowRate: number
 }
-interface BlowoutProperties {
+export interface BlowoutProperties {
   enable: boolean
   params?: BlowoutParams
 }
-interface Submerge {
+export interface Submerge {
   positionReference: PositionReference
   offset: Coordinates
   speed: number
@@ -756,8 +771,8 @@ interface BaseRetract {
   touchTip: TouchTipProperties
   delay: DelayProperties
 }
-type RetractAspirate = BaseRetract
-interface RetractDispense extends BaseRetract {
+export type RetractAspirate = BaseRetract
+export interface RetractDispense extends BaseRetract {
   blowout: BlowoutProperties
 }
 interface BaseLiquidHandlingProperties<RetractType> {
@@ -769,21 +784,22 @@ interface BaseLiquidHandlingProperties<RetractType> {
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-interface AspirateProperties
+export interface AspirateProperties
   extends BaseLiquidHandlingProperties<RetractAspirate> {
   preWet: boolean
   mix: MixProperties
 }
-interface SingleDispenseProperties
+export interface SingleDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-interface MultiDispenseProperties {
+export interface MultiDispenseProperties
+  extends BaseLiquidHandlingProperties<RetractDispense> {
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }
-interface ByTipTypeSetting {
+export interface ByTipTypeSetting {
   tiprack: string
   aspirate: AspirateProperties
   singleDispense: SingleDispenseProperties
@@ -796,6 +812,7 @@ interface ByPipetteSetting {
 export interface LiquidClass {
   liquidClassName: string
   displayName: string
+  description: string
   schemaVersion: number
   namespace: string
   byPipette: ByPipetteSetting[]

@@ -17,6 +17,7 @@ import type {
 } from '../types'
 
 const moduleId = 'absorbanceReaderId'
+const gripperId = 'gripperId'
 vi.mock('../robotStateSelectors')
 
 describe('absorbanceReaderOpenLid', () => {
@@ -28,7 +29,12 @@ describe('absorbanceReaderOpenLid', () => {
       id: moduleId,
       type: ABSORBANCE_READER_TYPE,
       model: ABSORBANCE_READER_V1,
+      pythonName: 'mock_absorbance_plate_reader_1',
     }
+    invariantContext.gripperEntities[gripperId] = {
+      id: gripperId,
+    }
+
     robotState = getInitialRobotStateStandard(invariantContext)
     robotState.modules[moduleId] = {
       slot: 'D3',
@@ -43,11 +49,9 @@ describe('absorbanceReaderOpenLid', () => {
     )
   })
   it('creates absorbance reader open lid command', () => {
-    const module = moduleId
     const result = absorbanceReaderOpenLid(
       {
-        module,
-        commandCreatorFnName: 'absorbanceReaderOpenLid',
+        moduleId,
       },
       invariantContext,
       robotState
@@ -58,19 +62,18 @@ describe('absorbanceReaderOpenLid', () => {
           commandType: 'absorbanceReader/openLid',
           key: expect.any(String),
           params: {
-            moduleId: module,
+            moduleId,
           },
         },
       ],
+      python: 'mock_absorbance_plate_reader_1.open_lid()',
     })
   })
   it('creates returns error if bad module state', () => {
-    const module = moduleId
     vi.mocked(absorbanceReaderStateGetter).mockReturnValue(null)
     const result = absorbanceReaderOpenLid(
       {
-        module,
-        commandCreatorFnName: 'absorbanceReaderOpenLid',
+        moduleId,
       },
       invariantContext,
       robotState
@@ -78,6 +81,20 @@ describe('absorbanceReaderOpenLid', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'MISSING_MODULE',
+    })
+  })
+  it('creates returns error if no gripper', () => {
+    invariantContext.gripperEntities = {}
+    const result = absorbanceReaderOpenLid(
+      {
+        moduleId,
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'ABSORBANCE_READER_NO_GRIPPER',
     })
   })
 })

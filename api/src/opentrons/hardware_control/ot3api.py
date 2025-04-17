@@ -91,6 +91,8 @@ from .types import (
     GripperProbe,
     UpdateStatus,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
@@ -99,6 +101,7 @@ from .types import (
     HardwareFeatureFlags,
     FailedTipStateCheck,
     PipetteSensorResponseQueue,
+    TipScrapeType,
 )
 from .errors import (
     UpdateOngoingError,
@@ -126,6 +129,7 @@ from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
     target_position_from_plunger,
+    target_positions_from_plunger_tracking,
     offset_for_mount,
     deck_from_machine,
     machine_from_deck,
@@ -242,6 +246,7 @@ class OT3API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
+        self._module_door_serial: str | None = None
         self._pause_manager = PauseManager()
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -276,6 +281,14 @@ class OT3API(
     @door_state.setter
     def door_state(self, door_state: DoorState) -> None:
         self._door_state = door_state
+
+    @property
+    def module_door_serial(self) -> str | None:
+        return self._module_door_serial
+
+    @module_door_serial.setter
+    def module_door_serial(self, module_serial: str | None = None) -> None:
+        self._module_door_serial = module_serial
 
     @property
     def gantry_load(self) -> GantryLoad:
@@ -316,15 +329,24 @@ class OT3API(
         async with self._backend.grab_pressure(instrument.channels, mount):
             yield
 
-    def _update_door_state(self, door_state: DoorState) -> None:
-        mod_log.info(f"Updating the window switch status: {door_state}")
-        self.door_state = door_state
-        for cb in self._callbacks:
-            hw_event = DoorStateNotification(new_state=door_state)
-            try:
-                cb(hw_event)
-            except Exception:
-                mod_log.exception("Errored during door state event callback")
+    def _update_door_state(
+        self, door_state: DoorState, module_serial: str | None = None
+    ) -> None:
+        mod_log.info(f"Updating the window or module switch status: {door_state}")
+        if self.door_state == DoorState.CLOSED or (
+            self.door_state == DoorState.OPEN
+            and self.module_door_serial == module_serial
+        ):
+            self.door_state = door_state
+            self.module_door_serial = module_serial
+            for cb in self._callbacks:
+                hw_event = DoorStateNotification(
+                    new_state=door_state, module_serial=module_serial
+                )
+                try:
+                    cb(hw_event)
+                except Exception:
+                    mod_log.exception("Errored during door state event callback")
 
     def _update_estop_state(self, event: HardwareEvent) -> "List[Future[None]]":
         if not isinstance(event, EstopStateNotification):
@@ -450,9 +472,11 @@ class OT3API(
             checked_config = config
 
         backend = await OT3Simulator.build(
-            {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
-            if attached_instruments
-            else {},
+            (
+                {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
+                if attached_instruments
+                else {}
+            ),
             checked_modules,
             checked_config,
             checked_loop,
@@ -571,6 +595,7 @@ class OT3API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
+        self._log.info(f"Setting status bar state to {state}")
         await self._backend.set_status_bar_state(state)
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
@@ -578,6 +603,11 @@ class OT3API(
 
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        return self._backend.add_status_bar_listener(listener)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -1189,7 +1219,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        _expect_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -1233,7 +1263,7 @@ class OT3API(
             target_position,
             speed=speed,
             max_speeds=checked_max,
-            expect_stalls=_expect_stalls,
+            expect_stalls=expect_stalls,
         )
 
     async def move_axes(  # noqa: C901
@@ -1241,6 +1271,7 @@ class OT3API(
         position: Mapping[Axis, float],
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
+        expect_stalls: bool = False,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.
@@ -1296,7 +1327,11 @@ class OT3API(
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
 
-        await self._move(target_position=absolute_positions, speed=speed)
+        await self._move(
+            target_position=absolute_positions,
+            speed=speed,
+            expect_stalls=expect_stalls,
+        )
 
     async def move_rel(
         self,
@@ -1306,7 +1341,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        _expect_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -1348,7 +1383,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
-            expect_stalls=_expect_stalls,
+            expect_stalls=expect_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -2046,12 +2081,16 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         volume: Optional[float] = None,
         rate: float = 1.0,
+        correction_volume: float = 0.0,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
-            realmount, volume, rate
+            mount=realmount,
+            volume=volume,
+            rate=rate,
+            correction_volume=correction_volume,
         )
         if not aspirate_spec:
             return
@@ -2088,12 +2127,19 @@ class OT3API(
         volume: Optional[float] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
+        correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
-            realmount, volume, rate, push_out
+            mount=realmount,
+            volume=volume,
+            rate=rate,
+            push_out=push_out,
+            is_full_dispense=is_full_dispense,
+            correction_volume=correction_volume,
         )
         if not dispense_spec:
             return
@@ -2320,28 +2366,43 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def tip_drop_moves(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        home_after: bool = False,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         realmount = OT3Mount.from_mount(mount)
-
-        await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
+        if ignore_plunger is False:
+            await self._move_to_plunger_bottom(
+                realmount, rate=1.0, check_current_vol=False
+            )
 
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             spec = self._pipette_handler.plan_ht_drop_tip()
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
-            spec = self._pipette_handler.plan_lt_drop_tip(realmount)
+            spec = self._pipette_handler.plan_lt_drop_tip(realmount, scrape_type)
             for move in spec.tip_action_moves:
                 async with self._backend.motor_current(move.currents):
-                    target_pos = target_position_from_plunger(
-                        realmount, move.distance, self._current_position
-                    )
-                    await self._move(
-                        target_pos,
-                        speed=move.speed,
-                        home_flagged_axes=False,
-                    )
-
+                    if not move.scrape_axis:
+                        target_pos = target_position_from_plunger(
+                            realmount, move.distance, self._current_position
+                        )
+                        await self._move(
+                            target_pos,
+                            speed=move.speed,
+                            home_flagged_axes=False,
+                        )
+                    else:
+                        target_pos = OrderedDict(self._current_position)
+                        target_pos[move.scrape_axis] += move.distance
+                        self._log.info(f"Moving to target Pos: {target_pos}")
+                        await self._move(
+                            target_pos,
+                            speed=move.speed,
+                            home_flagged_axes=False,
+                        )
         for shake in spec.shake_off_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
@@ -2964,6 +3025,103 @@ class OT3API(
 
     AMKey = TypeVar("AMKey")
 
+    async def aspirate_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        flow_rate: float = 1.0,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during apsiration.
+        :param volume: The volume of liquid to be aspirated.
+        :param flow_rate: The flow rate to aspirate with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        aspirate_spec = self._pipette_handler.plan_check_aspirate(
+            realmount, volume, flow_rate
+        )
+        if not aspirate_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            aspirate_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+        try:
+            await self._backend.set_active_current(
+                {aspirate_spec.axis: aspirate_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, aspirate_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("Aspirate failed")
+            aspirate_spec.instr.set_current_volume(0)
+            raise
+        else:
+            aspirate_spec.instr.add_current_volume(aspirate_spec.volume)
+
+    async def dispense_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        push_out: Optional[float],
+        flow_rate: float = 1.0,
+        is_full_dispense: bool = False,
+    ) -> None:
+        """
+        Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during dispensing.
+        :param volume: The volume of liquid to be dispensed.
+        :param flow_rate: The flow rate to dispense with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        dispense_spec = self._pipette_handler.plan_check_dispense(
+            realmount, volume, flow_rate, push_out, is_full_dispense
+        )
+        if not dispense_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            dispense_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+
+        try:
+            await self._backend.set_active_current(
+                {dispense_spec.axis: dispense_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, dispense_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("dispense failed")
+            dispense_spec.instr.set_current_volume(0)
+            raise
+        else:
+            dispense_spec.instr.remove_current_volume(dispense_spec.volume)
+
     @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         """Get a view of the state of the currently-attached subsystems."""
@@ -3000,3 +3158,11 @@ class OT3API(
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return await self._backend.get_hepa_uv_state()
+
+    async def increase_evo_disp_count(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+    ) -> None:
+        """Tell a pipette to increase its evo-tip-dispense-count in eeprom."""
+        realmount = OT3Mount.from_mount(mount)
+        await self._backend.increase_evo_disp_count(realmount)

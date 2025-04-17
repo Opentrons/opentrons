@@ -1,4 +1,8 @@
 import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
+import {
+  ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
+} from '@opentrons/shared-data'
 import { absorbanceReaderCloseInitialize } from '../commandCreators'
 import {
   absorbanceReaderStateGetter,
@@ -13,10 +17,6 @@ import type {
   InvariantContext,
   RobotState,
 } from '../types'
-import {
-  ABSORBANCE_READER_TYPE,
-  ABSORBANCE_READER_V1,
-} from '@opentrons/shared-data'
 
 vi.mock('../robotStateSelectors')
 
@@ -29,9 +29,11 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
   beforeEach(() => {
     absorbanceReaderCloseInitializeArgs = {
       commandCreatorFnName: 'absorbanceReaderInitialize',
-      module: ABSORBANCE_READER_MODULE_ID,
-      mode: 'single',
-      wavelengths: [450],
+      moduleId: ABSORBANCE_READER_MODULE_ID,
+      measureMode: 'single',
+      sampleWavelengths: [450],
+      name: 'some name',
+      description: 'some descirption',
     }
     invariantContext = {
       ...makeContext(),
@@ -40,6 +42,12 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
           id: ABSORBANCE_READER_MODULE_ID,
           type: ABSORBANCE_READER_TYPE,
           model: ABSORBANCE_READER_V1,
+          pythonName: 'mock_absorbance_plate_reader_1',
+        },
+      },
+      gripperEntities: {
+        gripperId: {
+          id: 'gripperId',
         },
       },
     }
@@ -80,7 +88,7 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
     )
 
     const result = absorbanceReaderCloseInitialize(
-      absorbanceReaderCloseInitializeArgs,
+      { ...absorbanceReaderCloseInitializeArgs, referenceWavelength: 450 },
       invariantContext,
       robotState
     )
@@ -100,15 +108,21 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
           moduleId: 'absorbanceReaderModuleId',
           sampleWavelengths: [450],
           measureMode: 'single',
+          referenceWavelength: 450,
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_absorbance_plate_reader_1.close_lid()
+mock_absorbance_plate_reader_1.initialize("single", [450], reference_wavelength=450)`.trimStart()
+    )
   })
   it('should emit close and intalize commands if multi mode', () => {
     absorbanceReaderCloseInitializeArgs = {
       ...absorbanceReaderCloseInitializeArgs,
-      mode: 'multi',
-      wavelengths: [450, 600],
+      measureMode: 'multi',
+      sampleWavelengths: [450, 600],
     }
     vi.mocked(absorbanceReaderStateGetter).mockReturnValue(
       {} as AbsorbanceReaderState
@@ -138,5 +152,10 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_absorbance_plate_reader_1.close_lid()
+mock_absorbance_plate_reader_1.initialize("multi", [450, 600])`.trimStart()
+    )
   })
 })

@@ -465,6 +465,18 @@ export const FLEX_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ...MAGNETIC_BLOCK_ADDRESSABLE_AREAS,
 ]
 
+export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ...FLEX_STACKER_ADDRESSABLE_AREAS,
+  A4_ADDRESSABLE_AREA,
+  B4_ADDRESSABLE_AREA,
+  C4_ADDRESSABLE_AREA,
+  D4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_A4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
+]
+
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
 export const ADDRESSABLE_AREA_3: '3' = '3'
@@ -565,6 +577,12 @@ export const ABSORBANCE_READER_V1_FIXTURE: 'absorbanceReaderV1' =
   'absorbanceReaderV1'
 export const FLEX_STACKER_V1_FIXTURE: 'flexStackerModuleV1' =
   'flexStackerModuleV1'
+export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE: 'flexStackerModuleV1WithWasteChuteRightAdapterCovered' =
+  'flexStackerModuleV1WithWasteChuteRightAdapterCovered'
+export const FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStackerModuleV1WithWasteChuteRightAdapterNoCover' =
+  'flexStackerModuleV1WithWasteChuteRightAdapterNoCover'
+export const FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE: 'flexStackerModuleV1WithMagneticBlockV1' =
+  'flexStackerModuleV1WithMagneticBlockV1'
 
 export const MODULE_FIXTURES_BY_MODEL: {
   [moduleModel in ModuleModel]?: CutoutFixtureId[]
@@ -617,6 +635,13 @@ export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 ]
 
+export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
+  FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+]
+
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
 
 // default hex values for liquid colors
@@ -644,3 +669,8 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // method in PD (not react code) and we do not want non react code loading
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
+
+export const WELL_TOP: 'well-top' = 'well-top'
+export const WELL_CENTER: 'well-center' = 'well-center'
+export const WELL_BOTTOM: 'well-bottom' = 'well-bottom'
+export const LIQUID_MENISCUS: 'liquid-meniscus' = 'liquid-meniscus'

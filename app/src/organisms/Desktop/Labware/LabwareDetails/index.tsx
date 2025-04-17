@@ -23,7 +23,10 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getUniqueWellProperties } from '@opentrons/shared-data'
+import {
+  getLabwareDefIsStandard,
+  getUniqueWellProperties,
+} from '@opentrons/shared-data'
 import { Slideout } from '/app/atoms/Slideout'
 import { getWellLabel } from './helpers/labels'
 import { WellCount } from './WellCount'
@@ -77,7 +80,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
-  const isCustomDefinition = definition.namespace !== 'opentrons'
+  const isCustomDefinition = !getLabwareDefIsStandard(definition)
   const [showToolTip, setShowToolTip] = useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP_START,

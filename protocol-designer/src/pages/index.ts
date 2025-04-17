@@ -1,4 +1,4 @@
-export * from './CreateNewProtocolWizard'
+export * from './Onboarding'
 export * from './Designer'
 export * from './Landing'
 export * from './Liquids'

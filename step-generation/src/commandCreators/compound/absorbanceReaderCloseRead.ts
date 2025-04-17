@@ -18,9 +18,9 @@ export const absorbanceReaderCloseRead: CommandCreator<AbsorbanceReaderReadArgs>
   const errors: CommandCreatorError[] = []
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,
-    args.module
+    args.moduleId
   )
-  if (absorbanceReaderState == null || args.module == null) {
+  if (absorbanceReaderState == null || args.moduleId == null) {
     errors.push(errorCreators.missingModuleError())
   }
   if (absorbanceReaderState?.initialization == null) {
@@ -29,15 +29,13 @@ export const absorbanceReaderCloseRead: CommandCreator<AbsorbanceReaderReadArgs>
   if (errors.length > 0) {
     return { errors }
   }
-  const { module, fileName } = args
+  const { moduleId, fileName } = args
   const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(absorbanceReaderCloseLid, {
-      commandCreatorFnName: 'absorbanceReaderCloseLid',
-      module,
+      moduleId,
     }),
     curryCommandCreator(absorbanceReaderRead, {
-      commandCreatorFnName: 'absorbanceReaderRead',
-      module,
+      moduleId,
       fileName,
     }),
   ]

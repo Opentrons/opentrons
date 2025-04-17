@@ -61,6 +61,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_while_tracking import (
+    AspirateWhileTracking,
+    AspirateWhileTrackingParams,
+    AspirateWhileTrackingCreate,
+    AspirateWhileTrackingResult,
+    AspirateWhileTrackingCommandType,
+)
+
 from .aspirate_in_place import (
     AspirateInPlace,
     AspirateInPlaceParams,
@@ -91,6 +99,14 @@ from .dispense import (
     DispenseCreate,
     DispenseResult,
     DispenseCommandType,
+)
+
+from .dispense_while_tracking import (
+    DispenseWhileTracking,
+    DispenseWhileTrackingParams,
+    DispenseWhileTrackingCreate,
+    DispenseWhileTrackingResult,
+    DispenseWhileTrackingCommandType,
 )
 
 from .dispense_in_place import (
@@ -381,6 +397,36 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipParams,
+    SealPipetteToTipCreate,
+    SealPipetteToTipResult,
+    SealPipetteToTipCommandType,
+)
+from .unseal_pipette_from_tip import (
+    UnsealPipetteFromTip,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipCommandType,
+)
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseParams,
+    PressureDispenseCreate,
+    PressureDispenseResult,
+    PressureDispenseCommandType,
+)
+
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -414,6 +460,12 @@ __all__ = [
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # aspirate while tracking command models
+    "AspirateWhileTracking",
+    "AspirateWhileTrackingCreate",
+    "AspirateWhileTrackingParams",
+    "AspirateWhileTrackingResult",
+    "AspirateWhileTrackingCommandType",
     # aspirate in place command models
     "AspirateInPlace",
     "AspirateInPlaceCreate",
@@ -438,6 +490,12 @@ __all__ = [
     "DispenseParams",
     "DispenseResult",
     "DispenseCommandType",
+    # dispense while tracking command models
+    "DispenseWhileTracking",
+    "DispenseWhileTrackingCreate",
+    "DispenseWhileTrackingParams",
+    "DispenseWhileTrackingResult",
+    "DispenseWhileTrackingCommandType",
     # dispense in place command models
     "DispenseInPlace",
     "DispenseInPlaceCreate",
@@ -486,6 +544,12 @@ __all__ = [
     "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
+    # identify module command models
+    "IdentifyModule",
+    "IdentifyModuleParams",
+    "IdentifyModuleCreate",
+    "IdentifyModuleResult",
+    "IdentifyModuleCommandType",
     # load pipette command models
     "LoadPipette",
     "LoadPipetteCreate",
@@ -672,4 +736,22 @@ __all__ = [
     "TryLiquidProbeCreate",
     "TryLiquidProbeResult",
     "TryLiquidProbeCommandType",
+    # seal command bundle
+    "SealPipetteToTip",
+    "SealPipetteToTipParams",
+    "SealPipetteToTipCreate",
+    "SealPipetteToTipResult",
+    "SealPipetteToTipCommandType",
+    # unseal command bundle
+    "UnsealPipetteFromTip",
+    "UnsealPipetteFromTipParams",
+    "UnsealPipetteFromTipCreate",
+    "UnsealPipetteFromTipResult",
+    "UnsealPipetteFromTipCommandType",
+    # pressure dispense command bundle
+    "PressureDispense",
+    "PressureDispenseParams",
+    "PressureDispenseCreate",
+    "PressureDispenseResult",
+    "PressureDispenseCommandType",
 ]

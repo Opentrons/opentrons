@@ -94,7 +94,7 @@ def test_configure_virtual_pipette_for_volume(
     )
     assert result1 == LoadedStaticPipetteData(
         model="p50_single_v3.6",
-        display_name="Flex 1-Channel 50 μL",
+        display_name="Flex 1-Channel 50 µL",
         min_volume=5,
         max_volume=50.0,
         channels=1,
@@ -110,7 +110,10 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result1.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
-        pipette_lld_settings={"t50": {"minHeight": 1.0, "minVolume": 0.0}},
+        pipette_lld_settings={
+            "t20": {"minHeight": 1.5, "minVolume": 0.0},
+            "t50": {"minHeight": 1.0, "minVolume": 0.0},
+        },
         plunger_positions={
             "top": 0.0,
             "bottom": 71.5,
@@ -128,7 +131,7 @@ def test_configure_virtual_pipette_for_volume(
     )
     assert result2 == LoadedStaticPipetteData(
         model="p50_single_v3.6",
-        display_name="Flex 1-Channel 50 μL",
+        display_name="Flex 1-Channel 50 µL",
         min_volume=1,
         max_volume=30,
         channels=1,
@@ -144,7 +147,10 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result2.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
-        pipette_lld_settings={"t50": {"minHeight": 1.0, "minVolume": 0.0}},
+        pipette_lld_settings={
+            "t20": {"minHeight": 1.5, "minVolume": 0.0},
+            "t50": {"minHeight": 1.0, "minVolume": 0.0},
+        },
         plunger_positions={
             "top": 0.0,
             "bottom": 61.5,

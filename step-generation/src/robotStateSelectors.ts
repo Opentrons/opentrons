@@ -8,6 +8,8 @@ import {
   getTiprackVolume,
   orderWells,
   THERMOCYCLER_MODULE_TYPE,
+  SINGLE,
+  getLabwareDefIsStandard,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from './constants'
 import type {
@@ -62,7 +64,7 @@ export function _getNextTip(args: {
   const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
-  if (pipetteChannels === 1) {
+  if (pipetteChannels === 1 || nozzles === SINGLE) {
     const well = orderedWells.find(hasTip)
     return well || null
   }
@@ -132,7 +134,7 @@ export function getNextTiprack(
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===
           'opentrons_flex_96_tiprack_adapter' &&
-        adapterEntity?.def.namespace === 'opentrons'
+        getLabwareDefIsStandard(adapterEntity?.def)
 
       return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
     }

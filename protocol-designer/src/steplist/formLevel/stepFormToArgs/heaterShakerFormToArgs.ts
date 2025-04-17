@@ -12,6 +12,8 @@ export const heaterShakerFormToArgs = (
     targetSpeed,
     setShake,
     latchOpen,
+    stepDetails,
+    stepName,
   } = formData
   console.assert(
     setHeaterShakerTemperature
@@ -23,7 +25,7 @@ export const heaterShakerFormToArgs = (
     setShake ? !Number.isNaN(targetSpeed) : true,
     'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
   )
-  const { minutes, seconds } = getTimeFromForm(formData, 'heaterShakerTimer')
+  const { minutes, seconds } = getTimeFromForm(formData.heaterShakerTimer)
 
   const isNullTime = minutes === 0 && seconds === 0
 
@@ -36,7 +38,9 @@ export const heaterShakerFormToArgs = (
 
   return {
     commandCreatorFnName: 'heaterShaker',
-    module: moduleId,
+    name: stepName,
+    description: stepDetails,
+    moduleId,
     targetTemperature: targetTemperature,
     rpm: targetShake,
     latchOpen: latchOpen,

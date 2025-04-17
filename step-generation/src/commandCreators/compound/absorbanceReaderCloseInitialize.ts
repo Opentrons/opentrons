@@ -1,11 +1,12 @@
-import { absorbanceReaderCloseLid, absorbanceReaderInitialize } from '../atomic'
 import * as errorCreators from '../../errorCreators'
 import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { absorbanceReaderCloseLid, absorbanceReaderInitialize } from '../atomic'
 
 import type {
   AbsorbanceReaderInitializeArgs,
   CommandCreator,
+  CommandCreatorError,
   CurriedCommandCreator,
 } from '../../types'
 
@@ -14,28 +15,29 @@ export const absorbanceReaderCloseInitialize: CommandCreator<AbsorbanceReaderIni
   invariantContext,
   prevRobotState
 ) => {
+  const { moduleId, measureMode, sampleWavelengths, referenceWavelength } = args
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,
-    args.module
+    moduleId
   )
 
-  if (args.module == null || absorbanceReaderState == null) {
-    return {
-      errors: [errorCreators.missingModuleError()],
-    }
+  const errors: CommandCreatorError[] = []
+  if (absorbanceReaderState == null) {
+    errors.push(errorCreators.missingModuleError())
   }
-  const { module, mode, wavelengths, referenceWavelength } = args
+
+  if (errors.length > 0) {
+    return { errors }
+  }
   const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(absorbanceReaderCloseLid, {
-      commandCreatorFnName: 'absorbanceReaderCloseLid',
-      module,
+      moduleId,
     }),
     curryCommandCreator(absorbanceReaderInitialize, {
-      commandCreatorFnName: 'absorbanceReaderInitialize',
-      module,
-      mode,
-      wavelengths,
-      referenceWavelength,
+      moduleId,
+      measureMode,
+      sampleWavelengths,
+      referenceWavelength: referenceWavelength ?? undefined,
     }),
   ]
   return reduceCommandCreators(

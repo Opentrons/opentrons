@@ -17,6 +17,7 @@ import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -29,6 +30,7 @@ import type {
   TCDeactivateLidCreateCommand,
   TCOpenLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
+  FlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
@@ -49,6 +51,7 @@ interface LatchControls {
 
 export function useLatchControls(module: AttachedModule): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { reportModuleCommand } = useModuleCommandAnalytics()
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
     (module.data.labwareLatchStatus === 'idle_closed' ||
@@ -68,11 +71,32 @@ export function useLatchControls(module: AttachedModule): LatchControls {
   const toggleLatch = (): void => {
     createLiveCommand({
       command: latchCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-      )
     })
+      .then(result => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: latchCommand.commandType,
+          result: { status: 'succeeded', data: undefined },
+          serialNumber: module.serialNumber,
+          errorDetails: '',
+          firmwareVersion: module.firmwareVersion,
+        })
+      })
+      .catch((e: Error) => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: latchCommand.commandType,
+          errorDetails: e.message,
+          result: { status: 'failed', data: undefined },
+          serialNumber: module.serialNumber,
+          firmwareVersion: module.firmwareVersion,
+        })
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+        )
+      })
   }
 
   return { toggleLatch, isLatchClosed }
@@ -207,13 +231,35 @@ export function useModuleOverflowMenu(
         moduleId: module.id,
       },
     }
+
     createLiveCommand({
       command: deactivateCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
-      )
     })
+      .then(() => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: deactivateCommand.commandType,
+          result: { status: 'succeeded', data: undefined },
+          serialNumber: module.serialNumber,
+          errorDetails: '',
+          firmwareVersion: module.firmwareVersion,
+        })
+      })
+      .catch((e: Error) => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: deactivateCommand.commandType,
+          result: { status: 'failed', data: undefined },
+          errorDetails: e.message,
+          serialNumber: module.serialNumber,
+          firmwareVersion: module.firmwareVersion,
+        })
+        console.error(
+          `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
+        )
+      })
   }
 
   const lidCommand: TCOpenLidCreateCommand | TCCloseLidCreateCommand = {
@@ -226,14 +272,50 @@ export function useModuleOverflowMenu(
       moduleId: module.id,
     },
   }
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   const controlTCLid = (): void => {
     createLiveCommand({
       command: lidCommand,
+    })
+      .then(() => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: lidCommand.commandType,
+          result: { status: 'succeeded', data: undefined },
+          serialNumber: module.serialNumber,
+          errorDetails: '',
+          firmwareVersion: module.firmwareVersion,
+        })
+      })
+      .catch((e: Error) => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: module.moduleType,
+          analyticCommand: lidCommand.commandType,
+          errorDetails: e.message,
+          result: { status: 'failed', data: undefined },
+          serialNumber: module.serialNumber,
+          firmwareVersion: module.firmwareVersion,
+        })
+        console.error(
+          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
+        )
+      })
+  }
+
+  const homeShuttleCommand: FlexStackerPrepareShuttleCreateCommand = {
+    commandType: 'flexStacker/prepareShuttle',
+    params: {
+      moduleId: module.id,
+    },
+  }
+  const homeShuttle = (): void => {
+    createLiveCommand({
+      command: homeShuttleCommand,
     }).catch((e: Error) => {
-      console.error(
-        `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
-      )
+      console.error(`error homing flex stacker shuttle: ${e.message}`)
     })
   }
 
@@ -371,11 +453,11 @@ export function useModuleOverflowMenu(
     ],
     flexStackerModuleType: [
       {
-        setSetting: t('overflow_menu_about'),
+        setSetting: t('overflow_menu_home_shuttle'),
         isSecondary: false,
-        isSettingDisabled: false,
-        menuButtons: [],
-        onClick: handleAboutClick,
+        isSettingDisabled: isDisabled,
+        menuButtons: [aboutModuleBtn],
+        onClick: homeShuttle,
       },
     ],
   }

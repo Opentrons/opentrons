@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { DeckLabelSet } from '@opentrons/components'
-import { getDesignerTab } from '../../file-data/selectors'
+import { getSelectedTerminalItemId } from '../../ui/steps'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -26,17 +26,16 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
     labelText = labwareDef.metadata.displayName,
   } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
-  const designerTab = useSelector(getDesignerTab)
+  const terminalItemId = useSelector(getSelectedTerminalItemId)
   const [labelContainerHeight, setLabelContainerHeight] = useState(0)
-
   const deckLabels = [
-    ...nestedLabwareInfo,
     {
       text: labelText,
       isSelected: isSelected,
       isLast: isLast,
-      isZoomed: designerTab === 'startingDeck',
+      isZoomed: terminalItemId === '__initial_setup__',
     },
+    ...nestedLabwareInfo,
   ]
 
   useEffect(() => {

@@ -82,7 +82,7 @@ export const runEpicTest = <A, R = RobotApiResponse>(
 
     if (response) {
       vi.mocked(fetchRobotApi as any).mockReturnValue(
-        cold<RobotApiResponse>('r', { r: response } as any)
+        cold<RobotApiResponse>('(r|)', { r: response } as any)
       )
     }
 

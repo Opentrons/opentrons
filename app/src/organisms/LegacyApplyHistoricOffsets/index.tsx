@@ -19,11 +19,12 @@ import {
   ModalShell,
   getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
-import { LabwareOffsetTable } from './LabwareOffsetTable'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
+import { LegacyLabwareOffsetTable } from './LegacyLabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
 import type { ChangeEvent } from 'react'
@@ -66,21 +67,23 @@ export function LegacyApplyHistoricOffsets(
     getIsLabwareOffsetCodeSnippetsOn
   )
   const JupyterSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="jupyter"
       labwareOffsets={offsetCandidates.map(o =>
         pick(o, ['definitionUri', 'vector', 'location'])
       )}
       {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const CommandLineSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="cli"
       labwareOffsets={offsetCandidates.map(o =>
         pick(o, ['definitionUri', 'vector', 'location'])
       )}
       {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const noOffsetData = offsetCandidates.length < 1
@@ -97,7 +100,7 @@ export function LegacyApplyHistoricOffsets(
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
             <Icon size={SIZE_1} name="reticle" />
             <LegacyStyledText as="p">
-              {t(noOffsetData ? 'no_offset_data' : 'apply_offset_data')}
+              {t(noOffsetData ? 'legacy_no_offset_data' : 'apply_offset_data')}
             </LegacyStyledText>
           </Flex>
         }
@@ -161,9 +164,9 @@ export function LegacyApplyHistoricOffsets(
                 </ExternalLink>
                 {!noOffsetData ? (
                   isLabwareOffsetCodeSnippetsOn ? (
-                    <LabwareOffsetTabs
+                    <LegacyLabwareOffsetTabs
                       TableComponent={
-                        <LabwareOffsetTable
+                        <LegacyLabwareOffsetTable
                           offsetCandidates={offsetCandidates}
                           labwareDefinitions={getLabwareDefinitionsFromCommands(
                             commands
@@ -174,7 +177,7 @@ export function LegacyApplyHistoricOffsets(
                       CommandLineComponent={CommandLineSnippet}
                     />
                   ) : (
-                    <LabwareOffsetTable
+                    <LegacyLabwareOffsetTable
                       offsetCandidates={offsetCandidates}
                       labwareDefinitions={getLabwareDefinitionsFromCommands(
                         commands

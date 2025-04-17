@@ -1,15 +1,16 @@
-import { uuid } from '../../utils'
-import type {
-  AbsorbanceReaderInitializeArgs,
-  CommandCreator,
-} from '../../types'
+import { formatPyList, formatPyStr, uuid } from '../../utils'
+import type { CommandCreator } from '../../types'
+import type { AbsorbanceReaderInitializeCreateCommand } from '@opentrons/shared-data'
 
-export const absorbanceReaderInitialize: CommandCreator<AbsorbanceReaderInitializeArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { module: moduleId, mode, wavelengths, referenceWavelength } = args
+export const absorbanceReaderInitialize: CommandCreator<
+  AbsorbanceReaderInitializeCreateCommand['params']
+> = (args, invariantContext, prevRobotState) => {
+  const { moduleId, sampleWavelengths, measureMode, referenceWavelength } = args
+  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
+  const referenceWavelengthPython =
+    referenceWavelength != null
+      ? `, reference_wavelength=${referenceWavelength}`
+      : ''
   return {
     commands: [
       {
@@ -17,11 +18,14 @@ export const absorbanceReaderInitialize: CommandCreator<AbsorbanceReaderInitiali
         key: uuid(),
         params: {
           moduleId,
-          measureMode: mode,
-          sampleWavelengths: wavelengths,
+          measureMode,
+          sampleWavelengths,
           ...(referenceWavelength != null ? { referenceWavelength } : {}),
         },
       },
     ],
+    python: `${pythonName}.initialize(${formatPyStr(
+      measureMode
+    )}, ${formatPyList(sampleWavelengths)}${referenceWavelengthPython})`,
   }
 }

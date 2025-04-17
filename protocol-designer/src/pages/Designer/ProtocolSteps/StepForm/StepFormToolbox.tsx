@@ -16,27 +16,40 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { stepIconsByType } from '../../../../form-types'
-import {
-  LINK_BUTTON_STYLE,
-  LINE_CLAMP_TEXT_STYLE,
-  NAV_BAR_HEIGHT_REM,
-} from '../../../../atoms'
-import { FormAlerts } from '../../../../organisms'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { RenameStepModal } from '../../../../organisms/RenameStepModal'
-import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
-import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import { analyticsEvent } from '../../../../analytics/actions'
-import {
-  getFormLevelErrorsForUnsavedForm,
-  getDynamicFieldFormErrorsForUnsavedForm,
-} from '../../../../step-forms/selectors'
 import {
   FORM_ERRORS_EVENT,
   FORM_WARNINGS_EVENT,
 } from '../../../../analytics/constants'
+import {
+  LINK_BUTTON_STYLE,
+  LINE_CLAMP_TEXT_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '../../../../components/atoms'
+import { FormAlerts } from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
+import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
+import { getEnableLiquidClasses } from '../../../../feature-flags/selectors'
+import { getRobotStateTimeline } from '../../../../file-data/selectors'
+import { stepIconsByType } from '../../../../form-types'
+import {
+  getAdditionalEquipmentEntities,
+  getCurrentFormIsPresaved,
+  getDynamicFieldFormErrorsForUnsavedForm,
+  getFormLevelErrorsForUnsavedForm,
+  getLabwareEntities,
+  getPipetteEntities,
+  getSavedStepForms,
+} from '../../../../step-forms/selectors'
+import { updateFieldsForLiquidClass } from '../../../../steplist/formLevel/handleFormChange/utils'
+import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
+import {
+  hoverSelection,
+  selectDropdownItem,
+} from '../../../../ui/steps/actions/actions'
+import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/organisms/AdvancedSettingsUpdateConfirmationModal'
+import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
   CommentTools,
@@ -68,10 +81,6 @@ import type {
   LiquidHandlingTab,
   StepFormProps,
 } from './types'
-import {
-  hoverSelection,
-  selectDropdownItem,
-} from '../../../../ui/steps/actions/actions'
 
 type StepFormMap = {
   [K in StepType]?: ComponentType<StepFormProps> | null
@@ -89,6 +98,15 @@ const STEP_FORM_MAP: StepFormMap = {
   comment: CommentTools,
   absorbanceReader: AbsorbanceReaderTools,
 }
+
+// used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings
+const FIELDS_REQUIRING_CONFIRMATION: string[] = [
+  'pipette',
+  'tipRack',
+  'liquidClass',
+  'volume',
+  'path',
+]
 
 interface StepFormToolboxProps {
   canSave: boolean
@@ -121,6 +139,14 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const { makeSnackbar } = useKitchen()
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const [analyticsStartTime] = useState<Date>(new Date())
+  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(
+    false
+  )
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const formWarningsForSelectedStep = useSelector(
     getFormWarningsForSelectedStep
   )
@@ -138,9 +164,47 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dependentFields: error.dependentProfileFields,
   }))
   const timeline = useSelector(getRobotStateTimeline)
+  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
+  const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
+  const savedStepForm = useSelector(getSavedStepForms)[formData.id]
+
+  // state used to track fields that have been confirmed through the modal but before saving the step form
+  const [confirmedFieldUpdates, setConfirmedFieldUpdates] = useState<
+    Record<string, any>
+  >({})
+
+  const fieldsChangedRequiringConfirmation = FIELDS_REQUIRING_CONFIRMATION.filter(
+    field => {
+      // if field has been updated and confirmed in modal, check its most recent confirmed value
+      const referenceObjectForField =
+        field in confirmedFieldUpdates
+          ? confirmedFieldUpdates
+          : savedStepForm ?? {}
+      return formData[field] !== referenceObjectForField[field]
+    }
+  )
+
+  const moduleId = formData.moduleId
+  const enableReadOrInitialization = useAbsorbanceReaderCommandType(
+    moduleId as string | null
+  )
   const [toolboxStep, setToolboxStep] = useState<number>(0)
   const [showFormErrors, setShowFormErrors] = useState<boolean>(false)
   const [tab, setTab] = useState<LiquidHandlingTab>('aspirate')
+
+  // state used to determine if user has seen advanced settings page (relevant for presaved forms)
+  const [
+    hasSeenAdvancedSettings,
+    setHasSeenAdvancedSettings,
+  ] = useState<boolean>(false)
+  useEffect(() => {
+    if (toolboxStep === 2 && !hasSeenAdvancedSettings) {
+      setHasSeenAdvancedSettings(true)
+    }
+  }, [toolboxStep])
+  const isConfirmationRequired =
+    fieldsChangedRequiringConfirmation.length > 0 &&
+    (!currentFormIsPresaved || hasSeenAdvancedSettings) // don't show if form is presaved and haven't reached advanced settings page yet
   const visibleFormWarnings = getVisibleFormWarnings({
     focusedField,
     dirtyFields: dirtyFields ?? [],
@@ -204,11 +268,15 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     )
   }
 
+  const numStepFormPages = getStepFormNumPages(
+    formData.stepType,
+    enableReadOrInitialization != null,
+    enableLiquidClasses
+  )
   const isMultiStepToolbox =
-    formData.stepType === 'absorbanceReader' ||
-    formData.stepType === 'moveLiquid' ||
-    formData.stepType === 'mix' ||
-    formData.stepType === 'thermocycler'
+    formData.stepType === 'absorbanceReader'
+      ? enableReadOrInitialization
+      : numStepFormPages > 1
   const numWarnings =
     visibleFormWarnings.length + timelineWarningsForSelectedStep.length
   const numErrors = timeline.errors?.length ?? 0
@@ -217,6 +285,26 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     errors: formLevelErrorsForUnsavedForm,
     page: toolboxStep,
   })
+
+  const handleUpdateLiquidClassValues = (): void => {
+    updateFieldsForLiquidClass({
+      propsForFields,
+      rawForm: formData,
+      pipetteEntities,
+      labwareEntities,
+      additionalEquipmentEntities,
+    })
+    setToolboxStep(toolboxStep + 1)
+    setShowConfirmationModal(false)
+    handleConfirmValues()
+  }
+  const handleConfirmValues = (): void => {
+    setConfirmedFieldUpdates(
+      FIELDS_REQUIRING_CONFIRMATION.reduce((acc, field) => {
+        return { ...acc, [field]: formData[field] }
+      }, {})
+    )
+  }
   const handleScrollToTop = (): void => {
     if (toolsComponentRef.current) {
       toolsComponentRef.current.scrollIntoView({
@@ -242,7 +330,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           numErrors,
           stepTypeDisplayName: i18n.format(
             t(`stepType.${formData.stepType}`),
-            'capitalize'
+            'titleCase'
           ),
           t,
         })
@@ -263,9 +351,20 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   }
 
   const handleContinue = (): void => {
-    if (isMultiStepToolbox && toolboxStep === 0) {
+    if (toolboxStep === 1 && numStepFormPages > 2) {
+      if (isConfirmationRequired) {
+        setShowConfirmationModal(true)
+      } else {
+        if (!hasSeenAdvancedSettings && currentFormIsPresaved) {
+          // don't overwrite values for saved form
+          handleUpdateLiquidClassValues()
+        } else {
+          setToolboxStep(toolboxStep + 1)
+        }
+      }
+    } else if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
       if (!isErrorOnCurrentPage) {
-        setToolboxStep(1)
+        setToolboxStep(prevStep => prevStep + 1)
         setShowFormErrors(false)
       } else {
         setShowFormErrors(true)
@@ -278,6 +377,22 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
   return (
     <>
+      {showConfirmationModal ? (
+        <AdvancedSettingsUpdateConfirmationModal
+          formData={formData}
+          fieldsChangedRequiringConfirmation={
+            fieldsChangedRequiringConfirmation
+          }
+          onKeepExistingSettings={() => {
+            setToolboxStep(toolboxStep + 1)
+            setShowConfirmationModal(false)
+          }}
+          onConfirmUpdateSettings={handleUpdateLiquidClassValues}
+          onClose={() => {
+            setShowConfirmationModal(false)
+          }}
+        />
+      ) : null}
       {isRename ? (
         <RenameStepModal
           formData={formData}
@@ -293,7 +408,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         subHeader={
           isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {t('shared:part', { current: toolboxStep + 1, max: 2 })}
+              {t('shared:part', {
+                current: toolboxStep + 1,
+                max: numStepFormPages,
+              })}
             </StyledText>
           ) : null
         }
@@ -324,11 +442,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         closeButton={<Icon size="2rem" name="close" />}
         confirmButton={
           <Flex gridGap={SPACING.spacing8}>
-            {isMultiStepToolbox && toolboxStep === 1 ? (
+            {isMultiStepToolbox && toolboxStep >= 1 ? (
               <SecondaryButton
                 width="100%"
                 onClick={() => {
-                  setToolboxStep(0)
+                  setToolboxStep(currStep => currStep - 1)
                   setShowFormErrors(false)
                   handleScrollToTop()
                 }}
@@ -337,7 +455,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               </SecondaryButton>
             ) : null}
             <PrimaryButton onClick={handleContinue} width="100%">
-              {isMultiStepToolbox && toolboxStep === 0
+              {isMultiStepToolbox && toolboxStep < numStepFormPages - 1
                 ? i18n.format(t('shared:continue'), 'capitalize')
                 : t('shared:save')}
             </PrimaryButton>
@@ -348,12 +466,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             <Icon size="1rem" name={icon} minWidth="1rem" />
             <StyledText
               desktopStyle="bodyLargeSemiBold"
-              css={LINE_CLAMP_TEXT_STYLE(2)}
+              css={LINE_CLAMP_TEXT_STYLE(2, true)}
             >
               {capitalizeFirstLetter(String(formData.stepName))}
             </StyledText>
           </Flex>
         }
+        width="21.875rem"
       >
         <div
           ref={toolsComponentRef}
@@ -384,4 +503,22 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       </Toolbox>
     </>
   )
+}
+
+const getStepFormNumPages = (
+  stepType: StepType,
+  enableReadOrInitialization: boolean,
+  enableLiquidClasses: boolean
+): number => {
+  switch (stepType) {
+    case 'mix':
+    case 'moveLiquid':
+      return enableLiquidClasses ? 3 : 2
+    case 'thermocycler':
+      return 2
+    case 'absorbanceReader':
+      return enableReadOrInitialization ? 2 : 1
+    default:
+      return 1
+  }
 }

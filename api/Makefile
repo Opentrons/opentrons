@@ -155,11 +155,11 @@ docs/dist/%: docs/root/%
 	$(SHX) cp -R docs/root/* docs/dist/
 
 .PHONY: docs
-docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1 docs/dist/hardware
+docs: docs/dist/v2 docs/dist/hardware
 
 .PHONY: docs-clean
 docs-clean:
-	$(SHX) rm -rf docs/dist docs/build
+	$(SHX) rm -rf docs/dist/v2 docs/dist/hardware docs/build
 
 .PHONY: dev
 dev:
@@ -213,6 +213,6 @@ term:
 plot-session:
 	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
 
-PHONY: command-schema
+.PHONY: command-schema
 command-schema: 
-	$(python) src/opentrons/protocol_engine/commands/generate_command_schema.py $(COMMAND_SCHEMA_VERSION) > ../shared-data/command/schemas/$(COMMAND_SCHEMA_VERSION).json
+	$(python) src/opentrons/protocol_engine/commands/generate_command_schema.py --overwrite-shared-data

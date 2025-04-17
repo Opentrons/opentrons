@@ -6,7 +6,6 @@ import {
   Flex,
   SPACING,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   COLORS,
   POSITION_FIXED,
   ALIGN_CENTER,
@@ -17,7 +16,6 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE,
@@ -26,10 +24,14 @@ import {
 } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useFeatureFlag } from '/app/redux/config'
 import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
+import { Aspirate } from './Aspirate'
+import { Dispense } from './Dispense'
 import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { SaveOrRunModal } from './SaveOrRunModal'
+import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
 
@@ -53,12 +55,15 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
+  const enableExportPython = useFeatureFlag('quickTransferExportPython')
+  const enableLiquidClassesForQT = useFeatureFlag(
+    'liquidClassesForQuickTransfer'
+  )
 
-  const displayCategory: string[] = [
-    'overview',
-    'advanced_settings',
-    'tip_management',
-  ]
+  const displayCategory: string[] = enableLiquidClassesForQT
+    ? ['overview', 'aspirate', 'dispense']
+    : ['overview', 'advanced_settings', 'tip_management']
+
   const [selectedCategory, setSelectedCategory] = useState<string>('overview')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -99,11 +104,10 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = createQuickTransferFile(
-      state,
-      deckConfig,
-      protocolName
-    )
+    const protocolFile = enableExportPython
+      ? createQuickTransferPythonFile(state, deckConfig, protocolName)
+      : createQuickTransferFile(state, deckConfig, protocolName)
+
     createProtocolAsync({
       files: [protocolFile],
       protocolKind: 'quick-transfer',
@@ -119,7 +123,10 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = createQuickTransferFile(state, deckConfig)
+    const protocolFile = enableExportPython
+      ? createQuickTransferPythonFile(state, deckConfig)
+      : createQuickTransferFile(state, deckConfig)
+
     createProtocolAsync({
       files: [protocolFile],
       protocolKind: 'quick-transfer',
@@ -146,18 +153,14 @@ export function SummaryAndSettings(
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing40}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing40}`} // TODO Ian 2023-05-02: remove this padding
         width="100%"
       >
         <Flex
-          gridGap={SPACING.spacing8}
-          height={SPACING.spacing80}
           backgroundColor={COLORS.white}
           width="100%"
-          flexDirection={DIRECTION_ROW}
           position={POSITION_FIXED}
-          top={SPACING.spacing120}
-          marginBottom={SPACING.spacing24}
+          top="7.5rem"
           alignItems={ALIGN_CENTER}
         >
           <Tabs
@@ -172,12 +175,28 @@ export function SummaryAndSettings(
           />
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
-        {selectedCategory === 'advanced_settings' ? (
-          <QuickTransferAdvancedSettings state={state} dispatch={dispatch} />
-        ) : null}
-        {selectedCategory === 'tip_management' ? (
-          <TipManagement state={state} dispatch={dispatch} />
-        ) : null}
+        {enableLiquidClassesForQT ? (
+          <>
+            {selectedCategory === 'aspirate' ? (
+              <Aspirate state={state} dispatch={dispatch} />
+            ) : null}
+            {selectedCategory === 'dispense' ? (
+              <Dispense state={state} dispatch={dispatch} />
+            ) : null}
+          </>
+        ) : (
+          <>
+            {selectedCategory === 'advanced_settings' ? (
+              <QuickTransferAdvancedSettings
+                state={state}
+                dispatch={dispatch}
+              />
+            ) : null}
+            {selectedCategory === 'tip_management' ? (
+              <TipManagement state={state} dispatch={dispatch} />
+            ) : null}
+          </>
+        )}
       </Flex>
     </Flex>
   )
