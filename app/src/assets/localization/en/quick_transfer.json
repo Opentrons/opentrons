@@ -36,6 +36,7 @@
   "character_limit_error": "Character limit exceeded",
   "column": "column",
   "columns": "columns",
+  "compatibility_error": "The {{pipetteOrLabware}} is incompatible with this liquid class",
   "consolidate_volume_error": "The selected destination well is too small to consolidate into. Try consolidating from fewer wells.",
   "create_new_to_edit": "Create a new quick transfer to edit",
   "create_new_transfer": "Create new quick transfer",

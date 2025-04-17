@@ -13,6 +13,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
 } from '@opentrons/shared-data'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { LiquidClass } from '@opentrons/shared-data'
@@ -37,7 +38,9 @@ export function SelectLiquidClass({
   dispatch,
 }: SelectLiquidClassProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  const [selectedLiquidClass, setSelectedLiquidClass] = useState<any>()
+  const [selectedLiquidClass, setSelectedLiquidClass] = useState<LiquidClass>()
+  const [incompatibleItem, setIncompatibleItem] = useState<string>('')
+  const { makeSnackbar } = useToaster()
 
   const liquidClasses = getAllLiquidClassDefs()
 
@@ -52,11 +55,15 @@ export function SelectLiquidClass({
 
   const liquidClassOptions = [noLiquidClass, ...Object.values(liquidClasses)]
   const handleClickNext = (): void => {
-    dispatch({ type: 'SET_LIQUID_CLASS', liquidClass: selectedLiquidClass })
+    dispatch({
+      type: 'SET_LIQUID_CLASS',
+      liquidClass: selectedLiquidClass ?? noLiquidClass,
+    })
     onNext()
   }
 
   console.log(liquidClassOptions)
+
   const checkTipRackExist = (tipTypes: string[], target: string): boolean => {
     return tipTypes.some(item => {
       const parts = item.split('/')
@@ -64,6 +71,9 @@ export function SelectLiquidClass({
     })
   }
 
+  /**
+   * return true if pipette/tipRack is incompatible with liquid class
+   */
   const checkCompatibility = (liquid: LiquidClass): boolean => {
     const { liquidClassName, byPipette } = liquid
     if (liquidClassName === 'none') return false
@@ -81,12 +91,20 @@ export function SelectLiquidClass({
       state.tipRack.parameters.loadName
     )
 
-    return isPipetteCompatible && isTipRackCompatible
+    if (isPipetteCompatible === false) {
+      setIncompatibleItem(state.pipette?.displayName)
+    }
+
+    return !isPipetteCompatible && !isTipRackCompatible
   }
 
   const handleClick = (option: LiquidClass): void => {
     if (checkCompatibility(option)) {
-      console.log('handleClick')
+      makeSnackbar(
+        t('compatibility_error', {
+          pipetteOrLabware: incompatibleItem,
+        }) as string
+      )
     }
   }
 
