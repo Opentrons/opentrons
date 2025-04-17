@@ -149,50 +149,22 @@ nest_96_wellplate_2ml_deep = "nest_96_wellplate_2ml_deep"
 nest_1_reservoir_290ml = "nest_1_reservoir_290ml"
 
 
-def add_parameters(parameters):
-    parameters.add_str(
-        display_name="Liquid Class",
-        variable_name="liquid_class",
-        default="water",
-        description="Which Liquid Class to use.",
-        choices=[
-            {"display_name": "H₂O", "value": "water"},
-            {"display_name": "80%% ethanol solution", "value": "ethanol_80"},
-            {"display_name": "50%% glycerol solution", "value": "glycerol_50"},
-        ],
-    )
-
-
 def run(ctx):
     # Stock liquid classes
-    liquid_class_name = ctx.params.liquid_class
-    liquid_class = ctx.define_liquid_class(liquid_class_name)
+
     volume = 105
     new_tip = "never"
 
-    ctx.comment(f"This test uses the liquid class: {liquid_class_name}.")
     ctx.comment(f"It will transfer, consolidate, and distribute liquid using the 96 channel pipette.")
     ctx.comment(f"The volume we are using is {volume} μl and is less than the max volume of the 200 μl tip.")
     ctx.comment(f"The tip strategy is {new_tip}.")
 
     tiprack_A1 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "A1", adapter="opentrons_flex_96_tiprack_adapter")
-    tiprack_A2 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "A2", adapter="opentrons_flex_96_tiprack_adapter")
-    tiprack_A3 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "A3", adapter="opentrons_flex_96_tiprack_adapter")
     tip_racks = [
         tiprack_A1,
-        tiprack_A2,
-        tiprack_A3,
     ]
     waste_chute_D3 = ctx.load_waste_chute()
     pipette_96 = ctx.load_instrument("flex_96channel_1000", "right", tip_racks=tip_racks)
-
-    source_B1 = ctx.load_labware(nest_1_reservoir_290ml, "B1", liquid_class_name)
-    source_B2 = ctx.load_labware(nest_1_reservoir_290ml, "B2", liquid_class_name)
-    sources = [
-        source_B1,
-        source_B2,
-    ]
-    SOURCE_WELL = "A1"  # These are single well reservoirs
 
     # Load liquids into source wells
     water = ctx.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
@@ -200,66 +172,83 @@ def run(ctx):
     glycerol = ctx.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
     filled = ctx.define_liquid(name="Has Liquid", description="Not Empty", display_color="#FF69B4")
 
-    if liquid_class_name == "water":
-        liquid_type = water
-    elif liquid_class_name == "ethanol_80":
-        liquid_type = ethanol
-    elif liquid_class_name == "glycerol_50":
-        liquid_type = glycerol
-    else:
-        raise ValueError(f"Unknown liquid class: {liquid_class_name}")
-
-    for source in sources:
-        source.load_liquid(wells=source.wells(), liquid=liquid_type, volume=200000)
-
-    dest_C1 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C1", f"{liquid_class_name} destination C1")
-    dest_C2 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C2", f"{liquid_class_name} destination C2")
-
-    destinations = [dest_C1, dest_C2]
-    for dest in destinations:
-        dest.load_empty(wells=dest.wells())
+    liquid_class_names = [
+        "water",
+        "ethanol_80",
+        "glycerol_50",
+    ]
 
     pipette_96.pick_up_tip()
 
-    pipette_96.transfer_with_liquid_class(
-        liquid_class=liquid_class,
-        volume=volume,
-        source=source_B1.wells(),
-        dest=dest_C1.wells(),
-        new_tip=new_tip,
-        trash_location=waste_chute_D3,
-    )
+    for liquid_class_name in liquid_class_names:
+        ctx.comment(f"Liquid class: {liquid_class_name}")
+        liquid_class = ctx.define_liquid_class(liquid_class_name)
+        if liquid_class_name == "water":
+            liquid_type = water
+        elif liquid_class_name == "ethanol_80":
+            liquid_type = ethanol
+        elif liquid_class_name == "glycerol_50":
+            liquid_type = glycerol
+        else:
+            raise ValueError(f"Unknown liquid class: {liquid_class_name}")
 
-    comment_labware_well_volume_status(ctx, source_B1)
-    comment_labware_well_volume_status(ctx, dest_C1)
+        source_B1 = ctx.load_labware(nest_1_reservoir_290ml, "B1", liquid_class_name)
+        source_B2 = ctx.load_labware(nest_1_reservoir_290ml, "B2", liquid_class_name)
+        sources = [
+            source_B1,
+            source_B2,
+        ]
+        SOURCE_WELL = "A1"  # These are single well reservoirs
 
-    pipette_96.consolidate_with_liquid_class(
-        liquid_class=liquid_class,
-        volume=volume,
-        source=[source_B1.wells(), source_B2.wells()],
-        dest=dest_C2.wells(),
-        new_tip=new_tip,
-        trash_location=waste_chute_D3,
-    )
+        for source in sources:
+            source.load_liquid(wells=source.wells(), liquid=liquid_type, volume=200000)
 
-    comment_labware_well_volume_status(ctx, source_B1)
-    comment_labware_well_volume_status(ctx, source_B2)
-    comment_labware_well_volume_status(ctx, dest_C2)
+        dest_C1 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C1", f"{liquid_class_name} destination C1")
+        dest_C2 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C2", f"{liquid_class_name} destination C2")
 
-    pipette_96.distribute_with_liquid_class(
-        liquid_class=liquid_class,
-        volume=volume,
-        source=source_B1.wells(),
-        dest=[dest_C1.wells(), dest_C2.wells()],
-        new_tip=new_tip,
-        trash_location=waste_chute_D3,
-    )
+        destinations = [dest_C1, dest_C2]
+        for dest in destinations:
+            dest.load_empty(wells=dest.wells())
 
-    comment_labware_well_volume_status(ctx, source_B1)
-    comment_labware_well_volume_status(ctx, dest_C1)
-    comment_labware_well_volume_status(ctx, dest_C2)
+        pipette_96.transfer_with_liquid_class(
+            liquid_class=liquid_class,
+            volume=volume,
+            source=source_B1.wells(),
+            dest=dest_C1.wells(),
+            new_tip=new_tip,
+            trash_location=waste_chute_D3,
+        )
 
-    for dest in destinations:
-        color_wells_with_liquid(dest, filled)
+        comment_labware_well_volume_status(ctx, source_B1)
+        comment_labware_well_volume_status(ctx, dest_C1)
+
+        pipette_96.consolidate_with_liquid_class(
+            liquid_class=liquid_class,
+            volume=volume,
+            source=[source_B1.wells(), source_B2.wells()],
+            dest=dest_C2.wells(),
+            new_tip=new_tip,
+            trash_location=waste_chute_D3,
+        )
+
+        comment_labware_well_volume_status(ctx, source_B1)
+        comment_labware_well_volume_status(ctx, source_B2)
+        comment_labware_well_volume_status(ctx, dest_C2)
+
+        pipette_96.distribute_with_liquid_class(
+            liquid_class=liquid_class,
+            volume=volume,
+            source=source_B1.wells(),
+            dest=[dest_C1.wells(), dest_C2.wells()],
+            new_tip=new_tip,
+            trash_location=waste_chute_D3,
+        )
+
+        comment_labware_well_volume_status(ctx, source_B1)
+        comment_labware_well_volume_status(ctx, dest_C1)
+        comment_labware_well_volume_status(ctx, dest_C2)
+
+        for dest in destinations:
+            color_wells_with_liquid(dest, filled)
 
     pipette_96.return_tip()
