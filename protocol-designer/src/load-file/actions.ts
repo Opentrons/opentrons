@@ -102,6 +102,9 @@ export const loadProtocolFile = (
               (customLabwareJson != null
                 ? {
                     ...designerApplicationJson,
+                    //  NOTE: labwareDefinitions contain custom labware only
+                    //  other labwareDefinitions are populated via mapping through
+                    //  the labware key in the labwareInvariantProperties reducer
                     labwareDefinitions: customLabwareJson,
                   }
                 : designerApplicationJson) as PythonDesignerApplication
