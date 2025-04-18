@@ -4,16 +4,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  Box,
   Btn,
-  COLORS,
-  CURSOR_POINTER,
   DIRECTION_COLUMN,
-  Divider,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
@@ -46,6 +40,8 @@ import { TerminalItemStep } from './TerminalItemStep'
 import { AddStepButton } from './AddStepButton'
 import { PresavedStep } from './PresavedStep'
 import { DraggableSteps } from './DraggableSteps'
+import { truncateString } from './utils'
+import { HardwareStep } from './HardwareStep'
 
 import type { StepIdType } from '../../../../form-types'
 import type { ThunkDispatch } from '../../../../types'
@@ -106,7 +102,7 @@ export const TimelineToolbox = ({
   const handleGoBack = (): void => {
     if (hasTrash) {
       navigate('/overview')
-      dispatch(selectTerminalItem('__initial_setup__'))
+      dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
       dispatch(
         selectDropdownItem({
           selection: null,
@@ -142,8 +138,14 @@ export const TimelineToolbox = ({
           <Btn css={LINK_BUTTON_STYLE} onClick={handleGoBack}>
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
               <Icon name="chevron-left" size="12px" />
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {isSidebarWidthSmall ? t('back') : t('back_to_overview')}
+              <StyledText desktopStyle="bodyDefaultRegular" width="max-content">
+                {isSidebarWidthSmall
+                  ? truncateString(
+                      t('back_to_overview'),
+                      Math.floor(sidebarWidth / 10),
+                      true
+                    )
+                  : t('back_to_overview')}
               </StyledText>
             </Flex>
           </Btn>
@@ -162,40 +164,7 @@ export const TimelineToolbox = ({
         gridGap={SPACING.spacing4}
         width="100%"
       >
-        <Flex
-          gridGap={SPACING.spacing8}
-          padding={SPACING.spacing12}
-          flexDirection={DIRECTION_COLUMN}
-        >
-          <StyledText desktopStyle="bodyDefaultSemiBold">
-            {isSidebarWidthSmall
-              ? truncateString('deck hardware', Math.floor(sidebarWidth / 10)) // scale with width
-              : 'deck hardware'}
-          </StyledText>
-          <Box
-            role="button"
-            onClick={() => {}}
-            padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
-            borderRadius={BORDERS.borderRadius8}
-            width="100%"
-            backgroundColor={COLORS.blue20}
-            cursor={CURSOR_POINTER}
-          >
-            <Flex
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
-              width="100%"
-            >
-              <Icon
-                size="1.7rem"
-                name="deck-map"
-                color={COLORS.black90}
-                minWidth="1.25rem"
-              />
-            </Flex>
-          </Box>
-        </Flex>
-        <Divider />
+        <HardwareStep sidebarWidth={sidebarWidth} />
         <Flex
           padding={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}
@@ -226,12 +195,4 @@ export const TimelineToolbox = ({
       </Flex>
     </Toolbox>
   )
-}
-
-function truncateString(text: string, maxLength: number): string {
-  const dots = '...'
-  if (text.length <= maxLength) return text
-  if (maxLength <= dots.length) return dots.slice(0, maxLength)
-
-  return text.slice(0, maxLength - dots.length) + dots
 }

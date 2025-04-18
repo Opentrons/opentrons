@@ -7,6 +7,7 @@ import { FlexTrash } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { selectors } from '../../../../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
@@ -63,7 +64,7 @@ describe('DeckSetupContainer', () => {
     vi.mocked(FlexTrash).mockReturnValue(<div>mock FlexTrash</div>)
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
       modules: {},

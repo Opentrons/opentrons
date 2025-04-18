@@ -11,6 +11,7 @@ import { LabwareRender, Module } from '@opentrons/components'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getSelectedTerminalItemId } from '../../../../ui/steps'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { FixtureRender } from '../FixtureRender'
 import { HoveredItems } from '../HoveredItems'
 import { ModuleLabel } from '../ModuleLabel'
@@ -60,7 +61,7 @@ describe('HoveredItems', () => {
     vi.mocked(LabwareRender).mockReturnValue(<div>mock LabwareRender</div>)
     vi.mocked(Module).mockReturnValue(<div>mock Module</div>)
     vi.mocked(ModuleLabel).mockReturnValue(<div>mock ModuleLabel</div>)
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
   })
   it('renders a hovered fixture', () => {
     render(props)

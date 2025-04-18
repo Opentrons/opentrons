@@ -19,6 +19,9 @@ import { ProtocolSteps } from './ProtocolSteps'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
+import { getSelectedTerminalItemId } from '../../ui/steps'
+import { HARDWARE_ID } from '../../steplist'
+import { FlexHardware } from '../../components/organisms/FlexHardware'
 
 export interface OpenSlot {
   cutoutId: CutoutId

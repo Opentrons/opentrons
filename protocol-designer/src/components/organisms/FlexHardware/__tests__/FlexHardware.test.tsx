@@ -5,13 +5,13 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
-} from '../../../step-forms/selectors'
-import { FlexHardware } from '../FlexHardware'
+} from '../../../../step-forms/selectors'
+import { FlexHardware } from '..'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {

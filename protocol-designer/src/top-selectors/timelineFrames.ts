@@ -1,8 +1,17 @@
 import { createSelector } from 'reselect'
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
-import { getActiveItem } from '../ui/steps/selectors'
-import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../steplist'
+import {
+  getActiveItem,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
+} from '../ui/steps/selectors'
+import {
+  START_TERMINAL_ITEM_ID,
+  PRESAVED_STEP_ID,
+  HARDWARE_ID,
+  TerminalItemId,
+} from '../steplist'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
@@ -20,7 +29,9 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   initialRobotState: RobotState,
   robotStateTimeline: Timeline,
   lastValidRobotState: RobotState,
-  orderedStepIds: string[]
+  orderedStepIds: string[],
+  selectedStepId: string | null,
+  selectedTerminalItemId: TerminalItemId | null
 ): CommandsAndRobotState | null => {
   if (activeItem === null) return null
   // Add pseudo-frames for start and end terminal items
@@ -44,6 +55,17 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   ) {
     // presaved step acts the same whether looking at timeline before or after active item
     timelineIdx = lastValidRobotStateIdx
+  } else if (activeItem.id === HARDWARE_ID) {
+    if (selectedStepId != null) {
+      timelineIdx = Math.min(
+        orderedStepIds.findIndex(id => id === selectedStepId),
+        lastValidRobotStateIdx
+      )
+    } else if (selectedTerminalItemId === START_TERMINAL_ITEM_ID) {
+      timelineIdx = 0
+    } else {
+      timelineIdx = lastValidRobotStateIdx
+    }
   } else if (beforeActiveItem) {
     if (activeItem.selectionType === SINGLE_STEP_SELECTION_TYPE) {
       timelineIdx = Math.min(
@@ -81,6 +103,8 @@ export const timelineFrameBeforeActiveItem: Selector<CommandsAndRobotState | nul
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.lastValidRobotState,
   stepFormSelectors.getOrderedStepIds,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
   _timelineFrameHelper(true)
 )
 export const timelineFrameAfterActiveItem: Selector<CommandsAndRobotState | null> = createSelector(
@@ -89,5 +113,7 @@ export const timelineFrameAfterActiveItem: Selector<CommandsAndRobotState | null
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.lastValidRobotState,
   stepFormSelectors.getOrderedStepIds,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
   _timelineFrameHelper(false)
 )

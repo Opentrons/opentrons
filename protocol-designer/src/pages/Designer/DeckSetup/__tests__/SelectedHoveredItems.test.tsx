@@ -15,6 +15,7 @@ import { selectors } from '../../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { LabwareOnDeck } from '../../../../components/organisms'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
 
@@ -60,7 +61,7 @@ describe('SelectedHoveredItems', () => {
       hoveredFixture: null,
       slotPosition: [0, 0, 0],
     }
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
     vi.mocked(getAllLabwareDefs).mockReturnValue({
       [mockAdapterURI]: {
         ...fixture24Tuberack,

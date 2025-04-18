@@ -49,7 +49,7 @@ import type { BaseState } from '../../../../types'
 const STARTING_DECK_STATE = 'Starting deck'
 const FINAL_DECK_STATE = 'Ending deck'
 const PX_HEIGHT_TO_TOP_OF_CONTAINER = 32
-const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 179
+export const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 179
 
 export interface StepContainerProps {
   title: string

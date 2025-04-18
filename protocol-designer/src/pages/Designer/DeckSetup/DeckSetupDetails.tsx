@@ -58,6 +58,7 @@ import type {
 } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
 import type { Fixture } from './constants'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup
@@ -200,7 +201,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         ): ComponentProps<typeof Module>['innerProps'] => {
           if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
             let lidMotorState = 'unknown'
-            if (terminalItemId === '__initial_setup__' || moduleState.lidOpen) {
+            if (
+              terminalItemId === START_TERMINAL_ITEM_ID ||
+              moduleState.lidOpen
+            ) {
               lidMotorState = 'open'
             } else if (moduleState.lidOpen === false) {
               lidMotorState = 'closed'
@@ -235,7 +239,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           moduleOnDeck.type === THERMOCYCLER_MODULE_TYPE &&
           (moduleOnDeck.moduleState as ThermocyclerModuleState).lidOpen !==
             true &&
-          terminalItemId !== '__initial_setup__'
+          terminalItemId !== START_TERMINAL_ITEM_ID
 
         const tempInnerProps = getModuleInnerProps(moduleOnDeck.moduleState)
         const innerProps =
