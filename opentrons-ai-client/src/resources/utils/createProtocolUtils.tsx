@@ -265,7 +265,6 @@ export function generateChatPrompt(
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
   ) => void
 ): string {
-
   const protocolFormat = `- ${startCase(values.protocol_format)}`
 
   const robotType = t(values.instruments.robot)
