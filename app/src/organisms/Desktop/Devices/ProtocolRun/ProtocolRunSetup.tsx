@@ -15,6 +15,7 @@ import {
   StyledText,
   LegacyStyledText,
   SPACING,
+  Divider,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -23,7 +24,6 @@ import {
 } from '@opentrons/shared-data'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
-import { Line } from '/app/atoms/structure'
 import { InfoMessage } from '/app/molecules/InfoMessage'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
@@ -397,7 +397,7 @@ export function ProtocolRunSetup({
                     </SetupStep>
                   )}
                   {index !== orderedSteps.length - 1 ? (
-                    <Line marginTop={SPACING.spacing24} />
+                    <Divider marginTop={SPACING.spacing24} marginBottom={0} />
                   ) : null}
                 </Flex>
               )
