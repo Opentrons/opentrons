@@ -23,7 +23,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ...disposal_locations import TrashBin, WasteChute
@@ -513,7 +513,7 @@ class LegacyInstrumentCoreSimulator(
         """This will never be called because it was added in API 2.15."""
         pass
 
-    def transfer_liquid(
+    def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -521,13 +521,14 @@ class LegacyInstrumentCoreSimulator(
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "transfer_liquid is not supported in legacy context"
 
-    def distribute_liquid(
+    def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -535,13 +536,14 @@ class LegacyInstrumentCoreSimulator(
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "distribute_liquid is not supported in legacy context"
 
-    def consolidate_liquid(
+    def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
         volume: float,
@@ -549,6 +551,7 @@ class LegacyInstrumentCoreSimulator(
         dest: Tuple[types.Location, LegacyWellCore],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:

@@ -5,7 +5,6 @@ import {
   ALL,
 } from '@opentrons/shared-data'
 import {
-  repeatArray,
   blowoutLocationHelper,
   curryCommandCreator,
   reduceCommandCreators,
@@ -52,6 +51,7 @@ export function mixUtil(args: {
   dispenseDelaySeconds?: number | null | undefined
   nozzles: NozzleConfigurationStyle | null
   invariantContext: InvariantContext
+  finalPushOut: number | null
 }): CurriedCommandCreator[] {
   const {
     pipette,
@@ -69,14 +69,14 @@ export function mixUtil(args: {
     yOffset,
     nozzles,
     invariantContext,
+    finalPushOut,
   } = args
   //  If delay is specified to something other than 0,
   //  emit individual py commands. Otherwise, emit mix()
   const hasUnsupportedMixApiArg =
-    aspirateDelaySeconds != null ||
-    (aspirateDelaySeconds != null && aspirateDelaySeconds === 0) ||
-    dispenseDelaySeconds != null ||
-    (dispenseDelaySeconds != null && dispenseDelaySeconds === 0)
+    (aspirateDelaySeconds != null && aspirateDelaySeconds !== 0) ||
+    (dispenseDelaySeconds != null && dispenseDelaySeconds !== 0) ||
+    finalPushOut != null
 
   const curryCreator = hasUnsupportedMixApiArg
     ? curryCommandCreator
@@ -105,6 +105,8 @@ export function mixUtil(args: {
       `location=${labwarePythonName}[${formatPyStr(
         well
       )}]${formatPyWellLocation(pythonWellLocation)}`,
+      // TODO (nd, 04/09/2025): uncomment next line once PAPI supports new `final_push_out` arg
+      // `final_push_out=${finalPushOut}`
     ]
     return {
       commands: [],
@@ -118,9 +120,11 @@ export function mixUtil(args: {
         )},\n)`,
     }
   }
-  return [
-    ...repeatArray(
-      [
+
+  const commandCreators = []
+  for (let i = 0; i < times; i++) {
+    commandCreators.push(
+      ...[
         curryCreator(aspirate, {
           pipetteId: pipette,
           volume,
@@ -155,11 +159,18 @@ export function mixUtil(args: {
           flowRate: dispenseFlowRateUlSec,
           tipRack,
           nozzles: nozzles,
+          ...(i < times - 1
+            ? { pushOut: 0 }
+            : finalPushOut == null
+            ? {}
+            : { pushOut: finalPushOut }), // only push out if final repetition
         }),
         ...getDelayCommand(dispenseDelaySeconds),
-      ],
-      times
-    ),
+      ]
+    )
+  }
+  return [
+    ...commandCreators,
     ...(hasUnsupportedMixApiArg ? [] : [pythonCommandCreator]),
   ]
 }
@@ -197,6 +208,7 @@ export const mix: CommandCreator<MixArgs> = (
     xOffset,
     yOffset,
     nozzles,
+    finalPushOut,
   } = data
 
   const isMultiChannelPipette =
@@ -337,6 +349,7 @@ export const mix: CommandCreator<MixArgs> = (
         yOffset,
         nozzles,
         invariantContext,
+        finalPushOut,
       })
       return [
         ...tipCommands,

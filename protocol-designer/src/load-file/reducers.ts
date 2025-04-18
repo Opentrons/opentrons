@@ -45,7 +45,7 @@ const unsavedChanges = (
     case 'SAVE_PROTOCOL_FILE':
       return false
 
-    case 'CREATE_NEW_PROTOCOL':
+    case 'TOGGLE_NEW_PROTOCOL_MODAL':
     case 'DISMISS_FORM_WARNING':
     case 'DISMISS_TIMELINE_WARNING':
     case 'CREATE_CONTAINER':

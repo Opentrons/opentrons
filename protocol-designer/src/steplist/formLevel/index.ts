@@ -49,8 +49,6 @@ import {
   referenceWavelengthOutOfRange,
   absorbanceReaderModuleIdRequired,
   magneticModuleIdRequired,
-  aspirateTouchTipSpeedRequired,
-  dispenseTouchTipSpeedRequired,
   aspirateTouchTipMmFromEdgeOutOfRange,
   dispenseTouchTipMmFromEdgeOutOfRange,
   aspirateTouchTipMmFromEdgeRequired,
@@ -156,7 +154,9 @@ const stepFormHelperMap: {
       timesRequired,
       aspirateDelayDurationRequired,
       dispenseDelayDurationRequired,
-      blowoutLocationRequired
+      blowoutLocationRequired,
+      pushOutVolumeOutOfRange,
+      pushOutVolumeRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
@@ -193,8 +193,9 @@ const stepFormHelperMap: {
       blowoutLocationRequired,
       aspirateWellsRequired,
       dispenseWellsRequired,
-      aspirateTouchTipSpeedRequired,
-      dispenseTouchTipSpeedRequired,
+      // TODO (nd: 04/17/2025): re-wire up the following errors once speed getters are implemented in migration
+      // aspirateTouchTipSpeedRequired,
+      // dispenseTouchTipSpeedRequired,
       pushOutVolumeRequired,
       pushOutVolumeOutOfRange,
       aspirateTouchTipMmFromEdgeOutOfRange,

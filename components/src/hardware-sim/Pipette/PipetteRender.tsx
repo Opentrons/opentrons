@@ -1,6 +1,4 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
-import { BORDERS } from '../../helix-design-system'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
 import {
   MULTI_CHANNEL_PIPETTE_WIDTH,
@@ -67,10 +65,6 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
           width: '100%',
           height: '100%',
           overflow: 'visible',
-          boxSizing: 'border-box',
-          borderRadius: BORDERS.borderRadius4,
-          boxShadow: `inset 0 0 0 1px ${C_MED_DARK_GRAY}`,
-          backgroundColor: `${C_MED_GRAY}80`,
         },
       }}
     >

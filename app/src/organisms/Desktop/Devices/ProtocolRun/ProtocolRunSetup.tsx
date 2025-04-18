@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -64,6 +64,7 @@ import { SetupStep } from './SetupStep'
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useUpdateClientLPC } from '/app/resources/client_data'
 
 import type { RefObject } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
@@ -129,12 +130,21 @@ export function ProtocolRunSetup({
   const flexOffsetsMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
+  const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
 
+  // A separate app can apply offsets. We need to update the missing steps as a side effect.
+  useEffect(() => {
+    if (flexOffsetsApplied) {
+      dispatch(updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: true }))
+    }
+  }, [flexOffsetsApplied])
+
   const offsetsConfirmed = isFlex
-    ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
+    ? runHasStarted ||
+      (flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY))
     : !missingSteps.includes(LPC_STEP_KEY)
   const buildLPCIncompleteText = (): string | null => {
     if (isFlex) {
@@ -266,11 +276,9 @@ export function ProtocolRunSetup({
         <SetupLabwarePositionCheck
           {...{ runId, robotName, robotType }}
           setOffsetsConfirmed={confirmed => {
-            dispatch(
-              updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: confirmed })
-            )
             if (confirmed) {
               dispatch(appliedOffsetsToRun(runId))
+              updateLPCStatusWithRunId(runId)
 
               setExpandedStepKey(LABWARE_SETUP_STEP_KEY)
             }

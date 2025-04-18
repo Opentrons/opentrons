@@ -57,7 +57,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     setHover,
     setShowMenuListForId,
     itemId,
-    tab,
+    terminalItemId,
     isSelected,
     deckDef,
     stagingAreaAddressableAreas,
@@ -132,7 +132,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
     slotPosition == null ||
-    tab === 'protocolSteps' ||
+    terminalItemId !== '__initial_setup__' ||
     isSelected
   )
     return null

@@ -49,11 +49,14 @@ function tripleMix(
   const { delayAfterAspirate, delayAfterDispense } = delayParams
 
   return [...Array(3)].reduce(
-    (acc, _) => [
+    (acc, _, i) => [
       ...acc,
       aspirateHelper(wellName, volume, params),
       ...(delayAfterAspirate ? [delayCommand(12)] : []),
-      dispenseHelper(wellName, volume, params),
+      dispenseHelper(wellName, volume, {
+        ...params,
+        ...(i === 2 ? {} : { pushOut: 0 }),
+      }),
       ...(delayAfterDispense ? [delayCommand(12)] : []),
     ],
     []
@@ -421,6 +424,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A1', 50),
       dispenseHelper('A1', 50, {
@@ -433,6 +437,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A1', 50),
       dispenseHelper('A1', 50, {
@@ -463,6 +468,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A3', 50),
       dispenseHelper('A3', 50, {
@@ -475,6 +481,7 @@ describe('consolidate single-channel', () => {
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
+        pushOut: 0,
       }),
       aspirateHelper('A3', 50),
       dispenseHelper('A3', 50, {

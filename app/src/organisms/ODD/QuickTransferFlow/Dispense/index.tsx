@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { DispenseSettingDetail } from './DispenseSettingDetail'
 import { DispenseSettingItem } from './DispenseSettingItem'
 import { useDispenseSettingsConfig } from './hooks/useDispenseSettingsConfig'
@@ -31,18 +29,10 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
     selectedSetting,
     setSelectedSetting,
   ] = useState<DispenseSettingOption | null>(null)
-  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const dispenseSettingsItems = useDispenseSettingsConfig({
     state,
     setSelectedSetting,
   })
-
-  useEffect(() => {
-    trackEventWithRobotSerial({
-      name: ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB,
-      properties: {},
-    })
-  }, [])
 
   return (
     <Flex

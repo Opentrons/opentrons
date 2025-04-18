@@ -319,7 +319,17 @@ class TOFMeasurementResult:
 
     sensor: TOFSensor
     kind: MeasurementKind
-    bins: Dict[int, List[int]]
+    bins: Dict[int, List[float]]
+
+
+@dataclass
+class TOFDetection:
+    """Labware detection parameters."""
+
+    sensor: TOFSensor
+    zones: List[int]
+    bins: list[int]
+    threshold: int
 
 
 @dataclass

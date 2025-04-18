@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -48,6 +48,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
@@ -92,10 +93,14 @@ export function ProtocolSetupLabware({
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
-  const startingDeck = getStackedItemsOnStartingDeck(
-    mostRecentAnalysis?.commands ?? [],
-    mostRecentAnalysis?.labware ?? [],
-    mostRecentAnalysis?.modules ?? []
+  const startingDeck = useMemo(
+    () =>
+      getStackedItemsOnStartingDeck(
+        mostRecentAnalysis?.commands ?? [],
+        mostRecentAnalysis?.labware ?? [],
+        mostRecentAnalysis?.modules ?? []
+      ),
+    [mostRecentAnalysis]
   )
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
@@ -202,7 +207,7 @@ export function ProtocolSetupLabware({
                     onClick={setSelectedLabwareStack}
                   />
                 ))}
-                {offDeckItems?.forEach((item, index) => (
+                {offDeckItems?.map((item, index) => (
                   <RowLabware
                     key={index}
                     attachedProtocolModules={attachedProtocolModuleMatches}
@@ -257,6 +262,7 @@ function LabwareLatch({
   const isLatchClosed =
     matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
     matchedHeaterShaker.data.labwareLatchStatus === 'opening'
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   let icon: 'latch-open' | 'latch-closed' | null = null
 
@@ -276,12 +282,30 @@ function LabwareLatch({
       waitUntilComplete: true,
     })
       .then(() => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: matchedHeaterShaker.moduleType,
+          analyticCommand: latchCommand.commandType,
+          result: { status: 'succeeded', data: undefined },
+          errorDetails: '',
+          serialNumber: matchedHeaterShaker.serialNumber,
+          firmwareVersion: matchedHeaterShaker.firmwareVersion,
+        })
         setIsRefetchingModules(true)
         refetchModules()
           .then(() => {
             setIsRefetchingModules(false)
           })
           .catch((e: Error) => {
+            reportModuleCommand({
+              kind: 'liveCommand',
+              moduleType: matchedHeaterShaker.moduleType,
+              analyticCommand: latchCommand.commandType,
+              result: { status: 'succeeded', data: undefined },
+              serialNumber: matchedHeaterShaker.serialNumber,
+              errorDetails: e.message,
+              firmwareVersion: matchedHeaterShaker.firmwareVersion,
+            })
             console.error(
               `error refetching modules after toggle latch: ${e.message}`
             )
@@ -289,6 +313,15 @@ function LabwareLatch({
           })
       })
       .catch((e: Error) => {
+        reportModuleCommand({
+          kind: 'liveCommand',
+          moduleType: matchedHeaterShaker.moduleType,
+          analyticCommand: latchCommand.commandType,
+          serialNumber: matchedHeaterShaker.serialNumber,
+          errorDetails: e.message,
+          result: { status: 'failed', data: undefined },
+          firmwareVersion: matchedHeaterShaker.firmwareVersion,
+        })
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
         )

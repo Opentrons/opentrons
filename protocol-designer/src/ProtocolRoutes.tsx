@@ -2,10 +2,11 @@ import { Route, Navigate, Routes, useNavigate } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Box } from '@opentrons/components'
 import {
-  CreateNewProtocolWizard,
   Designer,
+  Hardware,
   Landing,
   Liquids,
+  Onboarding,
   ProtocolOverview,
   Settings,
 } from './pages'
@@ -40,7 +41,7 @@ const pdRoutes: RouteProps[] = [
     path: '/designer',
   },
   {
-    Component: CreateNewProtocolWizard,
+    Component: Onboarding,
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',
@@ -50,6 +51,12 @@ const pdRoutes: RouteProps[] = [
     name: 'Settings',
     navLinkTo: '/settings',
     path: '/settings',
+  },
+  {
+    Component: Hardware,
+    name: 'Hardware',
+    navLinkTo: '/hardware',
+    path: '/hardware',
   },
 ]
 

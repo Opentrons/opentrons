@@ -16,6 +16,7 @@ import type {
   PipetteV2Specs,
   ShakeSpeedParams,
   LabwareMovementStrategy,
+  PositionReference,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
@@ -287,6 +288,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseXOffset: number
   /** y offset mm */
   dispenseYOffset: number
+  /** will be non-null once introduced to quick transfer */
+  pushOut: number | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -371,11 +374,14 @@ export type MixArgs = CommonArgs & {
   /** y offset */
   yOffset: number
   /** flow rates in uL/sec */
+  zOffset: number
+  positionReference: PositionReference
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
   aspirateDelaySeconds: number | null | undefined
   dispenseDelaySeconds: number | null | undefined
+  finalPushOut: number
 }
 
 export type PauseArgs = CommonArgs & {

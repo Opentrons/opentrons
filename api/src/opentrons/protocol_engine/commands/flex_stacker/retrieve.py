@@ -98,33 +98,33 @@ class RetrieveResult(BaseModel):
         ...,
         description="The labware ID of the primary retrieved labware.",
     )
-    adapterId: str | None = Field(
+    adapterId: str | SkipJsonSchema[None] = Field(
         None,
         description="The optional Adapter Labware ID of the adapter under a primary labware.",
     )
-    lidId: str | None = Field(
+    lidId: str | SkipJsonSchema[None] = Field(
         None,
         description="The optional Lid Labware ID of the lid on a primary labware.",
     )
     primaryLocationSequence: LabwareLocationSequence = Field(
         ..., description="The origin location of the primary labware."
     )
-    lidLocationSequence: LabwareLocationSequence | None = Field(
+    lidLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
         None,
         description="The origin location of the adapter labware under a primary labware.",
     )
-    adapterLocationSequence: LabwareLocationSequence | None = Field(
+    adapterLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
         None, description="The origin location of the lid labware on a primary labware."
     )
     primaryLabwareURI: str = Field(
         ...,
         description="The labware definition URI of the primary labware.",
     )
-    adapterLabwareURI: str | None = Field(
+    adapterLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the adapter labware.",
     )
-    lidLabwareURI: str | None = Field(
+    lidLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
         description="The labware definition URI of the lid labware.",
     )

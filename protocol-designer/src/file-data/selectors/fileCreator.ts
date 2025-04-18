@@ -11,6 +11,8 @@ import {
   FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
 import {
+  pythonCustomLabwareDict,
+  pythonDefRun,
   pythonImports,
   pythonMetadata,
   pythonRequirements,
@@ -30,7 +32,6 @@ import {
   getModulesLoadInfo,
   getPipettesLoadInfo,
 } from './utils'
-import { pythonDefRun } from './pythonFile'
 
 import type { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
 import type {
@@ -392,6 +393,7 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
           labwareNicknamesById,
           robotType
         ),
+        pythonCustomLabwareDict(invariantContext.labwareEntities),
       ]
         .filter(section => section) // skip any blank sections
         .join('\n\n') + '\n'

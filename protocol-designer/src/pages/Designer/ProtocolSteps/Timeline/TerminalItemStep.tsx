@@ -21,6 +21,7 @@ import {
 import {
   deselectAllSteps,
   hoverOnStep,
+  selectDropdownItem,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
 import { StepContainer } from './StepContainer'
@@ -58,6 +59,12 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
     dispatch(toggleViewSubstep(null))
     dispatch(hoverOnStep(null))
     selectItem()
+    dispatch(
+      selectDropdownItem({
+        selection: null,
+        mode: 'clear',
+      })
+    )
   }
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     handleConfirm,

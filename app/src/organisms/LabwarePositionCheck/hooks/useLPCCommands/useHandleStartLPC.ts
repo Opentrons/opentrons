@@ -3,6 +3,7 @@ import {
   moduleInitBeforeAnyLPCCommands,
   moveToMaintenancePosition,
 } from './commands'
+import { mapFlexStackerLabware } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -14,7 +15,6 @@ import type {
   SetupCreateCommand,
 } from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
-import { mapFlexStackerLabware } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/utils'
 
 export interface UseHandleStartLPCResult {
   handleStartLPC: (
