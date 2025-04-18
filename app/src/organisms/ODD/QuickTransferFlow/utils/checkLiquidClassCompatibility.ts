@@ -33,7 +33,6 @@ export const checkLiquidClassCompatibility = (
     state.path === undefined ||
     state.volume === undefined
   ) {
-    console.log('state is undefined')
     return { inCompatible: true }
   }
 
