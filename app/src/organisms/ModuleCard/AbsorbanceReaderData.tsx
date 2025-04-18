@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, COLORS, Flex } from '@opentrons/components'
+import { StyledText, COLORS, Flex, Chip, ChipType } from '@opentrons/components'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
@@ -18,26 +18,22 @@ export const AbsorbanceReaderData = (
   const { moduleData } = props
   const { t, i18n } = useTranslation(['device_details', 'shared'])
 
-  const StatusLabelProps = {
-    status: 'Idle',
-    backgroundColor: COLORS.grey30,
-    iconColor: COLORS.grey60,
-    textColor: COLORS.grey60,
-    pulse: false,
-  }
+  let statusText: string
+  let statusChipType: ChipType
   switch (moduleData.status) {
+    case 'idle': {
+      statusText = 'Idle'
+      statusChipType = 'neutral'
+      break
+    }
     case 'measuring': {
-      StatusLabelProps.status = 'Reading'
-      StatusLabelProps.backgroundColor = COLORS.blue30
-      StatusLabelProps.iconColor = COLORS.blue60
-      StatusLabelProps.textColor = COLORS.blue60
+      statusText = 'Reading'
+      statusChipType = 'info'
       break
     }
     case 'error': {
-      StatusLabelProps.status = 'Error'
-      StatusLabelProps.backgroundColor = COLORS.yellow30
-      StatusLabelProps.iconColor = COLORS.yellow60
-      StatusLabelProps.textColor = COLORS.yellow60
+      statusText = 'Error'
+      statusChipType = 'warning'
       break
     }
   }
@@ -48,7 +44,15 @@ export const AbsorbanceReaderData = (
 
   return (
     <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
-      <StatusLabel {...StatusLabelProps} />
+      <Chip
+        text={statusText}
+        chipSize="small"
+        type={statusChipType}
+        hasIcon={true}
+        iconName="connection-status"
+        textTransform="capitalize"
+        data-testid="abs_module_status"
+      />
       <StyledText
         css={MODULE_INFO_DETAIL_TEXT_STYLE}
         data-testid="abs_module_data"

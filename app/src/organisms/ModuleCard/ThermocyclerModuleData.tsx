@@ -1,12 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
-  Box,
-  COLORS,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   StyledText,
+  Chip,
+  ChipType
 } from '@opentrons/components'
 
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
@@ -15,6 +13,7 @@ import {
   MODULE_INFO_HEADER_TEXT_STYLE,
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
+
 
 interface ThermocyclerModuleProps {
   data: ThermocyclerData
@@ -26,46 +25,21 @@ export const ThermocyclerModuleData = (
   const { data } = props
   const { t } = useTranslation('device_details')
 
-  const getStatusLabelProps = (
+  const getTemperatureChipType = (
     status: string | null
-  ): {
-    backgroundColor: string
-    iconColor: string
-    textColor: string
-  } => {
-    const StatusLabelProps = {
-      backgroundColor: COLORS.grey30,
-      iconColor: COLORS.grey60,
-      textColor: COLORS.blue60,
-      pulse: false,
-    }
-
+  ): ChipType => {
     switch (status) {
-      case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.grey30
-        StatusLabelProps.iconColor = COLORS.grey60
-        StatusLabelProps.textColor = COLORS.grey60
-        break
-      }
-      case 'holding at target': {
-        StatusLabelProps.backgroundColor = COLORS.blue30
-        StatusLabelProps.iconColor = COLORS.blue60
-        break
-      }
+      case 'idle':
+        return "neutral"
+
+      case 'holding at target':
       case 'cooling':
-      case 'heating': {
-        StatusLabelProps.backgroundColor = COLORS.blue30
-        StatusLabelProps.iconColor = COLORS.blue60
-        StatusLabelProps.pulse = true
-        break
-      }
-      case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.yellow30
-        StatusLabelProps.iconColor = COLORS.yellow60
-        StatusLabelProps.textColor = COLORS.yellow60
-      }
+      case 'heating':
+        return "info"
+
+      default:
+        return "warning"
     }
-    return StatusLabelProps
   }
 
   return (
@@ -78,22 +52,25 @@ export const ThermocyclerModuleData = (
           {t('tc_lid')}
         </StyledText>
         <Flex flexDirection={DIRECTION_ROW}>
-          <Box marginRight={SPACING.spacing4}>
-            <StatusLabel
-              status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
-              backgroundColor={COLORS.grey30}
-              textColor={COLORS.grey60}
-              showIcon={false}
-              key="lidStatus"
-              id="lidStatus"
-            />
-          </Box>
-          <StatusLabel
-            status={data.lidTemperatureStatus}
-            {...getStatusLabelProps(data.lidTemperatureStatus)}
-            key="lidTempStatus"
-            id="lidTempStatus"
+          <Chip
+            text={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
+            chipSize="small"
+            type="neutral"
+            textTransform="capitalize"
+            data-testid="lidStatus"
           />
+          <Chip
+            text={data.lidTemperatureStatus}
+            chipSize="small"
+            type={getTemperatureChipType(data.lidTemperatureStatus)}
+            hasIcon={true}
+            pulseIcon={
+              data.lidTemperatureStatus === 'cooling' ||
+              data.lidTemperatureStatus === 'heating'
+            }
+            iconName="connection-status"
+            textTransform="capitalize"
+            data-testid="lidTempStatus" />
         </Flex>
         <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
           <StyledText
@@ -116,12 +93,17 @@ export const ThermocyclerModuleData = (
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('tc_block')}
         </StyledText>
-        <StatusLabel
-          status={data.status}
-          {...getStatusLabelProps(data.status)}
-          key="blockStatus"
-          id="blockStatus"
-        />
+        <Chip
+          text={data.status}
+          chipSize="small"
+          type={getTemperatureChipType(data.status)}
+          hasIcon={true}
+          pulseIcon={
+            data.status === 'cooling' || data.status === 'heating'
+          }
+          iconName="connection-status"
+          textTransform="capitalize"
+          data-testid="blockStatus" />
         <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
           <StyledText
             css={MODULE_INFO_DETAIL_TEXT_STYLE}
