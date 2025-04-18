@@ -25,7 +25,6 @@ import {
 import {
   useProtocolQuery,
   useInstrumentsQuery,
-  useDoorQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import {

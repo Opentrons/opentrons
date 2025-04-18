@@ -4,7 +4,7 @@ import { useDoorQuery, useModulesQuery } from '@opentrons/react-api-client'
 
 import { getRobotSettings } from '/app/redux/robot-settings'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { EQUIPMENT_POLL_MS } from '../constants'
+import { EQUIPMENT_POLL_MS } from '../ProtocolRun/ProtocolRunHeader/constants'
 
 import type { State } from '/app/redux/types'
 import { AttachedModule, FlexStackerData } from '@opentrons/api-client'
