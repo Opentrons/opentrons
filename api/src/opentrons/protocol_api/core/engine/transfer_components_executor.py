@@ -145,8 +145,8 @@ class TransferComponentsExecutor:
         """
         submerge_start_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=submerge_properties.position_reference,
-            offset=submerge_properties.offset,
+            position_reference=submerge_properties.start_position.position_reference,
+            offset=submerge_properties.start_position.offset,
         )
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
@@ -332,8 +332,8 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.aspirate.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -429,8 +429,8 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.dispense.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -568,8 +568,8 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.multi_dispense.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware

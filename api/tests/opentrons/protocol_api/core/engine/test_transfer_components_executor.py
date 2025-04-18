@@ -57,19 +57,16 @@ def patch_mock_raise_if_location_inside_liquid(
 
 """ Test aspirate properties:
 "submerge": {
-  "positionReference": "well-top",
-  "offset": {"x": 1, "y": 2, "z": 3},
+  "startPosition": {"positionReference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}},
   "speed": 100,
   "delay": {"enable": true, "params": {"duration": 10.0}}},
 "retract": {
-  "positionReference": "well-top",
-  "offset": {"x": 3, "y": 2, "z": 1},
+  "endPosition": {"positionReference": "well-top", "offset": {"x": 3, "y": 2, "z": 1}},
   "speed": 50,
   "airGapByVolume": [[1.0, 0.1], [49.9, 0.1], [50.0, 0.0]],
   "touchTip": {"enable": true, "params": {"zOffset": -1, "mmFromEdge": 0.5, "speed": 30}},
   "delay": {"enable": true, "params": {"duration": 20}}},
-"positionReference": "well-bottom",
-"offset": {"x": 10, "y": 20, "z": 30},
+"aspiratePosition": {"positionReference": "well-bottom", "offset": {"x": 10, "y": 20, "z": 30}},
 "flowRateByVolume": [[1.0, 35.0], [10.0, 24.0], [50.0, 35.0]],
 "correctionByVolume": [[0.0, 0.0]],
 "preWet": true,
@@ -318,7 +315,9 @@ def test_aspirate_and_wait(
 ) -> None:
     """It should execute an aspirate and a delay according to properties."""
     source_well = decoy.mock(cls=WellCore)
-    sample_transfer_props.aspirate.position_reference = position_reference
+    sample_transfer_props.aspirate.aspirate_position.position_reference = (
+        position_reference
+    )
     aspirate_flow_rate = (
         sample_transfer_props.aspirate.flow_rate_by_volume.get_for_volume(10)
     )
@@ -387,7 +386,9 @@ def test_dispense_and_wait(
 ) -> None:
     """It should execute a dispense and a delay according to properties."""
     source_well = decoy.mock(cls=WellCore)
-    sample_transfer_props.dispense.position_reference = position_reference
+    sample_transfer_props.dispense.dispense_position.position_reference = (
+        position_reference
+    )
     dispense_flow_rate = (
         sample_transfer_props.dispense.flow_rate_by_volume.get_for_volume(10)
     )
@@ -898,22 +899,19 @@ Single dispense properties:
 
 "singleDispense": {
     "submerge": {
-      "positionReference": "well-top",
-      "offset": {"x": 30, "y": 20, "z": 10},
+      "startPosition": {"positionReference": "well-top", "offset": {"x": 30, "y": 20, "z": 10}},
       "speed": 100,
       "delay": {"enable": true, "params": { "duration": 0.0 }}
     },
     "retract": {
-      "positionReference": "well-top",
-      "offset": {"x": 11, "y": 22, "z": 33},
+      "endPosition": {"positionReference": "well-top", "offset": {"x": 11, "y": 22, "z": 33}},
       "speed": 50,
       "airGapByVolume": [[1.0, 0.1], [49.9, 0.1], [50.0, 0.0]],
       "blowout": { "enable": true , "params": {"location": "source", "flowRate": 100}},
       "touchTip": { "enable": true, "params": { "zOffset": -1, "mmFromEdge": 0.5, "speed": 30}},
       "delay": {"enable": true, "params": { "duration": 10 }}
     },
-    "positionReference": "well-bottom",
-    "offset": {"x": 33, "y": 22, "z": 11},
+    "dispensePosition": {"positionReference": "well-bottom", "offset": {"x": 33, "y": 22, "z": 11}},
     "flowRateByVolume": [[1.0, 50.0]],
     "correctionByVolume": [[0.0, 0.0]],
     "mix": { "enable": true, "params": { "repetitions": 1, "volume": 50 }},
