@@ -37,7 +37,9 @@ describe('FlexStackerModuleData', () => {
 
     const doorChip = screen.getByTestId('stacker_door_label')
     expect(doorChip).toHaveTextContent('Closed')
-    expect(doorChip).toHaveStyle(`background-color: ${COLORS.black90}${COLORS.opacity20HexCode}`)
+    expect(doorChip).toHaveStyle(
+      `background-color: ${COLORS.black90}${COLORS.opacity20HexCode}`
+    )
 
     const shuttleChip = screen.getByTestId('stacker_shuttle_label')
     expect(shuttleChip).toHaveTextContent('Extended')

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, Flex, Chip } from '@opentrons/components'
+import { StyledText, Flex, Chip, ChipType } from '@opentrons/components'
 
 import type { FlexStackerModule } from '/app/redux/modules/types'
 
@@ -29,10 +29,7 @@ export function FlexStackerModuleData(
     }
   }
 
-  const shuttleDisplayStatus = i18n.format(
-    getShuttleStatusText(),
-    'capitalize'
-  )
+  const shuttleDisplayStatus = i18n.format(getShuttleStatusText(), 'capitalize')
   const doorDisplayStatus = i18n.format(
     moduleData.hopperDoorState === 'closed'
       ? t('shared:closed')
@@ -41,8 +38,19 @@ export function FlexStackerModuleData(
   )
 
   const doorType = moduleData.hopperDoorState === 'opened' ? 'info' : 'neutral'
-  const shuttleType =
-    moduleData.platformState === 'missing' ? 'error' : 'info'
+
+  let shuttleType: ChipType
+  switch (moduleData.platformState) {
+    case 'missing':
+      shuttleType = 'error'
+      break
+    case 'unknown':
+      shuttleType = 'neutral'
+      break
+    default:
+      shuttleType = 'info'
+      break
+  }
   return (
     <>
       <Flex
@@ -72,7 +80,7 @@ export function FlexStackerModuleData(
           text={shuttleDisplayStatus}
           chipSize="small"
           type={shuttleType}
-          iconName='connection-status'
+          iconName="connection-status"
         />
       </Flex>
     </>
