@@ -254,6 +254,35 @@ well_plate_3 = protocol.load_labware_from_definition(
 )`.trimStart()
     )
   })
+
+  describe('getLoadLabware off-deck', () => {
+    it('should generate loadLabware for off-deck', () => {
+      expect(
+        getLoadLabware(
+          {},
+          {
+            plateId: {
+              id: 'plateId',
+              labwareDefURI: 'opentrons/fixture_96_plate/1',
+              def: opentrons96Plate,
+              pythonName: 'well_plate_5',
+            },
+          },
+          { plateId: { slot: 'offDeck' } },
+          {}
+        )
+      ).toBe(
+        `
+# Load Labware:
+well_plate_5 = protocol.load_labware(
+    "fixture_96_plate",
+    location=protocol_api.OFF_DECK,
+    namespace="opentrons",
+    version=1,
+)`.trimStart()
+      )
+    })
+  })
 })
 
 describe('getLoadPipettes', () => {
