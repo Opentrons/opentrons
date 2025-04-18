@@ -17,6 +17,15 @@ import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import { getOnlyLatestDefs } from './labware'
 import type { CreatePrompt } from '../types'
 
+export function generatePromptPreviewProtocolFormatItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { protocol_format = 'Python' } = watch()
+
+  return [protocol_format]
+}
+
 export function generatePromptPreviewApplicationItems(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -220,6 +229,10 @@ export function generatePromptPreviewData(
   items: string[]
 }> {
   return [
+    {
+      title: t('protocol_format_title'),
+      items: generatePromptPreviewProtocolFormatItems(watch, t),
+    },
     {
       title: t('application_title'),
       items: generatePromptPreviewApplicationItems(watch, t),

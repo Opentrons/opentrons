@@ -241,7 +241,7 @@ export function CreateProtocol(): JSX.Element | null {
           <PromptPreview
             handleSubmit={handleSubmit}
             // todo: fix this disabled logic
-            isSubmitButtonEnabled={true}
+            isSubmitButtonEnabled={currentSection === TOTAL_STEPS}
             promptPreviewData={generatePromptPreviewData(methods.watch, t)}
           />
         </div>

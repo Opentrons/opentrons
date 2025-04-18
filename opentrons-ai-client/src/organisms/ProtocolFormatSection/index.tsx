@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useFormContext } from 'react-hook-form'
 import {
   Banner,
   DIRECTION_COLUMN,
@@ -14,6 +16,7 @@ export const PROTOCOL_FORMAT = 'protocol_format'
 
 export function ProtocolFormatSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
+  const { trigger } = useFormContext()
   const robotRadioButtons = [
     {
       id: PYTHON,
@@ -27,6 +30,11 @@ export function ProtocolFormatSection(): JSX.Element | null {
     },
   ]
 
+  // trigger form validation on mount for when users come back to this section after moving on
+  useEffect(() => {
+    void trigger([PROTOCOL_FORMAT])
+  })
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -35,7 +43,7 @@ export function ProtocolFormatSection(): JSX.Element | null {
     >
       <ControlledRadioButtonGroup
         radioButtons={robotRadioButtons}
-        title={t('protocol_format_title')}
+        title={t('protocol_format')}
         name={PROTOCOL_FORMAT}
         defaultValue={PYTHON}
         rules={{ required: true }}

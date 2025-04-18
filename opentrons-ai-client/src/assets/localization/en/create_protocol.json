@@ -1,6 +1,6 @@
 {
   "application_title": "Application",
-  "protocol_format": "Protocol Format",
+  "protocol_format_title": "Protocol Format",
   "application_scientific_dropdown_title": "What's your scientific application?",
   "application_scientific_dropdown_placeholder": "Select an option",
   "basic_aliquoting": "Basic aliquoting",
@@ -36,7 +36,7 @@
   "no_modules_added_yet": "No modules added yet",
   "modules_remove_label": "remove",
   "modules_adapter_label": "Adapter",
-  "protocol_format_title": "What file format should OpentronsAI use to generate the protocol?",
+  "protocol_format": "What file format should OpentronsAI use to generate the protocol?",
   "heater_shaker_module_v1": "Heater-Shaker Module GEN1",
   "temperature_module_v2": "Temperature Module GEN2",
   "thermocycler_module_v2": "Thermocycler Module GEN2",

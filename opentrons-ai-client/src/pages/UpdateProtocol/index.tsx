@@ -30,7 +30,6 @@ import { CSSTransition } from 'react-transition-group'
 import { useAtom } from 'jotai'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { TextAreaField } from '../../atoms/TextAreaField'
-import { sections } from '../../organisms/ProtocolSectionsContainer'
 
 interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions
@@ -105,7 +104,7 @@ export function UpdateProtocol(): JSX.Element {
   const { t }: { t: (key: string) => string } = useTranslation(
     'protocol_generator'
   )
-  const [, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
+  const [headerState, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
   const [updateType, setUpdateType] = useState<DropdownOption | null>(null)
   const [detailsValue, setDetailsValue] = useState<string>('')
   const [, setUpdateProtocolChatAtom] = useAtom(updateProtocolChatAtom)
@@ -115,8 +114,7 @@ export function UpdateProtocol(): JSX.Element {
   const [fileValue, setFile] = useState<File | null>(null)
   const [pythonText, setPythonTextValue] = useState<string>('')
   const [errorText, setErrorText] = useState<string | null>(null)
-  const progressIncrement = sections.length - 1
-
+  const progressIncrement = 1 / 3
   // Reset the chat data atom and protocol atoms when navigating to the update protocol page
   useEffect(() => {
     setCreateProtocolChatAtom({
@@ -210,8 +208,6 @@ export function UpdateProtocol(): JSX.Element {
     const detailsText = t('modify_details_of_change') + detailsValue + '\n'
 
     const chatPrompt = `${introText}${originalCodeText}${updateTypeText}${detailsText}`
-
-    console.log(chatPrompt)
 
     setUpdateProtocolChatAtom({
       prompt: chatPrompt,
@@ -341,7 +337,7 @@ export function UpdateProtocol(): JSX.Element {
         >
           <LargeButton
             // TODO: fix this disabled increment logic
-            disabled={false}
+            disabled={headerState.progress !== 1.0}
             buttonText={t('submit_prompt')}
             onClick={processDataAndNavigateToChat}
           />

@@ -19,6 +19,7 @@ import { StepsSection } from '../StepsSection'
 import { useFormContext } from 'react-hook-form'
 import { COLUMN } from '@opentrons/shared-data'
 import { ProtocolFormatSection } from '../ProtocolFormatSection'
+import { useEffect } from 'react'
 
 export const PROTOCOL_FORMAT_STEP = 0
 export const APPLICATION_STEP = 1
@@ -64,16 +65,20 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const {
     formState: { isValid },
+    trigger,
   } = useFormContext()
   const [{ currentSection, focusSection }, setCreateProtocolAtom] = useAtom(
     createProtocolAtom
   )
 
+  useEffect(() => {
+    trigger()
+  }, [focusSection])
+
   function handleSectionClick(stepNumber: number): void {
     currentSection >= stepNumber &&
-      isValid &&
       setCreateProtocolAtom({
-        currentSection,
+        currentSection: stepNumber,
         focusSection: stepNumber,
       })
   }
