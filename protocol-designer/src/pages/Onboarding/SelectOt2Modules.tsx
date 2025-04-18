@@ -4,14 +4,10 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  EmptySelectorButton,
   Flex,
-  FLEX_MAX_CONTENT,
   ListItem,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
-  WRAP,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -24,6 +20,7 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { WizardBody } from './WizardBody'
 import { DEFAULT_SLOT_MAP_OT2, OT2_SUPPORTED_MODULE_MODELS } from './constants'
 import { HandleEnter } from '../../components/atoms'
+import { ModuleEmptySelectorButtons } from '../../components/organisms'
 import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -84,23 +81,10 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
                 {t('which_modules')}
               </StyledText>
             ) : null}
-            <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
-              {filteredSupportedModules
-                .sort((moduleA, moduleB) => moduleA.localeCompare(moduleB))
-                .map(moduleModel => (
-                  <Flex width={FLEX_MAX_CONTENT} key={moduleModel}>
-                    <EmptySelectorButton
-                      disabled={false}
-                      textAlignment={TYPOGRAPHY.textAlignLeft}
-                      iconName="plus"
-                      text={getModuleDisplayName(moduleModel)}
-                      onClick={() => {
-                        handleAddModule(moduleModel)
-                      }}
-                    />
-                  </Flex>
-                ))}
-            </Flex>
+            <ModuleEmptySelectorButtons
+              modules={filteredSupportedModules}
+              addModule={handleAddModule}
+            />
             {Object.keys(modules).length > 0 ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -118,16 +102,9 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
                     .sort(([, moduleA], [, moduleB]) =>
                       moduleA.model.localeCompare(moduleB.model)
                     )
-                    .reduce<Array<FormModule & { count: number; key: string }>>(
+                    .reduce<Array<FormModule & { key: string }>>(
                       (acc, [key, module]) => {
-                        const existingModule = acc.find(
-                          m => m.type === module.type
-                        )
-                        if (existingModule != null) {
-                          existingModule.count++
-                        } else {
-                          acc.push({ ...module, count: 1, key })
-                        }
+                        acc.push({ ...module, key })
                         return acc
                       },
                       []

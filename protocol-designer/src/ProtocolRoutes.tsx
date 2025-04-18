@@ -3,6 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { Box } from '@opentrons/components'
 import {
   Designer,
+  Hardware,
   Landing,
   Liquids,
   Onboarding,
@@ -50,6 +51,12 @@ const pdRoutes: RouteProps[] = [
     name: 'Settings',
     navLinkTo: '/settings',
     path: '/settings',
+  },
+  {
+    Component: Hardware,
+    name: 'Hardware',
+    navLinkTo: '/hardware',
+    path: '/hardware',
   },
 ]
 
