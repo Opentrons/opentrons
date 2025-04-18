@@ -1,12 +1,26 @@
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
+import { checkLiquidClassCompatibility } from '../utils'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { SelectLiquidClass } from '../SelectLiquidClass'
 
 import type { ComponentProps } from 'react'
+
+vi.mock('../utils')
+vi.mock('/app/organisms/ToasterOven')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getAllLiquidClassDefs>()
+  return {
+    ...actual,
+    getAllLiquidClassDefs: vi.fn(() => mockLiquidClasses),
+  }
+})
+const mockMakeSnackbar = vi.fn()
 
 const mockNoLiquidClass = {
   byPipette: [],
@@ -16,6 +30,120 @@ const mockNoLiquidClass = {
   namespace: 'opentrons',
   schemaVersion: 1,
 }
+
+const mockByPipette = [
+  {
+    tiprack: 'opentrons/opentrons_flex_96_tiprack_50ul/1',
+    aspirate: {},
+    singleDispense: {
+      submerge: {
+        positionReference: 'well-top',
+        offset: {
+          x: 0,
+          y: 0,
+          z: 2,
+        },
+        speed: 100,
+        delay: {
+          enable: false,
+          params: {
+            duration: 0,
+          },
+        },
+      },
+    },
+    multiDispense: {},
+  },
+]
+
+const mockLiquidClasses = {
+  ethanol: {
+    liquidClassName: 'mock ethanol',
+    displayName: 'Volatile',
+    description: '80% ethanol',
+    schemaVersion: 0,
+    namespace: '',
+    byPipette: mockByPipette,
+  },
+  glyeral: {
+    liquidClassName: 'mock glyeral',
+    displayName: 'Viscous',
+    description: '50% glycerol',
+    schemaVersion: 0,
+    namespace: '',
+    byPipette: mockByPipette,
+  },
+  water: {
+    displayName: 'Aqueous',
+    liquidClassName: 'mock water',
+    description: 'Deionized water',
+    schemaVersion: 0,
+    namespace: '',
+    byPipette: mockByPipette,
+  },
+} as any
+
+const mockState = {
+  pipette: {
+    displayName: 'Flex 1-Channel 50 µL',
+    model: 'p50',
+    displayCategory: 'FLEX',
+    channels: 1,
+    liquids: {
+      default: {
+        $otSharedSchema:
+          '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
+        supportedTips: {},
+        maxVolume: 50,
+        minVolume: 5,
+        defaultTipracks: [
+          'opentrons/opentrons_flex_96_tiprack_50ul/1',
+          'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+        ],
+      },
+      lowVolumeDefault: {
+        $otSharedSchema:
+          '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
+        supportedTips: {},
+        maxVolume: 30,
+        minVolume: 1,
+        defaultTipracks: [
+          'opentrons/opentrons_flex_96_tiprack_50ul/1',
+          'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+        ],
+      },
+    },
+  } as any,
+  mount: 'left',
+  tipRack: {
+    wells: {
+      A1: {
+        totalLiquidVolume: 200,
+      },
+    },
+    parameters: {
+      format: '96Standard',
+      quirks: [],
+      isTiprack: true,
+      tipLength: 57.9,
+      tipOverlap: 10.5,
+      isMagneticModuleCompatible: false,
+      loadName: 'opentrons_flex_96_tiprack_50ul',
+    },
+  } as any,
+  source: {},
+  sourceWells: ['A1'],
+  destination: 'source',
+  destinationWells: ['A1'],
+  transferType: 'transfer',
+  volume: 15,
+  path: 'single',
+  changeTip: 'once',
+  dropTipLocation: {
+    cutoutFixtureId: 'trashBinAdapter',
+    cutoutId: 'cutoutA3',
+  },
+} as any
 
 const render = (props: ComponentProps<typeof SelectLiquidClass>) => {
   return renderWithProviders(<SelectLiquidClass {...props} />, {
@@ -35,9 +163,20 @@ describe('SelectLiquidClass', () => {
         buttonText: 'Exit',
         onClick: vi.fn(),
       },
-      state: {},
+      state: mockState,
       dispatch: vi.fn(),
     }
+    vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
+      inCompatible: false,
+      pipetteInCompatible: false,
+      tipRackICompatible: false,
+      pipettePathInCompatible: false,
+    })
+    vi.mocked(useToaster).mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      makeToast: vi.fn(),
+      eatToast: vi.fn(),
+    })
   })
 
   it('renders text, exit button and continue button', () => {
@@ -75,36 +214,59 @@ describe('SelectLiquidClass', () => {
     })
   })
 
-  // it('should call mock function when tapping continue button - aqueous', () => {
-  //   render(props)
-  //   fireEvent.click(screen.getByText("Don't use liquid class settings"))
-  //   fireEvent.click(screen.getByText('Continue'))
-  //   expect(props.onNext).toHaveBeenCalled()
-  //   expect(props.dispatch).toHaveBeenCalledWith({
-  //     type: 'SET_LIQUID_CLASS',
-  //     liquidClass: mockNoLiquidClass,
-  //   })
-  // })
+  it('should call mock function when tapping continue button - water', () => {
+    vi.mocked(getAllLiquidClassDefs).mockReturnValue(mockLiquidClasses)
+    render(props)
+    fireEvent.click(screen.getByText('Aqueous'))
+    fireEvent.click(screen.getByText('Continue'))
+    expect(props.onNext).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalledWith({
+      type: 'SET_LIQUID_CLASS',
+      liquidClass: mockLiquidClasses.water,
+    })
+  })
 
-  // it('should call mock function when tapping continue button - viscous', () => {
-  //   render(props)
-  //   fireEvent.click(screen.getByText("Don't use liquid class settings"))
-  //   fireEvent.click(screen.getByText('Continue'))
-  //   expect(props.onNext).toHaveBeenCalled()
-  //   expect(props.dispatch).toHaveBeenCalledWith({
-  //     type: 'SET_LIQUID_CLASS',
-  //     liquidClass: mockNoLiquidClass,
-  //   })
-  // })
+  it('should call mock snackbar function when tapping liquid class button - pipette incompatible', () => {
+    props.state.pipette = {
+      displayName: 'mock pipette',
+    } as any
+    vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
+      inCompatible: true,
+      pipetteInCompatible: true,
+      tipRackICompatible: true,
+      pipettePathInCompatible: false,
+    })
+    render(props)
+    fireEvent.click(screen.getByText('Aqueous'))
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'The mock pipette is incompatible with this liquid class'
+    )
+  })
 
-  // it('should call mock function when tapping continue button - volatile', () => {
-  //   render(props)
-  //   fireEvent.click(screen.getByText("Don't use liquid class settings"))
-  //   fireEvent.click(screen.getByText('Continue'))
-  //   expect(props.onNext).toHaveBeenCalled()
-  //   expect(props.dispatch).toHaveBeenCalledWith({
-  //     type: 'SET_LIQUID_CLASS',
-  //     liquidClass: mockNoLiquidClass,
-  //   })
-  // })
+  it('should call mock snackbar function when tapping liquid class button - pipette path incompatible', () => {
+    vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
+      inCompatible: true,
+      pipetteInCompatible: false,
+      tipRackICompatible: false,
+      pipettePathInCompatible: true,
+    })
+    render(props)
+    fireEvent.click(screen.getByText('Aqueous'))
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'The selected pipette path is incompatible with this liquid class'
+    )
+  })
+
+  it('should call mock function when tapping liquid class button - volume incompatible', () => {
+    vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
+      inCompatible: true,
+      volumeInCompatible: true,
+    })
+    render(props)
+    fireEvent.click(screen.getByText('Aqueous'))
+    fireEvent.click(screen.getByText('Continue'))
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'Transfer volumes of 10 µL or less are incompatible with liquid classes'
+    )
+  })
 })

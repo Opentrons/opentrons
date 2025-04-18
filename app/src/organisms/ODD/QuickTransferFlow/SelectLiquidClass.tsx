@@ -70,12 +70,9 @@ export function SelectLiquidClass({
     if (inCompatible) {
       if (volumeInCompatible === true) {
         makeSnackbar(t('transfer_volumes_incompatible') as string)
-      } else if (pipetteInCompatible === true) {
+      } else if (pipettePathInCompatible === true) {
         makeSnackbar(t('transfer_pipette_path_incompatible') as string)
-      } else if (
-        pipettePathInCompatible === true ||
-        tipRackICompatible === true
-      ) {
+      } else if (pipetteInCompatible === true || tipRackICompatible === true) {
         makeSnackbar(
           t('compatibility_error', {
             pipetteOrLabware: state.pipette?.displayName,
