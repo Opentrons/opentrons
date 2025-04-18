@@ -33,6 +33,8 @@ vi.mock('/app/redux/config')
 vi.mock('/app/resources/useNotifyDataReady')
 vi.mock('/app/redux-resources/robots')
 
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
 const render = (props: ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
     <MemoryRouter>
