@@ -112,7 +112,10 @@ import type {
   ProtocolHardware,
   ProtocolFixture,
 } from '/app/transformations/commands'
-import { NOT_CONFIGURED, useIsDoorOpen } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/hooks'
+import {
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/hooks'
 
 const FETCH_DURATION_MS = 5000
 
@@ -355,12 +358,21 @@ function PrepareToRun({
     offsetsConfirmed
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
-      if (doorStatus.moduleDoorLocation !== null && doorStatus.moduleDoorLocation !== NOT_CONFIGURED){
-        makeSnackbar(t('shared:close_stacker_door', {module_door_location: doorStatus.moduleDoorLocation}) as string)
-      } else if (doorStatus.moduleDoorLocation !== null && doorStatus.moduleDoorLocation === NOT_CONFIGURED){
+      if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation !== NOT_CONFIGURED
+      ) {
+        makeSnackbar(
+          t('shared:close_stacker_door', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          }) as string
+        )
+      } else if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation === NOT_CONFIGURED
+      ) {
         makeSnackbar(t('shared:close_unconfigured_stacker_door') as string)
-      }
-      else{
+      } else {
         makeSnackbar(t('shared:close_robot_door') as string)
       }
     } else {
@@ -528,7 +540,7 @@ function PrepareToRun({
       }
     }
   }
-  
+
   const doorStatus = useIsDoorOpen(robotName)
 
   const parametersDetail = hasRunTimeParameters

@@ -16,7 +16,8 @@ import {
 } from '@opentrons/shared-data'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-export const NOT_CONFIGURED: "moduleLocationNotConfigured" = "moduleLocationNotConfigured"
+export const NOT_CONFIGURED: 'moduleLocationNotConfigured' =
+  'moduleLocationNotConfigured'
 export type DoorResult = {
   isDoorOpen: boolean
   moduleDoorLocation: string | typeof NOT_CONFIGURED | null
@@ -82,8 +83,7 @@ export function useIsDoorOpen(robotName: string): DoorResult {
         attachedStacker,
         stackerCutout
       )
-    }
-    else {
+    } else {
       doorResult.moduleDoorLocation = NOT_CONFIGURED
     }
   }

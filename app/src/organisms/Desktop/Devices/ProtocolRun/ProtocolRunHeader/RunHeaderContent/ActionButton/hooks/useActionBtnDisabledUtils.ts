@@ -113,8 +113,14 @@ function useDisabledReason({
     return t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     return t('shared:a_software_update_is_available')
-  } else if (doorStatus.isDoorOpen && doorStatus.moduleDoorLocation !== null && isStartRunStatus(runStatus)) {
-    return t('close_stacker_door', {module_door_location: doorStatus.moduleDoorLocation,})
+  } else if (
+    doorStatus.isDoorOpen &&
+    doorStatus.moduleDoorLocation !== null &&
+    isStartRunStatus(runStatus)
+  ) {
+    return t('close_stacker_door', {
+      module_door_location: doorStatus.moduleDoorLocation,
+    })
   } else if (doorStatus.isDoorOpen && isStartRunStatus(runStatus)) {
     return t('close_door')
   } else if (isClosingCurrentRun) {
