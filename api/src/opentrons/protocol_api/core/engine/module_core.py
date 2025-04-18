@@ -762,7 +762,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         )
 
     def _core_groups_from_primary_core(self, labware: LabwareCore) -> _CoreTrio:
-        possible_adapter = (self._protocol_core.get_labware_location(labware),)
+        possible_adapter = self._protocol_core.get_labware_location(labware)
         return _CoreTrio(
             primary=labware,
             adapter=(
@@ -794,6 +794,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 strategy=StackerFillEmptyStrategy.MANUAL_WITH_PAUSE,
                 message=message,
                 labwareToStore=groups,
+                count=None,
             )
         )
 
@@ -810,9 +811,9 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
 
     def get_max_storable_labware(self) -> int:
         """Get the total number of configured labware the stacker can store."""
-        max_lw = self._engine_client.state.modules.get_flex_stacker_substate(
+        max_lw = self._engine_client.state.modules.stacker_max_pool_count(
             self._module_id
-        ).get_max_pool_count()
+        )
         if max_lw is None:
             location = self._engine_client.state.modules.get_location(self._module_id)
             raise FlexStackerLabwarePoolNotYetDefinedError(
@@ -824,9 +825,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         """Get the amount of space currently available for labware."""
         max_lw = self.get_max_storable_labware()
         current = len(
-            self._engine_client.state.modules.get_flex_stacker_substate(
-                self._module_id
-            ).get_contained_labware()
+            self._engine_client.state.modules.stacker_contained_labware(self._module_id)
         )
         return max_lw - current
 
@@ -869,18 +868,16 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
             self._core_groups_from_primary_core(labware[0])
         )
         current = len(
-            self._engine_client.state.modules.get_flex_stacker_substate(
-                self._module_id
-            ).get_contained_labware()
+            self._engine_client.state.modules.stacker_contained_labware(self._module_id)
         )
         total = max_count - current
         return labware[:total]
 
     def get_stored_labware(self) -> Sequence[LabwareCore]:
         """Get the currently-stored primary labware from the stacker."""
-        stored_groups = self._engine_client.state.modules.get_flex_stacker_substate(
+        stored_groups = self._engine_client.state.modules.stacker_contained_labware(
             self._module_id
-        ).get_contained_labware()
+        )
         return [
             self._protocol_core.add_or_get_labware_core(group.primaryLabwareId)
             for group in stored_groups
@@ -889,12 +886,10 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
     @overload
     def _ssld_from_core(
         self, core: LabwareCore
-    ) -> cmd.flex_stacker.StackerStoredLabwareDetails:
-        ...
+    ) -> cmd.flex_stacker.StackerStoredLabwareDetails: ...
 
     @overload
-    def _ssld_from_core(self, core: None) -> None:
-        ...
+    def _ssld_from_core(self, core: None) -> None: ...
 
     def _ssld_from_core(
         self, core: LabwareCore | None

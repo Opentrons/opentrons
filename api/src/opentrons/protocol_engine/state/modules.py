@@ -55,6 +55,7 @@ from ..types import (
     DeckType,
     LabwareMovementOffsetData,
     AddressableAreaLocation,
+    StackerStoredLabwareGroup,
 )
 
 from ..resources import DeckFixedLabware
@@ -344,24 +345,24 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=actual_model,
             )
         elif ModuleModel.is_heater_shaker_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = HeaterShakerModuleSubState.from_live_data(
-                module_id=HeaterShakerModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                HeaterShakerModuleSubState.from_live_data(
+                    module_id=HeaterShakerModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_temperature_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = TemperatureModuleSubState.from_live_data(
-                module_id=TemperatureModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                TemperatureModuleSubState.from_live_data(
+                    module_id=TemperatureModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_thermocycler_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = ThermocyclerModuleSubState.from_live_data(
-                module_id=ThermocyclerModuleId(module_id), data=live_data
+            self._state.substate_by_module_id[module_id] = (
+                ThermocyclerModuleSubState.from_live_data(
+                    module_id=ThermocyclerModuleId(module_id), data=live_data
+                )
             )
             self._update_additional_slots_occupied_by_thermocycler(
                 module_id=module_id, slot_name=slot_name
@@ -642,9 +643,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             prev_substate, FlexStackerSubState
         ), f"{module_id} is not a Flex Stacker."
 
-        self._state.substate_by_module_id[
-            module_id
-        ] = prev_substate.new_from_state_change(state_update)
+        self._state.substate_by_module_id[module_id] = (
+            prev_substate.new_from_state_change(state_update)
+        )
 
 
 class ModuleView:
@@ -1451,3 +1452,15 @@ class ModuleView:
         return math.floor(
             (max_fill_height - pool_overlap) / (pool_height - pool_overlap)
         )
+
+    def stacker_contained_labware(
+        self, module_id: str
+    ) -> list[StackerStoredLabwareGroup]:
+        """Get the labware contained in a Flex Stacker."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_contained_labware()
+
+    def stacker_max_pool_count(self, module_id: str) -> int:
+        """Get the max stored labware in this stacker configuration."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_max_pool_count()
