@@ -119,9 +119,9 @@ export function getLoadAdapters(
         parentName = moduleEntities[adapterSlot].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
-        locationArg = `location=${formatPyStr(
-          adapterSlot === 'offDeck' ? OFF_DECK : adapterSlot
-        )}`
+        locationArg = `location=${
+          adapterSlot === 'offDeck' ? OFF_DECK : formatPyStr(adapterSlot)
+        }`
       }
 
       const isStandard = getLabwareDefIsStandard(def)
@@ -183,9 +183,9 @@ export function getLoadLabware(
         parentName = moduleEntities[labwareSlot].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
-        locationArg = `location=${formatPyStr(
-          labwareSlot === 'offDeck' ? OFF_DECK : labwareSlot
-        )}`
+        locationArg = `location=${
+          labwareSlot === 'offDeck' ? OFF_DECK : formatPyStr(labwareSlot)
+        }`
       }
       const labelArg = hasNickname
         ? `label=${formatPyStr(labwareNicknamesById[id])}`
