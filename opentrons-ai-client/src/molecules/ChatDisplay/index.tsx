@@ -94,35 +94,6 @@ const FileName = styled.span`
   margin-right: auto;
 `
 
-export const ProtocolContentBadge = (props: {
-  onClick: () => void
-  handleFileDownload: () => void
-}): JSX.Element => {
-  const { onClick, handleFileDownload } = props
-  return (
-    <OuterContainer>
-      <FileContainer onClick={onClick}>
-        <IconWrapper>
-          <img src={smallLogo} alt="Opentrons logo" width="24" height="24" />
-        </IconWrapper>
-        <FileName>protocol.json</FileName>
-        <HoverShadow onClick={() => null}>
-          <StyledIcon size={SPACING.spacing20} name="reload" />
-        </HoverShadow>
-        <HoverShadow onClick={() => null}>
-          <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
-        </HoverShadow>
-        <HoverShadow onClick={() => null}>
-          <StyledIcon size={SPACING.spacing20} name="content-copy" />
-        </HoverShadow>
-        <HoverShadow onClick={handleFileDownload}>
-          <StyledIcon size={SPACING.spacing20} name="download" />
-        </HoverShadow>
-      </FileContainer>
-    </OuterContainer>
-  )
-}
-
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const trackEvent = useTrackEvent()
@@ -219,9 +190,14 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleClickCopy = async (): Promise<void> => {
-    const lastCodeBlock = document.querySelector(`#${chatId}`)
-    const code = lastCodeBlock?.textContent ?? ''
-    await navigator.clipboard.writeText(code)
+    if (protocol_content) {
+      await navigator.clipboard.writeText(JSON.stringify(protocol_content))
+    } else {
+      const lastCodeBlock = document.querySelector(`#${chatId}`)
+      const code = lastCodeBlock?.textContent ?? ''
+      await navigator.clipboard.writeText(code)
+    }
+
     setIsCopied(true)
     trackEvent({
       name: 'copy-protocol',
@@ -238,6 +214,49 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
 
   function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
     return <CodeWrapper {...props} id={chatId} />
+  }
+
+  const ProtocolContentBadge = (props: {
+    onClick: () => void
+  }): JSX.Element => {
+    const { onClick } = props
+    return (
+      <OuterContainer>
+        <FileContainer onClick={onClick}>
+          <IconWrapper>
+            <img src={smallLogo} alt="Opentrons logo" width="24" height="24" />
+          </IconWrapper>
+          <FileName>protocol.json</FileName>
+          <HoverShadow
+            onClick={(e: Event) => {
+              e.stopPropagation()
+              setShowFeedbackModal(true)
+            }}
+          >
+            <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
+          </HoverShadow>
+          <HoverShadow
+            onClick={async (e: Event) => {
+              e.stopPropagation()
+              await handleClickCopy()
+            }}
+          >
+            <StyledIcon
+              size={SPACING.spacing20}
+              name={isCopied ? 'check' : 'content-copy'}
+            />
+          </HoverShadow>
+          <HoverShadow
+            onClick={(e: Event) => {
+              e.stopPropagation()
+              handleFileDownload()
+            }}
+          >
+            <StyledIcon size={SPACING.spacing20} name="download" />
+          </HoverShadow>
+        </FileContainer>
+      </OuterContainer>
+    )
   }
 
   return (
@@ -282,7 +301,6 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
               onClick={() => {
                 setShowProtocolContent(!showProtocolContent)
               }}
-              handleFileDownload={handleFileDownload}
             ></ProtocolContentBadge>
 
             {showProtocolContent && (

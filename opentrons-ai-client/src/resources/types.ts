@@ -12,8 +12,8 @@ export interface ChatData {
   fake?: boolean
   /** uuid to map the chat prompt request to the response from the LLM */
   requestId: string
-  /** structured protocol content */
-  protocol_content?: string
+  /** structured JSON protocol content */
+  protocol_content?: { [key: string]: any }
 }
 
 export interface CreatePrompt {
