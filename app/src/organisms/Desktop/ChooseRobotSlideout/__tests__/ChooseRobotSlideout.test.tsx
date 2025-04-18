@@ -28,6 +28,9 @@ vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/networking')
 vi.mock('/app/resources/useNotifyDataReady')
+
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
 const render = (props: ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <MemoryRouter>
