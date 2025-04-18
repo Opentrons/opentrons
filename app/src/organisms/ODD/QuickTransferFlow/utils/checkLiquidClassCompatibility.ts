@@ -24,6 +24,7 @@ export const checkLiquidClassCompatibility = (
 ): Compatibility => {
   const { liquidClassName, byPipette } = liquid
   if (liquidClassName === 'none') {
+    console.log('no liquid class')
     return { inCompatible: false }
   }
   if (
@@ -51,11 +52,9 @@ export const checkLiquidClassCompatibility = (
     state.tipRack.parameters.loadName
   )
   let isPathCompatible = false
-  isPathCompatible = byPipette.some(pipette => {
-    // Check if *any* tip type within this pipette config matches the tiprack AND the required path parameter
-    return pipette.byTipType.some(tipType => {
-      // Check if the tiprack load name matches
-      if (tipType.tiprack === state?.tipRack?.parameters.loadName) {
+  isPathCompatible = byPipette.some(pipette =>
+    pipette.byTipType.some(tipType => {
+      if (isTipRackCompatible) {
         switch (state.path) {
           case 'single':
             // For 'single' path, check if 'singleDispense' property is defined
@@ -68,13 +67,18 @@ export const checkLiquidClassCompatibility = (
         }
       }
     })
-  })
+  )
+
+  const pipetteInCompatible = !isPipetteCompatible
+  const tipRackICompatible = !isTipRackCompatible
+  const pipettePathInCompatible = !isPathCompatible
+  const inCompatible =
+    pipetteInCompatible || tipRackICompatible || pipettePathInCompatible
 
   return {
-    pipetteInCompatible: !isPipetteCompatible,
-    tipRackICompatible: !isTipRackCompatible,
-    pipettePathInCompatible: !isPathCompatible,
-    inCompatible:
-      !isPipetteCompatible && !isTipRackCompatible && !isPathCompatible,
+    pipetteInCompatible,
+    tipRackICompatible,
+    pipettePathInCompatible,
+    inCompatible,
   }
 }

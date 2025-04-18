@@ -67,7 +67,7 @@ export function SelectLiquidClass({
       pipettePathInCompatible,
       volumeInCompatible,
     } = checkLiquidClassCompatibility(option, state)
-    if (inCompatible === true) {
+    if (inCompatible) {
       if (volumeInCompatible === true) {
         makeSnackbar(t('transfer_volumes_incompatible') as string)
       } else if (pipetteInCompatible === true) {
@@ -84,6 +84,40 @@ export function SelectLiquidClass({
       }
     }
   }
+
+  // console.log('state', JSON.stringify(state, null, 4))
+  // console.log(
+  //   'does not use liquid class settings',
+  //   JSON.stringify(
+  //     checkLiquidClassCompatibility(liquidClassOptions[0], state),
+  //     null,
+  //     4
+  //   )
+  // )
+  // console.log(
+  //   'aqueous',
+  //   JSON.stringify(
+  //     checkLiquidClassCompatibility(liquidClassOptions[1], state),
+  //     null,
+  //     4
+  //   )
+  // )
+  // console.log(
+  //   'viscous',
+  //   JSON.stringify(
+  //     checkLiquidClassCompatibility(liquidClassOptions[2], state),
+  //     null,
+  //     4
+  //   )
+  // )
+  // console.log(
+  //   'volatile',
+  //   JSON.stringify(
+  //     checkLiquidClassCompatibility(liquidClassOptions[3], state),
+  //     null,
+  //     4
+  //   )
+  // )
 
   return (
     <Flex>
