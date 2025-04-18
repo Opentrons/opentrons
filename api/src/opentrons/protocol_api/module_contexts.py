@@ -86,6 +86,9 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 14)
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
+        return self._get_type()
+
+    def _get_type(self) -> ModuleType:
         return cast(ModuleType, self._core.MODULE_TYPE.value)
 
     @requires_version(2, 0)
@@ -170,7 +173,7 @@ class ModuleContext(CommandPublisher):
         # todo(mm, 2024-11-08): This check belongs in opentrons.protocol_api.core.engine.deck_conflict.
         # We're currently doing it here, at the ModuleContext level, for consistency with what
         # ProtocolContext.load_labware() does. (It should also be moved to the deck_conflict module.)
-        if self.type == "absorbanceReaderType":
+        if self._get_type() == "absorbanceReaderType":
             if cast(AbsorbanceReaderCore, self._core).is_lid_on():
                 raise CommandPreconditionViolated(
                     f"Cannot load {name} onto the Absorbance Reader Module when its lid is closed."
