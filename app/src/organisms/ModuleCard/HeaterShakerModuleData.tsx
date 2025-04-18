@@ -8,8 +8,9 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  Chip,
+  ChipType
 } from '@opentrons/components'
-import { StatusLabel } from '/app/atoms/StatusLabel'
 import type {
   LatchStatus,
   SpeedStatus,
@@ -35,46 +36,23 @@ export const HeaterShakerModuleData = (
   const { t } = useTranslation(['device_details', 'heater_shaker', 'shared'])
   const isShaking = moduleData.speedStatus !== 'idle'
 
-  const getStatusLabelProps = (
+  const getStatusChipType = (
     status: SpeedStatus | TemperatureStatus
-  ): { backgroundColor: string; iconColor: string; textColor: string } => {
-    const StatusLabelProps = {
-      backgroundColor: COLORS.grey30,
-      iconColor: COLORS.grey60,
-      textColor: COLORS.blue60,
-      pulse: false,
-    }
-
+  ): ChipType => {
     switch (status) {
-      case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.grey30
-        StatusLabelProps.iconColor = COLORS.grey60
-        StatusLabelProps.textColor = COLORS.grey60
-        break
-      }
-      case 'holding at target': {
-        StatusLabelProps.backgroundColor = COLORS.blue30
-        StatusLabelProps.iconColor = COLORS.blue60
-        break
-      }
-      case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.yellow30
-        StatusLabelProps.iconColor = COLORS.yellow60
-        StatusLabelProps.textColor = COLORS.yellow60
-        break
-      }
+      case 'idle':
+        return "neutral"
+
+      case 'holding at target':
       case 'heating':
       case 'cooling':
       case 'slowing down':
-      case 'speeding up': {
-        StatusLabelProps.backgroundColor = COLORS.blue30 + '1A'
-        StatusLabelProps.iconColor = COLORS.blue60
-        StatusLabelProps.pulse = true
-        break
-      }
-    }
+      case 'speeding up':
+        return "info"
 
-    return StatusLabelProps
+      default:
+        return "warning"
+    }
   }
 
   const getLatchStatus = (latchStatus: LatchStatus): JSX.Element | string => {
@@ -119,9 +97,18 @@ export const HeaterShakerModuleData = (
           <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
             {t('heater')}
           </StyledText>
-          <StatusLabel
-            status={moduleData.temperatureStatus}
-            {...getStatusLabelProps(moduleData.temperatureStatus)}
+          <Chip
+            text={moduleData.temperatureStatus}
+            chipSize="small"
+            type={getStatusChipType(moduleData.temperatureStatus)}
+            hasIcon={true}
+            pulseIcon={
+              moduleData.temperatureStatus === 'cooling' ||
+              moduleData.temperatureStatus === 'heating'
+            }
+            iconName="connection-status"
+            textTransform="capitalize"
+            data-testid="tempStatus"
           />
           <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
             <StyledText
@@ -150,11 +137,19 @@ export const HeaterShakerModuleData = (
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('shaker')}
         </StyledText>
-        <StatusLabel
-          status={moduleData.speedStatus}
-          {...getStatusLabelProps(moduleData.speedStatus)}
+        <Chip
+          text={moduleData.speedStatus}
+          chipSize="small"
+          type={getStatusChipType(moduleData.speedStatus)}
+          hasIcon={true}
+          pulseIcon={
+            moduleData.speedStatus === 'speeding up' ||
+            moduleData.speedStatus === 'slowing down'
+          }
+          iconName="connection-status"
+          textTransform="capitalize"
+          data-testid="shakerStatus"
         />
-
         <StyledText
           title="shaker_target_speed"
           css={MODULE_INFO_DETAIL_TEXT_STYLE}

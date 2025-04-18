@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, COLORS, Flex, Chip, ChipType } from '@opentrons/components'
-import { StatusLabel } from '/app/atoms/StatusLabel'
+import { StyledText, Flex, Chip, ChipType } from '@opentrons/components'
 
 import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
 import {
