@@ -2654,7 +2654,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def measure_liquid_height(self, well: labware.Well) -> LiquidTrackingType:
         """Check the height of the liquid within a well.
 
-        :returns: The height, in mm, of the liquid from the deck.
+        :returns: The height, in mm, of the liquid from the bottom of the well.
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
