@@ -114,7 +114,7 @@ export const TimelineToolbox = ({
     }
   }
 
-  const name =
+  const name: string =
     protocolName != null && protocolName !== ''
       ? protocolName
       : t('protocol_overview:untitled_protocol')
@@ -141,7 +141,7 @@ export const TimelineToolbox = ({
               <StyledText desktopStyle="bodyDefaultRegular" width="max-content">
                 {isSidebarWidthSmall
                   ? truncateString(
-                      t('back_to_overview'),
+                      t('back_to_overview') as string,
                       Math.floor(sidebarWidth / 10),
                       true
                     )

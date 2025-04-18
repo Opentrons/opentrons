@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { Fragment, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,7 +9,7 @@ import {
   DeckFromLayers,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_FLEX_START,
+  JUSTIFY_FLEX_END,
   ListItem,
   ListItemCustomize,
   Module,
@@ -30,29 +30,26 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getHasGen1MultiChannelPipette } from '../../step-forms'
-import { getDisableModuleRestrictions } from '../../feature-flags/selectors'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
-import {
-  getSlotsWithCollisions,
-  ModuleEmptySelectorButtons,
-} from '../../components/organisms'
-import { createModule } from '../../step-forms/actions'
-import { ModuleDiagram } from '../Onboarding/ModuleDiagram'
-import { FixedTrashText } from '../../components/molecules'
-import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../modules'
-import { SlotWarning } from '../Designer/DeckSetup/SlotWarning'
+import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
+import { useKitchen } from '../Kitchen/hooks'
+import { getSlotsWithCollisions, ModuleEmptySelectorButtons } from '..'
+import { createModule } from '../../../step-forms/actions'
+import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
+import { FixedTrashText } from '../../molecules'
+import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../modules'
+import { SlotWarning } from '../../../pages/Designer/DeckSetup/SlotWarning'
 import {
   DEFAULT_SLOT_MAP_OT2,
   OT2_SUPPORTED_MODULE_MODELS,
-} from '../Onboarding/constants'
+} from '../../../pages/Onboarding/constants'
 import type {
   AddressableAreaName,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { OT2ModuleType } from '../Onboarding/ModuleDiagram'
-import type { ThunkDispatch } from '../../types'
+import type { OT2ModuleType } from '../../../pages/Onboarding/ModuleDiagram'
+import type { ThunkDispatch } from '../../../types'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -124,20 +121,22 @@ export function Ot2Modules(): JSX.Element {
     : []
 
   return (
-    <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap={WRAP} width="100%">
+    <Flex justifyContent={JUSTIFY_FLEX_END} flexWrap={WRAP} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="1.27"
         width="100%"
         paddingTop={SPACING.spacing120}
       >
-        <StyledText desktopStyle="headingSmallBold">
-          {t('protocol_overview:modules')}
-        </StyledText>
-        <ModuleEmptySelectorButtons
-          modules={filteredSupportedModules}
-          addModule={handleAddModule}
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+          <StyledText desktopStyle="headingSmallBold">
+            {t('protocol_overview:modules')}
+          </StyledText>
+          <ModuleEmptySelectorButtons
+            modules={filteredSupportedModules}
+            addModule={handleAddModule}
+          />
+        </Flex>
         {Object.keys(modules).length > 0 ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}

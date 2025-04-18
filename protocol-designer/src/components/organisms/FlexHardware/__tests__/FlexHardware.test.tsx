@@ -13,7 +13,7 @@ import {
 } from '../../../../step-forms/selectors'
 import { FlexHardware } from '..'
 
-vi.mock('../../../step-forms/selectors')
+vi.mock('../../../../step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof DeckConfigurator>()
   return {

@@ -85,12 +85,12 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
       }
     } else if (
       activeItem.id === HARDWARE_ID &&
-      selectedTerminalItemId == START_TERMINAL_ITEM_ID
+      selectedTerminalItemId === START_TERMINAL_ITEM_ID
     ) {
       robotState = initialRobotState
     } else if (
       activeItem.id === HARDWARE_ID &&
-      (selectedTerminalItemId == END_TERMINAL_ITEM_ID ||
+      (selectedTerminalItemId === END_TERMINAL_ITEM_ID ||
         selectedTerminalItemId === PRESAVED_STEP_ID)
     ) {
       robotState = lastValidRobotState

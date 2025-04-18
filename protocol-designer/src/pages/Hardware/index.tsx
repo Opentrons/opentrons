@@ -16,7 +16,7 @@ import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { FlexHardware } from '../../components/organisms'
-import { Ot2Modules } from './Ot2Modules'
+import { Ot2Modules } from '../../components/organisms/Ot2Modules'
 import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 
 export function Hardware(): JSX.Element {

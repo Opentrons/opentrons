@@ -10,7 +10,6 @@ import {
   START_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
   HARDWARE_ID,
-  TerminalItemId,
 } from '../steplist'
 import {
   SINGLE_STEP_SELECTION_TYPE,
@@ -22,6 +21,7 @@ import type {
   Timeline,
 } from '@opentrons/step-generation'
 import type { Selector } from '../types'
+import type { TerminalItemId } from '../steplist'
 import type { HoverableItem } from '../ui/steps/reducers'
 
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (

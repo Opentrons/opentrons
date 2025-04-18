@@ -42,7 +42,7 @@ export function HardwareStep(props: HardwareStepProps): JSX.Element {
   const isSidebarWidthSmall = sidebarWidth < 162
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const title =
+  const title: string =
     robotType === FLEX_ROBOT_TYPE ? t('deck_hardware') : t('modules')
   const hovered = useSelector(getHoveredTerminalItemId) === HARDWARE_ID
   const selected = useSelector(getSelectedTerminalItemId) === HARDWARE_ID

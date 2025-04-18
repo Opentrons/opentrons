@@ -51,6 +51,7 @@ import { DraggableSidebar } from './DraggableSidebar'
 import { TimelineEditHardware } from './TimelineEditHardware'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DeckSlot } from '../../../types'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '14.7rem'
@@ -72,6 +73,8 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const robotType = useSelector(getRobotType)
   const activeItem = useSelector(getActiveItem)
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
+  const savedStepForms = useSelector(getSavedStepForms)
+  const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -79,8 +82,6 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   >(leftString)
   // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
-
-  const savedStepForms = useSelector(getSavedStepForms)
 
   let currentStep
   if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
@@ -91,7 +92,6 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
   }
 
-  const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
   const showTimelineAlerts =
@@ -140,7 +140,13 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing24}
-            width={isZoomedIn ? '100%' : CONTENT_MAX_WIDTH}
+            width={
+              isZoomedIn ||
+              (selectedTerminalItemId === HARDWARE_ID &&
+                robotType === OT2_ROBOT_TYPE)
+                ? '90%'
+                : CONTENT_MAX_WIDTH
+            }
             justifyContent={JUSTIFY_CENTER}
             paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
             marginX="auto"
@@ -182,11 +188,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                 </Flex>
               </>
             )}
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing16}
-              height="100%"
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               {selectedTerminalItemId === HARDWARE_ID ? (
                 <TimelineEditHardware />
               ) : deckView === leftString ? (
