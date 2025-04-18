@@ -100,6 +100,13 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
     activeItem?.id !== HARDWARE_ID
   const stepDetails = currentStep?.stepDetails ?? null
 
+  let header: string = t(activeItem?.id)
+  if (currentStep != null) {
+    header = i18n.format(currentStep.stepName, 'titleCase')
+  } else if (hoveredTerminalItem === HARDWARE_ID) {
+    header = t(selectedTerminalItemId)
+  }
+
   return (
     <Flex
       backgroundColor={COLORS.grey10}
@@ -167,13 +174,8 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                   height="2.25rem"
                 >
                   <StyledText desktopStyle="headingSmallBold">
-                    {currentStep != null
-                      ? i18n.format(currentStep.stepName, 'titleCase')
-                      : hoveredTerminalItem === HARDWARE_ID
-                      ? t(selectedTerminalItemId)
-                      : t(activeItem?.id)}
+                    {header}
                   </StyledText>
-
                   <ToggleGroup
                     selectedValue={deckView}
                     leftText={leftString}

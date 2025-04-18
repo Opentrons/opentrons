@@ -22,6 +22,7 @@ import { getSlotsWithCollisions } from '../../../components/organisms/utils'
 import { getStagingAreaAddressableAreas } from '../../../utils'
 import { editSlotInfo } from '../../../labware-ingred/actions'
 import { getRobotType } from '../../../file-data/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getSlotInformation } from '../utils'
@@ -58,7 +59,6 @@ import type {
 } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
 import type { Fixture } from './constants'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup

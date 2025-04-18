@@ -9,7 +9,7 @@ import {
   DeckFromLayers,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
   ListItem,
   ListItemCustomize,
   Module,
@@ -121,7 +121,7 @@ export function Ot2Modules(): JSX.Element {
     : []
 
   return (
-    <Flex justifyContent={JUSTIFY_FLEX_END} flexWrap={WRAP} width="100%">
+    <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap={WRAP} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="1.27"
