@@ -198,9 +198,9 @@ export const duplicateLabware: (
 }
 
 interface EditSlotInfo {
-  createdModuleForSlot?: ModuleOnDeck | null
   createdLabwareForSlot?: LabwareOnDeck | null
   createdNestedLabwareForSlot?: LabwareOnDeck | null
+  createdModuleForSlot?: ModuleOnDeck | null
   preSelectedFixture?: Fixture | null
 }
 

@@ -28,7 +28,7 @@ import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getSlotInformation } from '../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
-import { HoveredItems } from './HoveredItems'
+import { HoveredItem } from './HoveredItem'
 import { SelectedHoveredItems } from './SelectedHoveredItems'
 import {
   getAdjacentLabware,
@@ -50,7 +50,6 @@ import type {
   CutoutId,
   DeckDefinition,
   DeckSlotId,
-  ModuleModel,
 } from '@opentrons/shared-data'
 import type {
   InitialDeckSetup,
@@ -58,16 +57,13 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
-import type { Fixture } from './constants'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
   hover: string | null
-  hoveredFixture: Fixture | null
   hoveredLabware: string | null
-  hoveredModule: ModuleModel | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
@@ -80,9 +76,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     addEquipment,
     deckDef,
     hover,
-    hoveredFixture,
     hoveredLabware: hoveredLabwareFromProp,
-    hoveredModule,
     selectedZoomInSlot,
     terminalItemId,
     setHover,
@@ -558,20 +552,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       <SelectedHoveredItems
         deckDef={deckDef}
         robotType={robotType}
-        hoveredFixture={hoveredFixture}
         hoveredLabware={hoveredLabwareFromProp}
-        hoveredModule={hoveredModule}
         slotPosition={slotPosition}
       />
 
-      {/* hovered hardware + labware */}
-      <HoveredItems
+      {/* hovered  labware */}
+      <HoveredItem
         hoveredSlotPosition={slotPosition}
-        deckDef={deckDef}
-        robotType={robotType}
-        hoveredFixture={hoveredFixture}
         hoveredLabware={hoveredLabwareFromProp}
-        hoveredModule={hoveredModule}
       />
 
       {/* slot overflow menu */}
