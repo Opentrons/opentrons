@@ -54,7 +54,7 @@ export function LiquidsOverflowMenu(
           ? '23.4rem'
           : SPACING.spacing12
       }
-      top={`calc(${NAV_BAR_HEIGHT_REM} + 3.1rem)`}
+      top={`calc(${NAV_BAR_HEIGHT_REM}rem + 3.1rem)`}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
