@@ -798,7 +798,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
             )
         )
 
-    def empty(self, message: str) -> None:
+    def empty(self, message: str | None) -> None:
         """Pause the protocol to remove labware from the Flex Stacker's hopper."""
         self._engine_client.execute_command(
             cmd.flex_stacker.EmptyParams(

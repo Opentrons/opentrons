@@ -428,7 +428,7 @@ class AbstractFlexStackerCore(
         """Pause the protocol to fill with a specific set of labware."""
 
     @abstractmethod
-    def empty(self, message: str) -> None:
+    def empty(self, message: str | None) -> None:
         """Pause the protocol to allow for emptying the stacker."""
 
     @abstractmethod

@@ -1332,7 +1332,7 @@ class FlexStackerContext(ModuleContext):
         self._core.fill(checked_count, checked_message)
 
     @requires_version(2, 24)
-    def fill_items(self, labware: list[Labware], message: str | None) -> None:
+    def fill_items(self, labware: list[Labware], message: str | None = None) -> None:
         """Pause the protocol to add a specific list of labware to the Flex Stacker.
 
         The ``labware`` argument must follow certain rules:
@@ -1347,7 +1347,7 @@ class FlexStackerContext(ModuleContext):
         self._core.fill_items(self._labware_to_cores(labware), message)
 
     @requires_version(2, 23)
-    def empty(self, message: str) -> None:
+    def empty(self, message: str | None = None) -> None:
         """Pause the protocol to remove labware from the Flex Stacker.
 
         :param message: A message to display in the Opentrons App to note what should be removed from
