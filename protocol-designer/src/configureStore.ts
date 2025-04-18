@@ -99,13 +99,18 @@ export function configureStore(): StoreType {
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
 
-  global.enablePrereleaseMode = () => {
-    store.dispatch({
-      type: 'SET_FEATURE_FLAGS',
-      payload: {
-        PRERELEASE_MODE: true,
-      },
-    })
+  if (process.env.NODE_ENV !== 'production') {
+    global.enablePrereleaseMode = () => {
+      console.log('Enabling Prerelease Mode (Development Only)')
+      store.dispatch({
+        type: 'SET_FEATURE_FLAGS',
+        payload: {
+          PRERELEASE_MODE: true,
+        },
+      })
+    }
+  } else {
+    console.log('Prerelease Mode can only be enabled in development builds.')
   }
 
   return store
