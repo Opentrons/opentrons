@@ -1,3 +1,4 @@
+import { CUSTOM_LABWARE_DICT_NAME } from '@opentrons/step-generation'
 import { migration } from './migration'
 import { selectors as fileDataSelectors } from '../file-data'
 import { saveFile, savePythonFile } from './utils'
@@ -89,9 +90,11 @@ export const loadProtocolFile = (
           const designerApplicationString = designerApplication[1]
           const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
 
-          const customLabware = result.match(
-            /=\s*json\.loads\s*\("""([\s\S]*?)"""\)/m
+          const customLabwareRegex = new RegExp(
+            `^${CUSTOM_LABWARE_DICT_NAME}\\s*=\\s*json.loads\\("""(.*)"""\\)`,
+            'm'
           )
+          const customLabware = result.match(customLabwareRegex)
           let customLabwareJson
           if (customLabware != null && customLabware[1]) {
             const customLabwareString = customLabware[1]
