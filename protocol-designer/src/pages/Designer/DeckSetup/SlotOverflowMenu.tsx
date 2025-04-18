@@ -144,7 +144,7 @@ export function SlotOverflowMenu(
   const nestedLabwareOnSlot = Object.values(deckSetupLabware).find(
     lw => lw.slot === labwareOnSlot?.id
   )
-  const hasNoItems = labwareOnSlot == null && nestedLabwareOnSlot == null
+  const hasNoItem = labwareOnSlot == null && nestedLabwareOnSlot == null
 
   const isStagingSlot = FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
     location as AddressableAreaName
@@ -221,15 +221,28 @@ export function SlotOverflowMenu(
     liquidLocations[nickNameId] != null &&
     Object.keys(liquidLocations[nickNameId]).length > 0
 
+  const handleConfirmDeleteEntityInUseModal = (): void => {
+    handleClear()
+    setShowMenuList(false)
+    setShowDeleteEntityInUseModal(false)
+  }
+
+  const handleClearLabware = (e: MouseEvent): void => {
+    if (isLabwareOnSlotInUse) {
+      setShowDeleteEntityInUseModal(true)
+      e.preventDefault()
+      e.stopPropagation()
+    } else {
+      handleClear()
+      setShowMenuList(false)
+    }
+  }
+
   const slotOverflowBody = (
     <>
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
         <ConfirmDeleteEntityInUseModal
-          onConfirm={() => {
-            handleClear()
-            setShowMenuList(false)
-            setShowDeleteEntityInUseModal(false)
-          }}
+          onConfirm={handleConfirmDeleteEntityInUseModal}
           onClose={() => {
             setShowDeleteEntityInUseModal(false)
           }}
@@ -278,7 +291,7 @@ export function SlotOverflowMenu(
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
-            {hasNoItems ? t('add_labware') : t('edit_labware')}
+            {hasNoItem ? t('add_labware') : t('edit_labware')}
           </StyledText>
         </MenuItem>
         {canRenameLabwareAndEditLiquids ? (
@@ -318,16 +331,9 @@ export function SlotOverflowMenu(
         ) : null}
         <Divider marginY="0" />
         <MenuItem
-          disabled={hasNoItems && !isStagingSlot}
+          disabled={hasNoItem && !isStagingSlot}
           onClick={(e: MouseEvent) => {
-            if (isLabwareOnSlotInUse) {
-              setShowDeleteEntityInUseModal(true)
-              e.preventDefault()
-              e.stopPropagation()
-            } else {
-              handleClear()
-              setShowMenuList(false)
-            }
+            handleClearLabware(e)
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">

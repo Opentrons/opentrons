@@ -32,13 +32,11 @@ import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { FixedTrashText } from '../../../components/molecules'
+import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupDetails } from './DeckSetupDetails'
-import {
-  DECK_SETUP_TOOLS_WIDTH_REM,
-  DeckSetupToolbox,
-} from './DeckSetupToolbox'
+import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
@@ -57,7 +55,7 @@ import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60
-const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem' // for Protocol Steps
+const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',

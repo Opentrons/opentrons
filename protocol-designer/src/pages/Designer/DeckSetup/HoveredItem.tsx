@@ -12,9 +12,7 @@ interface HoveredLabwareProps {
   hoveredLabware: string | null
   hoveredSlotPosition: CoordinateTuple | null
 }
-export const HoveredItems = (
-  props: HoveredLabwareProps
-): JSX.Element | null => {
+export const HoveredItem = (props: HoveredLabwareProps): JSX.Element | null => {
   const { hoveredLabware, hoveredSlotPosition } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedModuleModel, selectedLabwareDefUri } = selectedSlotInfo

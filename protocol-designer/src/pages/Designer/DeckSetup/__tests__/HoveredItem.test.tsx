@@ -6,7 +6,7 @@ import { LabwareRender } from '@opentrons/components'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getSelectedTerminalItemId } from '../../../../ui/steps'
-import { HoveredItems } from '../HoveredItems'
+import { HoveredItem } from '../HoveredItem'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
@@ -22,12 +22,12 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const render = (props: ComponentProps<typeof HoveredItems>) => {
-  return renderWithProviders(<HoveredItems {...props} />)[0]
+const render = (props: ComponentProps<typeof HoveredItem>) => {
+  return renderWithProviders(<HoveredItem {...props} />)[0]
 }
 
-describe('HoveredItems', () => {
-  let props: ComponentProps<typeof HoveredItems>
+describe('HoveredItem', () => {
+  let props: ComponentProps<typeof HoveredItem>
 
   beforeEach(() => {
     props = {

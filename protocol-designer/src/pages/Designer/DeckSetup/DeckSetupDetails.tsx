@@ -27,7 +27,7 @@ import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getSlotInformation } from '../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
-import { HoveredItems } from './HoveredItems'
+import { HoveredItem } from './HoveredItem'
 import { SelectedHoveredItems } from './SelectedHoveredItems'
 import {
   getAdjacentLabware,
@@ -553,7 +553,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       />
 
       {/* hovered  labware */}
-      <HoveredItems
+      <HoveredItem
         hoveredSlotPosition={slotPosition}
         hoveredLabware={hoveredLabwareFromProp}
       />

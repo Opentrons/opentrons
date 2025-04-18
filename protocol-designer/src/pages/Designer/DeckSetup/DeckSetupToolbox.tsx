@@ -26,6 +26,7 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../components/atoms'
+import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { ConfirmDeleteEntityInUseModal } from '../../../components/organisms'
 import { getSlotInformation } from '../utils'
@@ -41,7 +42,6 @@ interface DeckSetupToolsProps {
 }
 
 export type CategoryExpand = Record<string, boolean>
-export const DECK_SETUP_TOOLS_WIDTH_REM = 21.875
 
 export function DeckSetupToolbox(
   props: DeckSetupToolsProps
@@ -214,19 +214,42 @@ export function DeckSetupToolbox(
           top: `calc(${NAV_BAR_HEIGHT_REM}rem + ${SPACING.spacing12})`,
         }
       : {}
+
+  const handleConfirmDeleteEntityInUseModal = (): void => {
+    if (showDeleteEntityInUseModal === 'confirm') {
+      handleConfirm()
+    } else {
+      handleClear()
+      handleResetToolbox()
+    }
+    setShowDeleteEntityInUseModal(null)
+  }
+  const handleClose = (): void => {
+    onCloseClick()
+    dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
+    handleResetToolbox()
+  }
+  const handleConfirmSelection = (): void => {
+    if (isLabwareOnSlotInUse) {
+      setShowDeleteEntityInUseModal('confirm')
+    } else {
+      handleConfirm()
+    }
+  }
+  const handleClearSelection = (): void => {
+    if (isLabwareOnSlotInUse) {
+      setShowDeleteEntityInUseModal('clear')
+    } else {
+      handleClear()
+      handleResetToolbox()
+    }
+  }
+
   return (
     <>
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal != null ? (
         <ConfirmDeleteEntityInUseModal
-          onConfirm={() => {
-            if (showDeleteEntityInUseModal === 'confirm') {
-              handleConfirm()
-            } else {
-              handleClear()
-              handleResetToolbox()
-            }
-            setShowDeleteEntityInUseModal(null)
-          }}
+          onConfirm={handleConfirmDeleteEntityInUseModal}
           onClose={() => {
             setShowDeleteEntityInUseModal(null)
           }}
@@ -256,14 +279,7 @@ export function DeckSetupToolbox(
         }
         secondaryHeaderButton={
           <Btn
-            onClick={() => {
-              if (isLabwareOnSlotInUse) {
-                setShowDeleteEntityInUseModal('clear')
-              } else {
-                handleClear()
-                handleResetToolbox()
-              }
-            }}
+            onClick={handleClearSelection}
             css={LINK_BUTTON_STYLE}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
@@ -273,18 +289,8 @@ export function DeckSetupToolbox(
           </Btn>
         }
         closeButton={<Icon size="2rem" name="close" />}
-        onCloseClick={() => {
-          onCloseClick()
-          dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
-          handleResetToolbox()
-        }}
-        onConfirmClick={() => {
-          if (isLabwareOnSlotInUse) {
-            setShowDeleteEntityInUseModal('confirm')
-          } else {
-            handleConfirm()
-          }
-        }}
+        onCloseClick={handleClose}
+        onConfirmClick={handleConfirmSelection}
         confirmButtonText={t('done')}
       >
         <LabwareTools
