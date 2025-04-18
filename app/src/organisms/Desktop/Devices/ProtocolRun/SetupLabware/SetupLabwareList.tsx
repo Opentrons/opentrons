@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getLabwareInfoByLiquidId,
@@ -40,10 +40,14 @@ export function SetupLabwareList(
     slotName: string
     stack: StackItem[]
   } | null>(null)
-  const startingDeck = getStackedItemsOnStartingDeck(
-    protocolAnalysis?.commands ?? [],
-    protocolAnalysis?.labware ?? [],
-    protocolAnalysis?.modules ?? []
+  const startingDeck = useMemo(
+    () =>
+      getStackedItemsOnStartingDeck(
+        protocolAnalysis?.commands ?? [],
+        protocolAnalysis?.labware ?? [],
+        protocolAnalysis?.modules ?? []
+      ),
+    [protocolAnalysis]
   )
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     protocolAnalysis?.commands ?? []

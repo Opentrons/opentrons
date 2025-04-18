@@ -16,7 +16,6 @@ import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
-import { getDesignerTab } from '../../../file-data/selectors'
 import { LabwareLabel } from '../LabwareLabel'
 import { ModuleLabel } from './ModuleLabel'
 import { FixtureRender } from './FixtureRender'
@@ -53,7 +52,6 @@ const SLOTS = [
 export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
   const { robotType, deckDef } = props
   const { t } = useTranslation('application')
-  const tab = useSelector(getDesignerTab)
   const { labware, modules, additionalEquipmentOnDeck } = useSelector(
     getDeckSetupForActiveItem
   )
@@ -277,7 +275,6 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         }
         items.push(
           <DeckItemHighlight
-            tab={tab}
             slotBoundingBox={addressableArea.boundingBox}
             slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
             itemId={addressableArea.id}

@@ -14,6 +14,7 @@ export function MoveLabwareField(props: FieldProps): JSX.Element {
       {...props}
       options={options}
       title={t('select_labware')}
+      width="100%"
       onEnter={(id: string) => {
         dispatch(hoverSelection({ id, text: t('application:select') }))
       }}

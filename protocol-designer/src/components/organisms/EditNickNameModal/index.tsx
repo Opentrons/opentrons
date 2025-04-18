@@ -27,7 +27,7 @@ interface EditNickNameModalProps {
 }
 export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
   const { onClose, labwareId } = props
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const nickNames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
   const savedNickname = nickNames[labwareId]

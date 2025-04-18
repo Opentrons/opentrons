@@ -18,6 +18,7 @@ import { getMainPagePortalEl } from './Portal'
 
 interface ResetSettingsModalProps {
   tab: 'aspirate' | 'dispense'
+  onContinue: () => void
   onClose: () => void
   onScroll: () => void
   liquidClass?: string | null
@@ -25,15 +26,14 @@ interface ResetSettingsModalProps {
 export function ResetSettingsModal(
   props: ResetSettingsModalProps
 ): JSX.Element {
-  const { tab, liquidClass, onClose, onScroll } = props
+  const { tab, liquidClass, onContinue, onClose, onScroll } = props
   const { t, i18n } = useTranslation('protocol_steps')
 
-  // TODO: Update to check liquidClass !== 'none' for Don't use a liquid class
   const isLiquidClassSelected = liquidClass !== null && liquidClass !== ''
   const liquidClassName = getLiquidClassDisplayName(String(liquidClass))
 
   const handleContinue = (): void => {
-    console.log('TODO: Wire up reset settings modal.')
+    onContinue()
     onClose()
     onScroll()
   }

@@ -20,6 +20,7 @@ import {
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
 import {
+  getAdditionalEquipmentEntities,
   getInvariantContext,
   getLabwareEntities,
   getPipetteEntities,
@@ -51,6 +52,7 @@ import type { StepInputFieldProps } from './MultiInputField'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { FormData, StepFieldName } from '../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../steplist'
+import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
 
 const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
   `${prefix}_${fieldName}`
@@ -74,7 +76,11 @@ export const SecondStepsMoveLiquidTools = ({
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
-  const labwares = useSelector(getLabwareEntities)
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
@@ -95,7 +101,7 @@ export const SecondStepsMoveLiquidTools = ({
   const destinationLabwareType =
     formData.dispense_labware != null
       ? getTrashOrLabware(
-          labwares,
+          labwareEntities,
           wasteChuteEntities,
           trashBinEntities,
           formData.dispense_labware as string
@@ -147,7 +153,7 @@ export const SecondStepsMoveLiquidTools = ({
       {
         fieldTitle: t('protocol_steps:delay_duration'),
         fieldKey: `${tab}_${type}_delay_seconds`,
-        units: 'application:units.seconds',
+        units: 'application:units.seconds_long',
         errorToShow: getFormLevelError(
           `${tab}_${type}_delay_seconds`,
           mappedErrorsToField
@@ -169,7 +175,7 @@ export const SecondStepsMoveLiquidTools = ({
             ? Number(formData.disposalVolume_volume)
             : 0,
         pipetteSpecs: pipetteSpec,
-        labwareEntities: labwares,
+        labwareEntities: labwareEntities,
         tiprackDefUri: formData.tipRack,
       }),
     [
@@ -181,7 +187,9 @@ export const SecondStepsMoveLiquidTools = ({
   )
   const minXYDimension = isDestinationTrash
     ? null
-    : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
+    : getMinXYDimension(labwareEntities[formData[`${tab}_labware`]]?.def, [
+        'A1',
+      ])
   const minRadiusForTouchTip =
     minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
@@ -199,6 +207,16 @@ export const SecondStepsMoveLiquidTools = ({
       {showResetModal ? (
         <ResetSettingsModal
           tab={tab}
+          onContinue={() => {
+            updateFieldsForLiquidClass({
+              propsForFields,
+              rawForm: formData,
+              pipetteEntities,
+              labwareEntities,
+              additionalEquipmentEntities,
+              liquidHandlingAction: tab,
+            })
+          }}
           onClose={() => {
             setShowResetModal(false)
           }}
@@ -581,7 +599,6 @@ export const SecondStepsMoveLiquidTools = ({
           <ResetSettingsField
             tab={tab}
             onClick={() => {
-              console.log('TODO: wire up onClick handler')
               setShowResetModal(true)
             }}
           />

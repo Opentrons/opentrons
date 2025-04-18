@@ -10,9 +10,10 @@ import {
 import { LabwareRender, Module } from '@opentrons/components'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getDesignerTab } from '../../../../file-data/selectors'
+import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { FixtureRender } from '../FixtureRender'
 import { HoveredItems } from '../HoveredItems'
+import { ModuleLabel } from '../ModuleLabel'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
@@ -20,7 +21,8 @@ import type * as OpentronsComponents from '@opentrons/components'
 vi.mock('../FixtureRender')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('../ModuleLabel')
+vi.mock('../../../../ui/steps')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
@@ -57,7 +59,8 @@ describe('HoveredItems', () => {
     vi.mocked(FixtureRender).mockReturnValue(<div>mock FixtureRender</div>)
     vi.mocked(LabwareRender).mockReturnValue(<div>mock LabwareRender</div>)
     vi.mocked(Module).mockReturnValue(<div>mock Module</div>)
-    vi.mocked(getDesignerTab).mockReturnValue('startingDeck')
+    vi.mocked(ModuleLabel).mockReturnValue(<div>mock ModuleLabel</div>)
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
   })
   it('renders a hovered fixture', () => {
     render(props)
@@ -75,6 +78,6 @@ describe('HoveredItems', () => {
     props.hoveredModule = TEMPERATURE_MODULE_V2
     render(props)
     screen.getByText('mock Module')
-    screen.getByText('Temperature Module GEN2')
+    screen.getByText('mock ModuleLabel')
   })
 })

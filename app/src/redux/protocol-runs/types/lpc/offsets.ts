@@ -1,6 +1,7 @@
 import type {
   ANY_LOCATION,
   LabwareOffsetLocationSequence,
+  StoredLabwareOffset,
   VectorOffset,
 } from '@opentrons/api-client'
 import type {
@@ -122,3 +123,5 @@ interface WorkingBaseOffset {
   finalPosition: VectorOffset | null
   confirmedVector: VectorOffset | 'RESET_TO_DEFAULT' | null
 }
+
+export type SavedOffsets = [StoredLabwareOffset[], StoredLabwareOffset[]] // tuple of [updatedOffsets, deletedOffsets]

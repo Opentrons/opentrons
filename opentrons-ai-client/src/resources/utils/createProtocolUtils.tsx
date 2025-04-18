@@ -1,7 +1,9 @@
 import startCase from 'lodash/startCase'
 import {
+  getFlexNameConversion,
   getLabwareDisplayName,
   getPipetteSpecsV2,
+  splitLabwareDefURI,
 } from '@opentrons/shared-data'
 import type { PipetteName } from '@opentrons/shared-data'
 import { OTHER } from '../../organisms/ApplicationSection'
@@ -263,7 +265,6 @@ export function generateChatPrompt(
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
   ) => void
 ): string {
-  const defs = getOnlyLatestDefs()
 
   const protocolFormat = `- ${startCase(values.protocol_format)}`
 
@@ -272,19 +273,58 @@ export function generateChatPrompt(
     values.application.scientificApplication
   )}`
   const description = `- ${values.application.description}`
+
+  // we need to do this nonsense to convert pipette names to api load names
+  // this data does not yet live in  pipette defs, but hopefully aill within 6 months
+  // of writing this comment. https://opentrons.atlassian.net/browse/EXEC-1426
+  let leftPipetteApiLoadName: string | null = null
+  let rightPipetteApiLoadName: string | null = null
+
+  const leftPipetteName = values.instruments.leftPipette
+  const rightPipetteName = values.instruments.rightPipette
+
+  if (leftPipetteName && leftPipetteName !== NO_PIPETTES) {
+    const leftPipetteSpecs = getPipetteSpecsV2(leftPipetteName as PipetteName)
+    if (leftPipetteSpecs != null) {
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
+      }
+    }
+  }
+  if (rightPipetteName && rightPipetteName !== NO_PIPETTES) {
+    const rightPipetteSpecs = getPipetteSpecsV2(rightPipetteName as PipetteName)
+    if (rightPipetteSpecs != null) {
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
+      }
+    }
+  }
+  const leftPipettePromptName =
+    leftPipetteApiLoadName ?? values.instruments.leftPipette
+  const rightPipettePromptName =
+    rightPipetteApiLoadName ?? values.instruments.rightPipette
+
+  const mounts: string[] =
+    values.instruments.pipettes === TWO_PIPETTES
+      ? [
+          values.instruments.leftPipette !== NO_PIPETTES
+            ? `left pipette ${leftPipettePromptName}`
+            : '',
+          values.instruments.rightPipette !== NO_PIPETTES
+            ? `right pipette ${rightPipettePromptName}`
+            : '',
+        ].filter(Boolean)
+      : [values.instruments.pipettes]
+
   const pipetteMounts =
     values.instruments.pipettes === TWO_PIPETTES
       ? [
           values.instruments.leftPipette !== NO_PIPETTES &&
-            `- ${
-              getPipetteSpecsV2(values.instruments.leftPipette as PipetteName)
-                ?.displayName
-            } ${t('mounted_left')}`,
+            `- ${leftPipettePromptName} ${t('mounted_left')}`,
           values.instruments.rightPipette !== NO_PIPETTES &&
-            `- ${
-              getPipetteSpecsV2(values.instruments.rightPipette as PipetteName)
-                ?.displayName
-            } ${t('mounted_right')}`,
+            `- ${rightPipettePromptName} ${t('mounted_right')}`,
         ]
           .filter(Boolean)
           .join('\n')
@@ -297,15 +337,15 @@ export function generateChatPrompt(
   const modules = values.modules
     .map(
       module =>
-        `- ${module.name}${
-          module.adapter?.name != null ? ` with ${module.adapter.name}` : ''
+        `- ${module.model}${
+          module.adapter?.name != null ? ` with ${module.adapter.value}` : ''
         }`
     )
     .join('\n')
   const labwares = values.labwares
     .map(
       labware =>
-        `- ${getLabwareDisplayName(defs[labware.labwareURI])} x ${
+        `- ${splitLabwareDefURI(labware.labwareURI).loadName} x ${
           labware.count
         }`
     )
@@ -326,18 +366,6 @@ export function generateChatPrompt(
   )}:\n${modules}\n\n${t('labware_section_title')}:\n${labwares}\n\n${t(
     'liquid_section_title'
   )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
-
-  const mounts: string[] =
-    values.instruments.pipettes === TWO_PIPETTES
-      ? [
-          values.instruments.leftPipette !== NO_PIPETTES
-            ? `left pipette ${values.instruments.leftPipette}`
-            : '',
-          values.instruments.rightPipette !== NO_PIPETTES
-            ? `right pipette ${values.instruments.rightPipette}`
-            : '',
-        ].filter(Boolean)
-      : [values.instruments.pipettes]
 
   setCreateProtocolChatAtom({
     prompt,

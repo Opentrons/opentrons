@@ -5,8 +5,9 @@ import type {
   LPCStep,
   LPCWizardState,
   OffsetLocationDetails,
+  SavedOffsets,
 } from '/app/redux/protocol-runs/types/lpc'
-import type { StoredLabwareOffset, VectorOffset } from '@opentrons/api-client'
+import type { VectorOffset } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export interface PositionParams {
@@ -88,7 +89,7 @@ export interface ResetLocationSpecificOffsetToDefaultAction {
 
 export interface ApplyWorkingOffsetsAction {
   type: 'APPLY_WORKING_OFFSETS'
-  payload: { runId: string; saveResult: StoredLabwareOffset[] }
+  payload: { runId: string; saveResult: SavedOffsets }
 }
 
 export interface ProceedHandleLwSubstepAction {
@@ -121,6 +122,11 @@ export interface UpdateConflictTimestampAction {
   payload: { runId: string; info: ConflictTimestampInfo }
 }
 
+export interface ToggleDefaultOffsetInfoBanner {
+  type: 'TOGGLE_DEFAULT_OFFSET_INFO_BANNER'
+  payload: { runId: string }
+}
+
 export type LPCWizardAction =
   | UpdateLPCAction
   | UpdateLPCDeckAction
@@ -141,3 +147,4 @@ export type LPCWizardAction =
   | SourceOffsetsFromRunAction
   | SourceOffsetsFromDatabaseAction
   | UpdateConflictTimestampAction
+  | ToggleDefaultOffsetInfoBanner

@@ -132,6 +132,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         // give the outside of the base fixture svgs a stroke for extra spacing
         <g key={cutout.id} stroke={COLORS.white} strokeWidth="4">
           <SingleSlotFixture
+            data-testid={cutout.id}
             cutoutId={cutout.id}
             deckDefinition={deckDef}
             slotClipColor={COLORS.transparent}
@@ -142,6 +143,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {stagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <StagingAreaConfigFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -154,6 +156,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {emptyCutouts.map(({ cutoutId }) => (
         <EmptyConfigFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
@@ -162,6 +165,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {wasteChuteFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <WasteChuteConfigFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -174,6 +178,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {wasteChuteStagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <WasteChuteConfigFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -187,6 +192,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {trashBinFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <TrashBinConfigFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -199,6 +205,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {temperatureModuleFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <TemperatureModuleFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -211,6 +218,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {heaterShakerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <HeaterShakerFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -223,6 +231,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {magneticBlockFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <MagneticBlockFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -239,6 +248,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {thermocyclerFixtures.map(({ cutoutId, cutoutFixtureId }) => {
         return (
           <ThermocyclerFixture
+            data-testid={cutoutId}
             key={cutoutId}
             deckDefinition={deckDef}
             handleClickRemove={
@@ -258,6 +268,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       })}
       {absorbanceReaderFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <AbsorbanceReaderFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -270,6 +281,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {flexStackerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <FlexStackerFixture
+          data-testid={cutoutId}
           key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={
@@ -283,6 +295,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {additionalStaticFixtures?.map(staticFixture => (
         <StaticFixture
+          data-testid={staticFixture.location}
           key={staticFixture.location}
           deckDefinition={deckDef}
           label={staticFixture.label}

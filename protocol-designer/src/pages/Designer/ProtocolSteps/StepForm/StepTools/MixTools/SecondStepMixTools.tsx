@@ -16,6 +16,13 @@ import {
   InputStepFormField,
 } from '../../../../../../components/molecules'
 import {
+  getAdditionalEquipmentEntities,
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../../../../step-forms/selectors'
+import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
+import { getMaxPushOutVolume } from '../../../../../../utils'
+import {
   BlowoutLocationField,
   BlowoutOffsetField,
   FlowRateField,
@@ -52,6 +59,11 @@ export function SecondStepMixTools({
   const { t, i18n } = useTranslation(['application', 'form'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const aspirateTab = {
     text: i18n.format(t('aspirate'), 'capitalize'),
@@ -78,11 +90,27 @@ export function SecondStepMixTools({
     }
   }
 
+  const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
+  const maxPushoutVolume = getMaxPushOutVolume(
+    Number(formData.volume),
+    pipetteSpec
+  )
+
   return (
     <>
       {showResetModal ? (
         <ResetSettingsModal
           tab={tab}
+          onContinue={() => {
+            updateFieldsForLiquidClass({
+              propsForFields,
+              rawForm: formData,
+              pipetteEntities,
+              labwareEntities,
+              additionalEquipmentEntities,
+              liquidHandlingAction: tab,
+            })
+          }}
           onClose={() => {
             setShowResetModal(false)
           }}
@@ -134,6 +162,7 @@ export function SecondStepMixTools({
               zField="mix_mmFromBottom"
               xField="mix_x_position"
               yField="mix_y_position"
+              referenceField="mix_position_reference"
               labwareId={
                 formData[getLabwareFieldForPositioningField('mix_mmFromBottom')]
               }
@@ -144,7 +173,7 @@ export function SecondStepMixTools({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`0 ${SPACING.spacing16}`}
-          gridGap={SPACING.spacing8}
+          gridGap={SPACING.spacing4}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('protocol_steps:advanced_settings')}
@@ -173,6 +202,33 @@ export function SecondStepMixTools({
           </CheckboxExpandStepFormField>
           {tab === 'dispense' ? (
             <>
+              <CheckboxExpandStepFormField
+                title={i18n.format(
+                  t('form:step_edit_form.field.pushOut.title'),
+                  'capitalize'
+                )}
+                fieldProps={propsForFields.pushOut_checkbox}
+              >
+                {formData.pushOut_checkbox === true ? (
+                  <InputStepFormField
+                    showTooltip={false}
+                    padding="0"
+                    title={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.label'
+                    )}
+                    caption={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.caption',
+                      { min: 0, max: maxPushoutVolume }
+                    )}
+                    {...propsForFields.pushOut_volume}
+                    units={t('application:units.microliter')}
+                    errorToShow={getFormLevelError(
+                      'pushOut_volume',
+                      mappedErrorsToField
+                    )}
+                  />
+                ) : null}
+              </CheckboxExpandStepFormField>
               <CheckboxExpandStepFormField
                 title={i18n.format(
                   t('form:step_edit_form.field.blowout.label'),
@@ -244,7 +300,6 @@ export function SecondStepMixTools({
           <ResetSettingsField
             tab={tab}
             onClick={() => {
-              console.log('TODO: wire up onClick handler')
               setShowResetModal(true)
             }}
           />

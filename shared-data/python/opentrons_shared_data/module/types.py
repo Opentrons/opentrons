@@ -99,6 +99,11 @@ class GripperOffsets(TypedDict):
     dropOffset: NamedOffset
 
 
+class TOFSensorBaseline(TypedDict):
+    X: Dict[int, List[float]]
+    Z: Dict[int, List[float]]
+
+
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
 ModuleDefinitionV3 = TypedDict(
     "ModuleDefinitionV3",
@@ -115,6 +120,7 @@ ModuleDefinitionV3 = TypedDict(
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
+        "uniqueModuleData": Dict[str, Any],
         "incompatibleWithDecks": List[str],
         "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],

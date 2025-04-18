@@ -32,12 +32,10 @@ export function useRecoveryOptionCopy(): (
         return t('retry_with_new_tips')
       case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
         return t('retry_with_same_tips')
-      case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
-        if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
-          return t('clear_obstruction_in_stacker_and_skip_to_next_step')
-        } else {
-          return t('manually_fill_well_and_skip')
-        }
+      case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
+        return t('manually_fill_well_and_retry_same_tips')
+      case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+        return t('manually_fill_well_and_retry_new_tips')
       case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
         return t('ignore_error_and_skip')
       case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
@@ -50,8 +48,13 @@ export function useRecoveryOptionCopy(): (
         return t('manually_replace_lw_and_retry')
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('clear_obstruction_in_stacker_and_retry_step')
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+        return t('load_labware_into_stacker_and_retry_step')
       case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return t('manually_load_labware_into_labware_shuttle_and_skip_step')
+      case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+        return t('load_labware_shuttle_and_retry_step')
       default:
         return 'Unknown action'
     }

@@ -56,3 +56,24 @@ Type is the same as in `1.0.0`, but the number represented by `touchTipAspirate`
 touchTipAspirate = -(sourceWellHeight - prevTouchTipAspirate)
 touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 ```
+
+## [WIP] Version 1.2.0
+
+Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
+
+```ts
+export interface QuickTransferWizardState {
+  pipette?: PipetteV2Specs
+  mount?: Mount
+  tipRack?: LabwareDefinition2
+  source?: LabwareDefinition2
+  sourceWells?: string[]
+  destination?: LabwareDefinition2 | 'source'
+  destinationWells?: string[]
+  transferType?: TransferType
+  volume?: number
+  path?: PathOption // this has been added
+  changeTip?: ChangeTipOptions // this has been added
+  dropTipLocation?: CutoutConfig // this has been added
+}
+```

@@ -340,7 +340,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Calibration needed')
     })
 
@@ -364,7 +364,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
 
@@ -397,13 +397,13 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
       render()
-      const moduleSetup = screen.getByText('Deck hardware')
+      const moduleSetup = screen.getByText('Deck Hardware')
       fireEvent.click(moduleSetup)
       screen.getByText('Mock SetupModules')
     })
@@ -415,7 +415,7 @@ describe('ProtocolRunSetup', () => {
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required modules.')
       screen.getByText('Labware & Liquids')
@@ -448,7 +448,7 @@ describe('ProtocolRunSetup', () => {
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required module.')
       screen.getByText('Labware & Liquids')
@@ -477,7 +477,7 @@ describe('ProtocolRunSetup', () => {
       ])
       render()
 
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText(
         'Install and calibrate the required modules. Install the required fixtures.'
       )

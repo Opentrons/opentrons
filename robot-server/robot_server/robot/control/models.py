@@ -88,3 +88,6 @@ class DoorStatusModel(BaseModel):
     doorRequiredClosedForProtocol: bool = Field(
         ..., description="Whether the door must be closed to run a protcol."
     )
+    moduleSerial: str | None = Field(
+        None, description="The module serial number for the module door that is opened."
+    )

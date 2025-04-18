@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TypeVar, Optional, Union
 
 from opentrons.types import Point
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from .._liquid import Liquid
 
