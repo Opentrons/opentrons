@@ -29,6 +29,7 @@ vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/networking')
 vi.mock('/app/resources/useNotifyDataReady')
 
+// note for auto scroll to top
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 const render = (props: ComponentProps<typeof ChooseRobotSlideout>) => {
