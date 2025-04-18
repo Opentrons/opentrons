@@ -3,7 +3,7 @@ import { getFlexNameConversion } from '@opentrons/shared-data'
 import type { LiquidClass } from '@opentrons/shared-data'
 import type { QuickTransferWizardState } from '../types'
 
-interface Compatibility {
+export interface Compatibility {
   pipetteInCompatible?: boolean
   tipRackICompatible?: boolean
   pipettePathInCompatible?: boolean
@@ -24,15 +24,16 @@ export const checkLiquidClassCompatibility = (
 ): Compatibility => {
   const { liquidClassName, byPipette } = liquid
   if (liquidClassName === 'none') {
-    console.log('no liquid class')
     return { inCompatible: false }
   }
+
   if (
     state?.pipette === undefined ||
     state?.tipRack === undefined ||
     state.path === undefined ||
     state.volume === undefined
   ) {
+    console.log('state is undefined')
     return { inCompatible: true }
   }
 
