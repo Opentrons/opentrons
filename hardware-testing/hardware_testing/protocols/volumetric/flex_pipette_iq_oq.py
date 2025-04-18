@@ -10,6 +10,7 @@ from opentrons.protocol_api import (
     Well,
     LiquidClass,
 )
+from opentrons.protocol_api.labware import OutOfTipsError
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -32,11 +33,8 @@ DYE_CONFIGS = {
     "diluent": (0.1, 200.0, "#6666FF"),
 }
 
-DILUENT_RESERVOIR_BY_CHANNELS = {
-    1: "nest_12_reservoir_15ml",
-    8: "nest_12_reservoir_15ml",
-    96: "nest_1_reservoir_290ml",
-}
+DILUENT_RESERVOIR = "nest_1_reservoir_290ml"
+
 DYE_RESERVOIRS_BY_CHANNELS_AND_TIP = {
     (1, 50): (1, "nest_96_wellplate_2ml_deep"),
     (1, 200): (1, "nest_96_wellplate_2ml_deep"),
@@ -75,13 +73,12 @@ TRIALS_BY_PIPETTE_BY_TIP = {
 
 # fmt: off
 # FIXME: create plate stack, to reduce number of slots in use (and increase plates)
-# FIXME: move all tip-racks to deck-slots, so that they are accessible by pipette
-# FIXME: discuss with SW how to handle more tip-racks from off-deck (eg: stacker)
+# TODO: discuss with SW how to handle more tip-racks from off-deck (eg: stacker)
 SLOTS = {
-    "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "empty":            "A4",
-    "plate_0":      "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_3":           "B4",
-    "plate_1":      "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_2":           "C4",
-    "plate_2":      "D1",   "dye_2":    "D2",   "trash":    "D3",   "__inaccessible__": "D4",
+    "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "empty_1": "A4",
+    "plate":        "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_3":  "B4",
+    "stack_end":    "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_2":  "C4",
+    "stack_start":  "D1",   "dye_2":    "D2",   "chute":    "D3",   "empty_0": "D4",
 }
 # fmt: on
 
@@ -130,16 +127,6 @@ def add_parameters(params: ParameterContext) -> None:
             {"display_name": "ethanol_80", "value": "ethanol_80"},
             {"display_name": "legacy", "value": "legacy"},
         ],
-    )
-    params.add_bool(
-        display_name="use_gripper",
-        variable_name="use_gripper",
-        default=False,
-    )
-    params.add_bool(
-        display_name="use_waste_chute",
-        variable_name="use_waste_chute",
-        default=True,
     )
 
     well_choices = [f"{r}{c}" for c in range(1, 13) for r in "ABCDEFGH"]
@@ -204,8 +191,9 @@ def load_labware(
 ) -> Tuple[Labware, List[Labware], List[Labware]]:
     """Load and return a diluent reservoir, list of dye reservoirs, list of plates."""
     # diluent reservoir
-    load_name_diluent_reservoir = DILUENT_RESERVOIR_BY_CHANNELS[pipette.channels]
-    reservoir_diluent = ctx.load_labware(load_name_diluent_reservoir, SLOTS["diluent"])
+    reservoir_diluent = ctx.load_labware(DILUENT_RESERVOIR, SLOTS["diluent"])
+    if len(reservoir_diluent.wells()) > 1:
+        raise NotImplementedError("multiple wells in diluent reservoir not yet supported")
     reservoir_diluent.load_empty(reservoir_diluent.wells())
 
     # dye reservoir(s)
@@ -244,43 +232,34 @@ def load_liquid_diluent(
     pipette: InstrumentContext,
     reservoir: Labware,
     volumes: List[float],
-) -> Dict[float, List[Well]]:
+    tip_ul: float,
+) -> None:
     """Load diluent into wells of reservoir.
 
     Each supplied volume is matched to a diluent volume, and a total ul for
     all diluent is calculated. The total diluent (plus dead volume)
     is then loaded into consecutive wells in the reservoir.
     """
+
+    def _round_up_to(multiple_of: int = 1, value: int = 1):
+        return ((value + (multiple_of - 1)) // multiple_of) * multiple_of
+
+    trials = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
+    if pipette.channels == 1:
+        trials = [_round_up_to(multiple_of=8, value=t) for t in trials]
+    total_diluent_aspirated_ul = sum([
+        max(DYE_READER_IDEAL_UL - v, 0) * pipette.channels * t
+        for v, t in zip(volumes, trials)
+    ])
+    critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
+    assert total_diluent_aspirated_ul < critical_ul["setup_max"] - critical_ul["dead"], \
+        f"{reservoir.load_name} unable to hold {total_diluent_aspirated_ul} ul " \
+        f"(min={critical_ul['dead']}, max={critical_ul['setup_max']})"
+
     diluent = ctx.define_liquid(
         "diluent", "diluent", display_color=DYE_CONFIGS["diluent"][2]
     )
-    diluent_pip_ch = 96 if pipette.channels == 96 else 8
-    reservoir_wells = reservoir.wells()
-    critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
-    well_working_ul = critical_ul["setup_max"] - critical_ul["dead"]
-    num_aspirates_per_plate = 1 if diluent_pip_ch == 96 else 12
-
-    # count how much diluent is needed in each well before loading
-    ret: Dict[float, List[Well]] = {v: [] for v in volumes}
-    dil_ul_by_reservoir_well: Dict[Well, float] = {w: 0.0 for w in reservoir_wells}
-    current_well = reservoir_wells.pop(0)
-    for plate_ul in ret.keys():
-        diluent_per_well = max(DYE_READER_IDEAL_UL - plate_ul, 0)
-        diluent_per_aspirate = diluent_per_well * diluent_pip_ch
-        assert diluent_per_aspirate <= well_working_ul, (
-            f"diluent aspirate of {diluent_per_aspirate} ul "
-            f"is greater than well working volume {well_working_ul}"
-        )
-        max_ul_in_well = critical_ul["setup_max"] - diluent_per_aspirate
-        for _ in range(num_aspirates_per_plate):
-            if dil_ul_by_reservoir_well[current_well] > max_ul_in_well:
-                current_well = reservoir_wells.pop(0)
-            dil_ul_by_reservoir_well[current_well] += diluent_per_aspirate
-            ret[plate_ul].append(current_well)
-    for well, ul in dil_ul_by_reservoir_well.items():
-        well.load_liquid(diluent, ul + critical_ul["dead"])
-
-    return ret
+    reservoir["A1"].load_liquid(diluent, critical_ul["dead"] + total_diluent_aspirated_ul)
 
 
 def load_liquid_dye(
@@ -334,10 +313,9 @@ def load_liquid_dye(
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-    if ctx.params.use_waste_chute:  # type: ignore[attr-defined]
-        ctx.load_waste_chute()
-    else:
-        ctx.load_trash_bin(SLOTS["trash"])
+    # TODO: (sigler) once this Protocol is stable,
+    #       see about adding support for just the trash-bin
+    trash = ctx.load_waste_chute()
 
     # PIPETTES
     test_pipette = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
@@ -362,8 +340,8 @@ def run(ctx: ProtocolContext) -> None:
     dye_wells_by_volume = load_liquid_dye(
         ctx, test_pipette, reservoirs_dye, volumes, tip_ul
     )
-    diluent_wells_by_volume = load_liquid_diluent(
-        ctx, test_pipette, reservoir_diluent, volumes
+    load_liquid_diluent(
+        ctx, test_pipette, reservoir_diluent, volumes, tip_ul
     )
     # liquid-classes
     diluent_class = ctx.define_liquid_class("water")
@@ -400,11 +378,10 @@ def run(ctx: ProtocolContext) -> None:
                 for w in dest_wells_by_volume[ul]
                 if "A" in w.well_name  # new column
             ]
-            source_wells = diluent_wells_by_volume[ul][: len(dest_columns)]
             pip_for_dil.transfer_with_liquid_class(
                 liquid_class=diluent_class,
                 volume=DYE_READER_IDEAL_UL - ul,
-                source=source_wells,
+                source=[reservoir_diluent["A1"]] * len(dest_columns),
                 dest=dest_columns,
                 new_tip="never",
             )
@@ -425,3 +402,16 @@ def run(ctx: ProtocolContext) -> None:
                 )
         else:
             test_pipette.transfer(ul, source, dest, new_tip="always")
+
+        new_racks: List[Labware] = []
+        for rack in test_pipette.tip_racks:
+            if rack.next_tip(test_pipette.channels):
+                new_racks.append(rack)
+                continue
+            if not inaccessible_racks:
+                raise OutOfTipsError("no more tip-racks to replace the empty ones")
+            new_racks.append(inaccessible_racks.pop(0))
+            prev_parent = rack.parent
+            ctx.move_labware(rack, trash, use_gripper=True)
+            ctx.move_labware(new_racks[-1], prev_parent, use_gripper=True)
+        test_pipette.tip_racks = new_racks
