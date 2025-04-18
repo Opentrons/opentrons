@@ -11,7 +11,7 @@ import type { RunHeaderBannerContainerProps } from '.'
 import {
   DoorResult,
   NOT_CONFIGURED,
-} from '../../../hooks/useIsDoorOpen'
+} from '../../../../../DoorOpenControl/useIsDoorOpen'
 
 interface ShowGenericRunHeaderBannersParams {
   runStatus: RunHeaderBannerContainerProps['runStatus']
