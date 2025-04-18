@@ -85,40 +85,6 @@ export function SelectLiquidClass({
     }
   }
 
-  // console.log('state', JSON.stringify(state, null, 4))
-  // console.log(
-  //   'does not use liquid class settings',
-  //   JSON.stringify(
-  //     checkLiquidClassCompatibility(liquidClassOptions[0], state),
-  //     null,
-  //     4
-  //   )
-  // )
-  // console.log(
-  //   'aqueous',
-  //   JSON.stringify(
-  //     checkLiquidClassCompatibility(liquidClassOptions[1], state),
-  //     null,
-  //     4
-  //   )
-  // )
-  // console.log(
-  //   'viscous',
-  //   JSON.stringify(
-  //     checkLiquidClassCompatibility(liquidClassOptions[2], state),
-  //     null,
-  //     4
-  //   )
-  // )
-  // console.log(
-  //   'volatile',
-  //   JSON.stringify(
-  //     checkLiquidClassCompatibility(liquidClassOptions[3], state),
-  //     null,
-  //     4
-  //   )
-  // )
-
   return (
     <Flex>
       <ChildNavigation
@@ -151,7 +117,6 @@ export function SelectLiquidClass({
             buttonValue={option.liquidClassName}
             buttonSubLabel={{ label: option.description, align: 'vertical' }}
             onChange={() => {
-              console.log('onChange')
               setSelectedLiquidClass(option)
             }}
             onClick={() => {
