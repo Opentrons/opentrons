@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LINE_CLAMP_TEXT_STYLE,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
@@ -40,13 +41,13 @@ import { TerminalItemStep } from './TerminalItemStep'
 import { AddStepButton } from './AddStepButton'
 import { PresavedStep } from './PresavedStep'
 import { DraggableSteps } from './DraggableSteps'
-import { truncateString } from './utils'
 import { HardwareStep } from './HardwareStep'
 
 import type { StepIdType } from '../../../../form-types'
 import type { ThunkDispatch } from '../../../../types'
 
 const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
+const SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT = 100
 interface TimelineToolboxProps {
   sidebarWidth: number
 }
@@ -70,7 +71,7 @@ export const TimelineToolbox = ({
   const hasTrash = Object.values(additionalEquipmentOnDeck).some(
     ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
   )
-  const isSidebarWidthSmall = sidebarWidth < 162
+  const isWidthForBackText = sidebarWidth < SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT
   const protocolName = fileMetadata.protocolName
 
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
@@ -130,22 +131,18 @@ export const TimelineToolbox = ({
           <StyledText
             desktopStyle="bodyDefaultSemiBold"
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+            css={LINE_CLAMP_TEXT_STYLE(1)}
           >
-            {isSidebarWidthSmall
-              ? truncateString(name, Math.floor(sidebarWidth / 10))
-              : name}
+            {name}
           </StyledText>
           <Btn css={LINK_BUTTON_STYLE} onClick={handleGoBack}>
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-              <Icon name="chevron-left" size="12px" />
-              <StyledText desktopStyle="bodyDefaultRegular" width="max-content">
-                {isSidebarWidthSmall
-                  ? truncateString(
-                      t('back_to_overview') as string,
-                      Math.floor(sidebarWidth / 10),
-                      true
-                    )
-                  : t('back_to_overview')}
+              <Icon name="chevron-left" size="0.75rem" minWidth="0.75rem" />
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                css={isWidthForBackText ? undefined : LINE_CLAMP_TEXT_STYLE(1)}
+              >
+                {isWidthForBackText ? t('back') : t('back_to_overview')}
               </StyledText>
             </Flex>
           </Btn>

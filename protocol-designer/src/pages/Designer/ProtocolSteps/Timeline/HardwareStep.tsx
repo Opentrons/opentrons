@@ -27,7 +27,6 @@ import {
   selectTerminalItem,
 } from '../../../../ui/steps/actions/actions'
 import { getRobotType } from '../../../../file-data/selectors'
-import { truncateString } from './utils'
 import { PX_SIDEBAR_MIN_WIDTH_FOR_ICON } from './StepContainer'
 
 import type { ThunkDispatch } from '../../../../types'
@@ -39,7 +38,6 @@ interface HardwareStepProps {
 export function HardwareStep(props: HardwareStepProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
   const { sidebarWidth } = props
-  const isSidebarWidthSmall = sidebarWidth < 162
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const title: string =
@@ -55,7 +53,6 @@ export function HardwareStep(props: HardwareStepProps): JSX.Element {
   }
   if (hovered && !selected) {
     backgroundColor = COLORS.blue30
-    color = COLORS.black90
   }
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
 
@@ -66,10 +63,11 @@ export function HardwareStep(props: HardwareStepProps): JSX.Element {
         padding={SPACING.spacing12}
         flexDirection={DIRECTION_COLUMN}
       >
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {isSidebarWidthSmall
-            ? truncateString(title, Math.floor(sidebarWidth / 10))
-            : title}
+        <StyledText
+          desktopStyle="bodyDefaultSemiBold"
+          css={LINE_CLAMP_TEXT_STYLE(1)}
+        >
+          {title}
         </StyledText>
         <Box
           role="button"
@@ -96,7 +94,7 @@ export function HardwareStep(props: HardwareStepProps): JSX.Element {
             width="100%"
           >
             <Icon
-              size="1.7rem"
+              size="1.25rem"
               name="deck-map"
               color={color}
               minWidth="1.25rem"

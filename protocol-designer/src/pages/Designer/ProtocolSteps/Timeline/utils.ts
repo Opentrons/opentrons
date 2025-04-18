@@ -130,15 +130,3 @@ export const getMouseClickKeyInfo = (
 }
 
 export const getUserOS = (): string | undefined => new UAParser().getOS().name
-
-export function truncateString(
-  text: string,
-  maxLength: number,
-  removeDots?: boolean
-): string {
-  const dots = '...'
-  if (text.length <= maxLength) return text
-  if (maxLength <= dots.length) return dots.slice(0, maxLength)
-
-  return text.slice(0, maxLength - dots.length) + (removeDots ? '' : dots)
-}
