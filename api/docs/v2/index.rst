@@ -11,6 +11,7 @@ Welcome
     versioning
     new_labware
     liquid_classes
+    liquid_class_definitions
     moving_labware
     new_modules
     deck_slots

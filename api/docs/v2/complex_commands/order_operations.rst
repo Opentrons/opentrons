@@ -59,6 +59,8 @@ In a ``transfer_with_liquid_class()``, the liquid class definition specifies nea
     20. Touch tip at the blow out location
     21. Drop tip
 
+## TODO: shorten this long list. create a table with summaries of some steps (group together aspirate, etc.) or include icons to provide some information visually. 
+
 The ``transfer_with_liquid_class()`` method includes more steps, like delays or air gaps. Your chosen liquid class definition adds some or all of this transfer behavior, including position information, to optimize liquid transfers. For more information, see :ref:`liquid-class-definitions`. 
 
 Each command may repeat some or all of these steps in order to move liquid as requested. :py:meth:`.transfer` repeats as many times as there are wells in the longer of its ``source`` or ``dest`` argument. Both basic and liquid class distribute and and consolidate methods try to repeat as few times as possible. See :ref:`complex-tip-refilling` below for how they behave when they do need to repeat.

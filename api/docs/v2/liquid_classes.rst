@@ -44,6 +44,11 @@ Each Opentrons-verified liquid class is defined by a set of properties:
     * - Blowout
       - Larger volume of air the pipette dispenses to ensure all liquid leaves the tip. 
 
+
+## TODO: update property table with icons (?) and maybe for the most important parameters (chosen by Sanniti and Andy):
+- required parameters: position reference + offset, speed, and delay, correctionByVolume, flowRateByVolume, delay, disposalByVolume, and conditioningByVolume, airGapByVolume and pushOutByVolume + blowout
+- optional parameters: mix repetitions/volume, touch tip z offset, mmToEdge, and speed 
+
 A :ref:`liquid class definition <liquid-class-definitions>` specifies values for each property based on the liquid class. When you transfer with a liquid class in your protocol, transfer behavior based on each property is automatically applied. For example, when you use `.InstrumentContext.transfer_with_liquid_class` to transfer a viscous liquid, your Flex pipette automatically submerges more slowly into the liquid to prevent air bubbles from forming. 
 
 Properties marked with an asterisk, shown above, are determined by your pipette, tip, and volume combinations. For more information, see :ref:`liquid-class-definitions`. 
@@ -152,147 +157,9 @@ In many cases, the liquid class definition represents fine-tuned changes optimiz
 * Aspirating and dispensing at 30 µL/sec with a larger correction by volume. 
 * Pushing out a larger volume of air to ensure all liquid leaves the tip. 
 
-Not all transfer behavior is easily visible. See the next section for a full list of changes based on liquid class, pipette, and tip combination. For more detail on individual transfer settings, see :ref:`liquid-control`. 
+Not all transfer behavior is easily visible. See :ref:`liquid-class-definitions` for a full list of changes based on liquid class, pipette, and tip combination. For more detail on individual transfer settings, see :ref:`liquid-control`. 
 
-.. _liquid-class-definitions:
-
-Liquid Class Definitions
-=========================
-
-This section includes specific changes to transfer behavior for each liquid class. The transfer steps are listed in order the robot performs them. Advanced settings like mix, pre-wet tip, touch tip, and blowout are automatically disabled for liquid class transfers. 
-
-To use the tables below, select your liquid class: :ref:`aqueous`, :ref:`viscous`, or :ref:`volatile`. Then, use the tabs feature to find your pipette and tip combination. 
-
-The flow rates and air gap or push out volumes used in a liquid class transfer vary based on the pipette and tip combination in your protocol. Let's say you use a Flex P1000 1-channel pipette and Flex 200 µL tips to aspirate a volatile liquid. The transfer volume specifies the flow rate: 
-* 7 µL/sec to aspirate 5 µL
-* 50 µL/sec to aspirate 50 µL
-* 200 µL/sec to aspirate 200 µL 
-
-When you aspirate a liquid between these three volumes, like 100 µL, a linear interpolation automatically determines the flow rate. 
-
-.. _aqueous: 
-
-Aqueous 
--------
-.. tabs::
-
-    .. tab:: Flex P50 1-channel 
-
-      +----------------+------------------------------+---------------------------------------------------+
-      |                |         Transfer Step        |               Flex 96 Tiprack 50 µL               |
-      +================+==============================+===================================================+
-      |    Aspirate    |        Submerge speed        |                    100 mm/sec                     |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Aspirate flow rate by volume |       - Default: 50 µL/sec- 1 µL: 35 µL/sec       |
-      |                |                              |       - 10 µL: 24 µL/sec- 50 µL: 35 µL/sec        |
-      |                +------------------------------+---------------------------------------------------+
-      |                |     Correction by volume     |                         --                        |
-      |                +------------------------------+---------------------------------------------------+
-      |                |    Delay after aspirating    |                      0.2 sec                      |
-      |                +------------------------------+---------------------------------------------------+
-      |                |         Retract speed        |                     50 mm/sec                     |
-      |                +------------------------------+---------------------------------------------------+
-      |                |    Delay after retracting    |                        --                         |
-      |                +------------------------------+---------------------------------------------------+
-      |                |       Air gap by volume      | - Default: 0.1 µL- 1-49.9 µL: 0.1 µL- 50 µL: 0 µL |
-      +----------------+------------------------------+---------------------------------------------------+
-      |    Dispense    |        Submerge speed        |                     100 mm/sec                    |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Dispense position            | 2 mm above the well bottom                        |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Dispense flow rate by volume | Default: 50 µL                                    |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Push out by volume           | - Default: 2 µL- 1-4.999 µL: 7 µL- 5-50 µL: 2 µL  |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Delay after push out         | 0.2 sec                                           |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Retract speed                | 50 mm/sec                                         |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Delay after retracting       | --                                                |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Air gap by volume            | - Default: 0.1µL- 1-49.9 µL: 0.1 µL- 50 µL: 0 µL  |
-      +----------------+------------------------------+---------------------------------------------------+
-      | Multi-dispense | Submerge speed               | 100 mm/sec                                        |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Dispense position            | 2 mm below the well top                           |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Dispense flow rate by volume | 50 µL/sec                                         |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Delay after dispensing       | 0.2 sec                                           |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Retract speed                | 50 mm/sec                                         |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Delay after retracting       | --                                                |
-      |                +------------------------------+---------------------------------------------------+
-      |                | Air gap by volume            | - Default: 0.1 µL- 1-49.9 µL:0.1 µL- 50 µL: 0 µL  |
-      +----------------+------------------------------+---------------------------------------------------+
+##TODO: possibly insert an "edit a liquid class definition" section with 8.5
+##TODO: could also set up a toctree for liquid classes > liquid class definitions + editing a liquid class articles within
 
 
-.. tabs:: 
-
-  .. tab:: Flex P50 8-channel
-
-    +----------------+------------------------------+----------------------------------------------------------------+
-    |                |         Transfer Step        |                      Flex 96 Tiprack 50 µL                     |
-    +================+==============================+================================================================+
-    |    Aspirate    |        Submerge speed        |                           100 mm/sec                           |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Aspirate flow rate by volume |              - Default: 50 µL/sec- 1 µL: 35 µL/sec             |
-    |                |                              |              - 10 µL: 24 µL/sec- 50 µL: 35 µL/sec              |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                |     Correction by volume     |                               --                               |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                |    Delay after aspirating    |                             0.2 sec                            |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                |         Retract speed        |                            50 mm/sec                           |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                |    Delay after retracting    |                               --                               |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                |       Air gap by volume      |        - Default: 0.1 µL- 1-49.9 µL: 0.1 µL- 50 µL: 0 µL       |
-    +----------------+------------------------------+----------------------------------------------------------------+
-    |    Dispense    |        Submerge speed        |                           100 mm/sec                           |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Dispense position            | 2 mm above the well bottom                                     |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Dispense flow rate by volume | Default: 50 µL                                                 |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Push out by volume           | - Default: 2 µL- 1-4.999 µL: 7 µL- 5-50 µL: 2 µL - 50 µL: 3 µL |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Delay after push out         | 0.3 sec                                                        |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Retract speed                | 50 mm/sec                                                      |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Delay after retracting       | --                                                             |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Air gap by volume            | - Default: 0.1µL- 1-49.9 µL: 0.1 µL- 50 µL: 0 µL               |
-    +----------------+------------------------------+----------------------------------------------------------------+
-    | Multi-dispense | Submerge speed               | 100 mm/sec                                                     |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Dispense position            | 2 mm above the well bottom                                     |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Dispense flow rate by volume | 50 µL/sec                                                      |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Delay after dispensing       | 0.3 sec                                                        |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Retract speed                | 50 mm/sec                                                      |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Delay after retracting       | --                                                             |
-    |                +------------------------------+----------------------------------------------------------------+
-    |                | Air gap by volume            | - Default: 0.1 µL- 1-49.9 µL:0.1 µL- 50 µL: 0 µL               |
-    +----------------+------------------------------+----------------------------------------------------------------+
-
-    
-.. _viscous: 
-
-Viscous 
--------
-
-.. _volatile: 
-
-Volatile 
----------
-        
-
-
-      
-    
