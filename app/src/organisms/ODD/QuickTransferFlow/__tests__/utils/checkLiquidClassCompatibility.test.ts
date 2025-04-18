@@ -56,6 +56,24 @@ describe('checkLiquidClassCompatibility', () => {
     expect(result.inCompatible).toBe(false)
   })
 
+  it('liquid volume should be less than 10 incompatible', () => {
+    mockState.volume = 10
+    const result = checkLiquidClassCompatibility(mockLiquid, mockState)
+    expect(result.inCompatible).toBe(true)
+    expect(result.volumeInCompatible).toBe(true)
+  })
+
+  //   it('mock liquid should return inCompatible false', () => {
+  //     const result = checkLiquidClassCompatibility(mockLiquid, mockState)
+  //     expect(result.inCompatible).toBe(false)
+  //     expect(result.pipetteInCompatible).toBe(false)
+  //     expect(result.tipRackICompatible).toBe(false)
+  //     expect(result.pipettePathInCompatible).toBe(false)
+  //   })
+
+  it('', () => {})
+  it('', () => {})
+
   //   it('mock water shouldreturn inCompatible false', () => {
   //     const result = checkLiquidClassCompatibility(mockLiquid, mockState)
   //     expect(result.inCompatible).toBe(false)
