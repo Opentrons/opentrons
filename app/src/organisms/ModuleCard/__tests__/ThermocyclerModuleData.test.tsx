@@ -11,6 +11,7 @@ import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
 import type { ComponentProps } from 'react'
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
+import type { ChipType } from '@opentrons/components'
 import { COLORS } from '@opentrons/components'
 
 const render = (props: ComponentProps<typeof ThermocyclerModuleData>) => {

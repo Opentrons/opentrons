@@ -138,8 +138,8 @@ export function Chip(props: ChipProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${chipSize === 'medium'
-      ? TYPOGRAPHY.bodyTextSemiBold
-      : TYPOGRAPHY.smallBodyTextSemiBold}
+        ? TYPOGRAPHY.bodyTextSemiBold
+        : TYPOGRAPHY.smallBodyTextSemiBold}
     }
   `
 
@@ -161,7 +161,9 @@ export function Chip(props: ChipProps): JSX.Element {
           name={icon}
           color={iconColor}
           aria-label={`icon_${text}`}
-          css={iconName === 'connection-status' ? STATUS_ICON_STYLE : ICON_STYLE}
+          css={
+            iconName === 'connection-status' ? STATUS_ICON_STYLE : ICON_STYLE
+          }
         >
           {pulseIcon ? (
             <animate

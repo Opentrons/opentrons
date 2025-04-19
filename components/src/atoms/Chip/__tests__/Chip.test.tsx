@@ -451,10 +451,7 @@ describe('Chip Web', () => {
     render(props)
     const animate = screen.getByTestId('Chip_success_icon_animate')
     expect(animate).toHaveAttribute('attributeName', 'fill')
-    expect(animate).toHaveAttribute(
-      'values',
-      `${COLORS.green60}; transparent`
-    )
+    expect(animate).toHaveAttribute('values', `${COLORS.green60}; transparent`)
     expect(animate).toHaveAttribute('dur', '1s')
     expect(animate).toHaveAttribute('calcMode', 'discrete')
     expect(animate).toHaveAttribute('repeatCount', 'indefinite')
