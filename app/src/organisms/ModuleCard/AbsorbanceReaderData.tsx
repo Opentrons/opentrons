@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, Flex, Chip, ChipType } from '@opentrons/components'
+import { StyledText, Flex, Chip } from '@opentrons/components'
 
 import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
+import type { ChipType } from '@opentrons/components'
 import {
-  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
 
@@ -42,7 +43,7 @@ export const AbsorbanceReaderData = (
       : i18n.format(t('shared:open'), 'capitalize')
 
   return (
-    <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+    <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
       <Chip
         text={statusText}
         chipSize="small"

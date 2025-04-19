@@ -80,7 +80,7 @@ import { FlexStackerModuleData } from './FlexStackerModuleData'
 import {
   MODULE_INFO_DETAIL_TEXT_STYLE,
   MODULE_INFO_HEADER_TEXT_STYLE,
-  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_SUB_CONTAINER_STYLE,
 } from './constants'
 
 interface ModuleCardProps {
@@ -322,8 +322,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           }}
         />
       )}
-      <Box padding={SPACING.spacing16} width="100%">
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
+      <Box
+        paddingY={SPACING.spacing16}
+        paddingLeft={SPACING.spacing16}
+        width="100%"
+      >
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
               width="60px"
@@ -335,7 +339,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
-            paddingLeft={SPACING.spacing8}
             gridGap={SPACING.spacing8}
           >
             <ErrorInfo attachedModule={module} />
@@ -414,7 +417,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 </StyledText>
               </Flex>
             ) : (
-              <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+              <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
                   css={MODULE_INFO_HEADER_TEXT_STYLE}
@@ -453,7 +456,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <Flex
               opacity={isPending ? '50%' : '100%'}
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing8}
             >
               {moduleData}
             </Flex>

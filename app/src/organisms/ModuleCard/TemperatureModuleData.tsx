@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Chip, Flex, StyledText } from '@opentrons/components'
-import { StatusLabel } from '/app/atoms/StatusLabel'
 import type { TemperatureStatus } from '/app/redux/modules/api-types'
 import {
-  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
 
@@ -23,7 +22,10 @@ export const TemperatureModuleData = (
   const shouldPulse = moduleStatus === 'cooling' || moduleStatus === 'heating'
 
   return (
-    <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE} data-testid="temp_module_data">
+    <Flex
+      css={MODULE_INFO_DETAIL_CONTAINER_STYLE}
+      data-testid="temp_module_data"
+    >
       <Chip
         text={moduleStatus}
         chipSize="small"

@@ -4,7 +4,8 @@ import { StyledText, Flex, Chip, ChipType } from '@opentrons/components'
 import type { FlexStackerModule } from '/app/redux/modules/types'
 
 import {
-  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_CONTAINER_STYLE,
+  MODULE_INFO_SUB_CONTAINER_STYLE,
   MODULE_INFO_HEADER_TEXT_STYLE,
 } from './constants'
 
@@ -52,9 +53,9 @@ export function FlexStackerModuleData(
       break
   }
   return (
-    <>
+    <Flex css={MODULE_INFO_CONTAINER_STYLE}>
       <Flex
-        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
+        css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="stacker_door_data"
       >
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
@@ -69,7 +70,7 @@ export function FlexStackerModuleData(
         />
       </Flex>
       <Flex
-        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
+        css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="stacker_shuttle_data"
       >
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
@@ -83,6 +84,6 @@ export function FlexStackerModuleData(
           iconName="connection-status"
         />
       </Flex>
-    </>
+    </Flex>
   )
 }

@@ -7,8 +7,13 @@ import {
 } from '@opentrons/components'
 import { css } from 'styled-components'
 
-export const MODULE_INFO_SUB_CONTAINTER_STYLE = css`
-  grid-gap: ${SPACING.spacing2};
+export const MODULE_INFO_CONTAINER_STYLE = css`
+  grid-gap: ${SPACING.spacing8};
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_START};
+`
+export const MODULE_INFO_SUB_CONTAINER_STYLE = css`
+  grid-gap: ${SPACING.spacing4};
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_START};
 `
@@ -19,7 +24,11 @@ export const MODULE_INFO_HEADER_TEXT_STYLE = css`
 
   desktopstyle: 'bodyDefaultRegular';
 `
-
+export const MODULE_INFO_DETAIL_CONTAINER_STYLE = css`
+  grid-gap: ${SPACING.spacing2};
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_START};
+`
 export const MODULE_INFO_DETAIL_TEXT_STYLE = css`
   ${TYPOGRAPHY.h3Regular}
   color: ${COLORS.black90};

@@ -8,7 +8,6 @@ import {
   StyledText,
   TYPOGRAPHY,
   Chip,
-  ChipType
 } from '@opentrons/components'
 import type {
   LatchStatus,
@@ -16,9 +15,12 @@ import type {
   TemperatureStatus,
 } from '/app/redux/modules/api-types'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
+import type { ChipType } from '@opentrons/components'
 
 import {
-  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_CONTAINER_STYLE,
+  MODULE_INFO_SUB_CONTAINER_STYLE,
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
   MODULE_INFO_HEADER_TEXT_STYLE,
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
@@ -40,17 +42,17 @@ export const HeaterShakerModuleData = (
   ): ChipType => {
     switch (status) {
       case 'idle':
-        return "neutral"
+        return 'neutral'
 
       case 'holding at target':
       case 'heating':
       case 'cooling':
       case 'slowing down':
       case 'speeding up':
-        return "info"
+        return 'info'
 
       default:
-        return "warning"
+        return 'warning'
     }
   }
 
@@ -61,7 +63,7 @@ export const HeaterShakerModuleData = (
       case 'idle_unknown': {
         return (
           <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-            {t('open', { ns: 'shared' })}
+            {t('open', { ns: 'heater_shaker' })}
           </StyledText>
         )
       }
@@ -87,29 +89,29 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <>
-      {showTemperatureData && (
+    <Flex css={MODULE_INFO_CONTAINER_STYLE}>
+      {(showTemperatureData ?? false) && (
         <Flex
-          css={MODULE_INFO_SUB_CONTAINTER_STYLE}
+          css={MODULE_INFO_SUB_CONTAINER_STYLE}
           data-testid="heater_shaker_module_data_temp"
         >
           <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
             {t('heater')}
           </StyledText>
-          <Chip
-            text={moduleData.temperatureStatus}
-            chipSize="small"
-            type={getStatusChipType(moduleData.temperatureStatus)}
-            hasIcon={true}
-            pulseIcon={
-              moduleData.temperatureStatus === 'cooling' ||
-              moduleData.temperatureStatus === 'heating'
-            }
-            iconName="connection-status"
-            textTransform="capitalize"
-            data-testid="tempStatus"
-          />
-          <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+          <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
+            <Chip
+              text={moduleData.temperatureStatus}
+              chipSize="small"
+              type={getStatusChipType(moduleData.temperatureStatus)}
+              hasIcon={true}
+              pulseIcon={
+                moduleData.temperatureStatus === 'cooling' ||
+                moduleData.temperatureStatus === 'heating'
+              }
+              iconName="connection-status"
+              textTransform="capitalize"
+              data-testid="tempStatus"
+            />
             <StyledText
               title="heater_target_temp"
               css={MODULE_INFO_DETAIL_TEXT_STYLE}
@@ -130,49 +132,51 @@ export const HeaterShakerModuleData = (
         </Flex>
       )}
       <Flex
-        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
+        css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="heater_shaker_module_data_shaker"
       >
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('shaker')}
         </StyledText>
-        <Chip
-          text={moduleData.speedStatus}
-          chipSize="small"
-          type={getStatusChipType(moduleData.speedStatus)}
-          hasIcon={true}
-          pulseIcon={
-            moduleData.speedStatus === 'speeding up' ||
-            moduleData.speedStatus === 'slowing down'
-          }
-          iconName="connection-status"
-          textTransform="capitalize"
-          data-testid="shakerStatus"
-        />
-        <StyledText
-          title="shaker_target_speed"
-          css={MODULE_INFO_DETAIL_TEXT_STYLE}
-        >
-          {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
-            speed: moduleData.targetSpeed,
-          })}
-        </StyledText>
-        <StyledText
-          title="shaker_current_speed"
-          css={MODULE_INFO_DETAIL_TEXT_STYLE}
-        >
-          {t('current_speed', { speed: moduleData.currentSpeed })}
-        </StyledText>
+        <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
+          <Chip
+            text={moduleData.speedStatus}
+            chipSize="small"
+            type={getStatusChipType(moduleData.speedStatus)}
+            hasIcon={true}
+            pulseIcon={
+              moduleData.speedStatus === 'speeding up' ||
+              moduleData.speedStatus === 'slowing down'
+            }
+            iconName="connection-status"
+            textTransform="capitalize"
+            data-testid="shakerStatus"
+          />
+          <StyledText
+            title="shaker_target_speed"
+            css={MODULE_INFO_DETAIL_TEXT_STYLE}
+          >
+            {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
+              speed: moduleData.targetSpeed,
+            })}
+          </StyledText>
+          <StyledText
+            title="shaker_current_speed"
+            css={MODULE_INFO_DETAIL_TEXT_STYLE}
+          >
+            {t('current_speed', { speed: moduleData.currentSpeed ?? 0 })}
+          </StyledText>
+        </Flex>
       </Flex>
       <Flex
-        css={MODULE_INFO_SUB_CONTAINTER_STYLE}
+        css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="heater_shaker_module_data_latch"
       >
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE} title="latch_status">
           {t('labware_latch', { ns: 'heater_shaker' })}
         </StyledText>
         <Flex
-          css={MODULE_INFO_SUB_CONTAINTER_STYLE}
+          css={MODULE_INFO_DETAIL_CONTAINER_STYLE}
           flexDirection={DIRECTION_ROW}
         >
           {isShaking && (
@@ -189,6 +193,6 @@ export const HeaterShakerModuleData = (
           </StyledText>
         </Flex>
       </Flex>
-    </>
+    </Flex>
   )
 }

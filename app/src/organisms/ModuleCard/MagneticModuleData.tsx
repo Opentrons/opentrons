@@ -4,7 +4,7 @@ import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import type { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import type { MagneticStatus } from '/app/redux/modules/api-types'
 import {
-  MODULE_INFO_SUB_CONTAINTER_STYLE,
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
 
@@ -21,7 +21,7 @@ export const MagneticModuleData = (
   const { t } = useTranslation('device_details')
 
   return (
-    <Flex css={MODULE_INFO_SUB_CONTAINTER_STYLE}>
+    <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
       <Chip
         text={moduleStatus}
         chipSize="small"
@@ -30,8 +30,10 @@ export const MagneticModuleData = (
         pulseIcon={moduleStatus === 'engaged'}
         iconName="connection-status"
         textTransform="capitalize"
+        data-testid="mag_module_chip"
       />
-      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}
+      <StyledText
+        css={MODULE_INFO_DETAIL_TEXT_STYLE}
         data-testid="mag_module_data"
       >
         {t(
