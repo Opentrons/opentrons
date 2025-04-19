@@ -26,7 +26,6 @@ describe('unsavedChanges', () => {
       'REPLACE_CUSTOM_LABWARE_DEF',
       'CREATE_MODULE',
       'DELETE_MODULE',
-      'EDIT_MODULE',
     ]
     expect.assertions(actionTypes.length)
     actionTypes.forEach(actionType => {
