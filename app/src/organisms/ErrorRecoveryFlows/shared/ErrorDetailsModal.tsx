@@ -69,6 +69,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.TIP_NOT_DETECTED:
       case ERROR_KINDS.GRIPPER_ERROR:
       case ERROR_KINDS.STALL_OR_COLLISION:
+      case ERROR_KINDS.NO_LIQUID_DETECTED:
         return true
       default:
         return false
@@ -217,6 +218,8 @@ export function NotificationBanner({
         return <GripperErrorBanner />
       case ERROR_KINDS.STALL_OR_COLLISION:
         return <StallErrorBanner />
+      case ERROR_KINDS.NO_LIQUID_DETECTED:
+        return <NoLiquidDetectedBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')
         return <div />
@@ -270,6 +273,18 @@ export function StallErrorBanner(): JSX.Element {
       type="alert"
       heading={t('stall_or_collision_detected_when')}
       message={t('the_robot_must_return_to_home_position')}
+    />
+  )
+}
+
+export function NoLiquidDetectedBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('droplets_or_liquid_cause_failure')}
+      message={t('use_dry_unused_tips')}
     />
   )
 }

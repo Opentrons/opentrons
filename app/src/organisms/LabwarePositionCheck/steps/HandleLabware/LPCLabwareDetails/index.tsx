@@ -15,19 +15,16 @@ import { DefaultLocationOffset } from './DefaultLocationOffset'
 import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
-  selectIsAnyOffsetHardCoded,
-  selectIsDefaultOffsetAbsent,
   selectSelectedLwDisplayName,
-  selectSelectedLwOverview,
   selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   handleUnsavedOffsetsModalODD,
   UnsavedOffsetsDesktop,
 } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 import { getIsOnDevice } from '/app/redux/config'
+import { OffsetBannerContainer } from './OffsetBannerContainer'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -100,67 +97,9 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
 }
 
 function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
-  const { t } = useTranslation('labware_position_check')
-  const { runId, bannerUtils } = props
-  const {
-    showBanner: showInfoBanner,
-    toggleBanner: toggleInfoBanner,
-  } = bannerUtils.defaultOffsetInfoBanner
-
-  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
-  const isOnDevice = useSelector(getIsOnDevice)
-  const uri = selectedLwInfo?.uri ?? ''
-  const isDefaultOffsetAbsent = useSelector(
-    selectIsDefaultOffsetAbsent(runId, uri)
-  )
-  const isAnyOffsetHardCoded = useSelector(
-    selectIsAnyOffsetHardCoded(runId, uri)
-  )
-
-  const [showDefaultBanner, setShowDefaultBanner] = useState(
-    isDefaultOffsetAbsent
-  )
-  const [showHardCodedBanner, setShowHardCodedBanner] = useState(
-    isAnyOffsetHardCoded
-  )
-
   return (
     <Flex css={LIST_CONTAINER_STYLE}>
-      {showDefaultBanner && (
-        <InlineNotification
-          type="alert"
-          heading={t('add_a_default_offset')}
-          message={t('specific_slots_can_be_adjusted')}
-          onCloseClick={
-            isOnDevice
-              ? undefined
-              : () => {
-                  setShowDefaultBanner(false)
-                }
-          }
-        />
-      )}
-      {showHardCodedBanner && (
-        <InlineNotification
-          type="neutral"
-          heading={t('changing_default_not_update_hardcoded')}
-          message={t('hardcoded_offsets_changed_in_python')}
-          onCloseClick={
-            isOnDevice
-              ? undefined
-              : () => {
-                  setShowHardCodedBanner(false)
-                }
-          }
-        />
-      )}
-      {showInfoBanner && (
-        <InlineNotification
-          type="neutral"
-          heading={t('default_offset_description')}
-          onCloseClick={toggleInfoBanner}
-        />
-      )}
+      <OffsetBannerContainer {...props} />
       <DefaultLocationOffset {...props} />
       <LocationSpecificOffsetsContainer {...props} />
       {/* Accommodate scrolling on the ODD. */}

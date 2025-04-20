@@ -152,6 +152,29 @@ def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV5:
             ),
             id="module-ot2-native",
         ),
+        # On a module with no adapter, and specificially the module is a Thermocycler.
+        # The Thermocycler is special because the deck definition splits it into two
+        # fixtures. :(
+        pytest.param(
+            LegacyLabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_B1,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V2,
+            ),
+            "OT-3 Standard",
+            [
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.THERMOCYCLER_MODULE_V2
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="thermocyclerModuleV2",
+                ),
+            ],
+            LegacyLabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_B1,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V2,
+            ),
+            id="tc-module-flex-native",
+        ),
         # On a labware (or stack...) on a slot
         pytest.param(
             LegacyLabwareOffsetLocation(

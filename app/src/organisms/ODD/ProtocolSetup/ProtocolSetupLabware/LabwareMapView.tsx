@@ -1,11 +1,12 @@
+import { useMemo } from 'react'
 import { BaseDeck, Flex, getWellFillFromLabwareId } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
-  getAllDefinitions,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
+import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -36,7 +37,11 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
     labwareByLiquidId,
   } = props
   const deckConfig = getSimplestDeckConfigForProtocol(mostRecentAnalysis)
-  const allDefinitions = getAllDefinitions()
+  const definitionsByURI = useMemo(
+    () =>
+      getLabwareDefinitionsByURIForProtocol(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis]
+  )
   const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
     const { moduleDef, slotName } = module
     const slotAndStackOnModule = Object.entries(
@@ -53,7 +58,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
     const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
     const topLabwareDefinition =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
-        ? allDefinitions[topLabwareInfo.definitionUri]
+        ? definitionsByURI[topLabwareInfo.definitionUri]
         : null
     const topLabwareId =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -97,7 +102,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       const topLabwareInfo = stackedItems[0]
       const topLabwareDefinition =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo
-          ? allDefinitions[topLabwareInfo.definitionUri]
+          ? definitionsByURI[topLabwareInfo.definitionUri]
           : null
       const topLabwareId =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo

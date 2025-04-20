@@ -27,8 +27,8 @@ import {
 import { useKitchen } from '../Kitchen/hooks'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
-import type { UseFormSetValue } from 'react-hook-form'
 import type { Dispatch, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfig,
   CutoutId,
@@ -37,18 +37,30 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModalProps } from '@opentrons/components'
-import type { FormModules } from '../../../step-forms'
-import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
+import type { FormModules, ModuleOnDeck } from '../../../step-forms'
+import type { Fixtures, WizardFormState } from '../types'
+import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+
+export interface ModuleExtended extends ModuleOnDeck {
+  cutoutId: CutoutId
+}
+export interface InitialDeckStateModules {
+  [moduleId: string]: ModuleExtended
+}
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
   closeModal: () => void
-  modules: FormModules
-  fixtures: WizardFixtureType
+  modules: FormModules | InitialDeckStateModules
+  fixtures: Fixtures
   deckConfig: DeckConfiguration
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>
-  setValue: UseFormSetValue<WizardFormState>
   hasGripper: boolean
+  //  used for setting the value in react-hook-form for the onboarding flow
+  setValue?: UseFormSetValue<WizardFormState>
+  //  used for updating the initialDeckState in redux in overview and
+  //  starting deck state
+  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
 }
 export type OptionStage =
   | 'modulesOrFixtures'
@@ -57,10 +69,19 @@ export type OptionStage =
   | 'wasteChuteOptions'
 
 export interface CutoutConfigExtended extends CutoutConfig {
-  type?: FixtureName | ModuleModel | 'stagingAreaAndMagneticBlock'
+  type?:
+    | DeckFixture
+    | ModuleModel
+    | 'stagingAreaAndMagneticBlock'
+    | 'stagingAreaAndWasteChute'
 }
 
-const FIXTURES = ['wasteChute', 'trashBin', 'stagingArea']
+const FIXTURES = [
+  'wasteChute',
+  'trashBin',
+  'stagingArea',
+  'stagingAreaAndWasteChute',
+]
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
@@ -75,6 +96,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     setUpdatedDeckConfig,
     setValue,
     hasGripper,
+    updateInitialDeckState,
   } = props
   const { t, i18n } = useTranslation('shared')
   const { makeSnackbar } = useKitchen()
@@ -160,7 +182,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       //  block thermocycler from being added if there is something in slot A1
     } else if (
       addedCutoutConfigs.some(
-        cutoutConfig => cutoutConfig.type === 'thermocyclerModuleV2'
+        cutoutConfig => cutoutConfig.type === THERMOCYCLER_MODULE_V2
       ) &&
       (Object.values(modules).some(module => module.cutoutId === 'cutoutA1') ||
         Object.values(fixtures).some(
@@ -185,6 +207,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           (cutoutConfig.type != null && FIXTURES.includes(cutoutConfig.type)) ||
           cutoutConfig.type === 'stagingAreaAndMagneticBlock'
       )
+
       if (newModule != null) {
         const filteredModules = Object.fromEntries(
           Object.entries(modules).filter(
@@ -213,29 +236,48 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           },
         }
 
-        setValue('modules', updatedModules)
+        setValue?.('modules', updatedModules)
       }
       if (newFixture != null) {
+        const isStagingAreaAndWasteChute =
+          newFixture.type === 'stagingAreaAndWasteChute'
+
         const filteredFixtures = Object.fromEntries(
           Object.entries(fixtures).filter(
             ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
           )
         )
 
-        const updatedFixtures: WizardFixtureType = {
+        let additionalFixture: Fixtures | undefined
+        if (isStagingAreaAndWasteChute) {
+          additionalFixture = {
+            [uuid()]: {
+              name: 'stagingArea',
+              cutoutFixtureId: newFixture.cutoutFixtureId,
+              cutoutId: 'cutoutD3',
+            },
+          }
+        }
+        let name = newFixture.type as DeckFixture
+        if (newFixture.type === 'stagingAreaAndMagneticBlock') {
+          name = 'stagingArea'
+        } else if (newFixture.type === 'stagingAreaAndWasteChute') {
+          name = 'wasteChute'
+        }
+
+        const updatedFixtures: Fixtures = {
           ...filteredFixtures,
           [uuid()]: {
-            name:
-              newFixture.type === 'stagingAreaAndMagneticBlock'
-                ? 'stagingArea'
-                : (newFixture.type as FixtureName),
+            name,
             cutoutFixtureId: newFixture.cutoutFixtureId,
             cutoutId: newFixture.cutoutId,
           },
+          ...additionalFixture,
         }
-        setValue('fixtures', updatedFixtures)
+        setValue?.('fixtures', updatedFixtures)
       }
       setUpdatedDeckConfig(newDeckConfig)
+      updateInitialDeckState?.(addedCutoutConfigs)
       closeModal()
     }
   }

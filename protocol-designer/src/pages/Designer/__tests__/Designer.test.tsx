@@ -1,6 +1,6 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
@@ -8,7 +8,7 @@ import { selectors } from '../../../labware-ingred/selectors'
 import { getFileMetadata } from '../../../file-data/selectors'
 import { generateNewProtocol } from '../../../labware-ingred/actions'
 import { Designer } from '../index'
-import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
+import { LiquidsOverflowMenu } from '../../../components/organisms/LiquidsOverflowMenu'
 import { ProtocolSteps } from '../ProtocolSteps'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -19,7 +19,7 @@ vi.mock('../OffDeck')
 vi.mock('../ProtocolSteps')
 vi.mock('../../../labware-ingred/actions')
 vi.mock('../../../labware-ingred/selectors')
-vi.mock('../LiquidsOverflowMenu')
+vi.mock('../../../components/organisms/LiquidsOverflowMenu')
 vi.mock('../DeckSetup')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../top-selectors/labware-locations')
@@ -67,20 +67,9 @@ describe('Designer', () => {
     })
   })
 
-  it('renders deck setup container and nav buttons', () => {
+  it('renders deck setup container', () => {
     render()
     screen.getByText('mock ProtocolSteps')
-    screen.getByText('mockProtocolName')
-    screen.getByText('Edit protocol')
-    screen.getByTestId('water-drop')
-    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
-    expect(mockNavigate).toHaveBeenCalledWith('/overview')
-  })
-
-  it('renders the liquids button overflow menu', () => {
-    render()
-    fireEvent.click(screen.getByTestId('water-drop'))
-    screen.getByText('mock LiquidsOverflowMenu')
   })
 
   it('calls generateNewProtocol when hardware has been placed for a new protocol', () => {

@@ -14,6 +14,7 @@ import {
 } from '../../../../ui/steps/selectors'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
+import { LiquidButton } from '../../../../components/molecules/LiquidButton'
 import { DeckSetupContainer } from '../../DeckSetup'
 import { OffDeck } from '../../OffDeck'
 import { SubStepsToolbox } from '../Timeline'
@@ -35,11 +36,15 @@ vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
+vi.mock('../../../../components/molecules/LiquidButton')
 vi.mock('../Timeline/utils')
 const render = () => {
-  return renderWithProviders(<ProtocolSteps isZoomedIn={false} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <ProtocolSteps isZoomedIn={false} showLiquidOverflowMenu={vi.fn()} />,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 const MOCK_STEP_FORMS = {
@@ -76,6 +81,7 @@ describe('ProtocolSteps', () => {
       selectionType: 'SINGLE_STEP_SELECTION_TYPE',
       id: '0522fde8-25a3-4840-b84a-af7282bd80d5',
     })
+    vi.mocked(LiquidButton).mockReturnValue(<div>mock LiquidButton</div>)
     vi.mocked(OffDeck).mockReturnValue(<div>mock OffDeck</div>)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
     vi.mocked(getSelectedSubstep).mockReturnValue(null)
@@ -122,9 +128,12 @@ describe('ProtocolSteps', () => {
     screen.getByText('⇧ + click to select range')
     screen.getByText('^ + click to select multiple')
   })
-
   it('renders the current step name', () => {
     render()
     screen.getByText('Custom Pause')
+  })
+  it('renders the liquids button', () => {
+    render()
+    screen.getByText('mock LiquidButton')
   })
 })
