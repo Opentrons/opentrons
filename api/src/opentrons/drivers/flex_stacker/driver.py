@@ -3,7 +3,7 @@ import re
 import base64
 from typing import List, Optional
 
-from opentrons.drivers.asyncio.communication.errors import NoResponse
+from opentrons.drivers.asyncio.communication.errors import GCacheFull, NoResponse
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
@@ -46,6 +46,7 @@ FS_BAUDRATE = 115200
 DEFAULT_FS_TIMEOUT = 1
 FS_MOVE_TIMEOUT = 20
 FS_TOF_TIMEOUT = 20
+FS_TOF_INIT_TIMEOUT = 5
 FS_ACK = "OK\n"
 FS_ERROR_KEYWORD = "err"
 FS_ASYNC_ERROR_ACK = "async"
@@ -669,10 +670,18 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
 
     async def get_tof_sensor_status(self, sensor: TOFSensor) -> TOFSensorStatus:
         """Get the status of the tof sensor."""
-        response = await self._connection.send_command(
-            GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(sensor.name)
-        )
-        return self.parse_tof_sensor_status(response)
+        # This can fail because the TOF sensor task cannot respond to messages
+        # while the TOF sensors are initializing.
+        try:
+            response = await self._connection.send_command(
+                GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(sensor.name),
+                timeout=FS_TOF_INIT_TIMEOUT,
+            )
+            return self.parse_tof_sensor_status(response)
+        except (NoResponse, GCacheFull):
+            return TOFSensorStatus(
+                sensor, TOFSensorState.INITIALIZING, TOFSensorMode.UNKNOWN, False
+            )
 
     async def get_motion_params(self, axis: StackerAxis) -> MoveParams:
         """Get the motion parameters used by the given axis motor."""

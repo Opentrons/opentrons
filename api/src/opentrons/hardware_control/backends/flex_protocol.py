@@ -423,6 +423,9 @@ class FlexBackend(Protocol):
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         ...
 
+    def get_status_bar_enabled(self) -> bool:
+        ...
+
     def get_status_bar_state(self) -> StatusBarState:
         ...
 

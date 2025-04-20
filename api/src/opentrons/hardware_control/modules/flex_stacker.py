@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Dict, Optional, Mapping
+from typing import Any, Awaitable, Callable, Dict, Optional, Mapping
 
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -13,6 +13,9 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
     TOFSensor,
     HardwareRevision,
+    TOFSensorMode,
+    TOFSensorState,
+    TOFSensorStatus,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.flex_stacker.driver import (
@@ -50,7 +53,7 @@ from opentrons_shared_data.module import load_tof_baseline_data
 
 log = logging.getLogger(__name__)
 
-POLL_PERIOD = 1.0
+POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
 DFU_PID = "df11"
@@ -131,6 +134,9 @@ class FlexStacker(mod_abc.AbstractModule):
             disconnected_callback=disconnected_callback,
         )
 
+        # Set initialized callback
+        reader.set_initialized_callback(module._initialized_callback)
+
         # Enable stallguard
         for axis, config in STALLGUARD_CONFIG.items():
             await driver.set_stallguard_threshold(
@@ -167,9 +173,14 @@ class FlexStacker(mod_abc.AbstractModule):
         self._driver = driver
         self._reader = reader
         self._poller = poller
-        self._stacker_status = FlexStackerStatus.IDLE
         self._stall_detected = False
+        self._stacker_status = FlexStackerStatus.IDLE
         self._last_status_bar_event: Optional[StatusBarUpdateEvent] = None
+
+    async def _initialized_callback(self) -> None:
+        """Called by the reader once the module is initialized."""
+        if self._last_status_bar_event:
+            await self._handle_status_bar_event(self._last_status_bar_event)
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -202,6 +213,11 @@ class FlexStacker(mod_abc.AbstractModule):
     def platform_state(self) -> PlatformState:
         """The state of the platform."""
         return self._reader.platform_state
+
+    @property
+    def initialized(self) -> bool:
+        """The stacker is ready..."""
+        return self._reader.initialized
 
     @property
     def hopper_door_state(self) -> HopperDoorState:
@@ -545,12 +561,13 @@ class FlexStacker(mod_abc.AbstractModule):
 
     def event_listener(self, event: Any) -> None:
         if isinstance(event, StatusBarUpdateEvent):
+            self._last_status_bar_event = event
             asyncio.run_coroutine_threadsafe(
                 self._handle_status_bar_event(event), self._loop
             )
 
     async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:
-        if event.enabled:
+        if event.enabled and self.initialized:
             match event.state:
                 case StatusBarState.RUNNING:
                     await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
@@ -587,20 +604,43 @@ class FlexStackerReader(Reader):
         self.limit_switch_status = {
             axis: StackerAxisState.UNKNOWN for axis in StackerAxis
         }
-        self.platform_state = PlatformState.UNKNOWN
-        self.hopper_door_closed = False
+        self.tof_sensor_status: Dict[TOFSensor, TOFSensorStatus] = {
+            s: TOFSensorStatus(
+                s, TOFSensorState.INITIALIZING, TOFSensorMode.UNKNOWN, False
+            )
+            for s in TOFSensor
+        }
         self.motion_params: Dict[StackerAxis, Optional[MoveParams]] = {
             axis: None for axis in StackerAxis
         }
-        self.get_config = True
+        self.platform_state = PlatformState.UNKNOWN
+        self.hopper_door_closed = False
+        self.initialized = False
+        self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
+
+    def set_initialized_callback(self, callback: Callable[[], Awaitable[None]]) -> None:
+        """Sets the callback used when done initializing the module."""
+        self._initialized_callback = callback
 
     async def read(self) -> None:
-        await self.get_limit_switch_status()
-        await self.get_platform_sensor_state()
         await self.get_door_closed()
-        if self.get_config:
+        if not self.initialized:
+            initialized = True
+            await self.get_limit_switch_status()
+            await self.get_platform_sensor_state()
             await self.get_motion_parameters()
-            self.get_config = False
+            for sensor, status in self.tof_sensor_status.items():
+                if status.state == TOFSensorState.INITIALIZING:
+                    status = await self._driver.get_tof_sensor_status(sensor)
+                    self.tof_sensor_status[sensor] = status
+                    initialized &= status.ok
+
+            # We are done initializing, sync the led state
+            if initialized:
+                self.initialized = True
+                if self._initialized_callback:
+                    await self._initialized_callback()
+
         self._set_error(None)
 
     async def get_limit_switch_status(self) -> None:
