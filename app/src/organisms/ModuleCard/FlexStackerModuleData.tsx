@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, Flex, Chip, ChipType } from '@opentrons/components'
+import { StyledText, Flex, Chip } from '@opentrons/components'
 
+import type { ChipType } from '@opentrons/components'
 import type { FlexStackerModule } from '/app/redux/modules/types'
 
 import {
