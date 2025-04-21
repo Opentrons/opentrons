@@ -262,6 +262,7 @@ async def _main() -> None:
     await hw_api.home()
     await hw_api.home_plunger(mount)
     await hw_api.set_lights(rails=True)
+    await hw_api.update_nozzle_configuration_for_mount(mount, starting_nozzle="A1", back_left_nozzle="A1", front_right_nozzle="H1")
     plunger_pos = get_plunger_positions_ot3(hw_api, mount)
     print(plunger_pos)
     home_position = await hw_api.current_position_ot3(mount)
@@ -398,7 +399,7 @@ async def _main() -> None:
                     tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
                     print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
                 drop_tip_location =  Point(30 , 60 , 110.5)
-                await move_to_point(hw_api, mount, drop_tip_location, cp)
+                await move_to_point(hw_api, mount, Point(pickup_loc.x, pickup_loc.y, pickup_loc.z - 20), cp)
                 await hw_api.drop_tip(mount)
                 keyboard_input = input("Press Enter or Press 'q' to quit")
                 if keyboard_input == 'q':
