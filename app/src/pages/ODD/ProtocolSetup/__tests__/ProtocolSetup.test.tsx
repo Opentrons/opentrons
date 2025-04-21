@@ -8,7 +8,6 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
   useProtocolQuery,
-  useDoorQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
