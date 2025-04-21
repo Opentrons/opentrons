@@ -15,7 +15,10 @@ import {
   deleteDeckFixture,
 } from '../../../../step-forms/actions/additionalItems'
 import { updateInitialDeckState } from '../util'
-import type { AllTemporalPropertiesForTimelineFrame } from '../../../../step-forms'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  SavedStepFormState,
+} from '../../../../step-forms'
 
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../modules')
@@ -57,6 +60,11 @@ const mockInitialDeckSetup: AllTemporalPropertiesForTimelineFrame = {
     waste: { location: 'cutoutD3', name: 'wasteChute', id: 'waste' },
   },
 }
+const mockSetShowDeleteEntityModal = vi.fn()
+const mockSetShowDeleteStagingAreaModal = vi.fn()
+const mockSavedSteps: SavedStepFormState = {}
+const mockMakeSnackbar = vi.fn()
+const mockT: any = {}
 
 describe('updateInitialDeckState', () => {
   it('creates a module', () => {
@@ -69,7 +77,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockEmptyIntialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(
@@ -91,7 +104,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockInitialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(
@@ -111,7 +129,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockEmptyIntialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(createDeckFixture('trashBin', 'cutoutA3'))
@@ -127,7 +150,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockInitialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(deleteDeckFixture('trash'))
@@ -143,7 +171,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockEmptyIntialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
@@ -168,7 +201,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockInitialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
@@ -192,7 +230,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockEmptyIntialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
@@ -213,7 +256,12 @@ describe('updateInitialDeckState', () => {
         },
       ],
       mockInitialDeckSetup,
-      mockDispatch
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
     )
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,

@@ -18,6 +18,8 @@ import {
   deleteDeckFixture,
 } from '../../../step-forms/actions/additionalItems'
 import { FIXTURES } from '../../../pages/Designer/DeckSetup/constants'
+import { getIsLabwareCompatibleWithModule } from '../utils'
+import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
 import type { DeckConfiguration, ModuleModel } from '@opentrons/shared-data'
 import type { CutoutConfigExtended } from '../HardwareConfigurator/AddFixtureModal'
 import type { ThunkDispatch } from '../../../types'
@@ -27,7 +29,7 @@ import type {
   SavedStepFormState,
 } from '../../../step-forms'
 import type { Dispatch, SetStateAction } from 'react'
-import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
+import type { MakeSnackbar } from '../Kitchen/KitchenContext'
 
 const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
   cutoutA3: 'A4',
@@ -45,7 +47,15 @@ export const updateInitialDeckState = (
       deckConfig: DeckConfiguration
     } | null>
   >,
+  setShowDeleteStagingAreaModal: Dispatch<
+    SetStateAction<{
+      ids: string[]
+      deckConfig: DeckConfiguration
+    } | null>
+  >,
   savedSteps: SavedStepFormState,
+  makeSnackbar: MakeSnackbar,
+  t: any,
   deckConfig?: DeckConfiguration
 ): void => {
   const {
@@ -90,7 +100,17 @@ export const updateInitialDeckState = (
     )
     if (FIXTURES.includes(value.type as DeckFixture)) {
       if (matchingFixture != null) {
-        if (fixtureIds != null && deckConfig != null) {
+        if (
+          matchingFixture.name === 'stagingArea' &&
+          fixtureIds == null &&
+          matching4thColumnLabware != null &&
+          deckConfig != null
+        ) {
+          setShowDeleteStagingAreaModal({
+            ids: [matching4thColumnLabware.id, matchingFixture.id],
+            deckConfig,
+          })
+        } else if (fixtureIds != null && deckConfig != null) {
           setShowDeleteEntityModal({
             ids:
               fourthColumnSlotLabwareId != null
@@ -137,8 +157,29 @@ export const updateInitialDeckState = (
         matchingModuleForAboveStaging,
         matchingStagingArea != null ? [matchingStagingArea] : undefined
       )
-
+      const isLabwareCompatible =
+        matchingModuleForAboveStaging != null
+          ? getIsLabwareCompatibleWithModule(
+              matchingModuleForAboveStaging.type,
+              labwareOnDeck,
+              value.cutoutId
+            )
+          : true
       if (
+        matchingStagingArea != null &&
+        fixtureIds == null &&
+        matching4thColumnLabwarNextToMagBlock != null &&
+        deckConfig != null
+      ) {
+        setShowDeleteStagingAreaModal({
+          ids: [
+            matching4thColumnLabwarNextToMagBlock.id,
+            matchingStagingArea.id,
+          ],
+
+          deckConfig,
+        })
+      } else if (
         matchingStagingArea != null &&
         fixtureIds == null &&
         fourthColumnSlotLabwareId == null
@@ -172,13 +213,18 @@ export const updateInitialDeckState = (
           }
         }
       } else {
-        dispatch(
-          createModule({
-            slot: value.cutoutId.split('cutout')[1],
-            model: MAGNETIC_BLOCK_V1,
-            type: MAGNETIC_BLOCK_TYPE,
-          })
-        )
+        const slot = value.cutoutId.split('cutout')[1]
+        if (isLabwareCompatible) {
+          dispatch(
+            createModule({
+              slot,
+              model: MAGNETIC_BLOCK_V1,
+              type: MAGNETIC_BLOCK_TYPE,
+            })
+          )
+        } else {
+          makeSnackbar(t('module_incompatible', { slot }) as string)
+        }
       }
     } else if (value.type === 'stagingAreaAndWasteChute') {
       const matchingFixtures = Object.values(additionalEquipmentOnDeck).filter(
@@ -198,6 +244,17 @@ export const updateInitialDeckState = (
         matchingFixtures
       )
       if (
+        matchingFixtures.length > 0 &&
+        fixtureIds == null &&
+        matching4thColumnLabwareInD4 != null &&
+        deckConfig != null
+      ) {
+        const matchingFixtureIds = matchingFixtures.map(fixture => fixture.id)
+        setShowDeleteStagingAreaModal({
+          ids: [matching4thColumnLabwareInD4.id, ...matchingFixtureIds],
+          deckConfig,
+        })
+      } else if (
         matchingFixtures.length > 0 &&
         fixtureIds == null &&
         fourthColumnSlotLabwareId == null
@@ -239,13 +296,23 @@ export const updateInitialDeckState = (
       } else {
         const type = getModuleType(value.type as ModuleModel)
         const model = value.type as ModuleModel
-        dispatch(
-          createModule({
-            slot: value.cutoutId.split('cutout')[1],
-            model,
-            type,
-          })
+        const isLabwareCompatible = getIsLabwareCompatibleWithModule(
+          type,
+          labwareOnDeck,
+          value.cutoutId
         )
+        const slot = value.cutoutId.split('cutout')[1]
+        if (isLabwareCompatible) {
+          dispatch(
+            createModule({
+              slot,
+              model,
+              type,
+            })
+          )
+        } else {
+          makeSnackbar(t('module_incompatible', { slot }) as string)
+        }
       }
     }
   })

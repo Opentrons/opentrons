@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import {
   FLEX_ROBOT_TYPE,
@@ -20,9 +21,13 @@ import {
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../step-forms/selectors'
+import { editDeckConfiguration } from '../../../step-forms/actions'
 import { uuid } from '../../../utils'
+import { useKitchen } from '../Kitchen/hooks'
+import { HardwareConfigurator } from '../HardwareConfigurator'
+import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
+import { ConfirmDeleteStagingAreaModal } from '../ConfirmDeleteStagingAreaModal'
 import { updateInitialDeckState } from './util'
-import { ConfirmDeleteEntityInUseModal, HardwareConfigurator } from '..'
 import type {
   CutoutFixtureId,
   CutoutId,
@@ -32,15 +37,20 @@ import type {
 import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
 import type { ThunkDispatch } from '../../../types'
 import type { Fixtures, FixtureName } from '..'
-import { editDeckConfiguration } from '../../../step-forms/actions'
 
 export function FlexHardware(): JSX.Element {
+  const { t } = useTranslation('protocol_overview')
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const savedSteps = useSelector(getSavedStepForms)
+  const { makeSnackbar } = useKitchen()
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
   const [modalInfo, setShowDeleteEntityModal] = useState<{
+    ids: string[]
+    deckConfig: DeckConfiguration
+  } | null>(null)
+  const [stagingAreaModalInfo, setShowDeleteStagingAreaModal] = useState<{
     ids: string[]
     deckConfig: DeckConfiguration
   } | null>(null)
@@ -117,6 +127,41 @@ export function FlexHardware(): JSX.Element {
     },
     {}
   )
+  const handleConfirmDeleteEntity = (modalInfo: {
+    ids: string[]
+    deckConfig: DeckConfiguration
+  }): void => {
+    modalInfo.ids.forEach(item => {
+      if (moduleOnDeck[item] != null) {
+        dispatch(deleteModule({ moduleId: item }))
+      } else if (labwareOnDeck[item] != null) {
+        dispatch(deleteContainer({ labwareId: item }))
+      } else {
+        dispatch(deleteDeckFixture(item))
+      }
+      dispatch(editDeckConfiguration({ deckConfig: modalInfo.deckConfig }))
+      setShowDeleteEntityModal(null)
+    })
+  }
+
+  const handleConfirmDeleteStagingArea = (stagingAreaModalInfo: {
+    ids: string[]
+    deckConfig: DeckConfiguration
+  }): void => {
+    stagingAreaModalInfo.ids.forEach(item => {
+      if (labwareOnDeck[item] != null) {
+        dispatch(deleteContainer({ labwareId: item }))
+      } else {
+        dispatch(deleteDeckFixture(item))
+      }
+      dispatch(
+        editDeckConfiguration({
+          deckConfig: stagingAreaModalInfo.deckConfig,
+        })
+      )
+      setShowDeleteStagingAreaModal(null)
+    })
+  }
 
   return (
     <>
@@ -127,23 +172,20 @@ export function FlexHardware(): JSX.Element {
             setShowDeleteEntityModal(null)
           }}
           onConfirm={() => {
-            modalInfo.ids.forEach(item => {
-              if (moduleOnDeck[item] != null) {
-                dispatch(deleteModule({ moduleId: item }))
-              } else if (labwareOnDeck[item] != null) {
-                dispatch(deleteContainer({ labwareId: item }))
-              } else {
-                dispatch(deleteDeckFixture(item))
-              }
-              dispatch(
-                editDeckConfiguration({ deckConfig: modalInfo.deckConfig })
-              )
-              setShowDeleteEntityModal(null)
-            })
+            handleConfirmDeleteEntity(modalInfo)
           }}
         />
       ) : null}
-
+      {stagingAreaModalInfo != null ? (
+        <ConfirmDeleteStagingAreaModal
+          onClose={() => {
+            setShowDeleteStagingAreaModal(null)
+          }}
+          onConfirm={() => {
+            handleConfirmDeleteStagingArea(stagingAreaModalInfo)
+          }}
+        />
+      ) : null}
       <HardwareConfigurator
         modules={modules}
         fixtures={fixtures}
@@ -154,7 +196,10 @@ export function FlexHardware(): JSX.Element {
             initialDeckSetup,
             dispatch,
             setShowDeleteEntityModal,
+            setShowDeleteStagingAreaModal,
             savedSteps,
+            makeSnackbar,
+            t,
             deckConfig
           )
         }}

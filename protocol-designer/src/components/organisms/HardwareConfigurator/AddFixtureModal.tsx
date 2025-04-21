@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { uuid } from '@opentrons/step-generation'
 import {
@@ -18,16 +19,18 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleType,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   MODULE_MODELS,
   SINGLE_CENTER_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { editDeckConfiguration } from '../../../step-forms/actions'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { useKitchen } from '../Kitchen/hooks'
+import { getIsLabwareCompatibleWithModule } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
-
-import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfig,
@@ -40,8 +43,6 @@ import type { ModalProps } from '@opentrons/components'
 import type { FormModules, ModuleOnDeck } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
-import { useDispatch } from 'react-redux'
-import { editDeckConfiguration } from '../../../step-forms/actions'
 
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId
@@ -99,6 +100,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     updateInitialDeckState,
   } = props
   const { t, i18n } = useTranslation('shared')
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const { labware } = initialDeckSetup
   const dispatch = useDispatch()
   const { makeSnackbar } = useKitchen()
   const initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only magnetic block can be configured in column 2
@@ -277,7 +280,19 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         }
         setValue?.('fixtures', updatedFixtures)
       }
-      dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
+      const isLabwareCompatible =
+        newModule != null
+          ? getIsLabwareCompatibleWithModule(
+              newModule.type === 'stagingAreaAndMagneticBlock'
+                ? MAGNETIC_BLOCK_TYPE
+                : getModuleType(newModule.type as ModuleModel),
+              labware,
+              newModule?.cutoutId
+            )
+          : true
+      if (isLabwareCompatible) {
+        dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
+      }
       updateInitialDeckState?.(addedCutoutConfigs)
       closeModal()
     }

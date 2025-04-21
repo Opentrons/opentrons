@@ -20,6 +20,7 @@
   "liquids": "Liquids",
   "materials_list": "Materials list",
   "modified": "Last exported",
+  "module_incompatible": "Module is incompatible with the labware in slot {{slot}}",
   "modules": "Modules",
   "na": "N/A",
   "name": "Name",

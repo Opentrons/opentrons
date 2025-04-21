@@ -1,15 +1,17 @@
 import { describe, beforeEach, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { DeckConfigurator } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { useDeckConfigurationEditing } from '../useDeckConfigurationEditing'
+import { getDeckConfiguration } from '../../../../step-forms/selectors'
+import { HardwareConfiguratorContainer } from '../HardwareConfiguratorContainer'
 import { HardwareConfigurator } from '..'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('../useDeckConfigurationEditing')
+vi.mock('../HardwareConfiguratorContainer')
+vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
@@ -33,19 +35,14 @@ describe('HardwareConfigurator', () => {
       hasGripper: false,
       fixtures: {},
     }
-    vi.mocked(DeckConfigurator).mockReturnValue(
-      <div>mock DeckConfigurator</div>
+    vi.mocked(getDeckConfiguration).mockReturnValue({ deckConfig: [] })
+    vi.mocked(HardwareConfiguratorContainer).mockReturnValue(
+      <div>mock HardwareConfiguratorContainer</div>
     )
-    vi.mocked(useDeckConfigurationEditing).mockReturnValue({
-      addFixtureModal: <div>mock modal</div>,
-      addFixtureToCutout: vi.fn(),
-      removeFixtureFromCutout: vi.fn(),
-    })
   })
 
-  it('should render the deck configurator and modal', () => {
+  it('should render the HardwareConfiguratorContainer', () => {
     render(props)
-    screen.getByText('mock DeckConfigurator')
-    screen.getByText('mock modal')
+    screen.getByText('mock HardwareConfiguratorContainer')
   })
 })

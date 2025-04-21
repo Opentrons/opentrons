@@ -1,11 +1,17 @@
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import { getAreSlotsVerticallyAdjacent } from '@opentrons/shared-data'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../utils/labwareModuleCompatibility'
 import type {
   AddressableArea,
   AddressableAreaName,
+  CutoutId,
   DeckDefinition,
+  ModuleType,
 } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../step-forms'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  ModuleOnDeck,
+} from '../../step-forms'
 
 export const getSlotsWithCollisions = (
   deckDef: DeckDefinition,
@@ -30,4 +36,18 @@ export const getSlotsWithCollisions = (
     },
     []
   )
+}
+
+export const getIsLabwareCompatibleWithModule = (
+  moduleType: ModuleType,
+  labware: AllTemporalPropertiesForTimelineFrame['labware'],
+  cutoutId: CutoutId
+): boolean => {
+  const slot = cutoutId.split('cutout')[1]
+  const labwareOnSlot = Object.values(labware).find(lw => lw.slot === slot)
+  return labwareOnSlot != null
+    ? COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
+        labwareOnSlot.def.parameters.loadName
+      )
+    : true
 }
