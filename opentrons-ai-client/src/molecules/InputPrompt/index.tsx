@@ -26,6 +26,7 @@ import {
 } from '../../resources/atoms'
 import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils'
+import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import {
   STAGING_END_POINT,
   PROD_END_POINT,
@@ -44,7 +45,7 @@ import type {
   CreatePrompt,
   UpdatePrompt,
 } from '../../resources/types'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -68,6 +69,12 @@ export function InputPrompt(): JSX.Element {
   const watchUserPrompt = watch('userPrompt') ?? ''
 
   const { data, isLoading, callApi } = useApiCall()
+
+  let pdProtocolContent: null | ProtocolFile = null
+  if (data != null && typeof data === 'object' && 'protocol_content' in data) {
+    pdProtocolContent = data.protocol_content as ProtocolFile
+  }
+
   const [requestId, setRequestId] = useState<string>(uuidv4())
 
   // This is to autofill the input field for when we navigate to the chat page from the existing/new protocol generator pages
@@ -123,16 +130,6 @@ export function InputPrompt(): JSX.Element {
         : getChatEndpoint()
 
       const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
-      // attach PD protocol as separate part of request, this is so the backend can pull out the PD protocol
-      // so we dont flood the LLM model with a million unnecessary tokens
-      let pd_protocol_content = null
-      if (
-        data != null &&
-        typeof data === 'object' &&
-        'protocol_content' in data
-      ) {
-        pd_protocol_content = data.protocol_content
-      }
 
       const config = {
         url,
@@ -145,7 +142,7 @@ export function InputPrompt(): JSX.Element {
               history: chatHistory,
               fake: false,
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
-              pd_protocol_content,
+              pd_protocol_content: pdProtocolContent,
             },
       }
 

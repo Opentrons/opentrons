@@ -215,6 +215,10 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
     return <CodeWrapper {...props} id={chatId} />
   }
 
+  const protocolName =
+    chatdata.findLast(chat => chat.protocol_content != null)?.protocol_content
+      ?.metadata.protocolName ?? 'protocol.json'
+
   const ProtocolContentBadge = (props: {
     onClick: () => void
   }): JSX.Element => {
@@ -225,7 +229,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           <IconWrapper>
             <img src={smallLogo} alt="Opentrons logo" width="24" height="24" />
           </IconWrapper>
-          <FileName>protocol.json</FileName>
+          <FileName>{protocolName}</FileName>
           <HoverShadow
             onClick={(e: Event) => {
               e.stopPropagation()

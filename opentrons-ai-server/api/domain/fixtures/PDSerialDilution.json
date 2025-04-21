@@ -2,7 +2,7 @@
   "$otSharedSchema": "#/protocol/schemas/8",
   "schemaVersion": 8,
   "metadata": {
-    "protocolName": "Serial-dilution-6",
+    "protocolName": "Serial Dilution",
     "author": "",
     "description": "",
     "created": 1745434920000,
