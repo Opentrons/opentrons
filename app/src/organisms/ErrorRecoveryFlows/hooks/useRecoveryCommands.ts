@@ -36,6 +36,11 @@ import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
+import type {
+  RunCommandError,
+  RunCommandErrorOverpressure,
+  RunCommandErrorTipPhysicallyAttached,
+} from '@opentrons/shared-data'
 
 interface UseRecoveryCommandsParams {
   runId: string
@@ -137,42 +142,41 @@ export function useRecoveryCommands({
       'prepareToAspirate',
     ] as const
 
-    const RETRY_ERROR_TYPES = [
-      DEFINED_ERROR_TYPES.OVERPRESSURE,
-      DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED,
-    ] as const
-
     const isInPlace = (
-      failedCommand: FailedCommand
+      failedCommand: FailedCommand | null
     ): failedCommand is InPlaceCommand =>
+      unvalidatedFailedCommand != null &&
       IN_PLACE_COMMAND_TYPES.includes(
         (failedCommand as InPlaceCommand).commandType
       )
 
-    return unvalidatedFailedCommand != null
-      ? isInPlace(unvalidatedFailedCommand)
-        ? unvalidatedFailedCommand.error?.isDefined &&
-          RETRY_ERROR_TYPES.includes(
-            unvalidatedFailedCommand.error?.errorType
-          ) &&
-          // Paranoia: this value comes from the wire and may be unevenly implemented
-          typeof unvalidatedFailedCommand.error?.errorInfo?.retryLocation?.at(
-            0
-          ) === 'number'
-          ? {
-              commandType: 'moveToCoordinates',
-              intent: 'fixit',
-              params: {
-                pipetteId: unvalidatedFailedCommand.params?.pipetteId,
-                coordinates: {
-                  x: unvalidatedFailedCommand.error.errorInfo.retryLocation[0],
-                  y: unvalidatedFailedCommand.error.errorInfo.retryLocation[1],
-                  z: unvalidatedFailedCommand.error.errorInfo.retryLocation[2],
-                },
-              },
-            }
-          : null
-        : null
+    const isTargetedError = (
+      error?: RunCommandError | null
+    ): error is
+      | RunCommandErrorOverpressure
+      | RunCommandErrorTipPhysicallyAttached =>
+      error != null &&
+      error.isDefined &&
+      (error.errorType === DEFINED_ERROR_TYPES.OVERPRESSURE ||
+        error.errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED)
+
+    return isInPlace(unvalidatedFailedCommand) &&
+      isTargetedError(unvalidatedFailedCommand.error) &&
+      // Paranoia: this value comes from the wire and may be unevenly implemented
+      typeof unvalidatedFailedCommand.error?.errorInfo?.retryLocation?.at(0) ===
+        'number'
+      ? {
+          commandType: 'moveToCoordinates',
+          intent: 'fixit',
+          params: {
+            pipetteId: unvalidatedFailedCommand.params?.pipetteId,
+            coordinates: {
+              x: unvalidatedFailedCommand.error.errorInfo.retryLocation[0],
+              y: unvalidatedFailedCommand.error.errorInfo.retryLocation[1],
+              z: unvalidatedFailedCommand.error.errorInfo.retryLocation[2],
+            },
+          },
+        }
       : null
   }
 

@@ -9,7 +9,7 @@ import {
   getRelevantFailedLabwareCmdFrom,
   useRelevantFailedLwLocations,
   useFailedLabwareUtils,
-  getFailedCmdRelevantLabware,
+  getLabwareDisplayNamesFromFailedCmd,
   getFailedLabwareQuantity,
 } from '../useFailedLabwareUtils'
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
@@ -525,10 +525,9 @@ describe('getFailedCmdRelevantLabware', () => {
       },
     } as any
 
-    const result = getFailedCmdRelevantLabware(
+    const result = getLabwareDisplayNamesFromFailedCmd(
       mockProtocolAnalysis,
       mockCommand,
-      'GRIPPER_ERROR',
       mockRunRecord
     )
 
@@ -545,7 +544,7 @@ describe('getFailedCmdRelevantLabware', () => {
       },
     } as any
 
-    const result = getFailedCmdRelevantLabware(
+    const result = getLabwareDisplayNamesFromFailedCmd(
       mockProtocolAnalysis,
       mockCommand,
       mockRunRecord
@@ -555,7 +554,7 @@ describe('getFailedCmdRelevantLabware', () => {
   })
 
   it('should return null when command is null', () => {
-    const result = getFailedCmdRelevantLabware(
+    const result = getLabwareDisplayNamesFromFailedCmd(
       mockProtocolAnalysis,
       null,
       mockRunRecord
