@@ -3,6 +3,10 @@ import logging
 import serial
 import time
 import csv
+from serial.tools import list_ports
+
+PID = 32858
+VID = 9025
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +35,15 @@ LOG_CONFIG = {
 }
 
 # logging.config.dictConfig(LOG_CONFIG)
+def scan_for_serial_ports() -> str:
+    """Scan for serial ports and return the first one that matches the VID and PID."""
+    ports = list_ports.comports()
+    for port, desc, hwid in ports:
+        print(f"Port: {port}, Description: {desc}, HWID: {hwid}")
+        if desc == ("Nano 33 BLE") or desc == (f"USB Serial Device ({port})"):
+            print(f'port: {port}')
+            return port
+    raise("No matching serial port found.")
 
 class HoneywellPressureError(Exception):
     """Exception for Honeywell pressure sensor errors."""
@@ -42,8 +55,8 @@ class HoneywellPressureProtocolError(Exception):
 
 class HoneywellPressureDriver:
     """Driver for Honeywell pressure sensor."""
-    def __init__(self, port):
-        self.port = port
+    def __init__(self):
+        self.port = scan_for_serial_ports()
         self.is_connected = False
         self.is_reading = False
         self.pressure = 0.0
@@ -114,7 +127,7 @@ async def main():
         logging.error(f"Error in main: {e}")
 
 async def pressure_sensor_func():
-    driver = HoneywellPressureDriver('COM13')
+    driver = HoneywellPressureDriver()
     await driver.connect()
     await driver.zero_gauge()
     p_time = time.time()
@@ -141,6 +154,6 @@ async def pressure_sensor_func():
 
 if __name__ == '__main__':
     global pipette_action
-    asyncio.run(main())
+    asyncio.run(pressure_sensor_func())
     pipette_action = False
 
