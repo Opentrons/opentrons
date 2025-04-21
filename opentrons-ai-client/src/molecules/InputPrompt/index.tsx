@@ -123,6 +123,16 @@ export function InputPrompt(): JSX.Element {
         : getChatEndpoint()
 
       const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
+      // attach PD protocol as separate part of request, this is so the backend can pull out the PD protocol
+      // so we dont flood the LLM model with a million unnecessary tokens
+      let pd_protocol_content = null
+      if (
+        data != null &&
+        typeof data === 'object' &&
+        'protocol_content' in data
+      ) {
+        pd_protocol_content = data.protocol_content
+      }
 
       const config = {
         url,
@@ -135,6 +145,7 @@ export function InputPrompt(): JSX.Element {
               history: chatHistory,
               fake: false,
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
+              pd_protocol_content,
             },
       }
 
