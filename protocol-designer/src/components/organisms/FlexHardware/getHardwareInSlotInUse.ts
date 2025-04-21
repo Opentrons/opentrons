@@ -16,12 +16,12 @@ export function getHardwareInSlotInUse(
   savedSteps: SavedStepFormState,
   matchingLabwareFor4thColumn: LabwareOnDeck | null,
   moduleOnDeck?: ModuleOnDeck,
-  fixturesOnDeck?: {
+  fixturesOnDeck?: Array<{
     name: AdditionalEquipmentName
     id: string
     location: string
     pythonName?: string
-  }[]
+  }>
 ): HardwareInSlotInfo {
   const isModuleInUse =
     moduleOnDeck != null &&

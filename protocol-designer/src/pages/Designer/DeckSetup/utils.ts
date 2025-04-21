@@ -48,7 +48,6 @@ import type {
 } from '../../../step-forms'
 import type { Selection } from '../../../ui/steps'
 import type { Fixture } from './constants'
-import type { AdditionalEquipment } from '../utils'
 
 const OT2_TC_SLOTS = ['7', '8', '10', '11']
 const FLEX_TC_SLOTS = ['A1', 'B1']

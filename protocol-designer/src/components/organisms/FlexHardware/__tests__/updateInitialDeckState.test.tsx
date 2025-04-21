@@ -1,10 +1,8 @@
 import { describe, it, vi, expect } from 'vitest'
 import {
-  DeckConfiguration,
   fixture12Trough,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
-  LabwareDefinition2,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
@@ -18,6 +16,10 @@ import {
   deleteDeckFixture,
 } from '../../../../step-forms/actions/additionalItems'
 import { updateInitialDeckState } from '../util'
+import type {
+  DeckConfiguration,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,

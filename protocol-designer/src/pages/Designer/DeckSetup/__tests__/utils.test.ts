@@ -10,22 +10,15 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   getDeckErrors,
-  getIsHardwareOnSlotInUse,
   getIsLabwareOnSlotInUse,
   getModuleModelsBySlot,
   getSVGContainerWidth,
 } from '../utils'
 import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
-import type {
-  LabwareOnDeck,
-  ModuleOnDeck,
-  SavedStepFormState,
-} from '../../../../step-forms'
-import type { AdditionalEquipment } from '../../utils'
+import type { LabwareOnDeck, SavedStepFormState } from '../../../../step-forms'
 
 describe('getModuleModelsBySlot', () => {
   it('renders no modules for ot-2 middle slot', () => {
@@ -167,53 +160,13 @@ const mockSavedSteps: SavedStepFormState = {
     id: 'mockId3',
   },
 }
-let mockLabware: LabwareOnDeck = {
+const mockLabware: LabwareOnDeck = {
   slot: 'A3',
   id: 'mockLabwareId',
   pythonName: 'mockPythonName',
   labwareDefURI: 'mockURI',
   def: {} as any,
 }
-const mockModule: ModuleOnDeck = {
-  slot: 'A3',
-  type: 'heaterShakerModuleType',
-  id: 'mockHeaterShakerId',
-  model: 'heaterShakerModuleV1',
-  pythonName: 'mockPythonName',
-  moduleState: {} as any,
-}
-const mockFixtures: AdditionalEquipment[] = [
-  {
-    name: 'wasteChute',
-    id: 'mockWasteChute',
-    location: WASTE_CHUTE_CUTOUT,
-  },
-]
-describe('getIsHardwareOnSlotInUse', () => {
-  it('returns true when there is a module in use', () => {
-    expect(getIsHardwareOnSlotInUse(mockSavedSteps, null, mockModule)).toBe(
-      true
-    )
-  })
-
-  it('returns true when there is a matchingLabwareFor4thColumn in use', () => {
-    mockLabware = {
-      ...mockLabware,
-      slot: 'A4',
-    }
-    expect(getIsHardwareOnSlotInUse(mockSavedSteps, mockLabware)).toBe(true)
-  })
-  it('returns true when there is a fixture in use', () => {
-    expect(
-      getIsHardwareOnSlotInUse(mockSavedSteps, null, undefined, mockFixtures)
-    ).toBe(true)
-  })
-  it('returns false when there are no steps use', () => {
-    expect(
-      getIsHardwareOnSlotInUse({}, mockLabware, mockModule, mockFixtures)
-    ).toBe(false)
-  })
-})
 
 describe('getIsLabwareOnSlotInUse', () => {
   it('returns true when there is a labware in use', () => {

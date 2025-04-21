@@ -49,7 +49,7 @@ import type {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
-import type { DeckConfiguration, PipetteName } from '@opentrons/shared-data'
+import type { PipetteName } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import type { LoadFileAction } from '../../load-file'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
@@ -70,7 +70,6 @@ import type {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
   DeckConfigurationState,
-  EditDeckConfigurationAction,
 } from '../actions'
 
 import type {
