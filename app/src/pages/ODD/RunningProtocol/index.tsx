@@ -60,10 +60,7 @@ import {
 } from '/app/organisms/ErrorRecoveryFlows'
 
 import type { OnDeviceRouteParams } from '/app/App/types'
-import {
-  NOT_CONFIGURED,
-  useIsDoorOpen,
-} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/hooks'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000

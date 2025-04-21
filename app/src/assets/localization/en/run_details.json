@@ -37,7 +37,7 @@
   "device_details": "Device details",
   "door_is_open": "Robot door is open",
   "stacker_door_is_open": "Stacker {{module_door_location}} door is open",
-  "unconfigured_stacker_door_is_open": "Stacker {{module_door_location}} door is open",
+  "unconfigured_stacker_door_is_open": "Stacker door is open",
   "door_open_pause": "Current Step - Paused - Door Open",
   "download": "Download",
   "download_files": "Download files",

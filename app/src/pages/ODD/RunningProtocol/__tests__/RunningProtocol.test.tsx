@@ -25,6 +25,7 @@ import {
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
+import { getRobotSettings } from '/app/redux/robot-settings'
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
@@ -49,6 +50,7 @@ import {
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')
@@ -62,6 +64,7 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/ErrorRecoveryFlows')
 vi.mock('/app/organisms/InterventionModal')
+vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -72,6 +75,10 @@ const PROTOCOL_ANALYSIS = {
   status: 'completed',
   labware: [],
 } as any
+const DOOR_RESULT = {
+  isDoorOpen: true,
+  moduleDoorLocation: null,
+}
 const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()
 const mockStopRun = vi.fn()
@@ -199,6 +206,9 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID, { refetchInterval: 5000 })
       .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(DOOR_RESULT)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalled()
   })

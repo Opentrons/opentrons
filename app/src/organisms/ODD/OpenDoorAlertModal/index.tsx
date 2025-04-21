@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
-import { NOT_CONFIGURED } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/hooks'
+import { NOT_CONFIGURED } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 export interface OpenDoorModalProps {
   moduleDoorLocation: string | null

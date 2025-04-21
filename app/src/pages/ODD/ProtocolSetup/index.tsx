@@ -114,7 +114,7 @@ import type {
 import {
   NOT_CONFIGURED,
   useIsDoorOpen,
-} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/hooks'
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 const FETCH_DURATION_MS = 5000
 
