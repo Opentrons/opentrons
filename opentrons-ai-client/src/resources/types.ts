@@ -30,7 +30,6 @@ export interface CreatePrompt {
   liquids: string[]
   steps: string[]
   fake?: boolean
-  fake_id?: number
   fake_key?: string
 }
 
@@ -48,7 +47,6 @@ export interface UpdatePrompt {
   update_type: UpdateOptions
   update_details: string
   fake: boolean
-  fake_id: number
 }
 
 export interface Chat {
