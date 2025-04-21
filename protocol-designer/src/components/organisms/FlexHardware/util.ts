@@ -37,6 +37,7 @@ const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
   cutoutC3: 'C4',
   cutoutD3: 'D4',
 }
+
 export const updateInitialDeckState = (
   values: CutoutConfigExtended[],
   initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
@@ -98,8 +99,10 @@ export const updateInitialDeckState = (
       matchingModule,
       matchingFixture != null ? [matchingFixture] : undefined
     )
+    //  updating fixtures only
     if (FIXTURES.includes(value.type as DeckFixture)) {
       if (matchingFixture != null) {
+        //  if deleting staging area with labware in 4th column slot
         if (
           matchingFixture.name === 'stagingArea' &&
           fixtureIds == null &&
@@ -110,6 +113,7 @@ export const updateInitialDeckState = (
             ids: [matching4thColumnLabware.id, matchingFixture.id],
             deckConfig,
           })
+          //  if deleting fixture that is in use
         } else if (fixtureIds != null && deckConfig != null) {
           setShowDeleteEntityModal({
             ids:
@@ -118,12 +122,14 @@ export const updateInitialDeckState = (
                 : fixtureIds,
             deckConfig,
           })
+          //  if deleting fixture that is not in use
         } else {
           dispatch(deleteDeckFixture(matchingFixture.id))
           if (deckConfig != null) {
             dispatch(editDeckConfiguration({ deckConfig }))
           }
         }
+        //  creating fixture
       } else {
         dispatch(createDeckFixture(value.type as DeckFixture, value.cutoutId))
       }
@@ -147,11 +153,7 @@ export const updateInitialDeckState = (
               labware => labware.slot === fourthColumnSlotNextToMagBlock
             ) ?? null
           : null
-      const {
-        moduleId,
-        fixtureIds,
-        fourthColumnSlotLabwareId,
-      } = getHardwareInSlotInUse(
+      const { fixtureIds, fourthColumnSlotLabwareId } = getHardwareInSlotInUse(
         savedSteps,
         matching4thColumnLabwarNextToMagBlock,
         matchingModuleForAboveStaging,
@@ -165,6 +167,7 @@ export const updateInitialDeckState = (
               value.cutoutId
             )
           : true
+      //  if deleting staging area where labware is in 4th column slot
       if (
         matchingStagingArea != null &&
         fixtureIds == null &&
@@ -179,6 +182,7 @@ export const updateInitialDeckState = (
 
           deckConfig,
         })
+        //   if deleting staging area not in use
       } else if (
         matchingStagingArea != null &&
         fixtureIds == null &&
@@ -188,6 +192,7 @@ export const updateInitialDeckState = (
         if (deckConfig != null) {
           dispatch(editDeckConfiguration({ deckConfig }))
         }
+        //   if delete staging area that is in use
       } else if (
         matchingStagingArea != null &&
         (fixtureIds != null || fourthColumnSlotLabwareId != null) &&
@@ -198,20 +203,19 @@ export const updateInitialDeckState = (
           ...(fourthColumnSlotLabwareId ? [fourthColumnSlotLabwareId] : []),
         ]
         setShowDeleteEntityModal({ ids: idsToDelete, deckConfig })
+        //  creating fixture
       } else {
         dispatch(
           createDeckFixture('stagingArea' as DeckFixture, value.cutoutId)
         )
       }
       if (matchingModuleForAboveStaging != null) {
-        if (moduleId != null && deckConfig != null) {
-          setShowDeleteEntityModal({ ids: [moduleId], deckConfig })
-        } else {
-          dispatch(deleteModule({ moduleId: matchingModuleForAboveStaging.id }))
-          if (deckConfig != null) {
-            dispatch(editDeckConfiguration({ deckConfig }))
-          }
+        //   if deleting magnetic block
+        dispatch(deleteModule({ moduleId: matchingModuleForAboveStaging.id }))
+        if (deckConfig != null) {
+          dispatch(editDeckConfiguration({ deckConfig }))
         }
+        //   if creating module
       } else {
         const slot = value.cutoutId.split('cutout')[1]
         if (isLabwareCompatible) {
@@ -222,6 +226,7 @@ export const updateInitialDeckState = (
               type: MAGNETIC_BLOCK_TYPE,
             })
           )
+          //  trying to create module but incompatible labware is in the way
         } else {
           makeSnackbar(t('module_incompatible', { slot }) as string)
         }
@@ -243,6 +248,7 @@ export const updateInitialDeckState = (
         undefined,
         matchingFixtures
       )
+      //   if deleting staging area where labware is in 4th column slot
       if (
         matchingFixtures.length > 0 &&
         fixtureIds == null &&
@@ -254,6 +260,7 @@ export const updateInitialDeckState = (
           ids: [matching4thColumnLabwareInD4.id, ...matchingFixtureIds],
           deckConfig,
         })
+        //   if deleting staging area + waste chute not in use
       } else if (
         matchingFixtures.length > 0 &&
         fixtureIds == null &&
@@ -265,6 +272,7 @@ export const updateInitialDeckState = (
         if (deckConfig != null) {
           dispatch(editDeckConfiguration({ deckConfig }))
         }
+        //   if deleting staging area + waste chute and one is in use
       } else if (
         matchingFixtures.length > 0 &&
         (fixtureIds != null || fourthColumnSlotLabwareId != null) &&
@@ -275,6 +283,7 @@ export const updateInitialDeckState = (
           ...(fourthColumnSlotLabwareId ? [fourthColumnSlotLabwareId] : []),
         ]
         setShowDeleteEntityModal({ ids: idsToDelete, deckConfig })
+        //  if creating fixtures
       } else {
         dispatch(
           createDeckFixture('stagingArea' as DeckFixture, WASTE_CHUTE_CUTOUT)
@@ -284,9 +293,11 @@ export const updateInitialDeckState = (
         )
       }
     } else {
+      //  if deleting module in use
       if (matchingModule != null) {
         if (moduleId != null && deckConfig != null) {
           setShowDeleteEntityModal({ ids: [moduleId], deckConfig })
+          //   if deleting module
         } else {
           dispatch(deleteModule({ moduleId: matchingModule.id }))
           if (deckConfig != null) {
@@ -302,6 +313,7 @@ export const updateInitialDeckState = (
           value.cutoutId
         )
         const slot = value.cutoutId.split('cutout')[1]
+        //   if creating module
         if (isLabwareCompatible) {
           dispatch(
             createModule({
@@ -310,6 +322,7 @@ export const updateInitialDeckState = (
               type,
             })
           )
+          //   if adding module to slot with incompatible labware
         } else {
           makeSnackbar(t('module_incompatible', { slot }) as string)
         }
