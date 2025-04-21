@@ -1229,7 +1229,7 @@ class FlexStackerContext(ModuleContext):
         """
         return self._core.get_current_storable_labware()
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def set_stored_labware_items(self, labware: list[Labware]) -> None:
         """Configure a Flex Stacker by providing an initial list of stored labware objects.
 
