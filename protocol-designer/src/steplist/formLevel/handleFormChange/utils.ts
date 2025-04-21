@@ -416,18 +416,11 @@ const getSubmergeRetractFields = (args: {
 
   // all common submerge and retract fields
   const { delay, speed } = submergeRetractLookup
-  const [positionReference, offset] =
+  const { positionReference, offset } =
     'startPosition' in submergeRetractLookup
-      ? [
-          submergeRetractLookup.startPosition.positionReference,
-          submergeRetractLookup.startPosition.offset,
-        ]
-      : [
-          submergeRetractLookup.endPosition.positionReference,
-          submergeRetractLookup.endPosition.offset,
-        ]
+      ? submergeRetractLookup.startPosition
+      : submergeRetractLookup.endPosition
   const fullPrefix = `${liquidHandlingAction}_${tipMovement}` as SubmergeRetractAspirateDispensePrefix
-
   const offsetFields = getOffsetFields(offset, fullPrefix)
   const PositionReferenceFields = getPositionReferenceFields(
     positionReference,
