@@ -107,7 +107,6 @@ export function CreateProtocol(): JSX.Element | null {
       liquids: [],
       steps: [],
       fake: false,
-      fake_id: 0,
     })
     setUpdateProtocolChatAtom({
       prompt: '',
@@ -116,7 +115,6 @@ export function CreateProtocol(): JSX.Element | null {
       update_type: 'adapt_python_protocol',
       update_details: '',
       fake: false,
-      fake_id: 0,
     })
     setChatHistoryAtom([])
     setChatData([])

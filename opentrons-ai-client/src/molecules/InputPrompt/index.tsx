@@ -122,16 +122,18 @@ export function InputPrompt(): JSX.Element {
         ? getCreateOrUpdateEndpoint()
         : getChatEndpoint()
 
+      const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
+
       const config = {
         url,
         method: 'POST',
         headers,
         data: isUpdateOrCreateRequest
-          ? getUpdateOrCreatePrompt(isRegenerateRequest)
+          ? promptData
           : {
               message: watchUserPrompt,
               history: chatHistory,
-              fake: true,
+              fake: false,
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
             },
       }
