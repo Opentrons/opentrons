@@ -8,10 +8,8 @@ import {
 import { isCancellableStatus } from '../utils'
 
 import type { RunHeaderBannerContainerProps } from '.'
-import {
-  DoorResult,
-  NOT_CONFIGURED,
-} from '../../../../../DoorOpenControl/useIsDoorOpen'
+import type { DoorResult } from '../../../../../DoorOpenControl/useIsDoorOpen'
+import { NOT_CONFIGURED } from '../../../../../DoorOpenControl/useIsDoorOpen'
 
 interface ShowGenericRunHeaderBannersParams {
   runStatus: RunHeaderBannerContainerProps['runStatus']
