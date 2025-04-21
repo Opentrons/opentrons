@@ -24,11 +24,11 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=100,
     )
     parameters.add_float(
-        variable_name="soak_minutes",
-        display_name="Soak Minutes",
+        variable_name="soak_seconds",
+        display_name="Soak Seconds",
         default=5,
         minimum=1,
-        maximum=10,
+        maximum=30,
     )
     parameters.add_bool(
         variable_name="gripper_only", display_name="Gripper Only", default=True
@@ -45,8 +45,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     evotip = evosep_tips_labware.wells()[0]
     gripper_repeats = protocol.params.gripper_repeats  # type: ignore[attr-defined]
-    soak_minutes = protocol.params.soak_minutes  # type: ignore[attr-defined]
-    soak_seconds = soak_minutes * 60
+    soak_seconds = protocol.params.soak_seconds  # type: ignore[attr-defined]
     gripper_only = protocol.params.gripper_only  # type: ignore[attr-defined]
     short_adapter = protocol.load_adapter("ev_resin_tips_flex_short_adapter", "B2")
     sol_a_plate = protocol.load_labware("nest_1_reservoir_195ml", "C2", "Solvent A")
@@ -163,7 +162,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.pause("check tip alignment.")
 
         p1k_96.resin_tip_dispense(
-            location=trash_plate["A1"].top(), volume=400.0, rate=1.0
+            location=trash_plate["A1"].top(), volume=400.0, rate=100.0
         )
         protocol.delay(seconds=30)
         p1k_96.resin_tip_dispense(
