@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useErrorRecoverySettings } from '@opentrons/react-api-client'
 
@@ -11,7 +11,7 @@ import {
   useCurrentRunCommands,
   useIsRunCurrent,
 } from '/app/resources/runs'
-import { isTerminalRunStatus } from '../../utils'
+import { isTerminalRunStatus, isWaitingForAppUncurrentRun } from '../../utils'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 
@@ -138,8 +138,7 @@ export function useRunHeaderDropTip({
   // This marks the robot as "not busy" if drop tip CTAs are unnecessary.
   useEffect(() => {
     if (
-      runStatus === RUN_STATUS_STOPPED &&
-      isRunCurrent &&
+      isWaitingForAppUncurrentRun(runStatus, isRunCurrent) &&
       (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE)
     ) {
       closeCurrentRun()
