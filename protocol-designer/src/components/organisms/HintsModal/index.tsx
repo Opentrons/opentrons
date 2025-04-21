@@ -36,11 +36,9 @@ export const HintsModal = (): JSX.Element | null => {
   if (hintKey === 'thermocycler_lid_passive_cooling') {
     hintContents = (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <Flex>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t(`alert:hint.${hintKey}.body`)}
-          </StyledText>
-        </Flex>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t(`alert:hint.${hintKey}.body`)}
+        </StyledText>
         <Flex marginLeft={SPACING.spacing16}>
           <ul>
             <li>
@@ -92,7 +90,11 @@ export const HintsModal = (): JSX.Element | null => {
             </StyledText>
           </Flex>
           <Flex alignItems={ALIGN_END}>
-            <PrimaryButton onClick={() => handleRemoveHint(hintKey)}>
+            <PrimaryButton
+              onClick={() => {
+                handleRemoveHint(hintKey)
+              }}
+            >
               {i18n.format(t('shared:confirm'), 'capitalize')}
             </PrimaryButton>
           </Flex>
