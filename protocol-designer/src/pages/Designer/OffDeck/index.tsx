@@ -21,7 +21,7 @@ import { getOnlyLatestDefs } from '../../../labware-defs'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
-import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
+import { DeckSetupToolbox } from '../DeckSetup/DeckSetupToolbox'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
 
@@ -156,9 +156,8 @@ export function OffDeck(): JSX.Element {
               </Flex>
             </Flex>
           </Flex>
-          <DeckSetupTools
+          <DeckSetupToolbox
             position={POSITION_RELATIVE}
-            onDeckProps={null}
             setHoveredLabware={setHoveredLabware}
             onCloseClick={() => {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))

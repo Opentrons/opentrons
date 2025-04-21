@@ -47,6 +47,7 @@ import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 import { StepsInfo } from './StepsInfo'
 import { StartingDeck } from './StartingDeck'
+import { HardwareInfo } from './HardwareInfo'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
@@ -331,6 +332,11 @@ export function ProtocolOverview(): JSX.Element {
               pipettesOnDeck={pipettesOnDeck}
               additionalEquipment={additionalEquipment}
               setShowEditInstrumentsModal={setShowEditInstrumentsModal}
+            />
+            <HardwareInfo
+              robotType={robotType}
+              modules={Object.values(modulesOnDeck)}
+              additionalEquipment={additionalEquipmentOnDeck}
             />
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}

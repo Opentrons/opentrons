@@ -62,7 +62,7 @@ export function InputStepFormField(
             setIsPristine(false)
           }
         }}
-        value={value ? String(value) : null}
+        value={value?.toString()}
         units={units}
         placeholder={placeholder}
       />
