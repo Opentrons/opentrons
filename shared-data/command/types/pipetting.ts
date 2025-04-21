@@ -235,9 +235,10 @@ export interface VerifyTipPresenceRunTimeCommand
   result?: any
 }
 
+export type LiquidProbeParams = WellLocationParam & PipetteAccessParams
 export interface LiquidProbeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'liquidProbe'
-  params: WellLocationParam & PipetteAccessParams
+  params: LiquidProbeParams
 }
 export interface LiquidProbeRunTimeCommand
   extends CommonCommandRunTimeInfo,
