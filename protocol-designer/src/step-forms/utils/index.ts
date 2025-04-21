@@ -35,7 +35,6 @@ import type {
 import type { DeckSlot } from '../../types'
 import type { FormData, HydratedFormData } from '../../form-types'
 import type {
-  AdditionalEquipmentOnDeck,
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,
