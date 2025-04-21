@@ -24,11 +24,11 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=100,
     )
     parameters.add_float(
-        variable_name="soak_seconds",
-        display_name="Soak Seconds",
-        default=30,
+        variable_name="soak_minutes",
+        display_name="Soak Minutes",
+        default=5,
         minimum=1,
-        maximum=60,
+        maximum=10,
     )
     parameters.add_bool(
         variable_name="gripper_only", display_name="Gripper Only", default=True
@@ -45,7 +45,8 @@ def run(protocol: ProtocolContext) -> None:
     )
     evotip = evosep_tips_labware.wells()[0]
     gripper_repeats = protocol.params.gripper_repeats  # type: ignore[attr-defined]
-    soak_seconds = protocol.params.soak_seconds  # type: ignore[attr-defined]
+    soak_minutes = protocol.params.soak_minutes  # type: ignore[attr-defined]
+    soak_seconds = soak_minutes * 60
     gripper_only = protocol.params.gripper_only  # type: ignore[attr-defined]
     short_adapter = protocol.load_adapter("ev_resin_tips_flex_short_adapter", "B2")
     sol_a_plate = protocol.load_labware("nest_1_reservoir_195ml", "C2", "Solvent A")
@@ -54,25 +55,27 @@ def run(protocol: ProtocolContext) -> None:
     sample_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "D2", "Samples"
     )
+    trash_plate = protocol.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "D1", "Trash"
+    )
     sample = sample_plate.wells()[0]
     protocol.load_trash_bin("D3")
-    if not gripper_only:
-        tips_200 = protocol.load_labware(
-            "opentrons_flex_96_tiprack_200ul",
-            "B1",
-            "200uL tips",
+    tips_200 = protocol.load_labware(
+        "opentrons_flex_96_tiprack_200ul",
+        "B1",
+        "200uL tips",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
+    tips_50 = [
+        protocol.load_labware(
+            "opentrons_flex_96_tiprack_50ul",
+            slot,
+            "50uL tips",
             adapter="opentrons_flex_96_tiprack_adapter",
         )
-        tips_50 = [
-            protocol.load_labware(
-                "opentrons_flex_96_tiprack_50ul",
-                slot,
-                "50uL tips",
-                adapter="opentrons_flex_96_tiprack_adapter",
-            )
-            for slot in ["C3", "B3"]
-        ]
-
+        for slot in ["C3", "B3"]
+    ]
+    if not gripper_only:
         p1k_96 = protocol.load_instrument("flex_96channel_1000")
 
         # adding 15 uL and then 20 uL
@@ -107,8 +110,6 @@ def run(protocol: ProtocolContext) -> None:
         p1k_96.move_to(evotip.top(z=-23), speed=2)  # -22
         p1k_96.move_to(evotip.top(z=5))
 
-        # protocol.pause(' ')
-
         p1k_96.return_tip()
 
         # adding 150 uL
@@ -135,28 +136,25 @@ def run(protocol: ProtocolContext) -> None:
 
         p1k_96.move_to(evotip.top())
 
-        protocol.pause("Check for 3 distinct layers.")
-
         p1k_96.return_tip()
 
         # ------------------------Soak tips Action ------------------------------
-
+        protocol.pause("About to soak tips. Check for 3 distinct layers.")
         protocol.move_labware(evosep_tips_labware, short_adapter, True)
         protocol.delay(soak_seconds)
         protocol.move_labware(evosep_tips_labware, evotips_adapter, True)
-    for i in range(gripper_repeats):
-        protocol.move_labware(
-            labware=evosep_tips_labware,
-            new_location=short_adapter,
-            use_gripper=True,
-        )
-        protocol.move_labware(
-            labware=evosep_tips_labware,
-            new_location=evotips_adapter,
-            use_gripper=True,
-        )
-
-    protocol.delay(seconds=soak_seconds)
+    if gripper_only:
+        for i in range(gripper_repeats):
+            protocol.move_labware(
+                labware=evosep_tips_labware,
+                new_location=short_adapter,
+                use_gripper=True,
+            )
+            protocol.move_labware(
+                labware=evosep_tips_labware,
+                new_location=evotips_adapter,
+                use_gripper=True,
+            )
 
     # ------------------------End Gripper Action ---------------------------
     if not gripper_only:
@@ -165,13 +163,12 @@ def run(protocol: ProtocolContext) -> None:
         protocol.pause("check tip alignment.")
 
         p1k_96.resin_tip_dispense(
-            location=sample_plate["A1"].bottom(), volume=400.0, rate=100.0
-        )
-        protocol.delay(seconds=20)
-        p1k_96.resin_tip_dispense(
-            location=sample_plate["A1"].bottom(), volume=100.0, rate=1.0
+            location=trash_plate["A1"].top(), volume=400.0, rate=1.0
         )
         protocol.delay(seconds=30)
-
+        p1k_96.resin_tip_dispense(
+            location=trash_plate["A1"].top(), volume=100.0, rate=1.0
+        )
+        protocol.delay(seconds=30)
         # Unseal/eject the Evo Tips
         p1k_96.resin_tip_unseal(evosep_tips_labware)
