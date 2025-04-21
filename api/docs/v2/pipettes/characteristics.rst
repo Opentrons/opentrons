@@ -127,13 +127,26 @@ Finally, let's tell the robot to dispense 100 µL into the well plate at locatio
 
     right.dispense(volume=100, location=plate["B1"])
 
-The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1.
+The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1. 
 
-Complex Commands
-----------------
-All complex commands, including liquid class complex commands, work with single and multi-channel pipettes. 
+Liquid Class Transfers
+-----------------------
+You can transfer liquids of a defined class with single or multi-channel pipettes. 
 
-When you use a complex liquid class command, like ``transfer_with_liquid_class``, the pipette will visit every well you provide in a ``source`` or ``dest``, regardless of how many channels or attached tips the pipette has.  
+Instead of providing the primary nozzle for a method like :py:meth:`.InstrumentContext.transfer_with_liquid_class`, you'll need to provide every well that will be visited during a transfer that uses partial tip pickup. Let's look at an example with each well of two 96-well plates::
+
+  liquid_1 = protocol.define_liquid_class("glycerol_50")
+  trash = protocol.load_trash_bin("A3")
+
+  right.transfer_with_liquid_class(
+    liquid_class=liquid_1,
+    volume=50,
+    source=plate[.wells]
+    dest=plate_2[.wells]
+    trash_location=trash
+  )
+
+TODOs: updated to include a better explanation (still needs work). is this the best section? does this cover all examples (emphasize further this situtation with 96 and 384 well plates)? check code blocks. 
 
 .. _new-plunger-flow-rates:
 
