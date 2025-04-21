@@ -113,25 +113,16 @@ export function Chip(props: ChipProps): JSX.Element {
     }
   `
 
+  const smallSize = iconName === 'connection-status' ? '0.5rem' : '0.75rem'
   const ICON_STYLE = css`
-    width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
-    height: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
+      width: ${chipSize === 'medium' ? '1rem' :  smallSize};
+      height: ${chipSize === 'medium' ? '1rem' : smallSize};
 
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-      height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-    }
-  `
-
-  const STATUS_ICON_STYLE = css`
-    width: ${chipSize === 'medium' ? '1rem' : '0.5rem'};
-    height: ${chipSize === 'medium' ? '1rem' : '0.5rem'};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-      height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-    }
-  `
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
+        height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
+      }
+    `
 
   const TEXT_STYLE = css`
     ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
@@ -161,9 +152,7 @@ export function Chip(props: ChipProps): JSX.Element {
           name={icon}
           color={iconColor}
           aria-label={`icon_${text}`}
-          css={
-            iconName === 'connection-status' ? STATUS_ICON_STYLE : ICON_STYLE
-          }
+          css={ICON_STYLE}
         >
           {pulseIcon ? (
             <animate
