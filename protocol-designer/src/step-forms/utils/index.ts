@@ -12,7 +12,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
-import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
@@ -36,7 +35,6 @@ import type {
 import type { DeckSlot } from '../../types'
 import type { FormData, HydratedFormData } from '../../form-types'
 import type {
-  AdditionalEquipmentOnDeck,
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,
@@ -159,21 +157,7 @@ export function denormalizePipetteEntities(
     {}
   )
 }
-/** deprecated */
-export const getSlotIdsBlockedBySpanning = (
-  initialDeckSetup: InitialDeckSetup
-): DeckSlot[] => {
-  const loadedThermocycler = values(initialDeckSetup.modules).find(
-    ({ type }: ModuleOnDeck) => type === THERMOCYCLER_MODULE_TYPE
-  )
-  if (loadedThermocycler != null) {
-    return loadedThermocycler.slot === SPAN7_8_10_11_SLOT
-      ? ['7', '8', '10', '11']
-      : ['A1', 'B1']
-  }
 
-  return []
-}
 export const getSlotIdsBlockedBySpanningForThermocycler = (
   initialDeckSetup: InitialDeckSetup,
   robotType: RobotType
@@ -190,18 +174,12 @@ export const getSlotIdsBlockedBySpanningForThermocycler = (
   return []
 }
 
-//  TODO(ja, 3/7/25): this util is very outdated, much of it is probably
-//  not even in use. we should refactor this!!!
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
-  /* we don't always want to count the slot as full if there is a staging area present
-     since labware/wasteChute can still go on top of staging areas  **/
-  includeStagingAreas?: boolean,
-  /* optional disallowing for additionalEquipmentAreas or not **/
-  discountAdditionalEquipmentAreas?: boolean
+  discountTrash: boolean
 ): boolean => {
-  //   special-casing the TC's slot A1 for the Flex
+  //  special-casing the TC's slot A1 for the Flex
   if (
     slot === 'cutoutA1' &&
     Object.values(initialDeckSetup.modules).find(
@@ -210,38 +188,16 @@ export const getSlotIsEmpty = (
   ) {
     return false
   } else if (
-    slot === SPAN7_8_10_11_SLOT &&
-    TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
+    Object.values(initialDeckSetup.additionalEquipmentOnDeck).some(
+      ae =>
+        (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
+        ae.location.includes(slot)
+    ) &&
+    discountTrash
   ) {
-    // special "spanning slot" is not empty if there's anything in the slots that it spans,
-    // even when there's no spanning labware/module (eg thermocycler) on the deck
-    return false
-  } else if (getSlotIdsBlockedBySpanning(initialDeckSetup).includes(slot)) {
-    // if a slot is being blocked by a spanning labware/module (eg thermocycler), it's not empty
-    return false
-    //  don't allow duplicating into the trash slot.
-  } else if (slot === '12') {
     return false
   }
 
-  const filteredAdditionalEquipmentOnDeck = values(
-    initialDeckSetup.additionalEquipmentOnDeck
-  ).filter((additionalEquipment: AdditionalEquipmentOnDeck) => {
-    const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
-    const includeStaging = includeStagingAreas
-      ? true
-      : additionalEquipment.name !== 'stagingArea'
-    if (cutoutForSlotOt2 != null) {
-      //  for Ot-2
-      return additionalEquipment.location === cutoutForSlotOt2 && includeStaging
-    } else {
-      //  for Flex
-      return additionalEquipment.location?.includes(slot) && includeStaging
-    }
-  })
-  const additionalEquipment = discountAdditionalEquipmentAreas
-    ? []
-    : filteredAdditionalEquipmentOnDeck
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -255,7 +211,6 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...additionalEquipment,
     ].length === 0
   )
 }

@@ -1,6 +1,12 @@
 import type { FC } from 'react'
 import type { OutputSelector } from 'reselect'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  NozzleConfigurationStyle,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FileData } from './file-data'
@@ -61,3 +67,9 @@ export interface RouteProps {
   path: string
   navLinkTo: string
 }
+
+export type OT2ModuleType =
+  | typeof MAGNETIC_MODULE_TYPE
+  | typeof TEMPERATURE_MODULE_TYPE
+  | typeof THERMOCYCLER_MODULE_TYPE
+  | typeof HEATERSHAKER_MODULE_TYPE

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -19,8 +19,8 @@ import {
   JUSTIFY_FLEX_START,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { getAllDefinitions } from '@opentrons/shared-data'
 
+import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
@@ -51,7 +51,10 @@ export function SetupLabwareStackView({
   labwareByLiquidId,
   mostRecentAnalysis,
 }: SetupLabwareStackViewProps): JSX.Element {
-  const labwareDefinitions = getAllDefinitions()
+  const labwareDefinitionsByURI = useMemo(
+    () => getLabwareDefinitionsByURIForProtocol(mostRecentAnalysis.commands),
+    [mostRecentAnalysis]
+  )
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'protocol_command_text',
@@ -78,7 +81,8 @@ export function SetupLabwareStackView({
     labwareByLiquidId
   )
   const hasLiquids = Object.keys(wellFill).length > 0
-  const labwareDefinition = labwareDefinitions[selectedLabware.definitionUri]
+  const labwareDefinition =
+    labwareDefinitionsByURI[selectedLabware.definitionUri]
 
   return (
     <>

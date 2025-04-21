@@ -95,20 +95,24 @@ export function quickTransferWizardReducer(
         path: action.path,
       }
     }
-    // ToDo (kk:04/10/2025) uncomment this when add tip frequency
-    // case 'SET_CHANGE_TIP': {
-    //   return {
-    //     ...state,
-    //     changeTip: action.changeTip,
-    //   }
-    // }
-    // ToDo (kk:04/10/2025) uncomment this when add drop tip location
-    // case 'SET_DROP_TIP_LOCATION': {
-    //   return {
-    //     ...state,
-    //     dropTipLocation: action.location,
-    //   }
-    // }
+    case 'SET_CHANGE_TIP': {
+      return {
+        ...state,
+        changeTip: action.changeTip,
+      }
+    }
+    case 'SET_DROP_TIP_LOCATION': {
+      return {
+        ...state,
+        dropTipLocation: action.location,
+      }
+    }
+    case 'SET_LIQUID_CLASS': {
+      return {
+        ...state,
+        liquidClass: action.liquidClass,
+      }
+    }
   }
 }
 

@@ -8,6 +8,7 @@ import type {
   LabwareDefinition2,
   PipetteV2Specs,
   DeckConfiguration,
+  LiquidClass,
 } from '@opentrons/shared-data'
 import type { Mount } from '@opentrons/api-client'
 import type {
@@ -29,6 +30,7 @@ interface InitialSummaryStateProps {
     transferType: TransferType
     volume: number
     path: PathOption
+    liquidClass: LiquidClass
   }
   deckConfig: DeckConfiguration
 }
@@ -100,5 +102,6 @@ export function getInitialSummaryState(
     tipPositionDispense: 1,
     changeTip,
     dropTipLocation: trashConfigCutout,
+    liquidClass: state.liquidClass,
   }
 }

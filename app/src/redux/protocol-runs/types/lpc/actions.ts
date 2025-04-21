@@ -122,6 +122,11 @@ export interface UpdateConflictTimestampAction {
   payload: { runId: string; info: ConflictTimestampInfo }
 }
 
+export interface ToggleDefaultOffsetInfoBanner {
+  type: 'TOGGLE_DEFAULT_OFFSET_INFO_BANNER'
+  payload: { runId: string }
+}
+
 export type LPCWizardAction =
   | UpdateLPCAction
   | UpdateLPCDeckAction
@@ -142,3 +147,4 @@ export type LPCWizardAction =
   | SourceOffsetsFromRunAction
   | SourceOffsetsFromDatabaseAction
   | UpdateConflictTimestampAction
+  | ToggleDefaultOffsetInfoBanner

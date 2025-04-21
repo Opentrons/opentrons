@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
-  DIRECTION_COLUMN,
   Flex,
   INFO_TOAST,
   OVERFLOW_HIDDEN,
@@ -12,13 +11,10 @@ import {
 import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
-import {
-  DefineLiquidsModal,
-  DesignerNavigation,
-} from '../../components/organisms'
+import { DefineLiquidsModal } from '../../components/organisms'
 import { getFileMetadata } from '../../file-data/selectors'
 import { selectors } from '../../labware-ingred/selectors'
-import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
+import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
 import { ProtocolSteps } from './ProtocolSteps'
 
 import type { CutoutId } from '@opentrons/shared-data'
@@ -46,10 +42,6 @@ export function Designer(): JSX.Element {
   const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
 
   const { modules, additionalEquipmentOnDeck } = deckSetup
-
-  const hasTrashEntity = Object.values(additionalEquipmentOnDeck).some(
-    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
-  )
 
   const hasHardware =
     (modules != null && Object.values(modules).length > 0) ||
@@ -105,15 +97,11 @@ export function Designer(): JSX.Element {
           }}
         />
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN} height="100%">
-        <DesignerNavigation
-          hasZoomInSlot={zoomIn.slot != null || zoomIn.cutout != null}
-          hasTrashEntity={hasTrashEntity}
+      <Flex height="100%" width="100%" overflowY={OVERFLOW_HIDDEN}>
+        <ProtocolSteps
+          isZoomedIn={zoomIn.slot != null}
           showLiquidOverflowMenu={showLiquidOverflowMenu}
         />
-        <Flex height="100%" width="100%" overflowY={OVERFLOW_HIDDEN}>
-          <ProtocolSteps isZoomedIn={zoomIn.slot != null} />
-        </Flex>
       </Flex>
     </>
   )

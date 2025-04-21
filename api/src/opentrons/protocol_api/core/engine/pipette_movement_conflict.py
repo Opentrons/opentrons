@@ -19,14 +19,9 @@ from opentrons.protocol_engine import (
     StateView,
     DeckSlotLocation,
     OnLabwareLocation,
-    WellLocation,
-    LiquidHandlingWellLocation,
-    PickUpTipWellLocation,
     DropTipWellLocation,
 )
-from opentrons.protocol_engine.types import (
-    StagingSlotLocation,
-)
+from opentrons.protocol_engine.types import StagingSlotLocation, WellLocationType
 from opentrons.types import DeckSlotName, StagingSlotName, Point
 from . import point_calculations
 
@@ -69,12 +64,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
     pipette_id: str,
     labware_id: str,
     well_name: str,
-    well_location: Union[
-        WellLocation,
-        LiquidHandlingWellLocation,
-        PickUpTipWellLocation,
-        DropTipWellLocation,
-    ],
+    well_location: WellLocationType,
 ) -> None:
     """Check if the labware is safe to move to with a pipette in partial tip configuration.
 
@@ -100,12 +90,14 @@ def check_safe_for_pipette_movement(  # noqa: C901
             partially_configured=True,
         )
     well_location_point = engine_state.geometry.get_well_position(
-        labware_id=labware_id, well_name=well_name, well_location=well_location
+        labware_id=labware_id,
+        well_name=well_name,
+        well_location=well_location,
+        pipette_id=pipette_id,
     )
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
     destination_cp = _get_critical_point_to_use(engine_state, labware_id)
-
     pipette_bounds_at_well_location = (
         engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id=pipette_id,

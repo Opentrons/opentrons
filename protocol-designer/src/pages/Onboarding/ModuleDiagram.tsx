@@ -11,10 +11,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  MAGNETIC_BLOCK_TYPE,
-  MAGNETIC_BLOCK_V1,
-  ABSORBANCE_READER_TYPE,
-  ABSORBANCE_READER_V1,
 } from '@opentrons/shared-data'
 
 import magdeck_gen1 from '../../assets/images/modules/magdeck_gen1.png'
@@ -24,21 +20,20 @@ import temp_deck_gen_2_transparent from '../../assets/images/modules/temp_deck_g
 import thermocycler from '../../assets/images/modules/thermocycler.png'
 import thermocycler_gen2 from '../../assets/images/modules/thermocycler_gen2.png'
 import heater_shaker_module_transparent from '../../assets/images/modules/heater_shaker_module_transparent.png'
-import mag_block from '../../assets/images/modules/MagneticBlock_GEN1_HERO.png'
-import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
+import type { OT2ModuleType } from '../../types'
 
-interface Props {
-  type: ModuleType
+interface ModuleDiagramProps {
+  type: OT2ModuleType
   model: ModuleModel
 }
 
 type ModuleImg = {
-  [type in ModuleType]: {
+  [type in OT2ModuleType]: {
     [model in ModuleModel]?: string
   }
 }
 
-// @ts-expect-error Flex stacker not yet supported in PD
 const MODULE_IMG_BY_TYPE: ModuleImg = {
   [MAGNETIC_MODULE_TYPE]: {
     [MAGNETIC_MODULE_V1]: magdeck_gen1,
@@ -55,17 +50,10 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   [HEATERSHAKER_MODULE_TYPE]: {
     [HEATERSHAKER_MODULE_V1]: heater_shaker_module_transparent,
   },
-  [MAGNETIC_BLOCK_TYPE]: {
-    [MAGNETIC_BLOCK_V1]: mag_block,
-  },
-  [ABSORBANCE_READER_TYPE]: {
-    // TODO (AA): update absorbance reader image
-    [ABSORBANCE_READER_V1]: heater_shaker_module_transparent,
-  },
 }
 
 const IMAGE_MAX_WIDTH = '96px'
-export function ModuleDiagram(props: Props): JSX.Element {
+export function ModuleDiagram(props: ModuleDiagramProps): JSX.Element {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
   return (
     <img

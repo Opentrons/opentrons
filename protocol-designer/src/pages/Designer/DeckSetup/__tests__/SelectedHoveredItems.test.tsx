@@ -15,6 +15,7 @@ import { selectors } from '../../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { LabwareOnDeck } from '../../../../components/organisms'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
 
@@ -56,11 +57,9 @@ describe('SelectedHoveredItems', () => {
       deckDef: getDeckDefFromRobotType(FLEX_ROBOT_TYPE),
       robotType: FLEX_ROBOT_TYPE,
       hoveredLabware: null,
-      hoveredModule: null,
-      hoveredFixture: null,
       slotPosition: [0, 0, 0],
     }
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
     vi.mocked(getAllLabwareDefs).mockReturnValue({
       [mockAdapterURI]: {
         ...fixture24Tuberack,
@@ -178,10 +177,5 @@ describe('SelectedHoveredItems', () => {
         'Fixture Opentrons Universal Flat Heater-Shaker Adapter'
       )
     ).toHaveLength(2)
-  })
-  it('renders nothing when there is a hovered module but selected fixture', () => {
-    props.hoveredModule = HEATERSHAKER_MODULE_V1
-    render(props)
-    expect(screen.queryByText('mock FixtureRender')).not.toBeInTheDocument()
   })
 })

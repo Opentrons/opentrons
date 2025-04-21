@@ -425,6 +425,22 @@ export function generateQuickTransferArgs(
         commandCreatorFnName: 'transfer',
         sourceWells,
         destWells,
+        aspirateDelay:
+          quickTransferState.delayAspirate != null
+            ? {
+                seconds: quickTransferState.delayAspirate.delayDuration,
+                mmFromBottom:
+                  quickTransferState.delayAspirate.positionFromBottom,
+              }
+            : null,
+        dispenseDelay:
+          quickTransferState.delayDispense != null
+            ? {
+                seconds: quickTransferState.delayDispense.delayDuration,
+                mmFromBottom:
+                  quickTransferState.delayDispense.positionFromBottom,
+              }
+            : null,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {

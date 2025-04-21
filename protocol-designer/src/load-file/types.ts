@@ -1,4 +1,4 @@
-import type { PDProtocolFile } from '../file-types'
+import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
 import type { RobotType } from '@opentrons/shared-data'
 
 export type FileUploadErrorType =
@@ -21,12 +21,12 @@ export interface NewProtocolFields {
   name: string | null | undefined
   description: string | null | undefined
   organizationOrAuthor: string | null | undefined
-  robotType?: RobotType
+  robotType: RobotType
 }
 export interface LoadFileAction {
   type: 'LOAD_FILE'
   payload: {
-    file: PDProtocolFile
+    file: PDProtocolFile | PythonDesignerApplication
     didMigrate: boolean
     migrationsRan: string[]
   }

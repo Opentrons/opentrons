@@ -600,6 +600,10 @@ const getNoLiquidClassValuesMix = (
     aspirate.flowRateByVolume,
     'aspirate'
   )
+  const aspiratePositionReferenceFields = getPositionReferenceFields(
+    aspirate.positionReference,
+    'mix'
+  )
   const dispenseFlowRateFields = getFlowRateFields(
     volume,
     singleDispense.flowRateByVolume,
@@ -614,6 +618,7 @@ const getNoLiquidClassValuesMix = (
 
   const aspirateFields = {
     ...aspirateFlowRateFields,
+    ...aspiratePositionReferenceFields,
   }
   const dispenseFields = {
     ...dispenseFlowRateFields,

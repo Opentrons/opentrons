@@ -53,7 +53,7 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
     pipetteVolume,
     setIncompatibleTip,
   } = props
-  const { t } = useTranslation('create_new_protocol')
+  const { t } = useTranslation('onboarding')
   const { makeSnackbar } = useKitchen()
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()

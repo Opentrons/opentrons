@@ -73,5 +73,55 @@ export interface QuickTransferWizardState {
   transferType?: TransferType
   volume?: number
   path?: PathOption // this has been added
+  changeTip?: ChangeTipOptions // this has been added
+  dropTipLocation?: CutoutConfig // this has been added
+  liquidClass?: LiquidClass // this has been added
+}
+```
+
+```ts
+export interface QuickTransferSummaryState {
+  pipette: PipetteV2Specs
+  mount: Mount
+  tipRack: LabwareDefinition2
+  source: LabwareDefinition2
+  sourceWells: string[]
+  destination: LabwareDefinition2 | 'source'
+  destinationWells: string[]
+  transferType: TransferType
+  volume: number
+  aspirateFlowRate: number
+  dispenseFlowRate: number
+  path: PathOption
+  tipPositionAspirate: number
+  preWetTip: boolean
+  mixOnAspirate?: {
+    mixVolume: number
+    repititions: number
+  }
+  delayAspirate?: {
+    delayDuration: number
+    positionFromBottom: number
+  }
+  touchTipAspirate?: number
+  touchTipAspirateSpeed?: number
+  airGapAspirate?: number
+  tipPositionDispense: number
+  mixOnDispense?: {
+    mixVolume: number
+    repititions: number
+  }
+  delayDispense?: {
+    delayDuration: number
+    positionFromBottom: number
+  }
+  touchTipDispense?: number
+  touchTipDispenseSpeed?: number
+  disposalVolume?: number
+  blowOut?: BlowOutLocation
+  airGapDispense?: number
+  changeTip: ChangeTipOptions
+  dropTipLocation: CutoutConfig
+  liquidClass: LiquidClass // this has been added
 }
 ```

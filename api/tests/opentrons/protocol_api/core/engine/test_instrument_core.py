@@ -2,7 +2,10 @@
 
 from typing import cast, Optional
 
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError,
+    CommandPreconditionViolated,
+)
 import pytest
 from decoy import Decoy
 from decoy import errors
@@ -54,6 +57,7 @@ from opentrons.protocol_engine.types import (
     NextTipInfo,
     NoTipAvailable,
     NoTipReason,
+    WellLocationFunction,
 )
 from opentrons.protocol_api.disposal_locations import (
     TrashBin,
@@ -302,8 +306,16 @@ def test_move_to_well(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
         )
-    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+    ).then_return(
+        (
+            LiquidHandlingWellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            False,
+        )
+    )
 
     subject.move_to(
         location=location,
@@ -319,7 +331,7 @@ def test_move_to_well(
                 pipetteId="abc123",
                 labwareId="labware-id",
                 wellName="well-name",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
                 forceDirect=True,
@@ -378,14 +390,18 @@ def test_pick_up_tip(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_pick_up_tip_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.PICK_UP_TIP,
         )
     ).then_return(
-        PickUpTipWellLocation(
-            origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+        (
+            PickUpTipWellLocation(
+                origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            False,
         )
     )
 
@@ -496,8 +512,11 @@ def test_drop_tip_with_location(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.DROP_TIP,
         )
-    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+    ).then_return(
+        (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
+    )
     decoy.when(
         mock_engine_client.state.tips.get_pipette_channels("abc123")
     ).then_return(8)
@@ -622,10 +641,11 @@ def test_aspirate_from_well(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
             meniscus_tracking=None,
         )
     ).then_return(
@@ -729,10 +749,11 @@ def test_aspirate_from_meniscus(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
             meniscus_tracking=MeniscusTrackingTarget.END,
         )
     ).then_return(
@@ -833,9 +854,14 @@ def test_blow_out_to_well(
 
     decoy.when(
         mock_engine_client.state.geometry.get_relative_well_location(
-            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+            labware_id="123abc",
+            well_name="my cool well",
+            absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.BASE,
         )
-    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+    ).then_return(
+        (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
+    )
 
     subject.blow_out(location=location, well_core=well_core, in_place=False)
 
@@ -935,10 +961,11 @@ def test_dispense_to_well(
     decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
+            location_type=WellLocationFunction.LIQUID_HANDLING,
             meniscus_tracking=None,
         )
     ).then_return(
@@ -2247,9 +2274,13 @@ def test_get_next_tip(
     subject: InstrumentCore,
 ) -> None:
     """It should return the next tip result."""
-    tip_racks = [decoy.mock(cls=LabwareCore)]
+    tip_racks = [decoy.mock(cls=LabwareCore), decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("other-tiprack-id")
+    decoy.when(tip_racks[1].labware_id).then_return("tiprack-id")
+    mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.get_name()).then_return("F00")
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
     expected_next_tip = NextTipInfo(labwareId="1234", tipStartingWell="BAR")
-    decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
@@ -2259,7 +2290,33 @@ def test_get_next_tip(
     ).then_return(GetNextTipResult(nextTipInfo=expected_next_tip))
     result = subject.get_next_tip(
         tip_racks=tip_racks,
-        starting_well="F00",
+        starting_well=mock_starting_well,
+    )
+    assert result == expected_next_tip
+
+
+def test_get_next_tip_no_starting_tip(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should return the next tip result with no starting tip."""
+    tip_racks = [decoy.mock(cls=LabwareCore), decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("other-tiprack-id")
+    decoy.when(tip_racks[1].labware_id).then_return("tiprack-id")
+    expected_next_tip = NextTipInfo(labwareId="1234", tipStartingWell="BAR")
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.GetNextTipParams(
+                pipetteId="abc123",
+                labwareIds=["other-tiprack-id", "tiprack-id"],
+                startingTipWell=None,
+            )
+        )
+    ).then_return(GetNextTipResult(nextTipInfo=expected_next_tip))
+    result = subject.get_next_tip(
+        tip_racks=tip_racks,
+        starting_well=None,
     )
     assert result == expected_next_tip
 
@@ -2272,6 +2329,9 @@ def test_get_next_tip_when_no_tip_available(
     """It should return None when there's no next tip available."""
     tip_racks = [decoy.mock(cls=LabwareCore)]
     decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
+    mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
+    decoy.when(mock_starting_well.get_name()).then_return("F00")
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
@@ -2285,9 +2345,42 @@ def test_get_next_tip_when_no_tip_available(
     )
     result = subject.get_next_tip(
         tip_racks=tip_racks,
-        starting_well="F00",
+        starting_well=mock_starting_well,
     )
     assert result is None
+
+
+def test_get_next_tip_raises_for_starting_tip_with_partial_config(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise if a NoTipAvailable is returned with the reason of partial config with starting tip."""
+    tip_racks = [decoy.mock(cls=LabwareCore)]
+    decoy.when(tip_racks[0].labware_id).then_return("tiprack-id")
+    mock_starting_well = decoy.mock(cls=WellCore)
+    decoy.when(mock_starting_well.labware_id).then_return("tiprack-id")
+    decoy.when(mock_starting_well.get_name()).then_return("F00")
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.GetNextTipParams(
+                pipetteId="abc123", labwareIds=["tiprack-id"], startingTipWell="F00"
+            )
+        )
+    ).then_return(
+        GetNextTipResult(
+            nextTipInfo=NoTipAvailable(
+                noTipReason=NoTipReason.STARTING_TIP_WITH_PARTIAL
+            )
+        )
+    )
+    with pytest.raises(
+        CommandPreconditionViolated, match="tip tracking is not available"
+    ):
+        subject.get_next_tip(
+            tip_racks=tip_racks,
+            starting_well=mock_starting_well,
+        )
 
 
 def test_lpd_for_transfer_context_manager(

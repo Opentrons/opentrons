@@ -635,12 +635,26 @@ const getIsLabwareInUse = (
   )
 }
 
-export function getIsEntityOnSlotInUse(
+export function getIsLabwareOnSlotInUse(
+  savedSteps: SavedStepFormState,
+  createdLabwareForSlot?: LabwareOnDeck,
+  createdNestedLabwareForSlot?: LabwareOnDeck
+): boolean {
+  const isCurrentLabwareInUse = [
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+  ]
+    .map(lw => getIsLabwareInUse(savedSteps, lw))
+    .includes(true)
+
+  return isCurrentLabwareInUse
+}
+
+//  NOTE: This will be used for editing hardware Flex
+export function getIsHardwareOnSlotInUse(
   savedSteps: SavedStepFormState,
   matchingLabwareFor4thColumn: LabwareOnDeck | null,
   createdModuleForSlot?: ModuleOnDeck,
-  createdLabwareForSlot?: LabwareOnDeck,
-  createdNestedLabwareForSlot?: LabwareOnDeck,
   createdFixtureForSlots?: AdditionalEquipment[]
 ): boolean {
   const isCurrentModuleInUse =
@@ -655,13 +669,10 @@ export function getIsEntityOnSlotInUse(
         //  moving a labware from the module location
         ('labware' in step && step.labware === createdModuleForSlot.id)
     ) != null
-  const isCurrentLabwareInUse = [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
-    matchingLabwareFor4thColumn,
-  ]
-    .map(lw => getIsLabwareInUse(savedSteps, lw))
-    .includes(true)
+  const isCurrentLabwareInUse =
+    matchingLabwareFor4thColumn != null
+      ? getIsLabwareInUse(savedSteps, matchingLabwareFor4thColumn)
+      : false
 
   const isCurrentFixtureInUse =
     createdFixtureForSlots != null &&

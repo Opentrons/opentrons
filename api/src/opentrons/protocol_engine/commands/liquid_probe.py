@@ -22,8 +22,7 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
 )
 
-from ..types import DeckPoint
-from ..types.liquid_level_detection import LiquidTrackingType
+from ..types import DeckPoint, LiquidTrackingType
 from .pipetting_common import (
     LiquidNotFoundError,
     PipetteIdMixin,
