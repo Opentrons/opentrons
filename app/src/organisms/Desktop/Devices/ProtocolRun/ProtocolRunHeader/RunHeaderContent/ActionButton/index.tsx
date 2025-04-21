@@ -25,7 +25,11 @@ import {
   useModuleCalibrationStatus,
 } from '/app/resources/runs'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
-import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
+import {
+  getFallbackRobotSerialNumber,
+  isValidRunAgainStatus,
+  isWaitingForAppUncurrentRun,
+} from '../../utils'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
 
@@ -79,7 +83,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
-  const isValidRunAgain = isRunAgainStatus(runStatus)
+  const isValidRunAgain = isValidRunAgainStatus(runStatus, isCurrentRun)
   const { isClosingCurrentRun } = useCloseCurrentRun()
 
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
@@ -139,6 +143,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolNotReady ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
+              isWaitingForAppUncurrentRun(runStatus, isCurrentRun) ||
               isResetRunLoadingRef.current ||
               isClosingCurrentRun
             }
