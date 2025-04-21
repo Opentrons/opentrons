@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -35,7 +34,10 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getSavedStepForms } from '../../../step-forms/selectors'
+import {
+  getSavedStepForms,
+  getInitialDeckSetup,
+} from '../../../step-forms/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import {
   getDisableModuleRestrictions,
