@@ -78,11 +78,6 @@ export function SummaryAndSettings(
     initialSummaryState
   )
 
-  console.log('state', state)
-  // console.log('wizardFlowState', wizardFlowState)
-  console.log('initialSummaryState', initialSummaryState)
-  console.log('liquidClass', state.liquidClass)
-
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(

@@ -3,12 +3,13 @@ import { getFlexNameConversion } from '@opentrons/shared-data'
 import type { LiquidClass } from '@opentrons/shared-data'
 import type { QuickTransferWizardState } from '../types'
 
+const MINIMUM_LIQUID_CLASS_VOLUME = 10
 export interface Compatibility {
-  pipetteInCompatible?: boolean
-  tipRackICompatible?: boolean
-  pipettePathInCompatible?: boolean
-  volumeInCompatible?: boolean
-  inCompatible: boolean
+  pipetteIncompatible?: boolean
+  tipRackIncompatible?: boolean
+  pipettePathIncompatible?: boolean
+  volumeIncompatible?: boolean
+  incompatible: boolean
 }
 
 const checkTipRackExist = (tipTypes: string[], target: string): boolean => {
@@ -24,7 +25,7 @@ export const checkLiquidClassCompatibility = (
 ): Compatibility => {
   const { liquidClassName, byPipette } = liquid
   if (liquidClassName === 'none') {
-    return { inCompatible: false }
+    return { incompatible: false }
   }
 
   if (
@@ -33,11 +34,11 @@ export const checkLiquidClassCompatibility = (
     state.path === undefined ||
     state.volume === undefined
   ) {
-    return { inCompatible: true }
+    return { incompatible: true }
   }
 
-  if (state.volume <= 10) {
-    return { inCompatible: true, volumeInCompatible: true }
+  if (state.volume <= MINIMUM_LIQUID_CLASS_VOLUME) {
+    return { incompatible: true, volumeIncompatible: true }
   }
 
   const pipetteModels = byPipette.map(pipette => pipette.pipetteModel)
@@ -69,16 +70,16 @@ export const checkLiquidClassCompatibility = (
     })
   )
 
-  const pipetteInCompatible = !isPipetteCompatible
-  const tipRackICompatible = !isTipRackCompatible
-  const pipettePathInCompatible = !isPathCompatible
-  const inCompatible =
-    pipetteInCompatible || tipRackICompatible || pipettePathInCompatible
+  const pipetteIncompatible = !isPipetteCompatible
+  const tipRackIncompatible = !isTipRackCompatible
+  const pipettePathIncompatible = !isPathCompatible
+  const incompatible =
+    pipetteIncompatible || tipRackIncompatible || pipettePathIncompatible
 
   return {
-    pipetteInCompatible,
-    tipRackICompatible,
-    pipettePathInCompatible,
-    inCompatible,
+    pipetteIncompatible,
+    tipRackIncompatible,
+    pipettePathIncompatible,
+    incompatible,
   }
 }

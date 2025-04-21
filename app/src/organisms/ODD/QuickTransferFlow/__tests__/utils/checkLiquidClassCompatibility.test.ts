@@ -116,54 +116,54 @@ describe('checkLiquidClassCompatibility', () => {
       mockNotUsedLiquidClass,
       mockState
     )
-    expect(result.inCompatible).toBe(false)
+    expect(result.incompatible).toBe(false)
   })
 
   it('liquid volume should be less than 10 incompatible', () => {
     const invalidState = { ...mockState, volume: 10 }
     console.log('invalidState', invalidState)
     const result = checkLiquidClassCompatibility(mockLiquid, invalidState)
-    expect(result.inCompatible).toBe(true)
-    expect(result.volumeInCompatible).toBe(true)
+    expect(result.incompatible).toBe(true)
+    expect(result.volumeIncompatible).toBe(true)
   })
 
-  it('mock liquid should return inCompatible true pipette is undefined', () => {
+  it('mock liquid should return incompatible true pipette is undefined', () => {
     const invalidState = { ...mockState, pipette: undefined }
     const result = checkLiquidClassCompatibility(mockLiquid, invalidState)
-    expect(result.inCompatible).toBe(true)
+    expect(result.incompatible).toBe(true)
   })
 
-  it('mock liquid should return inCompatible true tipRack is undefined', () => {
+  it('mock liquid should return incompatible true tipRack is undefined', () => {
     const invalidState = { ...mockState, tipRack: undefined }
     const result = checkLiquidClassCompatibility(mockLiquid, invalidState)
-    expect(result.inCompatible).toBe(true)
+    expect(result.incompatible).toBe(true)
   })
 
-  it('mock liquid should return inCompatible true path is undefined', () => {
+  it('mock liquid should return incompatible true path is undefined', () => {
     const invalidState = { ...mockState, path: undefined }
     const result = checkLiquidClassCompatibility(mockLiquid, invalidState)
-    expect(result.inCompatible).toBe(true)
+    expect(result.incompatible).toBe(true)
   })
 
-  it('mock liquid should return inCompatible true volume is undefined', () => {
+  it('mock liquid should return incompatible true volume is undefined', () => {
     const invalidState = { ...mockState, volume: undefined }
     const result = checkLiquidClassCompatibility(mockLiquid, invalidState)
-    expect(result.inCompatible).toBe(true)
+    expect(result.incompatible).toBe(true)
   })
 
-  it('mock liquid should return inCompatible false', () => {
+  it('mock liquid should return incompatible false', () => {
     const result = checkLiquidClassCompatibility(mockLiquid, mockState)
-    expect(result.inCompatible).toBe(false)
-    expect(result.pipetteInCompatible).toBe(false)
-    expect(result.tipRackICompatible).toBe(false)
-    expect(result.pipettePathInCompatible).toBe(false)
+    expect(result.incompatible).toBe(false)
+    expect(result.pipetteIncompatible).toBe(false)
+    expect(result.tipRackIncompatible).toBe(false)
+    expect(result.pipettePathIncompatible).toBe(false)
   })
 
-  it('mock water should return inCompatible true singleDispense is undefined', () => {
+  it('mock water should return incompatible true singleDispense is undefined', () => {
     const invalidLiquid = { ...mockLiquid, byPipette: [] }
     const result = checkLiquidClassCompatibility(invalidLiquid, mockState)
-    expect(result.inCompatible).toBe(true)
-    expect(result.pipettePathInCompatible).toBe(true)
+    expect(result.incompatible).toBe(true)
+    expect(result.pipettePathIncompatible).toBe(true)
   })
 
   // TODO (kk:04/18/2025) add more test cases
