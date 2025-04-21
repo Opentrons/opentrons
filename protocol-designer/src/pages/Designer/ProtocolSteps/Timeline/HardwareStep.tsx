@@ -88,6 +88,7 @@ export function HardwareStep(props: HardwareStepProps): JSX.Element {
           color={color}
         >
           <Flex
+            height="1.9375rem"
             alignItems={ALIGN_CENTER}
             gridGap={SPACING.spacing8}
             justifyContent={hasText ? JUSTIFY_START : JUSTIFY_CENTER}
