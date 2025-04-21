@@ -13,6 +13,7 @@ export type RunHeaderContentProps = ProtocolRunHeaderProps & {
   attachedModules: AttachedModule[]
   protocolRunControls: RunControls
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
+  isClosingCurrentRun: boolean
 }
 
 export function RunHeaderContent(props: RunHeaderContentProps): JSX.Element {

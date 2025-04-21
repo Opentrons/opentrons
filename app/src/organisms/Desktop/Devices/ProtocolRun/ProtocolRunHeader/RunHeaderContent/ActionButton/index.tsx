@@ -17,7 +17,6 @@ import {
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import {
-  useCloseCurrentRun,
   useCurrentRunId,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
@@ -28,7 +27,6 @@ import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 import {
   getFallbackRobotSerialNumber,
   isValidRunAgainStatus,
-  isWaitingForAppUncurrentRun,
 } from '../../utils'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
@@ -39,6 +37,7 @@ export type BaseActionButtonProps = RunHeaderContentProps
 
 interface ActionButtonProps extends BaseActionButtonProps {
   isResetRunLoadingRef: MutableRefObject<boolean>
+  isClosingCurrentRun: boolean
 }
 
 export function ActionButton(props: ActionButtonProps): JSX.Element {
@@ -48,6 +47,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     runStatus,
     isResetRunLoadingRef,
     runHeaderModalContainerUtils,
+    isClosingCurrentRun,
   } = props
   const {
     missingStepsModalUtils,
@@ -83,8 +83,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
-  const isValidRunAgain = isValidRunAgainStatus(runStatus, isCurrentRun)
-  const { isClosingCurrentRun } = useCloseCurrentRun()
+  const isValidRunAgain = isValidRunAgainStatus(runStatus, isClosingCurrentRun)
 
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     isCurrentRun,
@@ -93,7 +92,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isValidRunAgain,
-    isClosingCurrentRun,
     ...props,
   })
 
@@ -118,7 +116,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isValidRunAgain,
     isOtherRunCurrent,
     isRobotOnWrongVersionOfSoftware,
-    isClosingCurrentRun,
     ...props,
   })
 
@@ -143,7 +140,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolNotReady ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
-              isWaitingForAppUncurrentRun(runStatus, isCurrentRun) ||
               isResetRunLoadingRef.current ||
               isClosingCurrentRun
             }

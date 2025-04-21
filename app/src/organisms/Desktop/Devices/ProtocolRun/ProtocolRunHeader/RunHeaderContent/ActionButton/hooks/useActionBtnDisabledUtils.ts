@@ -8,7 +8,6 @@ import {
   isCancellableStatus,
   isDisabledStatus,
   isStartRunStatus,
-  isWaitingForAppUncurrentRun,
 } from '../../../utils'
 
 import type { BaseActionButtonProps } from '..'
@@ -56,7 +55,6 @@ export function useActionBtnDisabledUtils(
 
   const isDisabled =
     (isCurrentRun && !isSetupComplete) ||
-    isWaitingForAppUncurrentRun(runStatus, isCurrentRun) ||
     isPlayRunActionLoading ||
     isPauseRunActionLoading ||
     isResetRunLoading ||
