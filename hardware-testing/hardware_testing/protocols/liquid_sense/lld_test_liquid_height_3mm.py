@@ -363,10 +363,6 @@ def _test_for_finding_liquid_height(  # noqa: C901
     liquid_pipette_probe_every_time: bool,
 ) -> None:
     global _src_meniscus_height
-    # assert len(liquid_tips) == len(
-    #     probing_tips
-    # ), f"{len(liquid_tips)},{len(probing_tips)}"
-    # assert len(liquid_tips) == len(wells), f"{len(liquid_tips)},{len(wells)}"
     trial_counter = 0
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
