@@ -23,6 +23,7 @@ export function TwoColTextAndImage(
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
     REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
     ROBOT_IN_MOTION,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
   const { route, step } = recoveryMap
   const {
@@ -33,10 +34,15 @@ export function TwoColTextAndImage(
   const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
+  const reengageLatchRoutes = [
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH,
+    REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH,
+  ]
+
   const primaryOnClick = (): void => {
     switch (route) {
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
-        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+        if (reengageLatchRoutes.includes(step)) {
           void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
             void closeLabwareLatch().then(() => {
               void proceedNextStep()
@@ -57,7 +63,8 @@ export function TwoColTextAndImage(
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('load_labware_shuttle_onto_track')
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
-        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (reengageLatchRoutes.includes(step)) {
           return t('prepare_for_stacker_latch_reengage')
         } else {
           return t('empty_stacker_of_labware_above_latch')
@@ -75,7 +82,8 @@ export function TwoColTextAndImage(
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('take_any_necessary_precautions_before_loading_shuttle')
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
-        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (reengageLatchRoutes.includes(step)) {
           return t('stacker_latch_will_reengage')
         } else {
           return t('empty_stacker_of_labware_above_latch_labware_stuck')
@@ -91,7 +99,8 @@ export function TwoColTextAndImage(
   const buildButtonText = (): string => {
     switch (route) {
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
-        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (reengageLatchRoutes.includes(step)) {
           return t('re_engage_latch')
         } else {
           return t('continue')
