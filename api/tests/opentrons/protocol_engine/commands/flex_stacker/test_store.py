@@ -269,6 +269,7 @@ async def test_store_raises_if_stall(
             id=error_id,
             createdAt=error_timestamp,
             wrappedErrors=[matchers.Anything()],
+            errorInfo={"labwareId": "labware-id"},
         ),
         state_update=StateUpdate(),
     )

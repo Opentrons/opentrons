@@ -108,5 +108,6 @@ async def test_home_command_with_stall_detected(
             id=err_id,
             createdAt=err_timestamp,
             wrappedErrors=[matchers.Anything()],
+            errorInfo={},
         )
     )

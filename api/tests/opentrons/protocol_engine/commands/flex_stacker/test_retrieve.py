@@ -718,6 +718,7 @@ async def test_retrieve_raises_recoverable_error(
             id=error_id,
             createdAt=error_timestamp,
             wrappedErrors=[matchers.Anything()],
+            errorInfo={"labwareId": "primary-id-1"},
         ),
         state_update=StateUpdate(),
     )

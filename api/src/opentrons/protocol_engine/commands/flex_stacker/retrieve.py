@@ -162,7 +162,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         self._model_utils = model_utils
 
     def handle_recoverable_error(
-        self, error: RecoverableExceptions
+        self, error: RecoverableExceptions, intended_id: str
     ) -> (
         DefinedErrorData[FlexStackerStallOrCollisionError]
         | DefinedErrorData[FlexStackerShuttleError]
@@ -185,6 +185,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                         error=error,
                     )
                 ],
+                errorInfo={"labwareId": intended_id},
             )
         )
 
@@ -217,6 +218,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         labware_height = self._state_view.geometry.get_height_of_stacker_labware_pool(
             params.moduleId
         )
+        to_retrieve = stacker_state.contained_labware_bottom_first[0]
 
         # Allow propagation of ModuleNotAttachedError.
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
@@ -228,9 +230,8 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 FlexStackerShuttleMissingError,
                 FlexStackerHopperLabwareError,
             ) as e:
-                return self.handle_recoverable_error(e)
+                return self.handle_recoverable_error(e, to_retrieve.primaryLabwareId)
 
-        to_retrieve = stacker_state.contained_labware_bottom_first[0]
         remaining = stacker_state.contained_labware_bottom_first[1:]
 
         locations, offsets = build_retrieve_labware_move_updates(
