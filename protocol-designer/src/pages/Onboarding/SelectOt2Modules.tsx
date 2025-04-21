@@ -84,6 +84,9 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
             <ModuleEmptySelectorButtons
               modules={filteredSupportedModules}
               addModule={handleAddModule}
+              enableMultipleTempModules={false}
+              numberOfTemps={0}
+              hasGen1Temp={false}
             />
             {Object.keys(modules).length > 0 ? (
               <Flex

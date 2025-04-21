@@ -2,7 +2,6 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   fixture96Plate,
-  LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
@@ -18,15 +17,19 @@ import {
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { getDismissedHints } from '../../../../tutorial/selectors'
-import { getIsHardwareOnSlotInUse } from '../../../../pages/Designer/DeckSetup/utils'
-import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
+import {
+  getDisableModuleRestrictions,
+  getEnableMutlipleTempsOT2,
+} from '../../../../feature-flags/selectors'
 import { createModuleEntityAndChangeForm } from '../../../../step-forms/actions/thunks'
 import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../../modules'
 import { createModule } from '../../../../step-forms/actions'
 import { MagnetModuleChangeContent } from '../../../molecules'
 import { useKitchen } from '../../Kitchen/hooks'
 import { ConfirmDeleteEntityInUseModal } from '../../ConfirmDeleteEntityInUseModal'
+import { getModuleOnSlot } from '../util'
 import { Ot2Modules } from '..'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
 
 vi.mock('../../../../feature-flags/selectors')
@@ -35,10 +38,10 @@ vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../modules')
 vi.mock('../../Kitchen/hooks')
 vi.mock('../../../../tutorial/selectors')
-vi.mock('../../../../pages/Designer/DeckSetup/utils')
 vi.mock('../../../../step-forms/actions/thunks')
 vi.mock('../../ConfirmDeleteEntityInUseModal')
 vi.mock('../../../molecules')
+vi.mock('../util')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
@@ -74,6 +77,7 @@ const mockModules = {
 const mockMakeSnackbar = vi.fn()
 describe('Ot2Modules', () => {
   beforeEach(() => {
+    vi.mocked(getEnableMutlipleTempsOT2).mockReturnValue(false)
     vi.mocked(MagnetModuleChangeContent).mockReturnValue(
       <div>mock MagnetModuleChangeContent</div>
     )
@@ -85,7 +89,10 @@ describe('Ot2Modules', () => {
       eatToast: vi.fn(),
       bakeToast: vi.fn(),
     })
-    vi.mocked(getIsHardwareOnSlotInUse).mockReturnValue(false)
+    vi.mocked(getModuleOnSlot).mockReturnValue({
+      isModuleInUse: false,
+      moduleId: 'temp',
+    })
     vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getDismissedHints).mockReturnValue([])
     vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)
@@ -178,7 +185,10 @@ describe('Ot2Modules', () => {
     )
   })
   it('should call the createModuleEntityAndChangeForm action when moving a module in use', () => {
-    vi.mocked(getIsHardwareOnSlotInUse).mockReturnValue(true)
+    vi.mocked(getModuleOnSlot).mockReturnValue({
+      isModuleInUse: true,
+      moduleId: 'temp',
+    })
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: mockModules,
@@ -197,7 +207,10 @@ describe('Ot2Modules', () => {
     })
   })
   it('should render the ConfirmDeleteEntityInUseModal when trying to delete a module in use', () => {
-    vi.mocked(getIsHardwareOnSlotInUse).mockReturnValue(true)
+    vi.mocked(getModuleOnSlot).mockReturnValue({
+      isModuleInUse: true,
+      moduleId: 'temp',
+    })
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: mockModules,
@@ -207,5 +220,16 @@ describe('Ot2Modules', () => {
     render()
     fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0])
     screen.getByText('mock ConfirmDeleteEntityInUseModal')
+  })
+  it('should render 2 temperature module GEN2 buttons when the useFacing flag is turned on', () => {
+    vi.mocked(getEnableMutlipleTempsOT2).mockReturnValue(true)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: {},
+      labware: {},
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    expect(screen.getAllByText('Temperature Module GEN2')).toHaveLength(2)
   })
 })

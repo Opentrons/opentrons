@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -16,10 +16,8 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
-  useBlockingHint,
 } from '../../../../components/organisms'
 import { maskField } from '../../../../steplist/fieldLevel'
-import { getHint } from '../../../../tutorial/selectors'
 import { getInvariantContext } from '../../../../step-forms/selectors'
 import { getDirtyFields, makeSingleEditFieldProps } from './utils'
 import { StepFormToolbox } from './StepFormToolbox'
@@ -68,7 +66,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveStepForm,
     invariantContext,
   } = props
-  const test = useSelector(getHint)
   const { t } = useTranslation('tooltip')
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
@@ -119,18 +116,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     isPristineSetHeaterShakerTempForm
   )
-  const [showHintModal, setShowHintModal] = useState<boolean>(test != null)
-  const exportWarningModal = useBlockingHint({
-    hintKey: 'waste_chute_warning',
-    enabled: showHintModal,
-    content: 'this is the content',
-    handleCancel: () => {
-      setShowHintModal(false)
-    },
-    handleContinue: () => {
-      handleSave
-    },
-  })
   // no form selected
   if (formData == null) {
     return null
@@ -178,7 +163,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           onContinueClick={confirmClose}
         />
       )}
-      {exportWarningModal}
       {showAddPauseUntilTempStepModal ||
       showAddPauseUntilHeaterShakerTempStepModal ? (
         <AutoAddPauseUntilTempStepModal

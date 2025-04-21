@@ -650,7 +650,7 @@ export function getIsLabwareOnSlotInUse(
   return isCurrentLabwareInUse
 }
 
-//  NOTE: FThis will be used for editing hardware
+//  NOTE: This will be used for editing hardware Flex
 export function getIsHardwareOnSlotInUse(
   savedSteps: SavedStepFormState,
   matchingLabwareFor4thColumn: LabwareOnDeck | null,

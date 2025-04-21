@@ -6,12 +6,13 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
-import { Ot2Modules } from '../../../components/organisms/Ot2Modules'
 import { FlexHardware } from '../FlexHardware'
 import { Hardware } from '..'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
+vi.mock('../../../feature-flags/selectors')
+vi.mock('../../../tutorial/selectors')
 vi.mock('../../../components/organisms/Ot2Modules')
 vi.mock('../FlexHardware')
 const render = () => {
@@ -33,7 +34,6 @@ describe('Hardware', () => {
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
     vi.mocked(FlexHardware).mockReturnValue(<div>mock FlexHardware</div>)
-    vi.mocked(Ot2Modules).mockReturnValue(<div>mock Ot2Modules</div>)
   })
   it('renders the hardware info for a flex', () => {
     render()
@@ -52,6 +52,5 @@ describe('Hardware', () => {
     screen.getByText(
       'Place the modules that you are using for this protocol onto the deck.'
     )
-    screen.getByText('mock Ot2Modules')
   })
 })

@@ -30,6 +30,8 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   OT2_ROBOT_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -37,31 +39,26 @@ import {
   getSavedStepForms,
 } from '../../../step-forms/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
+import {
+  getDisableModuleRestrictions,
+  getEnableMutlipleTempsOT2,
+} from '../../../feature-flags/selectors'
 import { createModule } from '../../../step-forms/actions'
 import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
 import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../modules'
 import { SlotWarning } from '../../../pages/Designer/DeckSetup/SlotWarning'
 import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
-import { getIsHardwareOnSlotInUse } from '../../../pages/Designer/DeckSetup/utils'
 import { getDismissedHints } from '../../../tutorial/selectors'
 import { createModuleEntityAndChangeForm } from '../../../step-forms/actions/thunks'
-import {
-  DEFAULT_SLOT_MAP_OT2,
-  OT2_SUPPORTED_MODULE_MODELS,
-} from '../../../pages/Onboarding/constants'
-import { FixedTrashText } from '../../molecules'
-import { MagnetModuleChangeContent } from '../../molecules'
+import { OT2_SUPPORTED_MODULE_MODELS } from '../../../pages/Onboarding/constants'
+import { FixedTrashText, MagnetModuleChangeContent } from '../../molecules'
 import { ModuleEmptySelectorButtons } from '../ModuleEmptySelectorButtons'
 import { useKitchen } from '../Kitchen/hooks'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
-import { getSlotsWithCollisions } from '../utils'
+import { getNextAvailableModuleSlot, getSlotsWithCollisions } from '../utils'
 import { useBlockingHint } from '../BlockingHintModal'
-import type {
-  AddressableAreaName,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
+import { getModuleOnSlot } from './util'
+import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
 import type { OT2ModuleType, ThunkDispatch } from '../../../types'
 import type { StepType } from '../../../form-types'
 
@@ -90,6 +87,7 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 export function Ot2Modules(): JSX.Element {
   const { t } = useTranslation(['onboarding', 'protocol_overview', 'shared'])
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const enable2TempModules = useSelector(getEnableMutlipleTempsOT2)
   const disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const savedSteps = useSelector(getSavedStepForms)
   const isDismissedModuleHint = useSelector(getDismissedHints).includes(
@@ -98,17 +96,16 @@ export function Ot2Modules(): JSX.Element {
   const deckDef = getDeckDefFromRobotType(OT2_ROBOT_TYPE)
   const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const [
-    entityToDelete,
-    setDeleteEntityInUseModal,
-  ] = useState<ModuleType | null>(null)
+  const [entityToDelete, setDeleteEntityInUseModal] = useState<string | null>(
+    null
+  )
   const [changeModuleWarningInfo, displayModuleWarning] = useState<boolean>(
     false
   )
+  const { modules, pipettes, labware } = initialDeckSetup
   const hasMagneticModuleSteps = Object.values(savedSteps).find(
     step => step.stepType === 'magnet'
   )
-  const { modules, pipettes, labware } = initialDeckSetup
   const magModModel = Object.values(modules).find(
     module => module.type === MAGNETIC_MODULE_TYPE
   )?.model
@@ -131,13 +128,13 @@ export function Ot2Modules(): JSX.Element {
         module => module.type === getModuleType(moduleModel)
       )
   )
+  const numberOfTemperatureModules = Object.values(modules).filter(
+    module => module.model === TEMPERATURE_MODULE_V2
+  )?.length
 
-  const handleRemoveModule = (moduleType: ModuleType): void => {
-    const moduleToDelete = Object.values(modules).find(
-      module => module.type === moduleType
-    )
-    if (moduleToDelete != null) {
-      dispatch(deleteModule({ moduleId: moduleToDelete.id }))
+  const handleRemoveModule = (moduleId: string | null): void => {
+    if (moduleId != null) {
+      dispatch(deleteModule({ moduleId }))
     }
   }
 
@@ -147,7 +144,13 @@ export function Ot2Modules(): JSX.Element {
     slot?: string
   ): void => {
     const moduleType = getModuleType(moduleModel)
-    const moduleSlot = slot ?? DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)]
+    const moduleSlot =
+      slot ??
+      getNextAvailableModuleSlot(
+        moduleModel,
+        Object.values(modules),
+        hasThermocycler
+      )
     const somethingInSlotModule =
       Object.values(modules).some(module => module.slot === moduleSlot) ||
       (moduleSlot === '10' && hasThermocycler)
@@ -167,18 +170,23 @@ export function Ot2Modules(): JSX.Element {
         }) as string
       )
     } else {
-      handleRemoveModule(getModuleType(moduleModel))
+      const moduleIdToDelete = Object.values(modules).find(module =>
+        enable2TempModules &&
+        moduleModel === TEMPERATURE_MODULE_V2 &&
+        numberOfTemperatureModules < 2
+          ? null
+          : module.type === moduleType
+      )?.id
+      //   remove the module if it already exists on the deck
+      handleRemoveModule(moduleIdToDelete ?? null)
       if (isModuleInUse) {
-        const moduleToDelete = Object.values(modules).find(
-          module => module.type === moduleType
-        )
         const moduleSteps = Object.values(savedSteps).filter(step => {
           return (
             step.stepType ===
               mapModTypeToStepTypeOt2[moduleType as OT2ModuleType] &&
             //  only update module steps that match the old moduleId
             //  to accommodate instances of MoaM
-            step.moduleId === moduleToDelete?.id
+            step.moduleId === moduleIdToDelete
           )
         })
 
@@ -187,7 +195,7 @@ export function Ot2Modules(): JSX.Element {
             step.stepType === 'pause' &&
             //  only update pause steps that match the old moduleId
             //  to accommodate instances of MoaM
-            step.moduleId === moduleToDelete?.id
+            step.moduleId === moduleIdToDelete
           )
         })
         dispatch(
@@ -223,12 +231,12 @@ export function Ot2Modules(): JSX.Element {
   }
   const handleRemoveButton = (
     isModuleInUse: boolean,
-    moduleType: ModuleType
+    moduleId: string
   ): void => {
     if (isModuleInUse) {
-      setDeleteEntityInUseModal(moduleType)
+      setDeleteEntityInUseModal(moduleId)
     } else {
-      handleRemoveModule(moduleType)
+      handleRemoveModule(moduleId)
     }
   }
 
@@ -295,6 +303,11 @@ export function Ot2Modules(): JSX.Element {
             addModule={moduleModel => {
               handleAddModuleButton(moduleModel)
             }}
+            enableMultipleTempModules={enable2TempModules}
+            numberOfTemps={numberOfTemperatureModules}
+            hasGen1Temp={Object.values(modules).some(
+              module => module.model === TEMPERATURE_MODULE_V1
+            )}
           />
           {Object.keys(modules).length > 0 ? (
             <Flex
@@ -303,21 +316,17 @@ export function Ot2Modules(): JSX.Element {
               paddingTop={SPACING.spacing60}
             >
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.values(modules).map(module => {
-                  const isModuleInUse = getIsHardwareOnSlotInUse(
+                {Object.values(modules).map((module, index) => {
+                  const { isModuleInUse, moduleId } = getModuleOnSlot(
                     savedSteps,
-                    null,
                     module
                   )
                   return (
-                    <ListItem type="default" key={module.model}>
+                    <ListItem type="default" key={`${module.model}_${index}`}>
                       <ListItemCustomize
                         linkText={t('remove')}
                         onClick={() => {
-                          handleRemoveButton(
-                            isModuleInUse,
-                            module.type as ModuleType
-                          )
+                          handleRemoveButton(isModuleInUse, moduleId)
                         }}
                         dropdown={
                           module.type === THERMOCYCLER_MODULE_TYPE

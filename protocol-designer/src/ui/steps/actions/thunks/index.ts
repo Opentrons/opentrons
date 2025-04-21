@@ -276,6 +276,7 @@ export const saveStepForm: () => ThunkAction<any> = () => (
     )
     return
   }
+
   if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
     dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
   }

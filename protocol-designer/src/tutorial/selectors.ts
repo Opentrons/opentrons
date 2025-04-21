@@ -6,7 +6,6 @@ import {
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 import {
   getUnsavedForm,
-  getOrderedStepIds,
   getAdditionalEquipmentEntities,
 } from '../step-forms/selectors'
 import isEmpty from 'lodash/isEmpty'
