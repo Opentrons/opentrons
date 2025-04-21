@@ -12,7 +12,7 @@ SLOTS_TIPRACK = {
     1000: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
 LABWARE_ON_SCALE = "usascientific_12_reservoir_22ml"
-
+SLOT_DE_STATIC = 1
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
