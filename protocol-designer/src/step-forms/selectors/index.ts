@@ -93,6 +93,7 @@ import type {
   MagneticBlockState,
   AbsorbanceReaderState,
 } from '../types'
+import type { DeckConfigurationState } from '../actions'
 import type {
   PresavedStepFormState,
   RootState,
@@ -966,3 +967,7 @@ export const getFormLevelWarningsPerStep: Selector<
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )
+
+export const getDeckConfiguration = (
+  state: BaseState
+): DeckConfigurationState => rootSelector(state).deckConfiguration

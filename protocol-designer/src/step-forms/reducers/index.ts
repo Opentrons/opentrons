@@ -5,6 +5,7 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import {
+  FLEX_SIMPLEST_DECK_CONFIG,
   getAllDefinitions,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
@@ -48,7 +49,7 @@ import type {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
-import type { PipetteName } from '@opentrons/shared-data'
+import type { DeckConfiguration, PipetteName } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import type { LoadFileAction } from '../../load-file'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
@@ -68,6 +69,8 @@ import type {
   ChangeBatchEditFieldAction,
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
+  DeckConfigurationState,
+  EditDeckConfigurationAction,
 } from '../actions'
 
 import type {
@@ -1506,6 +1509,24 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
   },
   initialOrderedStepIdsState
 )
+
+const initialDeckConfiguration: DeckConfigurationState = {
+  deckConfig: FLEX_SIMPLEST_DECK_CONFIG,
+}
+const deckConfigurationProperties: Reducer<
+  DeckConfigurationState,
+  any
+> = handleActions<DeckConfigurationState, any>(
+  {
+    EDIT_DECK_CONFIGURATION: (state, action) => {
+      return {
+        deckConfig: action.payload.deckConfig,
+      }
+    },
+  },
+  initialDeckConfiguration
+)
+
 export type PresavedStepFormState = {
   stepType: StepType
 } | null
@@ -1556,6 +1577,7 @@ export interface RootState {
   savedStepForms: SavedStepFormState
   unsavedForm: FormState
   batchEditFormChanges: BatchEditFormChangesState
+  deckConfiguration: DeckConfigurationState
 }
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
@@ -1595,6 +1617,10 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     batchEditFormChanges: batchEditFormChanges(
       prevStateFallback.batchEditFormChanges,
       action as BatchEditFormActions
+    ),
+    deckConfiguration: deckConfigurationProperties(
+      prevStateFallback.deckConfiguration,
+      action
     ),
   })
 )

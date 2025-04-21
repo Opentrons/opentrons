@@ -1,4 +1,5 @@
 import { getBatchEditFieldChanges } from '../selectors'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ThunkAction } from '../../types'
 import type { StepIdType, StepFieldName } from '../../form-types'
 import type { BatchEditFormChangesState } from '../reducers'
@@ -45,3 +46,17 @@ export const saveStepFormsMulti: (
   }
   dispatch(saveStepFormsMultiAction)
 }
+
+export interface DeckConfigurationState {
+  deckConfig: DeckConfiguration
+}
+export interface EditDeckConfigurationAction {
+  type: 'EDIT_DECK_CONFIGURATION'
+  payload: DeckConfigurationState
+}
+export const editDeckConfiguration = (
+  args: EditDeckConfigurationAction['payload']
+): EditDeckConfigurationAction => ({
+  type: 'EDIT_DECK_CONFIGURATION',
+  payload: args,
+})

@@ -40,6 +40,8 @@ import type { ModalProps } from '@opentrons/components'
 import type { FormModules, ModuleOnDeck } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import { useDispatch } from 'react-redux'
+import { editDeckConfiguration } from '../../../step-forms/actions'
 
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId
@@ -54,7 +56,6 @@ interface AddFixtureModalProps {
   modules: FormModules | InitialDeckStateModules
   fixtures: Fixtures
   deckConfig: DeckConfiguration
-  setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>
   hasGripper: boolean
   //  used for setting the value in react-hook-form for the onboarding flow
   setValue?: UseFormSetValue<WizardFormState>
@@ -93,12 +94,12 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     modules,
     fixtures,
     deckConfig,
-    setUpdatedDeckConfig,
     setValue,
     hasGripper,
     updateInitialDeckState,
   } = props
   const { t, i18n } = useTranslation('shared')
+  const dispatch = useDispatch()
   const { makeSnackbar } = useKitchen()
   const initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only magnetic block can be configured in column 2
     ? 'moduleOptions'
@@ -276,7 +277,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         }
         setValue?.('fixtures', updatedFixtures)
       }
-      setUpdatedDeckConfig(newDeckConfig)
+      dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
       updateInitialDeckState?.(addedCutoutConfigs)
       closeModal()
     }
