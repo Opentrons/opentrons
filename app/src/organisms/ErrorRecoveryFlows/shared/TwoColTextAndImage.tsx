@@ -18,17 +18,38 @@ import { css } from 'styled-components'
 export function TwoColTextAndImage(
   props: RecoveryContentProps
 ): JSX.Element | null {
-  const { routeUpdateActions, recoveryMap } = props
+  const { routeUpdateActions, recoveryMap, recoveryCommands } = props
   const {
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
     REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+    ROBOT_IN_MOTION,
   } = RECOVERY_MAP
-  const { route } = recoveryMap
-  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
+  const { route, step } = recoveryMap
+  const {
+    proceedNextStep,
+    goBackPrevStep,
+    handleMotionRouting,
+  } = routeUpdateActions
+  const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-    void proceedNextStep()
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+          void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
+            void closeLabwareLatch().then(() => {
+              void proceedNextStep()
+            })
+          })
+        } else {
+          void proceedNextStep()
+        }
+        break
+      default:
+        void proceedNextStep()
+        break
+    }
   }
 
   const buildTitle = (): string => {
@@ -36,7 +57,11 @@ export function TwoColTextAndImage(
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('load_labware_shuttle_onto_track')
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
-        return t('empty_stacker_of_labware_above_latch')
+        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+          return t('prepare_for_stacker_latch_reengage')
+        } else {
+          return t('empty_stacker_of_labware_above_latch')
+        }
       default:
         console.error(
           `TwoColTextAndImage: Unexpected recovery option: ${route}. Handle retry step copy explicitly.`
@@ -50,12 +75,32 @@ export function TwoColTextAndImage(
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('take_any_necessary_precautions_before_loading_shuttle')
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
-        return t('empty_stacker_of_labware_above_latch_labware_stuck')
+        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+          return t('stacker_latch_will_reengage')
+        } else {
+          return t('empty_stacker_of_labware_above_latch_labware_stuck')
+        }
       default:
         console.error(
           `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
+    }
+  }
+
+  const buildButtonText = (): string => {
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+        if (step === REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH) {
+          return t('re_engage_latch')
+        } else {
+          return t('continue')
+        }
+      default:
+        console.error(
+          `TwoColTextAndImage:buildButtonText: Unexpected recovery option ${route}. Handle retry step copy explicitly.`
+        )
+        return t('continue')
     }
   }
 
@@ -102,6 +147,7 @@ export function TwoColTextAndImage(
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
+        primaryBtnTextOverride={buildButtonText()}
         secondaryBtnOnClick={goBackPrevStep}
       ></RecoveryFooterButtons>
     </RecoverySingleColumnContentWrapper>

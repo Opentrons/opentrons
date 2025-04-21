@@ -174,6 +174,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STALL_WHILE_STACKING:
     case ERROR_KINDS.SHUTTLE_MISSING:
     case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -346,6 +347,7 @@ export function getFailedCmdRelevantLabware(
     protocolAnalysis?.commands ?? []
   )
   let labwareNickname, failedLWURI
+  // TODO(tz, 4-21-25): change the labware uri to use the command result after Seth merge's his PE pr
   if (STACKER_ERROR_KINDS.includes(errorKind)) {
     for (const key in lwDefsByURI) {
       if (lwDefsByURI.hasOwnProperty(key)) {

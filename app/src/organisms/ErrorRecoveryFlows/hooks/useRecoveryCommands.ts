@@ -69,6 +69,8 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   releaseLabwareLatch: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
+  closeLabwareLatch: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
   homeExceptPlungers: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   moveLabwareWithoutPause: () => Promise<CommandData[]>
@@ -310,8 +312,26 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands])
 
   const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
-    return chainRunRecoveryCommands([RELEASE_LABWARE_LATCH])
-  }, [chainRunRecoveryCommands])
+    const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
+    if (buildOpenLatchCommand == null) {
+      return Promise.reject(
+        new Error('Invalid use of open labware latch command')
+      )
+    } else {
+      return chainRunRecoveryCommands([buildOpenLatchCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
+  const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
+    const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
+    if (buildCloseLatchCommand == null) {
+      return Promise.reject(
+        new Error('Invalid use of close labware latch command')
+      )
+    } else {
+      return chainRunRecoveryCommands([buildCloseLatchCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
   const homeExceptPlungers = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_EXCEPT_PLUNGERS])
@@ -349,6 +369,7 @@ export function useRecoveryCommands({
     pickUpTips,
     releaseGripperJaws,
     releaseLabwareLatch,
+    closeLabwareLatch,
     homeExceptPlungers,
     moveLabwareWithoutPause,
     skipFailedCommand,
@@ -384,8 +405,8 @@ export const RELEASE_GRIPPER_JAW: CreateCommand = {
   intent: 'fixit',
 }
 
-export const RELEASE_LABWARE_LATCH: CreateCommand = {
-  commandType: 'flexStacker/openLatch',
+export const CLOSE_LABWARE_LATCH: CreateCommand = {
+  commandType: 'flexStacker/closeLatch',
   params: {
     moduleId: 'switch with actual',
   },
@@ -423,6 +444,46 @@ const buildHomeShuttle = (
       : ''
   return {
     commandType: 'flexStacker/prepareShuttle',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildOpenLatch = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'flexStacker/openLatch',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildCloseLatch = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'flexStacker/closeLatch',
     params: {
       moduleId: moduleId,
     },

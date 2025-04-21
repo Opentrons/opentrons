@@ -131,7 +131,11 @@ export function useGripperRelease({
     handleMotionRouting,
   } = routeUpdateActions
   const { isDoorOpen } = doorStatusUtils
-  const { MANUAL_MOVE_AND_SKIP, MANUAL_REPLACE_AND_RETRY } = RECOVERY_MAP
+  const {
+    MANUAL_MOVE_AND_SKIP,
+    MANUAL_REPLACE_AND_RETRY,
+    REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+  } = RECOVERY_MAP
   const [countdown, setCountdown] = useState(GRIPPER_RELEASE_COUNTDOWN_S)
 
   const proceedToDoorStep = (): void => {
@@ -156,6 +160,7 @@ export function useGripperRelease({
   }
 
   const proceedToValidNextStep = (): void => {
+    console.log('proceedToValidNextStep: ', selectedRecoveryOption)
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         void proceedToRouteAndStep(
@@ -169,60 +174,16 @@ export function useGripperRelease({
           MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
         )
         break
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+        void proceedToRouteAndStep(
+          REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
+          REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH
+        )
+        break
       default:
         console.error('Unhandled post grip-release routing.')
         void proceedNextStep()
     }
-  }
-
-  const startTimer = (intervalId): void => {
-    intervalId = setInterval(() => {
-      setCountdown(prevCountdown => {
-        const updatedCountdown = prevCountdown - 1
-
-        if (updatedCountdown === 0) {
-          if (intervalId != null) {
-            clearInterval(intervalId)
-          }
-          if (
-            recoveryMap.route ===
-            RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
-          ) {
-            void releaseLabwareLatch().then(() => {
-              if (isDoorOpen) {
-                return handleMotionRouting(false).then(() => {
-                  proceedToDoorStep()
-                })
-              }
-
-              return handleMotionRouting(true)
-                .then(() => homeExceptPlungers())
-                .then(() => handleMotionRouting(false))
-                .then(() => {
-                  proceedToValidNextStep()
-                })
-            })
-          }
-        } else {
-          void releaseGripperJaws().then(() => {
-            if (isDoorOpen) {
-              return handleMotionRouting(false).then(() => {
-                proceedToDoorStep()
-              })
-            }
-
-            return handleMotionRouting(true)
-              .then(() => homeExceptPlungers())
-              .then(() => handleMotionRouting(false))
-              .then(() => {
-                proceedToValidNextStep()
-              })
-          })
-        }
-
-        return updatedCountdown
-      })
-    }, 1000)
   }
 
   useEffect(() => {
@@ -231,7 +192,53 @@ export function useGripperRelease({
     switch (recoveryMap.route) {
       case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
       case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
-        startTimer(intervalId)
+        intervalId = setInterval(() => {
+          setCountdown(prevCountdown => {
+            const updatedCountdown = prevCountdown - 1
+
+            if (updatedCountdown === 0) {
+              if (intervalId != null) {
+                clearInterval(intervalId)
+              }
+              if (
+                recoveryMap.route ===
+                RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+              ) {
+                void releaseLabwareLatch().then(() => {
+                  if (isDoorOpen) {
+                    return handleMotionRouting(false).then(() => {
+                      proceedToDoorStep()
+                    })
+                  }
+
+                  return handleMotionRouting(true)
+                    .then(() => homeExceptPlungers())
+                    .then(() => handleMotionRouting(false))
+                    .then(() => {
+                      proceedToValidNextStep()
+                    })
+                })
+              } else {
+                void releaseGripperJaws().then(() => {
+                  if (isDoorOpen) {
+                    return handleMotionRouting(false).then(() => {
+                      proceedToDoorStep()
+                    })
+                  }
+
+                  return handleMotionRouting(true)
+                    .then(() => homeExceptPlungers())
+                    .then(() => handleMotionRouting(false))
+                    .then(() => {
+                      proceedToValidNextStep()
+                    })
+                })
+              }
+            }
+
+            return updatedCountdown
+          })
+        }, 1000)
         break
     }
 

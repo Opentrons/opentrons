@@ -150,5 +150,8 @@
   "empty_stacker_of_labware_above_latch": "Empty stacker of labware above latch",
   "empty_stacker_of_labware_above_latch_labware_stuck": "<block>Empty the stacker of all labware above the latch.</block><block>Labware stuck on the latch will be retrieved later in recovery.</block>",
   "is_there_labware_stuck_on_the_stacker_latch": "Is there labware stuck on the stacker latch?",
-  "release_labware_from_latch": "Release labware from latch"
+  "release_labware_from_latch": "Release labware from latch",
+  "prepare_for_stacker_latch_reengage": "Prepare for stacker latch to re-engage",
+  "stacker_latch_will_reengage": "The stacker latch will re-engage so that you can reload the stacker. Make sure that any obstructions have been cleared.",
+  "re_engage_latch": "Re-engage latch"
 }
