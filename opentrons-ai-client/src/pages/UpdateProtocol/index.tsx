@@ -114,7 +114,7 @@ export function UpdateProtocol(): JSX.Element {
   const [fileValue, setFile] = useState<File | null>(null)
   const [pythonText, setPythonTextValue] = useState<string>('')
   const [errorText, setErrorText] = useState<string | null>(null)
-
+  const progressIncrement = 1 / 3
   // Reset the chat data atom and protocol atoms when navigating to the update protocol page
   useEffect(() => {
     setCreateProtocolChatAtom({
@@ -148,15 +148,15 @@ export function UpdateProtocol(): JSX.Element {
   useEffect(() => {
     let progress = 0.0
     if (updateType !== null) {
-      progress += 0.33
+      progress += progressIncrement
     }
 
     if (detailsValue !== '') {
-      progress += 0.33
+      progress += progressIncrement
     }
 
     if (pythonText !== '' && fileValue !== null && errorText === null) {
-      progress += 0.34
+      progress += progressIncrement
     }
 
     setHeaderWithMeterAtom({
@@ -208,8 +208,6 @@ export function UpdateProtocol(): JSX.Element {
     const detailsText = t('modify_details_of_change') + detailsValue + '\n'
 
     const chatPrompt = `${introText}${originalCodeText}${updateTypeText}${detailsText}`
-
-    console.log(chatPrompt)
 
     setUpdateProtocolChatAtom({
       prompt: chatPrompt,
@@ -338,6 +336,7 @@ export function UpdateProtocol(): JSX.Element {
           justifyContent={JUSTIFY_END}
         >
           <LargeButton
+            // TODO: fix this disabled increment logic
             disabled={headerState.progress !== 1.0}
             buttonText={t('submit_prompt')}
             onClick={processDataAndNavigateToChat}
