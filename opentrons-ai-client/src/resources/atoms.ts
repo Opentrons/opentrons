@@ -26,7 +26,7 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
   labware: [],
   liquids: [],
   steps: [],
-  fake: false,
+  fake: true,
   fake_id: 0,
 })
 

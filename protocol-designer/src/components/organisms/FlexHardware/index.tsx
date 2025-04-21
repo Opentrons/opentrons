@@ -11,21 +11,21 @@ import {
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import { HardwareConfigurator } from '../../components/organisms'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
-} from '../../step-forms/selectors'
-import { uuid } from '../../utils'
-import { updateInitialDeckState } from './util'
+} from '../../../step-forms/selectors'
+import { uuid } from '../../../utils'
+import { updateInitialDeckState } from '../../../pages/Hardware/util'
+import { HardwareConfigurator } from '../HardwareConfigurator'
 import type {
   CutoutFixtureId,
   CutoutId,
   FlexModuleCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { InitialDeckStateModules } from '../../components/organisms/HardwareConfigurator/AddFixtureModal'
-import type { ThunkDispatch } from '../../types'
-import type { Fixtures, FixtureName } from '../../components/organisms'
+import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
+import type { ThunkDispatch } from '../../../types'
+import type { Fixtures, FixtureName } from '..'
 
 export function FlexHardware(): JSX.Element {
   const initialDeckSetup = useSelector(getInitialDeckSetup)

@@ -7,6 +7,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { selectTerminalItem } from '../../../ui/steps/actions/actions'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 
@@ -40,7 +41,7 @@ export const ErrorContents = (
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               css={LINK_BUTTON_STYLE}
               onClick={() => {
-                dispatch(selectTerminalItem('__initial_setup__'))
+                dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
               }}
             >
               {t(`timeline.error.${errorType}.link`)}
@@ -60,7 +61,7 @@ export const ErrorContents = (
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               css={LINK_BUTTON_STYLE}
               onClick={() => {
-                dispatch(selectTerminalItem('__initial_setup__'))
+                dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
               }}
             >
               {t(`timeline.error.${errorType}.link`)}

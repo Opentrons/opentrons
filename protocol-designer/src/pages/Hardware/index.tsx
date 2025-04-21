@@ -15,8 +15,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 import { useKitchen } from '../../components/organisms/Kitchen/hooks'
-import { FlexHardware } from './FlexHardware'
-import { Ot2Modules } from '../../components/organisms'
+import { FlexHardware, Ot2Modules } from '../../components/organisms'
 import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 
 export function Hardware(): JSX.Element {

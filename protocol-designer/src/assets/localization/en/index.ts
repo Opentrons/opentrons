@@ -9,7 +9,6 @@ import form from './form.json'
 import liquids from './liquids.json'
 import modal from './modal.json'
 import modules from './modules.json'
-import nav from './nav.json'
 import onboarding from './onboarding.json'
 import protocol_command_text from './protocol_command_text.json'
 import protocol_overview from './protocol_overview.json'
@@ -31,7 +30,6 @@ export const en = {
   liquids,
   modal,
   modules,
-  nav,
   onboarding,
   protocol_command_text,
   protocol_overview,
