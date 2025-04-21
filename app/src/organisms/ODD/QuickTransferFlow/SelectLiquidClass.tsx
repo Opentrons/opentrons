@@ -61,18 +61,18 @@ export function SelectLiquidClass({
 
   const handleClick = (option: LiquidClass): void => {
     const {
-      inCompatible,
-      pipetteInCompatible,
-      tipRackICompatible,
-      pipettePathInCompatible,
-      volumeInCompatible,
+      incompatible,
+      pipetteIncompatible,
+      tipRackIncompatible,
+      pipettePathIncompatible,
+      volumeIncompatible,
     } = checkLiquidClassCompatibility(option, state)
-    if (inCompatible) {
-      if (volumeInCompatible === true) {
+    if (incompatible) {
+      if (volumeIncompatible === true) {
         makeSnackbar(t('transfer_volumes_incompatible') as string)
-      } else if (pipettePathInCompatible === true) {
+      } else if (pipettePathIncompatible === true) {
         makeSnackbar(t('transfer_pipette_path_incompatible') as string)
-      } else if (pipetteInCompatible === true || tipRackICompatible === true) {
+      } else if (pipetteIncompatible === true || tipRackIncompatible === true) {
         makeSnackbar(
           t('compatibility_error', {
             pipetteOrLabware: state.pipette?.displayName,
@@ -120,7 +120,7 @@ export function SelectLiquidClass({
               handleClick(option)
             }}
             ariaDisabled={
-              checkLiquidClassCompatibility(option, state).inCompatible
+              checkLiquidClassCompatibility(option, state).incompatible
             }
           />
         ))}

@@ -72,7 +72,7 @@ interface RadioButtonProps extends StyleProps {
    *  onClick is needed for RadioButton since onChange requires actual selected value change.
    *  For this case, selected value change shouldn't be happened.
    */
-  onClick: MouseEventHandler
+  onClick?: MouseEventHandler
 }
 
 // used for ODD and helix

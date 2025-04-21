@@ -167,10 +167,10 @@ describe('SelectLiquidClass', () => {
       dispatch: vi.fn(),
     }
     vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
-      inCompatible: false,
-      pipetteInCompatible: false,
-      tipRackICompatible: false,
-      pipettePathInCompatible: false,
+      incompatible: false,
+      pipetteIncompatible: false,
+      tipRackIncompatible: false,
+      pipettePathIncompatible: false,
     })
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
@@ -231,10 +231,10 @@ describe('SelectLiquidClass', () => {
       displayName: 'mock pipette',
     } as any
     vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
-      inCompatible: true,
-      pipetteInCompatible: true,
-      tipRackICompatible: true,
-      pipettePathInCompatible: false,
+      incompatible: true,
+      pipetteIncompatible: true,
+      tipRackIncompatible: true,
+      pipettePathIncompatible: false,
     })
     render(props)
     fireEvent.click(screen.getByText('Aqueous'))
@@ -245,10 +245,10 @@ describe('SelectLiquidClass', () => {
 
   it('should call mock snackbar function when tapping liquid class button - pipette path incompatible', () => {
     vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
-      inCompatible: true,
-      pipetteInCompatible: false,
-      tipRackICompatible: false,
-      pipettePathInCompatible: true,
+      incompatible: true,
+      pipetteIncompatible: false,
+      tipRackIncompatible: false,
+      pipettePathIncompatible: true,
     })
     render(props)
     fireEvent.click(screen.getByText('Aqueous'))
@@ -259,8 +259,8 @@ describe('SelectLiquidClass', () => {
 
   it('should call mock function when tapping liquid class button - volume incompatible', () => {
     vi.mocked(checkLiquidClassCompatibility).mockReturnValue({
-      inCompatible: true,
-      volumeInCompatible: true,
+      incompatible: true,
+      volumeIncompatible: true,
     })
     render(props)
     fireEvent.click(screen.getByText('Aqueous'))
