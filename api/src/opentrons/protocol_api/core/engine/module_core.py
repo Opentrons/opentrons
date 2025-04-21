@@ -886,10 +886,12 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
     @overload
     def _ssld_from_core(
         self, core: LabwareCore
-    ) -> cmd.flex_stacker.StackerStoredLabwareDetails: ...
+    ) -> cmd.flex_stacker.StackerStoredLabwareDetails:
+        ...
 
     @overload
-    def _ssld_from_core(self, core: None) -> None: ...
+    def _ssld_from_core(self, core: None) -> None:
+        ...
 
     def _ssld_from_core(
         self, core: LabwareCore | None

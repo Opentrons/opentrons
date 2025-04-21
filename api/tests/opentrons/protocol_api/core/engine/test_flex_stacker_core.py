@@ -7,7 +7,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import FlexStacker
@@ -232,8 +232,8 @@ def test_get_max_storable_labware_from_list_primary_only(
     cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
     decoy.when(mock_protocol_core.get_labware_location(cores[0])).then_return(OFF_DECK)
     decoy.when(mock_protocol_core.get_labware_on_labware(cores[0])).then_return(None)
-    decoy.when(cores[0].get_labware_id()).then_return("core-0")
-    primary_def = decoy.mock(cls=LabwareDefinition)
+    decoy.when(cores[0].labware_id).then_return("core-0")
+    primary_def = decoy.mock(cls=LabwareDefinition2)
     decoy.when(cores[0].get_engine_definition()).then_return(primary_def)
     decoy.when(primary_def.parameters.loadName).then_return("mock-load-name")
     decoy.when(
@@ -265,11 +265,11 @@ def test_get_max_storable_labware_from_list_no_lid(
     decoy.when(mock_protocol_core.get_labware_on_labware(primary_cores[0])).then_return(
         None
     )
-    decoy.when(primary_cores[0].get_labware_id()).then_return("core-0")
-    decoy.when(adapter_cores[0].get_labware_id()).then_return("adapter-0")
+    decoy.when(primary_cores[0].labware_id).then_return("core-0")
+    decoy.when(adapter_cores[0].labware_id).then_return("adapter-0")
 
-    primary_def = decoy.mock(cls=LabwareDefinition, name="primary")
-    adapter_def = decoy.mock(cls=LabwareDefinition, name="adapter")
+    primary_def = decoy.mock(cls=LabwareDefinition2)
+    adapter_def = decoy.mock(cls=LabwareDefinition2)
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_def)
     decoy.when(adapter_cores[0].get_engine_definition()).then_return(adapter_def)
     decoy.when(adapter_def.parameters.loadName).then_return("mock-adapter-name")
@@ -308,11 +308,11 @@ def test_get_max_storable_labware_from_list_no_adapter(
     decoy.when(mock_protocol_core.get_labware_on_labware(primary_cores[0])).then_return(
         lid_cores[0]
     )
-    decoy.when(primary_cores[0].get_labware_id()).then_return("core-0")
-    decoy.when(lid_cores[0].get_labware_id()).then_return("lid-0")
+    decoy.when(primary_cores[0].labware_id).then_return("core-0")
+    decoy.when(lid_cores[0].labware_id).then_return("lid-0")
 
-    primary_def = decoy.mock(cls=LabwareDefinition, name="primary")
-    lid_def = decoy.mock(cls=LabwareDefinition, name="lid")
+    primary_def = decoy.mock(cls=LabwareDefinition2)
+    lid_def = decoy.mock(cls=LabwareDefinition2)
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_def)
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_def)
     decoy.when(primary_def.parameters.loadName).then_return("mock-primary-name")
@@ -352,13 +352,13 @@ def test_get_max_storable_labware_from_list_full_group(
     decoy.when(mock_protocol_core.get_labware_on_labware(primary_cores[0])).then_return(
         lid_cores[0]
     )
-    decoy.when(primary_cores[0].get_labware_id()).then_return("core-0")
-    decoy.when(adapter_cores[0].get_labware_id()).then_return("adapter-0")
-    decoy.when(lid_cores[0].get_labware_id()).then_return("lid-0")
+    decoy.when(primary_cores[0].labware_id).then_return("core-0")
+    decoy.when(adapter_cores[0].labware_id).then_return("adapter-0")
+    decoy.when(lid_cores[0].labware_id).then_return("lid-0")
 
-    primary_def = decoy.mock(cls=LabwareDefinition, name="primary")
-    adapter_def = decoy.mock(cls=LabwareDefinition, name="adapter")
-    lid_def = decoy.mock(cls=LabwareDefinition, name="lid")
+    primary_def = decoy.mock(cls=LabwareDefinition2)
+    adapter_def = decoy.mock(cls=LabwareDefinition2)
+    lid_def = decoy.mock(cls=LabwareDefinition2)
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_def)
     decoy.when(adapter_cores[0].get_engine_definition()).then_return(adapter_def)
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_def)
@@ -391,8 +391,8 @@ def test_get_current_storable_labware_from_list_primary_only(
     cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
     decoy.when(mock_protocol_core.get_labware_location(cores[0])).then_return(OFF_DECK)
     decoy.when(mock_protocol_core.get_labware_on_labware(cores[0])).then_return(None)
-    decoy.when(cores[0].get_labware_id()).then_return("core-0")
-    primary_def = decoy.mock(cls=LabwareDefinition)
+    decoy.when(cores[0].labware_id).then_return("core-0")
+    primary_def = decoy.mock(cls=LabwareDefinition2)
     decoy.when(cores[0].get_engine_definition()).then_return(primary_def)
     decoy.when(primary_def.parameters.loadName).then_return("mock-load-name")
     decoy.when(
@@ -447,8 +447,8 @@ def test_get_max_storable_labware_raises_if_not_configured(
         subject.get_max_storable_labware()
 
 
-def _prime_definition(decoy: Decoy, name: str) -> LabwareDefinition:
-    def_object = decoy.mock(cls=LabwareDefinition, name=name)
+def _prime_definition(decoy: Decoy, name: str) -> LabwareDefinition2:
+    def_object = decoy.mock(cls=LabwareDefinition2)
     decoy.when(def_object.parameters.loadName).then_return(f"{name}-loadname")
     decoy.when(def_object.namespace).then_return(f"{name}-namespace")
     decoy.when(def_object.version).then_return(1)
