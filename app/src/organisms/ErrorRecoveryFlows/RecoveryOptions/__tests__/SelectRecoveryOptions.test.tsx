@@ -290,13 +290,7 @@ describe('RecoveryOptions', () => {
         RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
         expect.any(String)
       )
-      .thenReturn('Manually fill well and retry with same tips')
-    when(mockGetRecoveryOptionCopy)
-      .calledWith(
-        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
-        expect.any(String)
-      )
-      .thenReturn('Manually fill well and retry with new tips')
+      .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with same tips')
@@ -367,11 +361,9 @@ describe('RecoveryOptions', () => {
     renderRecoveryOptions(props)
 
     screen.getByRole('label', {
-      name: 'Manually fill well and retry with same tips',
+      name: 'Manually fill well and skip to next step',
     })
-    screen.getByRole('label', {
-      name: 'Manually fill well and retry with new tips',
-    })
+    screen.getByRole('label', { name: 'Ignore error and skip to next step' })
     screen.getByRole('label', { name: 'Cancel run' })
   })
 
