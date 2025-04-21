@@ -12,6 +12,7 @@ import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../labware-defs/selectors')
+vi.mock('../../../../ui/steps/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
@@ -19,7 +20,6 @@ vi.mock('@opentrons/components', async importOriginal => {
     LabwareRender: vi.fn(),
   }
 })
-
 const render = (props: ComponentProps<typeof HoveredItem>) => {
   return renderWithProviders(<HoveredItem {...props} />)[0]
 }
