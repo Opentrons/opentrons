@@ -1,4 +1,4 @@
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -38,13 +38,7 @@ export const HintsModal = (): JSX.Element | null => {
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <Flex>
           <StyledText desktopStyle="bodyDefaultRegular">
-            <Trans
-              t={t}
-              components={{
-                strong: <strong />,
-              }}
-              i18nKey={`alert:hint.${hintKey}.body`}
-            />
+            {t(`alert:hint.${hintKey}.body`)}
           </StyledText>
         </Flex>
         <Flex marginLeft={SPACING.spacing16}>

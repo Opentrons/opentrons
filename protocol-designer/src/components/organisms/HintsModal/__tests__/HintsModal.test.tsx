@@ -32,11 +32,12 @@ describe('HintsModal', () => {
     vi.mocked(getHint).mockReturnValue('thermocycler_lid_passive_cooling')
     render()
     screen.getByText('Lid temperature')
+    screen.getByText('The Thermocycler lid does not actively cool.')
     screen.getByText(
-      'If the room temperature in your lab is higher than the temperature you have defined, the lid will never reach it. This will stall your protocol indefinitely.'
+      'When closed, the lid may take a very long time to reach a lower temperature.'
     )
     screen.getByText(
-      'If the room temperature in your lab is higher than the temperature you have defined, the lid will never reach it. This will stall your protocol indefinitely.'
+      'The lid might not ever reach a temperature below ambient.'
     )
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(vi.mocked(removeHint)).toHaveBeenCalled()

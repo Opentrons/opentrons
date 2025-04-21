@@ -37,9 +37,9 @@
     },
     "thermocycler_lid_passive_cooling": {
       "title": "Lid temperature",
-      "body": "Please note that the lid <strong>does not actively cool</strong> when entering a temperature lower than the previous temperature. Keep in mind the following:",
-      "li1": "If the Thermocycler lid is closed it may take a very long time to reach a cooler temperature.",
-      "li2": "If the room temperature in your lab is higher than the temperature you have defined, the lid will never reach it. This will stall your protocol indefinitely."
+      "body": "The Thermocycler lid does not actively cool.",
+      "li1": "When closed, the lid may take a very long time to reach a lower temperature.",
+      "li2": "The lid might not ever reach a temperature below ambient."
     },
     "waste_chute_warning": {
       "title": "Disposing labware",
