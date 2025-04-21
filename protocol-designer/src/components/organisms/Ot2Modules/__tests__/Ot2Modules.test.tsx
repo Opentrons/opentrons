@@ -5,19 +5,19 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { DeckFromLayers, DropdownMenu } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../modules'
-import { createModule } from '../../../step-forms/actions'
-import { Ot2Modules } from '../Ot2Modules'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
+import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
+import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../../modules'
+import { createModule } from '../../../../step-forms/actions'
+import { Ot2Modules } from '..'
 import type * as Components from '@opentrons/components'
 
-vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../step-forms/selectors')
-vi.mock('../../../step-forms/actions')
-vi.mock('../../../modules')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('../../../../step-forms/selectors')
+vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../modules')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {

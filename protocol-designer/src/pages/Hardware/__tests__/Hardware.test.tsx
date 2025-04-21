@@ -6,14 +6,13 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
-import { FlexHardware } from '../FlexHardware'
-import { Ot2Modules } from '../Ot2Modules'
+import { FlexHardware, Ot2Modules } from '../../../components/organisms'
 import { Hardware } from '..'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
-vi.mock('../Ot2Modules')
-vi.mock('../FlexHardware')
+vi.mock('../../../components/organisms/FlexHardware')
+vi.mock('../../../components/organisms/Ot2Modules')
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>

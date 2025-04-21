@@ -21,6 +21,7 @@ import {
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../../labware-defs'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { DND_TYPES } from '../../../../constants'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
@@ -132,7 +133,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
     slotPosition == null ||
-    terminalItemId !== '__initial_setup__' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected
   )
     return null
