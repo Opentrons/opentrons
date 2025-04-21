@@ -393,7 +393,7 @@ export function generateChatPrompt(
     fake: values.protocol_format === 'Protocol Designer',
     fake_key:
       values.protocol_format === 'Protocol Designer'
-        ? 'pdv8protocol'
+        ? 'pd serial diliution'
         : undefined,
     fake_id: 0,
   })

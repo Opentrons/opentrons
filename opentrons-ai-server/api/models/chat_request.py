@@ -13,7 +13,7 @@ class Chat(BaseModel):
 # really hate that I cannot *fake_keys
 # and therefore must keep them in sync
 # unit test validates that they are in sync
-FakeKeys = Literal["reagent transfer", "reagent transfer flex", "pcr", "pcr flex", "no markdown", "empty reply", "pdv8protocol"]
+FakeKeys = Literal["reagent transfer", "reagent transfer flex", "pcr", "pcr flex", "no markdown", "empty reply", "pd serial diliution"]
 # Use Annotated to specify string constraints
 FakeKeyType = Annotated[
     Optional[FakeKeys], Field(None, description="The key to use for the fake response. If not provided, the default is used.")

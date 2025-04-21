@@ -60,7 +60,7 @@ const StyledIcon = styled(Icon)`
 `
 
 const OuterContainer = styled.div`
-  background-color: #e5e7eb; // Light gray background
+  background-color: ${COLORS.white}
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -70,13 +70,12 @@ const OuterContainer = styled.div`
 `
 
 const FileContainer = styled.div`
-  background-color: white;
+  background-color: ${COLORS.grey20};
   border-radius: 12px;
   display: flex;
   align-items: center;
   padding: 12px 16px;
   width: 100%;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
 `
 
 const IconWrapper = styled.div`
@@ -90,7 +89,7 @@ const IconWrapper = styled.div`
 
 const FileName = styled.span`
   font-size: 14px;
-  color: #111827;
+  color: ${COLORS.black90};
   margin-right: auto;
 `
 
