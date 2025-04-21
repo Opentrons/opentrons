@@ -7,18 +7,18 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import { EQUIPMENT_POLL_MS } from './constants'
 
 import type { State } from '/app/redux/types'
-import { AttachedModule, FlexStackerData } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 
+import type { CutoutConfig } from '@opentrons/shared-data'
 import {
   FLEX_STACKER_MODULE_TYPE,
-  CutoutConfig,
   getCutoutDisplayName,
 } from '@opentrons/shared-data'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 export const NOT_CONFIGURED: 'moduleLocationNotConfigured' =
   'moduleLocationNotConfigured'
-export type DoorResult = {
+export interface DoorResult {
   isDoorOpen: boolean
   moduleDoorLocation: string | typeof NOT_CONFIGURED | null
 }
@@ -27,7 +27,7 @@ function identifyDooredModuleSlot(
   module: AttachedModule,
   cutout: CutoutConfig
 ): string {
-  var slot = getCutoutDisplayName(cutout.cutoutId)
+  let slot = getCutoutDisplayName(cutout.cutoutId)
   if (module.moduleType === FLEX_STACKER_MODULE_TYPE) {
     slot = slot.replace('3', '4')
   }

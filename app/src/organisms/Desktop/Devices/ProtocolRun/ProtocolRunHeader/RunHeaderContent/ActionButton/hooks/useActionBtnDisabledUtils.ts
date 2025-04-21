@@ -11,7 +11,7 @@ import {
 } from '../../../utils'
 
 import type { BaseActionButtonProps } from '..'
-import { DoorResult } from '../../../../../../../DoorOpenControl/useIsDoorOpen'
+import type { DoorResult } from '../../../../../../../DoorOpenControl/useIsDoorOpen'
 
 interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
   isCurrentRun: boolean
