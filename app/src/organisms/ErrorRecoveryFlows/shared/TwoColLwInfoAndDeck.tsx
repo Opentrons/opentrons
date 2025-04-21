@@ -41,6 +41,7 @@ export function TwoColLwInfoAndDeck(
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
     HOPPER_MANUAL_LOAD_AND_RETRY,
     HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { relevantWellName, failedLabware } = failedLabwareUtils
@@ -93,6 +94,7 @@ export function TwoColLwInfoAndDeck(
           return t('ensure_stacker_has_labware')
         }
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
       case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
         return t('load_labware_into_stacker')
@@ -131,6 +133,7 @@ export function TwoColLwInfoAndDeck(
           return t('make_sure_loaded_correct_number_of_labware_stacker')
         }
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
         return t('make_sure_loaded_correct_number_of_labware_stacker')
       default:
         console.error(
@@ -160,6 +163,7 @@ export function TwoColLwInfoAndDeck(
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
       case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
         return 'stacked'
       default:
         return 'default'
