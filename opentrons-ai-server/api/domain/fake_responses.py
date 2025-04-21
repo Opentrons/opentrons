@@ -1,8 +1,15 @@
-from typing import List
+import json
+from pathlib import Path
+from typing import Any, Dict, List, cast
 
 from pydantic import BaseModel
 
 from api.models.chat_response import ChatResponse
+
+
+def load_json_fixture(name: str) -> Dict[str, Any]:
+    data = json.loads(Path(f"api/domain/fixtures/{name}.json").read_text())
+    return cast(Dict[str, Any], data)
 
 
 class FakeResponse(BaseModel):
@@ -34,6 +41,11 @@ pcr_flex: ChatResponse = ChatResponse(
 
 no_markdown: ChatResponse = ChatResponse(reply="👀 at me I am a response without markdown! 😊 99.99µl", fake=True)
 
+pd_serial_dilution: ChatResponse = ChatResponse(
+    reply="Here is your Protocol Designer Protocol", fake=True, protocol_content=load_json_fixture("PDSerialDilution")
+)
+
+
 empty_reply: ChatResponse = ChatResponse(reply="", fake=True)
 
 
@@ -45,8 +57,10 @@ PCR = FakeResponse(key="PCR", chat_response=pcr, description="OT2 PCR Preparatio
 PCRFlex = FakeResponse(key="PCR Flex", chat_response=pcr_flex, description="Flex PCR Preparation Protocol")
 NoMarkdown = FakeResponse(key="no markdown", chat_response=no_markdown, description="Response without markdown")
 EmptyReply = FakeResponse(key="empty reply", chat_response=empty_reply, description="Reply field has empty string ''")
+PDSerialDilution = FakeResponse(key="pd serial diliution", chat_response=pd_serial_dilution, description="PD v8 Protocol")
 
-fake_responses: List[FakeResponse] = [ReagentTransfer, ReagentTransferFlex, PCR, PCRFlex, NoMarkdown, EmptyReply]
+
+fake_responses: List[FakeResponse] = [ReagentTransfer, ReagentTransferFlex, PCR, PCRFlex, NoMarkdown, EmptyReply, PDSerialDilution]
 fake_keys: List[str] = [response.key.lower() for response in fake_responses]
 
 

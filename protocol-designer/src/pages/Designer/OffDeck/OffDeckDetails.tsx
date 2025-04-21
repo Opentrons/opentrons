@@ -26,6 +26,7 @@ import { OffDeckControls } from './OffDeckControls'
 import { SlotDetailsContainer } from '../../../components/organisms'
 import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../../file-data/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
@@ -106,7 +107,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
           </StyledText>
         </Flex>
         <LabwareWrapper>
-          {terminalItemId === '__initial_setup__' ? (
+          {terminalItemId === START_TERMINAL_ITEM_ID ? (
             <Flex width="9.5625rem" height="6.375rem">
               <EmptySelectorButton
                 onClick={addLabware}
