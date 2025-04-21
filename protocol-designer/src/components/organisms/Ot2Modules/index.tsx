@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { Fragment, useMemo } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -27,29 +26,52 @@ import {
   getPositionFromSlotId,
   inferModuleOrientationFromSlot,
   inferModuleOrientationFromXCoordinate,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
   OT2_ROBOT_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import {
+  getSavedStepForms,
+  getInitialDeckSetup,
+} from '../../../step-forms/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { useKitchen } from '../Kitchen/hooks'
-import { getSlotsWithCollisions, ModuleEmptySelectorButtons } from '..'
+import {
+  getDisableModuleRestrictions,
+  getEnableMutlipleTempsOT2,
+} from '../../../feature-flags/selectors'
 import { createModule } from '../../../step-forms/actions'
 import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
-import { FixedTrashText } from '../../molecules'
 import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../modules'
 import { SlotWarning } from '../../../pages/Designer/DeckSetup/SlotWarning'
-import {
-  DEFAULT_SLOT_MAP_OT2,
-  OT2_SUPPORTED_MODULE_MODELS,
-} from '../../../pages/Onboarding/constants'
-import type {
-  AddressableAreaName,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
-import type { OT2ModuleType } from '../../../pages/Onboarding/ModuleDiagram'
-import type { ThunkDispatch } from '../../../types'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
+import { getDismissedHints } from '../../../tutorial/selectors'
+import { createModuleEntityAndChangeForm } from '../../../step-forms/actions/thunks'
+import { OT2_SUPPORTED_MODULE_MODELS } from '../../../pages/Onboarding/constants'
+import { FixedTrashText, MagnetModuleChangeContent } from '../../molecules'
+import { ModuleEmptySelectorButtons } from '../ModuleEmptySelectorButtons'
+import { useKitchen } from '../Kitchen/hooks'
+import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
+import { getNextAvailableModuleSlot, getSlotsWithCollisions } from '../utils'
+import { useBlockingHint } from '../BlockingHintModal'
+import { getModuleOnSlot } from './util'
+import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
+import type { OT2ModuleType, ThunkDispatch } from '../../../types'
+import type { StepType } from '../../../form-types'
+
+type MagneticModuleModels =
+  | typeof MAGNETIC_MODULE_V1
+  | typeof MAGNETIC_MODULE_V2
+
+const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
+  heaterShakerModuleType: 'heaterShaker',
+  magneticModuleType: 'magnet',
+  temperatureModuleType: 'temperature',
+  thermocyclerModuleType: 'thermocycler',
+}
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -65,12 +87,38 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 export function Ot2Modules(): JSX.Element {
   const { t } = useTranslation(['onboarding', 'protocol_overview', 'shared'])
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const enable2TempModules = useSelector(getEnableMutlipleTempsOT2)
   const disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
+  const savedSteps = useSelector(getSavedStepForms)
+  const isDismissedModuleHint = useSelector(getDismissedHints).includes(
+    'change_magnet_module_model'
+  )
   const deckDef = getDeckDefFromRobotType(OT2_ROBOT_TYPE)
   const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<any>>()
+  const [entityToDelete, setDeleteEntityInUseModal] = useState<string | null>(
+    null
+  )
+  const [changeModuleWarningInfo, displayModuleWarning] = useState<boolean>(
+    false
+  )
+  const { modules, pipettes, labware } = initialDeckSetup
+  const hasMagneticModuleSteps = Object.values(savedSteps).find(
+    step => step.stepType === 'magnet'
+  )
+  const magModModel = Object.values(modules).find(
+    module => module.type === MAGNETIC_MODULE_TYPE
+  )?.model
+
+  const [
+    magnetModuleModel,
+    setMagnetModuleModel,
+  ] = useState<MagneticModuleModels | null>(
+    hasMagneticModuleSteps && magModModel
+      ? (magModModel as MagneticModuleModels)
+      : null
+  )
   const supportedModules = OT2_SUPPORTED_MODULE_MODELS
-  const { modules, pipettes } = initialDeckSetup
   const hasThermocycler = Object.values(modules).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
   )
@@ -80,34 +128,118 @@ export function Ot2Modules(): JSX.Element {
         module => module.type === getModuleType(moduleModel)
       )
   )
+  const numberOfTemperatureModules = Object.values(modules).filter(
+    module => module.model === TEMPERATURE_MODULE_V2
+  )?.length
 
-  const handleRemoveModule = (moduleType: ModuleType): void => {
-    const moduleToDelete = Object.values(modules).find(
-      module => module.type === moduleType
-    )
-    if (moduleToDelete != null) {
-      dispatch(deleteModule({ moduleId: moduleToDelete.id }))
+  const handleRemoveModule = (moduleId: string | null): void => {
+    if (moduleId != null) {
+      dispatch(deleteModule({ moduleId }))
     }
   }
 
-  const handleAddModule = (moduleModel: ModuleModel, slot?: string): void => {
-    const moduleSlot = slot ?? DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)]
-    const somethingInSlot =
+  const handleAddModule = (
+    moduleModel: ModuleModel,
+    isModuleInUse: boolean,
+    slot?: string
+  ): void => {
+    const moduleType = getModuleType(moduleModel)
+    const moduleSlot =
+      slot ??
+      getNextAvailableModuleSlot(
+        moduleModel,
+        Object.values(modules),
+        hasThermocycler
+      )
+    const somethingInSlotModule =
       Object.values(modules).some(module => module.slot === moduleSlot) ||
       (moduleSlot === '10' && hasThermocycler)
-    if (somethingInSlot) {
-      makeSnackbar(t('protocol_overview:conflict_on_slot') as string)
-    } else {
-      handleRemoveModule(getModuleType(moduleModel))
-      dispatch(
-        createModule({
-          slot: moduleSlot ?? '1',
-          model: moduleModel,
-          type: getModuleType(moduleModel),
-        })
+    const incompatibleLabwareDisplayNameInSlot = Object.values(labware).find(
+      lw =>
+        lw.slot === moduleSlot &&
+        !Object.values(
+          COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
+        ).includes(lw.def.parameters.loadName)
+    )?.def.metadata.displayName
+    if (somethingInSlotModule) {
+      makeSnackbar(t('protocol_overview:conflict_on_slot_module') as string)
+    } else if (incompatibleLabwareDisplayNameInSlot != null) {
+      makeSnackbar(
+        t('protocol_overview:conflict_on_slot_labware', {
+          displayName: incompatibleLabwareDisplayNameInSlot,
+        }) as string
       )
+    } else {
+      const moduleIdToDelete = Object.values(modules).find(module =>
+        enable2TempModules &&
+        moduleModel === TEMPERATURE_MODULE_V2 &&
+        numberOfTemperatureModules < 2
+          ? null
+          : module.type === moduleType
+      )?.id
+      //   remove the module if it already exists on the deck
+      handleRemoveModule(moduleIdToDelete ?? null)
+      if (isModuleInUse) {
+        const moduleSteps = Object.values(savedSteps).filter(step => {
+          return (
+            step.stepType ===
+              mapModTypeToStepTypeOt2[moduleType as OT2ModuleType] &&
+            //  only update module steps that match the old moduleId
+            //  to accommodate instances of MoaM
+            step.moduleId === moduleIdToDelete
+          )
+        })
+
+        const pauseSteps = Object.values(savedSteps).filter(step => {
+          return (
+            step.stepType === 'pause' &&
+            //  only update pause steps that match the old moduleId
+            //  to accommodate instances of MoaM
+            step.moduleId === moduleIdToDelete
+          )
+        })
+        dispatch(
+          createModuleEntityAndChangeForm({
+            slot: moduleSlot ?? '1',
+            model: moduleModel,
+            type: getModuleType(moduleModel),
+            moduleSteps,
+            pauseSteps,
+          })
+        )
+      } else {
+        dispatch(
+          createModule({
+            slot: moduleSlot ?? '1',
+            model: moduleModel,
+            type: getModuleType(moduleModel),
+          })
+        )
+      }
     }
   }
+  const handleAddModuleButton = (moduleModel: ModuleModel): void => {
+    if (
+      !isDismissedModuleHint &&
+      magnetModuleModel != null &&
+      magnetModuleModel !== moduleModel
+    ) {
+      displayModuleWarning(true)
+    } else {
+      handleAddModule(moduleModel, false)
+    }
+  }
+  const handleRemoveButton = (
+    isModuleInUse: boolean,
+    moduleId: string
+  ): void => {
+    if (isModuleInUse) {
+      setDeleteEntityInUseModal(moduleId)
+    } else {
+      handleRemoveModule(moduleId)
+    }
+  }
+
   //  for GEN1 8-channel pipette x GEN1 module collision warnings
   const _hasGen1MultichannelPipette = useMemo(
     () => getHasGen1MultiChannelPipette(pipettes),
@@ -120,149 +252,200 @@ export function Ot2Modules(): JSX.Element {
     ? getSlotsWithCollisions(deckDef, Object.values(modules))
     : []
 
+  //  for switch magnetic module models since the units are 1/2mm and mm
+  const changeModuleWarning = useBlockingHint({
+    hintKey: 'change_magnet_module_model',
+    handleCancel: () => {
+      displayModuleWarning(false)
+    },
+    handleContinue: () => {
+      const model =
+        magnetModuleModel != null &&
+        magnetModuleModel === (MAGNETIC_MODULE_V1 as MagneticModuleModels)
+          ? MAGNETIC_MODULE_V2
+          : MAGNETIC_MODULE_V1
+
+      displayModuleWarning(false)
+      setMagnetModuleModel(model as MagneticModuleModels)
+      handleAddModule(model, false)
+    },
+    content: <MagnetModuleChangeContent />,
+    enabled: changeModuleWarningInfo,
+  })
+
   return (
-    <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap={WRAP} width="100%">
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        flex="1.27"
-        width="100%"
-        paddingTop={SPACING.spacing120}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+    <>
+      {entityToDelete != null ? (
+        <ConfirmDeleteEntityInUseModal
+          type="clear"
+          onClose={() => {
+            setDeleteEntityInUseModal(null)
+          }}
+          onConfirm={() => {
+            handleRemoveModule(entityToDelete)
+            setDeleteEntityInUseModal(null)
+          }}
+        />
+      ) : null}
+      {changeModuleWarning}
+      <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap={WRAP} width="100%">
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          flex="1.27"
+          width="100%"
+          paddingTop={SPACING.spacing120}
+        >
           <StyledText desktopStyle="headingSmallBold">
             {t('protocol_overview:modules')}
           </StyledText>
           <ModuleEmptySelectorButtons
             modules={filteredSupportedModules}
-            addModule={handleAddModule}
+            addModule={moduleModel => {
+              handleAddModuleButton(moduleModel)
+            }}
+            enableMultipleTempModules={enable2TempModules}
+            numberOfTemps={numberOfTemperatureModules}
+            hasGen1Temp={Object.values(modules).some(
+              module => module.model === TEMPERATURE_MODULE_V1
+            )}
           />
-        </Flex>
-        {Object.keys(modules).length > 0 ? (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing12}
-            paddingTop={SPACING.spacing60}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              {Object.values(modules).map(module => (
-                <ListItem type="default" key={module.model}>
-                  <ListItemCustomize
-                    linkText={t('remove')}
-                    onClick={() => {
-                      handleRemoveModule(module.type)
-                    }}
-                    dropdown={
-                      module.type === THERMOCYCLER_MODULE_TYPE
-                        ? undefined
-                        : {
-                            dropdownType: 'neutral',
-                            filterOptions: getAllModuleSlotsByTypeOt2(
-                              module.type
-                            ),
-                            onClick: value => {
-                              handleAddModule(module.model, value)
-                            },
-                            currentOption: {
-                              name: module.slot,
-                              value: module.slot,
-                            },
-                          }
-                    }
-                    header={getModuleDisplayName(module.model)}
-                    label={
-                      module.type === THERMOCYCLER_MODULE_TYPE
-                        ? undefined
-                        : t('protocol_overview:deck_slot')
-                    }
-                    leftHeaderItem={
-                      <Flex
-                        padding={SPACING.spacing2}
-                        backgroundColor={COLORS.white}
-                        borderRadius={BORDERS.borderRadius8}
-                        alignItems={ALIGN_CENTER}
-                        width="3.75rem"
-                        height="3.625rem"
-                      >
-                        <ModuleDiagram
-                          type={module.type as OT2ModuleType}
-                          model={module.model}
-                        />
-                      </Flex>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </Flex>
-          </Flex>
-        ) : null}
-      </Flex>
-      <Flex flex="1.27" minWidth="50%">
-        <RobotCoordinateSpaceWithRef
-          height="80%"
-          width="100%"
-          deckDef={deckDef}
-          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
-        >
-          {() => (
-            <>
-              <DeckFromLayers
-                robotType={OT2_ROBOT_TYPE}
-                layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-              />
-              <FixedTrashText />
-              {Object.values(modules).map(
-                ({ id, slot, model, moduleState }) => {
-                  const slotId = slot
-                  const slotPosition = getPositionFromSlotId(slotId, deckDef)
-                  if (slotPosition == null) {
-                    console.warn(`no slot ${slotId} for module ${id}`)
-                    return null
-                  }
-                  const moduleDef = getModuleDef2(model)
-                  return (
-                    <Fragment key={id}>
-                      <Module
-                        key={slot}
-                        x={slotPosition[0]}
-                        y={slotPosition[1]}
-                        def={moduleDef}
-                        orientation={inferModuleOrientationFromXCoordinate(
-                          slotPosition[0]
-                        )}
-                        innerProps={
-                          moduleState.type === THERMOCYCLER_MODULE_TYPE
-                            ? { lidMotorState: 'open' }
-                            : {}
-                        }
-                        targetSlotId={slotId}
-                        targetDeckId={deckDef.otId}
-                      />
-                    </Fragment>
+          {Object.keys(modules).length > 0 ? (
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing12}
+              paddingTop={SPACING.spacing60}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                {Object.values(modules).map((module, index) => {
+                  const { isModuleInUse, moduleId } = getModuleOnSlot(
+                    savedSteps,
+                    module
                   )
-                }
-              )}
-              {multichannelWarningSlotIds.map(slotId => {
-                const slotPosition = getPositionFromSlotId(slotId, deckDef)
-                const slotBoundingBox = getAddressableAreaFromSlotId(
-                  slotId,
-                  deckDef
-                )?.boundingBox
-                return slotPosition != null && slotBoundingBox != null ? (
-                  <SlotWarning
-                    key={slotId}
-                    warningType="gen1multichannel"
-                    x={slotPosition[0]}
-                    y={slotPosition[1]}
-                    xDimension={slotBoundingBox.xDimension}
-                    yDimension={slotBoundingBox.yDimension}
-                    orientation={inferModuleOrientationFromSlot(slotId)}
-                  />
-                ) : null
-              })}
-            </>
-          )}
-        </RobotCoordinateSpaceWithRef>
+                  return (
+                    <ListItem type="default" key={`${module.model}_${index}`}>
+                      <ListItemCustomize
+                        linkText={t('remove')}
+                        onClick={() => {
+                          handleRemoveButton(isModuleInUse, moduleId)
+                        }}
+                        dropdown={
+                          module.type === THERMOCYCLER_MODULE_TYPE
+                            ? undefined
+                            : {
+                                dropdownType: 'neutral',
+                                filterOptions: getAllModuleSlotsByTypeOt2(
+                                  module.type
+                                ),
+                                onClick: value => {
+                                  handleAddModule(
+                                    module.model,
+                                    isModuleInUse,
+                                    value
+                                  )
+                                },
+                                currentOption: {
+                                  name: module.slot,
+                                  value: module.slot,
+                                },
+                              }
+                        }
+                        header={getModuleDisplayName(module.model)}
+                        label={
+                          module.type === THERMOCYCLER_MODULE_TYPE
+                            ? undefined
+                            : t('protocol_overview:deck_slot')
+                        }
+                        leftHeaderItem={
+                          <Flex
+                            padding={SPACING.spacing2}
+                            backgroundColor={COLORS.white}
+                            borderRadius={BORDERS.borderRadius8}
+                            alignItems={ALIGN_CENTER}
+                            width="3.75rem"
+                            height="3.625rem"
+                          >
+                            <ModuleDiagram
+                              type={module.type as OT2ModuleType}
+                              model={module.model}
+                            />
+                          </Flex>
+                        }
+                      />
+                    </ListItem>
+                  )
+                })}
+              </Flex>
+            </Flex>
+          ) : null}
+        </Flex>
+        <Flex flex="1.27" minWidth="50%">
+          <RobotCoordinateSpaceWithRef
+            height="80%"
+            width="100%"
+            deckDef={deckDef}
+            viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+          >
+            {() => (
+              <>
+                <DeckFromLayers
+                  robotType={OT2_ROBOT_TYPE}
+                  layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+                />
+                <FixedTrashText />
+                {Object.values(modules).map(
+                  ({ id, slot, model, moduleState }) => {
+                    const slotId = slot
+                    const slotPosition = getPositionFromSlotId(slotId, deckDef)
+                    if (slotPosition == null) {
+                      console.warn(`no slot ${slotId} for module ${id}`)
+                      return null
+                    }
+                    const moduleDef = getModuleDef2(model)
+                    return (
+                      <Fragment key={id}>
+                        <Module
+                          key={slot}
+                          x={slotPosition[0]}
+                          y={slotPosition[1]}
+                          def={moduleDef}
+                          orientation={inferModuleOrientationFromXCoordinate(
+                            slotPosition[0]
+                          )}
+                          innerProps={
+                            moduleState.type === THERMOCYCLER_MODULE_TYPE
+                              ? { lidMotorState: 'open' }
+                              : {}
+                          }
+                          targetSlotId={slotId}
+                          targetDeckId={deckDef.otId}
+                        />
+                      </Fragment>
+                    )
+                  }
+                )}
+                {multichannelWarningSlotIds.map(slotId => {
+                  const slotPosition = getPositionFromSlotId(slotId, deckDef)
+                  const slotBoundingBox = getAddressableAreaFromSlotId(
+                    slotId,
+                    deckDef
+                  )?.boundingBox
+                  return slotPosition != null && slotBoundingBox != null ? (
+                    <SlotWarning
+                      key={slotId}
+                      warningType="gen1multichannel"
+                      x={slotPosition[0]}
+                      y={slotPosition[1]}
+                      xDimension={slotBoundingBox.xDimension}
+                      yDimension={slotBoundingBox.yDimension}
+                      orientation={inferModuleOrientationFromSlot(slotId)}
+                    />
+                  ) : null
+                })}
+              </>
+            )}
+          </RobotCoordinateSpaceWithRef>
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }

@@ -63,7 +63,6 @@ import type {
   CreatePipettesAction,
   DeleteModuleAction,
   DeletePipettesAction,
-  EditModuleAction,
   SubstituteStepFormPipettesAction,
   ChangeBatchEditFieldAction,
   ResetBatchEditFieldChangesAction,
@@ -125,7 +124,6 @@ export type UnsavedFormActions =
   | CreateModuleAction
   | DeleteModuleAction
   | SelectTerminalItemAction
-  | EditModuleAction
   | SubstituteStepFormPipettesAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
@@ -191,7 +189,6 @@ export const unsavedForm = (
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
-    case 'EDIT_MODULE':
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
@@ -266,7 +263,6 @@ export type SavedStepFormsActions =
   | DuplicateLabwareAction
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
-  | EditModuleAction
   | ToggleIsGripperRequiredAction
   | CreateDeckFixtureAction
   | DeleteDeckFixtureAction
@@ -522,19 +518,6 @@ export const savedStepForms = (
 
         return savedForm
       })
-    }
-
-    case 'EDIT_MODULE': {
-      const moduleId = action.payload.id
-      return mapValues(savedStepForms, (savedForm: FormData, formId) =>
-        _editModuleFormUpdate({
-          moduleId,
-          savedForm,
-          formId,
-          rootState,
-          nextModuleModel: action.payload.model,
-        })
-      )
     }
 
     case 'MOVE_DECK_ITEM': {
@@ -1125,17 +1108,6 @@ export const moduleInvariantProperties: Reducer<
         },
       }
     },
-
-    EDIT_MODULE: (
-      state: ModuleEntities,
-      action: EditModuleAction
-    ): ModuleEntities => ({
-      ...state,
-      [action.payload.id]: {
-        ...state[action.payload.id],
-        model: action.payload.model,
-      },
-    }),
     DELETE_MODULE: (
       state: ModuleEntities,
       action: DeleteModuleAction

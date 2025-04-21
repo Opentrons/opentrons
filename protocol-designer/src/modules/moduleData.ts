@@ -54,7 +54,7 @@ export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
   [FLEX_STACKER_MODULE_TYPE]: [],
 }
 
-const ALL_MODULE_SLOTS_OT2: DropdownOption[] = [
+export const ALL_MODULE_SLOTS_OT2: DropdownOption[] = [
   {
     name: '1',
     value: '1',

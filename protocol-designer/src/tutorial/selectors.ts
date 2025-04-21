@@ -6,7 +6,6 @@ import {
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 import {
   getUnsavedForm,
-  getOrderedStepIds,
   getAdditionalEquipmentEntities,
 } from '../step-forms/selectors'
 import isEmpty from 'lodash/isEmpty'
@@ -67,19 +66,14 @@ export const shouldShowCoolingHint: Selector<boolean> = createSelector(
     return false
   }
 )
-export const shouldShowBatchEditHint: Selector<boolean> = createSelector(
-  getOrderedStepIds,
-  orderedStepIds => orderedStepIds.length >= 1
-)
 export const shouldShowWasteChuteHint: Selector<boolean> = createSelector(
   timelineFrameBeforeActiveItem,
   getUnsavedForm,
   getAdditionalEquipmentEntities,
   (prevTimelineFrame, unsavedForm, additionalEquipmentEntities) => {
-    const hasWasteChute =
-      Object.values(additionalEquipmentEntities).find(
-        ae => ae.name === 'wasteChute'
-      ) != null
+    const hasWasteChute = Object.values(additionalEquipmentEntities).some(
+      ae => ae.name === 'wasteChute'
+    )
     if (unsavedForm?.stepType !== 'moveLabware' || !hasWasteChute) {
       return false
     }
