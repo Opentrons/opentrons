@@ -37,13 +37,13 @@ describe('PreventRobotCaching', () => {
     screen.queryByText(
       'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
     )
-    screen.getByRole('switch', { name: 'display_unavailable_robots' })
+    screen.getByRole('switch', { name: 'disable_robot_cache' })
   })
 
   it('should call mock toggleConfigValue when clicking the toggle button', () => {
     render()
     const toggleButton = screen.getByRole('switch', {
-      name: 'display_unavailable_robots',
+      name: 'disable_robot_cache',
     })
     fireEvent.click(toggleButton)
     expect(vi.mocked(toggleConfigValue)).toHaveBeenCalledWith(

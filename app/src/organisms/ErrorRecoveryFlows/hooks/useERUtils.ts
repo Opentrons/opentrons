@@ -181,6 +181,7 @@ export function useERUtils({
     protocolAnalysis,
     failedLabwareUtils,
     runLwDefsByUri,
+    recoveryMap,
   })
 
   const recoveryActionMutationUtils = useRecoveryActionMutation(

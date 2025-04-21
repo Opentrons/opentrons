@@ -756,6 +756,7 @@ describe('advanced options', () => {
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          pushOut: 0,
         }),
         // mix 2
         aspirateHelper('A1', 250),
@@ -810,6 +811,7 @@ describe('advanced options', () => {
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          pushOut: 0,
         }),
         // mix 2
         aspirateHelper('A1', 250),
@@ -995,7 +997,7 @@ describe('advanced options', () => {
             },
           },
         }),
-        dispenseHelper('B1', 250),
+        dispenseHelper('B1', 250, { pushOut: 0 }),
         // mix 2
         aspirateHelper('B1', 250, {
           labwareId: DEST_LABWARE,
@@ -1058,6 +1060,7 @@ describe('advanced options', () => {
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
+          pushOut: 0,
         }),
         delayCommand(12),
         // mix 2

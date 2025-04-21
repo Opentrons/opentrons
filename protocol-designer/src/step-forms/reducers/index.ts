@@ -5,6 +5,7 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import {
+  getAllDefinitions,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -1016,35 +1017,45 @@ export const labwareInvariantProperties: Reducer<
     ): NormalizedLabwareById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const labwareDefinitions = file.labwareDefinitions
+      const labwareDefinitionsFromFile = file.labwareDefinitions
+      const allLabware = getAllDefinitions()
+      let labware: NormalizedLabwareById = {}
 
-      const labware: NormalizedLabwareById = Object.entries(
-        metadata.labware
-      ).reduce((acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
-        if (labwareDefinitions[labwareLoadInfo.labwareDefURI] == null) {
-          console.error(
-            `expected to find matching labware definiton with labwareDefURI ${labwareLoadInfo.labwareDefURI} but could not`
-          )
-        }
-        const displayCategory =
-          labwareDefinitions[labwareLoadInfo.labwareDefURI]?.metadata
-            .displayCategory ?? 'otherLabware'
+      labware = Object.entries(metadata.labware).reduce(
+        (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
+          const labwareDefURI = labwareLoadInfo.labwareDefURI
+          const definition =
+            //  labwareDefinitionsFromFile from file are either customLabware for py
+            //  or all labwareDefs for JSON
+            labwareDefinitionsFromFile?.[labwareDefURI] ??
+            allLabware[labwareDefURI]
 
-        const displayCategoryCount = Object.values(acc).filter(
-          lw => lw.displayCategory === displayCategory
-        ).length
+          if (definition == null) {
+            console.error(
+              `Expected to find matching labware definition in the JSON file or Opentrons labware library but could not with labwareDefUri ${labwareDefURI}`
+            )
+          }
 
-        acc[id] = {
-          labwareDefURI: labwareLoadInfo.labwareDefURI,
-          pythonName: getLabwarePythonName(
+          const displayCategory =
+            definition?.metadata.displayCategory ?? 'otherLabware'
+
+          const displayCategoryCount = Object.values(acc).filter(
+            lw => lw.displayCategory === displayCategory
+          ).length
+
+          acc[id] = {
+            labwareDefURI,
+            pythonName: getLabwarePythonName(
+              displayCategory,
+              displayCategoryCount + 1
+            ),
             displayCategory,
-            displayCategoryCount + 1
-          ),
-          displayCategory,
-        }
+          }
 
-        return acc
-      }, {})
+          return acc
+        },
+        {}
+      )
 
       return { ...labware, ...state }
     },

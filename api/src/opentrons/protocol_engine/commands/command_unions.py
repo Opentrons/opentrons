@@ -17,6 +17,7 @@ from .movement_common import StallOrCollisionError
 from .flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerHopperError,
 )
 
 from . import absorbance_reader
@@ -381,28 +382,36 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
-from .evotip_seal_pipette import (
-    EvotipSealPipette,
-    EvotipSealPipetteParams,
-    EvotipSealPipetteCreate,
-    EvotipSealPipetteResult,
-    EvotipSealPipetteCommandType,
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipParams,
+    SealPipetteToTipCreate,
+    SealPipetteToTipResult,
+    SealPipetteToTipCommandType,
 )
 
-from .evotip_dispense import (
-    EvotipDispense,
-    EvotipDispenseParams,
-    EvotipDispenseCreate,
-    EvotipDispenseResult,
-    EvotipDispenseCommandType,
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseParams,
+    PressureDispenseCreate,
+    PressureDispenseResult,
+    PressureDispenseCommandType,
 )
 
-from .evotip_unseal_pipette import (
-    EvotipUnsealPipette,
-    EvotipUnsealPipetteParams,
-    EvotipUnsealPipetteCreate,
-    EvotipUnsealPipetteResult,
-    EvotipUnsealPipetteCommandType,
+from .unseal_pipette_from_tip import (
+    UnsealPipetteFromTip,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipCommandType,
+)
+
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
 )
 
 Command = Annotated[
@@ -429,6 +438,7 @@ Command = Annotated[
         LoadLiquid,
         LoadLiquidClass,
         LoadModule,
+        IdentifyModule,
         LoadPipette,
         LoadLidStack,
         LoadLid,
@@ -451,9 +461,9 @@ Command = Annotated[
         GetNextTip,
         LiquidProbe,
         TryLiquidProbe,
-        EvotipSealPipette,
-        EvotipDispense,
-        EvotipUnsealPipette,
+        SealPipetteToTip,
+        PressureDispense,
+        UnsealPipetteFromTip,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -498,6 +508,7 @@ Command = Annotated[
         unsafe.UnsafeEngageAxes,
         unsafe.UnsafeUngripLabware,
         unsafe.UnsafePlaceLabware,
+        unsafe.UnsafeManualRetrieve,
         robot.MoveTo,
         robot.MoveAxesRelative,
         robot.MoveAxesTo,
@@ -532,6 +543,7 @@ CommandParams = Union[
     LoadLiquidParams,
     LoadLiquidClassParams,
     LoadModuleParams,
+    IdentifyModuleParams,
     LoadPipetteParams,
     MoveLabwareParams,
     MoveRelativeParams,
@@ -552,9 +564,9 @@ CommandParams = Union[
     GetNextTipParams,
     LiquidProbeParams,
     TryLiquidProbeParams,
-    EvotipSealPipetteParams,
-    EvotipDispenseParams,
-    EvotipUnsealPipetteParams,
+    SealPipetteToTipParams,
+    PressureDispenseParams,
+    UnsealPipetteFromTipParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -599,6 +611,7 @@ CommandParams = Union[
     unsafe.UnsafeEngageAxesParams,
     unsafe.UnsafeUngripLabwareParams,
     unsafe.UnsafePlaceLabwareParams,
+    unsafe.UnsafeManualRetrieveParams,
     robot.MoveAxesRelativeParams,
     robot.MoveAxesToParams,
     robot.MoveToParams,
@@ -629,6 +642,7 @@ CommandType = Union[
     LoadLiquidCommandType,
     LoadLiquidClassCommandType,
     LoadModuleCommandType,
+    IdentifyModuleCommandType,
     LoadPipetteCommandType,
     LoadLidStackCommandType,
     LoadLidCommandType,
@@ -651,9 +665,9 @@ CommandType = Union[
     GetNextTipCommandType,
     LiquidProbeCommandType,
     TryLiquidProbeCommandType,
-    EvotipSealPipetteCommandType,
-    EvotipDispenseCommandType,
-    EvotipUnsealPipetteCommandType,
+    SealPipetteToTipCommandType,
+    PressureDispenseCommandType,
+    UnsealPipetteFromTipCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -698,6 +712,7 @@ CommandType = Union[
     unsafe.UnsafeEngageAxesCommandType,
     unsafe.UnsafeUngripLabwareCommandType,
     unsafe.UnsafePlaceLabwareCommandType,
+    unsafe.UnsafeManualRetrieveCommandType,
     robot.MoveAxesRelativeCommandType,
     robot.MoveAxesToCommandType,
     robot.MoveToCommandType,
@@ -729,6 +744,7 @@ CommandCreate = Annotated[
         LoadLiquidCreate,
         LoadLiquidClassCreate,
         LoadModuleCreate,
+        IdentifyModuleCreate,
         LoadPipetteCreate,
         LoadLidStackCreate,
         LoadLidCreate,
@@ -751,9 +767,9 @@ CommandCreate = Annotated[
         GetNextTipCreate,
         LiquidProbeCreate,
         TryLiquidProbeCreate,
-        EvotipSealPipetteCreate,
-        EvotipDispenseCreate,
-        EvotipUnsealPipetteCreate,
+        SealPipetteToTipCreate,
+        PressureDispenseCreate,
+        UnsealPipetteFromTipCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -798,6 +814,7 @@ CommandCreate = Annotated[
         unsafe.UnsafeEngageAxesCreate,
         unsafe.UnsafeUngripLabwareCreate,
         unsafe.UnsafePlaceLabwareCreate,
+        unsafe.UnsafeManualRetrieveCreate,
         robot.MoveAxesRelativeCreate,
         robot.MoveAxesToCreate,
         robot.MoveToCreate,
@@ -837,6 +854,7 @@ CommandResult = Union[
     LoadLiquidResult,
     LoadLiquidClassResult,
     LoadModuleResult,
+    IdentifyModuleResult,
     LoadPipetteResult,
     LoadLidStackResult,
     LoadLidResult,
@@ -859,9 +877,9 @@ CommandResult = Union[
     GetNextTipResult,
     LiquidProbeResult,
     TryLiquidProbeResult,
-    EvotipSealPipetteResult,
-    EvotipDispenseResult,
-    EvotipUnsealPipetteResult,
+    SealPipetteToTipResult,
+    PressureDispenseResult,
+    UnsealPipetteFromTipResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -906,6 +924,7 @@ CommandResult = Union[
     unsafe.UnsafeEngageAxesResult,
     unsafe.UnsafeUngripLabwareResult,
     unsafe.UnsafePlaceLabwareResult,
+    unsafe.UnsafeManualRetrieveResult,
     robot.MoveAxesRelativeResult,
     robot.MoveAxesToResult,
     robot.MoveToResult,
@@ -924,6 +943,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
     DefinedErrorData[FlexStackerShuttleError],
+    DefinedErrorData[FlexStackerHopperError],
 ]
 
 

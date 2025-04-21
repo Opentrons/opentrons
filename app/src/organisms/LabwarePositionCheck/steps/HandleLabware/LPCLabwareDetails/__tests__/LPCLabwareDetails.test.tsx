@@ -38,6 +38,9 @@ vi.mock(
     ),
   })
 )
+vi.mock('../OffsetBannerContainer', () => ({
+  OffsetBannerContainer: () => <div>MOCK_OFFSET_BANNER_CONTAINER</div>,
+}))
 vi.mock('/app/atoms/InlineNotification', () => ({
   InlineNotification: vi.fn(({ type, heading, message }) => (
     <div
@@ -165,28 +168,7 @@ describe('LPCLabwareDetails', () => {
 
     screen.getByText('MOCK_DEFAULT_LOCATION_OFFSET')
     screen.getByText('MOCK_LOCATION_SPECIFIC_OFFSETS_CONTAINER')
-  })
-
-  it('shows InlineNotification when default offset is absent', () => {
-    vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => true)
-
-    render(props)
-
-    const notification = screen.getByTestId('inline-notification')
-    expect(notification).toBeInTheDocument()
-    expect(notification.getAttribute('data-type')).toBe('alert')
-    expect(notification.getAttribute('data-heading')).toBe(
-      'Add a default offset to automatically apply it to all placements of this labware on the deck'
-    )
-    expect(notification.textContent).toBe(
-      'Specific slot locations can be adjusted as needed'
-    )
-  })
-
-  it('does not show the default InlineNotification when default offset is present', () => {
-    render(props)
-
-    expect(screen.queryByTestId('inline-notification')).not.toBeInTheDocument()
+    screen.getByText('MOCK_OFFSET_BANNER_CONTAINER')
   })
 
   it('dispatches actions when save is clicked with working offsets', async () => {
@@ -202,15 +184,5 @@ describe('LPCLabwareDetails', () => {
     expect(mockDispatch).toHaveBeenCalledTimes(2)
     expect(applyWorkingOffsets).toHaveBeenCalledWith(props.runId, 'mock-data')
     expect(goBackEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
-  })
-
-  it('shows the hardcoded InlineNotification when there is a hardcoded offset present', () => {
-    vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => true)
-
-    render(props)
-
-    screen.getByText(
-      'Hardcoded offsets must be changed in your Python protocol'
-    )
   })
 })

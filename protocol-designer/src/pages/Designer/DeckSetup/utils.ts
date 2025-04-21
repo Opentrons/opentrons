@@ -44,9 +44,11 @@ import type {
   InitialDeckSetup,
   LabwareOnDeck,
   ModuleOnDeck,
+  SavedStepFormState,
 } from '../../../step-forms'
 import type { Selection } from '../../../ui/steps'
 import type { Fixture } from './constants'
+import type { AdditionalEquipment } from '../utils'
 
 const OT2_TC_SLOTS = ['7', '8', '10', '11']
 const FLEX_TC_SLOTS = ['A1', 'B1']
@@ -247,9 +249,9 @@ export function zoomInOnCoordinate(props: ZoomInOnCoordinateProps): string {
   const newWidth = width * zoomFactor
   const newHeight = height * zoomFactor
 
-  //  +125 and +50 to get the approximate center of the screen point
+  //  +20 to get the approximate center of the screen point
   const newMinX = x - newWidth / 2 + 20
-  const newMinY = y - newHeight / 2 + 50
+  const newMinY = y - newHeight / 2
 
   return `${newMinX} ${newMinY} ${newWidth} ${newHeight + 70}`
 }
@@ -506,13 +508,12 @@ export const getOT2HoverDimensions = (
 
 export const getSVGContainerWidth = (
   robotType: RobotType,
-  tab: string,
   isZoomed: boolean
 ): string => {
-  if (robotType === OT2_ROBOT_TYPE && tab === 'startingDeck' && !isZoomed) {
+  if (robotType === OT2_ROBOT_TYPE && !isZoomed) {
     return '78.5%'
   }
-  if (robotType !== OT2_ROBOT_TYPE && !isZoomed && tab !== 'protocolSteps') {
+  if (robotType !== OT2_ROBOT_TYPE && !isZoomed) {
     return '70%'
   }
   return '100%'
@@ -612,4 +613,88 @@ export function getHighlightLabwareAndModules(
     }
   )
   return highlightItems
+}
+
+const getIsLabwareInUse = (
+  savedSteps: SavedStepFormState,
+  labware?: LabwareOnDeck | null
+): boolean => {
+  return (
+    labware != null &&
+    Object.values(savedSteps).find(
+      step =>
+        //  moveLabware && mixing in the labware
+        ('labware' in step && step.labware === labware.id) ||
+        //  moving labware to new location
+        ('newLocation' in step && step.newLocation === labware.id) ||
+        // moveLiquid in the labware
+        ('aspirate_labware' in step && step.aspirate_labware === labware.id) ||
+        //  moveLiquid in the labware
+        ('dispense_labware' in step && step.dispense_labware === labware.id)
+    ) != null
+  )
+}
+
+export function getIsLabwareOnSlotInUse(
+  savedSteps: SavedStepFormState,
+  createdLabwareForSlot?: LabwareOnDeck,
+  createdNestedLabwareForSlot?: LabwareOnDeck
+): boolean {
+  const isCurrentLabwareInUse = [
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+  ]
+    .map(lw => getIsLabwareInUse(savedSteps, lw))
+    .includes(true)
+
+  return isCurrentLabwareInUse
+}
+
+//  NOTE: FThis will be used for editing hardware
+export function getIsHardwareOnSlotInUse(
+  savedSteps: SavedStepFormState,
+  matchingLabwareFor4thColumn: LabwareOnDeck | null,
+  createdModuleForSlot?: ModuleOnDeck,
+  createdFixtureForSlots?: AdditionalEquipment[]
+): boolean {
+  const isCurrentModuleInUse =
+    createdModuleForSlot != null &&
+    Object.values(savedSteps).find(
+      step =>
+        //  module step
+        ('moduleId' in step && step.moduleId === createdModuleForSlot.id) ||
+        //  moving labware to the module
+        ('newLocation' in step &&
+          step.newlocation === createdModuleForSlot.id) ||
+        //  moving a labware from the module location
+        ('labware' in step && step.labware === createdModuleForSlot.id)
+    ) != null
+  const isCurrentLabwareInUse =
+    matchingLabwareFor4thColumn != null
+      ? getIsLabwareInUse(savedSteps, matchingLabwareFor4thColumn)
+      : false
+
+  const isCurrentFixtureInUse =
+    createdFixtureForSlots != null &&
+    createdFixtureForSlots.length > 0 &&
+    Object.values(savedSteps).find(
+      step =>
+        //  mix & moveLiquid
+        ('dropTip_location' in step &&
+          createdFixtureForSlots.find(
+            fixture => fixture.id === step.dropTip_location
+          ) != null) ||
+        //  dispensing in trash
+        ('dispense_labware' in step &&
+          createdFixtureForSlots.find(
+            fixture => fixture.id === step.dispense_labware
+          ) != null) ||
+        //  moving to wasteChute or 4th column slot
+        ('newLocation' in step &&
+          createdFixtureForSlots.find(
+            fixture => fixture.location === step.newLocation
+          ) != null)
+    ) != null
+
+  return isCurrentModuleInUse || isCurrentLabwareInUse || isCurrentFixtureInUse
 }

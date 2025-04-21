@@ -15,6 +15,7 @@ import type {
   AspDispAirgapParams,
   BlowoutParams,
   CreateCommand,
+  DispenseParams,
   TouchTipParams,
 } from '@opentrons/shared-data'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
@@ -231,7 +232,7 @@ const _defaultDispenseParams = {
   },
   flowRate: DISPENSE_FLOW_RATE,
 }
-export const makeDispenseHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedParams => (
+export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> = bakedParams => (
   wellName,
   volume,
   params

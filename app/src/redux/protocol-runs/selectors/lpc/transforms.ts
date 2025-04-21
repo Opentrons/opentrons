@@ -322,7 +322,11 @@ export function getCountMissingLSOffsetsWithoutDefault(
   lsDetails: LocationSpecificOffsetDetails[] | undefined
 ): number {
   return lsDetails != null
-    ? lsDetails.filter(detail => detail.existingOffset?.vector == null).length
+    ? lsDetails.filter(
+        detail =>
+          detail.existingOffset?.vector == null &&
+          detail.locationDetails.hardCodedOffsetId == null
+      ).length
     : 0
 }
 

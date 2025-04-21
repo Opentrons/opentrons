@@ -23,6 +23,7 @@ import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
+import { FlexStackerModuleData } from '../FlexStackerModuleData'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { ErrorInfo } from '../ErrorInfo'
@@ -34,6 +35,7 @@ import type {
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
+  FlexStackerModule,
 } from '/app/redux/modules/types'
 
 vi.mock('../ErrorInfo')
@@ -41,6 +43,7 @@ vi.mock('../MagneticModuleData')
 vi.mock('../TemperatureModuleData')
 vi.mock('../ThermocyclerModuleData')
 vi.mock('../HeaterShakerModuleData')
+vi.mock('../FlexStackerModuleData')
 vi.mock('/app/redux/config')
 vi.mock('../ModuleOverflowMenu')
 vi.mock('/app/organisms/RunTimeControl')
@@ -169,6 +172,27 @@ const mockHotThermo = {
   },
 } as ThermocyclerModule
 
+const mockFlexStacker = {
+  id: 'flex_stacker_id',
+  serialNumber: 'fs123',
+  hardwareRevision: 'flex_stacker_v1.0',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: false,
+  usbPort: {
+    path: '/dev/ot_module_flex_stacker',
+    hub: false,
+    port: 1,
+    portGroup: 'unknown',
+  },
+  data: {
+    platformState: 'extended',
+    hopperDoorState: 'closed',
+    status: 'idle',
+  },
+} as FlexStackerModule
+
 const mockMakeSnackbar = vi.fn()
 const mockMakeToast = vi.fn()
 const mockEatToast = vi.fn()
@@ -208,6 +232,9 @@ describe('ModuleCard', () => {
     )
     vi.mocked(HeaterShakerModuleData).mockReturnValue(
       <div>Mock Heater Shaker Module Data</div>
+    )
+    vi.mocked(FlexStackerModuleData).mockReturnValue(
+      <div>Mock Flex Stacker Module Data</div>
     )
     vi.mocked(ModuleOverflowMenu).mockReturnValue(
       <div>mock module overflow menu</div>
@@ -274,6 +301,19 @@ describe('ModuleCard', () => {
     screen.getByText('Mock Heater Shaker Module Data')
     screen.getByText('usb-1')
     screen.getByAltText('heaterShakerModuleV1')
+  })
+
+  it('renders information for a heater shaker module with mocked status', () => {
+    vi.mocked(getIsHeaterShakerAttached).mockReturnValue(true)
+    render({
+      ...props,
+      module: mockFlexStacker,
+    })
+
+    screen.getByText('Flex Stacker Module GEN1')
+    screen.getByText('Mock Flex Stacker Module Data')
+    screen.getByText('usb-1')
+    screen.getByAltText('flexStackerModuleV1')
   })
 
   it('renders kebab icon, opens and closes overflow menu on click', () => {

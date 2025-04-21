@@ -17,7 +17,6 @@ import {
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useLPCDisabledReason } from '/app/resources/runs'
 import {
-  selectAreOffsetsApplied,
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectLabwareOffsetsToAddToRun,
   selectTotalCountNonHardCodedLSOffsets,
@@ -31,6 +30,7 @@ export interface LPCSetupFlexBtnsProps extends SetupLabwarePositionCheckProps {
 
 export function LPCSetupFlexBtns({
   setOffsetsConfirmed,
+  offsetsConfirmed,
   launchLPC,
   runId,
   robotName,
@@ -41,7 +41,6 @@ export function LPCSetupFlexBtns({
   const isNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
-  const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
   const [runLPCTargetProps, runLPCTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_BOTTOM,
   })
@@ -70,8 +69,20 @@ export function LPCSetupFlexBtns({
       return t('add_missing_labware_offsets')
     } else if (offsetsConfirmed) {
       return t('offsets_already_applied')
+    } else if (lpcDisabledReason != null) {
+      return lpcDisabledReason
     } else if (!anyOffsetsToLpc) {
       return t('no_offsets_found')
+    } else {
+      return null
+    }
+  }
+
+  const runLPCDisabledTooltipText = (): string | null => {
+    if (lpcDisabledReason != null) {
+      return lpcDisabledReason
+    } else if (offsetsConfirmed) {
+      return t('offsets_already_applied')
     } else {
       return null
     }
@@ -101,12 +112,14 @@ export function LPCSetupFlexBtns({
         onClick={launchLPC}
         id="LabwareSetup_checkLabwarePositionsButton"
         {...runLPCTargetProps}
-        disabled={lpcDisabledReason !== null}
+        disabled={lpcDisabledReason !== null || offsetsConfirmed}
       >
         {t('run_labware_position_check')}
       </SecondaryButton>
-      {lpcDisabledReason !== null ? (
-        <Tooltip tooltipProps={runLPCTooltipProps}>{lpcDisabledReason}</Tooltip>
+      {lpcDisabledReason !== null || offsetsConfirmed ? (
+        <Tooltip tooltipProps={runLPCTooltipProps}>
+          {runLPCDisabledTooltipText()}
+        </Tooltip>
       ) : null}
       <PrimaryButton
         onClick={onApplyOffsets}

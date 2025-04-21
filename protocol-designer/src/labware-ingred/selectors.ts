@@ -74,10 +74,6 @@ const getLiquidSelectionOptions: Selector<
 const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
   rootSelector(state).modeLabwareSelection
 
-// TODO(mc, 2020-06-04): move SavedLabwareState to common location and import here
-const getSavedLabware = (state: BaseState): Record<string, boolean> =>
-  rootSelector(state).savedLabware
-
 const getSelectedLabwareId: Selector<
   RootSlice,
   SelectedContainerId
@@ -177,7 +173,6 @@ export const selectors = {
   getLiquidSelectionOptions,
   getLiquidGroupsOnDeck,
   getNextLiquidGroupId,
-  getSavedLabware,
   getSelectedLabwareId,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,

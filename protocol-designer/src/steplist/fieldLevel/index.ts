@@ -248,7 +248,11 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_delay_seconds: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+    maskValue: composeMaskers(
+      maskToInteger,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   aspirate_delay_mmFromBottom: {
@@ -271,11 +275,27 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   dispense_delay_seconds: {
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+    maskValue: composeMaskers(
+      maskToInteger,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   dispense_delay_mmFromBottom: {
     castValue: numberOrNull,
+  },
+  aspirate_submerge_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+  },
+  aspirate_retract_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+  },
+  dispense_submerge_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+  },
+  dispense_retract_delay_seconds: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   },
   pauseHour: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
@@ -437,6 +457,46 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: numberOrNull,
   },
   pushOut_volume: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  aspirate_submerge_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  aspirate_retract_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  dispense_submerge_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  dispense_retract_speed: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: numberOrNull,
+  },
+  conditioning_volume: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: numberOrNull,
   },

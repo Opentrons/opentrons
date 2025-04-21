@@ -552,6 +552,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            pipette_id="pipette-id",
         )
     ).then_return(destination_well_point)
     decoy.when(
@@ -672,6 +673,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            pipette_id="pipette-id",
         )
     ).then_return(destination_well_point)
 
@@ -816,6 +818,7 @@ def test_deck_conflict_raises_for_out_of_bounds_96_channel_move(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            pipette_id="pipette-id",
         )
     ).then_return(destination_well_point)
 

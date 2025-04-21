@@ -36,6 +36,7 @@ describe('getInitialSummaryState', () => {
       destinationWells: ['A1'],
       transferType: 'transfer',
       volume: 25,
+      path: 'single',
     } as any,
     deckConfig: [
       {

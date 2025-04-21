@@ -18,8 +18,11 @@ import {
   SET_SELECTED_LABWARE_URI,
   SOURCE_OFFSETS_FROM_DATABASE,
   SOURCE_OFFSETS_FROM_RUN,
+  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC,
+  UPDATE_LPC_DECK,
+  UPDATE_LPC_LABWARE,
 } from '../constants'
 import {
   clearAllWorkingOffsets,
@@ -51,6 +54,20 @@ export function LPCReducer(
     return undefined
   } else {
     switch (action.type) {
+      case UPDATE_LPC_DECK: {
+        return {
+          ...state,
+          deckConfig: action.payload.deck,
+        }
+      }
+
+      case UPDATE_LPC_LABWARE: {
+        return {
+          ...state,
+          labwareInfo: action.payload.labware,
+        }
+      }
+
       case PROCEED_STEP: {
         const { currentStepIndex, lastStepIndices } = state.steps
 
@@ -178,6 +195,10 @@ export function LPCReducer(
             lastStepIndices: null,
             currentSubstep: null,
           },
+          ui: {
+            ...state.ui,
+            showDefaultOffsetInfoBanner: true, // show banner each LPC launch
+          },
         }
 
       case APPLIED_OFFSETS_TO_RUN: {
@@ -252,6 +273,16 @@ export function LPCReducer(
             conflictTimestampInfo: info,
             sourcedOffsets: offsetSource(),
             labware: updatedLw(),
+          },
+        }
+      }
+
+      case TOGGLE_DEFAULT_OFFSET_INFO_BANNER: {
+        return {
+          ...state,
+          ui: {
+            ...state.ui,
+            showDefaultOffsetInfoBanner: !state.ui.showDefaultOffsetInfoBanner,
           },
         }
       }

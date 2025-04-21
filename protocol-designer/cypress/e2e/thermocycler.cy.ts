@@ -19,7 +19,6 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
     cy.importProtocol(protocol.path)
     verifyImportProtocolPage(protocol)
     cy.contains('Edit protocol').click()
-    cy.contains('Protocol steps').click()
   })
 
   it('It should verify the working function of thermocycler set up', () => {

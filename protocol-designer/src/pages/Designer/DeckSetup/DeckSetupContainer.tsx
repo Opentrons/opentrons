@@ -29,40 +29,33 @@ import {
 } from '@opentrons/shared-data'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+import { FixedTrashText } from '../../../components/molecules'
+import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
+import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupDetails } from './DeckSetupDetails'
-import { DECK_SETUP_TOOLS_WIDTH_REM, DeckSetupTools } from './DeckSetupTools'
+import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
   getSVGContainerWidth,
-  useDeckSetupWindowBreakPoint,
   zoomInOnCoordinate,
 } from './utils'
-import { HoverSlotDetailsContainer } from './HoverSlotDetailsContainer'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
-  ModuleModel,
+  RobotType,
 } from '@opentrons/shared-data'
-import type {
-  AdditionalEquipmentEntity,
-  DeckSlot,
-} from '@opentrons/step-generation'
-import type { DeckSetupTabType } from '../types'
-import type { Fixture } from './constants'
-import { FixedTrashText } from '../../../components/molecules'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60
-// Note (02/02/25:kk) the size is different from the design but the product team requested keep the current size
-const STARTING_DECK_VIEW_MIN_WIDTH = '75%'
-const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem' // for Protocol Steps
+const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -77,16 +70,21 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 export const lightFill = COLORS.grey35
 export const darkFill = COLORS.grey60
 
-export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
-  const { tab } = props
+interface DeckSetupContainerProps {
+  setHoverSlot: Dispatch<SetStateAction<string | null>>
+  hoverSlot: string | null
+  robotType: RobotType
+}
+export function DeckSetupContainer(
+  props: DeckSetupContainerProps
+): JSX.Element {
+  const { robotType, hoverSlot, setHoverSlot } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
-  const breakPointSize = useDeckSetupWindowBreakPoint()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
-  const robotType = useSelector(getRobotType)
+  const terminalItemId = useSelector(getSelectedTerminalItemId)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
-  const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -141,8 +139,6 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   }, '')
 
   const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
-  const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
-  const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -199,31 +195,20 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
 
-  let containerPadding = '0'
-  if (!isZoomed) {
-    if (tab === 'startingDeck') {
-      containerPadding = SPACING.spacing40
-    } else {
-      containerPadding = SPACING.spacing60
-    }
-  }
-
-  const svgContainerWidth = getSVGContainerWidth(robotType, tab, isZoomed)
+  const svgContainerWidth = getSVGContainerWidth(robotType, isZoomed)
 
   return (
     <>
       <Flex
-        backgroundColor={COLORS.white}
+        backgroundColor={!isZoomed ? COLORS.white : 'none'}
         borderRadius={BORDERS.borderRadius12}
         width="100%"
         height="100%"
         flexDirection={DIRECTION_COLUMN}
-        padding={containerPadding}
+        padding={SPACING.spacing60}
         justifyContent={JUSTIFY_CENTER}
         position="relative"
-        maxHeight={
-          tab === 'protocolSteps' ? DECK_VIEW_CONTAINER_MAX_HEIGHT : 'auto'
-        }
+        maxHeight={isZoomed ? '100%' : DECK_VIEW_CONTAINER_MAX_HEIGHT}
       >
         <Flex
           width="100%"
@@ -239,29 +224,13 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
             justifyContent={JUSTIFY_CENTER}
             position="relative"
           >
-            {/* Overlay Slot Details Container */}
-            {hoverSlot !== null && breakPointSize !== 'small' ? (
-              <HoverSlotDetailsContainer
-                hoverSlot={hoverSlot}
-                robotType={robotType}
-              />
-            ) : null}
-
             <RobotCoordinateSpaceWithRef
               height="100%"
-              width={
-                zoomIn.slot != null || tab === 'protocolSteps' ? '100%' : '50%'
-              }
-              minWidth={
-                tab === 'protocolSteps' ? 'auto' : STARTING_DECK_VIEW_MIN_WIDTH
-              }
+              width="100%"
+              minWidth="auto"
               deckDef={deckDef}
               viewBox={viewBoxAdjusted}
-              transform={
-                tab === 'protocolSteps' && robotType === OT2_ROBOT_TYPE
-                  ? 'scale(1.3, -1.3)'
-                  : 'scale(1, -1)'
-              }
+              transform={'scale(1.3, -1.3)'}
               outline="auto"
               zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}
@@ -372,10 +341,8 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
                   <DeckSetupDetails
                     selectedZoomInSlot={zoomIn.slot ?? undefined}
                     hoveredLabware={hoveredLabware}
-                    hoveredModule={hoveredModule}
-                    hoveredFixture={hoveredFixture}
                     hover={hoverSlot}
-                    tab={tab}
+                    terminalItemId={terminalItemId}
                     setHover={setHoverSlot}
                     addEquipment={addEquipment}
                     activeDeckSetup={activeDeckSetup}
@@ -397,11 +364,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
           </Flex>
         </Flex>
         {zoomIn.slot != null && zoomIn.cutout != null ? (
-          <DeckSetupTools
-            onDeckProps={{
-              setHoveredFixture,
-              setHoveredModule,
-            }}
+          <DeckSetupToolbox
             onCloseClick={() => {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
               animateZoom({

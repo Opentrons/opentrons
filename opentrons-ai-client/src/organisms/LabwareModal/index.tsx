@@ -62,11 +62,13 @@ export function LabwareModal({
     string,
     LabwareDefinition2[]
   > = useMemo(() => {
-    return reduce<LabwareDefByDefURI, Record<string, LabwareDefinition2[]>>(
+    const groupedLabware = reduce<
+      LabwareDefByDefURI,
+      Record<string, LabwareDefinition2[]>
+    >(
       defs,
-      (acc, def: typeof defs[keyof typeof defs]) => {
-        const category: string = def.metadata.displayCategory
-
+      (acc, def) => {
+        const category = def.metadata.displayCategory
         return {
           ...acc,
           [category]: [...(acc[category] ?? []), def],
@@ -74,6 +76,15 @@ export function LabwareModal({
       },
       {}
     )
+
+    // Sort each category's labware by display name in place
+    for (const category in groupedLabware) {
+      groupedLabware[category].sort((a, b) =>
+        a.metadata.displayName.localeCompare(b.metadata.displayName)
+      )
+    }
+
+    return groupedLabware
   }, [])
 
   const populatedCategories: Record<string, boolean> = useMemo(

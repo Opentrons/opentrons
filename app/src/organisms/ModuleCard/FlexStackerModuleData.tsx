@@ -1,5 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { StyledText, COLORS } from '@opentrons/components'
+import {
+  StyledText,
+  COLORS,
+  TYPOGRAPHY,
+  SPACING,
+  Flex,
+  WRAP,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import type { FlexStackerModule } from '/app/redux/modules/types'
@@ -14,45 +22,94 @@ export function FlexStackerModuleData(
   const { moduleData } = props
   const { t, i18n } = useTranslation(['device_details', 'shared'])
 
-  const StatusLabelProps = {
-    status: 'Idle',
+  const getShuttleStatusText = (): string => {
+    switch (moduleData.platformState) {
+      case 'extended':
+        return t('flex_stacker_extended')
+      case 'retracted':
+        return t('flex_stacker_retracted')
+      default:
+        return t('shared:unknown')
+    }
+  }
+
+  const shuttleDisplayStatus = i18n.format(getShuttleStatusText(), 'capitalize')
+
+  const doorDisplayStatus = i18n.format(
+    moduleData.hopperDoorState === 'closed'
+      ? t('shared:closed')
+      : t('shared:open'),
+    'capitalize'
+  )
+
+  const ShuttleStatusLabelProps = {
+    status: shuttleDisplayStatus,
     backgroundColor: COLORS.grey30,
     iconColor: COLORS.grey60,
     textColor: COLORS.grey60,
     pulse: false,
   }
-  switch (moduleData.status) {
-    case 'storing':
-    case 'dispensing': {
-      StatusLabelProps.status = moduleData.status
-      StatusLabelProps.backgroundColor = COLORS.blue30
-      StatusLabelProps.iconColor = COLORS.blue60
-      StatusLabelProps.textColor = COLORS.blue60
+
+  switch (moduleData.platformState) {
+    case 'extended':
+    case 'retracted': {
+      ShuttleStatusLabelProps.backgroundColor = COLORS.blue30
+      ShuttleStatusLabelProps.iconColor = COLORS.blue60
+      ShuttleStatusLabelProps.textColor = COLORS.blue60
       break
     }
-    case 'error': {
-      StatusLabelProps.status = 'Error'
-      StatusLabelProps.backgroundColor = COLORS.yellow30
-      StatusLabelProps.iconColor = COLORS.yellow60
-      StatusLabelProps.textColor = COLORS.yellow60
+    case 'missing': {
+      ShuttleStatusLabelProps.backgroundColor = COLORS.red30
+      ShuttleStatusLabelProps.iconColor = COLORS.red60
+      ShuttleStatusLabelProps.textColor = COLORS.red60
       break
     }
   }
-  const lidDisplayStatus =
-    moduleData.hopperDoorState === 'closed'
-      ? i18n.format(t('shared:closed'), 'capitalize')
-      : i18n.format(t('shared:open'), 'capitalize')
+
+  const DoorStatusLabelProps = {
+    status: doorDisplayStatus,
+    backgroundColor: COLORS.grey30,
+    iconColor: COLORS.grey60,
+    textColor: COLORS.grey60,
+    pulse: false,
+  }
+
+  if (moduleData.hopperDoorState === 'opened') {
+    DoorStatusLabelProps.backgroundColor = COLORS.blue30
+    DoorStatusLabelProps.iconColor = COLORS.blue60
+    DoorStatusLabelProps.textColor = COLORS.blue60
+  }
+
   return (
-    <>
-      <StatusLabel {...StatusLabelProps} />
-      <StyledText
-        desktopStyle="bodyDefaultRegular"
-        data-testid="stacker_module_data"
+    <Flex
+      flexWrap={WRAP}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid="stacker_door_data"
+        paddingTop={SPACING.spacing8}
       >
-        {t('flex_stacker_door_status', {
-          status: lidDisplayStatus,
-        })}
-      </StyledText>
-    </>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          {t('flex_stacker_door_status')}
+        </StyledText>
+        <StatusLabel {...DoorStatusLabelProps} />
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid="stacker_shuttle_data"
+        paddingTop={SPACING.spacing8}
+      >
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          color={COLORS.grey60}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+        >
+          {t('flex_stacker_shuttle_status')}
+        </StyledText>
+        <StatusLabel {...ShuttleStatusLabelProps} />
+      </Flex>
+    </Flex>
   )
 }

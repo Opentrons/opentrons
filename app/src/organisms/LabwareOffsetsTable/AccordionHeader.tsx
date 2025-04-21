@@ -9,6 +9,7 @@ import {
   StyledText,
   RESPONSIVENESS,
   COLORS,
+  NO_WRAP,
 } from '@opentrons/components'
 
 import { selectTotalOrMissingOffsetRequiredCountForLwCopy } from '/app/redux/protocol-runs'
@@ -57,7 +58,11 @@ const ACCORDION_HEADER_CONTAINER_STYLE = css`
 `
 
 const OFFSET_COPY_STYLE = css`
+  width: 6.85rem;
+  text-wrap: ${NO_WRAP};
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 10.25rem;
     color: ${COLORS.grey60};
   }
 `

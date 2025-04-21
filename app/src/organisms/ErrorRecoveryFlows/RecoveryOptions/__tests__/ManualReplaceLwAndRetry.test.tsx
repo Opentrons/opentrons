@@ -1,5 +1,5 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { act, fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -8,15 +8,19 @@ import { RECOVERY_MAP } from '../../constants'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../shared', () => ({
-  GripperIsHoldingLabware: vi.fn(() => (
-    <div>MOCK_GRIPPER_IS_HOLDING_LABWARE</div>
-  )),
-  GripperReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
-  TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
-  RetryStepInfo: vi.fn(() => <div>MOCK_RETRY_STEP_INFO</div>),
-  RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
-}))
+vi.mock('../../shared', async importOriginal => {
+  const mod = (await importOriginal()) as any
+  return {
+    ...mod,
+    GripperIsHoldingLabware: vi.fn(() => (
+      <div>MOCK_GRIPPER_IS_HOLDING_LABWARE</div>
+    )),
+    GripperReleaseLabware: vi.fn(() => <div>MOCK_GRIPPER_RELEASE_LABWARE</div>),
+    TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_TWO_COL_LW_INFO_AND_DECK</div>),
+    RetryStepInfo: vi.fn(() => <div>MOCK_RETRY_STEP_INFO</div>),
+    RecoveryDoorOpenSpecial: vi.fn(() => <div>MOCK_DOOR_OPEN_SPECIAL</div>),
+  }
+})
 
 vi.mock('../SelectRecoveryOption', () => ({
   SelectRecoveryOption: vi.fn(() => <div>MOCK_SELECT_RECOVERY_OPTION</div>),
@@ -32,8 +36,18 @@ describe('ManualReplaceLwAndRetry', () => {
         step:
           RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
       },
+      doorStatusUtils: {
+        isDoorOpen: false,
+      },
       routeUpdateActions: {
         proceedToRouteAndStep: vi.fn(),
+        handleMotionRouting: vi.fn(() => Promise.resolve()),
+      },
+      recoveryCommands: {
+        homeShuttle: vi.fn(() => Promise.resolve()),
+      },
+      stepCounts: {
+        hasRunDiverged: false,
       },
     } as any
   })
@@ -88,6 +102,35 @@ describe('ManualReplaceLwAndRetry', () => {
       RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
+  })
+
+  it(`renders TwoColTextAndImage for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE} step`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE
+    props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
+    render(props)
+    const button = screen.getAllByRole('button')[0]
+    expect(button).toBeEnabled()
+    screen.getByText('Load labware shuttle onto track')
+  })
+
+  it(`renders TwoColTextAndFailedStepNextStep for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING} step`, async () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING
+
+    props.recoveryMap.route = RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE
+    render(props)
+
+    const button = screen.getAllByRole('button')[1]
+    expect(button).toBeEnabled()
+    fireEvent.click(button)
+
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+
+    expect(props.routeUpdateActions.handleMotionRouting).toHaveBeenCalled()
+    expect(props.recoveryCommands.homeShuttle).toHaveBeenCalled()
   })
 
   it('renders SelectRecoveryOption for unknown step', () => {

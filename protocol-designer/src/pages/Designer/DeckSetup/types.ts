@@ -1,9 +1,9 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { CoordinateTuple } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
-import type { DeckSetupTabType } from '../types'
+import type { DeckSetupTerminalIdType } from '../types'
 
-export interface SharedControlsType extends DeckSetupTabType {
+export interface SharedControlsType extends DeckSetupTerminalIdType {
   slotPosition: CoordinateTuple | null
   //  this is the slotId (i.e. D1, A1, 1, 2, 3)
   itemId: string

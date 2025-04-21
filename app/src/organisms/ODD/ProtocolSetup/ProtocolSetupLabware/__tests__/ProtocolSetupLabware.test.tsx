@@ -16,6 +16,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis/getProtocolModulesInfo'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 import { ProtocolSetupLabware } from '..'
 import {
   mockProtocolModuleInfo,
@@ -29,6 +31,7 @@ import {
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
+import type * as AppCommandTransformations from '/app/transformations/commands'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
@@ -38,10 +41,18 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useModulesQuery: vi.fn(),
   }
 })
+vi.mock('/app/transformations/commands', async importOriginal => {
+  const actual = await importOriginal<typeof AppCommandTransformations>()
+  return {
+    ...actual,
+    getStackedItemsOnStartingDeck: vi.fn(),
+  }
+})
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/analysis/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
+vi.mock('/app/redux-resources/analytics/hooks')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()
@@ -70,6 +81,9 @@ const render = () => {
 
 describe('ProtocolSetupLabware', () => {
   beforeEach(() => {
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
     mockCreateLiveCommand.mockResolvedValue(null)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -94,6 +108,45 @@ describe('ProtocolSetupLabware', () => {
         },
       ],
     } as any)
+    vi.mocked(getStackedItemsOnStartingDeck).mockReturnValue({
+      A3: [
+        {
+          labwareId: 'fixedTrash',
+          definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+          displayName: 'Trash',
+        },
+      ],
+      D2: [
+        {
+          labwareId:
+            '8c75a22a-88e5-42fb-bd92-c2cceeeda504:opentrons/opentrons_96_filtertiprack_1000ul/1',
+          displayName: 'Opentrons 96 Filter Tip Rack 1000 µL',
+          definitionUri: 'opentrons/opentrons_96_filtertiprack_1000ul/1',
+        },
+      ],
+      D3: [
+        {
+          labwareId:
+            'a2eccd35-f173-4e6e-8eee-b9a8ca436e8f:opentrons/opentrons_96_filtertiprack_200ul/1',
+          displayName: 'Opentrons 96 Filter Tip Rack 200 µL',
+          definitionUri: 'opentrons/opentrons_96_filtertiprack_200ul/1',
+        },
+      ],
+      A1: [
+        {
+          labwareId:
+            '8057ec40-8d53-4d44-aeb7-726a76c10901:opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1',
+          definitionUri:
+            'opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1',
+          displayName: 'module labware',
+        },
+        {
+          moduleId:
+            'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',
+          moduleModel: 'heaterShakerModuleV1',
+        },
+      ],
+    })
   })
   afterEach(() => {
     vi.clearAllMocks()
@@ -102,7 +155,7 @@ describe('ProtocolSetupLabware', () => {
   it('renders the Labware Setup page', () => {
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
-    screen.getByText('Labware')
+    screen.getByText('Labware & Liquids')
     screen.getByText('Labware name')
     screen.getByText('Location')
     screen.getByRole('button', { name: 'Map View' })
@@ -121,7 +174,7 @@ describe('ProtocolSetupLabware', () => {
     expect(screen.queryByText('List View')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
-    screen.getByText('Labware')
+    screen.getByText('Labware & Liquids')
     screen.getByText('Labware name')
     screen.getByText('Location')
   })
@@ -164,7 +217,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useModulesQuery).mockReturnValue(
       mockUseModulesQueryOpening as any
     )
-
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Opening...')
@@ -183,7 +235,6 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useModulesQuery).mockReturnValue(
       mockUseModulesQueryUnknown as any
     )
-
     render()
     fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Open')
