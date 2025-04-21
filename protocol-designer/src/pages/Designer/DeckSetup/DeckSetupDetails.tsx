@@ -367,7 +367,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           return (
             addressableAreas &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
-            getSlotIsEmpty(activeDeckSetup, addressableArea.id, false, true)
+            getSlotIsEmpty(
+              activeDeckSetup,
+              addressableArea.id,
+              draggedLabware == null
+            )
           )
         })
         .map(addressableArea => {
