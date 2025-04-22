@@ -257,6 +257,8 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
     summary="Create Chat Completion",
     description="Generate a chat response based on the provided prompt.",
 )
+
+# ruff: noqa: C901
 async def create_chat_completion(
     body: ChatRequest, user: Annotated[User, Security(auth.verify)]
 ) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
