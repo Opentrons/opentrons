@@ -1,5 +1,11 @@
 """Gravimetric QC protocol."""
 
+from typing import List, Dict
+from dataclasses import dataclass
+import os
+import sys
+from time import time
+
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -9,13 +15,55 @@ from opentrons.protocol_api import (
     Liquid,
     LiquidClass,
 )
-from typing import List, Dict
-from dataclasses import dataclass
-
-from hardware_testing.data import get_testing_data_directory
+from opentrons import version
+from opentrons.config import infer_config_base_dir
 
 metadata = {"protocolName": "Gravimetric QC"}
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+
+
+def _download_and_extract(version_str: str, base_dir: str) -> None:
+    from urllib.request import urlretrieve
+    from zipfile import ZipFile
+
+    zipfile = f"https://github.com/Opentrons/opentrons/archive/refs/tags/v{release}.zip"
+    where_to_place = os.path.join(base_dir, "hardware_testing")
+    urlretrieve(zipfile, os.path.join(base_dir, "source.zip"))
+    zf = ZipFile(os.path.join(base_dir, "source.zip"), "r")
+    files = [f for f in zf.namelist() if "hardware_testing" in f and "tests" not in f]
+    files = [f for f in files if "py" in f]
+    start_path = f"opentrons-{version_str}/hardware-testing/hardware_testing/"
+    for f in files:
+        dest_name = f.replace(start_path, "")
+        dest_file = os.path.join(where_to_place, dest_name)
+        dat = zf.read(f)
+        os.makedirs(os.path.dirname(dest_file), exist_ok=True)
+        out = open(dest_file, "wb")
+        out.write(dat)
+        out.close()
+    with open(os.path.join(where_to_place, "VERSION.txt"), "w") as ver_file:
+        ver_file.write(version_str)
+
+
+if os.getenv("RUNNING_ON_VERDIN") is None:
+    # we're simulating
+    base_dir = str(infer_config_base_dir())
+    release = f"{version.replace('a', '-alpha.').replace('b', '-beta.')}"
+    version_file_path = os.path.join(base_dir, "hardware_testing", "VERSION.txt")
+    if os.path.exists(version_file_path):
+        with open(version_file_path, "r") as version_file:
+            if version_file.readline() != release:
+                _download_and_extract(release, base_dir)
+    else:
+        _download_and_extract(release, base_dir)
+    sys.path.append(base_dir)
+    from hardware_testing.data import create_run_id
+    from hardware_testing.gravimetric.measurement.scale import Scale
+    from hardware_testing.gravimetric.measurement.record import (
+        GravimetricRecorder,
+        GravimetricRecorderConfig,
+    )
+    from hardware_testing.drivers import asair_sensor as AsairDriver
 
 
 @dataclass
@@ -23,6 +71,7 @@ class FixtureSettings:
     """Dataclass to hold all the options for a gravimetric script."""
 
     name: str
+    run_id: str
     mount: str
     pipette: InstrumentContext
     pipette_volume: int
@@ -36,6 +85,9 @@ class FixtureSettings:
     tipracks: Dict[int, List[Labware]]
     liquid_source: Well
     volumes: Dict[int, List[float]]
+    scale: Scale
+    recorder: GravimetricRecorder
+    env_sensor: AsairDriver.AsairSensorBase
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -123,9 +175,27 @@ class FixtureSettings:
         pipette = ctx.load_instrument(
             f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
+        simulating = ctx.is_simulating()
+        run_id = create_run_id()
+        scale = Scale.build(simulating)
+        recorder = GravimetricRecorder(
+            GravimetricRecorderConfig(
+                test_name=name,
+                run_id=run_id,
+                start_time=time(),
+                duration=0,
+                frequency=1000 if simulating else 5,
+                stable=False,
+            ),
+            scale,
+            simulate=simulating,
+        )
+        recorder.record(in_thread=True)
+        env_sensor = AsairDriver.BuildAsairSensor(simulating)
 
         return cls(
             name=name,
+            run_id=run_id,
             mount=mount,
             pipette=pipette,
             pipette_volume=pipette_volume,
@@ -139,9 +209,13 @@ class FixtureSettings:
             tipracks=tipracks,
             liquid_source=source_well,
             volumes=volumes,
+            scale=scale,
+            recorder=recorder,
+            env_sensor=env_sensor,
         )
 
     def validate_settings(self) -> bool:
+        """Make sure all the settings are valid."""
         # TODO validate settings
         # - Enough tips to handle all the volumes/trials
         # - Tips fit on the given pipette
@@ -191,8 +265,11 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-def run_one_test(fixture_settings: FixtureSettings, tip, volume, trial):
+def run_one_test(
+    fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
+) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
+    pass
 
 
 def run(ctx: ProtocolContext) -> None:
