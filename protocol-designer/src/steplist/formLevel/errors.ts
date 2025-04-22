@@ -377,7 +377,7 @@ const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
   tab: 'dispense',
 }
 const BLOWOUT_LOCATION_REQUIRED: FormError = {
-  title: 'Volume required',
+  title: 'Blowout location required',
   dependentFields: ['blowout_checkbox', 'blowout_location'],
   showAtForm: false,
   showAtField: true,
@@ -503,7 +503,7 @@ const CONDITIONING_VOLUME_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
-  tab: 'dispense',
+  tab: 'aspirate',
 }
 const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   title: 'Conditioning volume out of range',
@@ -511,7 +511,7 @@ const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
-  tab: 'dispense',
+  tab: 'aspirate',
 }
 
 export type FormErrorChecker = (
@@ -962,7 +962,12 @@ export const blowoutLocationRequired = (
   fields: HydratedMixFormData | HydratedMoveLiquidFormData
 ): FormError | null => {
   const { blowout_checkbox, blowout_location } = fields
-  return blowout_checkbox && !blowout_location
+  const isDisposalChecked =
+    'disposalVolume_checkbox' in fields &&
+    'path' in fields &&
+    fields.disposalVolume_checkbox &&
+    fields.path === 'multiDispense'
+  return (blowout_checkbox || isDisposalChecked) && blowout_location == null
     ? BLOWOUT_LOCATION_REQUIRED
     : null
 }
