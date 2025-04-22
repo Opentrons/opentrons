@@ -366,6 +366,9 @@ export function isAssumeFalsePositiveResumeKind(
   switch (errorKind) {
     case ERROR_KINDS.TIP_NOT_DETECTED:
     case ERROR_KINDS.TIP_DROP_FAILED:
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
+    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
       return true
     default:
       return false

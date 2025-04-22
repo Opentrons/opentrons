@@ -162,7 +162,10 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         self._model_utils = model_utils
 
     def handle_recoverable_error(
-        self, error: RecoverableExceptions, intended_id: str
+        self,
+        error: RecoverableExceptions,
+        intended_id: str,
+        state_update: update_types.StateUpdate,
     ) -> (
         DefinedErrorData[FlexStackerStallOrCollisionError]
         | DefinedErrorData[FlexStackerShuttleError]
@@ -186,7 +189,8 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                     )
                 ],
                 errorInfo={"labwareId": intended_id},
-            )
+            ),
+            state_update_if_false_positive=state_update,
         )
 
     async def execute(self, params: RetrieveParams) -> _ExecuteReturn:
@@ -219,19 +223,6 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             params.moduleId
         )
         to_retrieve = stacker_state.contained_labware_bottom_first[0]
-
-        # Allow propagation of ModuleNotAttachedError.
-        stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
-        if stacker_hw is not None:
-            try:
-                await stacker_hw.dispense_labware(labware_height=labware_height)
-            except (
-                FlexStackerStallError,
-                FlexStackerShuttleMissingError,
-                FlexStackerHopperLabwareError,
-            ) as e:
-                return self.handle_recoverable_error(e, to_retrieve.primaryLabwareId)
-
         remaining = stacker_state.contained_labware_bottom_first[1:]
 
         locations, offsets = build_retrieve_labware_move_updates(
@@ -260,6 +251,29 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             ),
         )
 
+        state_update = (
+            update_types.StateUpdate()
+            .set_batch_labware_location(
+                new_locations_by_id=locations, new_offset_ids_by_id=offsets
+            )
+            .update_flex_stacker_contained_labware(params.moduleId, remaining)
+            .set_addressable_area_used(stacker_area)
+        )
+
+        # Allow propagation of ModuleNotAttachedError.
+        stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
+        if stacker_hw is not None:
+            try:
+                await stacker_hw.dispense_labware(labware_height=labware_height)
+            except (
+                FlexStackerStallError,
+                FlexStackerShuttleMissingError,
+                FlexStackerHopperLabwareError,
+            ) as e:
+                return self.handle_recoverable_error(
+                    e, to_retrieve.primaryLabwareId, state_update
+                )
+
         return SuccessData(
             public=RetrieveResult.model_construct(
                 labwareId=to_retrieve.primaryLabwareId,
@@ -285,14 +299,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                     stacker_state.pool_lid_definition
                 ),
             ),
-            state_update=(
-                update_types.StateUpdate()
-                .set_batch_labware_location(
-                    new_locations_by_id=locations, new_offset_ids_by_id=offsets
-                )
-                .update_flex_stacker_contained_labware(params.moduleId, remaining)
-                .set_addressable_area_used(stacker_area)
-            ),
+            state_update=state_update,
         )
 
 
