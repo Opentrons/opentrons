@@ -82,7 +82,6 @@
   "deck_conflict_info": "<block>通过移除位置 <strong>{{cutout}}</strong> 中的 <strong>{{currentFixture}}</strong> 来更新甲板配置。从甲板配置中移除对应装置或更新协议。</block>",
   "deck_conflict_info_thermocycler": "<block>通过移除位置 <strong>A1 和 B1</strong> 中的固定装置来更新甲板配置。从甲板配置中移除对应装置或更新协议。</block>",
   "deck_hardware": "甲板硬件",
-  "deck_hardware_ready": "甲板硬件准备",
   "deck_map": "甲板布局图",
   "default_values": "默认值",
   "download_files": "下载文件",
