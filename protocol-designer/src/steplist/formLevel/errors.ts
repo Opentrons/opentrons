@@ -963,9 +963,10 @@ export const blowoutLocationRequired = (
 ): FormError | null => {
   const { blowout_checkbox, blowout_location } = fields
   const isDisposalChecked =
-    'disposalVolume_checkbox' in fields && 'path' in fields
-      ? fields.disposalVolume_checkbox && fields.path === 'multiDispense'
-      : false
+    'disposalVolume_checkbox' in fields &&
+    'path' in fields &&
+    fields.disposalVolume_checkbox &&
+    fields.path === 'multiDispense'
   return (blowout_checkbox || isDisposalChecked) && blowout_location == null
     ? BLOWOUT_LOCATION_REQUIRED
     : null
