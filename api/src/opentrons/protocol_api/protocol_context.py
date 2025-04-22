@@ -1363,10 +1363,10 @@ class ProtocolContext(CommandPublisher):
     ) -> LiquidClass:
         """
         Define a liquid class for use in the protocol.
+        ..
+            This is intended for Opentrons internal use only and is not a guaranteed API.
 
         :meta private:
-
-        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return self._core.define_liquid_class(name=name)
 

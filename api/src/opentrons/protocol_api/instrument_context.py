@@ -1528,7 +1528,8 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
-        This is intended for Opentrons internal use only and is not a guaranteed API.
+        ..
+            This is intended for Opentrons internal use only and is not a guaranteed API.
 
         :param liquid_class: The type of liquid to move. You must specify the liquid class,
             even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
@@ -1637,7 +1638,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Distribute a particular type of liquid from one well to a group of wells.
 
-        This is intended for Opentrons internal use only and is not a guaranteed API.
+        ..
+            This is intended for Opentrons internal use only and is not a guaranteed API.
 
         :param liquid_class: The type of liquid to move. You must specify the liquid class,
             even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
@@ -1661,7 +1663,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
 
-            :meta private:
+        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -1752,7 +1754,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Consolidate a particular type of liquid from a group of wells to one well.
 
-        This is intended for Opentrons internal use only and is not a guaranteed API.
+        ..
+            This is intended for Opentrons internal use only and is not a guaranteed API.
 
         :param liquid_class: The type of liquid to move. You must specify the liquid class,
             even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
@@ -1776,7 +1779,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
 
-            :meta private:
+        :meta private:
         """
         if volume == 0.0:
             _log.info(
