@@ -82,6 +82,7 @@ describe('InputPrompt', () => {
     expect(sendButton).not.toBeDisabled() // Double check before clicking
     fireEvent.click(sendButton)
 
+    // Wait for callApi to be called first, since that happens before trackEvent
     await waitFor(() => {
       expect(mockCallApi).toHaveBeenCalled()
     })
