@@ -29,7 +29,7 @@ import {
 import { editDeckConfiguration } from '../../../step-forms/actions'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { useKitchen } from '../Kitchen/hooks'
-import { getIsLabwareCompatibleWithModule } from '../utils'
+import { getIsLabwareCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
@@ -290,7 +290,13 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
               newModule?.cutoutId
             )
           : true
-      if (isLabwareCompatible) {
+      const hasLabware =
+        newFixture != null
+          ? (newFixture.type === 'wasteChute' ||
+              newFixture.type === 'trashBin') &&
+            getSlotHasLabware(labware, cutoutId)
+          : false
+      if (isLabwareCompatible && !hasLabware) {
         dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
       }
       updateInitialDeckState?.(addedCutoutConfigs)

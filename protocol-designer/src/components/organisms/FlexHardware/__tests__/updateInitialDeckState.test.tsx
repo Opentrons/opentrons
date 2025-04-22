@@ -202,6 +202,38 @@ describe('updateInitialDeckState', () => {
       vi.mocked(createDeckFixture('trashBin', 'cutoutA3'))
     )
   })
+  it('renders snackbar when there is a labware on the slot', () => {
+    updateInitialDeckState(
+      [
+        {
+          cutoutId: 'cutoutA3',
+          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+          type: 'trashBin',
+        },
+      ],
+      {
+        ...mockEmptyIntialDeckSetup,
+        labware: {
+          labware: {
+            slot: 'A3',
+            def: fixture12Trough as LabwareDefinition2,
+            labwareDefURI: 'mockURI',
+            id: 'labware',
+            pythonName: 'mockPythonName',
+          },
+        },
+      },
+      mockDispatch,
+      mockSetShowDeleteEntityModal,
+      mockSetShowDeleteStagingAreaModal,
+      mockSavedSteps,
+      mockMakeSnackbar,
+      mockT
+    )
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'conflict_on_slot_labware_fixture'
+    )
+  })
   it('deletes deck fixture', () => {
     updateInitialDeckState(
       [

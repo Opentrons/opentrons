@@ -85,7 +85,16 @@ export function FlexHardware(): JSX.Element {
       ) {
         return acc
       }
-      if (hasStagingAreaAndWasteChute) {
+      //  the stagingArea + wasteChute combo is added only once through wasteChute
+      //  and filtered out the 2nd time for stagingArea here
+      if (
+        hasStagingAreaAndWasteChute &&
+        fixture.name === 'stagingArea' &&
+        fixture.location === WASTE_CHUTE_CUTOUT
+      ) {
+        return acc
+      }
+      if (hasStagingAreaAndWasteChute && fixture.name === 'wasteChute') {
         cutoutFixtureId = STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
       } else if (fixture.name === 'stagingArea') {
         cutoutFixtureId = STAGING_AREA_RIGHT_SLOT_FIXTURE

@@ -18,18 +18,18 @@ import {
   deleteDeckFixture,
 } from '../../../step-forms/actions/additionalItems'
 import { FIXTURES } from '../../../pages/Designer/DeckSetup/constants'
-import { getIsLabwareCompatibleWithModule } from '../utils'
+import { getIsLabwareCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
+import type { Dispatch, SetStateAction } from 'react'
 import type { DeckConfiguration, ModuleModel } from '@opentrons/shared-data'
-import type { CutoutConfigExtended } from '../HardwareConfigurator/AddFixtureModal'
 import type { ThunkDispatch } from '../../../types'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
 } from '../../../step-forms'
-import type { Dispatch, SetStateAction } from 'react'
 import type { MakeSnackbar } from '../Kitchen/KitchenContext'
+import type { CutoutConfigExtended } from '../HardwareConfigurator/AddFixtureModal'
 
 const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
   cutoutA3: 'A4',
@@ -70,6 +70,7 @@ export const updateInitialDeckState = (
     if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
       return
     }
+    const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
     const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
       ae => ae.name === (value.type as DeckFixture)
     )
@@ -131,7 +132,15 @@ export const updateInitialDeckState = (
         }
         //  creating fixture
       } else {
-        dispatch(createDeckFixture(value.type as DeckFixture, value.cutoutId))
+        //  if creating a trashBin or wasteChute and there is a labware on the slot
+        if (
+          hasLabwareOnSlot &&
+          (value.type === 'trashBin' || value.type === 'wasteChute')
+        ) {
+          makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
+        } else {
+          dispatch(createDeckFixture(value.type as DeckFixture, value.cutoutId))
+        }
       }
     } else if (value.type === 'stagingAreaAndMagneticBlock') {
       const matchingStagingArea = Object.values(additionalEquipmentOnDeck).find(
@@ -215,7 +224,7 @@ export const updateInitialDeckState = (
         if (deckConfig != null) {
           dispatch(editDeckConfiguration({ deckConfig }))
         }
-        //   if creating module
+        //   creating module
       } else {
         const slot = value.cutoutId.split('cutout')[1]
         if (isLabwareCompatible) {
@@ -283,14 +292,19 @@ export const updateInitialDeckState = (
           ...(fourthColumnSlotLabwareId ? [fourthColumnSlotLabwareId] : []),
         ]
         setShowDeleteEntityModal({ ids: idsToDelete, deckConfig })
-        //  if creating fixtures
+        //  creating fixtures
       } else {
-        dispatch(
-          createDeckFixture('stagingArea' as DeckFixture, WASTE_CHUTE_CUTOUT)
-        )
-        dispatch(
-          createDeckFixture('wasteChute' as DeckFixture, WASTE_CHUTE_CUTOUT)
-        )
+        // if there is a labware on the slot do not create the staging area & waste chute
+        if (hasLabwareOnSlot) {
+          makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
+        } else {
+          dispatch(
+            createDeckFixture('stagingArea' as DeckFixture, WASTE_CHUTE_CUTOUT)
+          )
+          dispatch(
+            createDeckFixture('wasteChute' as DeckFixture, WASTE_CHUTE_CUTOUT)
+          )
+        }
       }
     } else {
       //  if deleting module in use
@@ -313,7 +327,7 @@ export const updateInitialDeckState = (
           value.cutoutId
         )
         const slot = value.cutoutId.split('cutout')[1]
-        //   if creating module
+        //   creating module
         if (isLabwareCompatible) {
           dispatch(
             createModule({

@@ -58,6 +58,14 @@ export const getIsLabwareCompatibleWithModule = (
     : true
 }
 
+export const getSlotHasLabware = (
+  labware: AllTemporalPropertiesForTimelineFrame['labware'],
+  cutoutId: CutoutId
+): boolean => {
+  const slot = cutoutId.split('cutout')[1]
+  return Object.values(labware).some(lw => lw.slot === slot)
+}
+
 //  NOTE: used to get the next available module slot for OT-2
 export const getNextAvailableModuleSlot = (
   moduleModel: ModuleModel,
