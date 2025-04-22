@@ -25,6 +25,7 @@ from typing import (
     Mapping,
     Union,
     Literal,
+    Callable,
 )
 
 from opentrons_shared_data.labware.types import (
@@ -46,7 +47,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
     UnsupportedAPIError,
 )
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -460,6 +461,23 @@ class Labware:
         )
         return False
 
+    @classmethod
+    def _builder_for_core_map(
+        cls,
+        api_version: APIVersion,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
+    ) -> Callable[[AbstractLabware[Any]], Labware]:
+        def _do_build(core: AbstractLabware[Any]) -> Labware:
+            return Labware(
+                core=core,
+                api_version=api_version,
+                protocol_core=protocol_core,
+                core_map=core_map,
+            )
+
+        return _do_build
+
     @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
@@ -684,7 +702,7 @@ class Labware:
         version: Optional[int] = None,
     ) -> Labware:
         """
-        Load a stack of Lids onto a valid Deck Location or Adapter.
+        Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
 
         :param str load_name: A string to use for looking up a lid definition.
             You can find the ``load_name`` for any standard lid on the Opentrons
@@ -705,9 +723,7 @@ class Labware:
             leave this unspecified to let ``load_lid_stack()`` choose a version
             automatically.
 
-        :return: The initialized and loaded labware object representing the Lid Stack.
-
-        :meta private:
+        :return:  The initialized and loaded labware object representing the lid stack.
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
@@ -773,11 +789,14 @@ class Labware:
                 you must either use ``set_offset()`` on all of them or none of them.
             * - 2.14–2.17
               - ``set_offset()`` is not available, and the API raises an error.
-            * - 2.18 and newer
+            * - 2.18--2.22
               -
                 - Offsets apply to any labware of the same type, in the same on-deck location.
                 - Offsets can't be set on labware that is currently off-deck.
                 - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
+            * - 2.23 and newer
+              -
+                On Flex, offsets can apply to all labware of the same type, regardless of their on-deck location.
 
         .. note::
 

@@ -24,7 +24,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
-import { LabwareOffsetTable } from './LabwareOffsetTable'
+import { LegacyLabwareOffsetTable } from './LegacyLabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
 import type { ChangeEvent } from 'react'
@@ -166,7 +166,7 @@ export function LegacyApplyHistoricOffsets(
                   isLabwareOffsetCodeSnippetsOn ? (
                     <LegacyLabwareOffsetTabs
                       TableComponent={
-                        <LabwareOffsetTable
+                        <LegacyLabwareOffsetTable
                           offsetCandidates={offsetCandidates}
                           labwareDefinitions={getLabwareDefinitionsFromCommands(
                             commands
@@ -177,7 +177,7 @@ export function LegacyApplyHistoricOffsets(
                       CommandLineComponent={CommandLineSnippet}
                     />
                   ) : (
-                    <LabwareOffsetTable
+                    <LegacyLabwareOffsetTable
                       offsetCandidates={offsetCandidates}
                       labwareDefinitions={getLabwareDefinitionsFromCommands(
                         commands

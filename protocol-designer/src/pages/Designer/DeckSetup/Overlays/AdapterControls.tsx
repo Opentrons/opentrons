@@ -15,6 +15,7 @@ import {
 import { getLabwareIsCustom } from '../../../../utils/labwareModuleCompatibility'
 import { getLabwareEntities } from '../../../../step-forms/selectors'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { selectors as labwareDefSelectors } from '../../../../labware-defs'
 import { DND_TYPES } from '../../../../constants'
 import { DECK_CONTROLS_STYLE } from '../constants'
@@ -48,7 +49,7 @@ export const AdapterControls = (
     setShowMenuListForId,
     itemId,
     isSelected,
-    tab,
+    terminalItemId,
     swapBlocked,
   } = props
   const { t } = useTranslation(['deck', 'starting_deck_state'])
@@ -112,7 +113,7 @@ export const AdapterControls = (
 
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
-    tab === 'protocolSteps' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected ||
     slotPosition == null
   ) {

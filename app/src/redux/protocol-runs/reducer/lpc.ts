@@ -18,6 +18,7 @@ import {
   SET_SELECTED_LABWARE_URI,
   SOURCE_OFFSETS_FROM_DATABASE,
   SOURCE_OFFSETS_FROM_RUN,
+  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC,
   UPDATE_LPC_DECK,
@@ -194,6 +195,10 @@ export function LPCReducer(
             lastStepIndices: null,
             currentSubstep: null,
           },
+          ui: {
+            ...state.ui,
+            showDefaultOffsetInfoBanner: true, // show banner each LPC launch
+          },
         }
 
       case APPLIED_OFFSETS_TO_RUN: {
@@ -268,6 +273,16 @@ export function LPCReducer(
             conflictTimestampInfo: info,
             sourcedOffsets: offsetSource(),
             labware: updatedLw(),
+          },
+        }
+      }
+
+      case TOGGLE_DEFAULT_OFFSET_INFO_BANNER: {
+        return {
+          ...state,
+          ui: {
+            ...state.ui,
+            showDefaultOffsetInfoBanner: !state.ui.showDefaultOffsetInfoBanner,
           },
         }
       }

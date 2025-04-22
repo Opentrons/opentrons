@@ -32,6 +32,8 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupVerifications.OnStep3())
     steps.add(SetupSteps.NoGripper())
+    steps.add(SetupSteps.NoThermocycler())
+    steps.add(SetupSteps.NoWasteChute())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupVerifications.AbsorbanceNotSelectable())
     steps.add(SetupSteps.GoBack())
@@ -40,11 +42,9 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.AddPlateReader())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
@@ -62,10 +62,8 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('D2'))
 
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Armadillo 96 Well Plate'))
-    steps.add(SetupSteps.ProtocolStepsH())
     steps.add(SetupSteps.AddStep())
 
     // Move labware attempt to Plate Reader

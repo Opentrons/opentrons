@@ -52,17 +52,42 @@ export function RunHeaderBannerContainer(
   const { analysisErrorModalUtils } = runHeaderModalContainerUtils
 
   const { t } = useTranslation(['run_details', 'shared'])
-  const isDoorOpen = useIsDoorOpen(robotName)
+  const doorStatus = useIsDoorOpen(robotName)
 
   const {
     showRunCanceledBanner,
     showDoorOpenBeforeRunBanner,
     showDoorOpenDuringRunBanner,
+    showStackerDoorOpenBeforeRunBanner,
+    showStackerDoorOpenDuringRunBanner,
+    showUnconfiguredStackerDoorOpenBeforeRunBanner,
+    showUnconfiguredStackerDoorOpenDuringRunBanner,
   } = getShowGenericRunHeaderBanners({
     runStatus,
-    isDoorOpen,
+    doorStatus,
     enteredER,
   })
+
+  let doorBannerText: string | null = null
+  if (showDoorOpenBeforeRunBanner) {
+    doorBannerText = t('shared:close_robot_door')
+  } else if (showDoorOpenDuringRunBanner) {
+    doorBannerText = t('close_door_to_resume_run')
+  } else if (showStackerDoorOpenBeforeRunBanner) {
+    doorBannerText = t('shared:close_stacker_door', {
+      module_door_location: doorStatus.moduleDoorLocation,
+    })
+  } else if (showUnconfiguredStackerDoorOpenBeforeRunBanner) {
+    doorBannerText = t('shared:close_unconfigured_stacker_door', {
+      module_door_location: doorStatus.moduleDoorLocation,
+    })
+  } else if (showStackerDoorOpenDuringRunBanner) {
+    doorBannerText = t('close_stacker_to_resume_run', {
+      module_door_location: doorStatus.moduleDoorLocation,
+    })
+  } else if (showUnconfiguredStackerDoorOpenDuringRunBanner) {
+    doorBannerText = t('close_unconfigured_stacker_to_resume_run')
+  }
 
   const terminalBannerType = useTerminalRunBannerContainer(props)
 
@@ -78,14 +103,9 @@ export function RunHeaderBannerContainer(
           {t('run_canceled')}
         </Banner>
       ) : null}
-      {showDoorOpenBeforeRunBanner ? (
+      {doorBannerText ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('shared:close_robot_door')}
-        </Banner>
-      ) : null}
-      {showDoorOpenDuringRunBanner ? (
-        <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('close_door_to_resume_run')}
+          {doorBannerText}
         </Banner>
       ) : null}
       {terminalBannerType != null ? (

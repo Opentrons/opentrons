@@ -1138,7 +1138,9 @@ export const aspirateTouchTipMmFromEdgeRequired = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
   const { aspirate_touchTip_checkbox, aspirate_touchTip_mmFromEdge } = fields
-  return aspirate_touchTip_checkbox && !aspirate_touchTip_mmFromEdge
+  return aspirate_touchTip_checkbox &&
+    !aspirate_touchTip_mmFromEdge &&
+    aspirate_touchTip_mmFromEdge !== 0
     ? ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED
     : null
 }
@@ -1146,7 +1148,9 @@ export const dispenseTouchTipMmFromEdgeRequired = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
   const { dispense_touchTip_checkbox, dispense_touchTip_mmFromEdge } = fields
-  return dispense_touchTip_checkbox && !dispense_touchTip_mmFromEdge
+  return dispense_touchTip_checkbox &&
+    !dispense_touchTip_mmFromEdge &&
+    dispense_touchTip_mmFromEdge !== 0
     ? DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED
     : null
 }
@@ -1174,8 +1178,10 @@ export const pushOutVolumeOutOfRange = (
 export const conditioningVolumeRequired = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  const { conditioning_checkbox, conditioning_volume } = fields
-  return conditioning_checkbox && !conditioning_volume
+  const { conditioning_checkbox, conditioning_volume, path } = fields
+  return conditioning_checkbox &&
+    !conditioning_volume &&
+    path === 'multiDispense'
     ? CONDITIONING_VOLUME_REQUIRED
     : null
 }
@@ -1185,6 +1191,7 @@ export const conditioningVolumeOutOfRange = (
   labwareEntities?: LabwareEntities
 ): FormError | null => {
   const {
+    path,
     conditioning_checkbox,
     conditioning_volume,
     pipette,
@@ -1193,7 +1200,11 @@ export const conditioningVolumeOutOfRange = (
     disposalVolume_volume,
     tipRack,
   } = fields
-  if (pipette == null || conditioning_volume == null) {
+  if (
+    pipette == null ||
+    conditioning_volume == null ||
+    path !== 'multiDispense'
+  ) {
     return null
   }
   const maxConditioningVolume = getMaxConditioningVolume({

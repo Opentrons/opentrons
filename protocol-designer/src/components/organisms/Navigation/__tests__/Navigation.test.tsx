@@ -5,14 +5,24 @@ import { MemoryRouter } from 'react-router-dom'
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getHasUnsavedChanges } from '../../../../load-file/selectors'
-import { toggleNewProtocolModal } from '../../../../navigation/actions'
 import { SettingsIcon } from '../../SettingsIcon'
 import { Navigation } from '..'
+
+import type { NavigateFunction } from 'react-router-dom'
+
+const mockNavigate = vi.fn()
 
 vi.mock('../../SettingsIcon')
 vi.mock('../../../../navigation/actions')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../load-file/selectors')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -39,7 +49,7 @@ describe('Navigation', () => {
   it('when clicking Create new, should call the toggle action', () => {
     render()
     fireEvent.click(screen.getByText('Create new'))
-    expect(vi.mocked(toggleNewProtocolModal)).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalled()
   })
 
   it.todo('when clicking Import, mock function should be called', () => {})

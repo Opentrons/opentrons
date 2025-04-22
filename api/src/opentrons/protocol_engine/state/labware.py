@@ -400,6 +400,10 @@ class LabwareView:
                 f"Labware {labware_id} not found."
             ) from e
 
+    def known(self, labware_id: str) -> bool:
+        """Check if the labware specified by labware_id has been loaded."""
+        return labware_id in self._state.labware_by_id
+
     def get_id_by_module(self, module_id: str) -> str:
         """Return the ID of the labware loaded on the given module."""
         for labware_id, labware in self._state.labware_by_id.items():
@@ -807,6 +811,27 @@ class LabwareView:
             namespace=labware_definition.namespace,
             version=labware_definition.version,
         )
+
+    @overload
+    def get_uri_from_definition_unless_none(
+        self, labware_definition: LabwareDefinition
+    ) -> str:
+        ...
+
+    @overload
+    def get_uri_from_definition_unless_none(self, labware_definition: None) -> None:
+        ...
+
+    def get_uri_from_definition_unless_none(
+        self, labware_definition: LabwareDefinition | None
+    ) -> str | None:
+        """Get the URI from a labware definition, passing None through.
+
+        Don't use unless you're sure you want to accept that the definition might be None.
+        """
+        if labware_definition is None:
+            return None
+        return self.get_uri_from_definition(labware_definition)
 
     def is_tiprack(self, labware_id: str) -> bool:
         """Get whether labware is a tiprack."""

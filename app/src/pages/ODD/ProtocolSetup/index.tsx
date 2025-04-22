@@ -25,7 +25,6 @@ import {
 import {
   useProtocolQuery,
   useInstrumentsQuery,
-  useDoorQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import {
@@ -100,7 +99,7 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Run } from '@opentrons/api-client'
+import type { Run, RunStatus } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
@@ -112,12 +111,17 @@ import type {
   ProtocolHardware,
   ProtocolFixture,
 } from '/app/transformations/commands'
+import {
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 const FETCH_DURATION_MS = 5000
 
 const ANALYSIS_POLL_MS = 5000
 interface PrepareToRunProps {
   runId: string
+  runStatus: RunStatus | null
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   confirmStepsComplete: () => void
@@ -131,6 +135,7 @@ interface PrepareToRunProps {
 
 function PrepareToRun({
   runId,
+  runStatus,
   setSetupScreen,
   confirmAttachment,
   play,
@@ -173,11 +178,6 @@ function PrepareToRun({
       refetchInterval: ANALYSIS_POLL_MS,
     }
   )
-
-  const runStatus = useRunStatus(runId)
-  if (runStatus === RUN_STATUS_STOPPED) {
-    navigate('/protocols')
-  }
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -353,8 +353,24 @@ function PrepareToRun({
     areFixturesReady &&
     offsetsConfirmed
   const onPlay = (): void => {
-    if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door') as string)
+    if (doorStatus.isDoorOpen) {
+      if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation !== NOT_CONFIGURED
+      ) {
+        makeSnackbar(
+          t('shared:close_stacker_door', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          }) as string
+        )
+      } else if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation === NOT_CONFIGURED
+      ) {
+        makeSnackbar(t('shared:close_unconfigured_stacker_door') as string)
+      } else {
+        makeSnackbar(t('shared:close_robot_door') as string)
+      }
     } else {
       if (isReadyToRun) {
         if (runStatus === RUN_STATUS_IDLE && !labwareConfirmed) {
@@ -510,7 +526,10 @@ function PrepareToRun({
       }
     } else if (isAnyNecessaryDefaultOffsetMissing) {
       return {
-        detail: t('num_missing_offsets', { num: numMissingLSOffsets }),
+        detail:
+          numMissingLSOffsets > 1
+            ? t('num_missing_offsets', { num: numMissingLSOffsets })
+            : t('one_missing_offset'),
         status: 'not ready',
       }
     } else {
@@ -521,12 +540,7 @@ function PrepareToRun({
     }
   }
 
-  const { data: doorStatus } = useDoorQuery({
-    refetchInterval: FETCH_DURATION_MS,
-  })
-  const isDoorOpen =
-    doorStatus?.data.status === 'open' &&
-    doorStatus?.data.doorRequiredClosedForProtocol
+  const doorStatus = useIsDoorOpen(robotName)
 
   const parametersDetail = hasRunTimeParameters
     ? hasCustomRunTimeParameters
@@ -591,7 +605,7 @@ function PrepareToRun({
               disabled={isLoading}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={isDoorOpen}
+              isDoorOpen={doorStatus.isDoorOpen}
             />
           </Flex>
         </Flex>
@@ -709,6 +723,12 @@ export function ProtocolSetup(): JSX.Element {
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
+  const navigate = useNavigate()
+  const runStatus = useRunStatus(runId)
+  if (runStatus === RUN_STATUS_STOPPED) {
+    navigate('/protocols')
+  }
+
   const {
     data: mostRecentAnalysis = null,
   } = useProtocolAnalysisAsDocumentQuery(
@@ -795,7 +815,6 @@ export function ProtocolSetup(): JSX.Element {
     showConfirmation: showMissingStepsConfirmation,
     cancel: cancelExitMissingStepsConfirmation,
   } = useConditionalConfirm(handleProceedToRunClick, !labwareConfirmed)
-  const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const lpcLaunchProps = useLPCFlows({
     runId,
@@ -810,6 +829,7 @@ export function ProtocolSetup(): JSX.Element {
     'prepare to run': (
       <PrepareToRun
         runId={runId}
+        runStatus={runStatus}
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         confirmStepsComplete={confirmMissingSteps}

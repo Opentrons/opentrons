@@ -1,11 +1,11 @@
 import { useSelector } from 'react-redux'
 import { Module } from '@opentrons/components'
 import {
+  getAllLabwareDefs,
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { selectors } from '../../../labware-ingred/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { ModuleLabel } from './ModuleLabel'
@@ -15,31 +15,20 @@ import { SelectedModuleLabwareRender } from './SelectedModuleLabwareRender'
 import type {
   CoordinateTuple,
   DeckDefinition,
-  ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
 import type { DeckLabelProps } from '@opentrons/components'
-import type { Fixture } from './constants'
 
 interface SelectedHoveredItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
   hoveredLabware: string | null
-  hoveredModule: ModuleModel | null
-  hoveredFixture: Fixture | null
   slotPosition: CoordinateTuple | null
 }
 export const SelectedHoveredItems = (
   props: SelectedHoveredItemsProps
 ): JSX.Element => {
-  const {
-    deckDef,
-    robotType,
-    hoveredFixture,
-    hoveredModule,
-    hoveredLabware,
-    slotPosition,
-  } = props
+  const { deckDef, robotType, hoveredLabware, slotPosition } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
     selectedSlot,
@@ -49,7 +38,7 @@ export const SelectedHoveredItems = (
     selectedNestedLabwareDefUri,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
-  const defs = getOnlyLatestDefs()
+  const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware, modules } = deckSetup
   const matchingSelectedLabwareOnDeck = Object.values(labware).find(labware => {
@@ -146,10 +135,7 @@ export const SelectedHoveredItems = (
 
   return (
     <>
-      {selectedFixture != null &&
-      selectedSlot.cutout != null &&
-      hoveredFixture == null &&
-      hoveredModule == null ? (
+      {selectedFixture != null && selectedSlot.cutout != null ? (
         <FixtureRender
           fixture={selectedFixture}
           cutout={selectedSlot.cutout}
@@ -159,8 +145,6 @@ export const SelectedHoveredItems = (
       ) : null}
       {selectedModuleModel != null &&
       slotPosition != null &&
-      hoveredModule == null &&
-      hoveredFixture == null &&
       orientation != null ? (
         <>
           <Module

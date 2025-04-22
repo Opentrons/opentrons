@@ -7,6 +7,7 @@ import { FlexTrash } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { selectors } from '../../../../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
@@ -16,14 +17,14 @@ import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
 import { getRobotType } from '../../../../file-data/selectors'
 import { DeckSetupDetails } from '../DeckSetupDetails'
-import { DeckSetupTools } from '../DeckSetupTools'
+import { DeckSetupToolbox } from '../DeckSetupToolbox'
 import { DeckSetupContainer } from '../DeckSetupContainer'
 import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../feature-flags/selectors')
-vi.mock('../DeckSetupTools')
+vi.mock('../DeckSetupToolbox')
 vi.mock('../DeckSetupDetails')
 vi.mock('../../../../ui/steps')
 vi.mock('../../../../labware-ingred/selectors')
@@ -37,7 +38,13 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 
 const render = () => {
-  return renderWithProviders(<DeckSetupContainer tab="startingDeck" />)[0]
+  return renderWithProviders(
+    <DeckSetupContainer
+      setHoverSlot={vi.fn()}
+      hoverSlot={null}
+      robotType={FLEX_ROBOT_TYPE}
+    />
+  )[0]
 }
 
 describe('DeckSetupContainer', () => {
@@ -50,14 +57,16 @@ describe('DeckSetupContainer', () => {
       { id: null, text: null },
     ])
     vi.mocked(getHoveredDropdownItem).mockReturnValue({ id: null, text: null })
-    vi.mocked(DeckSetupTools).mockReturnValue(<div>mock DeckSetupTools</div>)
+    vi.mocked(DeckSetupToolbox).mockReturnValue(
+      <div>mock DeckSetupToolbox</div>
+    )
     vi.mocked(DeckSetupDetails).mockReturnValue(
       <div>mock DeckSetupDetails</div>
     )
     vi.mocked(FlexTrash).mockReturnValue(<div>mock FlexTrash</div>)
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
       modules: {},
@@ -65,12 +74,12 @@ describe('DeckSetupContainer', () => {
       pipettes: {},
     })
   })
-  it('renders the decksetupTools when slot and cutout are not null', () => {
+  it('renders the DeckSetupToolbox when slot and cutout are not null', () => {
     render()
     screen.getByText('mock DeckSetupDetails')
-    screen.getByText('mock DeckSetupTools')
+    screen.getByText('mock DeckSetupToolbox')
   })
-  it('renders no deckSetupTools when slot and cutout are null', () => {
+  it('renders no DeckSetupToolbox when slot and cutout are null', () => {
     vi.mocked(selectors.getZoomedInSlot).mockReturnValue({
       slot: null,
       cutout: null,

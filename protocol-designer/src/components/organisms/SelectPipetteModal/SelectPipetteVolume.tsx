@@ -36,7 +36,7 @@ export function SelectPipetteVolume(
     pipetteGen,
     pipetteVolume,
   } = props
-  const { t } = useTranslation('create_new_protocol')
+  const { t } = useTranslation('onboarding')
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>

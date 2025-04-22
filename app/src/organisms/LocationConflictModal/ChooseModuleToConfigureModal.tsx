@@ -16,6 +16,7 @@ import {
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   Modal,
+  FixtureOption,
 } from '@opentrons/components'
 import {
   getFixtureDisplayName,
@@ -25,7 +26,6 @@ import {
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
-import { FixtureOption } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { SmallButton } from '/app/atoms/buttons'
 import { useCloseCurrentRun } from '/app/resources/runs'

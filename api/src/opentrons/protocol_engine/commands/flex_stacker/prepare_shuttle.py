@@ -84,6 +84,7 @@ class PrepareShuttleImpl(AbstractCommandImpl[PrepareShuttleParams, _ExecuteRetur
                             error=e,
                         )
                     ],
+                    errorInfo={},
                 ),
             )
         # TODO we should also add a check for shuttle not detected error

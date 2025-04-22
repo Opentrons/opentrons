@@ -16,6 +16,7 @@ import type {
   PipetteV2Specs,
   ShakeSpeedParams,
   LabwareMovementStrategy,
+  PositionReference,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
@@ -373,6 +374,8 @@ export type MixArgs = CommonArgs & {
   /** y offset */
   yOffset: number
   /** flow rates in uL/sec */
+  zOffset: number
+  positionReference: PositionReference
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
