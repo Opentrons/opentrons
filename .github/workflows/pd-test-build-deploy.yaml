@@ -85,6 +85,7 @@ jobs:
         env:
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
+          # TODO: SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           make -C protocol-designer NODE_ENV=development
       - name: 'upload github artifact'

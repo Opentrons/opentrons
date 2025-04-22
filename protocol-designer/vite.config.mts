@@ -6,6 +6,7 @@ import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { versionForProject } from '../scripts/git-version.mjs'
 import type { UserConfig } from 'vite'
 
@@ -20,6 +21,8 @@ export default defineConfig(
       build: {
         // Relative to the root
         outDir: 'dist',
+        // sourcemap for Sentry
+        sourcemap: true,
       },
       plugins: [
         react({
@@ -37,6 +40,18 @@ export default defineConfig(
             }
           },
         },
+        sentryVitePlugin({
+          org: 'opentrons-at',
+          project: 'protocol-designer',
+          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./dist/**'],
+            ignore: ['./node_modules/**'],
+            // filesToDeleteAfterUpload:
+            //   mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+          },
+        }),
       ],
       optimizeDeps: {
         esbuildOptions: {
@@ -74,7 +89,7 @@ export default defineConfig(
         port: 5178,
         watch: {
           ignored: ['**/cypress/downloads/**'],
-        }
+        },
       },
     }
   }
