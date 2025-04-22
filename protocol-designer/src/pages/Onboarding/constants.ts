@@ -133,6 +133,6 @@ export const DEFAULT_SLOT_MAP_FLEX: {
 export const DEFAULT_SLOT_MAP_OT2: { [moduleType in ModuleType]?: string } = {
   [THERMOCYCLER_MODULE_TYPE]: '7',
   [HEATERSHAKER_MODULE_TYPE]: '1',
-  [MAGNETIC_MODULE_TYPE]: '9',
+  [MAGNETIC_MODULE_TYPE]: '1',
   [TEMPERATURE_MODULE_TYPE]: '3',
 }

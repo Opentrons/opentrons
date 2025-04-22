@@ -25,8 +25,8 @@ import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { FormModule } from '../../step-forms'
+import type { OT2ModuleType } from '../../types'
 import type { WizardTileProps } from './types'
-import type { OT2ModuleType } from './ModuleDiagram'
 
 export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -84,6 +84,9 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
             <ModuleEmptySelectorButtons
               modules={filteredSupportedModules}
               addModule={handleAddModule}
+              enableMultipleTempModules={false}
+              numberOfTemps={0}
+              hasGen1Temp={false}
             />
             {Object.keys(modules).length > 0 ? (
               <Flex

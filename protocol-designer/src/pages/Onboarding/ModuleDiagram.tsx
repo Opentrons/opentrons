@@ -21,14 +21,9 @@ import thermocycler from '../../assets/images/modules/thermocycler.png'
 import thermocycler_gen2 from '../../assets/images/modules/thermocycler_gen2.png'
 import heater_shaker_module_transparent from '../../assets/images/modules/heater_shaker_module_transparent.png'
 import type { ModuleModel } from '@opentrons/shared-data'
+import type { OT2ModuleType } from '../../types'
 
-export type OT2ModuleType =
-  | typeof MAGNETIC_MODULE_TYPE
-  | typeof TEMPERATURE_MODULE_TYPE
-  | typeof THERMOCYCLER_MODULE_TYPE
-  | typeof HEATERSHAKER_MODULE_TYPE
-
-interface Props {
+interface ModuleDiagramProps {
   type: OT2ModuleType
   model: ModuleModel
 }
@@ -58,7 +53,7 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
 }
 
 const IMAGE_MAX_WIDTH = '96px'
-export function ModuleDiagram(props: Props): JSX.Element {
+export function ModuleDiagram(props: ModuleDiagramProps): JSX.Element {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
   return (
     <img

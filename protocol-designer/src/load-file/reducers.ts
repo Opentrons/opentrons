@@ -66,7 +66,6 @@ const unsavedChanges = (
     case 'REPLACE_CUSTOM_LABWARE_DEF':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
-    case 'EDIT_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'DELETE_DECK_FIXTURE':
     case 'CREATE_DECK_FIXTURE':
