@@ -24,6 +24,9 @@ import type {
   FlexStackerRetrieveRunTimeCommand,
   LabwareLocation,
   LoadedModule,
+  Failed,
+  RunCommandFlexStackerError,
+  RunCommandError,
 } from '@opentrons/shared-data'
 
 import {
@@ -113,20 +116,18 @@ export function useFailedLabwareUtils({
 
   const failedLabwareDetails = useMemo(
     () =>
-      getFailedCmdRelevantLabware(
+      getLabwareDisplayNamesFromFailedCmd(
         protocolAnalysis,
         recentRelevantFailedLabwareCmd,
-        errorKind,
         runRecord
       ),
     [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key, errorKind]
   )
   const relevantPickUpTipCmdDetails = useMemo(
     () =>
-      getFailedCmdRelevantLabware(
+      getLabwareDisplayNamesFromFailedCmd(
         protocolAnalysis,
         relevantPickUpTipCommand,
-        errorKind,
         runRecord
       ),
     [protocolAnalysis?.id, relevantPickUpTipCommand?.key]
@@ -185,12 +186,12 @@ export function useFailedLabwareUtils({
 }
 
 type FailedCommandRelevantLabware =
-  | Omit<AspirateRunTimeCommand, 'result'>
-  | Omit<DispenseRunTimeCommand, 'result'>
-  | Omit<LiquidProbeRunTimeCommand, 'result'>
-  | Omit<PickUpTipRunTimeCommand, 'result'>
-  | Omit<MoveLabwareRunTimeCommand, 'result'>
-  | Omit<FlexStackerRetrieveRunTimeCommand, 'result'>
+  | Failed<AspirateRunTimeCommand>
+  | Failed<DispenseRunTimeCommand>
+  | Failed<LiquidProbeRunTimeCommand>
+  | Failed<PickUpTipRunTimeCommand>
+  | Failed<MoveLabwareRunTimeCommand>
+  | Failed<FlexStackerRetrieveRunTimeCommand>
   | null
 
 interface RelevantFailedLabwareCmd {
@@ -232,7 +233,7 @@ export function getRelevantFailedLabwareCmdFrom({
 function getRelevantPickUpTipCommand(
   failedCommandByRunRecord: FailedCommandBySource['byRunRecord'] | null,
   runCommands?: CommandsData
-): Omit<PickUpTipRunTimeCommand, 'result'> | null {
+): Failed<PickUpTipRunTimeCommand> | null {
   if (
     failedCommandByRunRecord == null ||
     runCommands == null ||
@@ -260,7 +261,7 @@ function getRelevantPickUpTipCommand(
   if (recentPickUpTipCmd == null) {
     return null
   } else {
-    return recentPickUpTipCmd as Omit<PickUpTipRunTimeCommand, 'result'>
+    return recentPickUpTipCmd as Failed<PickUpTipRunTimeCommand>
   }
 }
 
@@ -378,48 +379,63 @@ export function getFailedLabwareQuantity(
   return null
 }
 
-// TODO (tz, 4-8-2025): write tests for this method
+export function getRelevantLabwareIdFromFailedCmd(
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
+): string | null {
+  const isStackerError = (
+    error?: RunCommandError | null
+  ): error is RunCommandFlexStackerError =>
+    error != null &&
+    error.isDefined &&
+    [
+      'flexStackerStallOrCollision',
+      'flexStackerShuttleMissing',
+      'flexStackerHopperLabwareFailed',
+    ].includes(error.errorType)
+  if (recentRelevantFailedLabwareCmd == null) {
+    return null
+  } else if (isStackerError(recentRelevantFailedLabwareCmd?.error)) {
+    return recentRelevantFailedLabwareCmd?.error?.errorInfo?.labwareId ?? null
+  } else if (
+    recentRelevantFailedLabwareCmd.commandType !== 'flexStacker/retrieve'
+  ) {
+    return recentRelevantFailedLabwareCmd.params.labwareId
+  } else {
+    return null
+  }
+}
+
 // Get the name of the relevant labware relevant to the failed command, if any.
-export function getFailedCmdRelevantLabware(
+export function getLabwareDisplayNamesFromFailedCmd(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
-  errorKind: ErrorKind,
   runRecord?: Run
 ): { name: string | null; nickname: string | null } | null {
+  const labwareId = getRelevantLabwareIdFromFailedCmd(
+    recentRelevantFailedLabwareCmd
+  )
+  if (labwareId == null) {
+    return null
+  }
   const lwDefsByURI = getLoadedLabwareDefinitionsByUri(
     protocolAnalysis?.commands ?? []
   )
-  let labwareNickname, failedLWURI
-  if (STACKER_ERROR_KINDS.includes(errorKind)) {
-    for (const key in lwDefsByURI) {
-      if (lwDefsByURI.hasOwnProperty(key)) {
-        labwareNickname = getLabwareDisplayName(lwDefsByURI[key])
-        break
-      }
-    }
+
+  const labwareNickname =
+    protocolAnalysis != null
+      ? getLoadedLabware(protocolAnalysis.labware, labwareId)?.displayName ??
+        null
+      : null
+  const failedLWURI = runRecord?.data.labware.find(
+    labware => labware.id === labwareId
+  )?.definitionUri
+  if (failedLWURI != null && Object.keys(lwDefsByURI).includes(failedLWURI)) {
     return {
-      name: labwareNickname ?? '',
-      nickname: labwareNickname ?? null,
+      name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
+      nickname: labwareNickname,
     }
   } else {
-    labwareNickname =
-      protocolAnalysis != null
-        ? getLoadedLabware(
-            protocolAnalysis.labware,
-            (recentRelevantFailedLabwareCmd?.params.labwareId as string) ?? ''
-          )?.displayName ?? null
-        : null
-    failedLWURI = runRecord?.data.labware.find(
-      labware => labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
-    )?.definitionUri
-    if (failedLWURI != null && Object.keys(lwDefsByURI).includes(failedLWURI)) {
-      return {
-        name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
-        nickname: labwareNickname,
-      }
-    } else {
-      return null
-    }
+    return null
   }
 }
 
@@ -430,7 +446,8 @@ function getLabwareInfoFrom(
 ): LoadedLabware | null {
   return (
     runRecord?.data.labware.find(
-      lw => lw.id === recentRelevantPickUpTipCmd?.params.labwareId
+      lw =>
+        lw.id === getRelevantLabwareIdFromFailedCmd(recentRelevantPickUpTipCmd)
     ) ?? null
   )
 }

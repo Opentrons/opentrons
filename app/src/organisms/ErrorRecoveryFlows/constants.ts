@@ -29,7 +29,7 @@ export const DEFINED_ERROR_TYPES = {
   STACKER_STALL: 'flexStackerStallOrCollision',
   HOPPER_LABWARE_MISSING: 'flexStackerHopperLabwareFailed',
   SHUTTLE_MISSING: 'flexStackerShuttleMissing',
-}
+} as const
 
 // Client-defined error-handling flows.
 export const ERROR_KINDS = {
@@ -51,7 +51,7 @@ export const STACKER_ERROR_KINDS: ErrorKind[] = [
   ERROR_KINDS.STALL_WHILE_STACKING,
   ERROR_KINDS.SHUTTLE_MISSING,
   ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
-]
+] as const
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.

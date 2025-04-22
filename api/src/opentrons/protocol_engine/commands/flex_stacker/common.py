@@ -3,6 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, TYPE_CHECKING, Sequence, Iterator
+from typing_extensions import TypedDict
 from textwrap import dedent
 
 from opentrons_shared_data.errors import ErrorCodes
@@ -90,6 +91,12 @@ INITIAL_STORED_LABWARE_DESCRIPTION = dedent(
 )
 
 
+class FailedLabware(TypedDict, total=False):
+    """Holds the labware ID that would have been involved in a failed command."""
+
+    labwareId: str
+
+
 class FlexStackerStallOrCollisionError(ErrorOccurrence):
     """Returned when the motor driver detects a stall."""
 
@@ -98,6 +105,8 @@ class FlexStackerStallOrCollisionError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.STACKER_STALL_OR_COLLISION_DETECTED.value.code
     detail: str = ErrorCodes.STACKER_STALL_OR_COLLISION_DETECTED.value.detail
+
+    errorInfo: FailedLabware
 
 
 class FlexStackerShuttleError(ErrorOccurrence):
@@ -108,6 +117,8 @@ class FlexStackerShuttleError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.STACKER_SHUTTLE_MISSING.value.code
     detail: str = ErrorCodes.STACKER_SHUTTLE_MISSING.value.detail
+
+    errorInfo: FailedLabware
 
 
 class FlexStackerHopperError(ErrorOccurrence):
@@ -120,6 +131,8 @@ class FlexStackerHopperError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.detail
+
+    errorInfo: FailedLabware
 
 
 @dataclass

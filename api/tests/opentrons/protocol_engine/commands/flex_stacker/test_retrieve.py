@@ -718,6 +718,23 @@ async def test_retrieve_raises_recoverable_error(
             id=error_id,
             createdAt=error_timestamp,
             wrappedErrors=[matchers.Anything()],
+            errorInfo={"labwareId": "primary-id-1"},
         ),
-        state_update=StateUpdate(),
+        state_update_if_false_positive=StateUpdate(
+            batch_labware_location=BatchLabwareLocationUpdate(
+                new_locations_by_id={
+                    "primary-id-1": ModuleLocation(moduleId=stacker_id),
+                },
+                new_offset_ids_by_id={
+                    "primary-id-1": None,
+                },
+            ),
+            flex_stacker_state_update=FlexStackerStateUpdate(
+                module_id=stacker_id,
+                contained_labware_bottom_first=[],
+            ),
+            addressable_area_used=AddressableAreaUsedUpdate(
+                addressable_area_name="flexStackerV1B4"
+            ),
+        ),
     )

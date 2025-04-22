@@ -64,9 +64,9 @@ class StoreParams(BaseModel):
 class StoreResult(BaseModel):
     """Result data from a labware storage command."""
 
-    eventualDestinationLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(
+    eventualDestinationLocationSequence: (
+        LabwareLocationSequence | SkipJsonSchema[None]
+    ) = Field(
         None,
         description=(
             "The full location in which all labware moved by this command will eventually reside."
@@ -219,6 +219,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                             error=e,
                         )
                     ],
+                    errorInfo={"labwareId": primary_id},
                 ),
             )
         except FlexStackerShuttleMissingError as e:
@@ -233,6 +234,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                             error=e,
                         )
                     ],
+                    errorInfo={"labwareId": primary_id},
                 ),
             )
 
