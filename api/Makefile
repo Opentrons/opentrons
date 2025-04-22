@@ -124,12 +124,12 @@ test-ot2:
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests
-	$(python) -m black --check src tests setup.py
-	$(python) -m flake8 src tests setup.py
+	$(python) -m black --check src tests docs/v2/example_protocols setup.py
+	$(python) -m flake8 src tests docs/v2/example_protocols setup.py
 
 .PHONY: format
 format:
-	$(python) -m black src tests setup.py
+	$(python) -m black src tests docs/v2/example_protocols setup.py
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
