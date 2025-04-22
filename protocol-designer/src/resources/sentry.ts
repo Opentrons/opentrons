@@ -3,10 +3,15 @@ import {
   replayIntegration,
   browserTracingIntegration,
 } from '@sentry/react'
+import { getIsProduction } from '../networking/opentronsWebApi'
 import { getHasOptedIn } from '../analytics/selectors'
 import type { BaseState } from '../types'
 
 let isSentryInitialized = false
+
+const sentryDsn = getIsProduction()
+  ? process.env.OT_SENTRY_DNS
+  : process.env.OT_SENTRY_OT_SENTRY_DEV_DNS
 
 export const initializeSentry = (state: BaseState): void => {
   const optedIn = getHasOptedIn(state)?.hasOptedIn ?? false
@@ -15,7 +20,6 @@ export const initializeSentry = (state: BaseState): void => {
     return
   }
 
-  const sentryDsn = process.env.OT_SENTRY_DNS
   if (sentryDsn == null) {
     console.warn('Sentry DSN not found - Sentry is not initialized')
     return
@@ -23,7 +27,7 @@ export const initializeSentry = (state: BaseState): void => {
   if (optedIn) {
     try {
       init({
-        dsn: process.env.OT_SENTRY_DNS,
+        dsn: sentryDsn,
         integrations: [replayIntegration(), browserTracingIntegration()],
         tracesSampleRate: 1.0,
         tracePropagationTargets: [
