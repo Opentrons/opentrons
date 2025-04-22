@@ -9,11 +9,12 @@ import {
   DropdownStepFormField,
   InputStepFormField,
 } from '../../../../../components/molecules'
-import { getBlowoutLocationOptionsForForm } from '../utils'
+import { getBlowoutLocationOptionsForForm, getFormLevelError } from '../utils'
 import { FlowRateField } from './FlowRateField'
 import { BlowoutOffsetField } from './BlowoutOffsetField'
 
 import type { PathOption, StepType } from '../../../../../form-types'
+import type { FormError } from '../../../../../steplist/formLevel/errors'
 import type { FieldPropsByName } from '../types'
 
 interface DisposalFieldProps {
@@ -22,6 +23,7 @@ interface DisposalFieldProps {
   propsForFields: FieldPropsByName
   stepType: StepType
   volume: string | null
+  mappedErrorsToField: Record<string, FormError>
   aspirate_airGap_checkbox?: boolean | null
   aspirate_airGap_volume?: string | null
   tipRack?: string | null
@@ -37,6 +39,7 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
     aspirate_airGap_checkbox,
     aspirate_airGap_volume,
     tipRack,
+    mappedErrorsToField,
   } = props
   const { t } = useTranslation(['application', 'form'])
 
@@ -88,6 +91,10 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
           />
           <DropdownStepFormField
             {...propsForFields.blowout_location}
+            errorToShow={getFormLevelError(
+              'blowout_location',
+              mappedErrorsToField
+            )}
             options={disposalDestinationOptions}
             title={t('protocol_steps:blowout_location')}
             padding="0"
