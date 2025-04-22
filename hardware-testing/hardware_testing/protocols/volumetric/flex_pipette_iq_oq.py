@@ -151,7 +151,7 @@ def load_tip_racks(
     trials_list = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul_int]
     num_tips_needed = sum(trials_list) * pipette.channels
     num_racks_needed = ceil(num_tips_needed / 96)
-    available_rack_slot_names = [s for n, s in SLOTS.keys() for i in range(10) if f"tips_{i}" in n]
+    available_rack_slot_names = [s for n, s in SLOTS.items() for i in range(10) if f"tips_{i}" in n]
     assert num_racks_needed <= len(available_rack_slot_names), \
         f"protocol requires {num_racks_needed}, " \
         f"but {len(available_rack_slot_names)} are available"
