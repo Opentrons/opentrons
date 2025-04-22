@@ -377,7 +377,7 @@ const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
   tab: 'dispense',
 }
 const BLOWOUT_LOCATION_REQUIRED: FormError = {
-  title: 'Volume required',
+  title: 'Blowout location required',
   dependentFields: ['blowout_checkbox', 'blowout_location'],
   showAtForm: false,
   showAtField: true,
@@ -962,7 +962,11 @@ export const blowoutLocationRequired = (
   fields: HydratedMixFormData | HydratedMoveLiquidFormData
 ): FormError | null => {
   const { blowout_checkbox, blowout_location } = fields
-  return blowout_checkbox && !blowout_location
+  const isDisposalChecked =
+    'disposalVolume_checkbox' in fields && 'path' in fields
+      ? fields.disposalVolume_checkbox && fields.path === 'multiDispense'
+      : false
+  return (blowout_checkbox || isDisposalChecked) && blowout_location == null
     ? BLOWOUT_LOCATION_REQUIRED
     : null
 }
