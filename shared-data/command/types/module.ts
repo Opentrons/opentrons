@@ -73,7 +73,6 @@ export type ModuleCreateCommand =
   | FlexStackerStoreCreateCommand
   | FlexStackerFillCreateCommand
   | FlexStackerEmptyCreateCommand
-  | FlexStackerPrepareShuttleCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -481,15 +480,6 @@ export interface FlexStackerEmptyCreateCommand extends CommonCommandCreateInfo {
     strategy: 'manualWithPause' | 'logical'
     message?: string
     count?: number
-  }
-}
-
-export interface FlexStackerPrepareShuttleCreateCommand
-  extends CommonCommandCreateInfo {
-  commandType: 'flexStacker/prepareShuttle'
-  params: {
-    moduleId: string
-    ignoreLatch?: boolean
   }
 }
 

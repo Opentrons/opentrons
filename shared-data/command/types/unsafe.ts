@@ -12,6 +12,9 @@ export type UnsafeRunTimeCommand =
   | UnsafeEngageAxesRunTimeCommand
   | UnsafeUngripLabwareRunTimeCommand
   | UnsafePlaceLabwareRunTimeCommand
+  | UnsafeFlexStackerCloseLatchRunTimeCommand
+  | UnsafeFlexStackerOpenLatchRunTimeCommand
+  | UnsafeFlexStackerPrepareShuttleRunTimeCommand
 
 export type UnsafeCreateCommand =
   | UnsafeBlowoutInPlaceCreateCommand
@@ -20,6 +23,9 @@ export type UnsafeCreateCommand =
   | UnsafeEngageAxesCreateCommand
   | UnsafeUngripLabwareCreateCommand
   | UnsafePlaceLabwareCreateCommand
+  | UnsafeFlexStackerCloseLatchCreateCommand
+  | UnsafeFlexStackerOpenLatchCreateCommand
+  | UnsafeFlexStackerPrepareShuttleCreateCommand
 
 export interface UnsafeBlowoutInPlaceParams {
   pipetteId: string
@@ -103,5 +109,48 @@ export interface UnsafePlaceLabwareCreateCommand
 export interface UnsafePlaceLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     UnsafePlaceLabwareCreateCommand {
+  result?: any
+}
+
+export interface UnsafeFlexStackerCloseLatchParams {
+  moduleId: string
+}
+export interface UnsafeFlexStackerCloseLatchCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsafe/flexStacker/closeLatch'
+  params: UnsafeFlexStackerCloseLatchParams
+}
+export interface UnsafeFlexStackerCloseLatchRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    UnsafeFlexStackerCloseLatchCreateCommand {
+  result?: any
+}
+
+export interface UnsafeFlexStackerOpenLatchParams {
+  moduleId: string
+}
+export interface UnsafeFlexStackerOpenLatchCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsafe/flexStacker/openLatch'
+  params: UnsafeFlexStackerOpenLatchParams
+}
+export interface UnsafeFlexStackerOpenLatchRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    UnsafeFlexStackerOpenLatchCreateCommand {
+  result?: any
+}
+
+export interface UnsafeFlexStackerPrepareShuttleParams {
+  moduleId: string
+  ignoreLatch?: boolean
+}
+export interface UnsafeFlexStackerPrepareShuttleCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'unsafe/flexStacker/prepareShuttle'
+  params: UnsafeFlexStackerPrepareShuttleParams
+}
+export interface UnsafeFlexStackerPrepareShuttleRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    UnsafeFlexStackerPrepareShuttleCreateCommand {
   result?: any
 }

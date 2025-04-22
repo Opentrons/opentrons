@@ -665,7 +665,7 @@ describe('useModuleOverflowMenu', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'flexStacker/prepareShuttle',
+        commandType: 'unsafe/flexStacker/prepareShuttle',
         params: {
           moduleId: mockFlexStacker.id,
         },
