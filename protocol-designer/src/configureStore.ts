@@ -1,6 +1,5 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
-import { createReduxEnhancer } from '@sentry/react'
 import { trackEventMiddleware } from './analytics/middleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
@@ -22,17 +21,10 @@ import type {
   CombinedState,
   StoreEnhancer,
   Middleware,
-  AnyAction,
 } from 'redux'
 import type { BaseState, Action } from './types'
 
 const timelineMiddleware = makeTimelineMiddleware()
-
-// Note (kk:04/22/2025) this enhancer sends redux state to Sentry
-const sentryReduxEnhancer = createReduxEnhancer({
-  actionTransformer: (action: Action | AnyAction) => action,
-  stateTransformer: (state: BaseState) => state,
-})
 
 function getRootReducer(): Reducer<BaseState, Action> {
   const rootReducer = combineReducers<BaseState>({
@@ -96,7 +88,6 @@ export function configureStore(): StoreType {
     reducer,
     /* preloadedState, */
     composeEnhancers(
-      sentryReduxEnhancer,
       applyMiddleware(
         timelineMiddleware as Middleware<BaseState, Record<string, any>, any>,
         thunk,

@@ -31,7 +31,7 @@ export const initializeSentry = (state: BaseState): void => {
           /^https:\/\/designer\.opentrons\.com/,
         ],
         replaysSessionSampleRate: 0.0, // ToDo (kk: 04/22/2025) modify the rate later
-        replaysOnErrorSampleRate: 1.0,
+        replaysOnErrorSampleRate: 1.0, // ToDo (kk: 04/22/2025) modify the rate later
       })
       isSentryInitialized = true
       console.log('Sentry.init done')
