@@ -411,46 +411,34 @@ export const SecondStepsMoveLiquidTools = ({
               tooltipContent={propsForFields.preWetTip.tooltipContent ?? null}
             />
           ) : null}
-          {tab === 'dispense' && formData.path === 'multiDispense' ? (
-            <>
-              <CheckboxExpandStepFormField
-                title={t('form:step_edit_form.field.conditioning.title')}
-                fieldProps={propsForFields.conditioning_checkbox}
-              >
-                {formData.conditioning_checkbox === true ? (
-                  <InputStepFormField
-                    title={t(
-                      'form:step_edit_form.field.conditioning.conditioning_volume.label'
-                    )}
-                    caption={t(
-                      'form:step_edit_form.field.conditioning.conditioning_volume.caption',
-                      { min: 0, max: maxConditioningVolume }
-                    )}
-                    padding="0"
-                    {...propsForFields.conditioning_volume}
-                    showTooltip={false}
-                    errorToShow={getFormLevelError(
-                      'conditioning_volume',
-                      mappedErrorsToField
-                    )}
-                  />
-                ) : null}
-              </CheckboxExpandStepFormField>
-              <DisposalField
-                aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
-                aspirate_airGap_volume={formData.aspirate_airGap_volume}
-                path={formData.path}
-                pipette={formData.pipette}
-                propsForFields={propsForFields}
-                stepType={formData.stepType}
-                volume={formData.volume}
-                mappedErrorsToField={mappedErrorsToField}
-              />
-            </>
-          ) : null}
           {tab === 'aspirate' ? (
             <>
               {mixComponent}
+              {formData.path === 'multiDispense' ? (
+                <CheckboxExpandStepFormField
+                  title={t('form:step_edit_form.field.conditioning.title')}
+                  fieldProps={propsForFields.conditioning_checkbox}
+                >
+                  {formData.conditioning_checkbox === true ? (
+                    <InputStepFormField
+                      title={t(
+                        'form:step_edit_form.field.conditioning.conditioning_volume.label'
+                      )}
+                      caption={t(
+                        'form:step_edit_form.field.conditioning.conditioning_volume.caption',
+                        { min: 0, max: maxConditioningVolume }
+                      )}
+                      padding="0"
+                      {...propsForFields.conditioning_volume}
+                      showTooltip={false}
+                      errorToShow={getFormLevelError(
+                        'conditioning_volume',
+                        mappedErrorsToField
+                      )}
+                    />
+                  ) : null}
+                </CheckboxExpandStepFormField>
+              ) : null}
               {delayComponent}
             </>
           ) : (
@@ -527,6 +515,18 @@ export const SecondStepsMoveLiquidTools = ({
                   </Flex>
                 ) : null}
               </CheckboxExpandStepFormField>
+              {formData.path === 'multiDispense' ? (
+                <DisposalField
+                  aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
+                  aspirate_airGap_volume={formData.aspirate_airGap_volume}
+                  path={formData.path}
+                  pipette={formData.pipette}
+                  propsForFields={propsForFields}
+                  stepType={formData.stepType}
+                  volume={formData.volume}
+                  mappedErrorsToField={mappedErrorsToField}
+                />
+              ) : null}
             </>
           )}
           <CheckboxExpandStepFormField
