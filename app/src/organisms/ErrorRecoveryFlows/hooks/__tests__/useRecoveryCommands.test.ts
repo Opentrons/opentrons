@@ -331,7 +331,7 @@ describe('useRecoveryCommands', () => {
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [
         {
-          commandType: 'unssafe/flexStacker/prepareShuttle',
+          commandType: 'unsafe/flexStacker/prepareShuttle',
           params: {
             moduleId: '123',
           },
