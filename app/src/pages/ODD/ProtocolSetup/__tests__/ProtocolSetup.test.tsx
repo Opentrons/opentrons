@@ -530,7 +530,7 @@ describe('ProtocolSetup', () => {
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
-      'Close the stacker door before starting the run.'
+      'A stacker door is open. Close the stacker door before starting the run.'
     )
   })
 
