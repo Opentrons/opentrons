@@ -60,6 +60,7 @@ import {
 } from '/app/organisms/ErrorRecoveryFlows'
 
 import type { OnDeviceRouteParams } from '/app/App/types'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
@@ -126,6 +127,7 @@ export function RunningProtocol(): JSX.Element {
     runId,
     runStatus
   )
+  const doorStatus = useIsDoorOpen(robotName)
   const {
     showModal: showIntervention,
     modalProps: interventionProps,
@@ -177,7 +179,9 @@ export function RunningProtocol(): JSX.Element {
         />
       ) : null}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && !showIntervention ? (
-        <OpenDoorAlertModal />
+        <OpenDoorAlertModal
+          moduleDoorLocation={doorStatus.moduleDoorLocation}
+        />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
       {/* note: this zindex is here to establish a zindex context for the bullets

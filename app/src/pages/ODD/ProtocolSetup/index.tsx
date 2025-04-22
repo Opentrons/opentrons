@@ -25,7 +25,6 @@ import {
 import {
   useProtocolQuery,
   useInstrumentsQuery,
-  useDoorQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import {
@@ -112,6 +111,10 @@ import type {
   ProtocolHardware,
   ProtocolFixture,
 } from '/app/transformations/commands'
+import {
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 const FETCH_DURATION_MS = 5000
 
@@ -350,8 +353,24 @@ function PrepareToRun({
     areFixturesReady &&
     offsetsConfirmed
   const onPlay = (): void => {
-    if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door') as string)
+    if (doorStatus.isDoorOpen) {
+      if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation !== NOT_CONFIGURED
+      ) {
+        makeSnackbar(
+          t('shared:close_stacker_door', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          }) as string
+        )
+      } else if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation === NOT_CONFIGURED
+      ) {
+        makeSnackbar(t('shared:close_unconfigured_stacker_door') as string)
+      } else {
+        makeSnackbar(t('shared:close_robot_door') as string)
+      }
     } else {
       if (isReadyToRun) {
         if (runStatus === RUN_STATUS_IDLE && !labwareConfirmed) {
@@ -521,12 +540,7 @@ function PrepareToRun({
     }
   }
 
-  const { data: doorStatus } = useDoorQuery({
-    refetchInterval: FETCH_DURATION_MS,
-  })
-  const isDoorOpen =
-    doorStatus?.data.status === 'open' &&
-    doorStatus?.data.doorRequiredClosedForProtocol
+  const doorStatus = useIsDoorOpen(robotName)
 
   const parametersDetail = hasRunTimeParameters
     ? hasCustomRunTimeParameters
@@ -591,7 +605,7 @@ function PrepareToRun({
               disabled={isLoading}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={isDoorOpen}
+              isDoorOpen={doorStatus.isDoorOpen}
             />
           </Flex>
         </Flex>

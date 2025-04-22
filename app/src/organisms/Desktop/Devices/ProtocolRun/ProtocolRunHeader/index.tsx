@@ -27,7 +27,7 @@ import {
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
 import { RunHeaderContent } from './RunHeaderContent'
-import { EQUIPMENT_POLL_MS } from './constants'
+import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
 import { isCancellableStatus } from './utils'
 
 import type { RefObject } from 'react'
