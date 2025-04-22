@@ -25,11 +25,11 @@ if TYPE_CHECKING:
     from ...state.state import StateView
     from ...execution import EquipmentHandler
 
-PrepareShuttleCommandType = Literal["flexStacker/prepareShuttle"]
+UnsafeFlexStackerPrepareShuttleCommandType = Literal["unsafe/flexStacker/prepareShuttle"]
 
 
-class PrepareShuttleParams(BaseModel):
-    """The parameters for a PrepareShuttle command."""
+class UnsafeFlexStackerPrepareShuttleParams(BaseModel):
+    """The parameters for a UnsafeFlexStackerPrepareShuttle command."""
 
     moduleId: str = Field(..., description="Unique ID of the Flex Stacker")
     ignoreLatch: bool = Field(
@@ -37,17 +37,17 @@ class PrepareShuttleParams(BaseModel):
     )
 
 
-class PrepareShuttleResult(BaseModel):
-    """Result data from a stacker PrepareShuttle command."""
+class UnsafeFlexStackerPrepareShuttleResult(BaseModel):
+    """Result data from a stacker UnsafeFlexStackerPrepareShuttle command."""
 
 
 _ExecuteReturn = Union[
-    SuccessData[PrepareShuttleResult],
+    SuccessData[UnsafeFlexStackerPrepareShuttleResult],
     DefinedErrorData[FlexStackerStallOrCollisionError],
 ]
 
 
-class PrepareShuttleImpl(AbstractCommandImpl[PrepareShuttleParams, _ExecuteReturn]):
+class UnsafeFlexStackerPrepareShuttleImpl(AbstractCommandImpl[UnsafeFlexStackerPrepareShuttleParams, _ExecuteReturn]):
     """Implementation of a stacker prepare shuttle command."""
 
     def __init__(
@@ -61,7 +61,7 @@ class PrepareShuttleImpl(AbstractCommandImpl[PrepareShuttleParams, _ExecuteRetur
         self._equipment = equipment
         self._model_utils = model_utils
 
-    async def execute(self, params: PrepareShuttleParams) -> _ExecuteReturn:
+    async def execute(self, params: UnsafeFlexStackerPrepareShuttleParams) -> _ExecuteReturn:
         """Execute the stacker prepare shuttle command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -89,25 +89,25 @@ class PrepareShuttleImpl(AbstractCommandImpl[PrepareShuttleParams, _ExecuteRetur
             )
         # TODO we should also add a check for shuttle not detected error
 
-        return SuccessData(public=PrepareShuttleResult())
+        return SuccessData(public=UnsafeFlexStackerPrepareShuttleResult())
 
 
-class PrepareShuttle(
-    BaseCommand[PrepareShuttleParams, PrepareShuttleResult, ErrorOccurrence]
+class UnsafeFlexStackerPrepareShuttle(
+    BaseCommand[UnsafeFlexStackerPrepareShuttleParams, UnsafeFlexStackerPrepareShuttleResult, ErrorOccurrence]
 ):
     """A command to prepare Flex Stacker shuttle."""
 
-    commandType: PrepareShuttleCommandType = "flexStacker/prepareShuttle"
-    params: PrepareShuttleParams
-    result: PrepareShuttleResult | None = None
+    commandType: UnsafeFlexStackerPrepareShuttleCommandType = "unsafe/flexStacker/prepareShuttle"
+    params: UnsafeFlexStackerPrepareShuttleParams
+    result: UnsafeFlexStackerPrepareShuttleResult | None = None
 
-    _ImplementationCls: Type[PrepareShuttleImpl] = PrepareShuttleImpl
+    _ImplementationCls: Type[UnsafeFlexStackerPrepareShuttleImpl] = UnsafeFlexStackerPrepareShuttleImpl
 
 
-class PrepareShuttleCreate(BaseCommandCreate[PrepareShuttleParams]):
-    """A request to execute a Flex Stacker PrepareShuttle command."""
+class UnsafeFlexStackerPrepareShuttleCreate(BaseCommandCreate[UnsafeFlexStackerPrepareShuttleParams]):
+    """A request to execute a Flex Stacker UnsafeFlexStackerPrepareShuttle command."""
 
-    commandType: PrepareShuttleCommandType = "flexStacker/prepareShuttle"
-    params: PrepareShuttleParams
+    commandType: UnsafeFlexStackerPrepareShuttleCommandType = "unsafe/flexStacker/prepareShuttle"
+    params: UnsafeFlexStackerPrepareShuttleParams
 
-    _CommandCls: Type[PrepareShuttle] = PrepareShuttle
+    _CommandCls: Type[UnsafeFlexStackerPrepareShuttle] = UnsafeFlexStackerPrepareShuttle

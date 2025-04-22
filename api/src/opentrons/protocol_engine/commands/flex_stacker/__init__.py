@@ -85,22 +85,4 @@ __all__ = [
     "EmptyResult",
     "Empty",
     "EmptyCreate",
-    # flexStacker/closeLatch
-    "CloseLatchCommandType",
-    "CloseLatchParams",
-    "CloseLatchResult",
-    "CloseLatch",
-    "CloseLatchCreate",
-    # flexStacker/openLatch
-    "OpenLatchCommandType",
-    "OpenLatchParams",
-    "OpenLatchResult",
-    "OpenLatch",
-    "OpenLatchCreate",
-    # flexStacker/prepareShuttle
-    "PrepareShuttleCommandType",
-    "PrepareShuttleParams",
-    "PrepareShuttleResult",
-    "PrepareShuttle",
-    "PrepareShuttleCreate",
 ]
