@@ -2,9 +2,10 @@ import asyncio
 import json
 import os
 import time
-from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union
+from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union, cast
 
 import structlog
+from anthropic.types import MessageParam
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
 from ddtrace import tracer
@@ -205,25 +206,46 @@ async def create_chat_completion(
 
         response: Optional[str] = None
 
-        if body.history and body.history[0].get("content") and "Write a protocol using" in body.history[0]["content"]:  # type: ignore
+        # Safely extract content from the first history message if available
+        first_message_content: Optional[str] = None
+        if body.history and len(body.history) > 0:
+            first_message = body.history[0]
+            # Assuming message structure is dict-like, check 'content' key
+            if isinstance(first_message, dict):
+                content_value = first_message.get("content")
+                if isinstance(content_value, str):
+                    first_message_content = content_value
+
+        # Determine protocol option based on content
+        protocol_option = "update"  # Default
+        if first_message_content and "Write a protocol using" in first_message_content:
             protocol_option = "create"
-        else:
-            protocol_option = "update"
+
+        is_pd_request = False
+        if first_message_content and "Protocol Designer" in first_message_content:
+            is_pd_request = True
 
         if "openai" in settings.model.lower():
             response = openai.predict(prompt=body.message, chat_completion_message_params=body.history)
         else:
             if protocol_option == "create":
-                if "Protocol Designer" in body.history[0]["content"]:
-                    response = claude.create_pd(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
+                if is_pd_request:
+                    response = claude.create_pd(
+                        user_id=str(user.sub), prompt=body.message, history=cast(Optional[List[MessageParam]], body.history)
+                    )
                 else:
-                    response = claude.create(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
+                    response = claude.create(
+                        user_id=str(user.sub), prompt=body.message, history=cast(Optional[List[MessageParam]], body.history)
+                    )
             else:
-                response = claude.update(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
+                response = claude.update(
+                    user_id=str(user.sub), prompt=body.message, history=cast(Optional[List[MessageParam]], body.history)
+                )
 
         if response is None or response == "":
             return ChatResponse(reply="No response was generated", fake=bool(body.fake))
-        if "Protocol Designer" in body.history[0]["content"]:
+
+        if is_pd_request:  # Use the boolean flag here
             try:
                 pd_protocol_content = json.loads(response)
                 return ChatResponse(

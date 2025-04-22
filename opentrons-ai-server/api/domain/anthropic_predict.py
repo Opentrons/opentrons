@@ -3,13 +3,13 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Literal, cast
+from typing import Any, Dict, Iterable, List, Literal, Optional, cast
 
 import requests
 import structlog
 import weave  # type: ignore
 from anthropic import Anthropic
-from anthropic.types import Message, MessageParam
+from anthropic.types import Message, MessageParam, TextBlockParam
 from ddtrace import tracer
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, SYSTEM_PROMPT
@@ -71,12 +71,12 @@ class AnthropicPredict:
         ]
 
     @tracer.wrap()
-    def get_system_prompt_pd(self) -> str:
+    def get_system_prompt_pd(self) -> List[Dict[str, Any]]:
         """
         Get the system prompt for the PD model
         """
 
-        def load_file_content(filename):
+        def load_file_content(filename: str) -> str:
             filepath = self.path_docs_pd / filename
             print(f"Trying to load: {filepath}")  # Debug print
             with open(filepath, "r") as f:
@@ -107,7 +107,8 @@ class AnthropicPredict:
             },
             {"type": "text", "text": formatted_documents_pd, "cache_control": {"type": "ephemeral"}},
         ]
-        return system_content
+        # Cast to satisfy mypy return type
+        return cast(List[Dict[str, Any]], system_content)
 
     @tracer.wrap()
     def get_docs(self) -> str:
@@ -284,7 +285,7 @@ class AnthropicPredict:
                 max_tokens=20000,
                 messages=messages,
                 model=self.model_name,
-                system=self.system_prompt_pd,
+                system=cast(Iterable[TextBlockParam], self.system_prompt_pd),
                 metadata={"user_id": user_id},
                 temperature=0.0,
             )
@@ -320,7 +321,7 @@ class AnthropicPredict:
     def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message_pd(user_id, prompt, history, "create")
 
-    def standardize(self, data: dict) -> dict:
+    def standardize(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Reorganize the data structure according to the standard schema while preserving content.
         SCHEMA
@@ -468,21 +469,33 @@ class AnthropicPredict:
         return standard
 
     @tracer.wrap()
-    def fillup_pd(self, json_str: str) -> str:
+    def fillup_pd(self, json_str: str) -> str:  # noqa: C901
         """
         Fill up the JSON protocol with the missing fields.
         """
 
-        def get_definition_by_load_name(load_name: str = None):
+        def get_definition_by_load_name(load_name: Optional[str] = None) -> Optional[Dict[str, Any]]:
             # Extract the middle part of the load name which corresponds to the directory name
             # For 'opentrons/opentrons_96_tiprack_20ul/1', get 'opentrons_96_tiprack_20ul'
-            labware_name, version = load_name.split("/")[1], load_name.split("/")[-1]
+            if not load_name:
+                return None
+
+            try:
+                labware_name, version = load_name.split("/")[1], load_name.split("/")[-1]
+            except IndexError:
+                logger.error(f"Invalid load_name format: {load_name}")
+                return None
+
             definition_path = REPO_ROOT / "shared-data" / "labware" / "definitions" / "2" / labware_name / f"{version}.json"
 
             try:
                 with open(definition_path) as f:
-                    return json.load(f)
+                    return cast(Dict[str, Any], json.load(f))
             except FileNotFoundError:
+                logger.warning(f"Labware definition file not found: {definition_path}")
+                return None
+            except json.JSONDecodeError:
+                logger.error(f"Error decoding JSON from file: {definition_path}")
                 return None
 
         try:
@@ -581,7 +594,7 @@ class AnthropicPredict:
 
             return json.dumps(data, indent=2)
         except (FileNotFoundError, json.JSONDecodeError, KeyError):
-            return []
+            return ""
 
     @tracer.wrap()
     def update(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:

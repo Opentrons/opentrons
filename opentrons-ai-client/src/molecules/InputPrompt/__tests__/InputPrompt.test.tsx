@@ -14,10 +14,6 @@ vi.mock('../../../resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockTrackEvent,
 }))
 
-vi.mock('../../../hooks/useTrackEvent', () => ({
-  useTrackEvent: () => mockTrackEvent,
-}))
-
 const WrappingForm = (wrappedComponent: {
   children: ReactNode
 }): JSX.Element => {
@@ -68,7 +64,9 @@ describe('InputPrompt', () => {
     fireEvent.change(textbox, { target: { value: 'test' } })
 
     // Add a small wait to ensure state updates propagate
-    await waitFor(() => { expect(screen.getByRole('button')).not.toBeDisabled(); })
+    await waitFor(() => {
+      expect(screen.getByRole('button')).not.toBeDisabled()
+    })
 
     const sendButton = screen.getByRole('button')
     expect(sendButton).not.toBeDisabled() // Double check before clicking

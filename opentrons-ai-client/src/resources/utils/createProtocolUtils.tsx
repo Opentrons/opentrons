@@ -113,9 +113,7 @@ export function generatePromptPreviewLabwareLiquidsItems(
   // Add all labware items
   labwares?.forEach(labware => {
     items.push(
-      `${labware.count} x ${
-        getLabwareDisplayName(defs[labware.labwareURI])
-      }`
+      `${labware.count} x ${getLabwareDisplayName(defs[labware.labwareURI])}`
     )
   })
 
