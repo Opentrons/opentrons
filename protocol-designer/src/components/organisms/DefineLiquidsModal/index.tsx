@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import * as Yup from 'yup'
 import {
   Btn,
   COLORS,

@@ -13,6 +13,10 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import slot5LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
+import slot5LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
+import slot5RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
+import slot5RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
@@ -28,11 +32,6 @@ import { formatJogVector } from './utils'
 import type { CalibrationPanelProps } from './types'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { MouseEventHandler } from 'react'
-
-import slot5LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
-import slot5LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
-import slot5RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
-import slot5RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
 
 const assetMap = {
   left: {

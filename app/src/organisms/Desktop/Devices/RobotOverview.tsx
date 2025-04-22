@@ -18,6 +18,8 @@ import {
 } from '@opentrons/components'
 import { useAuthorization } from '@opentrons/react-api-client'
 
+import FLEX_PNG from '/app/assets/images/FLEX.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { ToggleButton } from '/app/atoms/buttons'
 import {
   useIsRobotBusy,
@@ -44,9 +46,6 @@ import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { State } from '/app/redux/types'
-
-import FLEX_PNG from '/app/assets/images/FLEX.png'
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 
 interface RobotOverviewProps {
   robotName: string

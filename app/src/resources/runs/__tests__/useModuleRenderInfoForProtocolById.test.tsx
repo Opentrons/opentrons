@@ -1,3 +1,4 @@
+import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import {
@@ -6,7 +7,6 @@ import {
   TEMPERATURE_MODULE_V2,
   TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
-import { renderHook } from '@testing-library/react'
 
 import {
   mockTemperatureModuleGen2,

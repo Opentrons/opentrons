@@ -1,9 +1,9 @@
+import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useErrorRecoverySettings,
   useUpdateErrorRecoverySettings,
 } from '@opentrons/react-api-client'
-import { act, renderHook } from '@testing-library/react'
 
 import { useErrorRecoverySettingsToggle } from '..'
 

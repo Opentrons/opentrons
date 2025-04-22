@@ -2,9 +2,9 @@
 // with wrapping providers for i18next and redux
 import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { render } from '@testing-library/react'
 import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
-import { render } from '@testing-library/react'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
 import type {

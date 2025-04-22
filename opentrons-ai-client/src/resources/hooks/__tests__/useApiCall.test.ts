@@ -1,7 +1,7 @@
+import { act, renderHook } from '@testing-library/react'
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 import { describe, expect, it } from 'vitest'
-import { act, renderHook } from '@testing-library/react'
 
 import { useApiCall } from '../useApiCall'
 

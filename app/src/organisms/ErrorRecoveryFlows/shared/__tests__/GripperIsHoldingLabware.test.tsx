@@ -1,6 +1,6 @@
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import capitalize from 'lodash/capitalize'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

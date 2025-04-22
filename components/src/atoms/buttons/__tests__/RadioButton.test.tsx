@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryByAttribute, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { COLORS } from '../../../helix-design-system'
 import { renderWithProviders } from '../../../testing/utils'

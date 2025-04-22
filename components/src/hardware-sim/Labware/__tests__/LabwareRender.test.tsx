@@ -1,5 +1,5 @@
-import { beforeEach, describe, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 

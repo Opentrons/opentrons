@@ -1,10 +1,10 @@
-import { describe, expect, it, vi } from 'vitest'
 import {
   fireEvent,
   render as rtlRender,
   screen,
   waitFor,
 } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'

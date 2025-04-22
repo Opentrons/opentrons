@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { yupResolver } from '@hookform/resolvers/yup'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import * as Yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, COLORS } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,

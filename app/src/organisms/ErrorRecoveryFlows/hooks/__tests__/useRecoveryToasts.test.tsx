@@ -1,7 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
+import { render, renderHook, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { render, renderHook, screen } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
 import { useCommandTextString } from '/app/local-resources/commands'

@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import {
@@ -6,7 +7,6 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import { useCloneRun } from '../useCloneRun'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'

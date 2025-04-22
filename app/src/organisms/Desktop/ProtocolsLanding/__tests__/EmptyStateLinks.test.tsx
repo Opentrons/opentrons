@@ -1,6 +1,6 @@
 import { BrowserRouter } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

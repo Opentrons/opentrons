@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
 
 import { getRobotModelByName } from '/app/redux/discovery'
 

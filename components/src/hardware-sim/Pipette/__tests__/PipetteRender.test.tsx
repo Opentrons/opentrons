@@ -1,6 +1,6 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fixtureTiprack300ul as _fixtureTiprack300ul } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { RobotCoordsForeignDiv } from '../../Deck/RobotCoordsForeignDiv'

@@ -1,8 +1,8 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderHook } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
 import { useAllLabware } from '/app/local-resources/labware'

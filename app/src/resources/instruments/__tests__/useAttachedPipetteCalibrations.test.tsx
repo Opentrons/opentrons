@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
@@ -8,7 +9,6 @@ import {
   useAllTipLengthCalibrationsQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import {
   mockPipetteOffsetCalibration1,

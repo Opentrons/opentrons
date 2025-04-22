@@ -1,5 +1,5 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 

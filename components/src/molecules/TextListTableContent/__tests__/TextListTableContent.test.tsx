@@ -1,5 +1,5 @@
-import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { TextListTableContent } from '..'
 import { ListTable } from '../../../atoms/ListTable'

@@ -35,6 +35,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'
+import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
@@ -50,9 +52,6 @@ import type { SelectablePipettes } from './types'
 import type { StyleProps } from '@opentrons/components'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
-
-import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'
-import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};

@@ -1,10 +1,10 @@
+import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import { RUN_ID_2 } from '../__fixtures__'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'

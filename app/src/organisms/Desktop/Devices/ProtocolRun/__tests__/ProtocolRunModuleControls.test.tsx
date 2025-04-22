@@ -1,7 +1,7 @@
+import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

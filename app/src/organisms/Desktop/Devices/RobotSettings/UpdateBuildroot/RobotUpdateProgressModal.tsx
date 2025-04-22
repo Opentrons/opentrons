@@ -17,6 +17,7 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import successIcon from '/app/assets/images/icon_success.png'
 import { ProgressBar } from '/app/atoms/ProgressBar'
 import {
   clearRobotUpdateSession,
@@ -37,8 +38,6 @@ import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
 import type { RobotInitializationStatus } from '/app/resources/health/hooks'
 import type { ChangeEventHandler } from 'react'
-
-import successIcon from '/app/assets/images/icon_success.png'
 
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};

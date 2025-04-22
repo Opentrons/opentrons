@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRunAction } from '@opentrons/api-client'
-import { act, renderHook, waitFor } from '@testing-library/react'
 
 import { usePlayRunMutation } from '..'
 import { mockPlayRunAction, RUN_ID_1 } from '../__fixtures__'

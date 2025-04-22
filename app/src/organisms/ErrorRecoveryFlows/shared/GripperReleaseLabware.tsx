@@ -9,6 +9,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import gripperReleaseAnimation from '/app/assets/videos/error-recovery/Gripper_Release.webm'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
@@ -18,8 +19,6 @@ import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { RecoveryContentProps } from '../types'
 import type { JSX } from 'react'
-
-import gripperReleaseAnimation from '/app/assets/videos/error-recovery/Gripper_Release.webm'
 
 export function GripperReleaseLabware({
   routeUpdateActions,

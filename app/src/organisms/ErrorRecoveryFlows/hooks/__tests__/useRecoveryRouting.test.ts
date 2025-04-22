@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import { RECOVERY_MAP } from '../../constants'
 import { useRecoveryRouting } from '../useRecoveryRouting'

@@ -1,6 +1,6 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 import { fixture96Plate } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import formDataForSingleStep from '../../../../../../../__fixtures__/formDataForSingleStep.json'
 import propsForFieldsForSingleStep from '../../../../../../../__fixtures__/propsForFieldsForSingleStep.json'

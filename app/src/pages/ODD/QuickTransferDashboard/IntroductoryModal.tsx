@@ -8,10 +8,9 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import imgSrc from '/app/assets/images/on-device-display/odd-abstract-6.png'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-
-import imgSrc from '/app/assets/images/on-device-display/odd-abstract-6.png'
 
 interface IntroductoryModalProps {
   onClose: () => void

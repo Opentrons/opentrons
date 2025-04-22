@@ -1,6 +1,6 @@
+import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { Tag } from '@opentrons/components'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

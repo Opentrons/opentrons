@@ -1,6 +1,6 @@
+import { renderHook, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
-import { renderHook, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

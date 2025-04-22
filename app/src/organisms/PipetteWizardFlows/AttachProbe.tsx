@@ -12,6 +12,9 @@ import {
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
+import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
@@ -25,10 +28,6 @@ import { getPipetteAnimations } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
 import type { CreateCommand, MotorAxes } from '@opentrons/shared-data'
-
-import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean

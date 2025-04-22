@@ -1,11 +1,11 @@
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   simpleAnalysisFileFixture,
 } from '@opentrons/shared-data'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

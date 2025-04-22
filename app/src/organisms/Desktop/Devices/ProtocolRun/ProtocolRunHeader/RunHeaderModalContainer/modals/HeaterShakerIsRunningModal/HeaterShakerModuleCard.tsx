@@ -13,11 +13,10 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
 
 import type { HeaterShakerModule } from '/app/redux/modules/types'
-
-import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 
 interface HeaterShakerModuleCardProps {
   module: HeaterShakerModule

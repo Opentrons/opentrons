@@ -1,5 +1,5 @@
-import { beforeEach, describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it } from 'vitest'
 
 import { ListButtonAccordion } from '..'
 import { renderWithProviders } from '../../../testing/utils'

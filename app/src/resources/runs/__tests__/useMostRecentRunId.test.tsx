@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
 
 import { useMostRecentRunId } from '../useMostRecentRunId'
 import { useNotifyAllRunsQuery } from '../useNotifyAllRunsQuery'

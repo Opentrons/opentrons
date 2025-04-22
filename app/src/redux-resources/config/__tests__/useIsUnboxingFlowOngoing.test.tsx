@@ -1,7 +1,7 @@
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderHook } from '@testing-library/react'
 
 import { getIsOnDevice, getOnDeviceDisplaySettings } from '/app/redux/config'
 

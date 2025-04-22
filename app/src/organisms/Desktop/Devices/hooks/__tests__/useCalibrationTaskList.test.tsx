@@ -1,5 +1,6 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
@@ -9,7 +10,6 @@ import {
   useCalibrationStatusQuery,
   useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
 import { useAttachedPipettes } from '/app/resources/instruments'

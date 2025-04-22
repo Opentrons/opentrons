@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
 
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState } from '../../../fields'

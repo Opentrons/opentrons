@@ -10,9 +10,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
-
 import screenImage from '/app/assets/images/on-device-display/welcome_background.png'
+import { MediumButton } from '/app/atoms/buttons'
 
 const IMAGE_ALT = 'Welcome screen background image'
 

@@ -1,10 +1,10 @@
+import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import { MOCK_RTP_DATA, PROTOCOL_ANALYSIS, PROTOCOL_ID } from '../__fixtures__'
 import { useRunTimeParameters } from '../useRunTimeParameters'

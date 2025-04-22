@@ -17,13 +17,13 @@ import {
   useMenuHandleClickOutside,
 } from '@opentrons/components'
 
+import flexGripper from '/app/assets/images/flex_gripper.png'
+
 import { MenuOverlay } from './MenuOverlay'
 
 import type { MenuOverlayItemProps } from './MenuOverlay'
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
-
-import flexGripper from '/app/assets/images/flex_gripper.png'
 
 interface InstrumentCardProps extends StyleProps {
   description: string

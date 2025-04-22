@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
 
 import { useRobot } from '/app/redux-resources/robots'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'

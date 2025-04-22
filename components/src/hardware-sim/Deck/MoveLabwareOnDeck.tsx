@@ -1,11 +1,11 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { animated, easings, useSpring } from '@react-spring/web'
 import styled from 'styled-components'
 import {
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import { animated, easings, useSpring } from '@react-spring/web'
 
 import { COLORS } from '../../helix-design-system'
 import { BaseDeck } from '../BaseDeck'

@@ -1,6 +1,6 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { MaterialsListModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'

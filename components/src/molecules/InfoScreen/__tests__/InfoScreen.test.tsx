@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InfoScreen } from '..'
 import { BORDERS, COLORS } from '../../../helix-design-system'

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { COLORS } from '@opentrons/components'
 import { screen } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 

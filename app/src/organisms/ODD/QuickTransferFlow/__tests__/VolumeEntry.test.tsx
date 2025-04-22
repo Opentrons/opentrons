@@ -1,6 +1,6 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InputField } from '@opentrons/components'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'

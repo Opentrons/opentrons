@@ -1,6 +1,6 @@
-import { beforeEach, describe, it, vi } from 'vitest'
 import * as auth0 from '@auth0/auth0-react'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from './__testing-utils__'
 import { i18n } from './i18n'

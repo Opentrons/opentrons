@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { screen } from '@testing-library/react'
 import { Module } from '@opentrons/components'
 import {
   fixture24Tuberack,
@@ -10,7 +11,6 @@ import {
   getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { LabwareOnDeck } from '../../../../components/organisms'

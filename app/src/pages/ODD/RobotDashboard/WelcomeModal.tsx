@@ -12,14 +12,13 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import welcomeModalImage from '/app/assets/images/on-device-display/welcome_dashboard_modal.png'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { updateConfigValue } from '/app/redux/config'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
-
-import welcomeModalImage from '/app/assets/images/on-device-display/welcome_dashboard_modal.png'
 
 interface WelcomeModalProps {
   setShowWelcomeModal: (showWelcomeModal: boolean) => void

@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
 

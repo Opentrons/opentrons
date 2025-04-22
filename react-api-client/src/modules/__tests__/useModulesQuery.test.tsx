@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   getModules,
@@ -6,7 +7,6 @@ import {
   mockUnknownModuleResponse,
   v2MockModulesResponse,
 } from '@opentrons/api-client'
-import { renderHook, waitFor } from '@testing-library/react'
 
 import { useModulesQuery } from '..'
 import { useHost } from '../../api'

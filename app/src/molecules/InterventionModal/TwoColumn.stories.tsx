@@ -5,6 +5,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
+import SuccessIcon from '/app/assets/images/icon_success.png'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import { TwoColumn as TwoColumnComponent } from './'
@@ -12,8 +13,6 @@ import { StandInContent } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type * as React from 'react'
-
-import SuccessIcon from '/app/assets/images/icon_success.png'
 
 interface StorybookArgs {
   leftStandIn: boolean

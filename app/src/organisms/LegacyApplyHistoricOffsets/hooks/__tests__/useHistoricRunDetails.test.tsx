@@ -1,6 +1,6 @@
+import { renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook, waitFor } from '@testing-library/react'
 
 import { mockRunningRun } from '/app/resources/runs/__fixtures__'
 import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'

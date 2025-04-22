@@ -1,10 +1,10 @@
+import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import {
   FLEX_ROBOT_TYPE,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../testing/utils'

@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
 
 import {
   mockIdleStartedRun,

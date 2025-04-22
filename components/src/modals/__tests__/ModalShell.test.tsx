@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
-import { beforeEach, describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '../../testing/utils'
 import { ModalShell } from '../ModalShell'

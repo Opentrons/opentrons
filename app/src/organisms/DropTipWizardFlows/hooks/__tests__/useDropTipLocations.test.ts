@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { renderHook } from '@testing-library/react'
 
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 

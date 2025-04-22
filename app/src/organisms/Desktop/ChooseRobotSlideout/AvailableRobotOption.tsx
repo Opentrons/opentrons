@@ -15,6 +15,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import FLEX_PNG from '/app/assets/images/FLEX.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
@@ -27,9 +29,6 @@ import type { IconName } from '@opentrons/components'
 import type { Robot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
 import type { Dispatch as ReactDispatch } from 'react'
-
-import FLEX_PNG from '/app/assets/images/FLEX.png'
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 
 interface AvailableRobotOptionProps {
   robot: Robot

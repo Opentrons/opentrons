@@ -1,6 +1,6 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

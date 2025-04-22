@@ -2,11 +2,6 @@ import { css } from 'styled-components'
 import { SPACING } from '@opentrons/components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
-import { FLOWS, SECTIONS } from './constants'
-
-import type { PipetteWizardFlow, PipetteWizardStep } from './types'
-import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-
 import attachLeft18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
 import attachRight18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
 import attach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_96.webm'
@@ -25,6 +20,11 @@ import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import zAxisAttach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
 import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
+
+import { FLOWS, SECTIONS } from './constants'
+
+import type { PipetteWizardFlow, PipetteWizardStep } from './types'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 export function getIsGantryEmpty(
   attachedPipette: AttachedPipettesFromInstrumentsQuery

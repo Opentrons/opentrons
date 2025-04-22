@@ -1,9 +1,9 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   fixture96Plate,
   fixtureP1000SingleV2Specs,
 } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { SelectWellsModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'

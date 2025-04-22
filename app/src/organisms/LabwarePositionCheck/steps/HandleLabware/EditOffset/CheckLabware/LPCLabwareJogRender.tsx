@@ -16,6 +16,8 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 
+import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
+import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
 import {
   selectActivePipette,
   selectIsSelectedLwTipRack,
@@ -24,9 +26,6 @@ import {
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-
-import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
-import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
 
 // TODO(jh, 03-12-25): Standardize viewboxes.
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'

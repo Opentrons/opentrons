@@ -1,3 +1,4 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -9,7 +10,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'

@@ -1,3 +1,4 @@
+import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -6,7 +7,6 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { renderHook } from '@testing-library/react'
 
 import { useNotifyRunQuery } from '/app/resources/runs'
 

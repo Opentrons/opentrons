@@ -9,14 +9,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { Slideout } from '/app/atoms/Slideout'
 
 import { MiniCard } from './'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
-
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 
 export default {
   title: 'App/Molecules/MiniCard',

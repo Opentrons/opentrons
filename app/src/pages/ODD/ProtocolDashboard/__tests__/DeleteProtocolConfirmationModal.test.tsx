@@ -1,8 +1,8 @@
+import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
-import { act, fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

@@ -17,6 +17,7 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
+import mountGripper from '/app/assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
@@ -27,8 +28,6 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import type { GripperWizardStepProps } from './types'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
-
-import mountGripper from '/app/assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};

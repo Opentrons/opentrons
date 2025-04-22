@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux'
+import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useCreateLabwareOffsetsMutation,
   useDeleteLabwareOffsetMutation,
 } from '@opentrons/react-api-client'
-import { act, renderHook } from '@testing-library/react'
 
 import { selectPendingOffsetOperations } from '/app/redux/protocol-runs'
 

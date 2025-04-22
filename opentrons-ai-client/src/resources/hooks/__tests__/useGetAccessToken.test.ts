@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
 import { useAuth0 } from '@auth0/auth0-react'
 import { renderHook } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { STAGING_AUTH0_AUDIENCE } from '../../constants'
 import { useGetAccessToken } from '../useGetAccessToken'

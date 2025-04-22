@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from 'react-hook-form'
-import { describe, expect, it } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import { LabwareLiquidsSection } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'

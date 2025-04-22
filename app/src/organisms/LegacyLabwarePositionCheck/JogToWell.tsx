@@ -33,6 +33,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
+import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
+import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
+import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
 import { SmallButton } from '/app/atoms/buttons'
 import { JogControls } from '/app/molecules/JogControls'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
@@ -45,11 +49,6 @@ import type { WellStroke } from '@opentrons/components'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 import type { ReactNode } from 'react'
-
-import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
-import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
-import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
-import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =

@@ -2,9 +2,9 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { screen } from '@testing-library/react'
 import { WasteChute } from '@opentrons/components'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'

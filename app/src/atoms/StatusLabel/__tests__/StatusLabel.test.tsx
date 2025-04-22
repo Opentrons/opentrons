@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { C_SKY_BLUE, COLORS } from '@opentrons/components'
 import { screen } from '@testing-library/react'
+import { C_SKY_BLUE, COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 

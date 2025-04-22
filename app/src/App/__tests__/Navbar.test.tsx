@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
-import { describe, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
 
 import { Navbar } from '../Navbar'
 

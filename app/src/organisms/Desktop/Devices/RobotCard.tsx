@@ -29,6 +29,8 @@ import {
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
 
+import FLEX_PNG from '/app/assets/images/FLEX.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -47,9 +49,6 @@ import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
-
-import FLEX_PNG from '/app/assets/images/FLEX.png'
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 
 interface RobotCardProps {
   robot: DiscoveredRobot

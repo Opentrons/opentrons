@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getEstopStatus } from '@opentrons/api-client'
-import { renderHook, waitFor } from '@testing-library/react'
 
 import { useEstopQuery } from '..'
 import { useHost } from '../../api'

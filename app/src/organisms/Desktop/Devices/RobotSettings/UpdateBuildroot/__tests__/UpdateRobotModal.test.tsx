@@ -1,6 +1,6 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
 
 import '@testing-library/jest-dom/vitest'
 

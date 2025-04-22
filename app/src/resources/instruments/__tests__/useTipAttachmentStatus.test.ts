@@ -1,3 +1,4 @@
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   getCommands,
@@ -6,7 +7,6 @@ import {
 } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { act, renderHook, waitFor } from '@testing-library/react'
 
 import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 

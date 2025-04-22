@@ -2,13 +2,13 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { screen } from '@testing-library/react'
 import { LabwareRender, Module } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'

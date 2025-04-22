@@ -1,5 +1,3 @@
-import type { ModuleModel } from '@opentrons/shared-data'
-
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import magneticBlockGen1 from '/app/assets/images/magnetic_block_gen_1.png'
 import magneticBlockGen1HighRes from '/app/assets/images/magnetic_block_gen_1@3x.png'
@@ -12,6 +10,8 @@ import absorbanceReader from '/app/assets/images/opentrons_plate_reader.png'
 import temperatureModule from '/app/assets/images/temp_deck_gen_2_transparent.png'
 import thermoModuleGen1 from '/app/assets/images/thermocycler_closed.png'
 import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
+
+import type { ModuleModel } from '@opentrons/shared-data'
 
 export function getModuleImage(
   model: ModuleModel,

@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TestProvider } from '../../../__testing-utils__'
 import { trackEvent } from '../../../analytics/mixpanel'

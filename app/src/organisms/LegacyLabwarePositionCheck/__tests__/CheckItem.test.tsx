@@ -1,3 +1,4 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   FLEX_ROBOT_TYPE,
@@ -5,7 +6,6 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

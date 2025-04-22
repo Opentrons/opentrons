@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { StepMeter } from '/app/atoms/StepMeter'

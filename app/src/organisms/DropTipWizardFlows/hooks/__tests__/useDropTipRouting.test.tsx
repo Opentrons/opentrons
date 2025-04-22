@@ -1,6 +1,6 @@
+import { act, renderHook } from '@testing-library/react'
 import head from 'lodash/head'
 import { describe, expect, it, vi } from 'vitest'
-import { act, renderHook } from '@testing-library/react'
 
 import { DT_ROUTES } from '../../constants'
 import { getInitialRouteAndStep, useDropTipRouting } from '../useDropTipRouting'

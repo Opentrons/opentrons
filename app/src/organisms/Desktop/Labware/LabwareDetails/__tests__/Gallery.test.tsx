@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'

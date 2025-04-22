@@ -12,6 +12,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import multiDemoAsset from '/app/assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
+import singleDemoAsset from '/app/assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
 import { JogControls } from '/app/molecules/JogControls'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import * as Sessions from '/app/redux/sessions'
@@ -21,9 +23,6 @@ import { formatJogVector } from './utils'
 
 import type { CalibrationPanelProps } from './types'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
-
-import multiDemoAsset from '/app/assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
-import singleDemoAsset from '/app/assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
 
 const ASSET_MAP = {
   multi: multiDemoAsset,

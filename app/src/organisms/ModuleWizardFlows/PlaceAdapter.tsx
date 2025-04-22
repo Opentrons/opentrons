@@ -21,6 +21,11 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
 } from '@opentrons/shared-data'
 
+import HeaterShaker_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
+import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
+import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
+import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
+import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
@@ -34,12 +39,6 @@ import type {
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { AxiosError } from 'axios'
 import type { UseMutateFunction } from 'react-query'
-
-import HeaterShaker_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
-import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
-import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
-import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
-import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration

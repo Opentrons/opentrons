@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import SuccessIcon from '/app/assets/images/icon_success.png'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   getFlexSlotNameOnly,
@@ -29,8 +30,6 @@ import type {
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 import type { TFunction } from 'i18next'
-
-import SuccessIcon from '/app/assets/images/icon_success.png'
 
 interface DesktopOffsetSuccessProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void

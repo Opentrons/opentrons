@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
+import { renderHook, waitFor } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
 
 import { useTrackEvent } from '/app/redux/analytics'
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'

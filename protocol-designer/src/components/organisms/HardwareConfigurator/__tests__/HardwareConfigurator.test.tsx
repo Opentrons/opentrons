@@ -1,7 +1,7 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 import { DeckConfigurator } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { HardwareConfigurator } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'

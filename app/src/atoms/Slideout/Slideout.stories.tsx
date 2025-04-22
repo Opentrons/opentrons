@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import { action } from '@storybook/addon-actions'
 import {
   COLORS,
   LegacyStyledText,
@@ -6,7 +7,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { action } from '@storybook/addon-actions'
 
 import { Slideout as SlideoutComponent } from './index'
 

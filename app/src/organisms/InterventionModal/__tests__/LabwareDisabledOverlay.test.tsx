@@ -1,6 +1,6 @@
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { COLORS } from '@opentrons/components'
-import { render, screen } from '@testing-library/react'
 
 import { LabwareDisabledOverlay } from '../LabwareDisabledOverlay'
 

@@ -1,8 +1,8 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider, useSelector } from 'react-redux'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, renderHook, waitFor } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
 import { LPC_STEP } from '/app/redux/protocol-runs'

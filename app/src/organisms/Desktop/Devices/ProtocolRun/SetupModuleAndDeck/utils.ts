@@ -11,8 +11,6 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
-import type { CutoutFixtureId } from '@opentrons/shared-data'
-
 import trashBin from '/app/assets/images/flex_trash_bin.png'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import magneticBlockGen1 from '/app/assets/images/magnetic_block_gen_1.png'
@@ -22,6 +20,8 @@ import temperatureModule from '/app/assets/images/temp_deck_gen_2_transparent.pn
 import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
 import wasteChuteStagingArea from '/app/assets/images/waste_chute_with_staging_area.png'
 import wasteChute from '/app/assets/images/waste_chute.png'
+
+import type { CutoutFixtureId } from '@opentrons/shared-data'
 
 export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {

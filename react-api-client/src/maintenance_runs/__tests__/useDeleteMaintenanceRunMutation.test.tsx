@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { deleteMaintenanceRun } from '@opentrons/api-client'
-import { act, renderHook, waitFor } from '@testing-library/react'
 
 import { useDeleteMaintenanceRunMutation } from '..'
 import { MAINTENANCE_RUN_ID } from '../__fixtures__'

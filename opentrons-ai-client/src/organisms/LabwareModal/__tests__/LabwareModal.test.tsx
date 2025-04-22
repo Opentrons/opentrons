@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from 'react-hook-form'
-import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { LabwareModal } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'

@@ -1,7 +1,7 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LEFT } from '@opentrons/shared-data'
 import { fixtureP10Multi } from '@opentrons/shared-data/pipette/fixtures/name'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

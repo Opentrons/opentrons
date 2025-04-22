@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { POSITION_RELATIVE } from '../../../styles'

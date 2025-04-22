@@ -1,3 +1,4 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 import {
   MAGNETIC_BLOCK_D3_ADDRESSABLE_AREA,
@@ -7,7 +8,6 @@ import {
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

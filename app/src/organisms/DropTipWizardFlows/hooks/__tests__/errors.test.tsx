@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../../constants'
 import { useDropTipCommandErrors, useDropTipErrorComponents } from '../errors'

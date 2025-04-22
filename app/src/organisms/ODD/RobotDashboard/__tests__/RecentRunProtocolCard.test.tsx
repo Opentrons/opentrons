@@ -1,4 +1,5 @@
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import { formatDistance } from 'date-fns'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
@@ -9,7 +10,6 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { Skeleton } from '/app/atoms/Skeleton'

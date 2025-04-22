@@ -1,6 +1,6 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
 
 import { EditInstrumentsModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'

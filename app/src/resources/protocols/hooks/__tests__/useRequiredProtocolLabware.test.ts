@@ -1,10 +1,10 @@
+import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import {
   NULL_PROTOCOL_ANALYSIS,

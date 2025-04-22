@@ -1,12 +1,12 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   simple_v6 as _uncastedSimpleV6Protocol,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-import { renderHook } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'

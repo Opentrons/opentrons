@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import { C_SELECTED_DARK, C_TRANSPARENT } from '../../../styles'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from '../constants'

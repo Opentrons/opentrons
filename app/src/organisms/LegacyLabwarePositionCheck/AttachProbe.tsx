@@ -9,6 +9,9 @@ import {
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
+import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
 
@@ -27,10 +30,6 @@ import type {
 import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type { Dispatch } from 'react'
-
-import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 
 const StyledVideo = styled.video`
   padding-top: ${SPACING.spacing4};

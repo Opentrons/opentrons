@@ -1,6 +1,6 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RUN_STATUS_AWAITING_RECOVERY_PAUSED } from '@opentrons/api-client'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

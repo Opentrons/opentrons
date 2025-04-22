@@ -1,3 +1,4 @@
+import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import {
@@ -5,7 +6,6 @@ import {
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

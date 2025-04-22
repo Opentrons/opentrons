@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createCommand } from '@opentrons/api-client'
-import { act, renderHook, waitFor } from '@testing-library/react'
 
 import { useCreateCommandMutation } from '..'
 import { mockAnonLoadCommand, RUN_ID_1 } from '../__fixtures__'

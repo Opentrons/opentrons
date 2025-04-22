@@ -11,10 +11,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import screenImage from '/app/assets/images/on-device-display/odd_abstract@x2.png'
 import { MediumButton } from '/app/atoms/buttons'
 import { StepMeter } from '/app/atoms/StepMeter'
-
-import screenImage from '/app/assets/images/on-device-display/odd_abstract@x2.png'
 
 const IMAGE_ALT = 'finish setting up a robot'
 

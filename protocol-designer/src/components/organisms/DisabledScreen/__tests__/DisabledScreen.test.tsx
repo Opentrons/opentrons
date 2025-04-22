@@ -1,6 +1,6 @@
+import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { COLORS } from '@opentrons/components'
-import { screen } from '@testing-library/react'
 
 import { DisabledScreen } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'

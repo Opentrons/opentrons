@@ -1,3 +1,4 @@
+import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import {
@@ -6,7 +7,6 @@ import {
 } from '@opentrons/api-client'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { renderHook } from '@testing-library/react'
 
 import { useAttachedPipettes } from '../useAttachedPipettes'
 

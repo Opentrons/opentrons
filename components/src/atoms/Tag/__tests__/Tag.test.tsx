@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import { COLORS } from '../../../helix-design-system'
 import { renderWithProviders } from '../../../testing/utils'

@@ -13,6 +13,18 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import slot1LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
+import slot1LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
+import slot1RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_RIGHT_MULTI_X-Y.webm'
+import slot1RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_RIGHT_SINGLE_X-Y.webm'
+import slot3LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_LEFT_MULTI_X-Y.webm'
+import slot3LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_LEFT_SINGLE_X-Y.webm'
+import slot3RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_RIGHT_MULTI_X-Y.webm'
+import slot3RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_RIGHT_SINGLE_X-Y.webm'
+import slot7LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_MULTI_X-Y.webm'
+import slot7LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_SINGLE_X-Y.webm'
+import slot7RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
+import slot7RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
 import { useLogger } from '/app/logger'
 import {
   JogControls,
@@ -34,19 +46,6 @@ import type {
   SessionCommandString,
   SessionType,
 } from '/app/redux/sessions/types'
-
-import slot1LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
-import slot1LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
-import slot1RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_RIGHT_MULTI_X-Y.webm'
-import slot1RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_RIGHT_SINGLE_X-Y.webm'
-import slot3LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_LEFT_MULTI_X-Y.webm'
-import slot3LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_LEFT_SINGLE_X-Y.webm'
-import slot3RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_RIGHT_MULTI_X-Y.webm'
-import slot3RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_RIGHT_SINGLE_X-Y.webm'
-import slot7LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_MULTI_X-Y.webm'
-import slot7LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_SINGLE_X-Y.webm'
-import slot7RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
-import slot7RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
 
 const assetMap: Record<
   CalibrationLabware['slot'],

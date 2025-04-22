@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
@@ -10,7 +11,6 @@ import {
   parsePipetteEntity,
   parseRequiredModulesEntity,
 } from '@opentrons/shared-data'
-import { renderHook } from '@testing-library/react'
 
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'

@@ -1,11 +1,11 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { act, renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
-import { act, renderHook } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
 import { useIsRobotBusy } from '/app/redux-resources/robots'

@@ -15,7 +15,6 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-
 import absorbanceReaderManualQRCode from '/app/assets/images/absorbance_reader_instruction_manual_code.png'
 import helpCenterQRCode from '/app/assets/images/module_instruction_code.png'
 

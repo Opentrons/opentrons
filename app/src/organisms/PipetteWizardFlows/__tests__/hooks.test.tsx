@@ -1,4 +1,5 @@
 import { I18nextProvider } from 'react-i18next'
+import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   LEFT,
@@ -6,7 +7,6 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { renderHook } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
 import {

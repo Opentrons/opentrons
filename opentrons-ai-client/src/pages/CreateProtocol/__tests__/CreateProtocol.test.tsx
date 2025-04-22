@@ -1,6 +1,6 @@
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { Provider } from 'jotai'
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { CreateProtocol } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'

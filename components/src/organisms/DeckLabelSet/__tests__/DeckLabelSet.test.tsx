@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DeckLabelSet } from '..'
 import { BORDERS, COLORS } from '../../../helix-design-system'

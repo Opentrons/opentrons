@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { usePlayRunMutation } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import { RECOVERY_MAP } from '../../constants'
 import { useRecoveryActionMutation } from '../useRecoveryActionMutation'

@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from 'react-hook-form'
-import { describe, expect, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import { ControlledAddTextAreaFields } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'

@@ -1,3 +1,4 @@
+import { renderHook } from '@testing-library/react'
 import omitBy from 'lodash/omitBy'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -11,7 +12,6 @@ import {
   FLEX_SIMPLEST_DECK_CONFIG,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import { renderHook } from '@testing-library/react'
 
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'

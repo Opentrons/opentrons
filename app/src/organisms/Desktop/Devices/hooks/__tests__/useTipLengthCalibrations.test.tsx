@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import {
   mockTipLengthCalibration1,

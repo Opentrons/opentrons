@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import {
   FLEX_ROBOT_TYPE,
@@ -8,7 +9,6 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
 } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { i18n } from '../../../../../i18n'
 import { renderWithProviders } from '../../../../../testing/utils'

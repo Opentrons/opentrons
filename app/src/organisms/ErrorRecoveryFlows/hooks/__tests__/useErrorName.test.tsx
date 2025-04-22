@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest'
 import { render, renderHook, screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
 
 import { ERROR_KINDS } from '../../constants'
 import { useErrorName } from '../useErrorName'

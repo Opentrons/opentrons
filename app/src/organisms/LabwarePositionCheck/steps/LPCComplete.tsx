@@ -10,12 +10,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import SuccessIcon from '/app/assets/images/icon_success.png'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-
-import SuccessIcon from '/app/assets/images/icon_success.png'
 
 export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')

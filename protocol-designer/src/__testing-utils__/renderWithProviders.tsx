@@ -3,9 +3,9 @@
 import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
+import { render } from '@testing-library/react'
 import { createStore } from 'redux'
 import { vi } from 'vitest'
-import { render } from '@testing-library/react'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
 import type {

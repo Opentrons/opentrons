@@ -1,10 +1,10 @@
+import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
-import { act, renderHook } from '@testing-library/react'
 
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {

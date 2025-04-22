@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { COLORS } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'

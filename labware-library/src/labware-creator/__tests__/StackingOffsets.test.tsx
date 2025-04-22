@@ -2,13 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { fireEvent, render, screen } from '@testing-library/react'
 import { useFormikContext } from 'formik'
 import {
   fixture96Plate,
   fixtureTiprackAdapter,
   getAllDefinitions,
 } from '@opentrons/shared-data'
-import { fireEvent, render, screen } from '@testing-library/react'
 
 import { StackingOffsets } from '../components/sections/StackingOffsets'
 

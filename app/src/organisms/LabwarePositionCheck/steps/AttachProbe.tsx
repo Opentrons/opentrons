@@ -3,15 +3,14 @@ import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { LegacyStyledText } from '@opentrons/components'
 
+import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { selectActivePipetteChannelCount } from '/app/redux/protocol-runs'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-
-import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 
 export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
   const {

@@ -1,6 +1,6 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 import { fixtureP1000SingleV2Specs, LEFT, RIGHT } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../testing/utils'
 import { InstrumentDiagram } from '../InstrumentDiagram'

@@ -1,8 +1,8 @@
 // tests for the useLights hooks
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getLights } from '@opentrons/api-client'
-import { renderHook, waitFor } from '@testing-library/react'
 
 import { useLightsQuery } from '..'
 import { useHost } from '../../api'

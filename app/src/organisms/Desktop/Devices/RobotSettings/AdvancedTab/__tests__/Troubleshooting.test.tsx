@@ -1,7 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
+import { act, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { act, screen, waitFor } from '@testing-library/react'
 
 import '@testing-library/jest-dom/vitest'
 

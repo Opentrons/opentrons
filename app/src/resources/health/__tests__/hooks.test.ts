@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { useHealthQuery } from '@opentrons/react-api-client'
-import { renderHook } from '@testing-library/react'
 
 import { INIT_STATUS, useRobotInitializationStatus } from '../hooks'
 

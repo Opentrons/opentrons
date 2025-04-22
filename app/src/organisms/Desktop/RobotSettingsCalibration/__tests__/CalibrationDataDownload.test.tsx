@@ -1,3 +1,4 @@
+import { fireEvent, screen } from '@testing-library/react'
 import {
   afterAll,
   beforeAll,
@@ -8,7 +9,6 @@ import {
   vi,
 } from 'vitest'
 import { when } from 'vitest-when'
-import { fireEvent, screen } from '@testing-library/react'
 
 import '@testing-library/jest-dom/vitest'
 

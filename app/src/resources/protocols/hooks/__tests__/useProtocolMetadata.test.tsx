@@ -1,9 +1,9 @@
 // tests for the HostConfig context and hook
 import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
 
 import { useCurrentProtocol } from '../useCurrentProtocol'
 import { useProtocolMetadata } from '../useProtocolMetadata'
