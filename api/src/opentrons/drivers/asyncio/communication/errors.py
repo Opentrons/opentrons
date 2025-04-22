@@ -42,7 +42,7 @@ class UnhandledGcode(ErrorResponse):
         super().__init__(port, response, command)
 
 
-class GCacheFull(ErrorResponse):
+class GCodeCacheFull(ErrorResponse):
     def __init__(self, port: str, response: str, command: str) -> None:
         super().__init__(port, response, command)
 

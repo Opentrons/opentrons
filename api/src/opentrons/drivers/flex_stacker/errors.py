@@ -3,7 +3,7 @@
 from opentrons.drivers.asyncio.communication.errors import (
     BaseErrorCode,
     ErrorResponse,
-    GCacheFull,
+    GCodeCacheFull,
     UnhandledGcode,
 )
 
@@ -55,7 +55,7 @@ class StackerErrorCodes(BaseErrorCode):
     """Stacker-specific error codes."""
 
     UNHANDLED_GCODE = ("ERR003", UnhandledGcode)
-    GCODE_CACHE_FULL = ("ERR004", GCacheFull)
+    GCODE_CACHE_FULL = ("ERR004", GCodeCacheFull)
     ESTOP_TRIGGERED = ("ERR006", EStopTriggered)
     MOTOR_STALL_DETECTED = ("ERR403", MotorStallDetected)
     MOTOR_QUEUE_FULL = ("ERR404", MotorQueueFull)
