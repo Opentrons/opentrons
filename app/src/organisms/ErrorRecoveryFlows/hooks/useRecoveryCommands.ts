@@ -24,6 +24,9 @@ import type {
   DropTipInPlaceRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
   MoveLabwareParams,
+  RunCommandError,
+  RunCommandErrorOverpressure,
+  RunCommandErrorTipPhysicallyAttached,
 } from '@opentrons/shared-data'
 import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
@@ -36,11 +39,6 @@ import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
-import type {
-  RunCommandError,
-  RunCommandErrorOverpressure,
-  RunCommandErrorTipPhysicallyAttached,
-} from '@opentrons/shared-data'
 
 interface UseRecoveryCommandsParams {
   runId: string
