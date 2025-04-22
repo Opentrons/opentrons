@@ -8,7 +8,6 @@ import {
   DeckFromLayers,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_FLEX_START,
   ListItem,
   ListItemCustomize,
   Module,
