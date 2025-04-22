@@ -36,15 +36,7 @@ export function RecoveryInProgress({
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
 
-  const gripperReleaseCountdown = useGripperRelease({
-    recoveryMap,
-    recoveryCommands,
-    routeUpdateActions,
-    doorStatusUtils,
-    currentRecoveryOptionUtils,
-  })
-
-  const latchReleaseCountdown = useGripperRelease({
+  const releaseCountdown = useReleaseLabware({
     recoveryMap,
     recoveryCommands,
     routeUpdateActions,
@@ -67,18 +59,18 @@ export function RecoveryInProgress({
       case ROBOT_SKIPPING_STEP.ROUTE:
         return t('stand_back_skipping_to_next_step')
       case ROBOT_RELEASING_LABWARE.ROUTE: {
-        if (gripperReleaseCountdown > 0) {
+        if (releaseCountdown > 0) {
           return t('gripper_will_release_in_s', {
-            seconds: gripperReleaseCountdown,
+            seconds: releaseCountdown,
           })
         } else {
           return t('gripper_releasing_labware')
         }
       }
       case ROBOT_RELEASING_LABWARE_LATCH.ROUTE: {
-        if (latchReleaseCountdown > 0) {
+        if (releaseCountdown > 0) {
           return t('latch_will_release_in_s', {
-            seconds: latchReleaseCountdown,
+            seconds: releaseCountdown,
           })
         } else {
           return t('latch_releasing_labware')
@@ -98,9 +90,9 @@ export function RecoveryInProgress({
   )
 }
 
-export const GRIPPER_RELEASE_COUNTDOWN_S = 3
+export const RELEASE_COUNTDOWN_S = 3
 
-type UseGripperReleaseProps = Pick<
+type useReleaseLabwareProps = Pick<
   RecoveryContentProps,
   | 'currentRecoveryOptionUtils'
   | 'recoveryCommands'
@@ -109,16 +101,16 @@ type UseGripperReleaseProps = Pick<
   | 'recoveryMap'
 >
 
-// Handles the gripper release copy and action, which operates on an interval. At T=0, release the labware then proceed
+// Handles the gripper/latch release copy and action, which operates on an interval. At T=0, release the labware then proceed
 // to the next step in the active route if the door is open (which should be a route to handle the door), or to the next
 // CTA route if the door is closed.
-export function useGripperRelease({
+export function useReleaseLabware({
   currentRecoveryOptionUtils,
   recoveryCommands,
   routeUpdateActions,
   doorStatusUtils,
   recoveryMap,
-}: UseGripperReleaseProps): number {
+}: useReleaseLabwareProps): number {
   const {
     releaseGripperJaws,
     releaseLabwareLatch,
@@ -137,7 +129,7 @@ export function useGripperRelease({
     REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
-  const [countdown, setCountdown] = useState(GRIPPER_RELEASE_COUNTDOWN_S)
+  const [countdown, setCountdown] = useState(RELEASE_COUNTDOWN_S)
 
   const proceedToDoorStep = (): void => {
     switch (selectedRecoveryOption) {

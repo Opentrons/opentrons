@@ -12,7 +12,7 @@ import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RECOVERY_MAP } from '../constants'
 
-import type { RecoveryContentProps } from '../types'
+import type { RecoveryContentProps, RouteStep } from '../types'
 import { css } from 'styled-components'
 
 export function TwoColTextAndImage(
@@ -34,7 +34,7 @@ export function TwoColTextAndImage(
   const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
-  const reengageLatchRoutes = [
+  const reengageLatchRoutes: RouteStep[] = [
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH,
     REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH,
   ]

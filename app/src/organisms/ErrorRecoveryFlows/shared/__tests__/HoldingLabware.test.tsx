@@ -162,8 +162,40 @@ describe('HoldingLabware', () => {
 
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-        RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
-        RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.CONFIRM_RETRY
+      )
+    })
+  })
+
+  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, async () => {
+    render({
+      ...props,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption:
+          RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+      } as any,
+    })
+
+    fireEvent.click(screen.getAllByLabelText('No')[0])
+    clickButtonLabeled('Continue')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(true)
+    })
+
+    await waitFor(() => {
+      expect(mockHomeExceptPlungers).toHaveBeenCalled()
+    })
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    })
+
+    await waitFor(() => {
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
       )
     })
   })

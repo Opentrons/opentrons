@@ -174,6 +174,23 @@ describe('TwoColLwInfoAndDeck', () => {
     )
   })
 
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE} with NOT manual replace step`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Ensure stacker has labware',
+        type: 'location',
+        bannerText:
+          'Make sure you load the correct number of labware into the stacker.',
+      }),
+      expect.anything()
+    )
+  })
+
   it('passes correct title to LeftColumnLabwareInfo for 96-channel pipette', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE
