@@ -3,7 +3,7 @@
   "version": 999,
   "schemaVersion": 3,
   "parameters": {
-    "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+    "loadName": "schema3test_96_wellplate_200ul_pcr_full_skirt",
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": true
