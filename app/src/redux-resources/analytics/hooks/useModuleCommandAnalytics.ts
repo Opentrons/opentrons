@@ -10,7 +10,6 @@ import {
   ANALYTICS_MODULE_COMMAND_COMPLETED,
 } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
@@ -24,7 +23,7 @@ import type {
   RunTimeCommand,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import type { CommandData, AttachedModule } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',
@@ -53,11 +52,14 @@ interface BaseModuleAnalytics {
     data: CommandData['data'] | undefined
   }
   errorDetails: string
+  runId?: string | null
+  analysis?: CompletedProtocolAnalysis | null
 }
 
 export interface ModuleAnalyticProtocolCommand extends BaseModuleAnalytics {
   kind: 'protocolCommand'
-  runId: string
+  runId: string | null
+  analysis: CompletedProtocolAnalysis | null
   params: CommandData['data']['params'] | undefined
 }
 
@@ -77,35 +79,27 @@ export interface UseModuleCommandAnalyticsResult {
   reportModuleCommand: (params: ModuleAnalyticType) => void
 }
 
-function UseMostRecentAnalysisWrapper(
-  runId: string | null
-): CompletedProtocolAnalysis | null {
-  return useMostRecentCompletedAnalysis(runId)
-}
-export function useModuleCommandAnalytics(
-  modules?: AttachedModule[]
-): UseModuleCommandAnalyticsResult {
+export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
   const doTrackEvent = useTrackEvent()
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
   const moduleQuery = useModulesQuery()
+
   const reportModuleCommand = ({
     kind,
     analyticCommand,
     errorDetails,
+    analysis,
+    runId,
     ...rest
   }: BaseModuleAnalytics): void => {
     if (!isValidCommandType(analyticCommand)) return
 
     const attachedModules = moduleQuery?.data?.data ?? []
-    const mostRecentAnalysis = UseMostRecentAnalysisWrapper(
-      'runId' in rest && typeof rest.runId === 'string' ? rest.runId : null
-    )
+
     const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
     const protocolModulesInfo =
-      mostRecentAnalysis != null
-        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-        : []
+      analysis != null ? getProtocolModulesInfo(analysis, deckDef) : []
 
     const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
       attachedModules,
@@ -159,6 +153,7 @@ export function useModuleCommandAnalytics(
         reportedSerialNumber,
         reportedTemperature,
         reportedFirmwareVersion,
+        ...(runId != null ? { transactionId: runId } : {}), // Acts as an idempotency key for Mixpanel reporting.
       },
     })
   }
