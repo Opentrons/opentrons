@@ -5443,33 +5443,21 @@
       "description": "Represents one group of labware stored in a stacker hopper.",
       "properties": {
         "adapterLabwareId": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Adapterlabwareid"
+          "default": null,
+          "title": "Adapterlabwareid",
+          "type": "string"
         },
         "lidLabwareId": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Lidlabwareid"
+          "default": null,
+          "title": "Lidlabwareid",
+          "type": "string"
         },
         "primaryLabwareId": {
           "title": "Primarylabwareid",
           "type": "string"
         }
       },
-      "required": ["primaryLabwareId", "adapterLabwareId", "lidLabwareId"],
+      "required": ["primaryLabwareId"],
       "title": "StackerStoredLabwareGroup",
       "type": "object"
     },
