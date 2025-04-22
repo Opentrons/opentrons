@@ -29,10 +29,10 @@ import type {
   MAGNETIC_BLOCK_V1,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_MODULE_TYPE,
-  WELL_BOTTOM,
-  WELL_CENTER,
-  WELL_TOP,
-  LIQUID_MENISCUS,
+  POSITION_REFERENCE_LIQUID_MENISCUS,
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_TOP,
 } from './constants'
 import type { RunTimeCommand, LoadedLabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
@@ -718,10 +718,10 @@ export interface Liquid {
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
 export type LiquidHandlingPropertyByVolume = number[][]
 export type PositionReference =
-  | typeof WELL_BOTTOM
-  | typeof WELL_CENTER
-  | typeof WELL_TOP
-  | typeof LIQUID_MENISCUS
+  | typeof POSITION_REFERENCE_BOTTOM
+  | typeof POSITION_REFERENCE_CENTER
+  | typeof POSITION_REFERENCE_TOP
+  | typeof POSITION_REFERENCE_LIQUID_MENISCUS
 
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {

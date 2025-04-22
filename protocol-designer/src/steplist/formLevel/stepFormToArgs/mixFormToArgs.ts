@@ -1,4 +1,4 @@
-import { WELL_BOTTOM } from '@opentrons/shared-data'
+import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
@@ -115,7 +115,7 @@ export const mixFormToArgs = (
     xOffset: mix_x_position ?? 0,
     yOffset: mix_y_position ?? 0,
     zOffset: mix_mmFromBottom ?? 0,
-    positionReference: mix_position_reference ?? WELL_BOTTOM,
+    positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     finalPushOut:
       pushOut_checkbox && pushOut_volume != null ? pushOut_volume : 0,
   }

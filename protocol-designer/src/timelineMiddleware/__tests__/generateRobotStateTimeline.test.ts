@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   fixtureTiprack300ul,
   getLabwareDefURI,
-  WELL_BOTTOM,
+  POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
@@ -137,7 +137,7 @@ describe('generateRobotStateTimeline', () => {
           yOffset: 0,
           finalPushOut: 0,
           zOffset: 0,
-          positionReference: WELL_BOTTOM,
+          positionReference: POSITION_REFERENCE_BOTTOM,
         },
       },
     }
