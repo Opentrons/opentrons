@@ -2,14 +2,14 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
 
-import { useUpdateLabwareInfo } from '../useUpdateLabwareInfo'
+import { useUpdateLabware } from '../useUpdateLabware'
 import { updateLPCLabware } from '/app/redux/protocol-runs'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 
 vi.mock('react-redux')
 vi.mock('/app/redux/protocol-runs')
 
-describe('useUpdateLabwareInfo', () => {
+describe('useUpdateLabware', () => {
   const RUN_ID = 'run-123'
   const MAINTENANCE_RUN_ID = 'maintenance-456'
   const MOCK_LABWARE_INFO = { areOffsetsApplied: true } as LPCLabwareInfo
@@ -19,25 +19,26 @@ describe('useUpdateLabwareInfo', () => {
     vi.clearAllMocks()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(updateLPCLabware).mockImplementation(
-      (runId: string, labwareInfo: LPCLabwareInfo) =>
+      (runId: string, labwareInfo: LPCLabwareInfo['labware']) =>
         ({ type: 'UPDATE_LPC_LABWARE', runId, labwareInfo } as any)
     )
   })
 
   it('should dispatch updateLPCLabware when runId is provided and maintenanceRunId is null', () => {
-    renderHook(() =>
-      useUpdateLabwareInfo(true, RUN_ID, null, MOCK_LABWARE_INFO)
-    )
+    renderHook(() => useUpdateLabware(true, RUN_ID, null, MOCK_LABWARE_INFO))
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
-    expect(updateLPCLabware).toHaveBeenCalledWith(RUN_ID, MOCK_LABWARE_INFO)
+    expect(updateLPCLabware).toHaveBeenCalledWith(
+      RUN_ID,
+      MOCK_LABWARE_INFO.labware
+    )
     expect(mockDispatch).toHaveBeenCalledWith(
-      updateLPCLabware(RUN_ID, MOCK_LABWARE_INFO)
+      updateLPCLabware(RUN_ID, MOCK_LABWARE_INFO.labware)
     )
   })
 
   it('should not dispatch when runId is null', () => {
-    renderHook(() => useUpdateLabwareInfo(true, null, null, MOCK_LABWARE_INFO))
+    renderHook(() => useUpdateLabware(true, null, null, MOCK_LABWARE_INFO))
 
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(updateLPCLabware).not.toHaveBeenCalled()
@@ -45,7 +46,7 @@ describe('useUpdateLabwareInfo', () => {
 
   it('should not dispatch when maintenanceRunId is provided', () => {
     renderHook(() =>
-      useUpdateLabwareInfo(true, RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
+      useUpdateLabware(true, RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
     )
 
     expect(mockDispatch).not.toHaveBeenCalled()
@@ -55,7 +56,7 @@ describe('useUpdateLabwareInfo', () => {
   it('should re-dispatch when labwareInfo changes', () => {
     const { rerender } = renderHook(
       props =>
-        useUpdateLabwareInfo(
+        useUpdateLabware(
           props.isFlex,
           props.runId,
           props.maintenanceRunId,
@@ -83,16 +84,19 @@ describe('useUpdateLabwareInfo', () => {
     })
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
-    expect(updateLPCLabware).toHaveBeenCalledWith(RUN_ID, NEW_LABWARE_INFO)
+    expect(updateLPCLabware).toHaveBeenCalledWith(
+      RUN_ID,
+      NEW_LABWARE_INFO.labware
+    )
     expect(mockDispatch).toHaveBeenCalledWith(
-      updateLPCLabware(RUN_ID, NEW_LABWARE_INFO)
+      updateLPCLabware(RUN_ID, NEW_LABWARE_INFO.labware)
     )
   })
 
   it('should re-dispatch when maintenanceRunId changes from value to null', () => {
     const { rerender } = renderHook(
       props => {
-        useUpdateLabwareInfo(
+        useUpdateLabware(
           props.isFlex,
           props.runId,
           props.maintenanceRunId,
@@ -119,13 +123,16 @@ describe('useUpdateLabwareInfo', () => {
     } as any)
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
-    expect(updateLPCLabware).toHaveBeenCalledWith(RUN_ID, MOCK_LABWARE_INFO)
+    expect(updateLPCLabware).toHaveBeenCalledWith(
+      RUN_ID,
+      MOCK_LABWARE_INFO.labware
+    )
   })
 
   it('should not re-dispatch when runId changes but other params remain the same', () => {
     const { rerender } = renderHook(
       props => {
-        useUpdateLabwareInfo(
+        useUpdateLabware(
           props.isFlex,
           props.runId,
           props.maintenanceRunId,
@@ -158,7 +165,7 @@ describe('useUpdateLabwareInfo', () => {
 
   it('should not dispatch if the robot is not a flex', () => {
     renderHook(() =>
-      useUpdateLabwareInfo(false, RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
+      useUpdateLabware(false, RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
     )
 
     expect(mockDispatch).not.toHaveBeenCalled()
