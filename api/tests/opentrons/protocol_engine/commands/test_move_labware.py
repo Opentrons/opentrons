@@ -805,7 +805,7 @@ async def test_move_labware_raises_for_missing_stacker_shuttle(
             pool_primary_definition=None,
             pool_adapter_definition=None,
             pool_lid_definition=None,
-            pool_count=0,
+            contained_labware_bottom_first=[],
             max_pool_count=0,
             pool_overlap=0,
         )

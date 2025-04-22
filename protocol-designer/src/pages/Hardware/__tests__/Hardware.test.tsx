@@ -30,6 +30,7 @@ describe('Hardware', () => {
   beforeEach(() => {
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mockProtocolName',
+      created: 123,
     })
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})

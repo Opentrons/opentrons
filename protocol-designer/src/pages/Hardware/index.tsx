@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -40,6 +41,16 @@ export function Hardware(): JSX.Element {
     fileMetadata.protocolName != null && fileMetadata.protocolName !== ''
       ? fileMetadata.protocolName
       : t('protocol_overview:untitled_protocol')
+
+  //  TODO: remove this when we do the routing refactor
+  useEffect(() => {
+    if (fileMetadata?.created == null) {
+      console.warn(
+        'fileMetadata was refreshed while on the hardware page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [fileMetadata])
 
   return (
     <Flex
