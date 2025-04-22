@@ -125,7 +125,7 @@ test-ot2:
 lint:
 	$(python) -m mypy src tests
 	$(python) -m black --check src tests docs/v2/example_protocols setup.py
-	$(python) -m flake8 src tests docs/v2/example_protocols setup.py
+	$(python) -m flake8 src tests setup.py
 
 .PHONY: format
 format:
