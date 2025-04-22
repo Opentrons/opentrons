@@ -267,3 +267,11 @@ class StackerFillEmptyStrategy(str, Enum):
 
     MANUAL_WITH_PAUSE = "manualWithPause"
     LOGICAL = "logical"
+
+
+class StackerStoredLabwareGroup(BaseModel):
+    """Represents one group of labware stored in a stacker hopper."""
+
+    primaryLabwareId: str
+    adapterLabwareId: str | None
+    lidLabwareId: str | None
