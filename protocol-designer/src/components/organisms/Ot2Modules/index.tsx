@@ -288,16 +288,21 @@ export function Ot2Modules(): JSX.Element {
         />
       ) : null}
       {changeModuleWarning}
-      <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap={WRAP} width="100%">
+      <Flex flexWrap={WRAP} width="100%">
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1.27"
-          width="100%"
+          minWidth="30.375rem"
           paddingTop={SPACING.spacing120}
         >
-          <StyledText desktopStyle="headingSmallBold">
-            {t('protocol_overview:modules')}
-          </StyledText>
+          {filteredSupportedModules.length > 0 ? (
+            <StyledText
+              desktopStyle="headingSmallBold"
+              paddingBottom={SPACING.spacing20}
+            >
+              {t('protocol_overview:modules')}
+            </StyledText>
+          ) : null}
           <ModuleEmptySelectorButtons
             modules={filteredSupportedModules}
             addModule={moduleModel => {
@@ -378,9 +383,14 @@ export function Ot2Modules(): JSX.Element {
             </Flex>
           ) : null}
         </Flex>
-        <Flex flex="1.27" minWidth="50%">
+        <Flex
+          flex="1.27"
+          maxHeight="35rem"
+          minWidth="50%"
+          paddingTop={SPACING.spacing80}
+        >
           <RobotCoordinateSpaceWithRef
-            height="80%"
+            height="100%"
             width="100%"
             deckDef={deckDef}
             viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
