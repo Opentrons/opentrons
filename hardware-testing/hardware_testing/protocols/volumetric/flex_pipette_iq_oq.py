@@ -217,9 +217,11 @@ def load_labware(
         * pipette.channels
     )
     num_plates_needed = ceil(num_wells_needed / 96)
+    # FIXME: support a stack of plates
+    if num_plates_needed > 1:
+        raise NotImplementedError("multiple plates not implemented yet")
     plates = [
-        ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS[f"plate_{i}"])
-        for i in range(int(num_plates_needed))
+        ctx.load_labware("corning_96_wellplate_360ul_flat", SLOTS[f"plate"])
     ]
     for plate in plates:
         plate.load_empty(plate.wells())
