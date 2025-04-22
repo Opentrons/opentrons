@@ -7,6 +7,7 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -44,7 +45,7 @@ export function OffDeckControls(
   } = props
   const { t } = useTranslation('starting_deck_state')
   if (
-    terminalItemId !== '__initial_setup__' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     slotPosition === null ||
     isSelected
   )

@@ -5,6 +5,7 @@ import { selectors } from '../../../../labware-ingred/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getSelectedTerminalItemId } from '../../../../ui/steps'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { OffDeckDetails } from '../OffDeckDetails'
 import { OffDeck } from '..'
 import type * as Components from '@opentrons/components'
@@ -35,7 +36,7 @@ describe('OffDeck', () => {
       selectedSlot: { slot: null, cutout: null },
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
+    vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
   })
   it('renders off deck details', () => {
     vi.mocked(OffDeckDetails).mockReturnValue(<div>mock off deck details</div>)

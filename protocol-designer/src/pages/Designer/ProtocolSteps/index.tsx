@@ -25,9 +25,10 @@ import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
   getIsMultiSelectMode,
   getSelectedSubstep,
-  getHoveredStepId,
   getHoveredTerminalItemId,
   getActiveItem,
+  getSelectedTerminalItemId,
+  getSelectedStepId,
 } from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../OffDeck'
@@ -40,14 +41,17 @@ import {
   getRobotType,
 } from '../../../file-data/selectors'
 import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
+import { HARDWARE_ID, START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { HotKeyDisplay, LiquidButton } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
   TimelineAlerts,
 } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
+import { TimelineEditHardware } from './TimelineEditHardware'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DeckSlot } from '../../../types'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '14.7rem'
@@ -60,13 +64,17 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const { isZoomedIn, showLiquidOverflowMenu } = props
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
+  const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selectedSubstep = useSelector(getSelectedSubstep)
+  const selectedStepId = useSelector(getSelectedStepId)
   const enableHotKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const robotType = useSelector(getRobotType)
   const activeItem = useSelector(getActiveItem)
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
+  const savedStepForms = useSelector(getSavedStepForms)
+  const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -75,17 +83,29 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
 
-  const currentHoveredStepId = useSelector(getHoveredStepId)
-  const savedStepForms = useSelector(getSavedStepForms)
-  const currentStep =
-    activeItem?.id != null ? savedStepForms[activeItem.id] : null
+  let currentStep
+  if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
+    currentStep = savedStepForms[selectedStepId]
+  } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
+    currentStep = null
+  } else {
+    currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
+  }
 
-  const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
   const showTimelineAlerts =
-    hasTimelineErrors && activeItem?.id !== '__initial_setup__'
+    hasTimelineErrors &&
+    activeItem?.id !== START_TERMINAL_ITEM_ID &&
+    activeItem?.id !== HARDWARE_ID
   const stepDetails = currentStep?.stepDetails ?? null
+
+  let header: string = t(activeItem?.id)
+  if (currentStep != null) {
+    header = i18n.format(currentStep.stepName, 'titleCase')
+  } else if (hoveredTerminalItem === HARDWARE_ID) {
+    header = t(selectedTerminalItemId)
+  }
 
   return (
     <Flex
@@ -127,12 +147,18 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing24}
-            width={isZoomedIn ? '100%' : CONTENT_MAX_WIDTH}
+            width={
+              isZoomedIn ||
+              (selectedTerminalItemId === HARDWARE_ID &&
+                robotType === OT2_ROBOT_TYPE)
+                ? '90%'
+                : CONTENT_MAX_WIDTH
+            }
             justifyContent={JUSTIFY_CENTER}
             paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
             marginX="auto"
           >
-            {isZoomedIn ? null : (
+            {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
               <>
                 {showTimelineAlerts ? (
                   <TimelineAlerts
@@ -147,19 +173,9 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                   alignItems={ALIGN_CENTER}
                   height="2.25rem"
                 >
-                  {currentStep != null && hoveredTerminalItem == null ? (
-                    <StyledText desktopStyle="headingSmallBold">
-                      {i18n.format(currentStep.stepName, 'titleCase')}
-                    </StyledText>
-                  ) : null}
-                  {activeItem?.selectionType ===
-                    'TERMINAL_ITEM_SELECTION_TYPE' &&
-                  currentHoveredStepId == null ? (
-                    <StyledText desktopStyle="headingSmallBold">
-                      {t(activeItem.id)}
-                    </StyledText>
-                  ) : null}
-
+                  <StyledText desktopStyle="headingSmallBold">
+                    {header}
+                  </StyledText>
                   <ToggleGroup
                     selectedValue={deckView}
                     leftText={leftString}
@@ -174,12 +190,10 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                 </Flex>
               </>
             )}
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing16}
-              height="100%"
-            >
-              {deckView === leftString ? (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+              {selectedTerminalItemId === HARDWARE_ID ? (
+                <TimelineEditHardware />
+              ) : deckView === leftString ? (
                 <DeckSetupContainer
                   hoverSlot={hoverSlot}
                   setHoverSlot={setHoverSlot}
@@ -188,15 +202,14 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
               ) : (
                 <OffDeck />
               )}
-              {isZoomedIn ? null : (
+              {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                 <>
                   {/* avoid shifting the deck view container */}
                   <Flex
                     height={STEP_SUMMARY_HEIGHT}
                     opacity={formData == null ? 1 : 0}
                   >
-                    {activeItem?.selectionType ===
-                    'TERMINAL_ITEM_SELECTION_TYPE' ? (
+                    {activeItem?.id === START_TERMINAL_ITEM_ID ? (
                       <SlotDetailsContainer
                         robotType={robotType}
                         slot={hoverSlot}

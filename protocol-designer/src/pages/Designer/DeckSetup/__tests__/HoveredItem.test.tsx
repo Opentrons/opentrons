@@ -5,7 +5,6 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { LabwareRender } from '@opentrons/components'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { HoveredItem } from '../HoveredItem'
 
 import type { ComponentProps } from 'react'
@@ -13,7 +12,7 @@ import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../ui/steps')
+vi.mock('../../../../ui/steps/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
@@ -21,7 +20,6 @@ vi.mock('@opentrons/components', async importOriginal => {
     LabwareRender: vi.fn(),
   }
 })
-
 const render = (props: ComponentProps<typeof HoveredItem>) => {
   return renderWithProviders(<HoveredItem {...props} />)[0]
 }
@@ -43,7 +41,6 @@ describe('HoveredItem', () => {
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(LabwareRender).mockReturnValue(<div>mock LabwareRender</div>)
-    vi.mocked(getSelectedTerminalItemId).mockReturnValue('__initial_setup__')
   })
   it('renders a hovered labware', () => {
     props.hoveredLabware = 'fixture/fixture_universal_flat_bottom_adapter/1'

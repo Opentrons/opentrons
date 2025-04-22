@@ -1,4 +1,4 @@
-from typing import Annotated, List, Literal, Optional
+from typing import Annotated, Any, Dict, List, Literal, Optional
 
 from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel, Field
@@ -34,4 +34,4 @@ class ChatRequest(BaseModel):
     fake: bool = Field(True, description="When set to true, the response will be a fake. OpenAI API is not used.")
     fake_key: FakeKeyType
     chat_options: ChatOptionType
-    json_protocol: Optional[str] = None
+    pd_protocol_content: Optional[Dict[str, Any]] = Field(None, description="PD protocol that was previously generated")
