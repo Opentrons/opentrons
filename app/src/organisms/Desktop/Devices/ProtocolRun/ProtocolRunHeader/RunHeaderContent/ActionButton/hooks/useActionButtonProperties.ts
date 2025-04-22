@@ -22,7 +22,6 @@ import {
   isRecoveryStatus,
   isRunAgainStatus,
   isStartRunStatus,
-  isWaitingForAppUncurrentRun,
 } from '../../../utils'
 
 import type { IconName } from '@opentrons/components'
@@ -92,10 +91,7 @@ export function useActionButtonProperties({
       pause()
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
     }
-  } else if (
-    runStatus === RUN_STATUS_STOP_REQUESTED ||
-    isWaitingForAppUncurrentRun(runStatus, runId === currentRunId)
-  ) {
+  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
   } else if (isStartRunStatus(runStatus)) {
