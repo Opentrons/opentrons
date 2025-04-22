@@ -714,7 +714,7 @@ const updatePatchOnPathChange = (
 ): FormPatch => {
   if (
     fieldHasChanged(rawForm, patch, 'path') &&
-    patch.path !== 'multiDispense'
+    rawForm.path === 'multiDispense'
   ) {
     return {
       ...patch,
