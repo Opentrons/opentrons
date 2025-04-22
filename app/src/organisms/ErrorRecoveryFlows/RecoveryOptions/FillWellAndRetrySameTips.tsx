@@ -1,6 +1,13 @@
 import { useTranslation, Trans } from 'react-i18next'
+import { css } from 'styled-components'
 
-import { LegacyStyledText } from '@opentrons/components'
+import {
+  LegacyStyledText,
+  Flex,
+  SPACING,
+  DIRECTION_COLUMN,
+  RESPONSIVENESS,
+} from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import { CancelRun } from './CancelRun'
@@ -12,13 +19,13 @@ import {
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 export function FillWellAndRetrySameTips(
   props: RecoveryContentProps
 ): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
-  console.log('=>(FillWellAndRetrySameTips.tsx:21) step', step)
   const { MANUAL_FILL_AND_RETRY_SAME_TIPS, CANCEL_RUN } = RECOVERY_MAP
 
   const buildContent = (): JSX.Element => {
@@ -76,13 +83,19 @@ export function SkipToNextStep(
 
   const buildBodyText = (): JSX.Element => {
     return (
-      <Trans
-        t={t}
-        i18nKey="robot_will_not_check_for_liquid"
-        components={{
-          block: <LegacyStyledText as="p" />,
-        }}
-      />
+      <Flex css={BODY_CONTAINER_STLYE}>
+        <Trans
+          t={t}
+          i18nKey="robot_will_not_check_for_liquid"
+          components={{
+            block: <LegacyStyledText as="p" />,
+          }}
+        />
+        <InlineNotification
+          type="alert"
+          heading={t('static_meniscus_less_accurate')}
+        />
+      </Flex>
     )
   }
 
@@ -97,3 +110,12 @@ export function SkipToNextStep(
     />
   )
 }
+
+const BODY_CONTAINER_STLYE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing8};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: ${SPACING.spacing24};
+  }
+`
