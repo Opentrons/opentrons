@@ -3,7 +3,10 @@
 from dataclasses import dataclass
 from typing import NewType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocol_engine.types.module import StackerStoredLabwareGroup
+from opentrons.protocol_engine.types.module import (
+    StackerStoredLabwareGroup,
+    StackerPoolDefinition,
+)
 from opentrons.protocol_engine.state.update_types import (
     FlexStackerStateUpdate,
     NO_CHANGE,
@@ -76,3 +79,22 @@ class FlexStackerSubState:
     def get_contained_labware(self) -> list[StackerStoredLabwareGroup]:
         """Get the labware inside the hopper."""
         return self.contained_labware_bottom_first
+
+    def get_max_pool_count(self) -> int | None:
+        """Get the maximum number of currently-configured labware.
+
+        If the stacker has not been configured, return None.
+        """
+        if not self.pool_primary_definition:
+            return None
+        return self.max_pool_count
+
+    def get_pool_definition(self) -> StackerPoolDefinition | None:
+        """Get the labware definitions of the stacker pool."""
+        if not self.pool_primary_definition:
+            return None
+        return StackerPoolDefinition(
+            primaryLabwareDefinition=self.pool_primary_definition,
+            adapterLabwareDefinition=self.pool_adapter_definition,
+            lidLabwareDefinition=self.pool_lid_definition,
+        )

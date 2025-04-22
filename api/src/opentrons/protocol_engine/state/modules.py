@@ -55,6 +55,7 @@ from ..types import (
     DeckType,
     LabwareMovementOffsetData,
     AddressableAreaLocation,
+    StackerStoredLabwareGroup,
 )
 
 from ..resources import DeckFixedLabware
@@ -1451,3 +1452,15 @@ class ModuleView:
         return math.floor(
             (max_fill_height - pool_overlap) / (pool_height - pool_overlap)
         )
+
+    def stacker_contained_labware(
+        self, module_id: str
+    ) -> list[StackerStoredLabwareGroup]:
+        """Get the labware contained in a Flex Stacker."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_contained_labware()
+
+    def stacker_max_pool_count(self, module_id: str) -> int | None:
+        """Get the max stored labware in this stacker configuration."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_max_pool_count()
