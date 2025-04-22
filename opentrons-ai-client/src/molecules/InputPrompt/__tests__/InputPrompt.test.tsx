@@ -64,10 +64,17 @@ describe('InputPrompt', () => {
   it('should track event when send button is clicked', async () => {
     render()
     const textbox = screen.getByRole('textbox')
-    fireEvent.change(textbox, { target: { value: ['test'] } })
+    // Ensure the textbox change updates the state and enables the button
+    fireEvent.change(textbox, { target: { value: 'test' } })
+
+    // Add a small wait to ensure state updates propagate
+    await waitFor(() => { expect(screen.getByRole('button')).not.toBeDisabled(); })
+
     const sendButton = screen.getByRole('button')
+    expect(sendButton).not.toBeDisabled() // Double check before clicking
     fireEvent.click(sendButton)
 
+    // Wait specifically for the trackEvent call
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: 'chat-submitted',
