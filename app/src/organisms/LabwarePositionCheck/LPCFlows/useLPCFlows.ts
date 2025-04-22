@@ -20,7 +20,7 @@ import {
   useUpdateDeckConfig,
   useHandleClientAppliedOffsets,
   useOffsetConflictTimestamp,
-  useUpdateLabwareInfo,
+  useUpdateLabware,
   useMonitorMaintenanceRunForDeletion,
 } from './hooks'
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
@@ -98,7 +98,7 @@ export function useLPCFlows({
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
   useUpdateDeckConfig(isFlex, runId, deckConfig)
-  useUpdateLabwareInfo(isFlex, runId, maintenanceRunId, labwareInfo)
+  useUpdateLabware(isFlex, runId, maintenanceRunId, labwareInfo)
   useHandleClientAppliedOffsets(isFlex, runId)
   useInitLPCStore({
     runId,

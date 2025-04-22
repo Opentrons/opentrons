@@ -28,7 +28,7 @@ export interface UpdateLPCDeckAction {
 
 export interface UpdateLPCLabwareAction {
   type: 'UPDATE_LPC_LABWARE'
-  payload: { runId: string; labware: LPCLabwareInfo }
+  payload: { runId: string; labware: LPCLabwareInfo['labware'] }
 }
 
 export interface FinishLPCAction {

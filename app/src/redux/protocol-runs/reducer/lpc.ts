@@ -66,7 +66,10 @@ export function LPCReducer(
       case UPDATE_LPC_LABWARE: {
         return {
           ...state,
-          labwareInfo: action.payload.labware,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: action.payload.labware,
+          },
         }
       }
 
