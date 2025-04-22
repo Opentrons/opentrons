@@ -123,7 +123,7 @@ describe('Update Protocol', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/chat')
   })
 
-  it('should call trackEvent when submit prompt button is clicked', async () => {
+  it.only('should call trackEvent when submit prompt button is clicked', async () => {
     render()
 
     // upload file

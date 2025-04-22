@@ -179,6 +179,19 @@ export function Onboarding(): JSX.Element | null {
             []
           )
         : []
+
+    if (values.fields.robotType === OT2_ROBOT_TYPE) {
+      const heaterShakerIndex = modules.findIndex(
+        mod => mod.type === HEATERSHAKER_MODULE_TYPE
+      )
+      const magModIndex = modules.findIndex(
+        mod => mod.type === MAGNETIC_MODULE_TYPE
+      )
+      if (heaterShakerIndex > -1 && magModIndex > -1) {
+        // if both are present, move the Magnetic module to slot 9, since both can't be in slot 1
+        modules[magModIndex].slot = '9'
+      }
+    }
     const newProtocolFields = values.fields
 
     dispatch(fileActions.createNewProtocol(newProtocolFields))

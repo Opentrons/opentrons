@@ -16,6 +16,7 @@ import {
   Kitchen,
   LabwareUploadModal,
   Navigation,
+  HintsModal,
 } from './components/organisms'
 import { ProtocolDesignerAppFallback } from './resources/ProtocolDesignerAppFallback'
 
@@ -84,6 +85,7 @@ export function ProtocolRoutes(): JSX.Element {
           <GateModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
+          <HintsModal />
           <Routes>
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />

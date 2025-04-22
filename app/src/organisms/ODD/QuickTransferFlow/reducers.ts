@@ -107,6 +107,12 @@ export function quickTransferWizardReducer(
         dropTipLocation: action.location,
       }
     }
+    case 'SET_LIQUID_CLASS': {
+      return {
+        ...state,
+        liquidClass: action.liquidClass,
+      }
+    }
   }
 }
 

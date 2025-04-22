@@ -25,6 +25,7 @@
     "@opentrons/shared-data": "link:../shared-data",
     "axios": "^0.21.1",
     "i18next": "^19.8.3",
+    "lodash": "4.17.21",
     "jotai": "2.8.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

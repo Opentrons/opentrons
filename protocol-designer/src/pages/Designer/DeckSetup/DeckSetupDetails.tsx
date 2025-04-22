@@ -22,6 +22,7 @@ import { getSlotsWithCollisions } from '../../../components/organisms/utils'
 import { getStagingAreaAddressableAreas } from '../../../utils'
 import { editSlotInfo } from '../../../labware-ingred/actions'
 import { getRobotType } from '../../../file-data/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getSlotInformation } from '../utils'
@@ -194,7 +195,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         ): ComponentProps<typeof Module>['innerProps'] => {
           if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
             let lidMotorState = 'unknown'
-            if (terminalItemId === '__initial_setup__' || moduleState.lidOpen) {
+            if (
+              terminalItemId === START_TERMINAL_ITEM_ID ||
+              moduleState.lidOpen
+            ) {
               lidMotorState = 'open'
             } else if (moduleState.lidOpen === false) {
               lidMotorState = 'closed'
@@ -229,7 +233,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           moduleOnDeck.type === THERMOCYCLER_MODULE_TYPE &&
           (moduleOnDeck.moduleState as ThermocyclerModuleState).lidOpen !==
             true &&
-          terminalItemId !== '__initial_setup__'
+          terminalItemId !== START_TERMINAL_ITEM_ID
 
         const tempInnerProps = getModuleInnerProps(moduleOnDeck.moduleState)
         const innerProps =
@@ -367,7 +371,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           return (
             addressableAreas &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
-            getSlotIsEmpty(activeDeckSetup, addressableArea.id, false, true)
+            getSlotIsEmpty(
+              activeDeckSetup,
+              addressableArea.id,
+              draggedLabware == null
+            )
           )
         })
         .map(addressableArea => {

@@ -35,7 +35,6 @@ import type {
 import type { DeckSlot } from '../../types'
 import type { FormData, HydratedFormData } from '../../form-types'
 import type {
-  AdditionalEquipmentOnDeck,
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,
@@ -175,18 +174,12 @@ export const getSlotIdsBlockedBySpanningForThermocycler = (
   return []
 }
 
-//  TODO(ja, 3/7/25): this util is very outdated, much of it is probably
-//  not even in use. we should refactor this!!!
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
-  /* we don't always want to count the slot as full if there is a staging area present
-     since labware/wasteChute can still go on top of staging areas  **/
-  includeStagingAreas?: boolean,
-  /* optional disallowing for additionalEquipmentAreas or not **/
-  discountAdditionalEquipmentAreas?: boolean
+  discountTrash: boolean
 ): boolean => {
-  //   special-casing the TC's slot A1 for the Flex
+  //  special-casing the TC's slot A1 for the Flex
   if (
     slot === 'cutoutA1' &&
     Object.values(initialDeckSetup.modules).find(
@@ -199,29 +192,12 @@ export const getSlotIsEmpty = (
       ae =>
         (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
         ae.location.includes(slot)
-    )
+    ) &&
+    discountTrash
   ) {
     return false
   }
 
-  const filteredAdditionalEquipmentOnDeck = values(
-    initialDeckSetup.additionalEquipmentOnDeck
-  ).filter((additionalEquipment: AdditionalEquipmentOnDeck) => {
-    const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
-    const includeStaging = includeStagingAreas
-      ? true
-      : additionalEquipment.name !== 'stagingArea'
-    if (cutoutForSlotOt2 != null) {
-      //  for Ot-2
-      return additionalEquipment.location === cutoutForSlotOt2 && includeStaging
-    } else {
-      //  for Flex
-      return additionalEquipment.location?.includes(slot) && includeStaging
-    }
-  })
-  const additionalEquipment = discountAdditionalEquipmentAreas
-    ? []
-    : filteredAdditionalEquipmentOnDeck
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -235,7 +211,6 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...additionalEquipment,
     ].length === 0
   )
 }

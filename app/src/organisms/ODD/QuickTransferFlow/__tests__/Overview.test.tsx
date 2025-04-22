@@ -43,6 +43,14 @@ describe('Overview', () => {
         } as any,
         transferType: 'transfer',
         volume: 25,
+        liquidClass: {
+          liquidClassName: 'dummyLiquidClass',
+          displayName: 'Dummy liquid class',
+          description: 'Dummy liquid class description',
+          schemaVersion: 0,
+          namespace: '',
+          byPipette: [],
+        },
       } as any,
     }
     when(vi.mocked(useFeatureFlag))
