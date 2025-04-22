@@ -33,6 +33,7 @@ export function LeftColumnLabwareInfo({
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
     HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
 
   const buildNewLocation = (): ComponentProps<
@@ -53,6 +54,7 @@ export function LeftColumnLabwareInfo({
         }
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY:
         return {
           deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
         }

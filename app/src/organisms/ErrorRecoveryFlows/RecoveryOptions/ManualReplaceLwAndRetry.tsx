@@ -107,6 +107,7 @@ export function ManualReplaceLwAndRetry(
       case HOPPER_MANUAL_LOAD_AND_RETRY.STEPS.CONFIRM_RETRY:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOOPER_MANUAL_REPLACE:
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.CONFIRM_RETRY:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY:
         return <TwoColLwInfoAndDeck {...props} />
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE:
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.EMPTY_STACKER:
@@ -133,6 +134,7 @@ export function ManualReplaceLwAndRetry(
         return <RetryStepInfo {...props} />
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.SKIP:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.SKIP:
         return <SkipStepInfo {...props} />
       default:
         console.warn(
