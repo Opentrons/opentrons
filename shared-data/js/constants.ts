@@ -671,15 +671,11 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 
-export const WELL_TOP: 'well-top' = 'well-top'
-export const WELL_CENTER: 'well-center' = 'well-center'
-export const WELL_BOTTOM: 'well-bottom' = 'well-bottom'
-export const LIQUID_MENISCUS: 'liquid-meniscus' = 'liquid-meniscus'
-
 export const POSITION_REFERENCE_TOP: 'well-top' = 'well-top'
 export const POSITION_REFERENCE_BOTTOM: 'well-bottom' = 'well-bottom'
 export const POSITION_REFERENCE_CENTER: 'well-center' = 'well-center'
-export const POSITION_REFERENCE_MENISCUS: 'liquid-meniscus' = 'liquid-meniscus'
+export const POSITION_REFERENCE_LIQUID_MENISCUS: 'liquid-meniscus' =
+  'liquid-meniscus'
 
 export const WELL_ORIGIN_TOP: 'top' = 'top'
 export const WELL_ORIGIN_BOTTOM: 'bottom' = 'bottom'
@@ -693,7 +689,7 @@ export const POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN: Record<
   [POSITION_REFERENCE_TOP]: WELL_ORIGIN_TOP,
   [POSITION_REFERENCE_BOTTOM]: WELL_ORIGIN_BOTTOM,
   [POSITION_REFERENCE_CENTER]: WELL_ORIGIN_CENTER,
-  [POSITION_REFERENCE_MENISCUS]: WELL_ORIGIN_MENISCUS,
+  [POSITION_REFERENCE_LIQUID_MENISCUS]: WELL_ORIGIN_MENISCUS,
 }
 
 export const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2
