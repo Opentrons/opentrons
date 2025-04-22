@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import time
 from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union
@@ -176,6 +177,8 @@ class CorsHeadersResponse(BaseModel):
     summary="Create Chat Completion",
     description="Generate a chat response based on the provided prompt.",
 )
+
+# ruff: noqa: C901
 async def create_chat_completion(
     body: ChatRequest, user: Annotated[User, Security(auth.verify)]
 ) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
@@ -211,14 +214,26 @@ async def create_chat_completion(
             response = openai.predict(prompt=body.message, chat_completion_message_params=body.history)
         else:
             if protocol_option == "create":
-                response = claude.create(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
+                if "Protocol Designer" in body.history[0]["content"]:
+                    response = claude.create_pd(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
+                else:
+                    response = claude.create(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
             else:
                 response = claude.update(user_id=str(user.sub), prompt=body.message, history=body.history)  # type: ignore
 
         if response is None or response == "":
             return ChatResponse(reply="No response was generated", fake=bool(body.fake))
-
-        return ChatResponse(reply=response, fake=bool(body.fake))
+        if "Protocol Designer" in body.history[0]["content"]:
+            try:
+                pd_protocol_content = json.loads(response)
+                return ChatResponse(
+                    reply="Here is your Protocol Designer protocol", fake=bool(body.fake), protocol_content=pd_protocol_content
+                )
+            except json.JSONDecodeError as e:
+                logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
+                return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(body.fake))
+        else:
+            return ChatResponse(reply=response, fake=bool(body.fake))
 
     except Exception as e:
         logger.exception("Error processing chat completion")
@@ -259,17 +274,39 @@ async def create_protocol(
 
         if body.fake:
             return ChatResponse(reply="Fake response", fake=body.fake)
+        # import code
+        # code.interact(local=dict(globals(), **locals()))
 
         response: Optional[str] = None
         if "openai" in settings.model.lower():
             response = openai.predict(prompt=str(body.model_dump()), chat_completion_message_params=None)
         else:
-            response = claude.create(user_id=str(user.sub), prompt=body.prompt, history=None)
+            if "Protocol Designer" in body.prompt:
+                response = claude.create_pd(user_id=str(user.sub), prompt=body.prompt, history=None)
+            else:
+                response = claude.create(user_id=str(user.sub), prompt=body.prompt, history=None)
 
         if response is None or response == "":
             return ChatResponse(reply="No response was generated", fake=bool(body.fake))
 
-        return ChatResponse(reply=response, fake=bool(body.fake))
+        if "Protocol Designer" in body.prompt:
+
+            pd_protocol_content = response
+            try:
+                # pd_protocol_content = json.loads(pd_protocol_content)
+
+                # import code
+                # code.interact(local=dict(globals(), **locals()))
+
+                pd_compatible = claude.fillup_pd(pd_protocol_content)
+                pd_compatible = json.loads(pd_compatible)
+
+                return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(body.fake), protocol_content=pd_compatible)
+            except json.JSONDecodeError as e:
+                logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
+                return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(body.fake))
+        else:
+            return ChatResponse(reply=response, fake=bool(body.fake))
 
     except Exception as e:
         logger.exception("Error processing protocol creation")

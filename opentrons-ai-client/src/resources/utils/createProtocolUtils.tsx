@@ -21,6 +21,7 @@ import type { UseFormWatch } from 'react-hook-form'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import type { CreatePrompt } from '../types'
+import { PYTHON } from '../../organisms/ProtocolFormatSection'
 
 export function generatePromptPreviewProtocolFormatItems(
   watch: UseFormWatch<CreateProtocolFormData>,
@@ -113,7 +114,7 @@ export function generatePromptPreviewLabwareLiquidsItems(
   labwares?.forEach(labware => {
     items.push(
       `${labware.count} x ${
-        getLabwareDisplayName(defs[labware.labwareURI]) as string
+        getLabwareDisplayName(defs[labware.labwareURI])
       }`
     )
   })
@@ -357,9 +358,11 @@ export function generateChatPrompt(
     ? values.steps.map(step => `- ${step}`).join('\n')
     : values.steps
 
-  const prompt = `${t('create_protocol_prompt_robot', { robotType })}\n${t(
-    'protocol_format'
-  )}:\n${protocolFormat}\n\n${t(
+  const prompt = `${
+    values.protocol_format === PYTHON
+      ? t('create_protocol_prompt_robot', { robotType }) + '\n'
+      : ''
+  }\n${t('protocol_format_title')}:\n${protocolFormat}\n\n${t(
     'application_title'
   )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
     'pipette_mounts'
@@ -393,11 +396,8 @@ export function generateChatPrompt(
     ),
     liquids: values.liquids,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake: values.protocol_format === 'Protocol Designer',
-    fake_key:
-      values.protocol_format === 'Protocol Designer'
-        ? 'pd serial diliution'
-        : undefined,
+    fake: false,
+    fake_key: undefined,
   })
 
   return prompt
