@@ -31,7 +31,10 @@ class UnsafeFlexStackerCloseLatchResult(BaseModel):
 
 
 class UnsafeFlexStackerCloseLatchImpl(
-    AbstractCommandImpl[UnsafeFlexStackerCloseLatchParams, SuccessData[UnsafeFlexStackerCloseLatchResult]]
+    AbstractCommandImpl[
+        UnsafeFlexStackerCloseLatchParams,
+        SuccessData[UnsafeFlexStackerCloseLatchResult],
+    ]
 ):
     """Implementation of a stacker UnsafeFlexStackerCloseLatch command."""
 
@@ -41,7 +44,9 @@ class UnsafeFlexStackerCloseLatchImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: UnsafeFlexStackerCloseLatchParams) -> SuccessData[UnsafeFlexStackerCloseLatchResult]:
+    async def execute(
+        self, params: UnsafeFlexStackerCloseLatchParams
+    ) -> SuccessData[UnsafeFlexStackerCloseLatchResult]:
         """Execute the stacker UnsafeFlexStackerCloseLatch command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -53,20 +58,34 @@ class UnsafeFlexStackerCloseLatchImpl(
         return SuccessData(public=UnsafeFlexStackerCloseLatchResult())
 
 
-class UnsafeFlexStackerCloseLatch(BaseCommand[UnsafeFlexStackerCloseLatchParams, UnsafeFlexStackerCloseLatchResult, ErrorOccurrence]):
+class UnsafeFlexStackerCloseLatch(
+    BaseCommand[
+        UnsafeFlexStackerCloseLatchParams,
+        UnsafeFlexStackerCloseLatchResult,
+        ErrorOccurrence,
+    ]
+):
     """A command to UnsafeFlexStackerCloseLatch the Flex Stacker of labware."""
 
-    commandType: UnsafeFlexStackerCloseLatchCommandType = "unsafe/flexStacker/closeLatch"
+    commandType: UnsafeFlexStackerCloseLatchCommandType = (
+        "unsafe/flexStacker/closeLatch"
+    )
     params: UnsafeFlexStackerCloseLatchParams
     result: Optional[UnsafeFlexStackerCloseLatchResult] = None
 
-    _ImplementationCls: Type[UnsafeFlexStackerCloseLatchImpl] = UnsafeFlexStackerCloseLatchImpl
+    _ImplementationCls: Type[
+        UnsafeFlexStackerCloseLatchImpl
+    ] = UnsafeFlexStackerCloseLatchImpl
 
 
-class UnsafeFlexStackerCloseLatchCreate(BaseCommandCreate[UnsafeFlexStackerCloseLatchParams]):
+class UnsafeFlexStackerCloseLatchCreate(
+    BaseCommandCreate[UnsafeFlexStackerCloseLatchParams]
+):
     """A request to execute a Flex Stacker UnsafeFlexStackerCloseLatch command."""
 
-    commandType: UnsafeFlexStackerCloseLatchCommandType = "unsafe/flexStacker/closeLatch"
+    commandType: UnsafeFlexStackerCloseLatchCommandType = (
+        "unsafe/flexStacker/closeLatch"
+    )
     params: UnsafeFlexStackerCloseLatchParams
 
     _CommandCls: Type[UnsafeFlexStackerCloseLatch] = UnsafeFlexStackerCloseLatch

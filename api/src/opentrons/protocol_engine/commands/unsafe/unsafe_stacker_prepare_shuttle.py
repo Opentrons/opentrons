@@ -25,7 +25,9 @@ if TYPE_CHECKING:
     from ...state.state import StateView
     from ...execution import EquipmentHandler
 
-UnsafeFlexStackerPrepareShuttleCommandType = Literal["unsafe/flexStacker/prepareShuttle"]
+UnsafeFlexStackerPrepareShuttleCommandType = Literal[
+    "unsafe/flexStacker/prepareShuttle"
+]
 
 
 class UnsafeFlexStackerPrepareShuttleParams(BaseModel):
@@ -47,7 +49,9 @@ _ExecuteReturn = Union[
 ]
 
 
-class UnsafeFlexStackerPrepareShuttleImpl(AbstractCommandImpl[UnsafeFlexStackerPrepareShuttleParams, _ExecuteReturn]):
+class UnsafeFlexStackerPrepareShuttleImpl(
+    AbstractCommandImpl[UnsafeFlexStackerPrepareShuttleParams, _ExecuteReturn]
+):
     """Implementation of a stacker prepare shuttle command."""
 
     def __init__(
@@ -61,7 +65,9 @@ class UnsafeFlexStackerPrepareShuttleImpl(AbstractCommandImpl[UnsafeFlexStackerP
         self._equipment = equipment
         self._model_utils = model_utils
 
-    async def execute(self, params: UnsafeFlexStackerPrepareShuttleParams) -> _ExecuteReturn:
+    async def execute(
+        self, params: UnsafeFlexStackerPrepareShuttleParams
+    ) -> _ExecuteReturn:
         """Execute the stacker prepare shuttle command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -93,21 +99,33 @@ class UnsafeFlexStackerPrepareShuttleImpl(AbstractCommandImpl[UnsafeFlexStackerP
 
 
 class UnsafeFlexStackerPrepareShuttle(
-    BaseCommand[UnsafeFlexStackerPrepareShuttleParams, UnsafeFlexStackerPrepareShuttleResult, ErrorOccurrence]
+    BaseCommand[
+        UnsafeFlexStackerPrepareShuttleParams,
+        UnsafeFlexStackerPrepareShuttleResult,
+        ErrorOccurrence,
+    ]
 ):
     """A command to prepare Flex Stacker shuttle."""
 
-    commandType: UnsafeFlexStackerPrepareShuttleCommandType = "unsafe/flexStacker/prepareShuttle"
+    commandType: UnsafeFlexStackerPrepareShuttleCommandType = (
+        "unsafe/flexStacker/prepareShuttle"
+    )
     params: UnsafeFlexStackerPrepareShuttleParams
     result: UnsafeFlexStackerPrepareShuttleResult | None = None
 
-    _ImplementationCls: Type[UnsafeFlexStackerPrepareShuttleImpl] = UnsafeFlexStackerPrepareShuttleImpl
+    _ImplementationCls: Type[
+        UnsafeFlexStackerPrepareShuttleImpl
+    ] = UnsafeFlexStackerPrepareShuttleImpl
 
 
-class UnsafeFlexStackerPrepareShuttleCreate(BaseCommandCreate[UnsafeFlexStackerPrepareShuttleParams]):
+class UnsafeFlexStackerPrepareShuttleCreate(
+    BaseCommandCreate[UnsafeFlexStackerPrepareShuttleParams]
+):
     """A request to execute a Flex Stacker UnsafeFlexStackerPrepareShuttle command."""
 
-    commandType: UnsafeFlexStackerPrepareShuttleCommandType = "unsafe/flexStacker/prepareShuttle"
+    commandType: UnsafeFlexStackerPrepareShuttleCommandType = (
+        "unsafe/flexStacker/prepareShuttle"
+    )
     params: UnsafeFlexStackerPrepareShuttleParams
 
     _CommandCls: Type[UnsafeFlexStackerPrepareShuttle] = UnsafeFlexStackerPrepareShuttle

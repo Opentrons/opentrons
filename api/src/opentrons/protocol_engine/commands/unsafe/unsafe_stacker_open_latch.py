@@ -30,7 +30,11 @@ class UnsafeFlexStackerOpenLatchResult(BaseModel):
     """Result data from a stacker UnsafeFlexStackerOpenLatch command."""
 
 
-class UnsafeFlexStackerOpenLatchImpl(AbstractCommandImpl[UnsafeFlexStackerOpenLatchParams, SuccessData[UnsafeFlexStackerOpenLatchResult]]):
+class UnsafeFlexStackerOpenLatchImpl(
+    AbstractCommandImpl[
+        UnsafeFlexStackerOpenLatchParams, SuccessData[UnsafeFlexStackerOpenLatchResult]
+    ]
+):
     """Implementation of a stacker UnsafeFlexStackerOpenLatch command."""
 
     def __init__(
@@ -39,7 +43,9 @@ class UnsafeFlexStackerOpenLatchImpl(AbstractCommandImpl[UnsafeFlexStackerOpenLa
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: UnsafeFlexStackerOpenLatchParams) -> SuccessData[UnsafeFlexStackerOpenLatchResult]:
+    async def execute(
+        self, params: UnsafeFlexStackerOpenLatchParams
+    ) -> SuccessData[UnsafeFlexStackerOpenLatchResult]:
         """Execute the stacker UnsafeFlexStackerOpenLatch command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -51,17 +57,27 @@ class UnsafeFlexStackerOpenLatchImpl(AbstractCommandImpl[UnsafeFlexStackerOpenLa
         return SuccessData(public=UnsafeFlexStackerOpenLatchResult())
 
 
-class UnsafeFlexStackerOpenLatch(BaseCommand[UnsafeFlexStackerOpenLatchParams, UnsafeFlexStackerOpenLatchResult, ErrorOccurrence]):
+class UnsafeFlexStackerOpenLatch(
+    BaseCommand[
+        UnsafeFlexStackerOpenLatchParams,
+        UnsafeFlexStackerOpenLatchResult,
+        ErrorOccurrence,
+    ]
+):
     """A command to UnsafeFlexStackerOpenLatch the Flex Stacker of labware."""
 
     commandType: UnsafeFlexStackerOpenLatchCommandType = "unsafe/flexStacker/openLatch"
     params: UnsafeFlexStackerOpenLatchParams
     result: Optional[UnsafeFlexStackerOpenLatchResult] = None
 
-    _ImplementationCls: Type[UnsafeFlexStackerOpenLatchImpl] = UnsafeFlexStackerOpenLatchImpl
+    _ImplementationCls: Type[
+        UnsafeFlexStackerOpenLatchImpl
+    ] = UnsafeFlexStackerOpenLatchImpl
 
 
-class UnsafeFlexStackerOpenLatchCreate(BaseCommandCreate[UnsafeFlexStackerOpenLatchParams]):
+class UnsafeFlexStackerOpenLatchCreate(
+    BaseCommandCreate[UnsafeFlexStackerOpenLatchParams]
+):
     """A request to execute a Flex Stacker UnsafeFlexStackerOpenLatch command."""
 
     commandType: UnsafeFlexStackerOpenLatchCommandType = "unsafe/flexStacker/openLatch"
