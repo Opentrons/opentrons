@@ -118,9 +118,7 @@ function useDisabledReason({
     doorStatus.moduleDoorLocation !== null &&
     isStartRunStatus(runStatus)
   ) {
-    return t('close_stacker_door', {
-      module_door_location: doorStatus.moduleDoorLocation,
-    })
+    return t('close_stacker_door')
   } else if (doorStatus.isDoorOpen && isStartRunStatus(runStatus)) {
     return t('close_door')
   } else if (isClosingCurrentRun) {

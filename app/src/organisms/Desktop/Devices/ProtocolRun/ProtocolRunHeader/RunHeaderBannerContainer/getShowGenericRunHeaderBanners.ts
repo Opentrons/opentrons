@@ -33,32 +33,25 @@ export function getShowGenericRunHeaderBanners({
   doorStatus,
   enteredER,
 }: ShowGenericRunHeaderBannersParams): ShowGenericRunHeaderBannersResult {
+  const beforeRunCondition =
+    doorStatus.isDoorOpen &&
+    isCancellableStatus(runStatus) &&
+    runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+    runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
+    runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
+
   const showRunCanceledBanner = runStatus === RUN_STATUS_STOPPED && !enteredER
 
   const showDoorOpenBeforeRunBanner =
-    doorStatus.isDoorOpen &&
-    doorStatus.moduleDoorLocation === null &&
-    isCancellableStatus(runStatus) &&
-    runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
+    doorStatus.moduleDoorLocation === null && beforeRunCondition
 
   const showUnconfiguredStackerDoorOpenBeforeRunBanner =
-    doorStatus.isDoorOpen &&
-    doorStatus.moduleDoorLocation === NOT_CONFIGURED &&
-    isCancellableStatus(runStatus) &&
-    runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
+    doorStatus.moduleDoorLocation === NOT_CONFIGURED && beforeRunCondition
 
   const showStackerDoorOpenBeforeRunBanner =
-    doorStatus.isDoorOpen &&
     doorStatus.moduleDoorLocation !== null &&
     doorStatus.moduleDoorLocation !== NOT_CONFIGURED &&
-    isCancellableStatus(runStatus) &&
-    runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
+    beforeRunCondition
 
   const showDoorOpenDuringRunBanner =
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&

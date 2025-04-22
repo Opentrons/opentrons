@@ -25,12 +25,12 @@ export function OpenDoorAlertModal(props: OpenDoorModalProps): JSX.Element {
   let doorText = t('close_door_to_resume_run')
   if (props.moduleDoorLocation === NOT_CONFIGURED) {
     doorHeader = t('unconfigured_stacker_door_is_open')
-    doorText = t('close_unconfigured_stacker_to_resume_run')
+    doorText = t('close_stacker_to_resume_generic')
   } else if (props.moduleDoorLocation !== null) {
     doorHeader = t('stacker_door_is_open', {
       module_door_location: props.moduleDoorLocation,
     })
-    doorText = t('close_stacker_to_resume_run', {
+    doorText = t('close_stacker_to_resume_generic', {
       module_door_location: props.moduleDoorLocation,
     })
   }
