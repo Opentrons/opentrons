@@ -6,8 +6,8 @@ import styled from 'styled-components'
 import { getWifiKeyByRequestId, postWifiKeys } from '/app/redux/networking'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
-import type { State } from '/app/redux/types'
 import type { ChangeEventHandler, ForwardedRef } from 'react'
+import type { State } from '/app/redux/types'
 
 export interface UploadKeyInputProps {
   robotName: string

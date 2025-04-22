@@ -16,8 +16,8 @@ import {
 import { getAllWellContentsForActiveItem } from '../../../../top-selectors/well-contents'
 import { SelectableLabware } from '../../Labware/SelectableLabware'
 
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../labware-ingred/selectors')

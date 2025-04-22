@@ -11,8 +11,8 @@ import { fieldsToLabware } from '../fieldsToLabware'
 import { labwareDefToFields } from '../labwareDefToFields'
 import { labwareFormSchema } from '../labwareFormSchema'
 
-import type { ProcessedLabwareFields } from '../fields'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ProcessedLabwareFields } from '../fields'
 
 vi.mock('../../definitions')
 

@@ -41,12 +41,12 @@ import {
   useTipLengthCalibrations,
 } from '../../../hooks'
 
+import type { MouseEventHandler } from 'react'
 import type {
   ResetConfigOption,
   ResetConfigRequest,
 } from '/app/redux/robot-admin/types'
 import type { Dispatch, State } from '/app/redux/types'
-import type { MouseEventHandler } from 'react'
 
 interface DeviceResetSlideoutProps {
   isExpanded: boolean

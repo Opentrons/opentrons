@@ -17,14 +17,14 @@ import {
   validateConnectFormFields,
 } from '../form-fields'
 
+import type { ComponentProps } from 'react'
+import type { FieldError } from 'react-hook-form'
 import type {
   ConnectFormValues,
   EapOption,
   WifiKey,
   WifiNetwork,
 } from '../../types'
-import type { ComponentProps } from 'react'
-import type { FieldError } from 'react-hook-form'
 
 const TestWrapperConnectFormFields = ({
   network,

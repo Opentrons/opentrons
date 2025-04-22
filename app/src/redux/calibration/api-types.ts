@@ -1,3 +1,4 @@
+import type { PipetteMount as Mount } from '@opentrons/shared-data'
 import type {
   CALIBRATION_SOURCE_CALIBRATION_CHECK,
   CALIBRATION_SOURCE_DEFAULT,
@@ -10,7 +11,6 @@ import type {
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_SINGULARITY,
 } from './constants'
-import type { PipetteMount as Mount } from '@opentrons/shared-data'
 
 export type DeckCalibrationStatus =
   | typeof DECK_CAL_STATUS_OK

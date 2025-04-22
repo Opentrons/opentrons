@@ -10,9 +10,9 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { PinnedProtocol } from './PinnedProtocol'
 
-import type { CardSizeType } from './PinnedProtocol'
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { Dispatch, SetStateAction } from 'react'
+import type { ProtocolResource } from '@opentrons/shared-data'
+import type { CardSizeType } from './PinnedProtocol'
 
 interface PinnedProtocolCarouselProps {
   pinnedProtocols: ProtocolResource[]

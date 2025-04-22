@@ -5,8 +5,8 @@ import thunk from 'redux-thunk'
 import { rootEpic } from './epic'
 import { rootReducer } from './reducer'
 
-import type { Action, State } from './types'
 import type { StoreEnhancer } from 'redux'
+import type { Action, State } from './types'
 
 const epicMiddleware = createEpicMiddleware<Action, Action, State, any>()
 

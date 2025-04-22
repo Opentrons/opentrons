@@ -12,9 +12,9 @@ import { getLabel } from '../fields'
 import styles from './Dropdown.module.css'
 import fieldStyles from './fieldStyles.module.css'
 
-import type { LabwareFields, RichOption, RichOptions } from '../fields'
-import type { SelectOption, StyleProps } from '@opentrons/components'
 import type * as React from 'react'
+import type { SelectOption, StyleProps } from '@opentrons/components'
+import type { LabwareFields, RichOption, RichOptions } from '../fields'
 
 export interface DropdownProps extends StyleProps {
   name: keyof LabwareFields

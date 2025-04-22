@@ -12,10 +12,10 @@ import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
 
 import { useTrackCreateProtocolRunEvent } from '../useTrackCreateProtocolRunEvent'
 
-import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
 import type { Mock } from 'vitest'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
 
 vi.mock('../../hooks')
 vi.mock('/app/transformations/analytics')

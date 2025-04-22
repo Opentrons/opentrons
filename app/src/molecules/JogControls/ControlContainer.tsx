@@ -9,8 +9,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 interface ControlContainerProps extends StyleProps {
   title: string

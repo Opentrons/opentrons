@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DropdownMenu } from '..'
 import { renderWithProviders } from '../../../testing/utils'
 
-import type { DropdownOption } from '..'
 import type { ComponentProps } from 'react'
+import type { DropdownOption } from '..'
 
 const mockOptions: DropdownOption[] = [
   { name: 'Option 1', value: 'option1' },

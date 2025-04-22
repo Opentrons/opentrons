@@ -34,11 +34,11 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useRunStatuses } from '/app/resources/runs'
 
+import type { MouseEvent } from 'react'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { SelectablePipettes } from '/app/organisms/PipetteWizardFlows/types'
-import type { MouseEvent } from 'react'
 
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'

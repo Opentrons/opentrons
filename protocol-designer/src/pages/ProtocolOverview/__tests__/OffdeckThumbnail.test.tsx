@@ -13,9 +13,9 @@ import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
 
+import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../top-selectors/well-contents')
 vi.mock('../../../labware-ingred/selectors')

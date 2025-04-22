@@ -16,8 +16,8 @@ import {
 
 import { selectDropdownItem } from '../../../ui/steps/actions/actions'
 
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
 import type { DropdownOption } from '@opentrons/components'
+import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
 
 export interface DropdownStepFormFieldProps extends FieldProps {
   options: DropdownOption[]

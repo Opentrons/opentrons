@@ -17,8 +17,8 @@ import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instrume
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 
-import type { FormattedPipetteOffsetCalibration } from '..'
 import type { ComponentProps } from 'react'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/resources/instruments')

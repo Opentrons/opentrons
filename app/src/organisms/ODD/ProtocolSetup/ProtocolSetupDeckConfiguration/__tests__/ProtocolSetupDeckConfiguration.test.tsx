@@ -14,13 +14,13 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import { ProtocolSetupDeckConfiguration } from '..'
 
+import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { Modules } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')

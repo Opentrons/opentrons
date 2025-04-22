@@ -7,9 +7,9 @@ import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
 import styles from './instrument.module.css'
 import { InstrumentDiagram } from './InstrumentDiagram'
 
+import type { ReactNode } from 'react'
 import type { Mount } from '../robot-types'
 import type { InstrumentDiagramProps } from './InstrumentDiagram'
-import type { ReactNode } from 'react'
 
 export interface InstrumentInfoProps {
   /** 'left' or 'right' */

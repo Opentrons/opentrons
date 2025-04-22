@@ -30,9 +30,9 @@ import { OneColumn } from './OneColumn'
 import { OneColumnOrTwoColumn } from './OneColumnOrTwoColumn'
 import { TwoColumn } from './TwoColumn'
 
-import type { IconName } from '@opentrons/components'
-import type { MouseEvent, ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { MouseEvent, ReactNode } from 'react'
+import type { IconName } from '@opentrons/components'
 
 export {
   ModalContentOneColSimpleButtons,

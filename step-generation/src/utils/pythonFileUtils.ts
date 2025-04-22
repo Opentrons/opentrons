@@ -17,6 +17,7 @@ import {
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
 
+import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
@@ -29,7 +30,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 
 const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
 

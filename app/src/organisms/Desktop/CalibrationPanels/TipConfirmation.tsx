@@ -13,11 +13,11 @@ import {
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import * as Sessions from '/app/redux/sessions'
 
-import type { CalibrationPanelProps } from './types'
 import type {
   SessionCommandString,
   SessionType,
 } from '/app/redux/sessions/types'
+import type { CalibrationPanelProps } from './types'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

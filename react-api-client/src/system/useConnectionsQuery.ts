@@ -3,8 +3,8 @@ import { getConnections } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { ActiveConnections, HostConfig } from '@opentrons/api-client'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { ActiveConnections, HostConfig } from '@opentrons/api-client'
 
 export function useConnectionsQuery(
   options: UseQueryOptions<ActiveConnections> = {}

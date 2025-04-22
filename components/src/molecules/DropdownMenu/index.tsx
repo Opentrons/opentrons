@@ -26,8 +26,8 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { DeckInfoLabel } from '../DeckInfoLabel'
 import { LiquidIcon } from '../LiquidIcon'
 
-import type { FocusEventHandler } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { FocusEventHandler } from 'react'
 
 export interface DropdownOption {
   name: string

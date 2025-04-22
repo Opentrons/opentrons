@@ -4,8 +4,8 @@ import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { uuid } from '../../utils'
 
-import type { CommandCreator } from '../../types'
 import type { HeaterShakerSetAndWaitForShakeSpeedCreateCommand } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 export const heaterShakerSetTargetShakeSpeed: CommandCreator<
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand['params']

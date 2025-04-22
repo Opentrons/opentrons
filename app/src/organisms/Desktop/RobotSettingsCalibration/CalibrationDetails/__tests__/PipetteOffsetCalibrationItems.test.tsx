@@ -20,9 +20,9 @@ import { OverflowMenu } from '../OverflowMenu'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { formatLastCalibrated } from '../utils'
 
+import type { ComponentProps } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
-import type { ComponentProps } from 'react'
 
 const render = (
   props: ComponentProps<typeof PipetteOffsetCalibrationItems>

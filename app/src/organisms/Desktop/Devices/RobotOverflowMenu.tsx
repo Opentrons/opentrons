@@ -31,10 +31,10 @@ import { useCurrentRunId } from '/app/resources/runs'
 
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
-import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot

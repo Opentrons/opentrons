@@ -28,9 +28,9 @@ import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { SetupModulesList } from '../SetupModulesList'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 
+import type { ComponentProps } from 'react'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')

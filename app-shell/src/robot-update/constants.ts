@@ -3,8 +3,8 @@ import { app } from 'electron'
 
 import { CURRENT_VERSION } from '../update'
 
-import type { UpdateManifestUrls } from './types'
 import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
+import type { UpdateManifestUrls } from './types'
 
 const OPENTRONS_PROJECT: string = _OPENTRONS_PROJECT_
 

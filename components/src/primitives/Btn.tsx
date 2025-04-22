@@ -4,9 +4,9 @@ import * as Styles from '../styles'
 import { RESPONSIVENESS } from '../ui-style-constants'
 import { isntStyleProp, styleProps } from './style-props'
 
-import type { StyleProps } from './types'
-import type { HTMLProps } from 'react'
 import type { StyledComponent } from 'styled-components'
+import type { HTMLProps } from 'react'
+import type { StyleProps } from './types'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'

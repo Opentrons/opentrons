@@ -1,8 +1,8 @@
-import type { GroupedCommands } from './types'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import type { GroupedCommands } from './types'
 
 export const getGroupedCommands = (
   mostRecentAnalysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis

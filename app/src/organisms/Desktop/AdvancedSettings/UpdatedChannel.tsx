@@ -17,9 +17,9 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
+import type { ComponentProps } from 'react'
 import type { SelectOption } from '/app/atoms/SelectField/Select'
 import type { Dispatch } from '/app/redux/types'
-import type { ComponentProps } from 'react'
 
 export function UpdatedChannel(): JSX.Element {
   const { t } = useTranslation('app_settings')

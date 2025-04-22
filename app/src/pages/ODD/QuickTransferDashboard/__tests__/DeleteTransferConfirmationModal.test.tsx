@@ -10,9 +10,9 @@ import { useToaster } from '/app/organisms/ToasterOven'
 
 import { DeleteTransferConfirmationModal } from '../DeleteTransferConfirmationModal'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import type { HostConfig } from '@opentrons/api-client'
 
 const mockNavigate = vi.fn()
 

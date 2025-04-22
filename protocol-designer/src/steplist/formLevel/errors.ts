@@ -27,6 +27,9 @@ import {
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 
+import type { ReactNode } from 'react'
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedFormData,
@@ -42,9 +45,6 @@ import type {
 } from '../../form-types'
 import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
 import type { ModuleEntities } from '../../step-forms'
-import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
-import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
-import type { ReactNode } from 'react'
 
 /*******************
  ** Error Messages **

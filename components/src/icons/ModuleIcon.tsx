@@ -10,8 +10,8 @@ import {
 
 import { Icon } from './Icon'
 
-import type { StyleProps } from '../primitives/types'
 import type { ModuleType } from '@opentrons/shared-data'
+import type { StyleProps } from '../primitives/types'
 
 export type ModuleIconName =
   | 'ot-magnet-v2'

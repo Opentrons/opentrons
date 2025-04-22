@@ -9,9 +9,9 @@ import {
 import { MOCK_RTP_DATA, PROTOCOL_ANALYSIS, PROTOCOL_ID } from '../__fixtures__'
 import { useRunTimeParameters } from '../useRunTimeParameters'
 
+import type { UseQueryResult } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 

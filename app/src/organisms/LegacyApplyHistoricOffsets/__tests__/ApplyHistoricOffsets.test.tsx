@@ -9,10 +9,10 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
 import { LegacyApplyHistoricOffsets } from '..'
 
-import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
+import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
+import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

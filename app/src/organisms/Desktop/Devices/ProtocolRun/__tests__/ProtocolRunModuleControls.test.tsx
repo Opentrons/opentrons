@@ -16,8 +16,8 @@ import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ModuleCard')

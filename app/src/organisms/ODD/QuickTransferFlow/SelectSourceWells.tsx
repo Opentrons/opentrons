@@ -14,12 +14,12 @@ import { WellSelection } from '/app/organisms/WellSelection'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '/app/redux/analytics'
 
+import type { ComponentProps, Dispatch, MouseEvent } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,
 } from './types'
-import type { SmallButton } from '/app/atoms/buttons'
-import type { ComponentProps, Dispatch, MouseEvent } from 'react'
 
 interface SelectSourceWellsProps {
   onNext: () => void

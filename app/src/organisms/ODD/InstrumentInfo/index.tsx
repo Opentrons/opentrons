@@ -24,10 +24,10 @@ import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
+import type { ComponentProps, MouseEventHandler } from 'react'
 import type { InstrumentData } from '@opentrons/api-client'
 import type { StyleProps } from '@opentrons/components'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { ComponentProps, MouseEventHandler } from 'react'
 
 interface InstrumentInfoProps {
   // NOTE: instrument will only be null while

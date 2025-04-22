@@ -6,9 +6,9 @@ import { getSessions } from '@opentrons/api-client'
 import { useAllSessionsQuery } from '..'
 import { useHost } from '../../api'
 
-import type { HostConfig, Response, Sessions } from '@opentrons/api-client'
 import type * as React from 'react'
 import type { UseQueryOptions } from 'react-query'
+import type { HostConfig, Response, Sessions } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

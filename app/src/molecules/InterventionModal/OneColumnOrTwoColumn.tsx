@@ -10,8 +10,8 @@ import {
 
 import { TWO_COLUMN_ELEMENT_MIN_WIDTH } from './constants'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 export interface OneColumnOrTwoColumnProps extends StyleProps {
   children: [ReactNode, ReactNode]

@@ -17,8 +17,8 @@ import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { RobotDashboard } from '..'
 import { WelcomeModal } from '../WelcomeModal'
 
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { NavigateFunction } from 'react-router-dom'
+import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 

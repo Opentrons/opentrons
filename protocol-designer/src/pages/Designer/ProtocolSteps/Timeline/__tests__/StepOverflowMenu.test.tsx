@@ -24,8 +24,8 @@ import {
 } from '../../../../../ui/steps/actions/actions'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
-import type * as OpentronsComponents from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 
 const mockConfirm = vi.fn()
 const mockCancel = vi.fn()

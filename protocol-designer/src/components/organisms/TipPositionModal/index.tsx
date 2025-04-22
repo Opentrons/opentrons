@@ -29,11 +29,11 @@ import { TipPositionSideView } from './TipPositionSideView'
 import { TipPositionTopView } from './TipPositionTopView'
 import * as utils from './utils'
 
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { PositionReference } from '@opentrons/shared-data'
 import type { StepFieldName } from '../../../form-types'
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 import type { MoveLiquidPrefixType } from '../../../resources/types'
-import type { PositionReference } from '@opentrons/shared-data'
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {

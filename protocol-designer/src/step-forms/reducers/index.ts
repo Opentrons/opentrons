@@ -43,6 +43,13 @@ import {
 } from '../utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 
+import type { Reducer } from 'redux'
+import type { Action as ReduxActionsAction } from 'redux-actions'
+import type { PipetteName } from '@opentrons/shared-data'
+import type {
+  NormalizedAdditionalEquipmentById,
+  NormalizedPipetteById,
+} from '@opentrons/step-generation'
 import type { PipetteLoadInfo } from '../../file-types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
@@ -103,13 +110,6 @@ import type {
   NormalizedLabware,
   NormalizedLabwareById,
 } from '../types'
-import type { PipetteName } from '@opentrons/shared-data'
-import type {
-  NormalizedAdditionalEquipmentById,
-  NormalizedPipetteById,
-} from '@opentrons/step-generation'
-import type { Reducer } from 'redux'
-import type { Action as ReduxActionsAction } from 'redux-actions'
 
 type FormState = FormData | null
 const unsavedFormInitialState = null

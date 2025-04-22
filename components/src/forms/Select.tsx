@@ -4,7 +4,6 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './Select.module.css'
 
-import type { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 import type {
   CSSObjectWithLabel,
   DropdownIndicatorProps,
@@ -12,6 +11,7 @@ import type {
   Props as ReactSelectProps,
   StylesConfig,
 } from 'react-select'
+import type { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 
 export { reactSelectComponents }
 

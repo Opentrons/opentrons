@@ -3,12 +3,12 @@ import { createLabwareDefinition } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
+import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
   CreateLabwareDefinitionResponsePayload,
   HostConfig,
 } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 
 interface CreateLabwareDefinitionParams {
   runId: string

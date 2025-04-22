@@ -3,10 +3,10 @@ import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
 
 import { COLORS } from '../../../helix-design-system'
 
+import type { CSSProperties, MemoExoticComponent, MouseEvent } from 'react'
+import type { LabwareWell } from '@opentrons/shared-data'
 import type { StyleProps } from '../../../primitives'
 import type { WellMouseEvent } from './types'
-import type { LabwareWell } from '@opentrons/shared-data'
-import type { CSSProperties, MemoExoticComponent, MouseEvent } from 'react'
 
 export interface WellProps extends StyleProps {
   /** Well Name (eg 'A1') */

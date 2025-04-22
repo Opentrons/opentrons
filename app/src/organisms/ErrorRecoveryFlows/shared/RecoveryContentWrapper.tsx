@@ -18,8 +18,8 @@ import {
 
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ComponentProps, ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 interface SingleColumnContentWrapperProps {
   children: ReactNode

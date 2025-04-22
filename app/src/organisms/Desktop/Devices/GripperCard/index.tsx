@@ -17,10 +17,10 @@ import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 
+import type { MouseEventHandler } from 'react'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/types'
-import type { MouseEventHandler } from 'react'
 
 interface GripperCardProps {
   attachedGripper: GripperData | BadGripper | null

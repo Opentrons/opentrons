@@ -16,9 +16,9 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
 import { StepContainer } from './StepContainer'
 
-import type { StepIdType } from '../../../../form-types'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
+import type { StepIdType } from '../../../../form-types'
 
 export interface ConnectedStepItemProps {
   stepId: StepIdType

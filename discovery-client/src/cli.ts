@@ -3,6 +3,7 @@ import Yargs from 'yargs'
 
 import { createDiscoveryClient, DEFAULT_PORT } from '.'
 
+import type { MiddlewareFunction } from 'yargs'
 import type {
   DiscoveryClient,
   DiscoveryClientRobot,
@@ -10,7 +11,6 @@ import type {
   Logger,
   LogLevel,
 } from './types'
-import type { MiddlewareFunction } from 'yargs'
 
 const LOG_LVLS: LogLevel[] = [
   'error',

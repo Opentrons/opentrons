@@ -14,13 +14,13 @@ import {
 import { uuid } from '../../../utils'
 import { KitchenContext } from './KitchenContext'
 
-import type { BakeOptions, MakeSnackbarOptions } from './KitchenContext'
+import type { ReactNode } from 'react'
 import type {
   SnackbarProps,
   ToastProps,
   ToastType,
 } from '@opentrons/components'
-import type { ReactNode } from 'react'
+import type { BakeOptions, MakeSnackbarOptions } from './KitchenContext'
 
 interface PantryProps {
   children: ReactNode

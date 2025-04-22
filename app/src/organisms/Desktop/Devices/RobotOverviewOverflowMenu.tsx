@@ -36,9 +36,9 @@ import { useCurrentRunId } from '/app/resources/runs'
 import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
+import type { MouseEvent, MouseEventHandler } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
-import type { MouseEvent, MouseEventHandler } from 'react'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot

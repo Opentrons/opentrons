@@ -15,9 +15,6 @@ import {
 import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
 
-import type { ErrorRecoveryFlowsProps } from '..'
-import type { ErrorKind } from '../types'
-import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
   DisplayLocationSlotOnlyParams,
@@ -35,6 +32,9 @@ import type {
   MoveLabwareRunTimeCommand,
   PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
+import type { ErrorRecoveryFlowsProps } from '..'
+import type { ErrorKind } from '../types'
+import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 
 interface UseFailedLabwareUtilsProps {
   failedCommand: FailedCommandBySource | null

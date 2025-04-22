@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Flex, JUSTIFY_CENTER } from '@opentrons/components'
 
-import type { DragRect, GenericRect } from './types'
 import type { MouseEventHandler, ReactNode, TouchEventHandler } from 'react'
+import type { DragRect, GenericRect } from './types'
 
 interface SelectionRectProps {
   onSelectionMove?: (rect: GenericRect) => void

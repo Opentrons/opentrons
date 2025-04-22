@@ -8,10 +8,10 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { useDeckConfigurationEditing } from '../useDeckConfigurationEditing'
 
+import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 import type { WizardTileProps } from '../../../../pages/Onboarding/types'
 import type { WizardFormState } from '../../types'
-import type * as OpentronsComponents from '@opentrons/components'
-import type { ComponentProps } from 'react'
 
 vi.mock('../useDeckConfigurationEditing')
 vi.mock('@opentrons/components', async importOriginal => {

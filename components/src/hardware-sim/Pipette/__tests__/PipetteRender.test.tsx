@@ -14,8 +14,8 @@ import { EightEmanatingNozzles } from '../EightEmanatingNozzles'
 import { EmanatingNozzle } from '../EmanatingNozzle'
 import { PipetteRender } from '../PipetteRender'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../Deck/RobotCoordsForeignDiv')
 vi.mock('../EmanatingNozzle')

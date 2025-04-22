@@ -1,5 +1,5 @@
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import type { MoveLabwareParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forMoveLabware(
   params: MoveLabwareParams,

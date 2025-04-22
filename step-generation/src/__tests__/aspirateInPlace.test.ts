@@ -7,8 +7,8 @@ import {
   makeContext,
 } from '../fixtures'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { AspirateInPlaceParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('aspirateInPlace', () => {
   let invariantContext: InvariantContext

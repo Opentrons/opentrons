@@ -13,9 +13,9 @@ import {
 } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
-import type { ListTableProps } from '../../atoms/ListTable'
-import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
+import type { ListTableProps } from '../../atoms/ListTable'
 
 const TRANSITION_STYLE = 'all 150ms ease-in'
 

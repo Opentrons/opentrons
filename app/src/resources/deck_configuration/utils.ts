@@ -1,7 +1,7 @@
 import { FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
-import type { CutoutConfigAndCompatibility } from './hooks'
 import type { CutoutFixtureId } from '@opentrons/shared-data'
+import type { CutoutConfigAndCompatibility } from './hooks'
 
 export function getRequiredDeckConfig(
   deckConfigProtocolSpec: CutoutConfigAndCompatibility[]

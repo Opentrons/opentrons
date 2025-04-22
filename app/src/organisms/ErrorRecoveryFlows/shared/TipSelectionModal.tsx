@@ -6,8 +6,8 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import { TipSelection } from './TipSelection'
 
-import type { TipSelectionProps } from './TipSelection'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { TipSelectionProps } from './TipSelection'
 
 type TipSelectionModalProps = TipSelectionProps & {
   toggleModal: () => void

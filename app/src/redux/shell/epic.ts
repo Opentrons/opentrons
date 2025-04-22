@@ -15,8 +15,8 @@ import { getUpdateChannel } from '../config'
 import { remote } from './remote'
 import { checkShellUpdate, getAvailableShellUpdate } from './update'
 
-import type { Action, Epic } from '../types'
 import type { OperatorFunction } from 'rxjs'
+import type { Action, Epic } from '../types'
 
 const { ipcRenderer } = remote
 

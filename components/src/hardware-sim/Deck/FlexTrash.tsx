@@ -12,8 +12,8 @@ import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
-import type { DeckLabelProps } from '../../molecules'
 import type { RobotType } from '@opentrons/shared-data'
+import type { DeckLabelProps } from '../../molecules'
 
 // only allow edge cutout locations (columns 1 and 3)
 export type TrashCutoutId =

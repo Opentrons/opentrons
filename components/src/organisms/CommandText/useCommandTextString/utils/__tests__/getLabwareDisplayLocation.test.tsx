@@ -16,8 +16,8 @@ import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getModuleDisplayLocation } from '../getModuleDisplayLocation'
 import { getModuleModel } from '../getModuleModel'
 
-import type { LabwareLocation } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareLocation } from '@opentrons/shared-data'
 
 vi.mock('../getModuleModel')
 vi.mock('../getModuleDisplayLocation')

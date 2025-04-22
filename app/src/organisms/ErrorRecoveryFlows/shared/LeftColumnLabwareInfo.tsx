@@ -2,8 +2,8 @@ import { InterventionContent } from '/app/molecules/InterventionModal/Interventi
 
 import { RECOVERY_MAP } from '../constants'
 
-import type { RecoveryContentProps } from '../types'
 import type { ComponentProps } from 'react'
+import type { RecoveryContentProps } from '../types'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string

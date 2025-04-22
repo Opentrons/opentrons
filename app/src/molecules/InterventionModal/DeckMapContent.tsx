@@ -11,13 +11,13 @@ import {
   useDeckLocationSelect,
 } from '@opentrons/components'
 
+import type { ComponentProps } from 'react'
 import type {
   LabwareDefinition2,
   LabwareLocation,
   ModuleLocation,
   RobotType,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 export type MapKind = 'intervention' | 'deck-config'
 

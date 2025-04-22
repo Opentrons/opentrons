@@ -72,6 +72,10 @@ import {
 } from './warnings'
 
 import type {
+  LabwareEntities,
+  ModuleEntities,
+} from '@opentrons/step-generation'
+import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
   HydratedFormData,
@@ -87,10 +91,6 @@ import type {
 } from '../../form-types'
 import type { FormError } from './errors'
 import type { FormWarning, FormWarningType } from './warnings'
-import type {
-  LabwareEntities,
-  ModuleEntities,
-} from '@opentrons/step-generation'
 
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'

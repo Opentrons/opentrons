@@ -5,11 +5,11 @@ import { getUserId } from '/app/redux/config'
 
 import { KEYS } from '../constants'
 
-import type { ClientDataLPC } from './types'
 import type {
   UseUpdateClientDataMutationOptions,
   UseUpdateClientDataMutationResult,
 } from '@opentrons/react-api-client'
+import type { ClientDataLPC } from './types'
 
 export type UseUpdateClientDataLPCResult = Omit<
   UseUpdateClientDataMutationResult<ClientDataLPC>,

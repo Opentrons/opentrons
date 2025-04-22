@@ -26,9 +26,9 @@ import { InitializationSettings } from './InitializationSettings'
 import { LidControls } from './LidControls'
 import { ReadSettings } from './ReadSettings'
 
+import type { AbsorbanceReaderState } from '@opentrons/step-generation'
 import type { AbsorbanceReaderFormType } from '../../../../../../form-types'
 import type { StepFormProps } from '../../types'
-import type { AbsorbanceReaderState } from '@opentrons/step-generation'
 
 export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
   const {

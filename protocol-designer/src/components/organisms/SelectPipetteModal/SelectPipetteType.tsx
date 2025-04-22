@@ -10,11 +10,11 @@ import {
 
 import { PIPETTE_TYPES } from '../../../pages/Onboarding/constants'
 
-import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
-import type { FormPipettesByMount } from '../../../step-forms'
-import type { PipetteMount, RobotType } from '@opentrons/shared-data'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
+import type { PipetteMount, RobotType } from '@opentrons/shared-data'
+import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
+import type { FormPipettesByMount } from '../../../step-forms'
 
 interface SelectPipetteTypeProps {
   mount: PipetteMount

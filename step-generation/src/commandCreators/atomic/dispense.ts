@@ -20,13 +20,13 @@ import {
   uuid,
 } from '../../utils'
 
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
 import type {
   CreateCommand,
   DispenseParams,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { Point } from '../../utils'
 
 export interface DispenseAtomicCommandParams extends DispenseParams {
   nozzles: NozzleConfigurationStyle | null

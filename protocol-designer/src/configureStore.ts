@@ -17,7 +17,6 @@ import { rootReducer as tutorialReducer } from './tutorial'
 import { rootReducer as uiReducer } from './ui'
 import { rootReducer as wellSelectionReducer } from './well-selection/reducers'
 
-import type { Action, BaseState } from './types'
 import type {
   CombinedState,
   Middleware,
@@ -25,6 +24,7 @@ import type {
   Store,
   StoreEnhancer,
 } from 'redux'
+import type { Action, BaseState } from './types'
 
 const timelineMiddleware = makeTimelineMiddleware()
 

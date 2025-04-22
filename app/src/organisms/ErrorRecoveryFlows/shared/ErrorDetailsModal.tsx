@@ -22,13 +22,13 @@ import { useErrorName } from '../hooks'
 import { getErrorKind } from '../utils'
 import { StepInfo } from './StepInfo'
 
-import type { ErrorRecoveryFlowsProps } from '..'
-import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
-import type { DesktopSizeType, ErrorKind } from '../types'
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { ReactNode } from 'react'
+import type { ErrorRecoveryFlowsProps } from '..'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
+import type { DesktopSizeType, ErrorKind } from '../types'
 
 export function useErrorDetailsModal(): {
   showModal: boolean

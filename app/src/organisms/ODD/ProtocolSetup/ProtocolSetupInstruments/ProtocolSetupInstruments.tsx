@@ -18,10 +18,10 @@ import { isGripperInCommands } from '/app/resources/protocols/utils'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import type { SetupScreens } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
+import type { SetupScreens } from '../types'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string

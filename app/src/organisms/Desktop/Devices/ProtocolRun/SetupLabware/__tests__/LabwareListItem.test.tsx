@@ -17,6 +17,7 @@ import {
 import { LabwareListItem } from '../LabwareListItem'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 
+import type { ComponentProps } from 'react'
 import type {
   LabwareDefinition2,
   ModuleModel,
@@ -24,7 +25,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type { ComponentProps } from 'react'
 
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')

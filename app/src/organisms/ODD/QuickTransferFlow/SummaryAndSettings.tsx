@@ -37,9 +37,9 @@ import { TipManagement } from './TipManagement'
 import { createQuickTransferFile, getInitialSummaryState } from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
-import type { QuickTransferWizardState } from './types'
-import type { SmallButton } from '/app/atoms/buttons'
 import type { ComponentProps } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
+import type { QuickTransferWizardState } from './types'
 
 interface SummaryAndSettingsProps {
   exitButtonProps: ComponentProps<typeof SmallButton>

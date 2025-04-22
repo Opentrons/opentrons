@@ -5,8 +5,8 @@ import { Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
-import type { StyleProps } from '../../primitives'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '../../primitives'
 
 export * from './ListItemChildren'
 

@@ -15,8 +15,8 @@ import { formatInterval } from '/app/transformations/commands'
 
 import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/analytics/hash')
 vi.mock('/app/redux/protocol-storage')

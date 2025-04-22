@@ -5,8 +5,8 @@ import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { ParametersTable } from './index'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Meta, StoryObj } from '@storybook/react'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const runTimeParameters: RunTimeParameter[] = [
   {

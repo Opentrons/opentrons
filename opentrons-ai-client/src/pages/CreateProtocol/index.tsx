@@ -27,9 +27,9 @@ import {
   generatePromptPreviewData,
 } from '../../resources/utils/createProtocolUtils'
 
+import type { MouseEvent } from 'react'
 import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 import type { DisplayModules } from '../../organisms/ModulesSection'
-import type { MouseEvent } from 'react'
 
 export interface CreateProtocolFormData {
   application: {

@@ -26,15 +26,15 @@ import {
 import { replaceTip } from './replaceTip'
 
 import type {
+  NozzleConfigurationStyle,
+  WellLocation,
+} from '@opentrons/shared-data'
+import type {
   CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
   MixArgs,
 } from '../../types'
-import type {
-  NozzleConfigurationStyle,
-  WellLocation,
-} from '@opentrons/shared-data'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {

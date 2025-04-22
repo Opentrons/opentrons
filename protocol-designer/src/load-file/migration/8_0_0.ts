@@ -9,7 +9,6 @@ import {
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { uuid } from '../../utils'
 
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type {
   MoveToAddressableAreaCreateCommand,
   ProtocolFileV7,
@@ -27,6 +26,7 @@ import type {
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV8'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration is to schema v8 and updates fixed trash by
 // treating it as an entity. Additionally, drop tip location is now selectable

@@ -22,8 +22,8 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
-import type { SetSettingOption } from './types'
 import type { Dispatch } from '/app/redux/types'
+import type { SetSettingOption } from './types'
 
 interface BrightnessTileProps {
   isActive: boolean

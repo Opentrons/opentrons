@@ -25,8 +25,8 @@ import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
 
 import styles from './styles.module.css'
 
-import type { Dispatch } from '/app/redux/types'
 import type { ChangeEvent } from 'react'
+import type { Dispatch } from '/app/redux/types'
 
 const BLOCK_REQUEST_EMAIL_BODY =
   '• Full name\n• Company or institution name\n• Shipping address\n• VAT ID (if outside the US)'

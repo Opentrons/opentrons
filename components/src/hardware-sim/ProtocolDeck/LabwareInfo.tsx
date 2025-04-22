@@ -13,8 +13,8 @@ import {
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignDiv } from '../Deck'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ReactNode } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const labwareDisplayNameStyle = css`
   ${TYPOGRAPHY.labelSemiBold}

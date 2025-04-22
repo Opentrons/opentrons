@@ -5,8 +5,8 @@ import glob from 'glob'
 import uniq from 'lodash/uniq'
 import { vi } from 'vitest'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Mock } from 'vitest'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,

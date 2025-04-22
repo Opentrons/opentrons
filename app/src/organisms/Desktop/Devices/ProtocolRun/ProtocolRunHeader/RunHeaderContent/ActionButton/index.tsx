@@ -29,8 +29,8 @@ import {
 import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 
-import type { RunHeaderContentProps } from '..'
 import type { MutableRefObject } from 'react'
+import type { RunHeaderContentProps } from '..'
 
 export type BaseActionButtonProps = RunHeaderContentProps
 

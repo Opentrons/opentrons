@@ -18,9 +18,9 @@ import {
 import { HighlightOffdeckSlot } from '../HighlightOffdeckSlot'
 import { OffDeckDetails } from '../OffDeckDetails'
 
+import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../HighlightOffdeckSlot')

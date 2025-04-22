@@ -10,8 +10,8 @@ import {
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
 import type { AttachedModule } from '@opentrons/api-client'
+import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface EqipmentItem {
   loadName: string

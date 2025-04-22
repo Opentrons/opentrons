@@ -21,8 +21,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
-import type { SetupScreens } from '../types'
 import type { Dispatch, SetStateAction } from 'react'
+import type { SetupScreens } from '../types'
 
 export interface ViewOnlyParametersProps {
   runId: string

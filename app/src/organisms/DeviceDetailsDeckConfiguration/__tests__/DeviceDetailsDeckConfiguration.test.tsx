@@ -22,11 +22,11 @@ import { useRunStatuses } from '/app/resources/runs'
 import { DeviceDetailsDeckConfiguration } from '../'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 
+import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { MaintenanceRun } from '@opentrons/api-client'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()

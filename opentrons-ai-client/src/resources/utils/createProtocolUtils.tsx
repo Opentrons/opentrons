@@ -15,10 +15,10 @@ import {
 } from '../../organisms/InstrumentsSection'
 import { getOnlyLatestDefs } from './labware'
 
+import type { UseFormWatch } from 'react-hook-form'
+import type { PipetteName } from '@opentrons/shared-data'
 import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import type { CreatePrompt } from '../types'
-import type { PipetteName } from '@opentrons/shared-data'
-import type { UseFormWatch } from 'react-hook-form'
 
 export function generatePromptPreviewApplicationItems(
   watch: UseFormWatch<CreateProtocolFormData>,

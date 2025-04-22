@@ -22,9 +22,9 @@ import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverf
 import { useDownloadRunLog } from '../hooks'
 import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
 
-import type { CommandsData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { CommandsData } from '@opentrons/api-client'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/robot-update/selectors')

@@ -9,13 +9,13 @@ import {
 } from '../ui/steps/reducers'
 import { getActiveItem } from '../ui/steps/selectors'
 
-import type { Selector } from '../types'
-import type { HoverableItem } from '../ui/steps/reducers'
 import type {
   CommandsAndRobotState,
   RobotState,
   Timeline,
 } from '@opentrons/step-generation'
+import type { Selector } from '../types'
+import type { HoverableItem } from '../ui/steps/reducers'
 
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   activeItem: HoverableItem | null,

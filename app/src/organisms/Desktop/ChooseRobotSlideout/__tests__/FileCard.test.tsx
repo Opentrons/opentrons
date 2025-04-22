@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { FileCard } from '../FileCard'
 
-import type { CsvFileParameter } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { CsvFileParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')

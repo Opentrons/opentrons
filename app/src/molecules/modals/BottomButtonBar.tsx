@@ -5,8 +5,8 @@ import { OutlineButton } from '@opentrons/components'
 
 import styles from './styles.module.css'
 
-import type { ButtonProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { ButtonProps } from '@opentrons/components'
 
 type MaybeButtonProps = ButtonProps | null | undefined
 interface Props {

@@ -7,8 +7,8 @@ import queryString from 'query-string'
 
 import { getAllDefinitions } from './definitions'
 
-import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 import type { Location } from 'react-router-dom'
+import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 
 export const FILTER_OFF = 'all'
 

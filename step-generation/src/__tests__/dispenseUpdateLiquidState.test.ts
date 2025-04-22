@@ -17,9 +17,9 @@ import {
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { DispenseUpdateLiquidStateArgs } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 import type { InvariantContext, RobotState } from '../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2

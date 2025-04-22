@@ -25,8 +25,8 @@ import { PipetteConfiguration } from './PipetteConfiguration'
 import { PipetteOverview } from './PipetteOverview'
 import { usePipetteConfig } from './usePipetteConfig'
 
-import type { ThunkDispatch } from '../../../types'
 import type { PipetteName } from '@opentrons/shared-data'
+import type { ThunkDispatch } from '../../../types'
 
 interface EditInstrumentsModalProps {
   onClose: () => void

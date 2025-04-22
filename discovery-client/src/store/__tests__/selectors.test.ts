@@ -13,8 +13,8 @@ import {
 } from '../../fixtures/health'
 import * as Selectors from '../selectors'
 
-import type { HostState, State } from '../types'
 import type { Agent } from 'http'
+import type { HostState, State } from '../types'
 
 const STATE: State = {
   robotsByName: {

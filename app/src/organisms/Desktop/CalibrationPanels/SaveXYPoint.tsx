@@ -37,7 +37,6 @@ import * as Sessions from '/app/redux/sessions'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
 
-import type { CalibrationPanelProps } from './types'
 import type { Mount } from '@opentrons/components'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type {
@@ -46,6 +45,7 @@ import type {
   SessionCommandString,
   SessionType,
 } from '/app/redux/sessions/types'
+import type { CalibrationPanelProps } from './types'
 
 const assetMap: Record<
   CalibrationLabware['slot'],

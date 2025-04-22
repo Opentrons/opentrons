@@ -11,10 +11,10 @@ import { getRobotApiVersionByName } from '/app/redux/discovery'
 import { useCanDisconnect } from '../useCanDisconnect'
 import { useWifiList } from '../useWifiList'
 
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { WifiNetwork } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
 
 vi.mock('../useWifiList')
 vi.mock('/app/redux-resources/robots')

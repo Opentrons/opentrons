@@ -3,11 +3,11 @@ import { COLORS } from '../../helix-design-system'
 import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import { StaticLabware, WellLabels } from './labwareInternals'
 
+import type { RefObject } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellLabelOption } from '../..'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type { HighlightedWellLabels } from './labwareInternals/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { RefObject } from 'react'
 
 const HIGHLIGHT_COLOR = COLORS.blue30
 const STROKE_WIDTH = 1

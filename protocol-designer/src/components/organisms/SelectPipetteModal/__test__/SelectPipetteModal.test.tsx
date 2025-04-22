@@ -14,10 +14,10 @@ import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getTiprackOptions } from '../../../../pages/Onboarding/utils'
 import { IncompatibleTipsModal } from '../../IncompatibleTipsModal'
 
-import type { WizardTileProps } from '../../../../pages/Onboarding/types'
-import type { WizardFormState } from '../../types'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import type { WizardTileProps } from '../../../../pages/Onboarding/types'
+import type { WizardFormState } from '../../types'
 
 vi.mock('../../../../labware-defs/actions')
 vi.mock('../../../../pages/Onboarding/utils')

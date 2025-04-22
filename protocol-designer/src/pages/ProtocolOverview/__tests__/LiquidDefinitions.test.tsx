@@ -5,9 +5,9 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { LiquidDefinitions } from '../LiquidDefinitions'
 
+import type { ComponentProps } from 'react'
 import type { InfoScreen } from '@opentrons/components'
 import type { LiquidEntities } from '@opentrons/step-generation'
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../feature-flags/selectors')
 

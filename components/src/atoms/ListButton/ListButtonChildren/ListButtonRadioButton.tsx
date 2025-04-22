@@ -6,8 +6,8 @@ import { CURSOR_POINTER } from '../../../styles'
 import { SPACING } from '../../../ui-style-constants'
 import { StyledText } from '../../StyledText'
 
-import type { StyleProps } from '../../../primitives'
 import type { ChangeEventHandler, MouseEvent } from 'react'
+import type { StyleProps } from '../../../primitives'
 
 interface ListButtonRadioButtonProps extends StyleProps {
   buttonText: string

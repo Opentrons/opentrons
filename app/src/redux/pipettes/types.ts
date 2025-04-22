@@ -1,9 +1,3 @@
-import type {
-  PipetteOffsetCalibration,
-  TipLengthCalibration,
-} from '../calibration/types'
-import type { RobotApiRequestMeta } from '../robot-api/types'
-import type { INCOMPATIBLE, INEXACT_MATCH, MATCH } from './constants'
 import type { PipetteData } from '@opentrons/api-client'
 import type {
   LabwareDefinition2,
@@ -12,6 +6,12 @@ import type {
   PipetteModelSpecs,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
+import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '../calibration/types'
+import type { RobotApiRequestMeta } from '../robot-api/types'
+import type { INCOMPATIBLE, INEXACT_MATCH, MATCH } from './constants'
 
 // common types
 

@@ -6,9 +6,9 @@ import { getEstopStatus } from '@opentrons/api-client'
 import { useEstopQuery } from '..'
 import { useHost } from '../../api'
 
-import type { UseEstopQueryOptions } from '../useEstopQuery'
-import type { EstopStatus, HostConfig, Response } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { EstopStatus, HostConfig, Response } from '@opentrons/api-client'
+import type { UseEstopQueryOptions } from '../useEstopQuery'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

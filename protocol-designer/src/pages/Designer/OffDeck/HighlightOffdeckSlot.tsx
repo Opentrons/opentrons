@@ -7,8 +7,8 @@ import {
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
 
-import type { LabwareOnDeck } from '../../../step-forms'
 import type { CoordinateTuple } from '@opentrons/shared-data'
+import type { LabwareOnDeck } from '../../../step-forms'
 
 interface HighlightOffdeckSlotProps {
   labwareOnDeck?: LabwareOnDeck

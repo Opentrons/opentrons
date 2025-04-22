@@ -6,12 +6,12 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { v1LabwareModelToV2Def } from './utils/v1LabwareModelToV2Def'
 
-import type { PDMetadata, PDProtocolFile as PDProtocolFileV1 } from './1_1_0'
 import type {
   FileLabware,
   FilePipette,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { PDMetadata, PDProtocolFile as PDProtocolFileV1 } from './1_1_0'
 
 // NOTE: PDMetadata type did not change btw 1.1.0 and 3.0.0
 export type PDProtocolFile = ProtocolFile<PDMetadata>

@@ -16,17 +16,6 @@ import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 
-import type { FormData, HydratedFormData } from '../../form-types'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlot } from '../../types'
-import type {
-  AdditionalEquipmentOnDeck,
-  FormPipette,
-  FormPipettesByMount,
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../types'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -45,6 +34,17 @@ import type {
   PipetteEntities,
   PipetteEntity,
 } from '@opentrons/step-generation'
+import type { FormData, HydratedFormData } from '../../form-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { DeckSlot } from '../../types'
+import type {
+  AdditionalEquipmentOnDeck,
+  FormPipette,
+  FormPipettesByMount,
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../types'
 
 export { createPresavedStepForm } from './createPresavedStepForm'
 

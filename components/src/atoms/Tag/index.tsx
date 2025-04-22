@@ -7,8 +7,8 @@ import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
-import type { IconName } from '../../icons'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { IconName } from '../../icons'
 
 export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
 

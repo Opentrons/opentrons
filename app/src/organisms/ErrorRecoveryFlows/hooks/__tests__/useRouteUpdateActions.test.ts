@@ -7,8 +7,8 @@ import {
   useRouteUpdateActions,
 } from '../useRouteUpdateActions'
 
-import type { GetRouteUpdateActionsParams } from '../useRouteUpdateActions'
 import type { Mock } from 'vitest'
+import type { GetRouteUpdateActionsParams } from '../useRouteUpdateActions'
 
 describe('useRouteUpdateActions', () => {
   const { OPTION_SELECTION } = RECOVERY_MAP

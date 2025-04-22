@@ -48,10 +48,10 @@ import { FLOWS } from './constants'
 import { ExitModal } from './ExitModal'
 import { getIsGantryEmpty } from './utils'
 
-import type { SelectablePipettes } from './types'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { SelectablePipettes } from './types'
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};

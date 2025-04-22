@@ -12,8 +12,8 @@ import { getShellUpdateDataFiles } from '/app/redux/shell'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 import { EmptyFile } from '../EmptyFile'
 
-import type { CsvFileParameter } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { CsvFileParameter } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/discovery')

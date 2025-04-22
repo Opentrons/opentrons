@@ -19,8 +19,8 @@ import {
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const OffsetTagMock = vi.fn(() => <div data-testid="offset-tag" />)
 const MultiDeckLabelTagBtnsMock = vi.fn(props => (

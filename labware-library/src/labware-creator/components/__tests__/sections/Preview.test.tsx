@@ -11,8 +11,8 @@ import { getLabwareName } from '../../../utils'
 import { Preview } from '../../sections/Preview'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 

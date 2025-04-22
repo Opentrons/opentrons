@@ -16,8 +16,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import type { Gen, PipetteType, PipetteVolumes } from './types'
 import type { ModuleModel, ModuleType, RobotType } from '@opentrons/shared-data'
+import type { Gen, PipetteType, PipetteVolumes } from './types'
 
 export const PIPETTE_GENS: Gen[] = ['GEN1', 'GEN2']
 

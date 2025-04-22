@@ -26,8 +26,8 @@ import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
-import type { LabwareFields } from '../../fields'
 import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
+import type { LabwareFields } from '../../fields'
 
 import src from '../../../images/stacking_offsets.svg'
 

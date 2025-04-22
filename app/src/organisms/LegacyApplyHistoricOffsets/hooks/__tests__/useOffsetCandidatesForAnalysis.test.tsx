@@ -13,9 +13,9 @@ import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombo
 import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
 
-import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 vi.mock('../useAllHistoricOffsets')
 vi.mock('../getLegacyLabwareLocationCombos')

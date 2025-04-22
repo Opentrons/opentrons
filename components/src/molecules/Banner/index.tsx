@@ -10,9 +10,9 @@ import {
 } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
-import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 
 export type BannerType =
   | 'success'

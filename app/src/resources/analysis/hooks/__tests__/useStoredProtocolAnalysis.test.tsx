@@ -24,12 +24,12 @@ import {
 } from '../__fixtures__/storedProtocolAnalysis'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 import type * as SharedData from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type { Store } from 'redux'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

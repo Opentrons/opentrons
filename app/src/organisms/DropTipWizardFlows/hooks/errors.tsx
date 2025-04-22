@@ -5,8 +5,8 @@ import { SmallButton } from '/app/atoms/buttons'
 
 import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
 
-import type { ErrorDetails } from '../types'
 import type { RunCommandError } from '@opentrons/shared-data'
+import type { ErrorDetails } from '../types'
 
 export interface SetRobotErrorDetailsParams {
   message: string | null

@@ -7,13 +7,13 @@ import { useCreateRunMutation } from '..'
 import { mockRunResponse, PROTOCOL_ID } from '../__fixtures__'
 import { useHost } from '../../api'
 
+import type * as React from 'react'
 import type {
   CreateRunData,
   HostConfig,
   Response,
   Run,
 } from '@opentrons/api-client'
-import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

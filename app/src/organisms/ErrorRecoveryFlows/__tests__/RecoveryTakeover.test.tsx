@@ -13,8 +13,8 @@ import { useUpdateClientDataRecovery } from '/app/resources/client_data'
 import { RecoveryTakeover, RecoveryTakeoverDesktop } from '../RecoveryTakeover'
 import { clickButtonLabeled } from './util'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/resources/client_data')
 

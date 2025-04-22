@@ -19,9 +19,9 @@ import {
   getModulesOnDeckByType,
 } from './utils'
 
+import type { DropdownOption } from '@opentrons/components'
 import type { LabwareNamesByModuleId } from '../../steplist/types'
 import type { Selector } from '../../types'
-import type { DropdownOption } from '@opentrons/components'
 
 export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,

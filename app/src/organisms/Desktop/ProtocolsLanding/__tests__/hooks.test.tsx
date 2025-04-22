@@ -6,11 +6,11 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useSortedProtocols } from '../hooks'
 
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
 
 const mockStoredProtocolData = [
   {

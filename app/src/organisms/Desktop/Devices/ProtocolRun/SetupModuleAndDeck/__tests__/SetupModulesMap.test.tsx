@@ -17,6 +17,7 @@ import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 
 import { SetupModulesMap } from '../SetupModulesMap'
 
+import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
@@ -24,7 +25,6 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

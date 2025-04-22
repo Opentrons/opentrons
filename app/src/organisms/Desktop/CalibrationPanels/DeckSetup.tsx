@@ -23,8 +23,8 @@ import * as Sessions from '/app/redux/sessions'
 
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 
-import type { CalibrationPanelProps } from './types'
 import type { AddressableArea } from '@opentrons/shared-data'
+import type { CalibrationPanelProps } from './types'
 
 const TIPRACK = 'tip rack'
 

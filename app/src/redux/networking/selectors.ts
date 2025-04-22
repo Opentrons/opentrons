@@ -5,9 +5,9 @@ import { createSelector } from 'reselect'
 
 import { INTERFACE_ETHERNET, INTERFACE_WIFI } from './constants'
 
+import type { Dictionary } from 'lodash'
 import type { State } from '../types'
 import type * as Types from './types'
-import type { Dictionary } from 'lodash'
 
 export function getInternetStatus(
   state: State,

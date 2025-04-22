@@ -8,8 +8,8 @@ import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/
 import { RECOVERY_MAP } from '../../constants'
 import { SkipStepInfo } from '../SkipStepInfo'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 describe('SkipStepInfo', () => {
   let props: ComponentProps<typeof SkipStepInfo>

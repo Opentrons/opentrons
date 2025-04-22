@@ -24,10 +24,10 @@ import {
   isStartRunStatus,
 } from '../../../utils'
 
-import type { BaseActionButtonProps } from '..'
 import type { IconName } from '@opentrons/components'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
+import type { BaseActionButtonProps } from '..'
 
 interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isProtocolNotReady: boolean

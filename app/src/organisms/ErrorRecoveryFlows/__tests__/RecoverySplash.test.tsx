@@ -20,8 +20,8 @@ import { RecoverySplash, useRecoverySplash } from '../RecoverySplash'
 import { StepInfo } from '../shared'
 import { clickButtonLabeled } from './util'
 
-import type { ComponentProps, FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { ComponentProps, FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/config')
 vi.mock('../shared')

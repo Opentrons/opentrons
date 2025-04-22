@@ -11,11 +11,11 @@ import {
 
 import { ErrorInfo } from '../ErrorInfo'
 
+import type { ComponentProps } from 'react'
 import type {
   HeaterShakerModule,
   ThermocyclerModule,
 } from '/app/redux/modules/types'
-import type { ComponentProps } from 'react'
 
 const mockErrorThermocycler = {
   id: 'thermocycler_id',

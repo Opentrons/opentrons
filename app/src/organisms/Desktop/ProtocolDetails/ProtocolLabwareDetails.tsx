@@ -25,9 +25,9 @@ import { Divider } from '/app/atoms/structure'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
 
+import type { MouseEventHandler } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
-import type { MouseEventHandler } from 'react'
 
 export const ProtocolLabwareDetails = (props: {
   commands: RunTimeCommand[]

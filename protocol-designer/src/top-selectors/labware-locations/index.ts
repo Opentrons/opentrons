@@ -35,10 +35,10 @@ import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { getIsAdapter } from '../../utils'
 
-import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
-import type { Selector } from '../../types'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
+import type { Selector } from '../../types'
 
 interface Option {
   name: string

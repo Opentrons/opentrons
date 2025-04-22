@@ -11,9 +11,9 @@ import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import { SECTIONS } from '../constants'
 import { PickUpTip } from '../PickUpTip'
 
-import type { CommandData } from '@opentrons/api-client'
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+import type { CommandData } from '@opentrons/api-client'
 
 vi.mock('/app/resources/protocols')
 vi.mock('/app/redux/config')

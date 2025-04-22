@@ -5,10 +5,10 @@ import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
 import { rgbaToHex } from './util'
 
-import type { Ingredient } from '@opentrons/step-generation'
 import type { RefObject } from 'react'
 import type { ColorResult } from 'react-color'
 import type { Control, UseFormSetValue } from 'react-hook-form'
+import type { Ingredient } from '@opentrons/step-generation'
 
 interface LiquidColorPickerProps {
   chooseColorWrapperRef: RefObject<HTMLDivElement>

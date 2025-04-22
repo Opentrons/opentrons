@@ -18,14 +18,14 @@ import {
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import { startPremigration, uploadSystemFile } from './update'
 
-import type { DownloadProgress } from '../http'
-import type { Action, Dispatch } from '../types'
-import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
 import type {
   RobotUpdateAction,
   RobotUpdateInfo,
   RobotUpdateTarget,
 } from '@opentrons/app/src/redux/robot-update/types'
+import type { DownloadProgress } from '../http'
+import type { Action, Dispatch } from '../types'
+import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
 
 const log = createLogger('robot-update/index')
 

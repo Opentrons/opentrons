@@ -17,8 +17,8 @@ import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
-import type { RecoveryContentProps } from '../types'
 import type { JSX } from 'react'
+import type { RecoveryContentProps } from '../types'
 
 export function GripperReleaseLabware({
   routeUpdateActions,

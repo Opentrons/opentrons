@@ -1,4 +1,3 @@
-import type { DeckSlot } from '../types'
 import type { Mount } from '@opentrons/components'
 import type {
   ABSORBANCE_READER_TYPE,
@@ -20,6 +19,7 @@ import type {
   PipetteEntity,
   TemperatureStatus,
 } from '@opentrons/step-generation'
+import type { DeckSlot } from '../types'
 
 export interface FormPipette {
   pipetteName?: string | null

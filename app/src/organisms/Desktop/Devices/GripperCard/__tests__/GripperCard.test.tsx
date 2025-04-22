@@ -9,8 +9,8 @@ import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { GripperCard } from '../'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
 
-import type { GripperData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { GripperData } from '@opentrons/api-client'
 
 vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('../AboutGripperSlideout')

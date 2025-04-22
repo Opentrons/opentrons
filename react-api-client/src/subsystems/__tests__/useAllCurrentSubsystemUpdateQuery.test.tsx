@@ -6,13 +6,13 @@ import { getCurrentAllSubsystemUpdates } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCurrentAllSubsystemUpdatesQuery } from '../useCurrentAllSubsystemUpdatesQuery'
 
+import type * as React from 'react'
 import type {
   CurrentSubsystemUpdate,
   CurrentSubsystemUpdates,
   HostConfig,
   Response,
 } from '@opentrons/api-client'
-import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

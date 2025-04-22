@@ -11,8 +11,8 @@ import { getUnsavedForm } from '../../../../../step-forms/selectors'
 import { StepContainer } from '../StepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
-import type { OverflowBtn } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { OverflowBtn } from '@opentrons/components'
 
 vi.mock('../../../../../step-forms/selectors')
 vi.mock('../../../../../ui/steps/actions/actions')

@@ -28,8 +28,8 @@ import { uuid } from '@opentrons/step-generation'
 import { useKitchen } from '../Kitchen/hooks'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
-import type { FormModules } from '../../../step-forms'
-import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
   CutoutConfig,
@@ -38,8 +38,8 @@ import type {
   FlexModuleCutoutFixtureId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseFormSetValue } from 'react-hook-form'
+import type { FormModules } from '../../../step-forms'
+import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId

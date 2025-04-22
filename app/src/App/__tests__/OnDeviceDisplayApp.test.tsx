@@ -32,10 +32,10 @@ import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
-import type { LocalizationProviderProps } from '../../LocalizationProvider'
+import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
-import type { UseQueryResult } from 'react-query'
+import type { LocalizationProviderProps } from '../../LocalizationProvider'
 
 vi.mock('@opentrons/react-api-client', async () => {
   const actual = await vi.importActual('@opentrons/react-api-client')

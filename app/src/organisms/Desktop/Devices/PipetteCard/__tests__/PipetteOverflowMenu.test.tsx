@@ -14,9 +14,9 @@ import {
 
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 
+import type { ComponentProps } from 'react'
 import type * as SharedData from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/config')
 vi.mock('@opentrons/shared-data', async importOriginal => {

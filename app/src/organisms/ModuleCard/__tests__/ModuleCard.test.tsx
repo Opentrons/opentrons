@@ -28,13 +28,13 @@ import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
+import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 import type {
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
 } from '/app/redux/modules/types'
-import type { ComponentProps } from 'react'
-import type { Mock } from 'vitest'
 
 vi.mock('../ErrorInfo')
 vi.mock('../MagneticModuleData')

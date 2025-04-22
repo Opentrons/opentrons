@@ -10,13 +10,13 @@ import { OPENTRONS_USB } from '../discovery'
 import { appShellRequestor } from '../shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
+import type { AxiosError } from 'axios'
+import type { Observable } from 'rxjs'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
   RobotHost,
 } from './types'
-import type { AxiosError } from 'axios'
-import type { Observable } from 'rxjs'
 
 const checkEmpty = (val: unknown): boolean => val == null || val === ''
 

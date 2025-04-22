@@ -14,8 +14,8 @@ import {
 import { getIsCustomTubeRack } from './utils/getIsCustomTubeRack'
 import { getIsOpentronsTubeRack } from './utils/getIsOpentronsTubeRack'
 
-import type { LabwareFields } from './fields'
 import type { RegularNameProps } from '@opentrons/shared-data'
+import type { LabwareFields } from './fields'
 
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (

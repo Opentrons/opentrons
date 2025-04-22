@@ -8,8 +8,8 @@ import {
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
 
-import type { LabwareFields } from '../../fields'
 import type { FormikTouched } from 'formik'
+import type { LabwareFields } from '../../fields'
 
 const xyMessage = (
   <div>

@@ -9,8 +9,8 @@ import { isEveryFieldHidden } from '../../../utils/isEveryFieldHidden'
 import { Description } from '../../sections/Description'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils/isEveryFieldHidden')
 

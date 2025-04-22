@@ -10,12 +10,12 @@ import {
   getLwModStackupDetails,
 } from './helpers'
 
-import type { LabwareLocationInfoWithLocSeq } from '.'
 import type {
   LoadedLabware,
   LoadedModule,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
+import type { LabwareLocationInfoWithLocSeq } from '.'
 
 export function getLoadLabwareLocationCombo(
   command: LoadLabwareRunTimeCommand,

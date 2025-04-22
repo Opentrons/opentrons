@@ -8,8 +8,8 @@ import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__f
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { LPCProbeNotAttached } from '/app/organisms/LabwarePositionCheck/LPCProbeNotAttached'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal<typeof useSelector>()

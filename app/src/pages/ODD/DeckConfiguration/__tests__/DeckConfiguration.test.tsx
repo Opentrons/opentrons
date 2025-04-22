@@ -15,10 +15,10 @@ import {
 
 import { DeckConfigurationEditor } from '..'
 
-import type * as Components from '@opentrons/components'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
+import type * as Components from '@opentrons/components'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 const mockUpdateDeckConfiguration = vi.fn()
 const mockGoBack = vi.fn()

@@ -14,6 +14,7 @@ import {
   getSelectedLabwareDefFrom,
 } from '../transforms'
 
+import type { Selector } from 'reselect'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ConflictTimestampInfo,
@@ -23,7 +24,6 @@ import type {
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { Selector } from 'reselect'
 
 export interface LPCLabwareInfoAndDefaultStatus {
   uri: string

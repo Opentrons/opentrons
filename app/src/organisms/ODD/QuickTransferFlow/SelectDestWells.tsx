@@ -26,17 +26,17 @@ import {
 } from './SelectSourceWells'
 
 import type {
-  QuickTransferWizardAction,
-  QuickTransferWizardState,
-} from './types'
-import type { SmallButton } from '/app/atoms/buttons'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type {
   ComponentProps,
   Dispatch,
   MouseEvent,
   SetStateAction,
 } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type {
+  QuickTransferWizardAction,
+  QuickTransferWizardState,
+} from './types'
 
 interface SelectDestWellsProps {
   onNext: () => void

@@ -24,8 +24,8 @@ import { pickUpTip } from '../atomic/pickUpTip'
 import { dropTipInTrash } from './dropTipInTrash'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
 
-import type { CommandCreator, CurriedCommandCreator } from '../../types'
 import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface ReplaceTipArgs {
   pipette: string

@@ -18,14 +18,14 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import { useMissingProtocolHardware } from '../useMissingProtocolHardware'
 
+import type { FunctionComponent, ReactNode } from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')

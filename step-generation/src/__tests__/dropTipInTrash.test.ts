@@ -7,8 +7,8 @@ import {
   makeContext,
 } from '../fixtures'
 
-import type { InvariantContext, PipetteEntities, RobotState } from '../types'
 import type { CutoutId } from '@opentrons/shared-data'
+import type { InvariantContext, PipetteEntities, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 

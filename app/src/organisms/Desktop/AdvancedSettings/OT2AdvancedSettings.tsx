@@ -16,8 +16,8 @@ import {
 } from '/app/redux/calibration'
 import { getUseTrashSurfaceForTipCal } from '/app/redux/config'
 
-import type { Dispatch, State } from '/app/redux/types'
 import type { ChangeEvent } from 'react'
+import type { Dispatch, State } from '/app/redux/types'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'

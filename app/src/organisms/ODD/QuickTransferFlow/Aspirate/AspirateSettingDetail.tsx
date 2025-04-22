@@ -6,12 +6,12 @@ import { Mix } from '../QuickTransferAdvancedSettings/Mix'
 import { TipPositionEntry } from '../QuickTransferAdvancedSettings/TipPosition'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 
+import type { ComponentType, Dispatch } from 'react'
 import type {
   AspirateSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { ComponentType, Dispatch } from 'react'
 
 interface CommonSettingProps {
   kind: 'aspirate'

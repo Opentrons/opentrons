@@ -8,8 +8,8 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery
 import { mockSuccessQueryResults } from '../../../../__fixtures__'
 import { useHistoricRunDetails } from '../useHistoricRunDetails'
 
-import type { RunData } from '@opentrons/api-client'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { RunData } from '@opentrons/api-client'
 
 vi.mock('/app/resources/runs/useNotifyAllRunsQuery')
 

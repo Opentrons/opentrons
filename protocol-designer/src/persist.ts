@@ -2,8 +2,8 @@ import get from 'lodash/get'
 
 import { dismissedHintsPersist } from './tutorial/reducers'
 
-import type { DismissedHintReducerState } from './tutorial/reducers'
 import type { Store } from 'redux'
+import type { DismissedHintReducerState } from './tutorial/reducers'
 
 export interface RehydratePersistedAction {
   type: 'REHYDRATE_PERSISTED'

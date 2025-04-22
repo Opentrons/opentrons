@@ -6,13 +6,13 @@ import { createProtocolAnalysis } from '@opentrons/api-client'
 import { useCreateProtocolAnalysisMutation } from '..'
 import { useHost } from '../../api'
 
+import type * as React from 'react'
 import type {
   HostConfig,
   ProtocolAnalysisSummaryResult,
   Response,
 } from '@opentrons/api-client'
 import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
-import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

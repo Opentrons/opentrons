@@ -41,11 +41,6 @@ import {
 } from './processing'
 
 import type {
-  LabwareOrAdditionalEquipmentEntity,
-  StepFieldName,
-} from '../../form-types'
-import type { ValueCaster, ValueMasker } from './processing'
-import type {
   AddressableAreaName,
   CutoutId,
   LabwareLocation,
@@ -57,6 +52,11 @@ import type {
   StagingAreaEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
+import type {
+  LabwareOrAdditionalEquipmentEntity,
+  StepFieldName,
+} from '../../form-types'
+import type { ValueCaster, ValueMasker } from './processing'
 
 export type { StepFieldName }
 

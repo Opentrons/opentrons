@@ -8,14 +8,14 @@ import {
   getSelectedWells,
 } from '../../well-selection/selectors'
 
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
 import type {
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,

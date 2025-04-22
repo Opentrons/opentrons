@@ -17,11 +17,7 @@ import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAtta
 
 import { RobotMotionLoader } from './RobotMotionLoader'
 
-import type {
-  AttachProbeStep,
-  RegisterPositionAction,
-  WorkingOffset,
-} from './types'
+import type { Dispatch } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -29,7 +25,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
-import type { Dispatch } from 'react'
+import type {
+  AttachProbeStep,
+  RegisterPositionAction,
+  WorkingOffset,
+} from './types'
 
 const StyledVideo = styled.video`
   padding-top: ${SPACING.spacing4};

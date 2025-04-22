@@ -29,11 +29,8 @@ import { TipConfirmation } from './TipConfirmation'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { getLabwareDef } from './utils/labware'
 
-import type {
-  PickUpTipStep,
-  RegisterPositionAction,
-  WorkingOffset,
-} from './types'
+import type { TFunction } from 'i18next'
+import type { Dispatch } from 'react'
 import type {
   LabwareOffset,
   LegacyLabwareOffsetLocation,
@@ -47,8 +44,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
-import type { TFunction } from 'i18next'
-import type { Dispatch } from 'react'
+import type {
+  PickUpTipStep,
+  RegisterPositionAction,
+  WorkingOffset,
+} from './types'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis

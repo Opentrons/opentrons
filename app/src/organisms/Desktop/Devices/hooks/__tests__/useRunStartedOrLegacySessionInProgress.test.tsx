@@ -6,8 +6,8 @@ import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
 
 import { useRunStartedOrLegacySessionInProgress } from '..'
 
-import type { Sessions } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { Sessions } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')

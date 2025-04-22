@@ -7,8 +7,8 @@ import { useRobot } from '/app/redux-resources/robots'
 
 import { useWifiList } from '../useWifiList'
 
-import type { WifiListResponse, WifiNetwork } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { WifiListResponse, WifiNetwork } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')

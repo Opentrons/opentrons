@@ -7,9 +7,9 @@ import tempy from 'tempy'
 import { fetchToFile } from '../../http'
 import { createLogger } from '../../log'
 
+import type { Dirent } from 'fs'
 import type { DownloadProgress } from '../../http'
 import type { ReleaseSetFilepaths, ReleaseSetUrls } from '../types'
-import type { Dirent } from 'fs'
 
 const log = createLogger('systemUpdate/from-web/release-files')
 const outPath = (dir: string, url: string): string => {

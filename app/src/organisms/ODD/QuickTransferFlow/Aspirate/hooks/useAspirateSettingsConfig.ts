@@ -7,13 +7,13 @@ import {
   ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS,
 } from '../../constants'
 
+import type { Dispatch } from 'react'
 import type {
   AspirateSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
   SettingItem,
 } from '../../types'
-import type { Dispatch } from 'react'
 
 interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState

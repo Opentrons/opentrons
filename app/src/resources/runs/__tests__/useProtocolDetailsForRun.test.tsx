@@ -11,9 +11,9 @@ import { useProtocolDetailsForRun } from '..'
 import { RUN_ID_2 } from '../__fixtures__'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'
 
+import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useNotifyRunQuery')

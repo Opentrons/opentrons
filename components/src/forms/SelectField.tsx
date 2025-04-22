@@ -4,10 +4,10 @@ import find from 'lodash/find'
 import { Select } from './Select'
 import styles from './SelectField.module.css'
 
-import type { SelectOption } from '.'
-import type { SelectProps } from './Select'
 import type { ReactNode } from 'react'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
+import type { SelectOption } from '.'
+import type { SelectProps } from './Select'
 
 export interface SelectFieldProps {
   /** optional HTML id for container */

@@ -16,11 +16,11 @@ import {
 } from '../../PipetteFields'
 import { getFormLevelError } from '../../utils'
 
+import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName } from '../../types'
 import type { ErrorMappedToField } from '../../utils'
-import type { PipetteEntities } from '@opentrons/step-generation'
 
 interface FirstStepMixToolsProps {
   propsForFields: FieldPropsByName

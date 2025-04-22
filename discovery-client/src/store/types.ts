@@ -1,3 +1,4 @@
+import type { Agent } from 'http'
 import type {
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_OK,
@@ -17,7 +18,6 @@ import type {
   REMOVE_ROBOT,
   SERVICE_FOUND,
 } from './actions'
-import type { Agent } from 'http'
 
 /**
  * Health state of a given robot

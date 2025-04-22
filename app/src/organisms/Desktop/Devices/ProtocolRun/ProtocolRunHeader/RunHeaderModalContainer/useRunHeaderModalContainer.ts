@@ -28,6 +28,9 @@ import {
   useRunFailedModal,
 } from './modals'
 
+import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
+import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
+import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunErrorsResult } from '../hooks'
 import type {
@@ -41,9 +44,6 @@ import type {
   UseHeaterShakerIsRunningModalResult,
   UseRunFailedModalResult,
 } from './modals'
-import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
-import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
-import type { RunControls } from '/app/organisms/RunTimeControl'
 
 interface OffsetCOnflictModalUtils {
   showModal: boolean

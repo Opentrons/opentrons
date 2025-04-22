@@ -18,10 +18,10 @@ import { LiquidClassesStepTools } from '../../MoveLiquidTools/LiquidClassesStepT
 import { FirstStepMixTools } from '../FirstStepMixTools'
 import { SecondStepMixTools } from '../SecondStepMixTools'
 
+import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormData } from '../../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../../steplist'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../../../../../../../feature-flags/selectors')

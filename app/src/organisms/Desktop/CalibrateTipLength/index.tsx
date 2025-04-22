@@ -29,7 +29,7 @@ import {
 } from '/app/organisms/Desktop/CalibrationPanels'
 import * as Sessions from '/app/redux/sessions'
 
-import type { CalibrateTipLengthParentProps } from './types'
+import type { ComponentType } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type {
@@ -37,7 +37,7 @@ import type {
   CalibrationSessionStep,
   SessionCommandParams,
 } from '/app/redux/sessions/types'
-import type { ComponentType } from 'react'
+import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'

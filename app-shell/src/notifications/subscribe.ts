@@ -6,8 +6,8 @@ import {
 import { notifyLog } from './notifyLog'
 import { connectionStore } from './store'
 
-import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type mqtt from 'mqtt'
+import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
 /**
  * @property {number} qos: "Quality of Service", "at least once". Because we use React Query, which does not trigger

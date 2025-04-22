@@ -7,8 +7,8 @@ import { getHealth } from '@opentrons/api-client'
 import { useHealth } from '..'
 import { useHost } from '../../api'
 
-import type { Health, HostConfig, Response } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { Health, HostConfig, Response } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

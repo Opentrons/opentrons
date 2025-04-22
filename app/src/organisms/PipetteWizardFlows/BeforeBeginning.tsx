@@ -36,7 +36,8 @@ import {
 } from './constants'
 import { getIsGantryEmpty } from './utils'
 
-import type { PipetteWizardStepProps } from './types'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -46,8 +47,7 @@ import type {
   LoadedPipette,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
+import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createMaintenanceRun: UseMutateFunction<

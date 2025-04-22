@@ -7,9 +7,9 @@ import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
 import { getEnablePartialTipSupport } from '../../../../../feature-flags/selectors'
 import { getInitialDeckSetup } from '../../../../../step-forms/selectors'
 
-import type { FieldProps } from '../types'
 import type { DropdownOption } from '@opentrons/components'
 import type { PipetteV2Specs } from '@opentrons/shared-data'
+import type { FieldProps } from '../types'
 
 interface PartialTipFieldProps extends FieldProps {
   pipetteSpecs: PipetteV2Specs

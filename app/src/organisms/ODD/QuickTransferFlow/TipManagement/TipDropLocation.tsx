@@ -21,12 +21,12 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import type { Dispatch } from 'react'
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { CutoutConfig } from '@opentrons/shared-data'
-import type { Dispatch } from 'react'
 
 interface TipDropLocationProps {
   onBack: () => void

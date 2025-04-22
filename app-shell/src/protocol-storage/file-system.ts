@@ -5,8 +5,8 @@ import uuid from 'uuid/v4'
 
 import { analyzeProtocolSource } from '../protocol-analysis'
 
-import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
+import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 
 /**
  * Module for managing local protocol files on the host filesystem

@@ -10,10 +10,10 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { useAttachedPipettes } from '../useAttachedPipettes'
 
-import type { FetchPipettesResponseBody } from '@opentrons/api-client'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { FetchPipettesResponseBody } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('@opentrons/shared-data')

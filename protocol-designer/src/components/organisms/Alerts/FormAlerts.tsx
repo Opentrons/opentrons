@@ -23,11 +23,11 @@ import * as timelineWarningSelectors from '../../../top-selectors/timelineWarnin
 import { getSelectedStepId } from '../../../ui/steps'
 import { WarningContents } from './WarningContents'
 
+import type { ReactNode } from 'react'
+import type { ProfileItem } from '@opentrons/step-generation'
 import type { StepFieldName } from '../../../form-types'
 import type { ProfileFormError } from '../../../steplist/formLevel/profileErrors'
 import type { MakeAlert } from './types'
-import type { ProfileItem } from '@opentrons/step-generation'
-import type { ReactNode } from 'react'
 
 interface FormAlertsProps {
   showFormErrors: boolean

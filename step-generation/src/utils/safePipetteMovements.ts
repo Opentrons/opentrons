@@ -9,18 +9,18 @@ import {
 } from '@opentrons/shared-data'
 
 import type {
+  AddressableArea,
+  CoordinateTuple,
+  ModuleModel,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
+import type {
   InvariantContext,
   LabwareEntity,
   ModuleEntities,
   PipetteEntity,
   RobotState,
 } from '../types'
-import type {
-  AddressableArea,
-  CoordinateTuple,
-  ModuleModel,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
 
 const A12_column_front_left_bound = { x: -11.03, y: 2 }
 const A12_column_back_right_bound = { x: 526.77, y: 506.2 }

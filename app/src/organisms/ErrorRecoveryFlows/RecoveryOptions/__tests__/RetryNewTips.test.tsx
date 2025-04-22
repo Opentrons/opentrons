@@ -10,8 +10,8 @@ import { RECOVERY_MAP } from '../../constants'
 import { RetryNewTips, RetryWithNewTips } from '../RetryNewTips'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')

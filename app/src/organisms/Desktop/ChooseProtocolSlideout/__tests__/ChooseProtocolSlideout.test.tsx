@@ -22,8 +22,8 @@ import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 
 import { ChooseProtocolSlideout } from '../'
 
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 vi.mock(
   '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'

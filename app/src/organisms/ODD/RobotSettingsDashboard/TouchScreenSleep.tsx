@@ -15,9 +15,9 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
-import type { SetSettingOption } from './types'
-import type { Dispatch } from '/app/redux/types'
 import type { ChangeEvent } from 'react'
+import type { Dispatch } from '/app/redux/types'
+import type { SetSettingOption } from './types'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 

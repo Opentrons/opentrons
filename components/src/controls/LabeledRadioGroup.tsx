@@ -1,8 +1,8 @@
 import { RadioGroup } from '../forms'
 import { StackedLabeledControl } from './StackedLabeledControl'
 
-import type { RadioGroupProps } from '../forms'
 import type { ReactNode } from 'react'
+import type { RadioGroupProps } from '../forms'
 
 export interface LabeledRadioGroupProps extends RadioGroupProps {
   label: string

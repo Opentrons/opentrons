@@ -15,6 +15,8 @@ import {
 import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { AddressableAreaName } from '@opentrons/shared-data'
 import type {
   DropTipBlowoutLocationDetails,
   DropTipBlowoutSlotName,
@@ -25,8 +27,6 @@ import type {
   ValidDropTipBlowoutLocation,
 } from '../types'
 import type { UseConfirmPositionResult } from './ConfirmPosition'
-import type { AddressableAreaName } from '@opentrons/shared-data'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 
 interface ChooseLocationProps extends DropTipWizardContainerProps {
   toggleIsRobotPipetteMoving: UseConfirmPositionResult['toggleIsRobotPipetteMoving']

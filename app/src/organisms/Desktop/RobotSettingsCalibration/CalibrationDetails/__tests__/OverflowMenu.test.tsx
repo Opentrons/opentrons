@@ -28,8 +28,8 @@ import {
 import { useDeckCalibrationData } from '../../../Devices/hooks'
 import { OverflowMenu } from '../OverflowMenu'
 
-import type { Mount } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { Mount } from '@opentrons/components'
 
 const render = (
   props: ComponentProps<typeof OverflowMenu>

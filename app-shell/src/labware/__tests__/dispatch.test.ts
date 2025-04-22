@@ -11,9 +11,9 @@ import * as Dialogs from '../../dialogs'
 import * as Defs from '../definitions'
 import * as Val from '../validation'
 
-import type { Dispatch } from '../../types'
-import type { Config } from '@opentrons/app/src/redux/config/types'
 import type { Mock } from 'vitest'
+import type { Config } from '@opentrons/app/src/redux/config/types'
+import type { Dispatch } from '../../types'
 
 vi.mock('fs-extra')
 vi.mock('electron')

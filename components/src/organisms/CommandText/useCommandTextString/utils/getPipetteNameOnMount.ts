@@ -1,5 +1,5 @@
-import type { LoadedPipettes } from './types'
 import type { LoadedPipette, PipetteName } from '@opentrons/shared-data'
+import type { LoadedPipettes } from './types'
 
 export function getLoadedPipette(
   loadedPipettes: LoadedPipettes,

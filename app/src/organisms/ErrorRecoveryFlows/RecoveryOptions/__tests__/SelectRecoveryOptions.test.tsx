@@ -23,8 +23,8 @@ import {
   TIP_NOT_DETECTED_OPTIONS,
 } from '../SelectRecoveryOption'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const renderSelectRecoveryOption = (
   props: ComponentProps<typeof SelectRecoveryOption>

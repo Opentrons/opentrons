@@ -4,8 +4,8 @@ import cx from 'classnames'
 import { FlatButton } from '../buttons'
 import styles from './structure.module.css'
 
-import type { ButtonProps } from '../buttons'
 import type { ReactNode } from 'react'
+import type { ButtonProps } from '../buttons'
 
 export interface TitleBarProps {
   id?: string

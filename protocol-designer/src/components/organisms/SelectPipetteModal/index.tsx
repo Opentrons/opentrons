@@ -29,13 +29,13 @@ import { SelectPipetteTips } from './SelectPipetteTips'
 import { SelectPipetteType } from './SelectPipetteType'
 import { SelectPipetteVolume } from './SelectPipetteVolume'
 
+import type { Dispatch, SetStateAction } from 'react'
+import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {
   Gen,
   PipetteType,
   WizardTileProps,
 } from '../../../pages/Onboarding/types'
-import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
 
 interface SelectedPipetteModalProps extends WizardTileProps {
   mount: PipetteMount

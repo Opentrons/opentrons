@@ -10,8 +10,8 @@ import { LPCOffsetsSnippets } from './LPCOffsetsSnippets'
 import { LPCSetupFlexBtns } from './LPCSetupFlexBtns'
 import { LPCSetupOffsetsTable } from './LPCSetupOffsetsTable'
 
-import type { SetupLabwarePositionCheckProps } from '..'
 import type { State } from '/app/redux/types'
+import type { SetupLabwarePositionCheckProps } from '..'
 
 export function FlexSetupLPC(
   props: SetupLabwarePositionCheckProps

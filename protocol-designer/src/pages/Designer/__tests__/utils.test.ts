@@ -10,9 +10,9 @@ import {
 
 import { formatTime, getSlotInformation } from '../utils'
 
-import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 const mockLabOnDeck1 = {
   slot: 'mockHsId',

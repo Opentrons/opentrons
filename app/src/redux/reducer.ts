@@ -35,8 +35,8 @@ import { shellReducer } from './shell/reducer'
 // system info state
 import { systemInfoReducer } from './system-info/reducer'
 
-import type { Action, State } from './types'
 import type { Reducer } from 'redux'
+import type { Action, State } from './types'
 
 export const rootReducer: Reducer<State, Action> = combineReducers({
   robotApi: robotApiReducer,

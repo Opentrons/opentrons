@@ -9,8 +9,8 @@ import { useCommandQuery, useHost } from '@opentrons/react-api-client'
 
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
-import type { FailedCommand } from '../types'
 import type { RunStatus } from '@opentrons/api-client'
+import type { FailedCommand } from '../types'
 
 const ALL_COMMANDS_POLL_MS = 5000
 

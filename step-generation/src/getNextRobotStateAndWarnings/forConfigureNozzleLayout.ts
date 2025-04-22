@@ -1,5 +1,5 @@
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 interface ConfigureNozzleLayoutParams {
   pipetteId: string

@@ -23,8 +23,8 @@ import {
   PIPETTE_96,
 } from '../fixtures'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'

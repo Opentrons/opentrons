@@ -4,12 +4,12 @@ import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import { makeInitialRobotState } from './misc'
 
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
-import type { RunTimeCommand } from '@opentrons/shared-data'
 
 export type RunCommandTimelineFrame = RobotStateAndWarnings & {
   command: RunTimeCommand

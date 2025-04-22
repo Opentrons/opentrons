@@ -10,8 +10,8 @@ import {
 
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('../useNotifyDeckConfigurationQuery')
 

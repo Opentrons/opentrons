@@ -24,13 +24,13 @@ import {
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 
-import type { PipetteWizardStepProps } from './types'
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   LoadedPipette,
   MotorAxes,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
+import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void

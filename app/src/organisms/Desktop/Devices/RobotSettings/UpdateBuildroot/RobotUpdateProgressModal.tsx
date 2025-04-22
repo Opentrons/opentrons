@@ -32,12 +32,12 @@ import {
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 
-import type { UpdateStep } from './useRobotUpdateInfo'
+import type { ChangeEventHandler } from 'react'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
 import type { RobotInitializationStatus } from '/app/resources/health/hooks'
-import type { ChangeEventHandler } from 'react'
+import type { UpdateStep } from './useRobotUpdateInfo'
 
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};

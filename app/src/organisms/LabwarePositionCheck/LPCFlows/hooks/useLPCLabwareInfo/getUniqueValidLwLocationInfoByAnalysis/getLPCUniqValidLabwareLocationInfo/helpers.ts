@@ -1,4 +1,3 @@
-import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
 import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 import type {
   FlexAddressableAreaName,
@@ -12,6 +11,7 @@ import type {
   LabwareModuleStackupDetail,
   LabwareModuleStackupDetails,
 } from '/app/redux/protocol-runs'
+import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
 
 // Given a location sequence, find the nearest module that is the beneath the topmost
 // location sequence component and return its moduleId, if any.

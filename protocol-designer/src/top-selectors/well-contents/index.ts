@@ -15,14 +15,14 @@ import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 // and make this index.js just imports and exports.
 import { getWellContentsAllLabware } from './getWellContentsAllLabware'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type * as StepGeneration from '@opentrons/step-generation'
 import type {
   ContentsByWell,
   WellContents,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type * as StepGeneration from '@opentrons/step-generation'
 
 export { getWellContentsAllLabware }
 export type { WellContentsByLabware }

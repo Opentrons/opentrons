@@ -1,5 +1,5 @@
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>

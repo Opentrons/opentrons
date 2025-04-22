@@ -7,8 +7,8 @@ import {
 import { DEFAULT_STATUS_REFETCH_INTERVAL } from './constants'
 import { useNotifyRunQuery } from './useNotifyRunQuery'
 
-import type { Run, RunAction, RunStatus } from '@opentrons/api-client'
 import type { UseQueryOptions } from 'react-query'
+import type { Run, RunAction, RunStatus } from '@opentrons/api-client'
 
 export function useRunStatus(
   runId: string | null,

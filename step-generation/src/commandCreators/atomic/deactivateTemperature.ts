@@ -7,8 +7,8 @@ import {
 import * as errorCreators from '../../errorCreators'
 import { uuid } from '../../utils'
 
-import type { CommandCreator } from '../../types'
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 /** Disengage temperature target for specified module. */
 export const deactivateTemperature: CommandCreator<ModuleOnlyParams> = (

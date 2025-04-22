@@ -7,6 +7,7 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
+import type { Reducer } from 'redux'
 import type { LoadFileAction } from '../load-file'
 import type { Action } from '../types'
 import type {
@@ -15,7 +16,6 @@ import type {
   ReplaceCustomLabwareDef,
 } from './actions'
 import type { LabwareDefByDefURI, LabwareUploadMessage } from './types'
-import type { Reducer } from 'redux'
 
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

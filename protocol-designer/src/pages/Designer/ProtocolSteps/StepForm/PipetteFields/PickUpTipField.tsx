@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux'
 import { DropdownStepFormField } from '../../../../../components/molecules'
 import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
 
-import type { FieldProps } from '../types'
 import type { DropdownOption } from '@opentrons/components'
+import type { FieldProps } from '../types'
 
 export function PickUpTipField(props: FieldProps): JSX.Element {
   const { value: dropdownItem } = props

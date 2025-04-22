@@ -5,6 +5,7 @@ import { handleActions } from 'redux-actions'
 import { getPDMetadata } from '../../file-types'
 import { PRESAVED_STEP_ID, START_TERMINAL_ITEM_ID } from '../../steplist/types'
 
+import type { Reducer } from 'redux'
 import type { StepIdType } from '../../form-types'
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -24,7 +25,6 @@ import type {
   SelectStepAction,
   SelectTerminalItemAction,
 } from './actions/types'
-import type { Reducer } from 'redux'
 
 export type CollapsedStepsState = Record<StepIdType, boolean>
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type

@@ -1,4 +1,3 @@
-import type { HandlesCommands } from '../types'
 import type {
   FlexStackerEmptyRunTimeCommand,
   FlexStackerFillRunTimeCommand,
@@ -7,6 +6,7 @@ import type {
   FlexStackerStoreRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { HandlesCommands } from '../types'
 
 export type FlexStackerCommand =
   | FlexStackerSetStoredLabwareRunTimeCommand

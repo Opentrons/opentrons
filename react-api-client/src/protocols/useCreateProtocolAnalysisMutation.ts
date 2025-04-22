@@ -3,6 +3,12 @@ import { createProtocolAnalysis } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
+import type { AxiosError } from 'axios'
+import type {
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
 import type {
   ErrorResponse,
   HostConfig,
@@ -10,12 +16,6 @@ import type {
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
-import type { AxiosError } from 'axios'
-import type {
-  UseMutateFunction,
-  UseMutationOptions,
-  UseMutationResult,
-} from 'react-query'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string

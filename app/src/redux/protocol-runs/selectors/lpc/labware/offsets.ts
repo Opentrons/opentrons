@@ -26,7 +26,8 @@ import {
   getWorkingOffsetsByUri,
 } from '../transforms'
 
-import type { WorkingOffsetsByUri } from '../transforms'
+import type { TFunction } from 'i18next'
+import type { Selector } from 'reselect'
 import type {
   LabwareOffsetCreateData,
   StoredLabwareOffsetCreate,
@@ -40,8 +41,7 @@ import type {
   WorkingOffset,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { TFunction } from 'i18next'
-import type { Selector } from 'reselect'
+import type { WorkingOffsetsByUri } from '../transforms'
 
 export const selectAreOffsetsApplied = (
   runId: string

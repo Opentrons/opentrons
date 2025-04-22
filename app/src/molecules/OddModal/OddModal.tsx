@@ -11,9 +11,9 @@ import {
 import { BackgroundOverlay } from '../BackgroundOverlay'
 import { OddModalHeader } from './OddModalHeader'
 
-import type { ModalSize, OddModalHeaderBaseProps } from './types'
-import type { StyleProps } from '@opentrons/components'
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
+import type { ModalSize, OddModalHeaderBaseProps } from './types'
 
 interface OddModalProps extends StyleProps {
   /** clicking anywhere outside of the modal closes it  */

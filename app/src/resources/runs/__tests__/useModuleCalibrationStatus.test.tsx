@@ -11,8 +11,8 @@ import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
 import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
 import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('../useModuleRenderInfoForProtocolById')

@@ -15,8 +15,6 @@ import { SPAN7_8_10_11_SLOT } from '../constants'
 import { getSlotIsEmpty } from '../step-forms'
 import { getStagingAreaAddressableAreas } from '../utils'
 
-import type { InitialDeckSetup } from '../step-forms'
-import type { DeckSlot } from '../types'
 import type { DropdownOption } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -24,6 +22,8 @@ import type {
   ModuleType,
   RobotType,
 } from '@opentrons/shared-data'
+import type { InitialDeckSetup } from '../step-forms'
+import type { DeckSlot } from '../types'
 
 export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   HEATERSHAKER_MODULE_TYPE,

@@ -8,8 +8,8 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, FLEX_MAX_CONTENT } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-import type { ModuleModel } from '@opentrons/shared-data'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 export interface DeckLabelProps {
   isZoomed: boolean

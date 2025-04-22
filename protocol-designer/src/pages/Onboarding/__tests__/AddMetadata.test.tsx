@@ -9,9 +9,9 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { AddMetadata } from '../AddMetadata'
 
+import type { ComponentProps } from 'react'
 import type { WizardFormState } from '../../../components/organisms'
 import type { WizardTileProps } from '../types'
-import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof AddMetadata>) => {
   return renderWithProviders(<AddMetadata {...props} />, {

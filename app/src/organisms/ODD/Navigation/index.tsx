@@ -33,8 +33,8 @@ import { useNetworkConnection } from '/app/resources/networking/hooks/useNetwork
 
 import { NavigationMenu } from './NavigationMenu'
 
-import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 import type { Dispatch, SetStateAction } from 'react'
+import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
   '/protocols',

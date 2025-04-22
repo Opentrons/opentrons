@@ -13,7 +13,6 @@ import { uuid } from '../../utils'
 //  and renames well to wellName
 import { getLoadLiquidCommands } from './utils/getLoadLiquidCommands'
 
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
 import type {
   CreateCommand,
@@ -24,6 +23,7 @@ import type {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6

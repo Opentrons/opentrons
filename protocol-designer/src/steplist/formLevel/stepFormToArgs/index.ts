@@ -12,6 +12,7 @@ import { pauseFormToArgs } from './pauseFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
 
+import type { CommandCreatorArgs } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
@@ -25,7 +26,6 @@ import type {
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
 } from '../../../form-types'
-import type { CommandCreatorArgs } from '@opentrons/step-generation'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting

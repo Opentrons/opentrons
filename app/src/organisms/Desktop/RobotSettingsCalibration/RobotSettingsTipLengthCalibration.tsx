@@ -14,9 +14,9 @@ import { useAttachedPipettes } from '/app/resources/instruments'
 import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
-import type { FormattedPipetteOffsetCalibration } from '.'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { TipLengthCalibration } from '/app/redux/calibration/api-types'
+import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsTipLengthCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]

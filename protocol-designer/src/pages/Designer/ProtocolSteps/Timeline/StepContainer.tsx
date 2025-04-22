@@ -37,15 +37,15 @@ import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
-import type { IconName } from '@opentrons/components'
+import type { ThunkDispatch } from 'redux-thunk'
 import type {
   Dispatch,
   MouseEvent as ReactMouseEvent,
   SetStateAction,
 } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
+import type { IconName } from '@opentrons/components'
+import type { StepIdType } from '../../../../form-types'
+import type { BaseState } from '../../../../types'
 
 const STARTING_DECK_STATE = 'Starting deck'
 const FINAL_DECK_STATE = 'Ending deck'

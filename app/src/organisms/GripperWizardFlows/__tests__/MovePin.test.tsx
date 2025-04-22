@@ -14,8 +14,8 @@ import {
 } from '../constants'
 import { MovePin } from '../MovePin'
 
-import type { CommandData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { CommandData } from '@opentrons/api-client'
 
 describe('MovePin', () => {
   let mockCreateRunCommand: any

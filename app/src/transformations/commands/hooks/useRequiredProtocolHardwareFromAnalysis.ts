@@ -21,13 +21,13 @@ import {
 
 import { getProtocolUsesGripper } from '../transformations'
 
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
   ProtocolGripper,
   ProtocolHardware,
   ProtocolModule,
   ProtocolPipette,
 } from './types'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

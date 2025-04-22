@@ -3,13 +3,13 @@ import { addLabwareOffsetToRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
+import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
   HostConfig,
   LabwareOffset,
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,
 } from '@opentrons/api-client'
-import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 
 interface AddLabwareOffsetToRunParams {
   runId: string

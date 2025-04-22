@@ -8,10 +8,10 @@ import { LabwareOutline } from './LabwareOutline'
 import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
 import { Well } from './Well'
 
-import type { WellMouseEvent, WellStroke } from './types'
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { MemoExoticComponent } from 'react'
 import type { CSSProperties } from 'styled-components'
+import type { MemoExoticComponent } from 'react'
+import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { WellMouseEvent, WellStroke } from './types'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */

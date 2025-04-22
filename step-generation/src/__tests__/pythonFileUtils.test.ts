@@ -27,6 +27,7 @@ import {
   pythonRequirements,
 } from '../utils'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   LabwareLiquidState,
@@ -37,7 +38,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // The labware fixtures use namespace "fixture", with is treated as custom labware.
 // Modify the labware fixtures to change them to the "opentrons" namespace.

@@ -21,8 +21,8 @@ import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../FixtureRender')

@@ -13,8 +13,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { IconName } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { IconName } from '@opentrons/components'
 
 interface FloatingActionButtonProps extends ComponentProps<typeof Btn> {
   buttonText: string

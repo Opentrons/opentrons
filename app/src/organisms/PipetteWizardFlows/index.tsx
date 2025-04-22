@@ -43,13 +43,13 @@ import { MountPipette } from './MountPipette'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
-import type { PipetteWizardFlow, SelectablePipettes } from './types'
 import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type {
   CreateCommand,
   LoadedPipette,
   PipetteMount,
 } from '@opentrons/shared-data'
+import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 

@@ -49,7 +49,8 @@ import {
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
 
-import type { SetupScreens } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type {
@@ -62,8 +63,7 @@ import type {
   ModuleInStack,
   StackItem,
 } from '/app/transformations/commands'
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseQueryResult } from 'react-query'
+import type { SetupScreens } from '../types'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

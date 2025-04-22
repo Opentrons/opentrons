@@ -3,12 +3,12 @@ import { getErrorRecoverySettings } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
+import type { AxiosError } from 'axios'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   ErrorRecoverySettingsResponse,
   HostConfig,
 } from '@opentrons/api-client'
-import type { AxiosError } from 'axios'
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export function useErrorRecoverySettings(
   options: UseQueryOptions<ErrorRecoverySettingsResponse, AxiosError> = {}

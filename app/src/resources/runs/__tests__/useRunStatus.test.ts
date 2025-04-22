@@ -11,8 +11,8 @@ import {
 import { useNotifyRunQuery } from '../useNotifyRunQuery'
 import { useRunStatus } from '../useRunStatus'
 
-import type { Run } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { Run } from '@opentrons/api-client'
 
 vi.mock('../useNotifyRunQuery')
 

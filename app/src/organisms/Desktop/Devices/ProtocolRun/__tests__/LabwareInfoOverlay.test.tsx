@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const render = (props: ComponentProps<typeof LabwareInfoOverlay>) => {
   return renderWithProviders(

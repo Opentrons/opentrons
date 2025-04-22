@@ -14,8 +14,8 @@ import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/config')
 vi.mock('../../Desktop/Devices/hooks')

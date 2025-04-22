@@ -10,8 +10,8 @@ import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
 import { useRobot } from '..'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/discovery')
 

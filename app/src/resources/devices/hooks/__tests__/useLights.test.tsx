@@ -10,9 +10,9 @@ import {
 
 import { useLights } from '../useLights'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
 import type { Mock } from 'vitest'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 

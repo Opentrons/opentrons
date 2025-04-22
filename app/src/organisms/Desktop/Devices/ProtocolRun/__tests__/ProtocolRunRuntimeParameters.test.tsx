@@ -17,13 +17,13 @@ import {
 
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 
+import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RunTimeParameter,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()

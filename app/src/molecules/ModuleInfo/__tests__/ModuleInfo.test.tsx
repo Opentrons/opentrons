@@ -11,8 +11,8 @@ import { useRunHasStarted } from '/app/resources/runs'
 
 import { ModuleInfo } from '../ModuleInfo'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/runs')
 

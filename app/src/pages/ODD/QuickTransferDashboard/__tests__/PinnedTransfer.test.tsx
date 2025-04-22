@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { PinnedTransfer } from '../PinnedTransfer'
 
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { NavigateFunction } from 'react-router-dom'
+import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 

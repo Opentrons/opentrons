@@ -9,10 +9,10 @@ import { useFeatureFlag } from '/app/redux/config'
 
 import { PinnedProtocol } from '../PinnedProtocol'
 
-import type { Chip } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import type { Chip } from '@opentrons/components'
+import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 

@@ -12,8 +12,8 @@ import {
 
 import { StackingOffsets } from '../components/sections/StackingOffsets'
 
-import type * as SharedData from '@opentrons/shared-data'
 import type * as Formik from 'formik'
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('formik', async importOriginal => {
   const actual = await importOriginal<typeof Formik>()

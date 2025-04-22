@@ -16,13 +16,13 @@ import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attac
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
 import type {
   CreateCommand,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
   adapterId: string | null

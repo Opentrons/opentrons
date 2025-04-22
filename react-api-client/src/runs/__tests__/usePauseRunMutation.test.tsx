@@ -7,9 +7,9 @@ import { usePauseRunMutation } from '..'
 import { mockPauseRunAction, RUN_ID_1 } from '../__fixtures__'
 import { useHost } from '../../api'
 
-import type { UsePauseRunMutationOptions } from '../usePauseRunMutation'
-import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
+import type { UsePauseRunMutationOptions } from '../usePauseRunMutation'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

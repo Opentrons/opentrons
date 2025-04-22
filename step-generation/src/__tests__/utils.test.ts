@@ -41,6 +41,7 @@ import {
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { RobotState } from '../'
 import type {
   LabwareEntities,
@@ -49,7 +50,6 @@ import type {
   ThermocyclerStateStepArgs,
 } from '../types'
 import type { Diff } from '../utils/thermocyclerStateDiff'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

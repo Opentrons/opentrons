@@ -22,7 +22,6 @@ import { FixtureRender } from './FixtureRender'
 import { ModuleLabel } from './ModuleLabel'
 import { getHighlightLabwareAndModules } from './utils'
 
-import type { Fixture } from './constants'
 import type {
   AddressableAreaName,
   CoordinateTuple,
@@ -31,6 +30,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type { Fixture } from './constants'
 
 interface HighlightItemsProps {
   deckDef: DeckDefinition

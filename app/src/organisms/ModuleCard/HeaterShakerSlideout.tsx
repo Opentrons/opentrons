@@ -20,9 +20,9 @@ import {
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 
+import type { MouseEventHandler } from 'react'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
-import type { MouseEventHandler } from 'react'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule

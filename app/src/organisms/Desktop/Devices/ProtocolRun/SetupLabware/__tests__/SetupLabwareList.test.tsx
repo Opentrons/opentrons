@@ -9,8 +9,8 @@ import { i18n } from '/app/i18n'
 import { LabwareListItem } from '../LabwareListItem'
 import { SetupLabwareList } from '../SetupLabwareList'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('../LabwareListItem')
 

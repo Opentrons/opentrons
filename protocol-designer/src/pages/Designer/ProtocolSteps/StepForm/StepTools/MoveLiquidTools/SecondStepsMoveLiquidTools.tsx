@@ -48,11 +48,11 @@ import {
 import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { FormData, StepFieldName } from '../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
-import type { Dispatch, SetStateAction } from 'react'
 
 const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
   `${prefix}_${fieldName}`

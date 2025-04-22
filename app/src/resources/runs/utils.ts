@@ -1,11 +1,11 @@
 import { format } from 'date-fns'
 
-import type { CreateMaintenanceCommand, CreateRunCommand } from './hooks'
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseMutateAsyncFunction } from 'react-query'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateLiveCommandMutateParams } from '@opentrons/react-api-client/src/runs/useCreateLiveCommandMutation'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseMutateAsyncFunction } from 'react-query'
+import type { CreateMaintenanceCommand, CreateRunCommand } from './hooks'
 
 export const chainRunCommandsRecursive = (
   commands: CreateCommand[],

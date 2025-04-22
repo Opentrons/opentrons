@@ -8,9 +8,9 @@ import { when } from 'vitest-when'
 import { useCurrentProtocol } from '../useCurrentProtocol'
 import { useProtocolMetadata } from '../useProtocolMetadata'
 
-import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('../useCurrentProtocol')
 

@@ -13,9 +13,9 @@ import {
 } from '../__fixtures__'
 import { useRequiredProtocolLabware } from '../useRequiredProtocolLabware'
 
+import type { UseQueryResult } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 

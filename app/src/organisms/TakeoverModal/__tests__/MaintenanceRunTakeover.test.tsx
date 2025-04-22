@@ -10,8 +10,8 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
 import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
 
-import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 import type { ComponentProps } from 'react'
+import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 vi.mock('../useMaintenanceRunTakeover')
 vi.mock('/app/resources/maintenance_runs')

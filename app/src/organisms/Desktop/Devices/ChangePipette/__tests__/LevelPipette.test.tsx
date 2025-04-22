@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { LevelPipette } from '../LevelPipette'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
 const render = (props: ComponentProps<typeof LevelPipette>) => {
   return renderWithProviders(<LevelPipette {...props} />, {

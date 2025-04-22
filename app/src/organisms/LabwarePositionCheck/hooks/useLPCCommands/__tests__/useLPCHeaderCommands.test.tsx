@@ -9,11 +9,11 @@ import { LPC_STEP } from '/app/redux/protocol-runs'
 
 import { useLPCHeaderCommands } from '../useLPCHeaderCommands'
 
-import type { UseLPCHeaderCommandsProps } from '../useLPCHeaderCommands'
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { UseLPCCommandsResult } from '/app/organisms/LabwarePositionCheck/hooks'
 import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
+import type { UseLPCHeaderCommandsProps } from '../useLPCHeaderCommands'
 
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal<typeof Provider>()

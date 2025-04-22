@@ -11,6 +11,7 @@ import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
 
+import type { Timeline } from '@opentrons/step-generation'
 import type { AnalyticsEventAction } from '../../../analytics/actions'
 import type { AnalyticsEvent } from '../../../analytics/mixpanel'
 import type { StepIdType, StepType } from '../../../form-types'
@@ -34,7 +35,6 @@ import type {
   ToggleViewSubstepAction,
   ViewSubstep,
 } from './types'
-import type { Timeline } from '@opentrons/step-generation'
 
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,

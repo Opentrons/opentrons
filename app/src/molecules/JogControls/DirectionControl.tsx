@@ -31,10 +31,10 @@ import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 import { ControlContainer } from './ControlContainer'
 import { TouchControlButton } from './TouchControlButton'
 
-import type { Axis, Bearing, Jog, Plane, Sign, StepSize } from './types'
-import type { IconName } from '@opentrons/components'
-import type { MouseEvent } from 'react'
 import type { CSSProperties } from 'styled-components'
+import type { MouseEvent } from 'react'
+import type { IconName } from '@opentrons/components'
+import type { Axis, Bearing, Jog, Plane, Sign, StepSize } from './types'
 
 interface Control {
   bearing: Bearing

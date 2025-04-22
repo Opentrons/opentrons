@@ -12,9 +12,9 @@ import * as Networking from '/app/redux/networking'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
-import type { State } from '/app/redux/types'
 import type { ComponentProps } from 'react'
 import type * as Dom from 'react-router-dom'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/networking')

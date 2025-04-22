@@ -12,8 +12,8 @@ import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
 import { useDeckCalibrationStatus } from '..'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/calibration')

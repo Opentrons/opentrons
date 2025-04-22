@@ -7,8 +7,8 @@ import {
   useUpdateClientDataRecovery,
 } from '/app/resources/client_data'
 
-import type { UseERWizardResult } from '../ErrorRecoveryWizard'
 import type { ClientDataRecovery } from '/app/resources/client_data'
+import type { UseERWizardResult } from '../ErrorRecoveryWizard'
 
 const CLIENT_DATA_INTERVAL_MS = 5000
 

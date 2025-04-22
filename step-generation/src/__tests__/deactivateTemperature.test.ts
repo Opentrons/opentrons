@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
 import { getStateAndContextTempTCModules } from '../fixtures'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'

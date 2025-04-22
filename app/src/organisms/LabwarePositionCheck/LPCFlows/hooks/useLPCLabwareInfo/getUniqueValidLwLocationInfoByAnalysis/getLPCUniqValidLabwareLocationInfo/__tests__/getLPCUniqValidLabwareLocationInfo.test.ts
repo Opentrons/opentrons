@@ -6,8 +6,8 @@ import { scanAllCommandsForAllLwUrisByLwId } from '../getAllPossibleLwURIsInRun'
 import { getLoadLabwareLocationCombo } from '../getLoadLabwareLocationCombo'
 import { getMoveLabwareLocationCombo } from '../getMoveLabwareLocationCombo'
 
-import type { LabwareLocationInfoWithLocSeq } from '..'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { LabwareLocationInfoWithLocSeq } from '..'
 
 vi.mock('../appendUniqValidLocCombo')
 vi.mock('../getLoadLabwareLocationCombo')

@@ -5,8 +5,8 @@ import { outputJson, readJson } from 'fs-extra'
 import { fetchJson, LocalAbortError } from '../../http'
 import { createLogger } from '../../log'
 
-import type { ReleaseManifest, ReleaseSetUrls } from '../types'
 import type { Stats } from 'fs'
+import type { ReleaseManifest, ReleaseSetUrls } from '../types'
 
 const log = createLogger('systemUpdate/from-web/provider')
 

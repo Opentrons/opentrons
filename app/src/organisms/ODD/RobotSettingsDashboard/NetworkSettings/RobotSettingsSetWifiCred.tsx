@@ -5,8 +5,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { SetWifiCred } from '../../NetworkSettings/SetWifiCred'
 
-import type { SetSettingOption } from '../types'
 import type { Dispatch, SetStateAction } from 'react'
+import type { SetSettingOption } from '../types'
 
 interface RobotSettingsSetWifiCredProps {
   handleConnect: () => void

@@ -37,9 +37,9 @@ import { LINK_BUTTON_STYLE } from '../../atoms'
 import { DefineLiquidsModal } from '../DefineLiquidsModal'
 import { LiquidCard } from './LiquidCard'
 
-import type { ContentsByWell } from '../../../labware-ingred/types'
-import type { DropdownOption } from '@opentrons/components'
 import type { ChangeEvent } from 'react'
+import type { DropdownOption } from '@opentrons/components'
+import type { ContentsByWell } from '../../../labware-ingred/types'
 
 export interface LiquidInfo {
   name: string

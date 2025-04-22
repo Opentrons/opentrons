@@ -8,13 +8,13 @@ import { createStore } from 'redux'
 import { vi } from 'vitest'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
+import type { PreloadedState, Store } from 'redux'
 import type {
   ComponentProps,
   ComponentType,
   PropsWithChildren,
   ReactElement,
 } from 'react'
-import type { PreloadedState, Store } from 'redux'
 
 export interface RenderWithProvidersOptions<State> extends RenderOptions {
   initialState?: State

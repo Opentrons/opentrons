@@ -6,8 +6,8 @@ import { deleteProtocol } from '@opentrons/api-client'
 import { useDeleteProtocolMutation } from '..'
 import { useHost } from '../../api'
 
-import type { EmptyResponse, HostConfig, Response } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { EmptyResponse, HostConfig, Response } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

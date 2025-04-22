@@ -8,8 +8,8 @@ import { formatTimestamp } from '/app/transformations/runs'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'
 import { useRunCreatedAtTimestamp } from '../useRunCreatedAtTimestamp'
 
-import type { Run } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { Run } from '@opentrons/api-client'
 
 vi.mock('../useNotifyRunQuery')
 vi.mock('/app/transformations/runs')

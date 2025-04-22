@@ -14,7 +14,6 @@ import {
 
 import { getUnoccupiedSlotForTrash } from '../../../step-forms'
 
-import type { SavedStepFormState } from '../../../step-forms'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -24,6 +23,7 @@ import type {
   MoveToAddressableAreaForDropTipCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
+import type { SavedStepFormState } from '../../../step-forms'
 
 export type LocationUpdate = Record<string, string>
 

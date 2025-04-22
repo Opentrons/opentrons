@@ -15,13 +15,13 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { truncateString } from '../../utils'
 import { LegacyStyledText } from '../StyledText'
 
-import type { IconName, IconProps } from '../../icons'
-import type { StyleProps } from '../../primitives'
 import type {
   DefaultTheme,
   FlattenSimpleInterpolation,
   ThemedCssFunction,
 } from 'styled-components'
+import type { IconName, IconProps } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 export const SUCCESS_TOAST: 'success' = 'success'
 export const WARNING_TOAST: 'warning' = 'warning'

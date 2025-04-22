@@ -5,10 +5,10 @@ import { Icon } from '../icons'
 import { BUTTON_TYPE_BUTTON } from '../primitives'
 import styles from './buttons.module.css'
 
+import type { ComponentType, MouseEventHandler, ReactNode } from 'react'
 import type { IconName } from '../icons'
 import type { BUTTON_TYPE_RESET, BUTTON_TYPE_SUBMIT } from '../primitives'
 import type { UseHoverTooltipTargetProps } from '../tooltips'
-import type { ComponentType, MouseEventHandler, ReactNode } from 'react'
 
 export interface ButtonProps {
   /** id attribute */

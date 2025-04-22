@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components'
 import { isntStyleProp, styleProps } from '../primitives'
 import * as styles from '../styles'
 
-import type { PrimitiveComponent, StyleProps } from '../primitives'
 import type { ReactNode } from 'react'
+import type { PrimitiveComponent, StyleProps } from '../primitives'
 
 export interface CardProps extends StyleProps {
   /** Title for card, all cards should receive a title. */

@@ -14,10 +14,10 @@ import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
+import type { MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
-import type { MouseEvent } from 'react'
 
 interface UpdateRobotBannerProps extends StyleProps {
   robot: DiscoveredRobot

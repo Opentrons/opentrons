@@ -33,9 +33,9 @@ import {
 import { uuid } from '../../../../../../utils'
 import { getStepIndex, getTimeFromString } from './utils'
 
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 
 export interface ThermocyclerCycleType {
   id: string

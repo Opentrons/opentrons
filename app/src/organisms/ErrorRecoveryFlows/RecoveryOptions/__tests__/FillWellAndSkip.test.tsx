@@ -11,8 +11,8 @@ import { CancelRun } from '../CancelRun'
 import { FillWell, FillWellAndSkip, SkipToNextStep } from '../FillWellAndSkip'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../shared', async () => {
   const actual = await vi.importActual('../../shared')

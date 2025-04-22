@@ -9,8 +9,8 @@ import { mockRecoveryContentProps } from '../__fixtures__'
 import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
 import { clickButtonLabeled } from './util'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof RecoveryDoorOpen>) => {
   return renderWithProviders(<RecoveryDoorOpen {...props} />, {

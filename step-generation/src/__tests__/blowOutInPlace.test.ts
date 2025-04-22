@@ -7,8 +7,8 @@ import {
   makeContext,
 } from '../fixtures'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('blowOutInPlace', () => {
   let invariantContext: InvariantContext

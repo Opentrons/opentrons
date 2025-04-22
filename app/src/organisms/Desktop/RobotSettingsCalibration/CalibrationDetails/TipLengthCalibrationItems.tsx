@@ -15,10 +15,10 @@ import { useAttachedPipettes } from '/app/resources/instruments'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
-import type { FormattedPipetteOffsetCalibration } from '..'
-import type { FormattedTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import type { Mount } from '@opentrons/components'
 import type { State } from '/app/redux/types'
+import type { FormattedPipetteOffsetCalibration } from '..'
+import type { FormattedTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 
 const StyledTable = styled.table`
   width: 100%;

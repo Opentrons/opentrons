@@ -11,8 +11,8 @@ import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '/
 
 import { SetupFlexPipetteCalibrationItem } from '../SetupFlexPipetteCalibrationItem'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/PipetteWizardFlows')

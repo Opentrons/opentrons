@@ -31,11 +31,11 @@ import { PipettePath } from './PipettePath'
 import { TipPositionEntry } from './TipPosition'
 import { TouchTip } from './TouchTip'
 
+import type { Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { Dispatch } from 'react'
 
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState

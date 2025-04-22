@@ -15,8 +15,8 @@ import {
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
 import { formatLastCalibrated } from './utils'
 
-import type { FormattedPipetteOffsetCalibration } from '..'
 import type { AttachedModule } from '@opentrons/api-client'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 interface ModuleCalibrationItemsProps {
   attachedModules: AttachedModule[]

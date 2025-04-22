@@ -27,13 +27,13 @@ import {
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
 import type {
   CutoutConfig,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { ModuleCalibrationWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};

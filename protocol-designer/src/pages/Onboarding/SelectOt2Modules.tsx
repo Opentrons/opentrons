@@ -26,10 +26,10 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 import { WizardBody } from './WizardBody'
 
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { FormModule } from '../../step-forms'
 import type { OT2ModuleType } from './ModuleDiagram'
 import type { WizardTileProps } from './types'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props

@@ -12,8 +12,8 @@ import { RobotCoordsForeignDiv } from '../hardware-sim/Deck'
 import { Icon } from '../icons'
 import styles from './ModuleItem.module.css'
 
-import type { IconName } from '../icons'
 import type { DeckSlot, ModuleModel } from '@opentrons/shared-data'
+import type { IconName } from '../icons'
 
 const FLIPPED_SLOTS = ['3', '6', '9']
 export interface ModuleProps {

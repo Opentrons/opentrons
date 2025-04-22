@@ -3,12 +3,12 @@ import { getProtocolAnalysisAsDocument } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisSummary,
 } from '@opentrons/shared-data'
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 const getMostRecentSuccessfulAnalysisId = async (
   analysisSummaryIds: string[],

@@ -18,8 +18,8 @@ import {
   uuid,
 } from '../../utils'
 
-import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
 export const moveToWell: CommandCreator<MoveToWellParams> = (

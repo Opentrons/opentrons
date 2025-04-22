@@ -9,8 +9,8 @@ import { RECOVERY_MAP } from '../../constants'
 import { SelectTips } from '../SelectTips'
 import { TipSelectionModal } from '../TipSelectionModal'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('../TipSelectionModal')
 vi.mock('../TipSelection')

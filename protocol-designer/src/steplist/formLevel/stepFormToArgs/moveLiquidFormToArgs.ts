@@ -9,7 +9,6 @@ import { getMatchingTipLiquidSpecs } from '../../../utils'
 import { getOrderedWells } from '../../utils'
 import { getMoveLiquidDelayData } from './getDelayData'
 
-import type { HydratedMoveLiquidFormData } from '../../../form-types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
@@ -17,6 +16,7 @@ import type {
   InnerMixArgs,
   TransferArgs,
 } from '@opentrons/step-generation'
+import type { HydratedMoveLiquidFormData } from '../../../form-types'
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(

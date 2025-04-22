@@ -25,9 +25,9 @@ import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { RecentRunProtocolCard } from '../'
 import { useRerunnableStatusText } from '../hooks'
 
-import type { ProtocolHardware } from '/app/transformations/commands'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import type { ProtocolHardware } from '/app/transformations/commands'
 
 const mockNavigate = vi.fn()
 

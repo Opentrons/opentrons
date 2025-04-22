@@ -1,3 +1,4 @@
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   RobotApiRequestMeta,
   RobotApiV2ErrorResponseBody,
@@ -35,7 +36,6 @@ import type * as PipOffsetCalConstants from './pipette-offset-calibration/consta
 import type * as PipOffsetCalTypes from './pipette-offset-calibration/types'
 import type * as TipCalConstants from './tip-length-calibration/constants'
 import type * as TipLengthCalTypes from './tip-length-calibration/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export * from './calibration-check/types'
 export * from './tip-length-calibration/types'

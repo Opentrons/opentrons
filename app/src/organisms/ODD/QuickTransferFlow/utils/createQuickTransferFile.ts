@@ -19,7 +19,6 @@ import {
 import { generateQuickTransferArgs } from './'
 import { pythonDef } from './pythonDef'
 
-import type { QuickTransferSummaryState } from '../types'
 import type {
   AddressableAreaName,
   CommandAnnotationV1Mixin,
@@ -35,6 +34,7 @@ import type {
   OT3RobotMixin,
 } from '@opentrons/shared-data'
 import type { CommandCreatorResult } from '@opentrons/step-generation'
+import type { QuickTransferSummaryState } from '../types'
 
 const uuid: () => string = uuidv1
 

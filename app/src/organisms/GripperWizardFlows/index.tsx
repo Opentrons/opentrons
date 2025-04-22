@@ -37,7 +37,8 @@ import { MovePin } from './MovePin'
 import { Success } from './Success'
 import { UnmountGripper } from './UnmountGripper'
 
-import type { GripperWizardFlowType } from './types'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CommandData,
   CreateMaintenanceRunData,
@@ -46,8 +47,7 @@ import type {
   RunStatus,
 } from '@opentrons/api-client'
 import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
+import type { GripperWizardFlowType } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 

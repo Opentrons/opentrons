@@ -8,8 +8,8 @@ import { configReducer } from '/app/redux/config/reducer'
 import { EstopPressedModal } from '.'
 
 import type { Meta, Story } from '@storybook/react'
-import type * as React from 'react'
 import type { Store, StoreEnhancer } from 'redux'
+import type * as React from 'react'
 
 export default {
   title: 'ODD/Organisms/EstopPressedModal',

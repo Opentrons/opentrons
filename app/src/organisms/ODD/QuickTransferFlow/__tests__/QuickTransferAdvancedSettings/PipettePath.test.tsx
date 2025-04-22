@@ -9,8 +9,8 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { useBlowOutLocationOptions } from '../../QuickTransferAdvancedSettings/BlowOut'
 import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
 
-import type { QuickTransferSummaryState } from '../../types'
 import type { ComponentProps } from 'react'
+import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')

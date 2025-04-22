@@ -9,13 +9,13 @@ import {
 
 import { getStagingAreaAddressableAreas } from '../../utils'
 
-import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
 import type {
   AddressableAreaName,
   CreateCommand,
   CutoutId,
   RobotType,
 } from '@opentrons/shared-data'
+import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
 
 interface AdditionalEquipment {
   [additionalEquipmentId: string]: {

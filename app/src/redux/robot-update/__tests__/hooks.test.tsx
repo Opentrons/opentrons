@@ -9,9 +9,9 @@ import { i18n } from '/app/i18n'
 import { clearRobotUpdateSession, startRobotUpdate } from '../actions'
 import { useDispatchStartRobotUpdate } from '../hooks'
 
-import type { State } from '../../types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '../../types'
 
 describe('useDispatchStartRobotUpdate', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>

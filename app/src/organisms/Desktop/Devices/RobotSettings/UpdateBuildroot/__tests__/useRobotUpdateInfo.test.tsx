@@ -11,14 +11,14 @@ import { getRobotUpdateDownloadProgress } from '/app/redux/robot-update'
 
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type {
   RobotUpdateSession,
   UpdateSessionStage,
   UpdateSessionStep,
 } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
 
 vi.mock('/app/redux/robot-update')
 

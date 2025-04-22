@@ -20,12 +20,12 @@ import { getRobotType } from '../../../../file-data/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getFlexHoverDimensions, getOT2HoverDimensions } from '../utils'
 
+import type { MutableRefObject, ReactNode } from 'react'
 import type {
   AddressableAreaName,
   CoordinateTuple,
   DeckSlotId,
 } from '@opentrons/shared-data'
-import type { MutableRefObject, ReactNode } from 'react'
 
 interface SlotOverlayProps {
   slotId: DeckSlotId

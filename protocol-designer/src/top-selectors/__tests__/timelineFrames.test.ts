@@ -14,9 +14,9 @@ import {
   timelineFrameBeforeActiveItem,
 } from '../timelineFrames'
 
+import type { CommandsAndRobotState } from '@opentrons/step-generation'
 import type { StepIdType } from '../../form-types'
 import type { HoverableItem } from '../../ui/steps/reducers'
-import type { CommandsAndRobotState } from '@opentrons/step-generation'
 
 const initialRobotState: any = 'fake initial robot state'
 const initialFrame: any = {

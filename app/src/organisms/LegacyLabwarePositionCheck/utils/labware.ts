@@ -8,7 +8,6 @@ import {
 
 import { getModuleInitialLoadInfo } from '/app/transformations/commands'
 
-import type { LabwareToOrder } from '../types'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
@@ -18,6 +17,7 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { LabwareToOrder } from '../types'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,

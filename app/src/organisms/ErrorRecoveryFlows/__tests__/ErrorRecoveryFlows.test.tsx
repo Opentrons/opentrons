@@ -23,8 +23,8 @@ import {
 } from '../hooks'
 import { RecoverySplash, useRecoverySplash } from '../RecoverySplash'
 
-import type { RunStatus } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { RunStatus } from '@opentrons/api-client'
 
 vi.mock('../ErrorRecoveryWizard')
 vi.mock('../hooks')

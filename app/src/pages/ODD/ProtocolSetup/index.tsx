@@ -97,6 +97,8 @@ import { CloseButton, PlayButton } from './Buttons'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { Dispatch, SetStateAction } from 'react'
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
@@ -109,8 +111,6 @@ import type {
   ProtocolFixture,
   ProtocolHardware,
 } from '/app/transformations/commands'
-import type { Dispatch, SetStateAction } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 
 const FETCH_DURATION_MS = 5000
 

@@ -33,12 +33,12 @@ import { ThermocyclerFixture } from './ThermocyclerFixture'
 import { TrashBinConfigFixture } from './TrashBinConfigFixture'
 import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
 
+import type { ReactNode } from 'react'
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { ReactNode } from 'react'
 
 export * from './constants'
 

@@ -1,4 +1,3 @@
-import type { HandlesCommands } from '../types'
 import type {
   HeaterShakerSetTargetTemperatureCreateCommand,
   RunTimeCommand,
@@ -7,6 +6,7 @@ import type {
   TemperatureModuleAwaitTemperatureCreateCommand,
   TemperatureModuleSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data'
+import type { HandlesCommands } from '../types'
 
 export type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand

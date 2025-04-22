@@ -24,8 +24,8 @@ import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getLiquidEntities } from '../../step-forms/selectors'
 
-import type { ThunkDispatch } from '../../types'
 import type { MouseEvent, RefObject } from 'react'
+import type { ThunkDispatch } from '../../types'
 
 const NAV_HEIGHT = '64px'
 

@@ -10,6 +10,11 @@ import {
 } from '@opentrons/shared-data'
 
 import type {
+  AddressableOffsetVector,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
+import type {
   AbsorbanceReaderState,
   HeaterShakerModuleState,
   MagneticBlockState,
@@ -18,11 +23,6 @@ import type {
   TemperatureModuleState,
   ThermocyclerModuleState,
 } from './types'
-import type {
-  AddressableOffsetVector,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
 
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =

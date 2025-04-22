@@ -29,6 +29,7 @@ import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type { RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -37,7 +38,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
-import type { ViewportListRef } from 'react-viewport-list'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.grey60};

@@ -20,6 +20,7 @@ import {
   UPDATE_LPC_LABWARE,
 } from '../constants'
 
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   AppliedOffsetsToRunAction,
   ApplyWorkingOffsetsAction,
@@ -49,7 +50,6 @@ import type {
   UpdateLPCDeckAction,
   UpdateLPCLabwareAction,
 } from '../types'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export const proceedStep = (
   runId: string,

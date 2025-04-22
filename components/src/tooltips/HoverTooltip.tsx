@@ -2,8 +2,8 @@ import { Component } from 'react'
 
 import { DeprecatedTooltip } from './DeprecatedTooltip'
 
-import type { DeprecatedTooltipProps } from './DeprecatedTooltip'
 import type { PropsWithRef } from 'react'
+import type { DeprecatedTooltipProps } from './DeprecatedTooltip'
 
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 0

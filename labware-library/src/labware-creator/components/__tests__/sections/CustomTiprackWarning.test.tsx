@@ -5,8 +5,8 @@ import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { CustomTiprackWarning } from '../../sections/CustomTiprackWarning'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 let formikConfig: FormikConfig<LabwareFields>
 

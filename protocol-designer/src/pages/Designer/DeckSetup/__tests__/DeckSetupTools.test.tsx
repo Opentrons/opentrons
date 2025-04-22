@@ -28,8 +28,8 @@ import { getDismissedHints } from '../../../../tutorial/selectors'
 import { DeckSetupTools } from '../DeckSetupTools'
 import { LabwareTools } from '../LabwareTools'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../LabwareTools')
 vi.mock('../../../../feature-flags/selectors')

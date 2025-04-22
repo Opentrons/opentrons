@@ -13,8 +13,8 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 import type { ReactNode } from 'react'
+import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 
 interface CheckboxExpandStepFormFieldProps {
   title: string

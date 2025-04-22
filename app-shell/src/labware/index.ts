@@ -32,14 +32,14 @@ import { sameIdentity } from './compare'
 import * as Definitions from './definitions'
 import { validateLabwareFiles, validateNewLabwareFile } from './validation'
 
-import type { Action, Dispatch } from '../types'
+import type { BrowserWindow } from 'electron'
 import type {
   CheckedLabwareFile,
   DuplicateLabwareFile,
   CustomLabwareListActionSource as ListSource,
   UncheckedLabwareFile,
 } from '@opentrons/app/src/redux/custom-labware/types'
-import type { BrowserWindow } from 'electron'
+import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 

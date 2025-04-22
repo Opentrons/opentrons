@@ -19,8 +19,8 @@ import {
 } from '../utils'
 import { curryCommandCreator } from '../utils/curryCommandCreator'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { BlowoutParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/curryCommandCreator')
 

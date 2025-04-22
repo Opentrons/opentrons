@@ -37,8 +37,8 @@ import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { getUnmatchedModulesForProtocol } from '../utils'
 
-import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
+import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/modules')

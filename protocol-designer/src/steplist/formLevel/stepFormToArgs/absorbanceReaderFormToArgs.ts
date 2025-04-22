@@ -4,8 +4,8 @@ import {
   ABSORBANCE_READER_READ,
 } from '../../../constants'
 
-import type { HydratedAbsorbanceReaderFormData } from '../../../form-types'
 import type { AbsorbanceReaderArgs } from '@opentrons/step-generation'
+import type { HydratedAbsorbanceReaderFormData } from '../../../form-types'
 
 export const absorbanceReaderFormToArgs = (
   hydratedFormData: HydratedAbsorbanceReaderFormData

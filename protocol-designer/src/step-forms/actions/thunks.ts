@@ -3,6 +3,11 @@ import { changeSavedStepForm } from '../../steplist/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { uuid } from '../../utils'
 
+import type {
+  DeckSlotId,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
 import type { FormData } from '../../form-types'
 import type {
   CreateContainerAction,
@@ -11,11 +16,6 @@ import type {
 import type { ChangeSavedStepFormAction } from '../../steplist/actions'
 import type { ThunkAction } from '../../types'
 import type { CreateModuleAction } from './modules'
-import type {
-  DeckSlotId,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
 
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId

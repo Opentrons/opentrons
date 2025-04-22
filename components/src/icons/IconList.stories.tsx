@@ -14,8 +14,8 @@ import {
 import { Icon as IconComponent } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
-import type { IconName } from './Icon'
 import type { Meta, Story } from '@storybook/react'
+import type { IconName } from './Icon'
 
 export default {
   title: 'Library/Atoms/IconList',

@@ -27,9 +27,9 @@ import { BatchEditMixTools } from './BatchEditMixTools'
 import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
 import { makeBatchEditFieldProps } from './utils'
 
+import type { ThunkDispatch } from 'redux-thunk'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { BaseState } from '../../../../types'
-import type { ThunkDispatch } from 'redux-thunk'
 
 export const BatchEditToolbox = (): JSX.Element | null => {
   const { t } = useTranslation(['tooltip', 'protocol_steps', 'shared'])

@@ -6,9 +6,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { RecoveryContentProps } from '../types'
-import type { StyleProps } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { StyleProps } from '@opentrons/components'
+import type { RecoveryContentProps } from '../types'
 
 interface StepInfoProps extends StyleProps {
   stepCounts: RecoveryContentProps['stepCounts']

@@ -31,14 +31,14 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { LEFT_SLOTS } from './constants'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
+import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration

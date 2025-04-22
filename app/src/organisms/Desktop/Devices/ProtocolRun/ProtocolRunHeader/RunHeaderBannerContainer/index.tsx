@@ -22,10 +22,10 @@ import {
   useTerminalRunBannerContainer,
 } from './TerminalRunBannerContainer'
 
+import type { RunStatus } from '@opentrons/api-client'
 import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunErrorsResult } from '../hooks'
 import type { UseRunHeaderModalContainerResult } from '../RunHeaderModalContainer'
-import type { RunStatus } from '@opentrons/api-client'
 
 export type RunHeaderBannerContainerProps = ProtocolRunHeaderProps & {
   runStatus: RunStatus | null

@@ -50,11 +50,11 @@ import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
+import type { ComponentProps } from 'react'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { Config } from '/app/redux/config/types'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()

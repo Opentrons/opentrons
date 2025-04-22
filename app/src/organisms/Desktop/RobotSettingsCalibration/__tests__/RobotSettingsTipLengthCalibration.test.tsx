@@ -16,8 +16,8 @@ import { useAttachedPipettes } from '/app/resources/instruments'
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 
-import type { FormattedPipetteOffsetCalibration } from '..'
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/Desktop/Devices/hooks')

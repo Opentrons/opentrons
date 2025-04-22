@@ -10,12 +10,12 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import type { ComponentProps, Dispatch } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,
 } from './types'
-import type { SmallButton } from '/app/atoms/buttons'
-import type { ComponentProps, Dispatch } from 'react'
 
 interface SelectTipFrequencyProps {
   onNext: () => void

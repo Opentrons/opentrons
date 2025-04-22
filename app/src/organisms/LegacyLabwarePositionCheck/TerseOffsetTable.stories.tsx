@@ -16,9 +16,9 @@ import { SmallButton } from '/app/atoms/buttons'
 
 import { TerseOffsetTable } from './ResultsSummary'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export default {
   title: 'ODD/Organisms/TerseOffsetTable',

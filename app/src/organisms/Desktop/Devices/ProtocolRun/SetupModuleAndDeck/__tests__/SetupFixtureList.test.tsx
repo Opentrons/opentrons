@@ -17,8 +17,8 @@ import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { NotConfiguredModal } from '../NotConfiguredModal'
 import { SetupFixtureList } from '../SetupFixtureList'
 
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 import type { ComponentProps } from 'react'
+import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/organisms/LocationConflictModal')

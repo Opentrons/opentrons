@@ -22,14 +22,14 @@ import { actions as stepsActions } from '../../../../ui/steps'
 import { StepFormToolbox } from './StepFormToolbox'
 import { getDirtyFields, makeSingleEditFieldProps } from './utils'
 
+import type { ConnectedComponent } from 'react-redux'
+import type { InvariantContext } from '@opentrons/step-generation'
 import type {
   FormData,
   StepFieldName,
   StepIdType,
 } from '../../../../form-types'
 import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { InvariantContext } from '@opentrons/step-generation'
-import type { ConnectedComponent } from 'react-redux'
 
 interface StateProps {
   canSave: boolean

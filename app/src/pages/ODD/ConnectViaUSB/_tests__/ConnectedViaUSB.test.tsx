@@ -8,9 +8,9 @@ import { i18n } from '/app/i18n'
 
 import { ConnectViaUSB } from '../'
 
-import type { ActiveConnections } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
+import type { ActiveConnections } from '@opentrons/api-client'
 
 const mockNavigate = vi.fn()
 

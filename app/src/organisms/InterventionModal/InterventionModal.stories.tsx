@@ -15,8 +15,8 @@ import { InterventionModal as InterventionModalComponent } from './'
 import { mockRunData } from './__fixtures__'
 
 import type { Meta, Story } from '@storybook/react'
-import type * as React from 'react'
 import type { Store, StoreEnhancer } from 'redux'
+import type * as React from 'react'
 
 const dummyConfig = {
   discovery: {

@@ -2,6 +2,7 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { migration } from './migration'
 import { saveFile, savePythonFile } from './utils'
 
+import type { SyntheticEvent } from 'react'
 import type { PDProtocolFile, PDPythonFile } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type {
@@ -10,7 +11,6 @@ import type {
   LoadFileAction,
   NewProtocolFields,
 } from './types'
-import type { SyntheticEvent } from 'react'
 
 export interface FileUploadMessageAction {
   type: 'FILE_UPLOAD_MESSAGE'

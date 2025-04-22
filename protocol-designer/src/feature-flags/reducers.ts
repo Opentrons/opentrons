@@ -5,11 +5,11 @@ import { handleActions } from 'redux-actions'
 
 import { DEPRECATED_FLAGS, userFacingFlags } from './types'
 
+import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
 import type { Action } from '../types'
 import type { SetFeatureFlagAction } from './actions'
 import type { Flags, FlagTypes } from './types'
-import type { Reducer } from 'redux'
 
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.

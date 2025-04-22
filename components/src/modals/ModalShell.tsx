@@ -16,8 +16,8 @@ import {
 } from '../styles'
 import { RESPONSIVENESS, SPACING } from '../ui-style-constants'
 
-import type { StyleProps } from '../primitives'
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
+import type { StyleProps } from '../primitives'
 
 export type Position = 'center' | 'bottomRight'
 export interface ModalShellProps extends StyleProps {

@@ -13,7 +13,6 @@ import {
 } from '@opentrons/shared-data'
 import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 
-import type { BoundingRect, GenericRect } from '../collision-types'
 import type { WellGroup } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -31,6 +30,7 @@ import type {
   PipetteEntities,
   PipetteEntity,
 } from '@opentrons/step-generation'
+import type { BoundingRect, GenericRect } from '../collision-types'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware

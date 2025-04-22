@@ -12,8 +12,8 @@ import {
 } from '../constants'
 import { DEFAULTS } from './migrate'
 
-import type { Config, Overrides } from './types'
 import type { ConfigValueChangeAction } from '@opentrons/app/src/redux/config/types'
+import type { Config, Overrides } from './types'
 
 export function shouldUpdate(path: string, overrides: Overrides): boolean {
   return !has(overrides, path)

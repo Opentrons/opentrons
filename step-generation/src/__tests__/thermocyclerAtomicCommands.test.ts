@@ -11,13 +11,13 @@ import { thermocyclerWaitForBlockTemperature } from '../commandCreators/atomic/t
 import { thermocyclerWaitForLidTemperature } from '../commandCreators/atomic/thermocyclerWaitForLidTemperature'
 import { getSuccessResult } from '../fixtures'
 
-import type { CommandCreator, ModuleEntities } from '../types'
 import type {
   AtomicProfileStep,
   ModuleOnlyParams,
   TCProfileParams,
   TemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { CommandCreator, ModuleEntities } from '../types'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for these command creators

@@ -3,13 +3,13 @@ import { createRunAction, RUN_ACTION_TYPE_PAUSE } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { HostConfig, RunAction } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
+import type { HostConfig, RunAction } from '@opentrons/api-client'
 
 export type UsePauseRunMutationResult = UseMutationResult<
   RunAction,

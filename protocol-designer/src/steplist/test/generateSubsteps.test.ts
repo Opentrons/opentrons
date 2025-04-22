@@ -9,13 +9,13 @@ import {
 import { THERMOCYCLER_STATE } from '../../constants'
 import { generateSubstepItem } from '../generateSubstepItem'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   ThermocyclerStateStepArgs,
 } from '../../../../step-generation/src/types'
 import type { LabwareNamesByModuleId, StepArgsAndErrors } from '../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 describe('generateSubstepItem', () => {
   const stepId = 'step123'

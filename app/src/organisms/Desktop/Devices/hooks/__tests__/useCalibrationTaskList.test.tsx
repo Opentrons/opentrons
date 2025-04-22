@@ -31,9 +31,9 @@ import {
 } from '../__fixtures__/taskListFixtures'
 import { useCalibrationTaskList } from '../useCalibrationTaskList'
 
-import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/resources/instruments')
 vi.mock('@opentrons/react-api-client')

@@ -24,9 +24,9 @@ import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
 import { ModuleDiagram } from '../ModelDiagram'
 
-import type { DisplayModules } from '../../organisms/ModulesSection'
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
+import type { DisplayModules } from '../../organisms/ModulesSection'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [

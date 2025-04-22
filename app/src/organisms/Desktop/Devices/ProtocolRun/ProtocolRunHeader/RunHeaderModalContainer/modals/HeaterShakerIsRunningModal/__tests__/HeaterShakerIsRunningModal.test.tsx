@@ -11,8 +11,8 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 
-import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { ComponentProps } from 'react'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()

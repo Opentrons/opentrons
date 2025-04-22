@@ -60,6 +60,7 @@ import {
   getRobotUpdateTargetVersion,
 } from './selectors'
 
+import type { Observable } from 'rxjs'
 import type { ViewableRobot } from '../discovery/types'
 import type { RestartStatusChangedAction } from '../robot-admin/types'
 import type { RobotApiResponse } from '../robot-api/types'
@@ -74,7 +75,6 @@ import type {
   StartRobotUpdateAction,
   UpdateSessionStage,
 } from './types'
-import type { Observable } from 'rxjs'
 
 export const POLL_INTERVAL_MS = 2000
 export const REDISCOVERY_TIME_MS = 1200000

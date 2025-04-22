@@ -13,12 +13,12 @@ import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 import { ResultModal } from './ConnectNetwork/ResultModal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 
+import type { WifiNetwork } from '/app/redux/networking/types'
+import type { Dispatch, State } from '/app/redux/types'
 import type {
   NetworkChangeState,
   WifiConfigureRequest,
 } from './ConnectNetwork/types'
-import type { WifiNetwork } from '/app/redux/networking/types'
-import type { Dispatch, State } from '/app/redux/types'
 
 interface SelectNetworkProps {
   robotName: string

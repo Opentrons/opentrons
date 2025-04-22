@@ -6,9 +6,9 @@ import { trackEvent } from '../../../analytics/mixpanel'
 import { mixpanelAtom } from '../../atoms'
 import { useTrackEvent } from '../useTrackEvent'
 
+import type { ReactNode } from 'react'
 import type { AnalyticsEvent } from '../../../analytics/mixpanel'
 import type { Mixpanel } from '../../types'
-import type { ReactNode } from 'react'
 
 vi.mock('../../../analytics/mixpanel', () => ({
   trackEvent: vi.fn(),

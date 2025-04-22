@@ -5,13 +5,13 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
+import type { FetchPipettesResponseBody } from '@opentrons/api-client'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
 import type { FetchPipettesAction } from '../types'
-import type { FetchPipettesResponseBody } from '@opentrons/api-client'
 
 const mapActionToRequest: ActionToRequestMapper<FetchPipettesAction> = action => ({
   method: GET,

@@ -11,6 +11,8 @@ import {
   Well,
 } from './labwareInternals'
 
+import type { RefObject } from 'react'
+import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
@@ -18,8 +20,6 @@ import type {
   WellMouseEvent,
   WellStroke,
 } from './labwareInternals/types'
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { RefObject } from 'react'
 
 export interface LabwareProps {
   /** Labware definition to render */

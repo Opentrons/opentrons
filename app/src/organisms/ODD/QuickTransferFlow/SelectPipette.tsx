@@ -14,13 +14,13 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { usePipetteSpecsV2 } from '/app/local-resources/instruments'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import type { ComponentProps, Dispatch } from 'react'
+import type { Mount, PipetteData } from '@opentrons/api-client'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,
 } from './types'
-import type { Mount, PipetteData } from '@opentrons/api-client'
-import type { SmallButton } from '/app/atoms/buttons'
-import type { ComponentProps, Dispatch } from 'react'
 
 interface SelectPipetteProps {
   onNext: () => void

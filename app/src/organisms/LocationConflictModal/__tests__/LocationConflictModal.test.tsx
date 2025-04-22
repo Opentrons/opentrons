@@ -23,9 +23,9 @@ import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { LocationConflictModal } from '../LocationConflictModal'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')

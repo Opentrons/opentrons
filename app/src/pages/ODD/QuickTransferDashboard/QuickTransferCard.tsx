@@ -36,10 +36,10 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import { LongPressModal } from './LongPressModal'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { Dispatch, SetStateAction } from 'react'
 
 const REFETCH_INTERVAL = 5000
 

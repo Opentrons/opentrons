@@ -28,10 +28,6 @@ import {
   getModuleOnDeckByType,
 } from '../../ui/modules/utils'
 
-import type { FormData, StepIdType, StepType } from '../../form-types'
-import type { FormPatch } from '../../steplist/actions/types'
-import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
-import type { InitialDeckSetup } from '../types'
 import type {
   AbsorbanceReaderState,
   AdditionalEquipmentEntities,
@@ -40,6 +36,10 @@ import type {
   RobotState,
   Timeline,
 } from '@opentrons/step-generation'
+import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { FormPatch } from '../../steplist/actions/types'
+import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
+import type { InitialDeckSetup } from '../types'
 
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType

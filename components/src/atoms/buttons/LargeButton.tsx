@@ -15,9 +15,9 @@ import { Btn } from '../../primitives'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
-import type { ReactNode } from 'react'
 
 type LargeButtonTypes =
   | 'primary'

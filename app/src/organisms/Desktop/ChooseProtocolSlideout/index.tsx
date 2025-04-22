@@ -63,12 +63,12 @@ import {
 
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
 
+import type { MouseEventHandler } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '/app/redux/discovery/types'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { State } from '/app/redux/types'
-import type { MouseEventHandler } from 'react'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};

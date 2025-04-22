@@ -10,8 +10,8 @@ import { appRestart } from '/app/redux/shell'
 
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
-import type { FallbackProps } from 'react-error-boundary'
 import type { Mock } from 'vitest'
+import type { FallbackProps } from 'react-error-boundary'
 
 vi.mock('/app/redux/shell')
 vi.mock('/app/redux/analytics')

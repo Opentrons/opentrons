@@ -18,7 +18,6 @@ import {
 } from './constants'
 import { createLogger } from './log'
 
-import type { Action, Dispatch } from './types'
 import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 import type {
   Address,
@@ -26,6 +25,7 @@ import type {
   DiscoveryClientRobot,
   LegacyService,
 } from '@opentrons/discovery-client'
+import type { Action, Dispatch } from './types'
 
 const log = createLogger('discovery')
 

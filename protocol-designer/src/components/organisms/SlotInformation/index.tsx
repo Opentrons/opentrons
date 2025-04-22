@@ -24,8 +24,8 @@ import {
 import { useDeckSetupWindowBreakPoint } from '../../../pages/Designer/DeckSetup/utils'
 import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 
-import type { RobotType } from '@opentrons/shared-data'
 import type { FC } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 
 interface SlotInformationProps {
   location: string

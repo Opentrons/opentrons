@@ -16,17 +16,17 @@ import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
 import { getStagingAreaAddressableAreas } from '../../utils'
 import { SlotHover } from './SlotHover'
 
-import type {
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../step-forms'
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../step-forms'
 
 interface DeckSetupDetailsProps {
   initialDeckSetup: InitialDeckSetup

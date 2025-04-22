@@ -19,14 +19,14 @@ import {
   SCREWDRIVER_LOADNAME,
 } from './constants'
 
-import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
+import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string

@@ -14,7 +14,6 @@ import { ModuleLabel } from './ModuleLabel'
 import { SelectedLabwareRender } from './SelectedLabwareRender'
 import { SelectedModuleLabwareRender } from './SelectedModuleLabwareRender'
 
-import type { Fixture } from './constants'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -22,6 +21,7 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
+import type { Fixture } from './constants'
 
 interface SelectedHoveredItemsProps {
   deckDef: DeckDefinition

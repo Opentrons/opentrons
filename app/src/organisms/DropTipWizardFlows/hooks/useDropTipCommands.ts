@@ -11,13 +11,6 @@ import {
 } from '../constants'
 import { getAddressableAreaFromConfig } from '../utils'
 
-import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
-import type {
-  DropTipFlowsRoute,
-  FixitCommandTypeUtils,
-  IssuedCommandsType,
-} from '../types'
-import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 import type { CommandData, PipetteData } from '@opentrons/api-client'
 import type {
   AddressableAreaName,
@@ -26,6 +19,13 @@ import type {
   RunCommandError,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
+import type {
+  DropTipFlowsRoute,
+  FixitCommandTypeUtils,
+  IssuedCommandsType,
+} from '../types'
+import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MAXIMUM_BLOWOUT_FLOW_RATE_UL_PER_S = 50

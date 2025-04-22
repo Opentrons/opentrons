@@ -21,8 +21,8 @@ import { useLights } from '/app/resources/devices'
 
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
-import type { Dispatch } from '/app/redux/types'
 import type { MouseEventHandler } from 'react'
+import type { Dispatch } from '/app/redux/types'
 
 interface NavigationMenuProps {
   onClick: MouseEventHandler

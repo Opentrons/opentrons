@@ -10,9 +10,9 @@ import * as RobotApi from '/app/redux/robot-api'
 
 import { ConfigurePipette } from '../../ConfigurePipette'
 
+import type { ComponentProps } from 'react'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { State } from '/app/redux/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/redux/config')

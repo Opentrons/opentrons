@@ -35,13 +35,6 @@ import {
 } from './utils'
 
 import type {
-  PDMetadata,
-  PDPythonFile,
-  PythonDesignerApplication,
-} from '../../file-types'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { Selector } from '../../types'
-import type {
   CommandAnnotationV1Mixin,
   CommandV10Mixin,
   CreateCommand,
@@ -59,6 +52,13 @@ import type {
   PipetteEntities,
   PipetteEntity,
 } from '@opentrons/step-generation'
+import type {
+  PDMetadata,
+  PDPythonFile,
+  PythonDesignerApplication,
+} from '../../file-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { Selector } from '../../types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')

@@ -14,6 +14,15 @@ import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import { substepTimeline } from './substepTimeline'
 import * as steplistUtils from './utils'
 
+import type {
+  ConsolidateArgs,
+  CurriedCommandCreator,
+  DistributeArgs,
+  InvariantContext,
+  MixArgs,
+  RobotState,
+  TransferArgs,
+} from '@opentrons/step-generation'
 import type { StepIdType } from '../form-types'
 import type {
   LabwareNamesByModuleId,
@@ -24,15 +33,6 @@ import type {
   SubstepItemData,
   SubstepTimelineFrame,
 } from './types'
-import type {
-  ConsolidateArgs,
-  CurriedCommandCreator,
-  DistributeArgs,
-  InvariantContext,
-  MixArgs,
-  RobotState,
-  TransferArgs,
-} from '@opentrons/step-generation'
 
 export type GetIngreds = (labware: string, well: string) => NamedIngred[]
 type TransferLikeArgs =

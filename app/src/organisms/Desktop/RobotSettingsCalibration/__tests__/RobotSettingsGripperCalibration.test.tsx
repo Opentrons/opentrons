@@ -10,8 +10,8 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 import { formatLastCalibrated } from '../CalibrationDetails/utils'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
 
-import type { GripperData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { GripperData } from '@opentrons/api-client'
 
 vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('../CalibrationDetails/utils')

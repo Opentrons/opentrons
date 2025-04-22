@@ -9,8 +9,8 @@ import {
 } from '../fixtures'
 import { PROTOCOL_CONTEXT_NAME } from '../utils'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { CutoutId } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 

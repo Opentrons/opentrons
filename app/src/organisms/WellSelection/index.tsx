@@ -11,13 +11,13 @@ import {
   getWellSetForMultichannel,
 } from './utils'
 
-import type { GenericRect } from './types'
 import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   NozzleLayoutDetails,
   PipetteChannels,
 } from '@opentrons/shared-data'
+import type { GenericRect } from './types'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2

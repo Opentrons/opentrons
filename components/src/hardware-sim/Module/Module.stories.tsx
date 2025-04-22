@@ -15,8 +15,8 @@ import { LabwareRender } from '../Labware'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module as ModuleComponent } from './'
 
-import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { Meta, Story } from '@storybook/react'
+import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 
 const moduleModels: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,

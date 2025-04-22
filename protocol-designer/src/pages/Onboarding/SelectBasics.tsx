@@ -29,9 +29,9 @@ import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { BasicsButtons } from './BasicsButtons'
 import { WizardBody } from './WizardBody'
 
+import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { WizardFixtureType } from '../../components/organisms'
 import type { Gen, PipetteType, WizardTileProps } from './types'
-import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
   const { setValue, proceed, watch } = props

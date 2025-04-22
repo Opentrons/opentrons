@@ -19,13 +19,13 @@ import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'
 
-import type { Direction } from './types'
 import type {
   PipetteDisplayCategory,
   PipetteModelSpecs,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
+import type { Direction } from './types'
 
 interface Props {
   robotName: string

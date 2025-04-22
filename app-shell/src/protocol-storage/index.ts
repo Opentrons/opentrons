@@ -24,9 +24,9 @@ import {
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 import * as FileSystem from './file-system'
 
-import type { Action, Dispatch } from '../types'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 

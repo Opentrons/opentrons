@@ -15,10 +15,10 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import { AddFixtureModal } from '../AddFixtureModal'
 
-import type { Modules } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { Modules } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')

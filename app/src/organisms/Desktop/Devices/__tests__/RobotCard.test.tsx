@@ -38,8 +38,8 @@ import { RobotCard } from '../RobotCard'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
-import type { State } from '/app/redux/types'
 import type { ComponentProps } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux/discovery/selectors')

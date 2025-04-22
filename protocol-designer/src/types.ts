@@ -1,3 +1,6 @@
+import type { OutputSelector } from 'reselect'
+import type { FC } from 'react'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FeatureFlags } from './feature-flags'
@@ -9,9 +12,6 @@ import type { RootState as StepForms } from './step-forms'
 import type { RootState as Tutorial } from './tutorial'
 import type { RootState as UI } from './ui'
 import type { RootState as WellSelection } from './well-selection/reducers'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
-import type { FC } from 'react'
-import type { OutputSelector } from 'reselect'
 
 export interface BaseState {
   analytics: Analytics

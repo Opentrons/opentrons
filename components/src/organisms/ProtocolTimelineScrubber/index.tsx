@@ -33,15 +33,15 @@ import {
   wellFillFromWellContents,
 } from './utils'
 
-import type { LabwareOnDeck, Module } from '../..'
+import type { ComponentProps } from 'react'
+import type { ViewportListRef } from 'react-viewport-list'
 import type {
   CompletedProtocolAnalysis,
   LabwareLocation,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { ModuleTemporalProperties } from '@opentrons/step-generation'
-import type { ComponentProps } from 'react'
-import type { ViewportListRef } from 'react-viewport-list'
+import type { LabwareOnDeck, Module } from '../..'
 
 export * from './types'
 export * from './utils'

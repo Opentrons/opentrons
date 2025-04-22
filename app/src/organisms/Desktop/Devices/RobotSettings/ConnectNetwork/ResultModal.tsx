@@ -6,8 +6,8 @@ import { FAILURE, PENDING } from '/app/redux/robot-api'
 
 import { DISCONNECT } from './constants'
 
-import type { NetworkChangeType } from './types'
 import type { RequestStatus } from '/app/redux/robot-api/types'
+import type { NetworkChangeType } from './types'
 
 export interface ResultModalProps {
   type: NetworkChangeType

@@ -1,15 +1,15 @@
 import { generateSubstepItem } from '../steplist/generateSubstepItem'
 
 import type {
-  LabwareNamesByModuleId,
-  StepArgsAndErrorsById,
-  Substeps,
-} from '../steplist/types'
-import type {
   InvariantContext,
   RobotState,
   Timeline,
 } from '@opentrons/step-generation'
+import type {
+  LabwareNamesByModuleId,
+  StepArgsAndErrorsById,
+  Substeps,
+} from '../steplist/types'
 
 export interface GenerateSubstepsArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById

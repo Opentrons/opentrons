@@ -12,11 +12,11 @@ import {
 } from '../step-forms/selectors'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
 
+import type { Middleware } from 'redux'
 import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
 import type { Action, BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { SubstepsArgsNoTimeline, WorkerResponse } from './types'
-import type { Middleware } from 'redux'
 
 const hasChanged = (
   nextValues: { [key in any]?: any },

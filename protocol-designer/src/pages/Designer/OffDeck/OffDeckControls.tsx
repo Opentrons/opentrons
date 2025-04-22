@@ -10,13 +10,13 @@ import {
 
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
-import type { DeckSetupTerminalIdType } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   CoordinateTuple,
   DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
+import type { DeckSetupTerminalIdType } from '../types'
 
 interface OffDeckControlsProps extends DeckSetupTerminalIdType {
   hover: string | null

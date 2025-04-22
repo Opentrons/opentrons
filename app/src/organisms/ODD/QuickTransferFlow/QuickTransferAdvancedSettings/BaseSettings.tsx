@@ -18,11 +18,11 @@ import {
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 
+import type { Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { Dispatch } from 'react'
 
 interface BaseSettingsProps {
   state: QuickTransferSummaryState

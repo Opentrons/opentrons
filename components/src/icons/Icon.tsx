@@ -4,8 +4,8 @@ import { css, keyframes } from 'styled-components'
 import { Svg } from '../primitives'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
-import type { SvgProps } from '../primitives'
 import type { ReactNode } from 'react'
+import type { SvgProps } from '../primitives'
 
 export type IconName = keyof typeof ICON_DATA_BY_NAME
 

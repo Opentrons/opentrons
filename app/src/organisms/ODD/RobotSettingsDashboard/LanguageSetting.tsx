@@ -19,9 +19,9 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
 
-import type { SetSettingOption } from './types'
-import type { Dispatch } from '/app/redux/types'
 import type { ChangeEvent } from 'react'
+import type { Dispatch } from '/app/redux/types'
+import type { SetSettingOption } from './types'
 
 interface LabelProps {
   isSelected?: boolean

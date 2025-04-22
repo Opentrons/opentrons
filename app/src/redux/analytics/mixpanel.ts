@@ -4,8 +4,8 @@ import { createLogger } from '/app/logger'
 
 import { CURRENT_VERSION } from '../shell'
 
-import type { AnalyticsConfig, AnalyticsEvent } from './types'
 import type { Config as MixpanelConfig } from 'mixpanel-browser'
+import type { AnalyticsConfig, AnalyticsEvent } from './types'
 
 const log = createLogger(new URL('', import.meta.url).pathname)
 

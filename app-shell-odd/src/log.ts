@@ -7,8 +7,8 @@ import winston from 'winston'
 import { getConfig } from './config'
 import { setUserDataPath } from './early'
 
-import type { Config } from './config'
 import type Transport from 'winston-transport'
+import type { Config } from './config'
 
 const LOG_DIR = path.join(setUserDataPath(), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')

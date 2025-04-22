@@ -1,5 +1,5 @@
-import type { HandlesCommands } from '../types'
 import type { MoveToCoordinatesRunTimeCommand } from '@opentrons/shared-data/command'
+import type { HandlesCommands } from '../types'
 
 export function getMoveToCoordinatesCommandText({
   command,

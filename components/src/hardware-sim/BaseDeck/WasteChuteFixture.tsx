@@ -12,13 +12,13 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
-import type { DeckLabelProps } from '../../molecules'
+import type { SVGProps } from 'react'
 import type {
   DeckDefinition,
   ModuleType,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import type { SVGProps } from 'react'
+import type { DeckLabelProps } from '../../molecules'
 
 const WASTE_CHUTE_WIDTH = 130
 const WASTE_CHUTE_HEIGHT = 138

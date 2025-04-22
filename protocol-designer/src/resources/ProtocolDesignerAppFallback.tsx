@@ -15,9 +15,9 @@ import {
 import { analyticsEvent } from '../analytics/actions'
 import { actions } from '../load-file'
 
+import type { FallbackProps } from 'react-error-boundary'
 import type { AnalyticsEvent } from '../analytics/mixpanel'
 import type { ThunkDispatch } from '../types'
-import type { FallbackProps } from 'react-error-boundary'
 
 export function ProtocolDesignerAppFallback({
   error,

@@ -12,6 +12,7 @@ import {
 } from '..'
 import { RUN_ID_1 } from '../__fixtures__'
 
+import type * as React from 'react'
 import type {
   UsePauseRunMutationResult,
   UsePlayRunMutationResult,
@@ -19,7 +20,6 @@ import type {
   UseResumeRunFromRecoveryMutationResult,
   UseStopRunMutationResult,
 } from '..'
-import type * as React from 'react'
 
 vi.mock('../usePlayRunMutation')
 vi.mock('../usePauseRunMutation')

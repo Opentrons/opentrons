@@ -15,12 +15,12 @@ import systemd from '../systemd'
 import { DEFAULTS_V12, migrate } from './migrate'
 import { getNextValue, shouldUpdate } from './update'
 
-import type { Action, Dispatch, Logger } from '../types'
-import type { Config, Overrides } from './types'
 import type {
   ConfigV12,
   ConfigValueChangeAction,
 } from '@opentrons/app/src/redux/config/types'
+import type { Action, Dispatch, Logger } from '../types'
+import type { Config, Overrides } from './types'
 
 export * from './types'
 

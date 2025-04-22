@@ -1,12 +1,12 @@
 import Axios from 'axios'
 
-import type { HostConfig } from './types'
 import type {
   AxiosPromise,
   AxiosRequestConfig,
   AxiosResponse,
   Method,
 } from 'axios'
+import type { HostConfig } from './types'
 
 export type ResponsePromise<Data> = AxiosPromise<Data>
 

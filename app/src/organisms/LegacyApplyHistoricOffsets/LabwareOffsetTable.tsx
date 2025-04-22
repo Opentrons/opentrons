@@ -6,9 +6,9 @@ import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 import { formatTimestamp } from '/app/transformations/runs'
 
-import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { TFunction } from 'i18next'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}

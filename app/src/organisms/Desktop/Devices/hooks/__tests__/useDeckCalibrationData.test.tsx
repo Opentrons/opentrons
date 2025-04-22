@@ -18,9 +18,9 @@ import { useDispatchApiRequest } from '/app/redux/robot-api'
 
 import { useDeckCalibrationData } from '..'
 
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/calibration')

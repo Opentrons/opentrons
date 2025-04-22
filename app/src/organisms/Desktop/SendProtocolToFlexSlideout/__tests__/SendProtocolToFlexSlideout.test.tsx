@@ -37,8 +37,8 @@ import {
   mockOT3ServerHealthResponse,
 } from '../../../../../../discovery-client/src/fixtures'
 
-import type * as ApiClient from '@opentrons/react-api-client'
 import type { ComponentProps } from 'react'
+import type * as ApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ApiClient>()

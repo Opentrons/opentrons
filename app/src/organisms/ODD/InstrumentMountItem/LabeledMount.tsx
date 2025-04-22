@@ -15,8 +15,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { Mount } from '/app/redux/pipettes/types'
 import type { MouseEventHandler } from 'react'
+import type { Mount } from '/app/redux/pipettes/types'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
   display: flex;

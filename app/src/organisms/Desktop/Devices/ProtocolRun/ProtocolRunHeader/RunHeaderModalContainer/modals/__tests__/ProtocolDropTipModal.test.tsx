@@ -10,8 +10,8 @@ import {
   useProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/local-resources/instruments')
 

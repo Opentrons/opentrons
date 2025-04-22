@@ -7,13 +7,13 @@ import { useAllRunsQuery } from '..'
 import { mockRunsResponse } from '../__fixtures__'
 import { useHost } from '../../api'
 
+import type * as React from 'react'
 import type {
   GetRunsParams,
   HostConfig,
   Response,
   Runs,
 } from '@opentrons/api-client'
-import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

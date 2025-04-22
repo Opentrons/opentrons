@@ -10,8 +10,8 @@ import {
 
 import { PIPETTE_GENS } from '../../../pages/Onboarding/constants'
 
-import type { Gen } from '../../../pages/Onboarding/types'
 import type { Dispatch, SetStateAction } from 'react'
+import type { Gen } from '../../../pages/Onboarding/types'
 
 interface SelectPipetteGenProps {
   setPipetteGen: Dispatch<SetStateAction<'flex' | Gen>>

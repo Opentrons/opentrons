@@ -5,7 +5,6 @@ import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
 
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 
-import type { Labware, Modules, Pipettes } from '../../file-types'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -27,6 +26,7 @@ import type {
   RobotState,
   TimelineFrame,
 } from '@opentrons/step-generation'
+import type { Labware, Modules, Pipettes } from '../../file-types'
 
 interface MappedPipettes {
   [pipetteId: string]: { name: PipetteName }

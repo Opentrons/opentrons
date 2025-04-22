@@ -12,17 +12,17 @@ import { SelectionRect } from './SelectionRect'
 import { SingleLabware } from './SingleLabware'
 import { WellTooltip } from './WellTooltip'
 
-import type { GenericRect } from '../../../collision-types'
-import type { ContentsByWell } from '../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../steplist/types'
-import type { NozzleType } from '../../../types'
+import type { ComponentProps } from 'react'
 import type {
   WellFill,
   WellGroup,
   WellMouseEvent,
   WellStroke,
 } from '@opentrons/components'
-import type { ComponentProps } from 'react'
+import type { GenericRect } from '../../../collision-types'
+import type { ContentsByWell } from '../../../labware-ingred/types'
+import type { WellIngredientNames } from '../../../steplist/types'
+import type { NozzleType } from '../../../types'
 
 export interface SelectableLabwareProps {
   labwareProps: Omit<ComponentProps<typeof SingleLabware>, 'selectedWells'>

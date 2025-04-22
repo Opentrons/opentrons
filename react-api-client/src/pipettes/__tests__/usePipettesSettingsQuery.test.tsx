@@ -9,13 +9,13 @@ import {
 import { usePipetteSettingsQuery } from '..'
 import { useHost } from '../../api'
 
-import type { UsePipetteSettingsQueryOptions } from '../usePipetteSettingsQuery'
+import type * as React from 'react'
 import type {
   HostConfig,
   PipetteSettings,
   Response,
 } from '@opentrons/api-client'
-import type * as React from 'react'
+import type { UsePipetteSettingsQueryOptions } from '../usePipetteSettingsQuery'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

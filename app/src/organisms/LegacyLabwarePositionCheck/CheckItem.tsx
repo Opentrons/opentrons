@@ -31,11 +31,8 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { getLabwareDef } from './utils/labware'
 
-import type {
-  CheckLabwareStep,
-  RegisterPositionAction,
-  WorkingOffset,
-} from './types'
+import type { TFunction } from 'i18next'
+import type { Dispatch } from 'react'
 import type {
   LabwareOffset,
   LegacyLabwareOffsetLocation,
@@ -50,8 +47,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
-import type { TFunction } from 'i18next'
-import type { Dispatch } from 'react'
+import type {
+  CheckLabwareStep,
+  RegisterPositionAction,
+  WorkingOffset,
+} from './types'
 
 const PROBE_LENGTH_MM = 44.5
 

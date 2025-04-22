@@ -3,13 +3,13 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
 
-import type { GetLPCLabwareInfoForURI } from '.'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   DefaultOffsetDetails,
   LabwareModuleStackupDetails,
   LocationSpecificOffsetDetails,
 } from '/app/redux/protocol-runs'
+import type { GetLPCLabwareInfoForURI } from '.'
 
 interface GetDefaultOffsetDetailsForLabwareParams
   extends GetLPCLabwareInfoForURI {

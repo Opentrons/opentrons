@@ -18,8 +18,8 @@ import { FixtureRender } from '../FixtureRender'
 import { HoveredItems } from '../HoveredItems'
 import { ModuleLabel } from '../ModuleLabel'
 
-import type * as OpentronsComponents from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../FixtureRender')
 vi.mock('../../../../labware-ingred/selectors')

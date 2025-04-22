@@ -11,18 +11,18 @@ import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistor
 import { SECTIONS } from '../constants'
 
 import type {
+  PickUpTipRunTimeCommand,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+import type {
   CheckLabwareStep,
   CheckTipRacksStep,
   LabwarePositionCheckStep,
   PickUpTipStep,
   ReturnTipStep,
 } from '../types'
-import type {
-  PickUpTipRunTimeCommand,
-  ProtocolAnalysisOutput,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
 interface LPCArgs {
   primaryPipetteId: string

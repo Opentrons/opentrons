@@ -9,9 +9,9 @@ import { checkShellUpdate } from '/app/redux/shell'
 
 import { useSoftwareUpdatePoll } from '../hooks'
 
-import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 describe('useSoftwareUpdatePoll', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>

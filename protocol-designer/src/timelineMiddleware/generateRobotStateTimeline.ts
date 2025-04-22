@@ -10,9 +10,9 @@ import {
 
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 
-import type { StepArgsAndErrorsById } from '../steplist/types'
 import type { CutoutId } from '@opentrons/shared-data'
 import type * as StepGeneration from '@opentrons/step-generation'
+import type { StepArgsAndErrorsById } from '../steplist/types'
 
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById

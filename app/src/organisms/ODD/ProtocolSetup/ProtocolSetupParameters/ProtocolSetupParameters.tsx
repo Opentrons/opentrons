@@ -33,7 +33,6 @@ import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ResetValuesModal } from './ResetValuesModal'
 
-import type { ProtocolSetupStepStatus } from '../ProtocolSetupStep'
 import type { FileData } from '@opentrons/api-client'
 import type {
   ChoiceParameter,
@@ -44,6 +43,7 @@ import type {
   RunTimeParameter,
   ValueRunTimeParameter,
 } from '@opentrons/shared-data'
+import type { ProtocolSetupStepStatus } from '../ProtocolSetupStep'
 
 interface ProtocolSetupParametersProps {
   protocolId: string

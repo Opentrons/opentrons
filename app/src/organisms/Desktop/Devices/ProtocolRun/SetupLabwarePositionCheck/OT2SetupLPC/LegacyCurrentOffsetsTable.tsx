@@ -25,13 +25,13 @@ import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
+import type { TFunction } from 'i18next'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,
   LoadedModule,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { TFunction } from 'i18next'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}

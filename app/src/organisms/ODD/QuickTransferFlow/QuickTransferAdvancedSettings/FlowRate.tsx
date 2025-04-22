@@ -23,13 +23,13 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
+import type { Dispatch } from 'react'
+import type { SupportedTip } from '@opentrons/shared-data'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { SupportedTip } from '@opentrons/shared-data'
-import type { Dispatch } from 'react'
 
 interface FlowRateEntryProps {
   onBack: () => void

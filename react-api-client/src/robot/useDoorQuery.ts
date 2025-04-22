@@ -3,8 +3,8 @@ import { getDoorStatus } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { DoorStatus, HostConfig } from '@opentrons/api-client'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { DoorStatus, HostConfig } from '@opentrons/api-client'
 
 export type UseDoorQueryOptions<TError = Error> = UseQueryOptions<
   DoorStatus,

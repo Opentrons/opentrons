@@ -14,12 +14,12 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 import { getVolumeRange } from './utils'
 
+import type { ComponentProps, Dispatch } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,
 } from './types'
-import type { SmallButton } from '/app/atoms/buttons'
-import type { ComponentProps, Dispatch } from 'react'
 
 interface VolumeEntryProps {
   onNext: () => void

@@ -12,9 +12,9 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import { InterventionModal } from '../'
 
-import type { ModalType } from '../'
-import type { State } from '/app/redux/types'
 import type { ComponentProps } from 'react'
+import type { State } from '/app/redux/types'
+import type { ModalType } from '../'
 
 vi.mock('/app/redux/config')
 

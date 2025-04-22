@@ -11,8 +11,8 @@ import { isEveryFieldHidden } from '../../../utils'
 import { Footprint } from '../../sections/Footprint'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 

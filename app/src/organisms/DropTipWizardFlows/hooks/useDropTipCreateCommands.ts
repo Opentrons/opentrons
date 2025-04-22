@@ -6,10 +6,10 @@ import {
   useCreateRunCommandMutation,
 } from '/app/resources/runs'
 
-import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
-import type { FixitCommandTypeUtils } from '../types'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
+import type { FixitCommandTypeUtils } from '../types'
 
 export interface RunCommandByCommandTypeParams {
   command: CreateCommand

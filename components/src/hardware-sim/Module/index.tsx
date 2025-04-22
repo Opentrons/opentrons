@@ -28,11 +28,11 @@ import { PlateReader } from './PlateReader'
 import { Temperature } from './Temperature'
 import { Thermocycler } from './Thermocycler'
 
+import type { ComponentProps, ReactNode } from 'react'
 import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
-import type { ComponentProps, ReactNode } from 'react'
 
 export * from './Thermocycler'
 

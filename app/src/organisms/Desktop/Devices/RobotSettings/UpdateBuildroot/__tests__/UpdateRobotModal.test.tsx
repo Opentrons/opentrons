@@ -15,9 +15,9 @@ import {
 
 import { RELEASE_NOTES_URL_BASE, UpdateRobotModal } from '../UpdateRobotModal'
 
-import type { State } from '/app/redux/types'
-import type { ComponentProps } from 'react'
 import type { Store } from 'redux'
+import type { ComponentProps } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/discovery')

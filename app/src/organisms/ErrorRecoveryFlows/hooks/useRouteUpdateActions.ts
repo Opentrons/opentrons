@@ -9,6 +9,7 @@ import {
   STEP_ORDER,
 } from '../constants'
 
+import type { MutableRefObject } from 'react'
 import type {
   IRecoveryMap,
   RecoveryRoute,
@@ -17,7 +18,6 @@ import type {
 } from '../types'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 import type { UseShowDoorInfoResult } from './useShowDoorInfo'
-import type { MutableRefObject } from 'react'
 
 export interface GetRouteUpdateActionsParams {
   hasLaunchedRecovery: boolean

@@ -29,14 +29,14 @@ import { LINK_BUTTON_STYLE } from '../../atoms'
 import { PipetteInfoItem } from '../PipetteInfoItem'
 import { getSectionsFromPipetteName } from './utils'
 
+import type { RobotType } from '@opentrons/shared-data'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   PipetteOnDeck,
 } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { PipetteConfig } from './usePipetteConfig'
-import type { RobotType } from '@opentrons/shared-data'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 
 interface Gripper {
   name: AdditionalEquipmentName

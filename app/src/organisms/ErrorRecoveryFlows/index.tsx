@@ -30,10 +30,10 @@ import {
 import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
 import { RecoveryTakeover } from './RecoveryTakeover'
 
-import type { FailedCommand } from './types'
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+import type { FailedCommand } from './types'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,

@@ -23,12 +23,12 @@ import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
-import type { RobotBusyStatusAction } from '.'
+import type { Dispatch as ReactDispatch } from 'react'
 import type { Runs } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { Robot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
-import type { Dispatch as ReactDispatch } from 'react'
+import type { RobotBusyStatusAction } from '.'
 
 interface AvailableRobotOptionProps {
   robot: Robot

@@ -77,15 +77,15 @@ import {
   getModuleModelsBySlot,
 } from './utils'
 
-import type { StepType } from '../../../form-types'
-import type { ThunkDispatch } from '../../../types'
-import type { Fixture } from './constants'
-import type { ModuleModelExtended } from './utils'
 import type {
   AddressableAreaName,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { StepType } from '../../../form-types'
+import type { ThunkDispatch } from '../../../types'
+import type { Fixture } from './constants'
+import type { ModuleModelExtended } from './utils'
 
 //  @ts-expect-error: add flexStackerType and stepType
 const mapModTypeToStepType: Record<ModuleType, StepType> = {

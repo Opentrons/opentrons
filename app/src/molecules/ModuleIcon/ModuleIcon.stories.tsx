@@ -9,8 +9,8 @@ import {
 import { ModuleIcon } from './index'
 
 import type { Meta, Story } from '@storybook/react'
-import type { AttachedModule } from '/app/redux/modules/types'
 import type * as React from 'react'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 export default {
   title: 'App/Molecules/ModuleIcon',

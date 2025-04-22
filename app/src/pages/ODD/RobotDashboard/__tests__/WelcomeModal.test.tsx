@@ -8,8 +8,8 @@ import { updateConfigValue } from '/app/redux/config'
 
 import { WelcomeModal } from '../WelcomeModal'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/config')
 vi.mock('@opentrons/react-api-client')

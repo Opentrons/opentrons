@@ -5,8 +5,8 @@ import glob from 'glob'
 import { vi } from 'vitest'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import type { LabwareDefByDefURI } from '../types'
 import type { LabwareDefinition1 } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../types'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,

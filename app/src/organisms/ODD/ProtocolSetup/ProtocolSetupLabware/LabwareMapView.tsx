@@ -8,6 +8,7 @@ import {
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -17,7 +18,6 @@ import type {
   StackedItemsOnDeck,
   StackItem,
 } from '/app/transformations/commands'
-import type { Dispatch, SetStateAction } from 'react'
 
 interface LabwareMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]

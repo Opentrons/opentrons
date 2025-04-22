@@ -14,13 +14,13 @@ import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 import { LabwareListItem } from './LabwareListItem'
 import { SlotDetailModal } from './SlotDetailModal'
 
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { StackItem } from '/app/transformations/commands'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }

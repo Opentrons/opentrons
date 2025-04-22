@@ -25,9 +25,9 @@ import {
 } from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
 import { swatchColors } from '../DefineLiquidsModal/swatchColors'
 
-import type { WellIngredientNames } from '../../../steplist/types'
-import type { LocationLiquidState } from '@opentrons/step-generation'
 import type { MouseEvent, ReactNode } from 'react'
+import type { LocationLiquidState } from '@opentrons/step-generation'
+import type { WellIngredientNames } from '../../../steplist/types'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4

@@ -17,17 +17,17 @@ import {
   forHeaterShakerStopShake as _forHeaterShakerStopShake,
 } from '../getNextRobotStateAndWarnings/heaterShakerUpdates'
 
+import type {
+  ModuleOnlyParams,
+  ShakeSpeedParams,
+  TemperatureParams,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ImmutableStateUpdater } from '../__utils__'
 import type {
   HeaterShakerModuleState,
   InvariantContext,
   RobotState,
 } from '../types'
-import type {
-  ModuleOnlyParams,
-  ShakeSpeedParams,
-  TemperatureParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 const forHeaterShakerSetTargetTemperature = makeImmutableStateUpdater(
   _forHeaterShakerSetTargetTemperature

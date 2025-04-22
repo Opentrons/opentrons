@@ -3,15 +3,15 @@ import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 import { getModuleState } from '../robotStateSelectors'
 
 import type {
+  AbsorbanceReaderInitializeParams,
+  ModuleOnlyParams,
+} from '@opentrons/shared-data'
+import type {
   AbsorbanceReaderState,
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
-import type {
-  AbsorbanceReaderInitializeParams,
-  ModuleOnlyParams,
-} from '@opentrons/shared-data'
 
 const _getAbsorbanceReaderState = (
   robotState: RobotState,

@@ -3,8 +3,8 @@ import { getCommand } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { CommandDetail, HostConfig } from '@opentrons/api-client'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { CommandDetail, HostConfig } from '@opentrons/api-client'
 
 export function useCommandQuery(
   runId: string | null,

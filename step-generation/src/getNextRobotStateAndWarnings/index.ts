@@ -48,12 +48,12 @@ import {
   forThermocyclerSetTargetLidTemperature,
 } from './thermocyclerUpdates'
 
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
-import type { CreateCommand } from '@opentrons/shared-data'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(

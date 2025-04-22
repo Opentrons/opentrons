@@ -6,9 +6,9 @@ import { getDoorStatus } from '@opentrons/api-client'
 import { useDoorQuery } from '..'
 import { useHost } from '../../api'
 
-import type { UseDoorQueryOptions } from '../useDoorQuery'
-import type { DoorStatus, HostConfig, Response } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { DoorStatus, HostConfig, Response } from '@opentrons/api-client'
+import type { UseDoorQueryOptions } from '../useDoorQuery'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

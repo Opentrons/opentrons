@@ -12,9 +12,9 @@ import {
 
 import { Select } from '/app/atoms/SelectField/Select'
 
+import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { SelectOption } from '/app/atoms/SelectField/Select'
-import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */

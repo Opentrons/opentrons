@@ -8,12 +8,12 @@ import { DispenseSettingDetail } from './DispenseSettingDetail'
 import { DispenseSettingItem } from './DispenseSettingItem'
 import { useDispenseSettingsConfig } from './hooks/useDispenseSettingsConfig'
 
+import type { Dispatch } from 'react'
 import type {
   DispenseSettingOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { Dispatch } from 'react'
 
 const PADDING_TOP_FOR_NAV = '12rem'
 

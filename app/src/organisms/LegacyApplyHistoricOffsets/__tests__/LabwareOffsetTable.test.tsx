@@ -7,9 +7,9 @@ import { i18n } from '/app/i18n'
 
 import { LabwareOffsetTable } from '../LabwareOffsetTable'
 
-import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
 const mockLabwareDef = fixture96Plate as LabwareDefinition2
 const mockAdapterDef = fixtureTiprackAdapter as LabwareDefinition2

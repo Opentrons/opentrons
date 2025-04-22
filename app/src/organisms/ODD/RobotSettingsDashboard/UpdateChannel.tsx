@@ -21,8 +21,8 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
-import type { Dispatch } from '/app/redux/types'
 import type { ChangeEvent } from 'react'
+import type { Dispatch } from '/app/redux/types'
 
 interface LabelProps {
   isSelected?: boolean

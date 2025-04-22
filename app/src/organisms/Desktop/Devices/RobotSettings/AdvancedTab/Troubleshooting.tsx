@@ -24,8 +24,8 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
 
-import type { IconProps } from '@opentrons/components'
 import type { MouseEventHandler } from 'react'
+import type { IconProps } from '@opentrons/components'
 
 interface TroubleshootingProps {
   robotName: string

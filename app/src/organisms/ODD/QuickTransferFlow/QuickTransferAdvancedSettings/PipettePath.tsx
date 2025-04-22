@@ -24,13 +24,13 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { ACTIONS } from '../constants'
 import { useBlowOutLocationOptions } from './BlowOut'
 
+import type { Dispatch } from 'react'
 import type {
   BlowOutLocation,
   PathOption,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { Dispatch } from 'react'
 
 interface PipettePathProps {
   onBack: () => void

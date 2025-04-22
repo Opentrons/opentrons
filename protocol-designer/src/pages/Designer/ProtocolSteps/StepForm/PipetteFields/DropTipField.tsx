@@ -10,8 +10,8 @@ import {
 } from '../../../../../step-forms/selectors'
 import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
 
-import type { FieldProps } from '../types'
 import type { DropdownOption } from '@opentrons/components'
+import type { FieldProps } from '../types'
 
 export function DropTipField(props: FieldProps): JSX.Element {
   const { value: dropdownItem, updateValue } = props

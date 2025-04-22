@@ -31,11 +31,11 @@ import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 import type {
   AdditionalEquipmentEntity,
   LiquidEntities,
 } from '@opentrons/step-generation'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 
 // ToDo (kk:09/04/2024) this should be removed when break-point is set up
 const MODAL_MIN_WIDTH = '37.125rem'

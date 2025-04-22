@@ -9,8 +9,8 @@ import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
 import { getOrderedWells } from '../../../utils'
 import { mixFormToArgs } from '../mixFormToArgs'
 
-import type { HydratedMixFormData } from '../../../../form-types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { HydratedMixFormData } from '../../../../form-types'
 
 vi.mock('../../../utils')
 

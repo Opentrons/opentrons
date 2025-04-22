@@ -14,8 +14,8 @@ import {
   selectStepInfo,
 } from '/app/redux/protocol-runs'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
   LPCContentContainer: MockLPCContentContainer,

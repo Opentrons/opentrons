@@ -5,8 +5,6 @@ import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
 
-import type { WellFill } from '../../hardware-sim'
-import type { CommandTextData } from './types'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
@@ -19,6 +17,8 @@ import type {
   SingleLabwareLiquidState,
   TimelineFrame,
 } from '@opentrons/step-generation'
+import type { WellFill } from '../../hardware-sim'
+import type { CommandTextData } from './types'
 
 //  copied from protocol-designer
 export interface WellContents {

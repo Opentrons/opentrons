@@ -26,8 +26,8 @@ import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 
-import type { RunStatus } from '@opentrons/api-client'
 import type { MouseEventHandler } from 'react'
+import type { RunStatus } from '@opentrons/api-client'
 
 export interface UseConfirmCancelModalResult {
   showModal: boolean

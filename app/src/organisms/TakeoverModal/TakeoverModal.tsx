@@ -16,8 +16,8 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { Dispatch, SetStateAction } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
   title: string

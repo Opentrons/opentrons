@@ -6,8 +6,8 @@ import { buildFiltersUrl, getAllManufacturers } from '../../filters'
 import { MANUFACTURER, MANUFACTURER_VALUES } from '../../localization'
 import styles from './styles.module.css'
 
-import type { FilterParams } from '../../types'
 import type { SelectOptionOrGroup } from '@opentrons/components'
+import type { FilterParams } from '../../types'
 
 export interface FilterManufacturerProps {
   filters: FilterParams

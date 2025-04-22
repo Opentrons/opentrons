@@ -33,12 +33,12 @@ import {
   getLabwareDefinitionsInUse,
 } from '../selectors'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../../step-generation/src/types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../load-file/migration/utils/getLoadLiquidCommands')
 

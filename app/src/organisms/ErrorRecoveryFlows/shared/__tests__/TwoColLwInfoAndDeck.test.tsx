@@ -11,8 +11,8 @@ import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
 import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')

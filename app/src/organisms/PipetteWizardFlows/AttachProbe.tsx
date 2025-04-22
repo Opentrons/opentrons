@@ -26,8 +26,8 @@ import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 import { ProbeNotAttached } from './ProbeNotAttached'
 import { getPipetteAnimations } from './utils'
 
-import type { PipetteWizardStepProps } from './types'
 import type { CreateCommand, MotorAxes } from '@opentrons/shared-data'
+import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean

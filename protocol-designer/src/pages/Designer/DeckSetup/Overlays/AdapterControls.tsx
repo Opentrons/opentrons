@@ -22,9 +22,9 @@ import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
 
-import type { DroppedItem, SharedControlsType } from '../types'
-import type { Dimensions } from '@opentrons/shared-data'
 import type { DropTargetMonitor } from 'react-dnd'
+import type { Dimensions } from '@opentrons/shared-data'
+import type { DroppedItem, SharedControlsType } from '../types'
 
 interface AdapterControlsProps extends SharedControlsType {
   slotBoundingBox: Dimensions

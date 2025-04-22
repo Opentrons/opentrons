@@ -5,11 +5,11 @@ import {
 } from '../../../constants'
 import { getTimeFromForm } from '../../utils/getTimeFromForm'
 
-import type { HydratedPauseFormData } from '../../../form-types'
 import type {
   PauseArgs,
   WaitForTemperatureArgs,
 } from '@opentrons/step-generation'
+import type { HydratedPauseFormData } from '../../../form-types'
 
 export const pauseFormToArgs = (
   formData: HydratedPauseFormData

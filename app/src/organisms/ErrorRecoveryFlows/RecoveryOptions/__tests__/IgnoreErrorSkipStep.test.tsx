@@ -15,8 +15,8 @@ import {
 } from '../IgnoreErrorSkipStep'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/organisms/ErrorRecoveryFlows/shared', async () => {
   const actual = await vi.importActual(

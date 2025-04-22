@@ -15,8 +15,8 @@ import { useNotifyRunQuery } from '../useNotifyRunQuery'
 import { useRunCommands } from '../useRunCommands'
 import { useRunTimestamps } from '../useRunTimestamps'
 
-import type { Run } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { Run } from '@opentrons/api-client'
 
 vi.mock('../useRunCommands')
 vi.mock('../useNotifyRunQuery')

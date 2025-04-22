@@ -8,16 +8,16 @@ import {
 import { getModuleState } from '../robotStateSelectors'
 
 import type {
+  ModuleOnlyParams,
+  TemperatureModuleAwaitTemperatureParams,
+  TemperatureParams,
+} from '@opentrons/shared-data'
+import type {
   InvariantContext,
   ModuleTemporalProperties,
   RobotStateAndWarnings,
   TemperatureStatus,
 } from '../types'
-import type {
-  ModuleOnlyParams,
-  TemperatureModuleAwaitTemperatureParams,
-  TemperatureParams,
-} from '@opentrons/shared-data'
 
 function _setTemperatureAndStatus(
   moduleState: ModuleTemporalProperties['moduleState'],

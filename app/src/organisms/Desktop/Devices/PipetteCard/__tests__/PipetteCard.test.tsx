@@ -17,8 +17,8 @@ import { useDispatchApiRequest } from '/app/redux/robot-api'
 import { PipetteCard } from '..'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { ComponentProps } from 'react'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('../PipetteOverflowMenu')
 vi.mock('/app/redux/config')

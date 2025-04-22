@@ -12,8 +12,8 @@ import {
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
 
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import type { AspDispAirgapParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forAspirate(
   params: AspDispAirgapParams,

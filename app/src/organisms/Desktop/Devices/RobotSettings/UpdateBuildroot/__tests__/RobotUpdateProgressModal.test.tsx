@@ -25,9 +25,9 @@ import {
 } from '../RobotUpdateProgressModal'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 
+import type { ComponentProps } from 'react'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')

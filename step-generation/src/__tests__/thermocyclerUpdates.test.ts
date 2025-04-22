@@ -19,17 +19,17 @@ import {
   forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
 } from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
 
+import type {
+  ModuleOnlyParams,
+  TemperatureParams,
+  ThermocyclerSetTargetBlockTemperatureParams,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ImmutableStateUpdater } from '../__utils__'
 import type {
   InvariantContext,
   RobotState,
   ThermocyclerModuleState,
 } from '../types'
-import type {
-  ModuleOnlyParams,
-  TemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature

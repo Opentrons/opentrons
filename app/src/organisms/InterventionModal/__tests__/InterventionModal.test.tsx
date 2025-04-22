@@ -17,9 +17,9 @@ import {
   truncatedCommandMessage,
 } from '../__fixtures__'
 
+import type { ComponentProps } from 'react'
 import type { RunData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 const ROBOT_NAME = 'Otie'
 

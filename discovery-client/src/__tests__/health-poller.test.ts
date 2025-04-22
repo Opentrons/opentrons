@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as Fixtures from '../fixtures'
 import { createHealthPoller } from '../health-poller'
 
-import type { HealthPoller } from '../types'
 import type { RequestInit, Response } from 'node-fetch'
+import type { HealthPoller } from '../types'
 
 // TODO(mc, 2020-07-13): remove __mocks__/node-fetch
 vi.mock('node-fetch')

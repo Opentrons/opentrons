@@ -9,9 +9,9 @@ import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
 
-import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/resources/runs')
 

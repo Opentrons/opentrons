@@ -5,8 +5,8 @@ import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
 
-import type { DropdownMenuProps } from '../../molecules'
 import type { Meta, StoryObj } from '@storybook/react'
+import type { DropdownMenuProps } from '../../molecules'
 
 import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
 

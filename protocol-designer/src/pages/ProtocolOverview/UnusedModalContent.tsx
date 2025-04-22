@@ -6,10 +6,10 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
 import type { HintKey } from '../../tutorial'
 import type { Fixture } from './index'
-import type { ReactNode } from 'react'
 
 interface MissingContent {
   noCommands: boolean

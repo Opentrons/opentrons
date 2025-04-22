@@ -9,8 +9,8 @@ import {
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'
 
-import type { PipetteWizardStep } from '../types'
 import type { LoadedPipette } from '@opentrons/shared-data'
+import type { PipetteWizardStep } from '../types'
 
 const mockPipetteInfo = [
   { id: '123', pipetteName: 'p1000_96', mount: 'left' },

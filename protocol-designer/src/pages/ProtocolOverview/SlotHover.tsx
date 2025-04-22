@@ -22,13 +22,13 @@ import {
   getOT2HoverDimensions,
 } from '../Designer/DeckSetup/utils'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CoordinateTuple,
   DeckSlotId,
   RobotType,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
 
 interface SlotHoverProps {
   hover: string | null

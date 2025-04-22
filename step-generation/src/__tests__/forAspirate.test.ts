@@ -12,12 +12,12 @@ import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/for
 import { AIR, createTipLiquidState } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
 
+import type { AspDispAirgapParams } from '@opentrons/shared-data'
 import type {
   CommandCreatorWarning,
   InvariantContext,
   RobotState,
 } from '../types'
-import type { AspDispAirgapParams } from '@opentrons/shared-data'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 

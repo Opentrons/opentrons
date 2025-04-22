@@ -22,8 +22,8 @@ import {
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
-import type { FormattedPipetteOffsetCalibration } from '..'
 import type { State } from '/app/redux/types'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`
   width: 100%;

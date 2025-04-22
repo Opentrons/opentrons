@@ -11,9 +11,9 @@ import { appShellListener } from '/app/redux/shell/remote'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
 
-import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
-import type { HostConfig } from '@opentrons/api-client'
 import type { Mock } from 'vitest'
+import type { HostConfig } from '@opentrons/api-client'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
 vi.unmock('../useNotifyDataReady')
 vi.mock('react-redux')

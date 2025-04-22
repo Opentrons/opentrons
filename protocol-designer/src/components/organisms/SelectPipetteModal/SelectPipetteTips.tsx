@@ -26,11 +26,11 @@ import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { removeOpentronsPhrases } from '../../../utils'
 import { useKitchen } from '../Kitchen/hooks'
 
-import type { BaseState } from '../../../types'
-import type { PipetteMount, RobotType } from '@opentrons/shared-data'
+import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { ThunkDispatch } from 'redux-thunk'
+import type { PipetteMount, RobotType } from '@opentrons/shared-data'
+import type { BaseState } from '../../../types'
 
 interface SelectPipetteTipsProps {
   mount: PipetteMount

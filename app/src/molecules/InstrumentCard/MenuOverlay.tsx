@@ -11,8 +11,8 @@ import {
 
 import { Divider } from '/app/atoms/structure'
 
-import type { StyleProps } from '@opentrons/components'
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 export interface MenuOverlayItemProps {
   label: ReactNode

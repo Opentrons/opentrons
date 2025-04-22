@@ -8,12 +8,12 @@ import {
 
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import type { ValidDropTipBlowoutLocation } from '../types'
 import type {
   AddressableAreaName,
   CutoutConfig,
   RobotType,
 } from '@opentrons/shared-data'
+import type { ValidDropTipBlowoutLocation } from '../types'
 
 export type DropTipBlowoutSlotName =
   | AddressableAreaName

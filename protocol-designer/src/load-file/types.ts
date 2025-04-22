@@ -1,5 +1,5 @@
-import type { PDProtocolFile } from '../file-types'
 import type { RobotType } from '@opentrons/shared-data'
+import type { PDProtocolFile } from '../file-types'
 
 export type FileUploadErrorType =
   | 'INVALID_FILE_TYPE'

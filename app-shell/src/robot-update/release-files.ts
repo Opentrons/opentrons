@@ -11,10 +11,10 @@ import { fetchToFile } from '../http'
 import { createLogger } from '../log'
 import { CURRENT_VERSION } from '../update'
 
+import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
 import type { DownloadProgress } from '../http'
 import type { Dispatch } from '../types'
 import type { ReleaseSetFilepaths, ReleaseSetUrls, UserFileInfo } from './types'
-import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
 
 const VERSION_FILENAME = 'VERSION.json'
 

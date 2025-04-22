@@ -6,7 +6,6 @@ import {
   moveToMaintenancePosition,
 } from './commands'
 
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -16,6 +15,7 @@ import type {
   SetupCreateCommand,
   SetupRunTimeCommand,
 } from '@opentrons/shared-data'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 export interface UseHandleStartLPCResult {
   handleStartLPC: (

@@ -11,8 +11,8 @@ import {
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import type { SmallButton } from '/app/atoms/buttons'
 import type { ComponentProps } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
 
 interface CreateNewTransferProps {
   onNext: () => void

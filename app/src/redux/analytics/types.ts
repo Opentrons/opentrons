@@ -1,3 +1,4 @@
+import type { PipetteMount as Mount, RobotType } from '@opentrons/shared-data'
 import type { DeckCalibrationStatus } from '../calibration/types'
 import type { Config } from '../config/types'
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
@@ -6,7 +7,6 @@ import type {
   ANALYTICS_RESOURCE_MONITOR_REPORT,
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
-import type { PipetteMount as Mount, RobotType } from '@opentrons/shared-data'
 
 export type AnalyticsConfig = Config['analytics']
 

@@ -12,14 +12,14 @@ import {
 } from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
 
-import type { SubstepItemData } from '../steplist/types'
-import type { Selector } from '../types'
 import type { WellGroup } from '@opentrons/components'
 import type {
   CreateCommand,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
+import type { SubstepItemData } from '../steplist/types'
+import type { Selector } from '../types'
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,

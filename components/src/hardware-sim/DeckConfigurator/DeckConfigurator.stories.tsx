@@ -8,9 +8,9 @@ import {
 
 import { DeckConfigurator } from '.'
 
-import type { CutoutConfig } from '@opentrons/shared-data'
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
+import type { CutoutConfig } from '@opentrons/shared-data'
 
 export default {
   title: 'Library/Molecules/Simulation/DeckConfigurator',

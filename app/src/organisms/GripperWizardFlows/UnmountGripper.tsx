@@ -26,8 +26,8 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 
-import type { GripperWizardStepProps } from './types'
 import type { GripperData } from '@opentrons/api-client'
+import type { GripperWizardStepProps } from './types'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};

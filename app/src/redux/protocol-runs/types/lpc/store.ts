@@ -1,4 +1,3 @@
-import type { LPCLabwareInfo } from './labware'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
@@ -8,6 +7,7 @@ import type {
   HANDLE_LW_SUBSTEP,
   LPC_STEP,
 } from '/app/redux/protocol-runs/constants'
+import type { LPCLabwareInfo } from './labware'
 
 export interface LPCWizardState {
   steps: StepInfo

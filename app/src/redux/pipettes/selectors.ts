@@ -11,9 +11,9 @@ import {
 } from '../calibration/tip-length'
 import * as Constants from './constants'
 
+import type { PipetteModel } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type * as Types from './types'
-import type { PipetteModel } from '@opentrons/shared-data'
 
 export const getAttachedPipettes: (
   state: State,

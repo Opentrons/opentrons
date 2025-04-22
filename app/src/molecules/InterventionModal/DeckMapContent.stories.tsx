@@ -20,9 +20,9 @@ import {
 import { StandInContent } from './story-utils/StandIn'
 import { TwoColumn } from './TwoColumn'
 
-import type { LabwareDefinition2, ModuleLocation } from '@opentrons/shared-data'
 import type { Meta, StoryObj } from '@storybook/react'
 import type * as React from 'react'
+import type { LabwareDefinition2, ModuleLocation } from '@opentrons/shared-data'
 
 const DEFAULT_MODULES_ON_DECK = [
   {

@@ -32,11 +32,11 @@ import { useRequiredProtocolHardware } from '/app/resources/protocols'
 
 import { EmptySection } from './EmptySection'
 
+import type { TFunction } from 'i18next'
 import type {
   ProtocolHardware,
   ProtocolPipette,
 } from '/app/transformations/commands'
-import type { TFunction } from 'i18next'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}

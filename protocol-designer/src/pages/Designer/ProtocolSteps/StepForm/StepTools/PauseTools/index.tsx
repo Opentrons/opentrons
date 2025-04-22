@@ -29,8 +29,8 @@ import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
 import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
-import type { StepFormProps } from '../../types'
 import type { ChangeEvent } from 'react'
+import type { StepFormProps } from '../../types'
 
 export function PauseTools(props: StepFormProps): JSX.Element {
   const { propsForFields, visibleFormErrors, setShowFormErrors } = props

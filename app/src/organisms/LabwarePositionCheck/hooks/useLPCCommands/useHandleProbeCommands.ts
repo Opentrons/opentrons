@@ -8,8 +8,8 @@ import {
   verifyProbeAttachmentAndHomeCommands,
 } from './commands'
 
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { CreateCommand, LoadedPipette } from '@opentrons/shared-data'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 export interface UseProbeCommandsResult {
   handleProbeAttachment: (pipette: LoadedPipette | null) => Promise<void>

@@ -1,9 +1,9 @@
 import { ProtocolDeck as ProtocolDeckComponent } from './'
 import analysisFileFixture from './__fixtures__/analysis_QIAseqFX24xv4_8.json'
 
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Meta, StoryObj } from '@storybook/react'
 import type * as React from 'react'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const meta: Meta<React.ComponentProps<typeof ProtocolDeckComponent>> = {
   component: ProtocolDeckComponent,

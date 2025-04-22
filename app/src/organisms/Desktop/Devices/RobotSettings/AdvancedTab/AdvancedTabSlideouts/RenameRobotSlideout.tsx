@@ -26,10 +26,10 @@ import {
   removeRobot,
 } from '/app/redux/discovery'
 
-import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { Dispatch, State } from '/app/redux/types'
 import type { ChangeEvent } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
+import type { UpdatedRobotName } from '@opentrons/api-client'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface RenameRobotSlideoutProps {
   isExpanded: boolean

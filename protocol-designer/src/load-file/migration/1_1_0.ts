@@ -7,14 +7,14 @@ import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { getLegacyLabwareDef } from '../../labware-defs'
 
-import type { FormData } from '../../form-types'
-import type { FormPatch } from '../../steplist/actions'
 import type { PipetteName } from '@opentrons/shared-data'
 import type {
   FileLabware,
   FilePipette,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV1'
+import type { FormData } from '../../form-types'
+import type { FormPatch } from '../../steplist/actions'
 
 export interface PDMetadata {
   pipetteTiprackAssignments: Record<string, string>

@@ -12,7 +12,7 @@ import { BaseDeck } from '../BaseDeck'
 import { LabwareRender } from '../Labware'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 
-import type { StyleProps } from '../../primitives'
+import type { ReactNode } from 'react'
 import type {
   Coordinates,
   DeckConfiguration,
@@ -23,7 +23,7 @@ import type {
   LoadedModule,
   RobotType,
 } from '@opentrons/shared-data'
-import type { ReactNode } from 'react'
+import type { StyleProps } from '../../primitives'
 
 const getModulePosition = (
   deckDef: DeckDefinition,

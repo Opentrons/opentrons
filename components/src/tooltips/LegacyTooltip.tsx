@@ -8,10 +8,10 @@ import { spacing8 } from '../ui-style-constants/spacing'
 import { fontSizeH4 } from '../ui-style-constants/typography'
 import { ARROW_SIZE_PX } from './styles'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { CSSProperties, ForwardedRef, ReactNode, RefCallback } from 'react'
 import type { StyleProps } from '../primitives'
 import type { Placement } from './types'
-import type { CSSProperties, ForwardedRef, ReactNode, RefCallback } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface LegacyTooltipProps extends StyleProps {
   /** Whether or not the tooltip should be rendered */

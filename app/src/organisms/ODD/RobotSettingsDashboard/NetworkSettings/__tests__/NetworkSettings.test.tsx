@@ -13,9 +13,9 @@ import { NetworkSettings } from '..'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
+import type { ComponentProps } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { WifiNetwork } from '/app/redux/networking/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/networking/hooks')

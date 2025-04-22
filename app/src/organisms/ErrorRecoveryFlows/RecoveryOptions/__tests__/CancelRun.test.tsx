@@ -10,8 +10,8 @@ import { RECOVERY_MAP } from '../../constants'
 import { CancelRun } from '../CancelRun'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('../SelectRecoveryOption')
 

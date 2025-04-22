@@ -19,8 +19,8 @@ import {
   makeState,
 } from '../fixtures'
 
-import type { InvariantContext } from '../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { InvariantContext } from '../types'
 
 let invariantContext: InvariantContext
 

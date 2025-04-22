@@ -11,8 +11,8 @@ import {
 import { useCloneRun } from '../useCloneRun'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'
 
-import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs/useNotifyRunQuery')

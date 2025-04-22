@@ -22,11 +22,11 @@ import { ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB } from '/app/redux/analytic
 import { ChangeTip } from './ChangeTip'
 import { TipDropLocation } from './TipDropLocation'
 
+import type { Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
-import type { Dispatch } from 'react'
 
 interface TipManagementProps {
   state: QuickTransferSummaryState

@@ -36,11 +36,11 @@ import {
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 
+import type { MouseEventHandler } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '/app/redux/discovery/types'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
-import type { MouseEventHandler } from 'react'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]

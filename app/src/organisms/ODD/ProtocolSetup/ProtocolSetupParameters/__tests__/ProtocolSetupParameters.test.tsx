@@ -19,10 +19,10 @@ import { ChooseCsvFile } from '../ChooseCsvFile'
 import { ChooseEnum } from '../ChooseEnum'
 import { ChooseNumber } from '../ChooseNumber'
 
-import type { HostConfig } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import type { HostConfig } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 

@@ -15,10 +15,10 @@ import { executeAnalyzeCli } from '../executeAnalyzeCli'
 import { getPythonPath, selectPythonPath } from '../getPythonPath'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
+import type electron from 'electron'
 import type { Config } from '../../config'
 import type { createLogger } from '../../log'
 import type { Dispatch } from '../../types'
-import type electron from 'electron'
 
 vi.mock('../../labware')
 vi.mock('../../dialogs')

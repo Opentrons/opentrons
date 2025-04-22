@@ -9,9 +9,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
-import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
 
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 

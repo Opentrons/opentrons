@@ -15,7 +15,6 @@ import {
 import { isTerminalRunStatus } from '../../utils'
 import { useProtocolDropTipModal } from '../modals'
 
-import type { UseProtocolDropTipModalResult } from '../modals'
 import type { Run, RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { DropTipWizardFlowsProps } from '/app/organisms/DropTipWizardFlows'
@@ -24,6 +23,7 @@ import type {
   TipAttachmentStatusResult,
 } from '/app/resources/instruments'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
+import type { UseProtocolDropTipModalResult } from '../modals'
 
 export type RunHeaderDropTipWizProps =
   | { showDTWiz: true; dtWizProps: DropTipWizardFlowsProps }

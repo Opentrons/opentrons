@@ -13,8 +13,8 @@ import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtu
 import { GripperWizardFlows } from './'
 
 import type { Meta, Story } from '@storybook/react'
-import type * as React from 'react'
 import type { Store, StoreEnhancer } from 'redux'
+import type * as React from 'react'
 
 export default {
   title: 'App/organisms/GripperWizardFlows',

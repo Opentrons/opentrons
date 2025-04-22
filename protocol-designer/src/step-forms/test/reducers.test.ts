@@ -32,6 +32,7 @@ import {
 } from '../selectors'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 
+import type { ModuleEntity } from '@opentrons/step-generation'
 import type { FormData, StepType } from '../../form-types'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
@@ -68,7 +69,6 @@ import type {
   SavedStepFormsActions,
   UnsavedFormActions,
 } from '../reducers'
-import type { ModuleEntity } from '@opentrons/step-generation'
 
 vi.mock('../../labware-defs/utils')
 vi.mock('../selectors')

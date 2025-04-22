@@ -8,6 +8,11 @@ import { uuid } from '.'
 import { GRIPPER_LOCATION } from '../constants'
 
 import type {
+  LoadLabwareRunTimeCommand,
+  PickUpTipRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type {
   InvariantContext,
   LabwareEntities,
   ModuleEntities,
@@ -15,11 +20,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import type {
-  LoadLabwareRunTimeCommand,
-  PickUpTipRunTimeCommand,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]

@@ -16,9 +16,6 @@ import {
   getRunModuleRenderInfo,
 } from '/app/organisms/InterventionModal/utils'
 
-import type { ErrorRecoveryFlowsProps } from '..'
-import type { ERUtilsProps } from './useERUtils'
-import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { Run } from '@opentrons/api-client'
 import type {
   CutoutConfigProtocolSpec,
@@ -36,6 +33,9 @@ import type {
   RunLabwareInfo,
   RunModuleInfo,
 } from '/app/organisms/InterventionModal/utils'
+import type { ErrorRecoveryFlowsProps } from '..'
+import type { ERUtilsProps } from './useERUtils'
+import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 
 interface UseDeckMapUtilsProps {
   runId: ErrorRecoveryFlowsProps['runId']

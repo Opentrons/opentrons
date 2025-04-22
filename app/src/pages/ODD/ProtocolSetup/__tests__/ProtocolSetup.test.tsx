@@ -73,9 +73,9 @@ import { ProtocolSetup } from '../'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 
-import type * as SharedData from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
+import type * as SharedData from '@opentrons/shared-data'
 
 let mockNavigate = vi.fn()
 

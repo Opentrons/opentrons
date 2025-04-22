@@ -25,8 +25,8 @@ import logoSvg from '/app/assets/images/logo_nav.svg'
 
 import { NAV_BAR_WIDTH } from './constants'
 
-import type { RouteProps } from './types'
 import type { MouseEvent } from 'react'
+import type { RouteProps } from './types'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 const PROJECT: string = _OPENTRONS_PROJECT_

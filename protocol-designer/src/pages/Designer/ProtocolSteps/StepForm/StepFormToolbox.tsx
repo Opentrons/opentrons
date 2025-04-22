@@ -71,6 +71,7 @@ import {
   getVisibleFormWarnings,
 } from './utils'
 
+import type { ComponentType } from 'react'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
 import type { FormData, StepType } from '../../../../form-types'
 import type { FormWarningType } from '../../../../steplist'
@@ -81,7 +82,6 @@ import type {
   LiquidHandlingTab,
   StepFormProps,
 } from './types'
-import type { ComponentType } from 'react'
 
 type StepFormMap = {
   [K in StepType]?: ComponentType<StepFormProps> | null

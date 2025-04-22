@@ -17,11 +17,11 @@ import {
   moveLiquidFormToArgs,
 } from '../moveLiquidFormToArgs'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,
   PathOption,
 } from '../../../../form-types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../utils')
 vi.mock('assert')

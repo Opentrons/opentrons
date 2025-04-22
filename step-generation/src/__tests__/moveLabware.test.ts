@@ -17,11 +17,11 @@ import {
   TIPRACK_1,
 } from '../fixtures'
 
-import type { InvariantContext, RobotState } from '../types'
 import type {
   LabwareDefinition2,
   MoveLabwareParams,
 } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const mockWasteChuteId = 'mockWasteChuteId'
 const mockTrashBinId = 'mockTrashBinId'

@@ -8,9 +8,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 
 import { ModuleIcon } from '../'
 
+import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

@@ -14,6 +14,7 @@ import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { LevelPipette } from './LevelPipette'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   PipetteDisplayCategory,
   PipetteModelSpecs,
@@ -21,7 +22,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
 import type { Mount } from '/app/redux/pipettes/types'
-import type { Dispatch, SetStateAction } from 'react'
 
 export interface ConfirmPipetteProps {
   robotName: string

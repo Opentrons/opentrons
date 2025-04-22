@@ -1,5 +1,6 @@
 import { PUT, request } from '../request'
 
+import type { RunCommandError, RunTimeCommand } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type {
@@ -8,7 +9,6 @@ import type {
   UpdateErrorRecoveryPolicyRequest,
   UpdateErrorRecoveryPolicyResponse,
 } from './types'
-import type { RunCommandError, RunTimeCommand } from '@opentrons/shared-data'
 
 export type RecoveryPolicyRulesParams = Array<{
   commandType: RunTimeCommand['commandType']

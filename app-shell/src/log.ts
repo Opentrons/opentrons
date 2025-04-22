@@ -8,8 +8,8 @@ import winston from 'winston'
 
 import { getConfig } from './config'
 
-import type { ConfigV0 } from '@opentrons/app/src/redux/config/schema-types'
 import type Transport from 'winston-transport'
+import type { ConfigV0 } from '@opentrons/app/src/redux/config/schema-types'
 
 export const LOG_DIR = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')

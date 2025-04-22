@@ -9,12 +9,12 @@ import {
 
 import { MoveLabwareOnDeck as MoveLabwareOnDeckComponent } from './MoveLabwareOnDeck'
 
+import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
 import type {
   DeckConfiguration,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { Meta, StoryObj } from '@storybook/react'
-import type * as React from 'react'
 
 const meta: Meta<React.ComponentProps<typeof MoveLabwareOnDeckComponent>> = {
   component: MoveLabwareOnDeckComponent,

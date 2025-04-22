@@ -39,13 +39,7 @@ import {
   getSwapBlockedModule,
 } from './utils'
 
-import type {
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../../step-forms'
-import type { DeckSetupTerminalIdType } from '../types'
-import type { Fixture } from './constants'
+import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
   AddressableArea,
@@ -59,7 +53,13 @@ import type {
   ModuleTemporalProperties,
   ThermocyclerModuleState,
 } from '@opentrons/step-generation'
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../../step-forms'
+import type { DeckSetupTerminalIdType } from '../types'
+import type { Fixture } from './constants'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup

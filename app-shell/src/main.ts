@@ -19,9 +19,9 @@ import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
 import { registerUpdate } from './update'
 import { registerUsb } from './usb'
 
-import type { Action, Dispatch, Logger } from './types'
 import type { BrowserWindow } from 'electron'
 import type { LogEntry } from 'winston'
+import type { Action, Dispatch, Logger } from './types'
 
 /**
  * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail

@@ -23,8 +23,8 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import { equipmentImages } from './equipmentImages'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 interface WizardRequiredEquipmentListProps extends StyleProps {
   equipmentList: Array<ComponentProps<typeof RequiredEquipmentCard>>

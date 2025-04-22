@@ -15,11 +15,11 @@ import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateResultsModal } from '../UpdateResultsModal'
 
+import type { ComponentProps } from 'react'
 import type {
   BadPipette,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../UpdateInProgressModal')

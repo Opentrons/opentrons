@@ -10,8 +10,8 @@ import {
 
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
-import type { ThermocyclerData } from '/app/redux/modules/api-types'
 import type { ComponentProps } from 'react'
+import type { ThermocyclerData } from '/app/redux/modules/api-types'
 
 const render = (props: ComponentProps<typeof ThermocyclerModuleData>) => {
   return renderWithProviders(<ThermocyclerModuleData {...props} />, {

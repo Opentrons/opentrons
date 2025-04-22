@@ -14,8 +14,8 @@ import {
 
 import { useIsRobotViewable } from '../useIsRobotViewable'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/discovery')
 

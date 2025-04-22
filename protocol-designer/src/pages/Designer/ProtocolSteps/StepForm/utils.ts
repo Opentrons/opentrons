@@ -16,6 +16,8 @@ import {
   getDisabledFields,
 } from '../../../../steplist/formLevel'
 
+import type { DropdownOption } from '@opentrons/components'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type {
   FormData,
   HydratedFormData,
@@ -30,8 +32,6 @@ import type { FormWarning } from '../../../../steplist/formLevel/warnings'
 import type { StepFormErrors } from '../../../../steplist/types'
 import type { NozzleType } from '../../../../types'
 import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
-import type { DropdownOption } from '@opentrons/components'
-import type { PipetteEntity } from '@opentrons/step-generation'
 
 export function getBlowoutLocationOptionsForForm(args: {
   stepType: StepType

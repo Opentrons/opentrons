@@ -21,8 +21,8 @@ import { TRASH_BIN_LOAD_NAME } from '../constants'
 import { Body } from './Body'
 import { InvalidationWarning } from './InvalidationWarning'
 
-import type { CalibrationPanelProps } from '../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { CalibrationPanelProps } from '../types'
 
 const TRASH_BIN = 'Removable black plastic trash bin'
 

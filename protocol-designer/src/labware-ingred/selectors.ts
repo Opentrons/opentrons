@@ -4,6 +4,10 @@ import max from 'lodash/max'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
+import type { Selector } from 'reselect'
+import type { DropdownOption } from '@opentrons/components'
+import type { CutoutId } from '@opentrons/shared-data'
+import type { Ingredient, LabwareLiquidState } from '@opentrons/step-generation'
 import type { BaseState, DeckSlot } from './../types'
 import type {
   ContainersState,
@@ -18,10 +22,6 @@ import type {
   IngredInputs,
   ZoomedIntoSlotInfoState,
 } from './types'
-import type { DropdownOption } from '@opentrons/components'
-import type { CutoutId } from '@opentrons/shared-data'
-import type { Ingredient, LabwareLiquidState } from '@opentrons/step-generation'
-import type { Selector } from 'reselect'
 
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 interface RootSlice {

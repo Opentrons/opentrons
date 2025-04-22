@@ -6,12 +6,12 @@ import {
 
 import { SlotBase } from '../BaseDeck/SlotBase'
 
+import type { SVGProps } from 'react'
 import type {
   DeckDefinition,
   DeckSlot,
   RobotType,
 } from '@opentrons/shared-data'
-import type { SVGProps } from 'react'
 
 interface LegacyDeckSlotLocationProps extends SVGProps<SVGGElement> {
   robotType: RobotType

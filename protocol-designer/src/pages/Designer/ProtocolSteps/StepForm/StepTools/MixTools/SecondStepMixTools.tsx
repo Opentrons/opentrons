@@ -37,10 +37,10 @@ import {
 } from '../../utils'
 import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { ErrorMappedToField } from '../../utils'
-import type { Dispatch, SetStateAction } from 'react'
 
 interface SecondStepMixToolsProps {
   propsForFields: FieldPropsByName

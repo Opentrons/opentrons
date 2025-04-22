@@ -9,8 +9,8 @@ import { getLabwareName } from '../getLabwareName'
 import { getLoadedLabware } from '../getLoadedLabware'
 import { getWellRange } from '../getWellRange'
 
-import type { GetCommandText } from '../..'
 import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
+import type { GetCommandText } from '../..'
 
 export const getPipettingCommandText = ({
   command,

@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { CreateNewTransfer } from '../CreateNewTransfer'
 
-import type * as OpentronsComponents from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()

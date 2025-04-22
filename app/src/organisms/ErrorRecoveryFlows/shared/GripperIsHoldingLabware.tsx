@@ -16,9 +16,9 @@ import { DESKTOP_ONLY, ODD_ONLY, RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
-import type { RecoveryContentProps } from '../types'
 import type { TFunction } from 'i18next'
 import type { JSX } from 'react'
+import type { RecoveryContentProps } from '../types'
 
 type HoldingLabwareOption = 'yes' | 'no'
 export const HOLDING_LABWARE_OPTIONS: HoldingLabwareOption[] = [

@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
 
-import type * as SharedData from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('../../Desktop/Devices/ProtocolRun/SetupLiquids/SetupLiquidsList')
 vi.mock('@opentrons/shared-data', async importOriginal => {

@@ -8,6 +8,7 @@ import * as Actions from '../actions'
 import * as Constants from '../constants'
 import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
 
+import type { Observable } from 'rxjs'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
@@ -21,7 +22,6 @@ import type {
   CreateSessionCommandSuccessAction,
   SessionResponse,
 } from '../types'
-import type { Observable } from 'rxjs'
 
 const mapActionToRequest = (
   action: CreateSessionCommandAction

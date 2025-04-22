@@ -30,11 +30,11 @@ import {
   thermocyclerPipetteCollision,
 } from '../utils'
 
-import type { InvariantContext, RobotState } from '../'
 import type {
   AspDispAirgapParams,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../'
 
 const fixtureTiprack10ul = tip10 as LabwareDefinition2
 const fixtureTiprack1000ul = tip1000 as LabwareDefinition2

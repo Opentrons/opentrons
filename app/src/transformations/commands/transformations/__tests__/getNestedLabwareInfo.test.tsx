@@ -4,8 +4,8 @@ import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import { getNestedLabwareInfo } from '../getNestedLabwareInfo'
 
-import type { LabwareSetupItem } from '../getLabwareSetupItemGroups'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { LabwareSetupItem } from '../getLabwareSetupItemGroups'
 
 const MOCK_LABWARE_ID = 'mockLabwareId'
 const MOCK_OTHER_LABWARE_ID = 'mockOtherLabwareId'

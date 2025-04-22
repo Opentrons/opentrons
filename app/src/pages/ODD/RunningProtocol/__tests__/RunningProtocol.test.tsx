@@ -47,8 +47,8 @@ import {
 
 import { RunningProtocol } from '..'
 
-import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')

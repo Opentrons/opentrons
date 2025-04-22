@@ -20,9 +20,9 @@ import {
 
 import { useCurrentRunStatus, useRunControls, useRunErrors } from '../hooks'
 
+import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ApiClient>()

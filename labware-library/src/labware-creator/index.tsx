@@ -63,6 +63,8 @@ import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { WizardHeader } from './WizardHeader'
 
+import type { FormikErrors } from 'formik'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   FormStatus,
   ImportError,
@@ -70,8 +72,6 @@ import type {
   ProcessedLabwareFields,
 } from './fields'
 import type { LabwareCreatorErrors } from './formLevelValidation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { FormikErrors } from 'formik'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)

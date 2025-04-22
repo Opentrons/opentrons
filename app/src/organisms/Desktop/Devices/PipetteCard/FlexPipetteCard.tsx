@@ -30,6 +30,7 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
+import type { MouseEventHandler } from 'react'
 import type {
   BadPipette,
   HostConfig,
@@ -41,7 +42,6 @@ import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '/app/organisms/PipetteWizardFlows/types'
-import type { MouseEventHandler } from 'react'
 
 interface FlexPipetteCardProps {
   attachedPipette: PipetteData | BadPipette | null

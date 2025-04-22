@@ -13,8 +13,8 @@ import { Dropdown } from '../../Dropdown'
 import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../Dropdown')
 vi.mock('../../alerts/FormAlerts')

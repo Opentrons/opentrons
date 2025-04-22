@@ -8,8 +8,8 @@ import { syncSystemTime } from '/app/redux/robot-admin'
 
 import { useSyncRobotClock } from '..'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/discovery')
 

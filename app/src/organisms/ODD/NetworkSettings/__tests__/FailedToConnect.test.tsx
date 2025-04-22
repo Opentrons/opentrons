@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { FailedToConnect } from '../FailedToConnect'
 
-import type { RequestState } from '/app/redux/robot-api/types'
 import type { ComponentProps } from 'react'
+import type { RequestState } from '/app/redux/robot-api/types'
 
 const render = (props: ComponentProps<typeof FailedToConnect>) => {
   return renderWithProviders(

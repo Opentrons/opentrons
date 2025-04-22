@@ -13,13 +13,13 @@ import {
 
 import { TERMINAL_RUN_STATUSES } from '../constants'
 
+import type { ReactNode } from 'react'
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { ReactNode } from 'react'
 
 interface UseRunProgressResult {
   currentStepContents: ReactNode

@@ -9,8 +9,8 @@ import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { LabwareCard } from '..'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 
-import type * as OpentronsComponents from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('/app/local-resources/labware')
 vi.mock('../CustomLabwareOverflowMenu')

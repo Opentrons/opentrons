@@ -22,8 +22,8 @@ import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 
 import { ChooseRobotSlideout } from '..'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')

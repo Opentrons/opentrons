@@ -1,10 +1,10 @@
 import { Flex } from '../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { StyleProps } from '..'
 import type { Mount } from '../robot-types'
-import type { PipetteV2Specs } from '@opentrons/shared-data'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 
 import eightChannelFlexSrc from './eight-channel-flex.png'
 import multiSrc from './multi-channel_GEN1_800px.png'

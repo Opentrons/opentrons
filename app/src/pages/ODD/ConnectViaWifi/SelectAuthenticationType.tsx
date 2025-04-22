@@ -4,8 +4,8 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { SelectAuthenticationType as SelectAuthenticationTypeComponent } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
-import type { WifiScreenOption } from './'
 import type { WifiSecurityType } from '@opentrons/api-client'
+import type { WifiScreenOption } from './'
 
 interface SelectAuthenticationTypeProps {
   handleWifiConnect: () => void

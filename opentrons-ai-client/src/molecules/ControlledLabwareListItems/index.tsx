@@ -15,8 +15,8 @@ import { LabwareDiagram } from '../../molecules/LabwareDiagram'
 import { LABWARES_FIELD_NAME } from '../../organisms/LabwareLiquidsSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
 
-import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 import type { DropdownBorder } from '@opentrons/components'
+import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 
 export function ControlledLabwareListItems(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')

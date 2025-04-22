@@ -27,10 +27,10 @@ import { FileUpload } from '/app/molecules/FileUpload'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { restartRobot } from '/app/redux/robot-admin'
 
-import type { RobotSettingsField } from '@opentrons/api-client'
-import type { Dispatch } from '/app/redux/types'
 import type { ChangeEvent, MouseEventHandler } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
+import type { RobotSettingsField } from '@opentrons/api-client'
+import type { Dispatch } from '/app/redux/types'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean

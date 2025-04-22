@@ -18,8 +18,8 @@ import {
   uuid,
 } from '../../utils'
 
-import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { BlowoutParams, CreateCommand } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export const blowOutInWell: CommandCreator<BlowoutParams> = (
   args,

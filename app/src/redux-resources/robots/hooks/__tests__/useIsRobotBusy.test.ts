@@ -11,9 +11,9 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
 
-import type { Runs, Sessions } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 import type { UseQueryResult } from 'react-query'
+import type { Runs, Sessions } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')

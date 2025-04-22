@@ -30,10 +30,10 @@ import {
   setSelectedLabwareUri,
 } from '/app/redux/protocol-runs'
 
+import type { TFunction } from 'i18next'
 import type { LPCContentContainerProps } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LwGeometryDetails } from '/app/redux/protocol-runs'
-import type { TFunction } from 'i18next'
 
 export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')

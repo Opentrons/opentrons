@@ -53,8 +53,8 @@ import {
   getUnusedTrash,
 } from './utils'
 
-import type { ThunkDispatch } from '../../types'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { ThunkDispatch } from '../../types'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'

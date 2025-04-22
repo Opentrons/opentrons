@@ -9,13 +9,13 @@ import {
   getLwModStackupDetails,
 } from './helpers'
 
-import type { LabwareLocationInfoWithLocSeq } from '.'
-import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
 import type {
   LoadedLabware,
   LoadedModule,
   MoveLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
+import type { LabwareLocationInfoWithLocSeq } from '.'
+import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
 
 export function getMoveLabwareLocationCombo(
   command: MoveLabwareRunTimeCommand,

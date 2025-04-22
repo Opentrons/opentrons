@@ -12,8 +12,8 @@ import {
 import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 
-import type { Selector } from '../../types'
 import type { WellGroup } from '@opentrons/components'
+import type { Selector } from '../../types'
 
 export const getMissingTipsByLabwareId: Selector<Record<
   string,

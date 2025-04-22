@@ -14,6 +14,7 @@ import {
 
 import { COLUMN_4_SLOTS } from './constants'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
   InvariantContext,
@@ -21,7 +22,6 @@ import type {
   RobotState,
   ThermocyclerModuleState,
 } from './types'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']

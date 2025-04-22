@@ -11,12 +11,6 @@ import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 
-import type { FormData, PathOption, StepFieldName } from '../../../form-types'
-import type {
-  FieldPropsByName,
-  LiquidHandlingTab,
-} from '../../../pages/Designer/ProtocolSteps/StepForm/types'
-import type { FormPatch } from '../../actions/types'
 import type {
   BlowoutProperties,
   ByTipTypeSetting,
@@ -38,6 +32,12 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import type { FormData, PathOption, StepFieldName } from '../../../form-types'
+import type {
+  FieldPropsByName,
+  LiquidHandlingTab,
+} from '../../../pages/Designer/ProtocolSteps/StepForm/types'
+import type { FormPatch } from '../../actions/types'
 
 type LiquidClassSettingsType = 'aspirate' | 'dispense' | 'all'
 

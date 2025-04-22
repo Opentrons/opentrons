@@ -17,8 +17,8 @@ import {
 import { OnOffToggle } from './OnOffToggle'
 import { RobotSettingButton } from './RobotSettingButton'
 
-import type { SetSettingOption } from './types'
 import type { Dispatch } from '/app/redux/types'
+import type { SetSettingOption } from './types'
 
 interface PrivacyProps {
   robotName: string

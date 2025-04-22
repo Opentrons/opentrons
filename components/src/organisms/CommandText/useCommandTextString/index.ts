@@ -2,18 +2,18 @@ import { useTranslation } from 'react-i18next'
 
 import * as utils from './utils'
 
+import type { TFunction } from 'i18next'
+import type {
+  LabwareDefinition2,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type { CommandTextData } from '../../ProtocolTimelineScrubber/types'
 import type {
   GetDirectTranslationCommandText,
   TCProfileCycleText,
   TCProfileStepText,
 } from './utils'
-import type {
-  LabwareDefinition2,
-  RobotType,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import type { TFunction } from 'i18next'
 
 export * from './utils'
 

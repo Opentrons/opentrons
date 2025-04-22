@@ -8,6 +8,7 @@ import { withRobotHost } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
+import type { Observable } from 'rxjs'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
@@ -15,7 +16,6 @@ import type {
 } from '../../robot-api/types'
 import type { Action, Epic, State } from '../../types'
 import type { MoveAction, PositionsResponse } from '../types'
-import type { Observable } from 'rxjs'
 
 const mapActionToRequest = (
   action: MoveAction,

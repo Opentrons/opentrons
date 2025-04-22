@@ -6,9 +6,9 @@ import { i18n } from '/app/i18n'
 
 import { ProtocolParameters } from '..'
 
+import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()

@@ -19,13 +19,13 @@ import { SmallButton } from '/app/atoms/buttons'
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type {
   IconPlacement,
   SmallButtonTypes,
 } from '/app/atoms/buttons/SmallButton'
 import type { InlineNotificationProps } from '/app/atoms/InlineNotification'
-import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 
 export interface ChildNavigationProps extends StyleProps {
   header: string

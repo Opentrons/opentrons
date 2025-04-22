@@ -18,8 +18,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { IconName } from '@opentrons/components'
 import type { MouseEventHandler, ReactNode } from 'react'
+import type { IconName } from '@opentrons/components'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;

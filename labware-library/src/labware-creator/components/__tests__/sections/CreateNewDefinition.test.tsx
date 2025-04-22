@@ -7,8 +7,8 @@ import { getDefaultFormState } from '../../../fields'
 import { CreateNewDefinition } from '../../sections/CreateNewDefinition'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),

@@ -3,9 +3,9 @@ import { FLEX_MAX_CONTENT } from '../../styles'
 import { LegacyTooltip } from '../../tooltips'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '../../primitives'
 import type { UseTooltipResultTooltipProps } from '../../tooltips'
-import type { ReactNode } from 'react'
 
 export interface TooltipProps extends StyleProps {
   children: ReactNode

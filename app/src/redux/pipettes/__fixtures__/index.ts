@@ -3,6 +3,7 @@ import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 
 import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
 
+import type { PipetteData } from '@opentrons/api-client'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
@@ -14,7 +15,6 @@ import type {
   PipetteSettings,
   PipetteSettingsFieldsMap,
 } from '../types'
-import type { PipetteData } from '@opentrons/api-client'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 

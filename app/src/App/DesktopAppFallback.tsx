@@ -18,8 +18,8 @@ import {
 } from '/app/redux/analytics'
 import { reloadUi } from '/app/redux/shell'
 
-import type { Dispatch } from '/app/redux/types'
 import type { FallbackProps } from 'react-error-boundary'
+import type { Dispatch } from '/app/redux/types'
 
 export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   const { t } = useTranslation('app_settings')

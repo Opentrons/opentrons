@@ -18,9 +18,9 @@ import { RECOVERY_MAP } from '../../constants'
 import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('/app/organisms/DropTipWizardFlows')
 vi.mock('../SelectRecoveryOption')

@@ -35,6 +35,16 @@ import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './index'
 
 import type {
+  AddressableAreaName,
+  BlowoutParams,
+  CutoutFixtureId,
+  CutoutId,
+  LabwareDefinition2,
+  NozzleConfigurationStyle,
+  PipetteChannels,
+  RobotType,
+} from '@opentrons/shared-data'
+import type {
   CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
@@ -49,16 +59,6 @@ import type {
   WasteChuteEntities,
   WasteChuteEntity,
 } from '../types'
-import type {
-  AddressableAreaName,
-  BlowoutParams,
-  CutoutFixtureId,
-  CutoutId,
-  LabwareDefinition2,
-  NozzleConfigurationStyle,
-  PipetteChannels,
-  RobotType,
-} from '@opentrons/shared-data'
 
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'

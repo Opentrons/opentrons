@@ -33,14 +33,14 @@ import {
 import { maskToInteger } from '../../../../../../steplist/fieldLevel/processing'
 import { getFormErrorsMappedToField } from '../../utils'
 
+import type { TFunction } from 'i18next'
+import type { Dispatch, SetStateAction } from 'react'
+import type { DropdownOption } from '@opentrons/components'
 import type { FormData } from '../../../../../../form-types'
 import type { InitializationMode } from '../../../../../../step-forms/types'
 import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldProps, FieldPropsByName } from '../../types'
 import type { ErrorMappedToField } from '../../utils'
-import type { DropdownOption } from '@opentrons/components'
-import type { TFunction } from 'i18next'
-import type { Dispatch, SetStateAction } from 'react'
 
 const MAX_WAVELENGTHS = 6
 const CUSTOM_OPTION: DropdownOption = { name: 'Other', value: '' }

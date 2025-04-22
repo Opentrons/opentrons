@@ -44,7 +44,7 @@ import {
   zoomInOnCoordinate,
 } from './utils'
 
-import type { Fixture } from './constants'
+import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -53,7 +53,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60

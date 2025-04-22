@@ -1,7 +1,7 @@
 import { getTimeFromForm } from '../../utils/getTimeFromForm'
 
-import type { HydratedHeaterShakerFormData } from '../../../form-types'
 import type { HeaterShakerArgs } from '@opentrons/step-generation'
+import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
 export const heaterShakerFormToArgs = (
   formData: HydratedHeaterShakerFormData

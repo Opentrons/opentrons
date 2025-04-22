@@ -2,14 +2,14 @@ import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../constants'
 import { PROFILE_STEP } from '../../../form-types'
 
 import type {
+  ThermocyclerProfileStepArgs,
+  ThermocyclerStateStepArgs,
+} from '@opentrons/step-generation'
+import type {
   HydratedThermocyclerFormData,
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
-import type {
-  ThermocyclerProfileStepArgs,
-  ThermocyclerStateStepArgs,
-} from '@opentrons/step-generation'
 
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 

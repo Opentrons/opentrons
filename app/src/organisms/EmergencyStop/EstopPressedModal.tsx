@@ -29,12 +29,12 @@ import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
 
+import type { MouseEventHandler } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type {
   ModalSize,
   OddModalHeaderBaseProps,
 } from '/app/molecules/OddModal/types'
-import type { MouseEventHandler } from 'react'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.

@@ -11,10 +11,10 @@ import { useCloseCurrentRun } from '/app/resources/runs'
 import { useDropTipWizardFlows } from '..'
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 
+import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteWithTip } from '/app/resources/instruments'
-import type { Mock } from 'vitest'
 
 vi.mock('/app/resources/runs/useCloseCurrentRun')
 vi.mock('..')

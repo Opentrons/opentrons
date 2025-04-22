@@ -27,11 +27,11 @@ import { useRunStatuses } from '/app/resources/runs'
 
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 
+import type { ComponentProps } from 'react'
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '/app/redux/pipettes/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')

@@ -10,8 +10,8 @@ import { useToaster } from '/app/organisms/ToasterOven'
 
 import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')

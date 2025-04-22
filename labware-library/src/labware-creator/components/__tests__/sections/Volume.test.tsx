@@ -10,8 +10,8 @@ import { getLabwareName, isEveryFieldHidden } from '../../../utils'
 import { Volume } from '../../sections/Volume'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 

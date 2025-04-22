@@ -1,9 +1,4 @@
 import type {
-  ErrorDetails,
-  LabwareOffsetLocationSequence,
-  ResourceLink,
-} from '../types'
-import type {
   LabwareDefinition1,
   LabwareDefinition2,
   LabwareDefinition3,
@@ -18,6 +13,11 @@ import type {
   RunTimeCommand,
   RunTimeParameter,
 } from '@opentrons/shared-data'
+import type {
+  ErrorDetails,
+  LabwareOffsetLocationSequence,
+  ResourceLink,
+} from '../types'
 
 export * from './commands/types'
 

@@ -22,6 +22,7 @@ import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/A
 
 import { useNotifyDeckConfigurationQuery } from './useNotifyDeckConfigurationQuery'
 
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   CutoutConfigProtocolSpec,
@@ -30,7 +31,6 @@ import type {
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'
-import type { ReactNode } from 'react'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

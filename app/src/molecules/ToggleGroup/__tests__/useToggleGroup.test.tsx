@@ -10,9 +10,9 @@ import { useTrackEvent } from '/app/redux/analytics'
 
 import { useToggleGroup } from '../useToggleGroup'
 
-import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/analytics')
 

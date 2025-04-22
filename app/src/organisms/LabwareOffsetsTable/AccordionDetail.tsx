@@ -12,10 +12,10 @@ import { DeckInfoLabelTextTag } from '/app/molecules/DeckInfoLabelTextTag'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck'
 
-import type { AccordionChildrenProps } from './AccordionChildren'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck'
 import type { LocationSpecificOffsetDetailsWithCopy } from '/app/redux/protocol-runs'
-import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { AccordionChildrenProps } from './AccordionChildren'
 
 interface AccordionDetailProps extends AccordionChildrenProps {
   detail: LocationSpecificOffsetDetailsWithCopy

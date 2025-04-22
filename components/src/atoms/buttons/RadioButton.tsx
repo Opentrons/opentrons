@@ -17,10 +17,10 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ChangeEventHandler, ReactNode } from 'react'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
-import type { ChangeEventHandler, ReactNode } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface RadioButtonSubLabel {
   /* Optional subtext */

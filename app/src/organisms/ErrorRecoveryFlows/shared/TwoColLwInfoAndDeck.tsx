@@ -15,9 +15,9 @@ import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
-import type { RecoveryContentProps } from '../types'
-import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 import type { ComponentProps } from 'react'
+import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import type { RecoveryContentProps } from '../types'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps

@@ -12,8 +12,8 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')

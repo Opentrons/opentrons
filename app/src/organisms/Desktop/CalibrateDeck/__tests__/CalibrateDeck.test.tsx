@@ -13,9 +13,9 @@ import { mockDeckCalibrationSessionAttributes } from '/app/redux/sessions/__fixt
 
 import { CalibrateDeck } from '../index'
 
+import type { ComponentProps, ComponentType } from 'react'
 import type { DispatchRequestsType } from '/app/redux/robot-api'
 import type { DeckCalibrationStep } from '/app/redux/sessions/types'
-import type { ComponentProps, ComponentType } from 'react'
 
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')

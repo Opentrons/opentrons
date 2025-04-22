@@ -37,8 +37,8 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
 
-import type { DistributeArgs, InvariantContext, RobotState } from '../types'
 import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { DistributeArgs, InvariantContext, RobotState } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

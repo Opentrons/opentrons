@@ -16,8 +16,8 @@ import { useAttachedPipettes } from '/app/resources/instruments'
 
 import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 import type { ComponentProps } from 'react'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('../..//CalibrationStatusCard')
 vi.mock('/app/redux/robot-api/selectors')

@@ -13,8 +13,8 @@ import { useWifiList } from '/app/resources/networking/hooks'
 
 import { useNetworkConnection } from '../useNetworkConnection'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/networking/selectors')
 vi.mock('../useWifiList')

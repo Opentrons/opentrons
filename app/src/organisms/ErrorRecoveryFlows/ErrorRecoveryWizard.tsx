@@ -30,11 +30,11 @@ import {
 } from './shared'
 import { getErrorKind } from './utils'
 
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
-import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 
 export interface UseERWizardResult {
   hasLaunchedRecovery: boolean

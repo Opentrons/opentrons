@@ -12,9 +12,9 @@ import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { FlexPipetteCard } from '../FlexPipetteCard'
 
-import type { PipetteData } from '@opentrons/api-client'
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+import type { PipetteData } from '@opentrons/api-client'
 
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows/ChoosePipette')

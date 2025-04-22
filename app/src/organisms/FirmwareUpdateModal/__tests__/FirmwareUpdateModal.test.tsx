@@ -14,12 +14,12 @@ import { i18n } from '/app/i18n'
 
 import { FirmwareUpdateModal } from '..'
 
+import type { ComponentProps } from 'react'
 import type {
   BadPipette,
   PipetteData,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 

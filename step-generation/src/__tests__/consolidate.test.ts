@@ -29,12 +29,12 @@ import {
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 
-import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
 import type {
   AspDispAirgapParams,
   CreateCommand,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

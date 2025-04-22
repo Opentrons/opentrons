@@ -29,13 +29,13 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 
+import type { ChangeEvent } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,
   LoadedModule,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { ChangeEvent } from 'react'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

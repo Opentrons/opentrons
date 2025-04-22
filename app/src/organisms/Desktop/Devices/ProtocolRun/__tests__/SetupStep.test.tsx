@@ -6,8 +6,8 @@ import { i18n } from '/app/i18n'
 
 import { SetupStep } from '../SetupStep'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 describe('SetupStep', () => {
   const render = ({

@@ -56,10 +56,10 @@ import {
 import { getIsAdapterFromDef } from '../../../../utils'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
+import type { ThunkDispatch } from 'redux-thunk'
+import type { MouseEvent } from 'react'
 import type { StepType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
-import type { MouseEvent } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
 
 interface AddStepButtonProps {
   hasText: boolean

@@ -6,11 +6,11 @@ import {
   swatchColors,
 } from '../DefineLiquidsModal/swatchColors'
 
+import type { WellFill } from '@opentrons/components'
 import type {
   ContentsByWell,
   WellContents,
 } from '../../../labware-ingred/types'
-import type { WellFill } from '@opentrons/components'
 
 const ingredIdsToColor = (
   groupIds: string[],

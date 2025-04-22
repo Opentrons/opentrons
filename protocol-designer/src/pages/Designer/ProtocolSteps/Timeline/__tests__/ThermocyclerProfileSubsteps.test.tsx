@@ -6,8 +6,8 @@ import { i18n } from '../../../../../assets/localization'
 import { getSavedStepForms } from '../../../../../step-forms/selectors'
 import { ThermocyclerProfileSubsteps } from '../ThermocyclerProfileSubsteps'
 
-import type { FormData } from '../../../../../form-types'
 import type { ComponentProps } from 'react'
+import type { FormData } from '../../../../../form-types'
 
 const render = (props: ComponentProps<typeof ThermocyclerProfileSubsteps>) => {
   return renderWithProviders(<ThermocyclerProfileSubsteps {...props} />, {

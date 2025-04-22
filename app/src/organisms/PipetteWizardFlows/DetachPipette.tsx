@@ -30,9 +30,9 @@ import {
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
-import type { PipetteWizardStepProps } from './types'
-import type { PipetteData } from '@opentrons/api-client'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { PipetteData } from '@opentrons/api-client'
+import type { PipetteWizardStepProps } from './types'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
   isFetching: boolean

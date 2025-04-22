@@ -14,8 +14,8 @@ import { executeAnalyzeCli } from './executeAnalyzeCli'
 import { getPythonPath, selectPythonPath } from './getPythonPath'
 import { writeFailedAnalysis } from './writeFailedAnalysis'
 
-import type { Action, Dispatch } from '../types'
 import type { BrowserWindow } from 'electron'
+import type { Action, Dispatch } from '../types'
 
 const log = createLogger('protocol-analysis')
 

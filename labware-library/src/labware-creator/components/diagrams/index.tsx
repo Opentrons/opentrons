@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import type { LabwareType, WellShape } from '../../fields'
 import type { WellBottomShape } from '@opentrons/shared-data'
+import type { LabwareType, WellShape } from '../../fields'
 
 import depthPlateFlatImage from '../../images/depth_plate_flat.svg'
 import depthPlateRoundImage from '../../images/depth_plate_round.svg'

@@ -10,9 +10,9 @@ import {
 import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from './LabwareRender'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture24Tuberack = _fixture24Tuberack as LabwareDefinition2

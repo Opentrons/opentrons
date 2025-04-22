@@ -11,8 +11,8 @@ import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
 
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
-import type { Mount } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { Mount } from '@opentrons/components'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ModuleWizardFlows')

@@ -21,8 +21,8 @@ import SuccessIcon from '/app/assets/images/icon_success.png'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { getIsOnDevice } from '/app/redux/config'
 
-import type { RobotType } from '@opentrons/shared-data'
 import type { ReactNode } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 
 interface Props {
   iconColor: string

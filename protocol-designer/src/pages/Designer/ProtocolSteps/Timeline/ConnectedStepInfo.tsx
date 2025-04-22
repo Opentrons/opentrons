@@ -34,6 +34,8 @@ import {
   nonePressed,
 } from './utils'
 
+import type { ThunkDispatch } from 'redux-thunk'
+import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { DeleteModalType } from '../../../../components/organisms'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
@@ -41,8 +43,6 @@ import type {
   HoverOnStepAction,
   SelectMultipleStepsAction,
 } from '../../../../ui/steps'
-import type { Dispatch, MouseEvent, SetStateAction } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType

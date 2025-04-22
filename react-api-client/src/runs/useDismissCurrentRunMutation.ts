@@ -3,12 +3,12 @@ import { dismissCurrentRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { EmptyResponse, HostConfig } from '@opentrons/api-client'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
+import type { EmptyResponse, HostConfig } from '@opentrons/api-client'
 
 export type UseDismissCurrentRunMutationResult = UseMutationResult<
   EmptyResponse,

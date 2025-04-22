@@ -23,8 +23,8 @@ import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis
 
 import { FLOWS, SECTIONS } from './constants'
 
-import type { PipetteWizardFlow, PipetteWizardStep } from './types'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import type { PipetteWizardFlow, PipetteWizardStep } from './types'
 
 export function getIsGantryEmpty(
   attachedPipette: AttachedPipettesFromInstrumentsQuery

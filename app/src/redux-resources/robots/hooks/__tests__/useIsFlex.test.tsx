@@ -9,8 +9,8 @@ import { getRobotModelByName } from '/app/redux/discovery'
 
 import { useIsFlex } from '..'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/discovery/selectors')
 

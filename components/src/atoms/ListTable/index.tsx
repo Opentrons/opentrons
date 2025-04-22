@@ -10,8 +10,8 @@ import {
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
-import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 
 export interface ListTableProps {
   children: ReactNode

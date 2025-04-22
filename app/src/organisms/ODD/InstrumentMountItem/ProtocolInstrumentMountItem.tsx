@@ -27,6 +27,7 @@ import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
+import type { MouseEventHandler } from 'react'
 import type { InstrumentData } from '@opentrons/api-client'
 import type {
   GripperModel,
@@ -34,7 +35,6 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
-import type { MouseEventHandler } from 'react'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
   display: flex;

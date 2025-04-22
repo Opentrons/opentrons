@@ -35,11 +35,11 @@ import {
   selectStepInfo,
 } from '/app/redux/protocol-runs'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import type { ChildNavigationProps } from '/app/organisms/ODD/ChildNavigation'
-import type { ReactNode } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 
 interface LPCContentContainerTertiaryBtnProps {
   onClick: () => void

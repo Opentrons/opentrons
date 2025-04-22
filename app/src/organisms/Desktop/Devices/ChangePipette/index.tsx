@@ -46,10 +46,10 @@ import {
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 
-import type { WizardStep } from './types'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
 import type { Dispatch, State } from '/app/redux/types'
+import type { WizardStep } from './types'
 
 interface Props {
   robotName: string

@@ -7,7 +7,6 @@ import { selectActivePipette } from '/app/redux/protocol-runs'
 
 import { moveRelativeCommand, moveToWellCommands } from './commands'
 
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 import type {
@@ -17,6 +16,7 @@ import type {
   StepSize,
 } from '/app/molecules/JogControls/types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MAX_QUEUED_JOGS = 3

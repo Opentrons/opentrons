@@ -13,8 +13,8 @@ import {
 import { SPACING } from '../../ui-style-constants'
 import { textDecorationUnderline } from '../../ui-style-constants/typography'
 
-import type { StyleProps } from '../../primitives'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '../../primitives'
 
 export interface ToolboxProps extends StyleProps {
   title: JSX.Element

@@ -20,9 +20,9 @@ import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 
-import type { DeckSlot } from '../../types'
-import type { RobotType } from '@opentrons/shared-data'
 import type { Dispatch, SetStateAction } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
+import type { DeckSlot } from '../../types'
 
 interface StartingDeckProps {
   robotType: RobotType

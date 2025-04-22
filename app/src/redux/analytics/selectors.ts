@@ -10,6 +10,7 @@ import {
 import * as Sessions from '../sessions'
 import { getRobotSessionById } from '../sessions/selectors'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type {
   AnalyticsConfig,
@@ -17,7 +18,6 @@ import type {
   BuildrootAnalyticsData,
   SessionInstrumentAnalyticsData,
 } from './types'
-import type { RobotType } from '@opentrons/shared-data'
 
 export function getBuildrootAnalyticsData(
   state: State,

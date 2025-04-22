@@ -16,8 +16,8 @@ import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
-import type { TemperatureStatus } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { TemperatureStatus } from '@opentrons/api-client'
 
 vi.mock('/app/resources/legacy_sessions')
 vi.mock('/app/redux-resources/robots')

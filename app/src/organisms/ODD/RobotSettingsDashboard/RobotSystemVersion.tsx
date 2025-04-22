@@ -17,8 +17,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
-import type { SetSettingOption } from './types'
 import type { RobotUpdateInfo } from '/app/redux/robot-update/types'
+import type { SetSettingOption } from './types'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 

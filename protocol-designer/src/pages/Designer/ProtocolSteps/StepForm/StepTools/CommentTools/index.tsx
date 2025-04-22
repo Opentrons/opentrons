@@ -9,8 +9,8 @@ import {
 
 import { TextAreaField } from '../../../../../../components/molecules'
 
-import type { StepFormProps } from '../../types'
 import type { ChangeEvent } from 'react'
+import type { StepFormProps } from '../../types'
 
 export function CommentTools(props: StepFormProps): JSX.Element {
   const { t, i18n } = useTranslation('form')

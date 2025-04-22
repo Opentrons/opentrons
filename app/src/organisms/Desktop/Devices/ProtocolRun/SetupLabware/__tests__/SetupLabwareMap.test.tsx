@@ -19,13 +19,13 @@ import {
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
+import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof BaseDeck>()

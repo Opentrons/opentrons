@@ -24,7 +24,7 @@ import { CHECK_PIPETTE_RANK_FIRST } from '/app/redux/sessions'
 import { ResultsSummary } from './ResultsSummary'
 import { ReturnTip } from './ReturnTip'
 
-import type { CalibrationCheckParentProps } from './types'
+import type { ComponentType } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type {
@@ -33,7 +33,7 @@ import type {
   RobotCalibrationCheckStep,
   SessionCommandParams,
 } from '/app/redux/sessions/types'
-import type { ComponentType } from 'react'
+import type { CalibrationCheckParentProps } from './types'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'
 

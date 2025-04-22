@@ -21,9 +21,9 @@ import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
+import type { ChangeEvent } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
-import type { ChangeEvent } from 'react'
 
 interface SelectAuthenticationTypeProps {
   selectedAuthType: WifiSecurityType

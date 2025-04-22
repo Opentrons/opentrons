@@ -1,3 +1,10 @@
+import type { ChangeEventHandler, FocusEventHandler } from 'react'
+import type { FieldError } from 'react-hook-form'
+import type {
+  EapOption,
+  WifiKey,
+  WifiNetwork,
+} from '/app/redux/networking/types'
 import type {
   CONNECT,
   DISCONNECT,
@@ -6,13 +13,6 @@ import type {
   FIELD_TYPE_TEXT,
   JOIN_OTHER,
 } from './constants'
-import type {
-  EapOption,
-  WifiKey,
-  WifiNetwork,
-} from '/app/redux/networking/types'
-import type { ChangeEventHandler, FocusEventHandler } from 'react'
-import type { FieldError } from 'react-hook-form'
 
 export type {
   WifiNetwork,

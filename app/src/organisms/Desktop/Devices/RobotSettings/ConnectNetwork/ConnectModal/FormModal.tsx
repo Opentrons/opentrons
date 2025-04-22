@@ -15,8 +15,8 @@ import { KeyFileField } from './KeyFileField'
 import { SecurityField } from './SecurityField'
 import { TextField } from './TextField'
 
-import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
 import type { Control } from 'react-hook-form'
+import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
 
 const fieldStyle = css`
   min-width: 12rem;

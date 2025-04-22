@@ -22,7 +22,6 @@ import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { darkFill, lightFill } from './DeckSetupContainer'
 import { getAdjacentSlots } from './utils'
 
-import type { Fixture } from './constants'
 import type {
   DeckLabelProps,
   StagingAreaLocation,
@@ -35,6 +34,7 @@ import type {
   RobotType,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import type { Fixture } from './constants'
 
 interface FixtureRenderProps {
   fixture: Fixture

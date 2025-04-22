@@ -13,8 +13,8 @@ import { useRequiredProtocolLabware } from '/app/resources/protocols'
 
 import { Labware } from '../Labware'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/protocols')
 

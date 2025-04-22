@@ -15,16 +15,16 @@ import {
   getLabwareLocationFromSequence,
 } from './getLabwareLocation'
 
-import type {
-  LocationFullParams,
-  LocationSlotOnlyParams,
-} from './getLabwareLocation'
+import type { TFunction } from 'i18next'
 import type {
   AddressableAreaName,
   LabwareLocation,
   LabwareLocationSequence,
 } from '@opentrons/shared-data'
-import type { TFunction } from 'i18next'
+import type {
+  LocationFullParams,
+  LocationSlotOnlyParams,
+} from './getLabwareLocation'
 
 export interface DisplayLocationSlotOnlyParams
   extends Omit<LocationSlotOnlyParams, 'location'> {

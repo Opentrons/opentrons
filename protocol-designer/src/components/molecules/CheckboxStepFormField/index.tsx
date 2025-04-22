@@ -7,9 +7,9 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
-import type { Placement } from '@opentrons/components'
 import type { ReactElement, ReactNode } from 'react'
+import type { Placement } from '@opentrons/components'
+import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
 
 type CheckboxStepFormFieldProps = FieldProps & {
   children?: ReactElement

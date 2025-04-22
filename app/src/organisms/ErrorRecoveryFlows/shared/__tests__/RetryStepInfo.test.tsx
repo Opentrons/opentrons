@@ -8,8 +8,8 @@ import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/
 import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import { RetryStepInfo } from '../RetryStepInfo'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 describe('RetryStepInfo', () => {
   let props: ComponentProps<typeof RetryStepInfo>

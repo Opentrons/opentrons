@@ -15,8 +15,8 @@ import {
 } from '../fixtures'
 import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/heaterShakerCollision')
 

@@ -9,8 +9,8 @@ import {
 } from '../../../../../../ui/modules/selectors'
 import { TemperatureTools } from '../TemperatureTools'
 
-import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
 import type { ComponentProps } from 'react'
+import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
 
 vi.mock('../../../../../../ui/modules/selectors', async importOriginal => {
   const actualFields = await importOriginal<typeof ModulesSelectors>()

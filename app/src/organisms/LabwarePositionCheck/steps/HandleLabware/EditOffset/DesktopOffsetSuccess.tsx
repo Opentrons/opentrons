@@ -22,6 +22,7 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
 } from '/app/redux/protocol-runs'
 
+import type { TFunction } from 'i18next'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type {
   LPCWizardState,
@@ -29,7 +30,6 @@ import type {
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { TFunction } from 'i18next'
 
 interface DesktopOffsetSuccessProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void

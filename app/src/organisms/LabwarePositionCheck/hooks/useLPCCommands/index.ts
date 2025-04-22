@@ -14,6 +14,9 @@ import { useHandleStartLPC } from './useHandleStartLPC'
 import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToMaintenancePosition'
 import { useSaveWorkingOffsets } from './useSaveWorkingOffsets'
 
+import type { CommandData } from '@opentrons/api-client'
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
 import type { UseHandleConditionalCleanupResult } from './useHandleClose'
 import type { UseHandleConfirmPositionResult } from './useHandleConfirmLwFinalPosition'
 import type { UseHandleConfirmPlacementResult } from './useHandleConfirmLwModulePlacement'
@@ -24,9 +27,6 @@ import type { UseHandleResetLwModulesOnDeckResult } from './useHandleResetLwModu
 import type { UseHandleStartLPCResult } from './useHandleStartLPC'
 import type { UseHandleValidMoveToMaintenancePositionResult } from './useHandleValidMoveToMaintenancePosition'
 import type { UseBuildOffsetsToApplyResult } from './useSaveWorkingOffsets'
-import type { CommandData } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
 
 export interface UseLPCCommandsProps extends LPCWizardFlexProps {}
 

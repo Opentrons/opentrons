@@ -29,6 +29,7 @@ import {
   TROUGH_LABWARE,
 } from './data'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   Config,
   InvariantContext,
@@ -42,7 +43,6 @@ import type {
   TEMPERATURE_AT_TARGET,
 } from '../constants'
 import type { TrashBinEntities } from '../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2

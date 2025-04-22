@@ -22,8 +22,8 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
-import type { RobotType } from '@opentrons/shared-data'
 import type { ReactNode } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 
 import one from '../../assets/images/onboarding_animation_1.webm'
 import two from '../../assets/images/onboarding_animation_2.webm'

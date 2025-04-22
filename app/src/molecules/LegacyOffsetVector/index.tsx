@@ -5,8 +5,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 interface LegacyOffsetVectorProps extends StyleProps {
   x: number

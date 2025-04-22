@@ -16,17 +16,17 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { getLabwareLatestSlotFromCurrentStepIndex } from './utils'
 
-import type {
-  AllTemporalPropertiesForTimelineFrame,
-  SavedStepFormState,
-} from '../../step-forms'
-import type { Selector } from '../../types'
 import type { DropdownOption } from '@opentrons/components'
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntity,
 } from '@opentrons/step-generation'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  SavedStepFormState,
+} from '../../step-forms'
+import type { Selector } from '../../types'
 
 export const getLabwareNicknamesById: Selector<
   Record<string, string>

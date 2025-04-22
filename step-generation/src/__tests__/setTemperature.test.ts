@@ -4,8 +4,8 @@ import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { setTemperature } from '../commandCreators/atomic/setTemperature'
 import { getStateAndContextTempTCModules } from '../fixtures'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { TemperatureParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'

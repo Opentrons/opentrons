@@ -22,16 +22,16 @@ import {
 import * as warningCreators from '../../warningCreators'
 
 import type {
-  CommandCreator,
-  CommandCreatorError,
-  CommandCreatorWarning,
-} from '../../types'
-import type {
   AddressableAreaName,
   CreateCommand,
   CutoutId,
   MoveLabwareParams,
 } from '@opentrons/shared-data'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  CommandCreatorWarning,
+} from '../../types'
 
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareParams> = (

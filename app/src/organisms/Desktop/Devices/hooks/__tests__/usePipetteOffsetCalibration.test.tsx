@@ -15,11 +15,11 @@ import { useDispatchApiRequest } from '/app/redux/robot-api'
 
 import { usePipetteOffsetCalibration } from '..'
 
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
 
 vi.mock('/app/redux/calibration')
 vi.mock('/app/redux/robot-api')

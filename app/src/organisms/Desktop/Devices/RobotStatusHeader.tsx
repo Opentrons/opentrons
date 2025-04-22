@@ -33,10 +33,10 @@ import {
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
+import type { MouseEvent } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
-import type { MouseEvent } from 'react'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {

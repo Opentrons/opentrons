@@ -5,10 +5,10 @@ import { C_BLACK, C_BLUE } from '../../../styles/colors'
 import { RobotCoordsText } from '../../Deck'
 import { WELL_LABEL_OPTIONS } from '../LabwareRender'
 
+import type { MemoExoticComponent } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellLabelOption } from '../LabwareRender'
 import type { HighlightedWellLabels } from './types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { MemoExoticComponent } from 'react'
 
 // magic layout numbers to make the letters close to the edges of the labware
 const LETTER_COLUMN_X_INSIDE = 4

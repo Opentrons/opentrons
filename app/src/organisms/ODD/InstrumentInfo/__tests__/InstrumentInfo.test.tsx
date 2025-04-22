@@ -9,9 +9,9 @@ import { mockPipetteData1Channel } from '/app/redux/pipettes/__fixtures__'
 
 import { InstrumentInfo } from '..'
 
-import type { GripperData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
 import type * as ReactRouterDom from 'react-router-dom'
+import type { GripperData } from '@opentrons/api-client'
 
 const mockNavigate = vi.fn()
 

@@ -14,8 +14,8 @@ import { mockTipLengthCalibrationSessionAttributes } from '/app/redux/sessions/_
 
 import { CalibrateTipLength } from '../index'
 
-import type { TipLengthCalibrationStep } from '/app/redux/sessions/types'
 import type { ComponentProps, ComponentType } from 'react'
+import type { TipLengthCalibrationStep } from '/app/redux/sessions/types'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()

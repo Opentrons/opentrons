@@ -8,8 +8,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ChangeEventHandler, MouseEvent } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 interface ListButtonCheckboxProps extends StyleProps {
   buttonText: string

@@ -17,12 +17,12 @@ import {
   updateSetting,
 } from '/app/redux/robot-settings'
 
+import type { MouseEventHandler } from 'react'
 import type {
   RobotSettings,
   RobotSettingsField,
 } from '/app/redux/robot-settings/types'
 import type { Dispatch, State } from '/app/redux/types'
-import type { MouseEventHandler } from 'react'
 
 interface RobotSettingsFeatureFlagsProps {
   robotName: string

@@ -6,8 +6,8 @@ import { getRun } from '@opentrons/api-client'
 import { useRunQuery } from '..'
 import { useHost } from '../../api'
 
-import type { HostConfig, Response, Run } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { HostConfig, Response, Run } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

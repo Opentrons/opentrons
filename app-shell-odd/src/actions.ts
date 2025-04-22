@@ -49,15 +49,6 @@ import {
 } from './constants'
 
 import type {
-  Config,
-  ConfigInitializedAction,
-  ConfigValueUpdatedAction,
-  FinishDiscoveryAction,
-  RobotSystemAction,
-  SendFilePathsAction,
-  StartDiscoveryAction,
-} from './types'
-import type {
   ResetConfigValueAction,
   UpdateConfigValueAction,
 } from '@opentrons/app/src/redux/config'
@@ -115,6 +106,15 @@ import type {
   UsbDeviceAddedAction,
   UsbDeviceRemovedAction,
 } from '@opentrons/app/src/redux/system-info/types'
+import type {
+  Config,
+  ConfigInitializedAction,
+  ConfigValueUpdatedAction,
+  FinishDiscoveryAction,
+  RobotSystemAction,
+  SendFilePathsAction,
+  StartDiscoveryAction,
+} from './types'
 
 // config file has been initialized
 export const configInitialized = (config: Config): ConfigInitializedAction => ({

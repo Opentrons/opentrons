@@ -10,6 +10,7 @@ import {
 } from '../constants'
 import * as Actions from './actions'
 
+import type { Reducer } from 'redux'
 import type {
   HealthErrorResponse,
   HealthResponse,
@@ -25,7 +26,6 @@ import type {
   RobotState,
   State,
 } from './types'
-import type { Reducer } from 'redux'
 
 const INITIAL_STATE: State = {
   robotsByName: {},

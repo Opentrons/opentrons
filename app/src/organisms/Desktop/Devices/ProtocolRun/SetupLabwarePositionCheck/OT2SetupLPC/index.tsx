@@ -30,8 +30,8 @@ import { getLatestCurrentOffsets } from '/app/transformations/runs'
 
 import { LegacyCurrentOffsetsTable } from './LegacyCurrentOffsetsTable'
 
-import type { SetupLabwarePositionCheckProps } from '..'
 import type { LabwareOffset } from '@opentrons/api-client'
+import type { SetupLabwarePositionCheckProps } from '..'
 
 export function OT2SetupLPC(
   props: SetupLabwarePositionCheckProps

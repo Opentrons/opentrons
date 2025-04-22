@@ -17,8 +17,8 @@ import {
   setInitialPosition,
 } from '/app/redux/protocol-runs'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')

@@ -9,9 +9,9 @@ import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
 
+import type { ComponentProps } from 'react'
 import type { FormData } from '../../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../../steplist'
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../../feature-flags/selectors')
 vi.mock('../../../../../../../step-forms/selectors')

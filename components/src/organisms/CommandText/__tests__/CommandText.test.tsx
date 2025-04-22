@@ -12,7 +12,6 @@ import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
 import { mockRobotSideAnalysis } from '../fixtures'
 import { CommandText } from '../index'
 
-import type { CommandTextData } from '../../ProtocolTimelineScrubber'
 import type {
   AspirateInPlaceRunTimeCommand,
   BlowoutInPlaceRunTimeCommand,
@@ -33,6 +32,7 @@ import type {
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { CommandTextData } from '../../ProtocolTimelineScrubber'
 
 const mockCommandTextData: CommandTextData = {
   commands: mockRobotSideAnalysis.commands,

@@ -6,16 +6,16 @@ import {
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
 
-import type { DismissedWarningState } from '../../../dismiss/reducers'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { IngredientsState } from '../../../labware-ingred/reducers'
-import type { FileMetadataFields } from '../../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   LabwareLiquidState,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import type { DismissedWarningState } from '../../../dismiss/reducers'
+import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type { IngredientsState } from '../../../labware-ingred/reducers'
+import type { FileMetadataFields } from '../../types'
 
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2

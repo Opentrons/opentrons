@@ -8,8 +8,8 @@ import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { addHint } from '../../../../tutorial/actions'
 import { addAndSelectStep } from '../thunks'
 
-import type { StepType } from '../../../../form-types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { StepType } from '../../../../form-types'
 
 vi.mock('../../../../tutorial/actions')
 vi.mock('../../../../ui/modules/selectors')

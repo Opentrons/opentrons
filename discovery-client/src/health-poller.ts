@@ -10,6 +10,8 @@ import {
   UPDATE_SERVER_HEALTH_PATH,
 } from './constants'
 
+import type { Agent } from 'http'
+import type { RequestInit } from 'node-fetch'
 import type {
   HealthPoller,
   HealthPollerConfig,
@@ -20,8 +22,6 @@ import type {
   LogLevel,
   ServerHealthResponse,
 } from './types'
-import type { Agent } from 'http'
-import type { RequestInit } from 'node-fetch'
 
 const DEFAULT_REQUEST_OPTS: RequestInit = {
   timeout: 10000,

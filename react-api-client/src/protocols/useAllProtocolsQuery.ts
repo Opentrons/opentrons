@@ -3,8 +3,8 @@ import { getProtocols } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { HostConfig, Protocols } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { HostConfig, Protocols } from '@opentrons/api-client'
 
 export function useAllProtocolsQuery(): UseQueryResult<Protocols> {
   const host = useHost()

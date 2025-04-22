@@ -6,12 +6,12 @@ import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 import { UploadKeyInput } from './UploadKeyInput'
 
-import type { WifiKey } from '../types'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
   FieldValues,
 } from 'react-hook-form'
+import type { WifiKey } from '../types'
 
 export interface KeyFileFieldProps {
   id: string

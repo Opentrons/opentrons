@@ -11,8 +11,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import type { IconName } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { IconName } from '@opentrons/components'
 
 interface CollapsibleProps {
   expanded: boolean

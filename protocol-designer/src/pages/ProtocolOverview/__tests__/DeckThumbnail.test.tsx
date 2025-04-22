@@ -14,9 +14,9 @@ import { LabwareOnDeck } from '../../../components/organisms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { DeckThumbnail } from '../DeckThumbnail'
 
+import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../components/organisms')
 vi.mock('../../../file-data/selectors')

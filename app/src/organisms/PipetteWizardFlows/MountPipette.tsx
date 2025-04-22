@@ -19,8 +19,8 @@ import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
-import type { PipetteWizardStepProps } from './types'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { PipetteWizardStepProps } from './types'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
   isFetching: boolean

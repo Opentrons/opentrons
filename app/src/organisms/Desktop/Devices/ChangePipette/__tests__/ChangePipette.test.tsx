@@ -20,11 +20,11 @@ import { ConfirmPipette } from '../ConfirmPipette'
 import { ExitModal } from '../ExitModal'
 import { PipetteSelection } from '../PipetteSelection'
 
+import type { ComponentProps } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { AttachedPipette } from '/app/redux/pipettes/types'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
-import type { ComponentProps } from 'react'
-import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 

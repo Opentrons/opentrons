@@ -6,9 +6,9 @@ import { useModulesQuery } from '@opentrons/react-api-client'
 import { useIncompatibleModulesAttached } from '..'
 import * as Fixtures from '../__fixtures__'
 
-import type { Modules } from '@opentrons/api-client'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 

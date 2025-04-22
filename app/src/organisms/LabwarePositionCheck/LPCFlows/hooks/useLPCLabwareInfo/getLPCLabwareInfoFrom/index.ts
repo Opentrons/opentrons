@@ -8,7 +8,6 @@ import {
 import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
 import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
 
-import type { UseLPCLabwareInfoProps } from '..'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -18,6 +17,7 @@ import type {
   LabwareLocationInfo,
   LPCLabwareInfo,
 } from '/app/redux/protocol-runs'
+import type { UseLPCLabwareInfoProps } from '..'
 
 interface GetLPCLabwareInfoParams {
   currentOffsets: StoredLabwareOffset[] | undefined

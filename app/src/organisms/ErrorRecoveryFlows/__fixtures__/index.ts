@@ -9,8 +9,8 @@ import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 
 import { RECOVERY_MAP } from '../constants'
 
-import type { FailedCommand, RecoveryContentProps } from '../types'
 import type { LabwareDefinition2, LoadedLabware } from '@opentrons/shared-data'
+import type { FailedCommand, RecoveryContentProps } from '../types'
 
 export const mockFailedCommand: FailedCommand = {
   commandType: 'pickUpTip',

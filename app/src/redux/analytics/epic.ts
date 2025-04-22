@@ -15,10 +15,10 @@ import { makeEvent } from './make-event'
 import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
 import { getAnalyticsConfig, getAnalyticsOptedIn } from './selectors'
 
+import type { Observable, OperatorFunction } from 'rxjs'
 import type { ConfigInitializedAction } from '../config/types'
 import type { Action, Epic, State } from '../types'
 import type { AnalyticsConfig, AnalyticsEvent, TrackEventArgs } from './types'
-import type { Observable, OperatorFunction } from 'rxjs'
 
 const initializeAnalyticsEpic: Epic = (action$, state$) => {
   return action$.pipe(

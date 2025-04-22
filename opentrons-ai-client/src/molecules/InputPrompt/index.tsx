@@ -39,12 +39,12 @@ import { useApiCall } from '../../resources/hooks'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { calcTextAreaHeight } from '../../resources/utils'
 
+import type { AxiosRequestConfig } from 'axios'
 import type {
   ChatData,
   CreatePrompt,
   UpdatePrompt,
 } from '../../resources/types'
-import type { AxiosRequestConfig } from 'axios'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')

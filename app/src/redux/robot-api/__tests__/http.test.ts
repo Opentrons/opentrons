@@ -9,8 +9,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { DELETE, GET, HTTP_API_VERSION, PATCH, POST } from '../constants'
 import { fetchRobotApi, robotApiUrl } from '../http'
 
-import type { RobotHost } from '../types'
 import type { Application } from 'express'
+import type { RobotHost } from '../types'
 
 vi.unmock('node-fetch')
 

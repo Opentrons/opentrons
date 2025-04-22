@@ -1,12 +1,12 @@
 import { getWellTotalVolume } from '@opentrons/shared-data'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedFormData,
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
 } from '../../form-types'
 import type { FormError } from './errors'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 /*******************
  ** Warning Messages **

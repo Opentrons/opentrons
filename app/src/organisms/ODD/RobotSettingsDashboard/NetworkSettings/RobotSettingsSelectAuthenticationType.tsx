@@ -5,9 +5,9 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { SelectAuthenticationType } from '../../NetworkSettings'
 
-import type { SetSettingOption } from '../types'
-import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, SetStateAction } from 'react'
+import type { WifiSecurityType } from '@opentrons/api-client'
+import type { SetSettingOption } from '../types'
 
 interface RobotSettingsSelectAuthenticationTypeProps {
   handleWifiConnect: () => void

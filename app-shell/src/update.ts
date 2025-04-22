@@ -5,8 +5,8 @@ import { getConfig } from './config'
 import { UI_INITIALIZED, UPDATE_VALUE } from './constants'
 import { createLogger } from './log'
 
-import type { Action, Dispatch, PlainError } from './types'
 import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
+import type { Action, Dispatch, PlainError } from './types'
 
 const autoUpdater = updater.autoUpdater
 

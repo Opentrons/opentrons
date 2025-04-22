@@ -1,4 +1,3 @@
-import type * as ApiTypes from './api-types'
 import type {
   ABSORBANCE_READER_TYPE,
   AbsorbanceReaderModel,
@@ -13,6 +12,7 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type * as ApiTypes from './api-types'
 
 export * from './api-types'
 

@@ -10,8 +10,8 @@ import { ModuleCalibrationItems } from '../ModuleCalibrationItems'
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 import { formatLastCalibrated } from '../utils'
 
-import type { AttachedModule } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('../ModuleCalibrationOverflowMenu')
 

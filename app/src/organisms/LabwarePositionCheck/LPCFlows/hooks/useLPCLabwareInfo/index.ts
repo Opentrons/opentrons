@@ -9,10 +9,10 @@ import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
 import { getLPCSearchParams } from './getLPCSearchParams'
 import { getUniqueValidLwLocationInfoByAnalysis } from './getUniqueValidLwLocationInfoByAnalysis'
 
-import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
 import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
+import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
 
 const REFETCH_OFFSET_SEARCH_MS = 5000
 

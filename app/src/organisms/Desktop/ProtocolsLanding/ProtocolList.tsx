@@ -35,12 +35,12 @@ import { useSortedProtocols } from './hooks'
 import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
+import type { MouseEventHandler } from 'react'
 import type {
   ProtocolSort,
   StoredProtocolData,
 } from '/app/redux/protocol-storage'
 import type { Dispatch } from '/app/redux/types'
-import type { MouseEventHandler } from 'react'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};

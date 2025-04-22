@@ -17,12 +17,12 @@ import {
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
 
-import type { FormData } from '../../../../form-types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import type { FormData } from '../../../../form-types'
 
 const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2
 const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2

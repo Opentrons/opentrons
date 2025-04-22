@@ -9,8 +9,8 @@ import {
 
 import { LabwareListItem } from './LabwareListItem'
 
-import type { StackItem } from '/app/transformations/commands'
 import type { Dispatch, SetStateAction } from 'react'
+import type { StackItem } from '/app/transformations/commands'
 
 interface OffDeckLabwareListProps {
   labwareItems: StackItem[]

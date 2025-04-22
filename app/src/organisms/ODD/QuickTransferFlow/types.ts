@@ -1,3 +1,9 @@
+import type { Mount } from '@opentrons/api-client'
+import type {
+  CutoutConfig,
+  LabwareDefinition2,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
 import type {
   ACTIONS,
   ASPIRATE_SETTING_OPTIONS,
@@ -6,12 +12,6 @@ import type {
   DISTRIBUTE,
   TRANSFER,
 } from './constants'
-import type { Mount } from '@opentrons/api-client'
-import type {
-  CutoutConfig,
-  LabwareDefinition2,
-  PipetteV2Specs,
-} from '@opentrons/shared-data'
 
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs

@@ -19,10 +19,10 @@ import {
 
 import { useLabwareFailure, useNewLabwareName } from '../hooks'
 
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { FailedLabwareFile } from '/app/redux/custom-labware/types'
 import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
 
 vi.mock('/app/redux/custom-labware')
 vi.mock('/app/local-resources/labware/utils/getAllDefs')

@@ -24,9 +24,9 @@ import { arrayToWellGroup } from '../../../utils'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 
+import type { WellGroup } from '@opentrons/components'
 import type { StepFieldName } from '../../../form-types'
 import type { NozzleType } from '../../../types'
-import type { WellGroup } from '@opentrons/components'
 
 interface SelectWellsModalProps {
   isOpen: boolean

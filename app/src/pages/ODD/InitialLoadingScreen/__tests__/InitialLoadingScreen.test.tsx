@@ -7,8 +7,8 @@ import { getIsShellReady } from '/app/redux/shell'
 
 import { InitialLoadingScreen } from '..'
 
-import type { RobotSettingsResponse } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/config')

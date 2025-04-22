@@ -23,15 +23,7 @@ import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
 
-import type { SetFeatureFlagAction } from '../feature-flags/actions'
-import type { FormData, StepIdType, StepType } from '../form-types'
-import type { RenameStepAction } from '../labware-ingred/actions'
-import type { CreatePipettesAction } from '../step-forms/actions'
-import type { StepArgsAndErrors } from '../steplist'
-import type { BaseState } from '../types'
-import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
-import type { AnalyticsEventAction } from './actions'
-import type { AnalyticsEvent } from './mixpanel'
+import type { Middleware } from 'redux'
 import type {
   AddressableAreaName,
   LoadLabwareCreateCommand,
@@ -46,7 +38,15 @@ import type {
   NormalizedPipetteById,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { Middleware } from 'redux'
+import type { SetFeatureFlagAction } from '../feature-flags/actions'
+import type { FormData, StepIdType, StepType } from '../form-types'
+import type { RenameStepAction } from '../labware-ingred/actions'
+import type { CreatePipettesAction } from '../step-forms/actions'
+import type { StepArgsAndErrors } from '../steplist'
+import type { BaseState } from '../types'
+import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
+import type { AnalyticsEventAction } from './actions'
+import type { AnalyticsEvent } from './mixpanel'
 
 const DEFAULT_VALUE = 'default'
 const PIPETTING_ARGS_FILTER_LIST = [

@@ -6,12 +6,12 @@ import { getCsvFileRaw } from '@opentrons/api-client'
 import { useCsvFileRawQuery } from '..'
 import { useHost } from '../../api'
 
+import type * as React from 'react'
 import type {
   DownloadedCsvFileResponse,
   HostConfig,
   Response,
 } from '@opentrons/api-client'
-import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

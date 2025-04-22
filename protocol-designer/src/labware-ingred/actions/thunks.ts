@@ -14,6 +14,7 @@ import {
   selectNestedLabware,
 } from './actions'
 
+import type { LabwareEntities } from '@opentrons/step-generation'
 import type {
   LabwareOnDeck,
   ModuleOnDeck,
@@ -32,7 +33,6 @@ import type {
   SelectModuleAction,
   SelectNestedLabwareAction,
 } from './actions'
-import type { LabwareEntities } from '@opentrons/step-generation'
 
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'

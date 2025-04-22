@@ -9,10 +9,10 @@ import { getRobotType } from '../../../../file-data/selectors'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../../step-forms'
+import type { ComponentProps } from 'react'
 import type { InfoScreen } from '@opentrons/components'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import type { ComponentProps } from 'react'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../../../step-forms'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../labware-ingred/selectors')

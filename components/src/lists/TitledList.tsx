@@ -7,8 +7,8 @@ import { COLORS } from '../helix-design-system'
 import { Icon } from '../icons'
 import styles from './lists.module.css'
 
-import type { IconName, IconProps } from '../icons'
 import type { MouseEvent, ReactNode } from 'react'
+import type { IconName, IconProps } from '../icons'
 
 // TODO(bc, 2021-03-31): reconsider whether this belongs in components library
 // it is bloated with application specific functionality

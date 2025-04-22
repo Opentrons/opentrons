@@ -16,12 +16,12 @@ import {
 } from './constants'
 import { createLogger } from './log'
 
-import type { Action, Dispatch } from './types'
+import type { AxiosRequestConfig } from 'axios'
+import type { IpcMainInvokeEvent } from 'electron'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
-import type { AxiosRequestConfig } from 'axios'
-import type { IpcMainInvokeEvent } from 'electron'
+import type { Action, Dispatch } from './types'
 
 let usbHttpAgent: SerialPortHttpAgent | undefined
 const usbLog = createLogger('usb')

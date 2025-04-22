@@ -8,8 +8,8 @@ import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/
 
 import { GripperReleaseLabware } from '../GripperReleaseLabware'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/assets/videos/error-recovery/Gripper_Release.webm', () => ({
   default: 'mocked-animation-path.webm',

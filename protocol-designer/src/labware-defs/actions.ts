@@ -13,10 +13,10 @@ import {
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
 
+import type { SyntheticEvent } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SyntheticEvent } from 'react'
 
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'

@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux'
 import { DropdownStepFormField } from '../../../../../components/molecules'
 import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
 
-import type { FieldProps } from '../types'
 import type { DropdownOption } from '@opentrons/components'
+import type { FieldProps } from '../types'
 
 type BlowoutLocationDropdownProps = FieldProps & {
   options: DropdownOption[]

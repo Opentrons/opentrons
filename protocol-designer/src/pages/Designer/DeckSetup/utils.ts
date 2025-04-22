@@ -25,17 +25,7 @@ import {
   RECOMMENDED_LABWARE_BY_MODULE,
 } from './constants'
 
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type {
-  AllTemporalPropertiesForTimelineFrame,
-  InitialDeckSetup,
-  LabwareOnDeck,
-  ModuleOnDeck,
-  SavedStepFormState,
-} from '../../../step-forms'
-import type { Selection } from '../../../ui/steps'
-import type { AdditionalEquipment } from '../utils'
-import type { Fixture } from './constants'
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CoordinateTuple,
@@ -48,7 +38,17 @@ import type {
   ModuleType,
   RobotType,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
+import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleOnDeck,
+  SavedStepFormState,
+} from '../../../step-forms'
+import type { Selection } from '../../../ui/steps'
+import type { AdditionalEquipment } from '../utils'
+import type { Fixture } from './constants'
 
 const OT2_TC_SLOTS = ['7', '8', '10', '11']
 const FLEX_TC_SLOTS = ['A1', 'B1']

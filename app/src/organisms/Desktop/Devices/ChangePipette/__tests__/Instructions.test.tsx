@@ -10,8 +10,8 @@ import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { Instructions } from '../Instructions'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('../CheckPipettesButton')
 

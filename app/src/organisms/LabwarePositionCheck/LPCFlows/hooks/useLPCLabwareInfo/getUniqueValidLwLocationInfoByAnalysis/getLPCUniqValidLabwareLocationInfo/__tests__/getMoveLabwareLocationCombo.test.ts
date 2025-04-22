@@ -12,12 +12,12 @@ import {
   getLwModStackupDetails,
 } from '../helpers'
 
-import type { AnalysisLwURIsByLwId } from '../getAllPossibleLwURIsInRun'
 import type {
   LoadedLabware,
   LoadedModule,
   MoveLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
+import type { AnalysisLwURIsByLwId } from '../getAllPossibleLwURIsInRun'
 
 vi.mock('../helpers')
 vi.mock('/app/local-resources/offsets')

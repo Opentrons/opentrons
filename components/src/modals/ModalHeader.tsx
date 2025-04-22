@@ -12,8 +12,8 @@ import {
 } from '../styles'
 import { SPACING } from '../ui-style-constants'
 
-import type { IconProps } from '../icons'
 import type { MouseEventHandler, ReactNode } from 'react'
+import type { IconProps } from '../icons'
 
 export interface ModalHeaderProps {
   title: ReactNode

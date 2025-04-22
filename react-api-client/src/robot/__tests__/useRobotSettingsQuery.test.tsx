@@ -6,13 +6,13 @@ import { getRobotSettings } from '@opentrons/api-client'
 import { useRobotSettingsQuery } from '..'
 import { useHost } from '../../api'
 
-import type { UseRobotSettingsQueryOptions } from '../useRobotSettingsQuery'
+import type * as React from 'react'
 import type {
   HostConfig,
   Response,
   RobotSettingsResponse,
 } from '@opentrons/api-client'
-import type * as React from 'react'
+import type { UseRobotSettingsQueryOptions } from '../useRobotSettingsQuery'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

@@ -4,12 +4,12 @@ import {
   uuid,
 } from '../../utils'
 
-import type { CommandCreator } from '../../types'
 import type {
   AddressableAreaName,
   CutoutId,
   MoveToAddressableAreaParams,
 } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 interface MoveToAddressableAreaAtomicParams
   extends Omit<MoveToAddressableAreaParams, 'addressableAreaName'> {

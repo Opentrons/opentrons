@@ -5,10 +5,10 @@ import { delay, switchMap } from 'rxjs/operators'
 import { UI_INITIALIZED } from '../shell'
 import { DISCOVERY_START, finishDiscovery } from './actions'
 
+import type { Observable } from 'rxjs'
 import type { UiInitializedAction } from '../shell/types'
 import type { Action, Epic } from '../types'
 import type { DiscoveryAction, StartDiscoveryAction } from './types'
-import type { Observable } from 'rxjs'
 
 export const DISCOVERY_TIMEOUT_MS = 30000
 export const RESTART_DISCOVERY_TIMEOUT_MS = 60000

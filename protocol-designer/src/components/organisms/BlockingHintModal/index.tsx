@@ -18,8 +18,8 @@ import {
 import { actions } from '../../../tutorial'
 import { getMainPagePortalEl } from '../Portal'
 
-import type { HintKey } from '../../../tutorial'
 import type { ReactNode } from 'react'
+import type { HintKey } from '../../../tutorial'
 
 export interface HintProps {
   hintKey: HintKey

@@ -22,10 +22,10 @@ import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
+import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
 import type { SimpleInterfaceStatus } from '/app/redux/networking/types'
 import type { State } from '/app/redux/types'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/RunTimeControl/hooks')

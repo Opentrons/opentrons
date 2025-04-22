@@ -12,9 +12,9 @@ import { useRunStatus, useRunTimestamps } from '/app/resources/runs'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 
+import type { ComponentProps } from 'react'
 import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/protocol-storage')
 vi.mock('/app/resources/runs')

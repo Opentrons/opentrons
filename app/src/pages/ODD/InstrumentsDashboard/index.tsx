@@ -9,8 +9,8 @@ import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecali
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const FETCH_PIPETTE_CAL_POLL = 10000
 

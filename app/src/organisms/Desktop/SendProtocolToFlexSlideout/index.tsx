@@ -21,11 +21,11 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 
+import type { AxiosError } from 'axios'
 import type { IconProps, StyleProps } from '@opentrons/components'
 import type { Robot } from '/app/redux/discovery/types'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { State } from '/app/redux/types'
-import type { AxiosError } from 'axios'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]

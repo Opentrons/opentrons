@@ -19,8 +19,8 @@ import { toggleNewProtocolModal } from '../../../navigation/actions'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { SettingsIcon } from '../SettingsIcon'
 
-import type { ThunkDispatch } from '../../../types'
 import type { ChangeEvent } from 'react'
+import type { ThunkDispatch } from '../../../types'
 
 export function Navigation(): JSX.Element | null {
   const { t } = useTranslation(['shared', 'alert'])

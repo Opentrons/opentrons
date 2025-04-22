@@ -10,11 +10,11 @@ import { getTopMostLabwareInSlots } from './utils/getLabwareInSlots'
 import { getModulesInSlots } from './utils/getModulesInSlots'
 import { getWellFillFromLabwareId } from './utils/getWellFillFromLabwareId'
 
+import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 export * from './utils/getStandardDeckViewLayerBlockList'
 export * from './types'

@@ -11,10 +11,10 @@ import { i18n } from '/app/i18n'
 
 import { Deck } from '../Deck'
 
-import type { Protocol } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { Protocol } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 

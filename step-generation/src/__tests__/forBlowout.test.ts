@@ -9,8 +9,8 @@ import {
 } from '../fixtures'
 import { forBlowout as _forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { BlowoutParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const forBlowout = makeImmutableStateUpdater(_forBlowout)
 let invariantContext: InvariantContext

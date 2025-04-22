@@ -12,11 +12,11 @@ import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
 import { uuid } from '../../../utils'
 
+import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
+import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { StepIdType } from '../../../form-types'
 import type { LabwareOnDeck, PipetteOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
-import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { NormalizedPipette } from '@opentrons/step-generation'
 
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 

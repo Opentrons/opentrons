@@ -40,6 +40,7 @@ import {
 import { removeOpentronsPhrases } from '../../../utils'
 import { getShouldShowPipetteType, getTiprackOptions } from './utils'
 
+import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type {
   Gen,
   PipetteInfoByGen,
@@ -49,7 +50,6 @@ import type {
 import type { PipetteOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { PipetteConfig } from './usePipetteConfig'
-import type { PipetteName, RobotType } from '@opentrons/shared-data'
 
 interface PipetteConfigurationProps {
   has96Channel: boolean

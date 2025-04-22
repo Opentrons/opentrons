@@ -2,9 +2,9 @@ import { usePlayRunMutation } from '@opentrons/react-api-client'
 
 import { RECOVERY_MAP } from '../constants'
 
+import type { RunAction } from '@opentrons/api-client'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsResults } from './useERUtils'
-import type { RunAction } from '@opentrons/api-client'
 
 export interface RecoveryActionMutationResult {
   resumeRecovery: () => Promise<RunAction>

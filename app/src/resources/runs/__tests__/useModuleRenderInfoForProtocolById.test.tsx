@@ -20,6 +20,7 @@ import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 
+import type { UseQueryResult } from 'react-query'
 import type {
   CutoutConfig,
   DeckConfiguration,
@@ -28,7 +29,6 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/modules')

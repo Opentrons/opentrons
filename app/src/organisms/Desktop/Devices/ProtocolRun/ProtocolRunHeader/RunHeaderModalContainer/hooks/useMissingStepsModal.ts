@@ -11,11 +11,11 @@ import {
 
 import { isAnyHeaterShakerShaking } from '../modals'
 
-import type { ConfirmMissingStepsModalProps } from '../modals'
 import type { AttachedModule, RunStatus } from '@opentrons/api-client'
 import type { UseConditionalConfirmResult } from '@opentrons/components'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
+import type { ConfirmMissingStepsModalProps } from '../modals'
 
 const UNCONFIRMABLE_MISSING_STEPS = new Set<StepKey>([
   ROBOT_CALIBRATION_STEP_KEY,

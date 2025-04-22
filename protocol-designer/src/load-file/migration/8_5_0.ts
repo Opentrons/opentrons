@@ -8,13 +8,13 @@ import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquip
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
-import type { PDMetadata } from '../../file-types'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
+import type { PDMetadata } from '../../file-types'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>

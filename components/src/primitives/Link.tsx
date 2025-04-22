@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import { CURSOR_POINTER } from '../styles'
 import { isntStyleProp, styleProps } from './style-props'
 
-import type { PrimitiveComponent, StyleProps } from './types'
 import type { ComponentProps } from 'react'
+import type { PrimitiveComponent, StyleProps } from './types'
 
 export interface LinkProps extends StyleProps {
   /** render link with target="_blank" */

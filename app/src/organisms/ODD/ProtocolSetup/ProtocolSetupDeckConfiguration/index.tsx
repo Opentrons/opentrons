@@ -26,14 +26,14 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { AddFixtureModal } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 
-import type { SetupScreens } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
 import type { ModuleOnDeck } from '@opentrons/components'
 import type {
   CutoutFixtureId,
   CutoutId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
+import type { SetupScreens } from '../types'
 
 interface ProtocolSetupDeckConfigurationProps {
   cutoutId: CutoutId | null

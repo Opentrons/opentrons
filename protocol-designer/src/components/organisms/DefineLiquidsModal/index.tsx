@@ -32,9 +32,9 @@ import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
 import { swatchColors } from './swatchColors'
 
-import type { BaseState } from '../../../types'
-import type { Ingredient } from '@opentrons/step-generation'
 import type { ThunkDispatch } from 'redux-thunk'
+import type { Ingredient } from '@opentrons/step-generation'
+import type { BaseState } from '../../../types'
 
 const liquidEditFormSchema: any = Yup.object().shape({
   displayName: Yup.string().required('liquid name is required'),

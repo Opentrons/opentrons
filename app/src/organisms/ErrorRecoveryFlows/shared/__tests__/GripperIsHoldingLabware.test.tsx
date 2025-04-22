@@ -13,8 +13,8 @@ import {
   HOLDING_LABWARE_OPTIONS,
 } from '../GripperIsHoldingLabware'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof GripperIsHoldingLabware>) => {
   return renderWithProviders(<GripperIsHoldingLabware {...props} />, {

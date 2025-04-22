@@ -13,8 +13,8 @@ import {
 import { setFeatureFlags } from '../../../feature-flags/actions'
 import { HandleEnter } from '../../atoms'
 
-import type { BaseState } from '../../../types'
 import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
 
 interface IncompatibleTipsProps {
   onClose: () => void

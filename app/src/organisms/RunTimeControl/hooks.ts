@@ -9,8 +9,8 @@ import {
   useRunStatus,
 } from '/app/resources/runs'
 
-import type { Run, RunData, RunStatus } from '@opentrons/api-client'
 import type { UseQueryOptions } from 'react-query'
+import type { Run, RunData, RunStatus } from '@opentrons/api-client'
 
 export interface RunControls {
   play: () => void

@@ -4,10 +4,10 @@ import { SPACING } from '../ui-style-constants'
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
 
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconProps } from '../icons'
 import type { StyleProps } from '../primitives'
 import type { Position } from './ModalShell'
-import type { MouseEventHandler, ReactNode } from 'react'
 
 type ModalType = 'info' | 'warning' | 'error'
 

@@ -37,8 +37,8 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import { useDownloadRunLog } from './hooks'
 
-import type { Run } from '@opentrons/api-client'
 import type { MouseEventHandler } from 'react'
+import type { Run } from '@opentrons/api-client'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string

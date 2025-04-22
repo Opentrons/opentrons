@@ -33,7 +33,7 @@ import { RobotMotionLoader } from '../RobotMotionLoader'
 import { TwoUpTileLayout } from '../TwoUpTileLayout'
 import { getPrepCommands } from './getPrepCommands'
 
-import type { RegisterPositionAction } from '../types'
+import type { Dispatch } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -41,7 +41,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 import type { useChainRunCommands } from '/app/resources/runs'
-import type { Dispatch } from 'react'
+import type { RegisterPositionAction } from '../types'
 
 export const INTERVAL_MS = 3000
 

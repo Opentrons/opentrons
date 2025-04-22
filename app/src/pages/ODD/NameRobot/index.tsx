@@ -38,9 +38,9 @@ import {
   removeRobot,
 } from '/app/redux/discovery'
 
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
-import type { FieldError, Resolver } from 'react-hook-form'
 
 interface FormValues {
   newRobotName: string

@@ -38,7 +38,6 @@ import { ResultsSummary } from './ResultsSummary'
 import { ReturnTip } from './ReturnTip'
 import { RobotMotionLoader } from './RobotMotionLoader'
 
-import type { RegisterPositionAction, WorkingOffset } from './types'
 import type {
   CommandData,
   LabwareOffset,
@@ -53,6 +52,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds

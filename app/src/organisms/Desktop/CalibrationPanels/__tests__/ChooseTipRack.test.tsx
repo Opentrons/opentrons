@@ -18,8 +18,8 @@ import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
 
 import { ChooseTipRack } from '../ChooseTipRack'
 
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 import type { ComponentProps } from 'react'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/pipettes/selectors')

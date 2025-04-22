@@ -16,13 +16,13 @@ import {
 } from './network-interfaces'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
 
+import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { Action, Dispatch } from '../types'
 import type {
   NetworkInterface,
   NetworkInterfaceMonitor,
 } from './network-interfaces'
 import type { UsbDeviceMonitor } from './usb-devices'
-import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 
 export { createNetworkInterfaceMonitor }
 export type { NetworkInterface, NetworkInterfaceMonitor }

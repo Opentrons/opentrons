@@ -33,13 +33,13 @@ import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
 
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
   CurriedCommandCreator,
   DistributeArgs,
 } from '../../types'
-import type { CutoutId } from '@opentrons/shared-data'
 
 export const distribute: CommandCreator<DistributeArgs> = (
   args,

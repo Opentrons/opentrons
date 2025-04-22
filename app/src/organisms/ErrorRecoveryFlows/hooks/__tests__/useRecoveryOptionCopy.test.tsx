@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import { useRecoveryOptionCopy } from '../useRecoveryOptionCopy'
 
-import type { ErrorKind, RecoveryRoute } from '../../types'
 import type { ComponentProps } from 'react'
+import type { ErrorKind, RecoveryRoute } from '../../types'
 
 function MockRenderCmpt({
   route,

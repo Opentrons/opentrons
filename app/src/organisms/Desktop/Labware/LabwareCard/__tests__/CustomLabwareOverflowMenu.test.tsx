@@ -8,9 +8,9 @@ import { useTrackEvent } from '/app/redux/analytics'
 
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 
-import type * as OpentronsComponents from '@opentrons/components'
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('/app/redux/analytics')
 

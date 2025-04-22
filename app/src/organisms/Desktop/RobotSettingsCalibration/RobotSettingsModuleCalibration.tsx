@@ -9,8 +9,8 @@ import {
 
 import { ModuleCalibrationItems } from './CalibrationDetails/ModuleCalibrationItems'
 
-import type { FormattedPipetteOffsetCalibration } from '.'
 import type { AttachedModule } from '@opentrons/api-client'
+import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsModuleCalibrationProps {
   attachedModules: AttachedModule[]

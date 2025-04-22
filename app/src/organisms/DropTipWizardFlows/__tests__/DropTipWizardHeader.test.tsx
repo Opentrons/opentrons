@@ -10,9 +10,9 @@ import {
   useWizardExitHeader,
 } from '../DropTipWizardHeader'
 
-import type { UseWizardExitHeaderProps } from '../DropTipWizardHeader'
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+import type { UseWizardExitHeaderProps } from '../DropTipWizardHeader'
 
 const render = (props: ComponentProps<typeof DropTipWizardHeader>) => {
   return renderWithProviders(<DropTipWizardHeader {...props} />, {

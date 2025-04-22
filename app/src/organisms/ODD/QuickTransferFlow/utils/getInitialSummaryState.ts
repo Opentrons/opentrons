@@ -4,18 +4,18 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import type {
-  ChangeTipOptions,
-  PathOption,
-  QuickTransferSummaryState,
-  TransferType,
-} from '../types'
 import type { Mount } from '@opentrons/api-client'
 import type {
   DeckConfiguration,
   LabwareDefinition2,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
+import type {
+  ChangeTipOptions,
+  PathOption,
+  QuickTransferSummaryState,
+  TransferType,
+} from '../types'
 
 interface InitialSummaryStateProps {
   state: {

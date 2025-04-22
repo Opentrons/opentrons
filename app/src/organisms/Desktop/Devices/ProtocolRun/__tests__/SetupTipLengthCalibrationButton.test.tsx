@@ -14,8 +14,8 @@ import { useDeckCalibrationData } from '../../hooks'
 import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components/src/hooks')
 vi.mock('/app/organisms/RunTimeControl/hooks')

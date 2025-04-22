@@ -21,8 +21,8 @@ import {
 import { ControlContainer } from './ControlContainer'
 import { TouchControlButton } from './TouchControlButton'
 
-import type { StepSize } from './types'
 import type { MouseEvent } from 'react'
+import type { StepSize } from './types'
 
 const JUMP_SIZE_SUBTITLE = '- / +'
 

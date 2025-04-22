@@ -11,7 +11,6 @@ import {
   tiprackWellNamesFlat,
 } from './data'
 
-import type { CommandCreatorErrorResponse, CommandsAndWarnings } from '../types'
 import type {
   AddressableAreaName,
   AspDispAirgapParams,
@@ -20,6 +19,7 @@ import type {
   DispenseParams,
   TouchTipParams,
 } from '@opentrons/shared-data'
+import type { CommandCreatorErrorResponse, CommandsAndWarnings } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response

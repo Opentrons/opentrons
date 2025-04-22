@@ -6,10 +6,10 @@ import { getLabel } from '../fields'
 import { getIsHidden } from '../formSelectors'
 import fieldStyles from './fieldStyles.module.css'
 
-import type { LabwareFields } from '../fields'
-import type { LegacyInputFieldProps } from '@opentrons/components'
 import type { FieldProps } from 'formik'
 import type * as React from 'react'
+import type { LegacyInputFieldProps } from '@opentrons/components'
+import type { LabwareFields } from '../fields'
 
 interface Props {
   name: keyof LabwareFields

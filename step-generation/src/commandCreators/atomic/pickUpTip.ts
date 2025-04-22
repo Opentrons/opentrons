@@ -7,11 +7,11 @@ import {
 } from '../../errorCreators'
 import { getIsSafePipetteMovement, uuid } from '../../utils'
 
-import type { CommandCreator, CommandCreatorError } from '../../types'
 import type {
   NozzleConfigurationStyle,
   PickUpTipParams,
 } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 interface PickUpTipAtomicParams extends PickUpTipParams {
   nozzles?: NozzleConfigurationStyle

@@ -17,10 +17,10 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import type { SetSettingOption } from '../types'
+import type { ComponentProps } from 'react'
 import type { ChipType, IconName } from '@opentrons/components'
 import type { NetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
-import type { ComponentProps } from 'react'
+import type { SetSettingOption } from '../types'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
 

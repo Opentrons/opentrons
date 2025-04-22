@@ -9,6 +9,8 @@ import {
 import { useResetFormOnSecurityChange } from './form-state'
 import { FormModal } from './FormModal'
 
+import type { TFunction } from 'i18next'
+import type { Control, Resolver } from 'react-hook-form'
 import type {
   ConnectFormValues,
   EapOption,
@@ -16,8 +18,6 @@ import type {
   WifiKey,
   WifiNetwork,
 } from '../types'
-import type { TFunction } from 'i18next'
-import type { Control, Resolver } from 'react-hook-form'
 
 export interface ConnectModalProps {
   robotName: string

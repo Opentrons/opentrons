@@ -11,8 +11,8 @@ import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors
 import { BlockedSlot } from '../Overlays/BlockedSlot'
 import { SlotOverlay } from '../Overlays/SlotOverlay'
 
-import type * as OpentronsComponents from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../Overlays/SlotOverlay')
 vi.mock('@opentrons/step-generation')

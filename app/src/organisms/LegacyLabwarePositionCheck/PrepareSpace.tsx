@@ -23,13 +23,13 @@ import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import type { CheckLabwareStep } from './types'
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
   RobotType,
 } from '@opentrons/shared-data'
-import type { ReactNode } from 'react'
+import type { CheckLabwareStep } from './types'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

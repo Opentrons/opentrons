@@ -32,7 +32,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
-import type { SetupScreens } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   CompletedProtocolAnalysis,
   CutoutFixtureId,
@@ -41,7 +41,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
-import type { Dispatch, SetStateAction } from 'react'
+import type { SetupScreens } from '../types'
 
 interface FixtureTableProps {
   robotType: RobotType

@@ -25,15 +25,15 @@ import {
 } from '../fixtures'
 
 import type {
+  AspDispAirgapParams,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
+import type {
   ChangeTipOptions,
   InvariantContext,
   MixArgs,
   RobotState,
 } from '../types'
-import type {
-  AspDispAirgapParams,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper({ labwareId: SOURCE_LABWARE })

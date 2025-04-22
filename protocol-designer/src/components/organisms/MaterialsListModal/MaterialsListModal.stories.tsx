@@ -5,12 +5,12 @@ import { MaterialsListModal as MaterialsListModalComponent } from '.'
 import { i18n } from '../../../assets/localization'
 import { configureStore } from '../../../configureStore'
 
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
+import type { Meta, StoryObj } from '@storybook/react'
 import type {
   AdditionalEquipmentEntity,
   LiquidEntities,
 } from '@opentrons/step-generation'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 
 const mockStore = configureStore()
 const mockHardware = [

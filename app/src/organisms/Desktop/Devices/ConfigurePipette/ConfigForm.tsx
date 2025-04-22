@@ -14,13 +14,13 @@ import {
 } from './ConfigFormGroup'
 import { ConfigFormResetButton } from './ConfigFormResetButton'
 
-import type { FormValues } from './ConfigFormGroup'
+import type { FieldError, Resolver } from 'react-hook-form'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   UpdatePipetteSettingsData,
 } from '@opentrons/api-client'
-import type { FieldError, Resolver } from 'react-hook-form'
+import type { FormValues } from './ConfigFormGroup'
 
 export interface DisplayFieldProps extends PipetteSettingsField {
   name: string

@@ -8,8 +8,8 @@ import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { SlotInformation } from '../SlotInformation'
 
-import type { ContentsByWell } from '../../../labware-ingred/types'
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'
+import type { ContentsByWell } from '../../../labware-ingred/types'
 
 interface SlotDetailContainerProps {
   robotType: RobotType

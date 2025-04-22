@@ -5,8 +5,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 
 import { ChildNavigation } from '..'
 
-import type { SmallButton } from '/app/atoms/buttons'
 import type { ComponentProps } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
 
 const render = (props: ComponentProps<typeof ChildNavigation>) =>
   renderWithProviders(<ChildNavigation {...props} />)

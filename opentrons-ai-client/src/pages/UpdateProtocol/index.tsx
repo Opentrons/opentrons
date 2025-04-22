@@ -29,9 +29,9 @@ import {
 } from '../../resources/atoms'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
-import type { UpdateOptions } from '../../resources/types'
-import type { DropdownOption } from '@opentrons/components'
 import type { ChangeEvent } from 'react'
+import type { DropdownOption } from '@opentrons/components'
+import type { UpdateOptions } from '../../resources/types'
 
 interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions

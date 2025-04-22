@@ -7,9 +7,9 @@ import { getIsOnDevice, getOnDeviceDisplaySettings } from '/app/redux/config'
 
 import { useIsUnboxingFlowOngoing } from '../useIsUnboxingFlowOngoing'
 
-import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/config')
 

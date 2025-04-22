@@ -7,8 +7,8 @@ import { DeckLabel } from '../../molecules/DeckLabel'
 import { Box } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 
-import type { DeckLabelProps } from '../../molecules/DeckLabel'
 import type { ForwardedRef } from 'react'
+import type { DeckLabelProps } from '../../molecules/DeckLabel'
 
 interface DeckLabelSetProps {
   deckLabels: DeckLabelProps[]

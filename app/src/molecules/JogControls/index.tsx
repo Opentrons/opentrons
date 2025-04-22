@@ -20,9 +20,9 @@ import {
 import { DirectionControl, TouchDirectionControl } from './DirectionControl'
 import { StepSizeControl, TouchStepSizeControl } from './StepSizeControl'
 
-import type { Jog, Plane, StepSize } from './types'
-import type { StyleProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
+import type { Jog, Plane, StepSize } from './types'
 
 export type { Jog }
 export interface JogControlsProps extends StyleProps {

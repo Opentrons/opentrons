@@ -16,8 +16,8 @@ import { WizardHeader } from '../WizardHeader'
 import { GenericWizardTile } from './index'
 
 import type { Meta, Story } from '@storybook/react'
-import type * as React from 'react'
 import type { Store, StoreEnhancer } from 'redux'
+import type * as React from 'react'
 
 const dummyConfig = {
   config: {

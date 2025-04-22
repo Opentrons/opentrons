@@ -7,8 +7,8 @@ import {
 
 import { DeckLocationSelect as DeckLocationSelectComponent } from './'
 
-import type { RobotType } from '@opentrons/shared-data'
 import type { Meta, StoryObj } from '@storybook/react'
+import type { RobotType } from '@opentrons/shared-data'
 
 const meta: Meta<React.ComponentProps<typeof DeckLocationSelectComponent>> = {
   component: DeckLocationSelectComponent,

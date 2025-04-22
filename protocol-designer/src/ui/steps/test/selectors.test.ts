@@ -25,10 +25,10 @@ import {
   getSelectedStepTitleInfo,
 } from '../selectors'
 
+import type { MoveLabwareArgs } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 import type { StepArgsAndErrorsById } from '../../../steplist/types'
-import type { MoveLabwareArgs } from '@opentrons/step-generation'
 
 vi.mock('../../modules/utils')
 

@@ -4,8 +4,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 export interface OneColumnProps extends StyleProps {
   children: ReactNode

@@ -1,11 +1,11 @@
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 
-import type { BooleanString, LabwareFields } from './fields'
 import type {
   Coordinates,
   LabwareDefinition2,
   LabwareWellGroup,
 } from '@opentrons/shared-data'
+import type { BooleanString, LabwareFields } from './fields'
 
 // NOTE: this is just String() with some typing for flow
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')

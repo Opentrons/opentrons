@@ -26,7 +26,7 @@ import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
 
-import type { DroppedItem, SharedControlsType } from '../types'
+import type { DropTargetMonitor } from 'react-dnd'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -34,7 +34,7 @@ import type {
   Dimensions,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { DropTargetMonitor } from 'react-dnd'
+import type { DroppedItem, SharedControlsType } from '../types'
 
 interface SlotControlsProps extends SharedControlsType {
   stagingAreaAddressableAreas: AddressableAreaName[]

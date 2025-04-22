@@ -7,6 +7,7 @@ import {
 
 import { RESET_TO_DEFAULT } from '../constants'
 
+import type { VectorOffset } from '@opentrons/api-client'
 import type {
   DefaultOffsetDetails,
   ExistingOffset,
@@ -16,7 +17,6 @@ import type {
   WorkingLocationSpecificOffset,
   WorkingOffset,
 } from '../types'
-import type { VectorOffset } from '@opentrons/api-client'
 
 // Returns the most recent vector offset from offset details.
 export function getMostRecentVectorFrom(

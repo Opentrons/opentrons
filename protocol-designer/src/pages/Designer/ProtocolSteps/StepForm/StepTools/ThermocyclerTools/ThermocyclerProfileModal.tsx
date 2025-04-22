@@ -18,11 +18,11 @@ import {
 import { ThermocyclerCycle } from './ThermocyclerCycle'
 import { ThermocyclerStep } from './ThermocyclerStep'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
 import type { ThermocyclerCycleType } from './ThermocyclerCycle'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
-import type { Dispatch, SetStateAction } from 'react'
 
 export type ThermocyclerStepTypeGeneral =
   | ThermocyclerCycleType

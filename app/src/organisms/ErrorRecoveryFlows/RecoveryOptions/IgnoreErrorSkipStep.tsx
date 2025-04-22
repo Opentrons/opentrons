@@ -26,8 +26,8 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
-import type { RecoveryContentProps } from '../types'
 import type { ChangeEvent } from 'react'
+import type { RecoveryContentProps } from '../types'
 
 export function IgnoreErrorSkipStep(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props

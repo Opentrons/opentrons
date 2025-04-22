@@ -5,8 +5,8 @@ import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../../assets/localization'
 import { InitializationSettings } from '../InitializationSettings'
 
-import type { Initialization } from '@opentrons/step-generation'
 import type { ComponentProps } from 'react'
+import type { Initialization } from '@opentrons/step-generation'
 
 // Mocking constants
 const INITIALIZATION_SINGLE_NO_REFERENCE: Initialization = {

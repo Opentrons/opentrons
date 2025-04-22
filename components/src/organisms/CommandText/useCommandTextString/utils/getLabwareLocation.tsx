@@ -11,7 +11,6 @@ import {
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
 
-import type { LoadedLabwares, LoadedModules } from './types'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -21,6 +20,7 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
+import type { LoadedLabwares, LoadedModules } from './types'
 
 export interface LocationResult {
   slotName: string

@@ -19,9 +19,9 @@ import {
 
 import { updateConfigValue } from '/app/redux/config'
 
+import type { ChangeEvent } from 'react'
 import type { UpdateConfigValueAction } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
-import type { ChangeEvent } from 'react'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean

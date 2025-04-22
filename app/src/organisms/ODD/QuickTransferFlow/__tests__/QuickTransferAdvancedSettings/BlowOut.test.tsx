@@ -8,8 +8,8 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import { BlowOut } from '../../QuickTransferAdvancedSettings/BlowOut'
 
-import type { QuickTransferSummaryState } from '../../types'
 import type { ComponentProps } from 'react'
+import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/redux-resources/analytics')

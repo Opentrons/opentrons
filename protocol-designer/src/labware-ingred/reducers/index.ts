@@ -6,6 +6,14 @@ import { handleActions } from 'redux-actions'
 
 import { getPDMetadata } from '../../file-types'
 
+import type { Reducer } from 'redux'
+import type {
+  LabwareLiquidState,
+  LiquidEntities,
+  LiquidEntity,
+  LocationLiquidState,
+  SingleLabwareLiquidState,
+} from '@opentrons/step-generation'
 import type { LoadFileAction } from '../../load-file'
 import type { Action, DeckSlot } from '../../types'
 import type {
@@ -36,14 +44,6 @@ import type {
   GenerateNewProtocolState,
   ZoomedIntoSlotInfoState,
 } from '../types'
-import type {
-  LabwareLiquidState,
-  LiquidEntities,
-  LiquidEntity,
-  LocationLiquidState,
-  SingleLabwareLiquidState,
-} from '@opentrons/step-generation'
-import type { Reducer } from 'redux'
 
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot

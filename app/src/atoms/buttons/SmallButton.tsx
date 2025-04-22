@@ -16,8 +16,8 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from './constants'
 
-import type { IconName, StyleProps } from '@opentrons/components'
 import type { MouseEventHandler, ReactNode } from 'react'
+import type { IconName, StyleProps } from '@opentrons/components'
 
 export type SmallButtonTypes =
   | 'alert'

@@ -25,12 +25,12 @@ import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
+import type { ComponentProps, MouseEventHandler } from 'react'
 import type {
   GripperData,
   HostConfig,
   PipetteData,
 } from '@opentrons/api-client'
-import type { ComponentProps, MouseEventHandler } from 'react'
 
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData

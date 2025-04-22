@@ -10,12 +10,12 @@ import { RUN_ID_2 } from '../__fixtures__'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'
 import { useProtocolAnalysisErrors } from '../useProtocolAnalysisErrors'
 
+import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   PendingProtocolAnalysis,
 } from '@opentrons/shared-data'
-import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useNotifyRunQuery')

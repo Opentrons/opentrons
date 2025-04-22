@@ -43,15 +43,15 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getStagingAreaAddressableAreas } from '../../../utils'
 import { getIsEntityOnSlotInUse } from './utils'
 
-import type { LabwareOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+import type { MouseEvent, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CoordinateTuple,
   CutoutId,
   DeckSlotId,
 } from '@opentrons/shared-data'
-import type { MouseEvent, SetStateAction } from 'react'
+import type { LabwareOnDeck } from '../../../step-forms'
+import type { ThunkDispatch } from '../../../types'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
   'D1',

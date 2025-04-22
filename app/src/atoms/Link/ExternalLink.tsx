@@ -7,8 +7,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { LinkProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { LinkProps } from '@opentrons/components'
 
 export interface ExternalLinkProps extends LinkProps {
   href: string

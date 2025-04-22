@@ -3,18 +3,18 @@ import { uploadCsvFile } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type {
-  ErrorResponse,
-  FileData,
-  HostConfig,
-  UploadedCsvFileResponse,
-} from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 import type {
   UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
+import type {
+  ErrorResponse,
+  FileData,
+  HostConfig,
+  UploadedCsvFileResponse,
+} from '@opentrons/api-client'
 
 export type UseUploadCsvFileMutationResult = UseMutationResult<
   UploadedCsvFileResponse,

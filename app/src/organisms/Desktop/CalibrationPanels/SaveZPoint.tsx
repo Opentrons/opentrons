@@ -29,9 +29,9 @@ import * as Sessions from '/app/redux/sessions'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
 
-import type { CalibrationPanelProps } from './types'
-import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { MouseEventHandler } from 'react'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { CalibrationPanelProps } from './types'
 
 const assetMap = {
   left: {

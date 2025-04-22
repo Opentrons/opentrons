@@ -2,12 +2,12 @@ import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from './constants'
 
+import type { PipetteMount } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,
   PipetteWizardStep,
   SelectablePipettes,
 } from './types'
-import type { PipetteMount } from '@opentrons/shared-data'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,

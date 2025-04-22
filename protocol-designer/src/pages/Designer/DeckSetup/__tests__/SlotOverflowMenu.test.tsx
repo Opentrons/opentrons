@@ -26,9 +26,9 @@ import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-loc
 import { SlotOverflowMenu } from '../SlotOverflowMenu'
 import { getIsEntityOnSlotInUse } from '../utils'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 

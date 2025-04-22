@@ -8,8 +8,8 @@ import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/
 import { RECOVERY_MAP } from '../../constants'
 import { TwoColTextAndImage } from '../TwoColTextAndImage'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')

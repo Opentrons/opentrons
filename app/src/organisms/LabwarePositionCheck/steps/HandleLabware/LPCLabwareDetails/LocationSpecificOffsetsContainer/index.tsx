@@ -18,9 +18,9 @@ import {
 import { LabwareLocationItem } from './LabwareLocationItem'
 import { OffsetTableHeaders } from './OffsetTableHeaders'
 
+import type { TFunction } from 'i18next'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { SelectedLwOverview } from '/app/redux/protocol-runs'
-import type { TFunction } from 'i18next'
 
 export function LocationSpecificOffsetsContainer(
   props: LPCWizardContentProps

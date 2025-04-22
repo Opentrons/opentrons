@@ -42,9 +42,9 @@ import {
   useRunStatuses,
 } from '/app/resources/runs'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
-import type { ViewportListRef } from 'react-viewport-list'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}

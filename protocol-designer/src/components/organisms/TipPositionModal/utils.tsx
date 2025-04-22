@@ -9,8 +9,8 @@ import {
 import { getIsTouchTipField } from '../../../form-types'
 import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
 
-import type { StepFieldName } from '../../../form-types'
 import type { PositionReference } from '@opentrons/shared-data'
+import type { StepFieldName } from '../../../form-types'
 
 export function getDefaultMmFromEdge(args: {
   name: StepFieldName

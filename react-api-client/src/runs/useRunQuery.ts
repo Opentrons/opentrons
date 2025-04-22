@@ -5,8 +5,8 @@ import { getRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { HostConfig, Run, RunError } from '@opentrons/api-client'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { HostConfig, Run, RunError } from '@opentrons/api-client'
 
 export function useRunQuery<TError = Error>(
   runId: string | null,

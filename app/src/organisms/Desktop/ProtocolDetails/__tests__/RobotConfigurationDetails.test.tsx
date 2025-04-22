@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
 
 const mockRequiredModuleDetails = [
   {

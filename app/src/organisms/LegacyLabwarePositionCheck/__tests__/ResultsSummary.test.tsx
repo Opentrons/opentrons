@@ -13,8 +13,8 @@ import {
 import { SECTIONS } from '../constants'
 import { ResultsSummary } from '../ResultsSummary'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/config')
 

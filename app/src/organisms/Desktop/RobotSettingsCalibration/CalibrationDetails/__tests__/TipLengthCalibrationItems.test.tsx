@@ -9,8 +9,8 @@ import { i18n } from '/app/i18n'
 import { OverflowMenu } from '../OverflowMenu'
 import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 
-import type { Mount } from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type { Mount } from '@opentrons/components'
 
 vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('/app/redux/config')

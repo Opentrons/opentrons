@@ -11,8 +11,8 @@ import { useDispatchApiRequest } from '/app/redux/robot-api'
 
 import { DeviceResetModal } from '../DeviceResetModal'
 
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { ComponentProps } from 'react'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/robot-admin')

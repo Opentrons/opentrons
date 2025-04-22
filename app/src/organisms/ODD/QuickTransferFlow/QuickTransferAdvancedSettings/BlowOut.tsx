@@ -25,6 +25,8 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import { ACTIONS } from '../constants'
 
+import type { Dispatch } from 'react'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   BlowOutLocation,
   FlowRateKind,
@@ -32,8 +34,6 @@ import type {
   QuickTransferSummaryState,
   TransferType,
 } from '../types'
-import type { DeckConfiguration } from '@opentrons/shared-data'
-import type { Dispatch } from 'react'
 
 interface BlowOutProps {
   onBack: () => void

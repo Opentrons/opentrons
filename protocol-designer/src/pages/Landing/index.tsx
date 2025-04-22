@@ -32,8 +32,8 @@ import {
   setLocalStorageItem,
 } from '../../persist'
 
-import type { ThunkDispatch } from '../../types'
 import type { ChangeEvent, ComponentProps } from 'react'
+import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
 

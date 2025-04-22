@@ -1,7 +1,7 @@
 import { formatPyStr, PROTOCOL_CONTEXT_NAME, uuid } from '../../utils'
 
-import type { CommandCreator } from '../../types'
 import type { CommentParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 export const comment: CommandCreator<CommentParams> = (
   args,

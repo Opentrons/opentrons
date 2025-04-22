@@ -1,7 +1,7 @@
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
-import type { HandlesCommands } from '../types'
 import type { PrepareToAspirateRunTimeCommand } from '@opentrons/shared-data/command'
+import type { HandlesCommands } from '../types'
 
 export function getPrepareToAspirateCommandText({
   command,

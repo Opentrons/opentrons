@@ -50,13 +50,13 @@ import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryM
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 
+import type { MouseEventHandler } from 'react'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type {
   RobotSettings,
   RobotSettingsField,
 } from '/app/redux/robot-settings/types'
 import type { Dispatch, State } from '/app/redux/types'
-import type { MouseEventHandler } from 'react'
 
 interface RobotSettingsAdvancedProps {
   robotName: string

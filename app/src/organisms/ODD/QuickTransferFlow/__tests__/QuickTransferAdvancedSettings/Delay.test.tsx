@@ -8,8 +8,8 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 
 import { Delay } from '../../QuickTransferAdvancedSettings/Delay'
 
-import type { QuickTransferSummaryState } from '../../types'
 import type { ComponentProps } from 'react'
+import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')

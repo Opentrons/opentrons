@@ -3,8 +3,8 @@ import { getMaintenanceRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { HostConfig, MaintenanceRun } from '@opentrons/api-client'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { HostConfig, MaintenanceRun } from '@opentrons/api-client'
 
 export function useMaintenanceRunQuery<TError = Error>(
   maintenanceRunId: string | null,

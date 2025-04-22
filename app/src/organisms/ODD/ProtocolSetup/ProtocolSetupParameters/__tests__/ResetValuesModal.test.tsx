@@ -6,8 +6,8 @@ import { i18n } from '/app/i18n'
 
 import { ResetValuesModal } from '../ResetValuesModal'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const mockGoBack = vi.fn()
 const mockSetRunTimeParametersOverrides = vi.fn()

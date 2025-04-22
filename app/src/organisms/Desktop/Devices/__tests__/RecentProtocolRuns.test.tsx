@@ -11,9 +11,9 @@ import { useNotifyAllRunsQuery, useRunStatuses } from '/app/resources/runs'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
 
-import type { Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 import type { UseQueryResult } from 'react-query'
+import type { Runs } from '@opentrons/api-client'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')

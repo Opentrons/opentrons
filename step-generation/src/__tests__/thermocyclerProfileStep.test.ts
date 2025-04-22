@@ -8,11 +8,11 @@ import {
   getSuccessResult,
 } from '../fixtures'
 
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   ThermocyclerModuleState,
   ThermocyclerProfileStepArgs,
 } from '../types'
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'

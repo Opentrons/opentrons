@@ -19,8 +19,8 @@ import { IncompatibleModuleDesktopModalBody } from '../IncompatibleModuleDesktop
 import { IncompatibleModuleODDModalBody } from '../IncompatibleModuleODDModalBody'
 import { IncompatibleModuleTakeover } from '../IncompatibleModuleTakeover'
 
-import type { AttachedModule } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('../hooks')
 vi.mock('../IncompatibleModuleODDModalBody')

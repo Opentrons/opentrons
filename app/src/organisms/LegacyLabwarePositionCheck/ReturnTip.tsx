@@ -21,7 +21,7 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { getLabwareDef } from './utils/labware'
 
-import type { ReturnTipStep } from './types'
+import type { TFunction } from 'i18next'
 import type { VectorOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -30,7 +30,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { useChainRunCommands } from '/app/resources/runs'
-import type { TFunction } from 'i18next'
+import type { ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis

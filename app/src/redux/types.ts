@@ -1,5 +1,8 @@
 /* eslint-disable no-use-before-define */
 // application types
+import type { RouterAction } from 'connected-react-router'
+import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
+import type { Observable } from 'rxjs'
 import type { AlertsAction, AlertsState } from './alerts/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
 import type { CalibrationAction, CalibrationState } from './calibration/types'
@@ -33,9 +36,6 @@ import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
 import type { SessionsAction, SessionState } from './sessions/types'
 import type { ShellAction, ShellState } from './shell/types'
 import type { SystemInfoAction, SystemInfoState } from './system-info/types'
-import type { RouterAction } from 'connected-react-router'
-import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
-import type { Observable } from 'rxjs'
 
 export interface State {
   readonly robotApi: RobotApiState

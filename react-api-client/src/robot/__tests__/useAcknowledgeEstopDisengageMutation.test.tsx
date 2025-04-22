@@ -6,8 +6,8 @@ import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 import { useAcknowledgeEstopDisengageMutation } from '..'
 import { useHost } from '../../api'
 
-import type { EstopStatus, HostConfig, Response } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { EstopStatus, HostConfig, Response } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost.ts')

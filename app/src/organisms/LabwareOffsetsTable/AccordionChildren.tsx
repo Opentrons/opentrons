@@ -5,9 +5,9 @@ import { selectSortedLSOffsetDetailsWithCopy } from '/app/redux/protocol-runs'
 
 import { AccordionDetail } from './AccordionDetail'
 
-import type { LabwareOffsetsTableProps } from '.'
-import type { LPCLabwareInfoAndDefaultStatus } from '/app/redux/protocol-runs'
 import type { TFunction } from 'i18next'
+import type { LPCLabwareInfoAndDefaultStatus } from '/app/redux/protocol-runs'
+import type { LabwareOffsetsTableProps } from '.'
 
 export interface AccordionChildrenProps extends LabwareOffsetsTableProps {
   lpcLabwareInfo: LPCLabwareInfoAndDefaultStatus

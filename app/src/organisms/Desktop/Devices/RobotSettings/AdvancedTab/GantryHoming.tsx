@@ -13,9 +13,9 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { updateSetting } from '/app/redux/robot-settings'
 
+import type { MouseEventHandler } from 'react'
 import type { RobotSettingsField } from '/app/redux/robot-settings/types'
 import type { Dispatch } from '/app/redux/types'
-import type { MouseEventHandler } from 'react'
 
 interface GantryHomingProps {
   settings: RobotSettingsField | undefined

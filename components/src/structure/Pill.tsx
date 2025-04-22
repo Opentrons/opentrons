@@ -2,8 +2,8 @@ import cx from 'classnames'
 
 import styles from './Pill.module.css'
 
-import type { UseHoverTooltipTargetProps } from '../tooltips'
 import type { ReactNode } from 'react'
+import type { UseHoverTooltipTargetProps } from '../tooltips'
 
 // TODO(bc, 2021-03-29): this component is only used in PD
 // reconsider whether it belongs in components library

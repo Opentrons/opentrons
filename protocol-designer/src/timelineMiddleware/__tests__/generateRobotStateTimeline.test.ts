@@ -12,8 +12,8 @@ import {
 
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 
-import type { StepArgsAndErrorsById } from '../../steplist'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { StepArgsAndErrorsById } from '../../steplist'
 
 vi.mock('../../labware-defs/utils')
 

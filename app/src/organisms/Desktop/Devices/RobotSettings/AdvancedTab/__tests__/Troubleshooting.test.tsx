@@ -18,9 +18,9 @@ import {
 
 import { Troubleshooting } from '../Troubleshooting'
 
+import type { ComponentProps } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { ToasterContextType } from '/app/organisms/ToasterOven/ToasterContext'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')

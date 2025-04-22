@@ -38,6 +38,7 @@ import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { isInterventionCommand } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   RunCommandSummary,
   RunData,
@@ -45,7 +46,6 @@ import type {
 } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { ReactNode } from 'react'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,

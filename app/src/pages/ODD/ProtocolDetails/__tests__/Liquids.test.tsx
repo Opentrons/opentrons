@@ -15,10 +15,10 @@ import { i18n } from '/app/i18n'
 
 import { Liquids } from '../Liquids'
 
-import type { Protocol } from '@opentrons/api-client'
-import type * as SharedData from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { Protocol } from '@opentrons/api-client'
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

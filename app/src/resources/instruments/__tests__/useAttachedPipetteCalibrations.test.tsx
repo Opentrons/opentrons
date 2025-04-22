@@ -21,9 +21,9 @@ import {
 
 import { useAttachedPipetteCalibrations } from '..'
 
-import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/calibration')

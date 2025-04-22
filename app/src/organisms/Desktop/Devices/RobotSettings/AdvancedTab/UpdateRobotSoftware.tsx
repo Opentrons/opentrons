@@ -24,8 +24,8 @@ import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
 
-import type { State } from '/app/redux/types'
 import type { ChangeEventHandler, MouseEventHandler } from 'react'
+import type { State } from '/app/redux/types'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
 const HIDDEN_CSS = css`

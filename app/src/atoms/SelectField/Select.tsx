@@ -11,7 +11,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { DropdownBorder } from '@opentrons/components'
 import type {
   CSSObjectWithLabel,
   DropdownIndicatorProps,
@@ -19,6 +18,7 @@ import type {
   Props as ReactSelectProps,
   StylesConfig,
 } from 'react-select'
+import type { DropdownBorder } from '@opentrons/components'
 
 export interface SelectOption {
   value: string

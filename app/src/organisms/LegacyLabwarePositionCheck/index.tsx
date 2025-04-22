@@ -8,12 +8,12 @@ import { useLogger } from '../../logger'
 import { FatalErrorModal } from './FatalErrorModal'
 import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
 
+import type { ErrorInfo, ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
 } from '@opentrons/shared-data'
-import type { ErrorInfo, ReactNode } from 'react'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void

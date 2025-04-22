@@ -3,9 +3,9 @@ import { memo } from 'react'
 import { COLORS } from '../../../helix-design-system'
 import { Well } from './Well'
 
-import type { WellGroup } from './types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CSSProperties, MemoExoticComponent } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { WellGroup } from './types'
 
 type WellContents =
   | 'tipPresent'

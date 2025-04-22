@@ -7,8 +7,8 @@ import {
   Flex,
 } from '@opentrons/components'
 
-import type { Ingredient } from '@opentrons/step-generation'
 import type { Control, UseFormSetValue } from 'react-hook-form'
+import type { Ingredient } from '@opentrons/step-generation'
 
 interface LiquidClassDropdownProps {
   control: Control<Ingredient, any>

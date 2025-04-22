@@ -3,8 +3,8 @@ import { Icon } from '@opentrons/components'
 
 import styles from './styles.module.css'
 
-import type { IconName } from '@opentrons/components'
 import type * as React from 'react'
+import type { IconName } from '@opentrons/components'
 
 export interface ClickableIconProps {
   name: IconName

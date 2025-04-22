@@ -32,8 +32,8 @@ import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 import { ChooseRobotToRunProtocolSlideout } from '../'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 
-import type { State } from '/app/redux/types'
 import type { ComponentProps } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/organisms/ProtocolUpload/hooks')

@@ -16,9 +16,9 @@ import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import { useTrackProtocolRunEvent } from '../useTrackProtocolRunEvent'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
 import type { Mock } from 'vitest'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('../useProtocolRunAnalyticsData')

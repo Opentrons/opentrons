@@ -15,8 +15,8 @@ import {
 
 import { formatVolume } from './utils'
 
-import type { SubstepIdentifier, SubstepWellData } from '../../../../steplist'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type { SubstepIdentifier, SubstepWellData } from '../../../../steplist'
 
 interface SubstepProps {
   trashName: AdditionalEquipmentName | null

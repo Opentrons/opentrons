@@ -1,5 +1,3 @@
-import type { RobotApiRequestMeta } from '../robot-api/types'
-import type * as ApiTypes from './api-types'
 import type { ModuleOffset } from '@opentrons/api-client'
 import type {
   ABSORBANCE_READER_TYPE,
@@ -15,6 +13,8 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { RobotApiRequestMeta } from '../robot-api/types'
+import type * as ApiTypes from './api-types'
 
 export * from './api-types'
 

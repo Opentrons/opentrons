@@ -66,9 +66,9 @@ import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupStep } from './SetupStep'
 
+import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
-import type { RefObject } from 'react'
 
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: RefObject<HTMLDivElement> | null

@@ -1,13 +1,13 @@
 import { getDefaultBlowoutFlowRate } from './utils/getDefaultBlowoutFlowRate'
 
-import type { LegacyDismissedWarningState } from '../../dismiss/reducers'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type {
   LoadLabwareCreateCommand,
   LoadPipetteCreateCommand,
   PipetteName,
   ProtocolFile,
 } from '@opentrons/shared-data'
+import type { LegacyDismissedWarningState } from '../../dismiss/reducers'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export interface DesignerApplicationDataV8 {
   ingredients: Record<

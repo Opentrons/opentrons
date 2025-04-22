@@ -16,10 +16,10 @@ import {
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 import { getDisabledPathMap } from './utils'
 
+import type { ChangeEvent, ReactNode } from 'react'
 import type { PathOption } from '../../../../../form-types'
 import type { FieldProps } from '../types'
 import type { DisabledPathMap, ValuesForPath } from './utils'
-import type { ChangeEvent, ReactNode } from 'react'
 
 import MULTI_ASPIRATE_IMAGE from '../../../../../assets/images/path_multi_aspirate.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../../assets/images/path_multi_dispense.svg'

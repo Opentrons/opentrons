@@ -6,8 +6,8 @@ import { getProtocols } from '@opentrons/api-client'
 import { useAllProtocolsQuery } from '..'
 import { useHost } from '../../api'
 
-import type { HostConfig, Protocols, Response } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { HostConfig, Protocols, Response } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

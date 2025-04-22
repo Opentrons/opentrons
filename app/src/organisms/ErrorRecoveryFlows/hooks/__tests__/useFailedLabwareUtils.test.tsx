@@ -13,9 +13,9 @@ import {
   useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
 
-import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
-import type { RunCommandSummary } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { RunCommandSummary } from '@opentrons/api-client'
+import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {

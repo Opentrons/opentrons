@@ -9,13 +9,13 @@ import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { ConfirmPipette } from '../ConfirmPipette'
 
-import type { LevelingVideo } from '../LevelPipette'
+import type { ComponentProps } from 'react'
 import type {
   PipetteModelSpecs,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
-import type { ComponentProps } from 'react'
+import type { LevelingVideo } from '../LevelPipette'
 
 vi.mock('../CheckPipettesButton')
 vi.mock('../LevelPipette', async importOriginal => {

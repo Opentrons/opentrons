@@ -15,9 +15,9 @@ import {
   useRecoveryToastText,
 } from '../useRecoveryToasts'
 
-import type { BuildToast } from '../useRecoveryToasts'
-import type { ReactElement } from 'react'
 import type { Mock } from 'vitest'
+import type { ReactElement } from 'react'
+import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')
 vi.mock('/app/local-resources/commands')

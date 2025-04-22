@@ -12,8 +12,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { StyleProps } from '@opentrons/components'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;

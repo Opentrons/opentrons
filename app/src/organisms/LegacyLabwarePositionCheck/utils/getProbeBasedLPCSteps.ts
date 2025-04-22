@@ -6,12 +6,12 @@ import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistor
 
 import { SECTIONS } from '../constants'
 
-import type { CheckPositionsStep, LabwarePositionCheckStep } from '../types'
 import type {
   CompletedProtocolAnalysis,
   LoadedPipette,
 } from '@opentrons/shared-data'
 import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+import type { CheckPositionsStep, LabwarePositionCheckStep } from '../types'
 
 function getPrimaryPipetteId(pipettes: LoadedPipette[]): string {
   if (pipettes.length < 1) {

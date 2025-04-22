@@ -10,9 +10,9 @@ import { useFeatureFlag } from '/app/redux/config'
 import { notifySubscribeAction } from '/app/redux/shell'
 import { appShellListener } from '/app/redux/shell/remote'
 
+import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 import type { NotifyResponseData, NotifyTopic } from '/app/redux/shell/types'
-import type { UseQueryOptions } from 'react-query'
 
 export type HTTPRefetchFrequency = 'once' | null
 

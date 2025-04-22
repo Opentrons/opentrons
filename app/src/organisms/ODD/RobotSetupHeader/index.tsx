@@ -15,8 +15,8 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 
-import type { InlineNotificationProps } from '/app/atoms/InlineNotification'
 import type { MouseEventHandler, ReactNode } from 'react'
+import type { InlineNotificationProps } from '/app/atoms/InlineNotification'
 
 interface RobotSetupHeaderProps {
   header: string

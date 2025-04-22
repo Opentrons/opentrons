@@ -18,8 +18,8 @@ import {
 } from '../constants'
 import { RecoverySingleColumnContentWrapper } from '../shared'
 
-import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '/app/resources/instruments'
+import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.

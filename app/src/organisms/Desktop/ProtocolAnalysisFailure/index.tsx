@@ -21,8 +21,8 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { analyzeProtocol } from '/app/redux/protocol-storage'
 
-import type { Dispatch } from '/app/redux/types'
 import type { MouseEventHandler } from 'react'
+import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolAnalysisFailureProps {
   errors: string[]

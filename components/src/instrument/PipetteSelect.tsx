@@ -11,9 +11,9 @@ import { CONTEXT_VALUE, Select } from '../forms'
 import { Flex } from '../primitives'
 import styles from './PipetteSelect.module.css'
 
-import type { SelectOption } from '../forms'
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { SelectOption } from '../forms'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */

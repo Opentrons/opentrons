@@ -7,8 +7,8 @@ import protocolSchemaV3 from '../../protocol/schemas/3.json'
 import protocolSchemaV4 from '../../protocol/schemas/4.json'
 import protocolSchemaV5 from '../../protocol/schemas/5.json'
 
-import type { JsonProtocolFile } from '../../protocol'
 import type { ErrorObject } from 'ajv'
+import type { JsonProtocolFile } from '../../protocol'
 
 export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 

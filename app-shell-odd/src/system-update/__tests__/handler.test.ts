@@ -16,15 +16,15 @@ import {
   manageDriver,
 } from '../handler'
 
+import type {
+  ConfigInitializedAction,
+  ConfigValueUpdatedAction,
+} from '@opentrons/app/src/redux/config'
 import type { Dispatch } from '../../types'
 import type { USBUpdateSource } from '../from-usb'
 import type { WebUpdateSource } from '../from-web'
 import type { UpdateDriver } from '../handler'
 import type { UpdateProvider } from '../types'
-import type {
-  ConfigInitializedAction,
-  ConfigValueUpdatedAction,
-} from '@opentrons/app/src/redux/config'
 
 vi.unmock('electron-updater') // ?
 vi.mock('electron-updater')

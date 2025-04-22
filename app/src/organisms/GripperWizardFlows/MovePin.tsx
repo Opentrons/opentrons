@@ -26,10 +26,10 @@ import {
   REMOVE_PIN_FROM_REAR_JAW,
 } from './constants'
 
-import type { GripperWizardStepProps, MovePinStep } from './types'
+import type { ReactNode } from 'react'
 import type { Coordinates } from '@opentrons/shared-data'
 import type { CreateMaintenanceCommand } from '/app/resources/runs'
-import type { ReactNode } from 'react'
+import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void

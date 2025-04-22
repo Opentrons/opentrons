@@ -17,8 +17,8 @@ import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { FLOWS } from '../constants'
 import { Results } from '../Results'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/robot-settings/hooks')

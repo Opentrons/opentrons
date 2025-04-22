@@ -1,9 +1,4 @@
 import type {
-  TEMPERATURE_APPROACHING_TARGET,
-  TEMPERATURE_AT_TARGET,
-  TEMPERATURE_DEACTIVATED,
-} from './constants'
-import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
   HEATERSHAKER_MODULE_TYPE,
@@ -23,6 +18,11 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from './constants'
 
 // Copied from PD
 export type DeckSlot = string

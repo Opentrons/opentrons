@@ -5,8 +5,8 @@ import { Flex } from '../../primitives'
 import { CURSOR_DEFAULT, CURSOR_POINTER } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
-import type { StyleProps } from '../../primitives'
 import type { ReactNode } from 'react'
+import type { StyleProps } from '../../primitives'
 
 export * from './ListButtonChildren/index'
 

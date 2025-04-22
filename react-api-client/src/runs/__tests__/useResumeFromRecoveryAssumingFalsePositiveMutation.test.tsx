@@ -7,9 +7,9 @@ import { useResumeRunFromRecoveryAssumingFalsePositiveMutation } from '..'
 import { mockResumeFromRecoveryAction, RUN_ID_1 } from '../__fixtures__'
 import { useHost } from '../../api'
 
-import type { UseResumeRunFromRecoveryAssumingFalsePositiveMutationOptions } from '../useResumeFromRecoveryAssumingFalsePositiveMutation'
-import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
+import type { UseResumeRunFromRecoveryAssumingFalsePositiveMutationOptions } from '../useResumeFromRecoveryAssumingFalsePositiveMutation'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

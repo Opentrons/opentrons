@@ -10,12 +10,12 @@ import {
 
 import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
 
-import type { WizardTileProps } from '../../../pages/Onboarding/types'
 import type {
   CutoutConfig,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { WizardTileProps } from '../../../pages/Onboarding/types'
 
 export function HardwareConfigurator(props: WizardTileProps): JSX.Element {
   const { watch, setValue } = props

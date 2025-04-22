@@ -21,8 +21,8 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { FormattedPipetteOffsetCalibration } from '..'
 import type { AttachedModule } from '/app/redux/modules/types'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean

@@ -19,9 +19,9 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { resetConfig } from '/app/redux/robot-admin'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
-import type { SetSettingOption } from './types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
+import type { SetSettingOption } from './types'
 
 interface LabelProps {
   isSelected?: boolean

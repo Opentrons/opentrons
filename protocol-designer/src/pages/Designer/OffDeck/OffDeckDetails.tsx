@@ -34,8 +34,8 @@ import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
 import { OffDeckControls } from './OffDeckControls'
 
-import type { DeckSetupTerminalIdType } from '../types'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSetupTerminalIdType } from '../types'
 
 const OFF_DECK_MAP_WIDTH = '41.625rem'
 const OFF_DECK_MAP_HEIGHT_FOR_STEP = '30.3rem'

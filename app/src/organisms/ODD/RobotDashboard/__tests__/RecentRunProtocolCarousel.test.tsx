@@ -6,8 +6,8 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
-import type { RunData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { RunData } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../RecentRunProtocolCard')

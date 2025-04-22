@@ -2,8 +2,8 @@ import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getLabwareName } from '../getLabwareName'
 
-import type { HandlesCommands } from '../types'
 import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/command'
+import type { HandlesCommands } from '../types'
 
 export function getMoveToWellCommandText({
   command,

@@ -6,8 +6,8 @@ import { FAILURE, PENDING, SUCCESS } from '/app/redux/robot-api'
 
 import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
 
-import type { SetSettingOption } from '../types'
 import type { RequestState } from '/app/redux/robot-api/types'
+import type { SetSettingOption } from '../types'
 
 interface RobotSettingsWifiConnectProps {
   handleConnect: () => void

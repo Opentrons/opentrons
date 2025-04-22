@@ -9,6 +9,7 @@ import {
 
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
+import type { UseMutateFunction } from 'react-query'
 import type {
   HostConfig,
   LegacyLabwareOffsetCreateData,
@@ -17,7 +18,6 @@ import type {
 import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 import type { State } from '/app/redux/types'
-import type { UseMutateFunction } from 'react-query'
 
 export interface UseCreateRun {
   createRunFromProtocolSource: UseMutateFunction<

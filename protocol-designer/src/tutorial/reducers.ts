@@ -3,11 +3,11 @@ import uniq from 'lodash/uniq'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
+import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
 import type { Action } from '../types'
 import type { AddHintAction, RemoveHintAction } from './actions'
 import type { HintKey } from './index'
-import type { Reducer } from 'redux'
 
 type HintReducerState = HintKey[]
 const hints = handleActions<HintReducerState>(

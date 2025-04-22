@@ -40,6 +40,7 @@ import {
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
 } from '/app/redux/protocol-runs'
 
+import type { TFunction } from 'i18next'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { Coordinates, LoadedPipette } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
@@ -49,7 +50,6 @@ import type {
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { TFunction } from 'i18next'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void

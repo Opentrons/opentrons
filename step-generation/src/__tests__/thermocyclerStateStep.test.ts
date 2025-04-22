@@ -4,13 +4,13 @@ import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerS
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
 import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   ThermocyclerStateStepArgs,
 } from '../types'
 import type { Diff } from '../utils/thermocyclerStateDiff'
-import type { CreateCommand } from '@opentrons/shared-data'
 
 vi.mock('../utils/thermocyclerStateDiff')
 

@@ -13,8 +13,8 @@ import {
 } from '../../../../../../ui/modules/selectors'
 import { MagnetTools } from '../MagnetTools'
 
-import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
 import type { ComponentProps } from 'react'
+import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
 
 vi.mock('../../../../../../step-forms/selectors')
 

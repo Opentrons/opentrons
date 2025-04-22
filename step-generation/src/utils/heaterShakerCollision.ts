@@ -10,13 +10,13 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
 import type {
   DeckSlot,
   LabwareEntities,
   LabwareEntity,
   RobotState,
 } from '../types'
-import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
 
 export const getIsHeaterShakerEastWestWithLatchOpen = (
   hwModules: RobotState['modules'],

@@ -11,6 +11,7 @@ import {
   OFFSET_KIND_LOCATION_SPECIFIC,
 } from '/app/redux/protocol-runs/constants'
 
+import type { TFunction } from 'i18next'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
@@ -26,7 +27,6 @@ import type {
   WorkingOffset,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { TFunction } from 'i18next'
 
 export const getFlexSlotNameOnly = (
   details: OffsetLocationDetails | null,

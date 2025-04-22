@@ -4,9 +4,9 @@ import { round } from 'lodash'
 import { DropdownMenu } from '@opentrons/components'
 import { WELL_BOTTOM, WELL_CENTER, WELL_TOP } from '@opentrons/shared-data'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { PositionReference } from '@opentrons/shared-data'
-import type { Dispatch, SetStateAction } from 'react'
 
 interface UsePositionReferenceResult {
   positionReferenceDropdown: JSX.Element

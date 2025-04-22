@@ -3,13 +3,13 @@ import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { EstopStatus, HostConfig } from '@opentrons/api-client'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
+import type { EstopStatus, HostConfig } from '@opentrons/api-client'
 
 export type UseAcknowledgeEstopDisengageMutationResult = UseMutationResult<
   EstopStatus,

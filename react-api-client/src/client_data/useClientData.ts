@@ -3,13 +3,13 @@ import { getClientData } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
+import type { AxiosError } from 'axios'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   ClientDataResponse,
   DefaultClientData,
   HostConfig,
 } from '@opentrons/api-client'
-import type { AxiosError } from 'axios'
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export function useClientData<T = DefaultClientData>(
   key: string,

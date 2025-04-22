@@ -24,11 +24,11 @@ import {
 
 import { useDownloadRunLog } from '../../../../hooks'
 
-import type { UseRunErrorsResult } from '../../hooks'
+import type { MouseEventHandler } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type { RunCommandError } from '@opentrons/shared-data'
-import type { MouseEventHandler } from 'react'
+import type { UseRunErrorsResult } from '../../hooks'
 
 // Note(kk:08/07/2023)
 // This modal and run failed modal for Touchscreen app will be merged into one component like EstopModals.

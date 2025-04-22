@@ -3,8 +3,8 @@ import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { useIsLegacySessionInProgress } from '../useIsLegacySessionInProgress'
 
-import type { Sessions } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { Sessions } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 

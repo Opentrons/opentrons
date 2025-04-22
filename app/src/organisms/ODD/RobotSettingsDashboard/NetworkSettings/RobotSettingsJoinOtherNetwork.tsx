@@ -6,8 +6,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { SetWifiSsid } from '../../NetworkSettings'
 
-import type { SetSettingOption } from '../types'
 import type { Dispatch, SetStateAction } from 'react'
+import type { SetSettingOption } from '../types'
 
 interface RobotSettingsJoinOtherNetworkProps {
   setCurrentOption: SetSettingOption

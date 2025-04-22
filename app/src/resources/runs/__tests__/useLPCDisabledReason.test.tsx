@@ -23,10 +23,10 @@ import { useRunCalibrationStatus } from '../useRunCalibrationStatus'
 import { useRunHasStarted } from '../useRunHasStarted'
 import { useUnmatchedModulesForProtocol } from '../useUnmatchedModulesForProtocol'
 
+import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
 
 vi.mock('../useUnmatchedModulesForProtocol')
 vi.mock('../useRunCalibrationStatus')

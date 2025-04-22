@@ -15,8 +15,8 @@ import {
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
 
-import type { LabwareFields } from '../../fields'
 import type { FormikErrors, FormikTouched } from 'formik'
+import type { LabwareFields } from '../../fields'
 
 export interface Props {
   values: LabwareFields

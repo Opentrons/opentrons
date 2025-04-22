@@ -6,8 +6,8 @@ import { getCommand } from '@opentrons/api-client'
 import { useCommandQuery } from '..'
 import { useHost } from '../../api'
 
-import type { CommandDetail, HostConfig, Response } from '@opentrons/api-client'
 import type * as React from 'react'
+import type { CommandDetail, HostConfig, Response } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

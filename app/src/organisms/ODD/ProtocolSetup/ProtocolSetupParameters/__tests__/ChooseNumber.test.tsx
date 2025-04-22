@@ -10,8 +10,8 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { mockRunTimeParameterData } from '../../__fixtures__'
 import { ChooseNumber } from '../ChooseNumber'
 
-import type { NumberParameter } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { NumberParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/organisms/ToasterOven')
 

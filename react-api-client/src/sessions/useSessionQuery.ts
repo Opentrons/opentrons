@@ -3,8 +3,8 @@ import { getSession } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { HostConfig, Session } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { HostConfig, Session } from '@opentrons/api-client'
 
 export function useSessionQuery(sessionId: string): UseQueryResult<Session> {
   const host = useHost()

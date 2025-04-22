@@ -39,12 +39,12 @@ import {
 } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import type { Dispatch, SetStateAction } from 'react'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

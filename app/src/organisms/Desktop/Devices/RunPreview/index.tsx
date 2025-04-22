@@ -33,10 +33,10 @@ import {
   useRunStatus,
 } from '/app/resources/runs'
 
-import type { RunStatus } from '@opentrons/api-client'
-import type { RobotType } from '@opentrons/shared-data'
 import type { ForwardedRef } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
+import type { RunStatus } from '@opentrons/api-client'
+import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000

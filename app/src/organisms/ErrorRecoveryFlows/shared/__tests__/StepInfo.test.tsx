@@ -8,8 +8,8 @@ import { i18n } from '/app/i18n'
 import { mockFailedCommand, mockRecoveryContentProps } from '../../__fixtures__'
 import { StepInfo } from '../StepInfo'
 
-import type * as OpentronsComponents from '@opentrons/components'
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

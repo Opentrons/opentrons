@@ -7,8 +7,8 @@ import {
 import * as errorCreators from '../../errorCreators'
 import { uuid } from '../../utils'
 
-import type { CommandCreator } from '../../types'
 import type { TemperatureParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 /** Set temperature target for specified module. */
 export const setTemperature: CommandCreator<TemperatureParams> = (

@@ -37,9 +37,9 @@ import {
 } from '../__fixtures__'
 import { useDownloadRunLog } from '../../Devices/hooks'
 
+import type { ComponentProps } from 'react'
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
-import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ApiClient>()

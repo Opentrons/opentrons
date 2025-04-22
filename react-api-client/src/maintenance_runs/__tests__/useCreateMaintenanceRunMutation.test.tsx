@@ -7,12 +7,12 @@ import { useCreateMaintenanceRunMutation } from '..'
 import { mockMaintenanceRunResponse } from '../__fixtures__'
 import { useHost } from '../../api'
 
+import type * as React from 'react'
 import type {
   HostConfig,
   MaintenanceRun,
   Response,
 } from '@opentrons/api-client'
-import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

@@ -13,7 +13,6 @@ import {
   getWellsForTips,
 } from '@opentrons/step-generation'
 
-import type { SourceDestData, SubstepTimelineFrame, TipLocation } from './types'
 import type { Channels } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -27,6 +26,7 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
+import type { SourceDestData, SubstepTimelineFrame, TipLocation } from './types'
 
 const wasteChuteddressableAreaNamesPipette = [
   '1ChannelWasteChute',

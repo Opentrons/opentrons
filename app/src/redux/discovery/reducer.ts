@@ -4,9 +4,9 @@ import keyBy from 'lodash/keyBy'
 import { UI_INITIALIZED } from '../shell'
 import * as actions from './actions'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { DiscoveryState } from './types'
-import type { Reducer } from 'redux'
 
 export const INITIAL_STATE: DiscoveryState = {
   scanning: false,

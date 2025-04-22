@@ -12,12 +12,12 @@ import { i18n } from '/app/i18n'
 import { LongPressModal } from '../LongPressModal'
 import { QuickTransferCard } from '../QuickTransferCard'
 
+import type { UseQueryResult } from 'react-query'
+import type { NavigateFunction } from 'react-router-dom'
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
-import type { UseQueryResult } from 'react-query'
-import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 

@@ -17,8 +17,8 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 
-import type { AnalysisError } from '@opentrons/shared-data'
 import type { MouseEventHandler } from 'react'
+import type { AnalysisError } from '@opentrons/shared-data'
 
 interface ProtocolAnalysisErrorBannerProps {
   errors: AnalysisError[]

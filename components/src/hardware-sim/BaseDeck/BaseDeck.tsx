@@ -32,10 +32,7 @@ import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
 
-import type { Svg } from '../../primitives'
-import type { TrashCutoutId } from '../Deck/FlexTrash'
-import type { WellFill, WellGroup } from '../Labware'
-import type { StagingAreaLocation } from './StagingAreaFixture'
+import type { ComponentProps, ReactNode } from 'react'
 import type {
   CutoutFixtureId,
   DeckConfiguration,
@@ -45,7 +42,10 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type { ComponentProps, ReactNode } from 'react'
+import type { Svg } from '../../primitives'
+import type { TrashCutoutId } from '../Deck/FlexTrash'
+import type { WellFill, WellGroup } from '../Labware'
+import type { StagingAreaLocation } from './StagingAreaFixture'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation

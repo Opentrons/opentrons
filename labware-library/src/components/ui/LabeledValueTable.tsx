@@ -3,8 +3,8 @@ import { Table, TABLE_COLUMN, TableEntry } from './Table'
 import { TableTitle } from './TableTitle'
 import { Value } from './Value'
 
-import type { TableDirection } from './Table'
 import type * as React from 'react'
+import type { TableDirection } from './Table'
 
 export interface ValueEntry {
   label: React.ReactNode

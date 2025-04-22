@@ -31,6 +31,7 @@ import { Divider } from '/app/atoms/structure'
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   CutoutConfigProtocolSpec,
   LoadModuleRunTimeCommand,
@@ -38,7 +39,6 @@ import type {
   RobotType,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { ReactNode } from 'react'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null

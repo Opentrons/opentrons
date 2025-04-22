@@ -9,8 +9,8 @@ import {
   makeContext,
 } from '../fixtures'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { CutoutId } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const mockCutout = 'cutoutA3' as CutoutId
 const mockTrashId = 'mockTrashId'

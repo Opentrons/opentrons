@@ -26,8 +26,8 @@ import {
 } from '../../../PipetteFields'
 import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../../../PipetteFields')

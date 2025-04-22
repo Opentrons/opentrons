@@ -60,12 +60,12 @@ import {
   getLabwareIsRecommended,
 } from './utils'
 
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { CategoryExpand } from './DeckSetupTools'
-import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48

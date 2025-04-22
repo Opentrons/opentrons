@@ -23,11 +23,11 @@ import {
 } from './constants'
 import { RecoveryInterventionModal } from './shared'
 
-import type { ErrorRecoveryFlowsProps } from '.'
 import type {
   ClientDataRecovery,
   UseUpdateClientDataRecoveryResult,
 } from '/app/resources/client_data'
+import type { ErrorRecoveryFlowsProps } from '.'
 
 // The takeover view, functionally similar to MaintenanceRunTakeover
 export function RecoveryTakeover(props: {

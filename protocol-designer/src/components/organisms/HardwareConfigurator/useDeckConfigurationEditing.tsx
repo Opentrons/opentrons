@@ -32,16 +32,16 @@ import {
 
 import { AddFixtureModal } from './AddFixtureModal'
 
-import type { FormModules } from '../../../step-forms'
-import type { WizardFixtureType, WizardFormState } from '../types'
-import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
-import type { UseFormSetValue } from 'react-hook-form'
+import type { FormModules } from '../../../step-forms'
+import type { WizardFixtureType, WizardFormState } from '../types'
+import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
 
 interface DeckConfigurationEditingProps {
   addFixtureToCutout: (cutoutId: CutoutId) => void

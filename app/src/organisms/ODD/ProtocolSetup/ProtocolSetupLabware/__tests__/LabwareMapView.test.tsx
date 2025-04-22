@@ -12,13 +12,13 @@ import { getLabwareRenderInfo } from '/app/transformations/analysis'
 import { mockProtocolModuleInfo } from '../__fixtures__'
 import { LabwareMapView } from '../LabwareMapView'
 
+import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
   getSimplestDeckConfigForProtocol,
   LabwareDefinition2,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ComponentProps } from 'react'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')

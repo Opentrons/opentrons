@@ -26,11 +26,11 @@ import {
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
 
+import type { ThunkDispatch } from 'redux-thunk'
+import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
 
 interface StepOverflowMenuProps {
   stepId: string

@@ -24,8 +24,8 @@ import {
   thermocyclerPipetteCollision,
 } from '../utils'
 
-import type { InvariantContext, RobotState } from '../types'
 import type { WellOrigin } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/absorbanceReaderCollision')
 vi.mock('../utils/thermocyclerPipetteCollision')

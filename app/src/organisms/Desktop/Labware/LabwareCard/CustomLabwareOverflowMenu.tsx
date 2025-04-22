@@ -36,8 +36,8 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
-import type { Dispatch } from '/app/redux/types'
 import type { MouseEventHandler } from 'react'
+import type { Dispatch } from '/app/redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 

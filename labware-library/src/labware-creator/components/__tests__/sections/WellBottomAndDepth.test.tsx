@@ -10,8 +10,8 @@ import { getLabwareName } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-import type { LabwareFields, LabwareType } from '../../../fields'
 import type { FormikConfig } from 'formik'
+import type { LabwareFields, LabwareType } from '../../../fields'
 
 vi.mock('../../../utils')
 

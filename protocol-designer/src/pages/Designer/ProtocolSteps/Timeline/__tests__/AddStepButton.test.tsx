@@ -27,12 +27,12 @@ import {
 import { getIsMultiSelectMode } from '../../../../../ui/steps'
 import { AddStepButton } from '../AddStepButton'
 
+import type { ComponentProps } from 'react'
 import type {
   LabwareDefinition2,
   LabwareParameters,
 } from '@opentrons/shared-data'
 import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
-import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../feature-flags/selectors')
 vi.mock('../../../../../file-data/selectors')

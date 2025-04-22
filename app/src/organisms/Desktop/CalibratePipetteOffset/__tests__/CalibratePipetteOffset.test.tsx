@@ -14,9 +14,9 @@ import { mockPipetteOffsetCalibrationSessionAttributes } from '/app/redux/sessio
 
 import { CalibratePipetteOffset } from '../index'
 
+import type { ComponentProps, ComponentType } from 'react'
 import type { DispatchRequestsType } from '/app/redux/robot-api'
 import type { PipetteOffsetCalibrationStep } from '/app/redux/sessions/types'
-import type { ComponentProps, ComponentType } from 'react'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()

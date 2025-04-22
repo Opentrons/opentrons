@@ -18,8 +18,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { IconProps, StyleProps } from '@opentrons/components'
 import type { MouseEventHandler } from 'react'
+import type { IconProps, StyleProps } from '@opentrons/components'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 

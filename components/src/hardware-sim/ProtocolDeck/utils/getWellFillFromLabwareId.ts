@@ -1,6 +1,6 @@
+import type { Liquid } from '@opentrons/shared-data'
 import type { WellFill } from '../../Labware'
 import type { LabwareByLiquidId } from '../types'
-import type { Liquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(
   labwareId: string,

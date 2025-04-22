@@ -16,9 +16,9 @@ import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
-import type { PipetteOnDeck } from '../../step-forms'
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+import type { PipetteOnDeck } from '../../step-forms'
 
 interface InstrumentsInfoProps {
   robotType: RobotType

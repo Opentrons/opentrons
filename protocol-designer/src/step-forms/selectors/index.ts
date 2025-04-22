@@ -30,6 +30,30 @@ import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 
+import type { Selector } from 'reselect'
+import type { ComponentProps } from 'react'
+import type {
+  DropdownOption,
+  InstrumentGroup,
+  InstrumentInfoProps,
+  Mount,
+} from '@opentrons/components'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type {
+  AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
+  GripperEntities,
+  InvariantContext,
+  LabwareEntities,
+  LabwareEntity,
+  LiquidEntities,
+  ModuleEntities,
+  NormalizedAdditionalEquipmentById,
+  PipetteEntities,
+  StagingAreaEntities,
+  TrashBinEntities,
+  WasteChuteEntities,
+} from '@opentrons/step-generation'
 import type {
   FormData,
   HydratedAbsorbanceReaderFormData,
@@ -77,30 +101,6 @@ import type {
   TemperatureModuleState,
   ThermocyclerModuleState,
 } from '../types'
-import type {
-  DropdownOption,
-  InstrumentGroup,
-  InstrumentInfoProps,
-  Mount,
-} from '@opentrons/components'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
-import type {
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
-  GripperEntities,
-  InvariantContext,
-  LabwareEntities,
-  LabwareEntity,
-  LiquidEntities,
-  ModuleEntities,
-  NormalizedAdditionalEquipmentById,
-  PipetteEntities,
-  StagingAreaEntities,
-  TrashBinEntities,
-  WasteChuteEntities,
-} from '@opentrons/step-generation'
-import type { ComponentProps } from 'react'
-import type { Selector } from 'reselect'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>

@@ -6,8 +6,8 @@ import { i18n } from '/app/i18n'
 
 import { ChosenTipRackRender } from '../ChosenTipRackRender'
 
-import type { SelectOption } from '/app/atoms/SelectField/Select'
 import type { ComponentProps } from 'react'
+import type { SelectOption } from '/app/atoms/SelectField/Select'
 
 const render = (props: ComponentProps<typeof ChosenTipRackRender>) => {
   return renderWithProviders(<ChosenTipRackRender {...props} />, {

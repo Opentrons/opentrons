@@ -42,7 +42,7 @@ import {
 
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
-import type { ResultsSummaryStep, WorkingOffset } from './types'
+import type { TFunction } from 'i18next'
 import type {
   LabwareOffset,
   LegacyLabwareOffsetCreateData,
@@ -51,7 +51,7 @@ import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { TFunction } from 'i18next'
+import type { ResultsSummaryStep, WorkingOffset } from './types'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

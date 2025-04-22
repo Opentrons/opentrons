@@ -15,7 +15,6 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../constants'
 
-import type { QuickTransferSummaryState } from '../types'
 import type {
   CutoutConfig,
   DeckConfiguration,
@@ -34,6 +33,7 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
+import type { QuickTransferSummaryState } from '../types'
 
 export type MoveLiquidStepArgs =
   | ConsolidateArgs

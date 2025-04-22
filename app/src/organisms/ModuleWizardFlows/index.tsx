@@ -40,13 +40,13 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 
+import type { SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CreateCommand,
   CutoutConfig,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { SetStateAction } from 'react'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule

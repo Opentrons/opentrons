@@ -4,8 +4,8 @@ import { getLabwareEntities } from '../../step-forms/selectors'
 import { getHoveredStepLabware } from '../../ui/steps'
 import { LabwareLabel } from './LabwareLabel'
 
-import type { LabwareOnDeck } from '../../step-forms'
 import type { CoordinateTuple } from '@opentrons/shared-data'
+import type { LabwareOnDeck } from '../../step-forms'
 
 interface HighlightLabwareProps {
   labwareOnDeck: LabwareOnDeck

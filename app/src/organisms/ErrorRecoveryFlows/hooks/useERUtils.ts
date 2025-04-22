@@ -22,6 +22,9 @@ import { useRecoveryToasts } from './useRecoveryToasts'
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useShowDoorInfo } from './useShowDoorInfo'
 
+import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { IRecoveryMap, RecoveryRoute, RouteStep } from '../types'
 import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
@@ -38,9 +41,6 @@ import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseShowDoorInfoResult } from './useShowDoorInfo'
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
-import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
-import type { StepCounts } from '/app/resources/protocols/hooks'
 
 export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']

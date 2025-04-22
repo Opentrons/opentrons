@@ -7,8 +7,8 @@ import { i18n } from '/app/i18n'
 
 import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof RecoveryFooterButtons>) => {
   return renderWithProviders(<RecoveryFooterButtons {...props} />, {

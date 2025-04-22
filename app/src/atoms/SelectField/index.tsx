@@ -11,9 +11,9 @@ import {
 
 import { Select } from './Select'
 
-import type { SelectOption, SelectProps } from './Select'
 import type { ReactNode } from 'react'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
+import type { SelectOption, SelectProps } from './Select'
 
 export interface SelectFieldProps {
   /** optional HTML id for container */

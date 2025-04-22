@@ -13,8 +13,8 @@ import { getModuleState } from '../../robotStateSelectors'
 import { uuid } from '../../utils'
 import * as warningCreators from '../../warningCreators'
 
-import type { CommandCreator, CommandCreatorWarning } from '../../types'
 import type { TemperatureParams } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorWarning } from '../../types'
 
 /** Set temperature target for specified module. */
 export const waitForTemperature: CommandCreator<TemperatureParams> = (

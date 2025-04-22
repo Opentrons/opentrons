@@ -8,10 +8,10 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { SetupOffsetsHeader } from './SetupOffsetsHeader'
 import { SetupOffsetsTable } from './SetupOffsetsTable'
 
-import type { SetupScreens } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
 import type { Run } from '@opentrons/api-client'
 import type { UseLPCFlowsResult } from '/app/organisms/LabwarePositionCheck'
-import type { Dispatch, SetStateAction } from 'react'
+import type { SetupScreens } from '../types'
 
 export interface ProtocolSetupOffsetsProps {
   lpcLaunchProps: UseLPCFlowsResult

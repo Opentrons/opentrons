@@ -8,8 +8,8 @@ import { i18n } from '/app/i18n'
 import { useDownloadRunLog } from '../../../../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
 
-import type { RunError } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
+import type { RunError } from '@opentrons/api-client'
 
 vi.mock('../../../../../hooks')
 

@@ -39,7 +39,7 @@ import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/comman
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import type { MouseEvent } from 'react'
 import type { LabwareByLiquidId } from '@opentrons/components'
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -53,7 +53,7 @@ import type {
   ModuleInStack,
   StackItem,
 } from '/app/transformations/commands'
-import type { MouseEvent } from 'react'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface LabwareListItemProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }

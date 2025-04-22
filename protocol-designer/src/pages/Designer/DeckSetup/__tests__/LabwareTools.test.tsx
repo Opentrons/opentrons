@@ -24,8 +24,8 @@ import {
 import { getHas96Channel } from '../../../../utils'
 import { LabwareTools } from '../LabwareTools'
 
-import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
 vi.mock('../../../../utils')
 vi.mock('../../../../step-forms/selectors')
