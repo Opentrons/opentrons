@@ -395,7 +395,6 @@ export function generateChatPrompt(
       values.protocol_format === 'Protocol Designer'
         ? 'pd serial diliution'
         : undefined,
-    fake_id: 0,
   })
 
   return prompt

@@ -1,3 +1,4 @@
+import type { ProtocolFile } from '@opentrons/shared-data'
 import type { FC } from 'react'
 
 /** assistant: ChatGPT API, user: user */
@@ -13,7 +14,7 @@ export interface ChatData {
   /** uuid to map the chat prompt request to the response from the LLM */
   requestId: string
   /** structured JSON protocol content */
-  protocol_content?: { [key: string]: any }
+  protocol_content?: ProtocolFile
 }
 
 export interface CreatePrompt {
@@ -30,7 +31,6 @@ export interface CreatePrompt {
   liquids: string[]
   steps: string[]
   fake?: boolean
-  fake_id?: number
   fake_key?: string
 }
 
@@ -48,7 +48,6 @@ export interface UpdatePrompt {
   update_type: UpdateOptions
   update_details: string
   fake: boolean
-  fake_id: number
 }
 
 export interface Chat {
