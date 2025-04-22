@@ -23,10 +23,10 @@ interface DisposalFieldProps {
   propsForFields: FieldPropsByName
   stepType: StepType
   volume: string | null
+  mappedErrorsToField: Record<string, FormError>
   aspirate_airGap_checkbox?: boolean | null
   aspirate_airGap_volume?: string | null
   tipRack?: string | null
-  mappedErrorsToField: Record<string, FormError>
 }
 
 export function DisposalField(props: DisposalFieldProps): JSX.Element {
