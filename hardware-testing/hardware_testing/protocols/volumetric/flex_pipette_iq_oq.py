@@ -327,9 +327,14 @@ def run(ctx: ProtocolContext) -> None:
 
     # LABWARE
     tip_ul, inaccessible_racks = load_tip_racks(ctx, test_pipette, diluent_pipette)
+    # NOTE: configuring for MAX tip uL before calculate test volumes
+    test_pipette.configure_for_volume(tip_ul)
+    # NOTE: limiting 96ch to only test <=200uL, b/c 1000uL requires too many plates
     max_possible_ul = (
         DYE_SHAKER_MAX_UL if test_pipette.channels == 96 else test_pipette.max_volume
     )
+    # NOTE: configuring for MINIMUM tip uL before calculate test volumes
+    test_pipette.configure_for_volume(1)
     volumes = [
         min(max(v, test_pipette.min_volume), tip_ul, max_possible_ul)
         for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
