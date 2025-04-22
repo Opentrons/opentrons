@@ -503,7 +503,7 @@ const CONDITIONING_VOLUME_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
-  tab: 'dispense',
+  tab: 'aspirate',
 }
 const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   title: 'Conditioning volume out of range',
@@ -511,7 +511,7 @@ const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
-  tab: 'dispense',
+  tab: 'aspirate',
 }
 
 export type FormErrorChecker = (
