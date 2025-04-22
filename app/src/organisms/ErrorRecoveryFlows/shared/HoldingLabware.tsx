@@ -46,6 +46,7 @@ export function HoldingLabware({
     MANUAL_REPLACE_AND_RETRY,
     OPTION_SELECTION,
     REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
 
   const [selectedOption, setSelectionOption] = useState<HoldingLabwareOption>(
@@ -56,6 +57,7 @@ export function HoldingLabware({
   const buildTitle = (): string => {
     switch (route) {
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return t('is_there_labware_stuck_on_the_stacker_latch')
       default:
         return t('first_is_gripper_holding_labware')
@@ -83,6 +85,11 @@ export function HoldingLabware({
             return proceedToRouteAndStep(
               REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
               REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.CONFIRM_RETRY
+            )
+          case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+            return proceedToRouteAndStep(
+              MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+              MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
             )
           default: {
             console.error('Unexpected recovery option for gripper routing.')

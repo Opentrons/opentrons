@@ -27,15 +27,18 @@ export function ReleaseLabware({
 }: RecoveryContentProps): JSX.Element {
   const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
   const { route } = recoveryMap
-  const { REPLACE_LABWARE_IN_HOOPER_AND_RETRY } = RECOVERY_MAP
+  const {
+    REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+  } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const buildPrimaryOnClick = (): void => {
     // Because the actual release command is executed on a delay, the execution behavior is deferred to the
     // motion route.
-    console.log('route: ', route)
     switch (route) {
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         void handleMotionRouting(
           true,
           RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
@@ -53,6 +56,7 @@ export function ReleaseLabware({
   const buildTitle = (): string => {
     switch (route) {
       case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return t('release_labware_from_latch')
       default:
         return t('release_labware_from_gripper')

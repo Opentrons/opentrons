@@ -135,6 +135,7 @@ export function useGripperRelease({
     MANUAL_MOVE_AND_SKIP,
     MANUAL_REPLACE_AND_RETRY,
     REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
   const [countdown, setCountdown] = useState(GRIPPER_RELEASE_COUNTDOWN_S)
 
@@ -160,7 +161,6 @@ export function useGripperRelease({
   }
 
   const proceedToValidNextStep = (): void => {
-    console.log('proceedToValidNextStep: ', selectedRecoveryOption)
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         void proceedToRouteAndStep(
@@ -178,6 +178,12 @@ export function useGripperRelease({
         void proceedToRouteAndStep(
           REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
           REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH
+        )
+        break
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        void proceedToRouteAndStep(
+          MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+          MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH
         )
         break
       default:

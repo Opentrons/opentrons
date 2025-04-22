@@ -42,6 +42,7 @@ export function ManualReplaceLwAndRetry(
       switch (route) {
         case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+        case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
           void homeShuttle().then(() => {
             proceedToRouteAndStep(route, buildNextStep())
           })
@@ -73,6 +74,8 @@ export function ManualReplaceLwAndRetry(
         case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
           return REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS
             .CONFIRM_LABWARE_IN_LATCH
+        case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+          return MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH
         default:
           return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
       }
