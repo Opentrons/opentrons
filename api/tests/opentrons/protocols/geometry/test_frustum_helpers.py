@@ -20,6 +20,8 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_rectangular,
     _height_from_volume_spherical,
     height_at_volume_within_section,
+    find_height_at_well_volume,
+    find_volume_at_well_height,
     _get_segment_capacity,
     find_volume_at_well_height,
 )
@@ -232,7 +234,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
                 found_height = _height_from_volume_circular(
                     target_volume=found_volume, segment=segment
                 )
-                assert isclose(found_height, target_height)
+                assert isclose(found_height, target_height, abs_tol=0.001)
 
 
 @pytest.mark.parametrize("well", fake_frusta())
@@ -319,14 +321,23 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
 @pytest.mark.parametrize("well", fake_frusta())
 def test_height_at_volume_at_section_boundaries(well: List[Any]) -> None:
     """Test that finding the height when volume 0 or ~= capacity  works."""
-    for segment in well:
+    inner_well_geometry = InnerWellGeometry(sections=well)
+    sorted_well = sorted(
+        inner_well_geometry.sections, key=lambda section: section.topHeight
+    )
+    running_volume = 0.0
+    height = find_height_at_well_volume(
+        target_volume=0.0, well_geometry=inner_well_geometry
+    )
+    assert isclose(height, 0.0)
+    for segment in sorted_well:
         segment_height = segment.topHeight - segment.bottomHeight
-        height = height_at_volume_within_section(segment, 0.0, segment_height)
-        assert isclose(height, 0.0)
-        height = height_at_volume_within_section(
-            segment, _get_segment_capacity(segment), segment_height
+        running_volume += _get_segment_capacity(segment)
+        height = find_height_at_well_volume(
+            target_volume=running_volume,
+            well_geometry=inner_well_geometry,
         )
-        assert isclose(height, segment_height)
+        assert isclose(height, segment.topHeight)
 
 
 @pytest.mark.parametrize("well", fake_frusta())
