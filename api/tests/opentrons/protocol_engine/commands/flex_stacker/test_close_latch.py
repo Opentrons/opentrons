@@ -11,19 +11,20 @@ from opentrons.protocol_engine.state.module_substates import (
     FlexStackerId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.commands import flex_stacker
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.flex_stacker.close_latch import (
-    CloseLatchImpl,
+from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_close_latch import (
+    UnsafeFlexStackerCloseLatchImpl,
+    UnsafeFlexStackerCloseLatchParams,
+    UnsafeFlexStackerCloseLatchResult,
 )
 
 
 @pytest.fixture
 def subject(
     state_view: StateView, equipment: EquipmentHandler, model_utils: ModelUtils
-) -> CloseLatchImpl:
-    """Get a CloseLatch command to test."""
-    return CloseLatchImpl(
+) -> UnsafeFlexStackerCloseLatchImpl:
+    """Get a UnsafeFlexStackerCloseLatch command to test."""
+    return UnsafeFlexStackerCloseLatchImpl(
         state_view=state_view, equipment=equipment, model_utils=model_utils
     )
 
@@ -32,12 +33,12 @@ async def test_close_latch_command(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: CloseLatchImpl,
+    subject: UnsafeFlexStackerCloseLatchImpl,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should return a success data."""
-    data = flex_stacker.CloseLatchParams(moduleId=stacker_id)
+    data = UnsafeFlexStackerCloseLatchParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -56,4 +57,4 @@ async def test_close_latch_command(
 
     decoy.verify(await stacker_hardware.close_latch(), times=1)
 
-    assert result == SuccessData(public=flex_stacker.CloseLatchResult())
+    assert result == SuccessData(public=UnsafeFlexStackerCloseLatchResult())

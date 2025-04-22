@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
-from .common import FlexStackerStallOrCollisionError
+from ..flex_stacker.common import FlexStackerStallOrCollisionError
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,

@@ -9,9 +9,7 @@ from typing_extensions import Type
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors import (
-    ErrorOccurrence,
-)
+from ...errors import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ...state.state import StateView
