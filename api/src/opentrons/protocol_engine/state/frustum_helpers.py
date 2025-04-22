@@ -88,13 +88,6 @@ def _circular_frustum_polynomial_roots(
 def _volume_from_height_circular(
     target_height: float, segment: ConicalFrustum
 ) -> float:
-    """Find the volume given a height within a circular frustum."""
-    # ret = segment.volume_from_height_circular(
-    #     top_radius=segment.topDiameter / 2,
-    #     bottom_radius=segment.bottomDiameter / 2,
-    #     target_height=target_height,
-    # )
-    # reveal_type(ret)
     return segment.volume_from_height_circular(
         top_radius=segment.topDiameter / 2,
         bottom_radius=segment.bottomDiameter / 2,
@@ -147,7 +140,6 @@ def _height_from_volume_circular(
     target_volume: float, segment: ConicalFrustum
 ) -> float:
     """Find the height given a volume within a squared cone segment."""
-
     return segment.height_from_volume_binary_search(target_volume)
 
 
@@ -211,14 +203,6 @@ def _get_segment_capacity(segment: WellSegment) -> float:
     section_height = segment.topHeight - segment.bottomHeight
     match segment:
         case SphericalSegment():
-            # ret = (
-            #     _volume_from_height_spherical(
-            #         target_height=segment.topHeight,
-            #         radius_of_curvature=segment.radiusOfCurvature,
-            #     )
-            #     * segment.count
-            # )
-            # breakpoint()
             return (
                 _volume_from_height_spherical(
                     target_height=segment.topHeight,
@@ -227,18 +211,6 @@ def _get_segment_capacity(segment: WellSegment) -> float:
                 * segment.count
             )
         case CuboidalFrustum():
-            # ret = (
-            #     _volume_from_height_rectangular(
-            #         target_height=section_height,
-            #         bottom_length=segment.bottomYDimension,
-            #         bottom_width=segment.bottomXDimension,
-            #         top_length=segment.topYDimension,
-            #         top_width=segment.topXDimension,
-            #         total_frustum_height=section_height,
-            #     )
-            #     * segment.count
-            # )
-            # breakpoint()
             return (
                 _volume_from_height_rectangular(
                     target_height=section_height,
@@ -282,7 +254,6 @@ def get_well_volumetric_capacity(
 
     for segment in sorted_well:
         section_volume = _get_segment_capacity(segment)
-        # breakoint()
         well_volume.append((segment.topHeight, section_volume))
     return well_volume
 
@@ -407,7 +378,6 @@ def find_volume_at_well_height(
     # beneath the target height
     closed_section_volume = 0.0
     for boundary_height, section_volume in volumetric_capacity:
-        # breakpoint()
         if boundary_height > target_height:
             break
         closed_section_volume += section_volume
@@ -435,8 +405,6 @@ def _find_height_in_partial_frustum(
         return 0.0
     for section, capacity in zip(sorted_well, volumetric_capacity):
         section_top_height, section_volume = capacity
-        # if isclose(target_volume, 404.16666667):
-        #     breakpoint()
         if target_volume == section_volume + bottom_section_volume:
             return section_top_height
         if (
@@ -487,12 +455,6 @@ def find_height_at_well_volume(
 
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height
-    ret = _find_height_in_partial_frustum(
-        sorted_well=sorted_well,
-        volumetric_capacity=volumetric_capacity,
-        target_volume=target_volume,
-    )
-    # breakpoint()
     return _find_height_in_partial_frustum(
         sorted_well=sorted_well,
         volumetric_capacity=volumetric_capacity,

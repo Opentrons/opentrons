@@ -19,11 +19,9 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _height_from_volume_spherical,
-    height_at_volume_within_section,
     find_height_at_well_volume,
     find_volume_at_well_height,
     _get_segment_capacity,
-    find_volume_at_well_height,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
@@ -329,14 +327,15 @@ def test_height_at_volume_at_section_boundaries(well: List[Any]) -> None:
     height = find_height_at_well_volume(
         target_volume=0.0, well_geometry=inner_well_geometry
     )
+    assert isinstance(height, float)
     assert isclose(height, 0.0)
     for segment in sorted_well:
-        segment_height = segment.topHeight - segment.bottomHeight
         running_volume += _get_segment_capacity(segment)
         height = find_height_at_well_volume(
             target_volume=running_volume,
             well_geometry=inner_well_geometry,
         )
+        assert isinstance(height, float)
         assert isclose(height, segment.topHeight)
 
 
