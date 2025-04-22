@@ -104,5 +104,13 @@ class AbstractWellCore(ABC):
     def get_liquid_volume(self) -> LiquidTrackingType:
         """Get the current volume within a well."""
 
+    @abstractmethod
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+
+    @abstractmethod
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
+
 
 WellCoreType = TypeVar("WellCoreType", bound=AbstractWellCore)

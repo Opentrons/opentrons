@@ -143,6 +143,14 @@ class LegacyWellCore(AbstractWellCore):
         """Get the current well volume."""
         return 0.0
 
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+        return 0.0
+
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
+        return 0.0
+
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
         """Use the well's display name as its repr."""
