@@ -1,9 +1,10 @@
-import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { restartRobot } from '/app/redux/robot-admin'
+
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 
 import type { ComponentProps } from 'react'

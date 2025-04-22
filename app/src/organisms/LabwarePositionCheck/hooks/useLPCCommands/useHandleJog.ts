@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import debounce from 'lodash/debounce'
-
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
-import { moveRelativeCommand, moveToWellCommands } from './commands'
 import { selectActivePipette } from '/app/redux/protocol-runs'
 
+import { moveRelativeCommand, moveToWellCommands } from './commands'
+
+import type { UseLPCCommandWithChainRunChildProps } from './types'
+import type { VectorOffset } from '@opentrons/api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 import type {
   Axis,
@@ -14,8 +16,6 @@ import type {
   Sign,
   StepSize,
 } from '/app/molecules/JogControls/types'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
-import type { VectorOffset } from '@opentrons/api-client'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000

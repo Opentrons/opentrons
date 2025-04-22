@@ -1,14 +1,14 @@
-import { connectionStore } from './store'
 import {
+  closeConnectionForcefully,
   connectAsync,
   establishListeners,
-  closeConnectionForcefully,
 } from './connect'
-import { subscribe } from './subscribe'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
+import { subscribe } from './subscribe'
 
-import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
+import type { BrowserWindow } from 'electron'
 
 // Manages the MQTT broker connection through a connection store. Subscriptions are handled "lazily" - a component must
 // dispatch a subscribe action before a subscription request is made to the broker. Unsubscribe requests only occur if

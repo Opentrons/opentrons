@@ -1,19 +1,18 @@
-import { useTranslation, Trans } from 'react-i18next'
-
+import { Trans, useTranslation } from 'react-i18next'
 import {
-  Flex,
-  SPACING,
-  LegacyStyledText,
   DeckConfigurator,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps } from 'react'
 
 interface CreateNewTransferProps {
   onNext: () => void

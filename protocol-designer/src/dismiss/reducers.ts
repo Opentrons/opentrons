@@ -1,11 +1,13 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import { getPDMetadata } from '../file-types'
-import type { Reducer } from 'redux'
-import type { BaseState, Action } from '../types'
-import type { LoadFileAction } from '../load-file'
+
 import type { StepIdType } from '../form-types'
+import type { LoadFileAction } from '../load-file'
+import type { Action, BaseState } from '../types'
 import type { DismissFormWarning, DismissTimelineWarning } from './actions'
+import type { Reducer } from 'redux'
 
 export type WarningType = string
 

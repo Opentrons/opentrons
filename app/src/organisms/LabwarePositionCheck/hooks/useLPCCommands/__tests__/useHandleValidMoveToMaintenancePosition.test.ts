@@ -1,4 +1,4 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 
 import { moveToMaintenancePosition } from '../commands'

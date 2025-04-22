@@ -1,3 +1,7 @@
+import { useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -7,13 +11,10 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-import { useState } from 'react'
 import { COLUMN } from '@opentrons/shared-data'
-import { ControlledAddTextAreaFields } from '../../molecules/ControlledAddTextAreaFields'
+
 import { ControlledTextAreaField } from '../../atoms/ControlledTextAreaField'
+import { ControlledAddTextAreaFields } from '../../molecules/ControlledAddTextAreaFields'
 
 export const STEPS_FIELD_NAME = 'steps'
 

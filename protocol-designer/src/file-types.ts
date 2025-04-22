@@ -1,3 +1,7 @@
+import type { RootState as DismissRoot } from './dismiss'
+import type { FileMetadataFields } from './file-data'
+import type { RootState as IngredRoot } from './labware-ingred/reducers'
+import type { RootState as StepformRoot } from './step-forms'
 import type {
   ModuleModel,
   PipetteName,
@@ -5,10 +9,6 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
-import type { RootState as IngredRoot } from './labware-ingred/reducers'
-import type { RootState as StepformRoot } from './step-forms'
-import type { RootState as DismissRoot } from './dismiss'
-import type { FileMetadataFields } from './file-data'
 
 export interface PipetteLoadInfo {
   pipetteName: PipetteName

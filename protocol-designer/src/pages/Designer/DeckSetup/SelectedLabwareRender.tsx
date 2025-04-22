@@ -1,13 +1,14 @@
 import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import { LabwareLabel } from '../LabwareLabel'
 import { LabwareRenderOnDeck } from './LabwareRenderOnDeck'
+
+import type { LabwareOnDeck } from '../../../step-forms'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
   LabwareDefinition2,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { LabwareOnDeck } from '../../../step-forms'
 
 interface SelectedLabwareRenderProps {
   labwareDef: LabwareDefinition2 | null

@@ -1,5 +1,5 @@
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
@@ -20,6 +20,8 @@ import {
   StyledText,
   useConditionalConfirm,
 } from '@opentrons/components'
+
+import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
 import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
@@ -32,19 +34,18 @@ import {
   populateForm,
 } from '../../../../ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
-import type {
-  SetStateAction,
-  Dispatch,
-  MouseEvent as ReactMouseEvent,
-} from 'react'
-import type { ThunkDispatch } from 'redux-thunk'
-import type { IconName } from '@opentrons/components'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
+import type { IconName } from '@opentrons/components'
+import type {
+  Dispatch,
+  MouseEvent as ReactMouseEvent,
+  SetStateAction,
+} from 'react'
+import type { ThunkDispatch } from 'redux-thunk'
 
 const STARTING_DECK_STATE = 'Starting deck'
 const FINAL_DECK_STATE = 'Ending deck'

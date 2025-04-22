@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   ListButton,
@@ -11,13 +11,15 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+
 import { Substep } from './Substep'
 import { formatVolume } from './utils'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+
 import type {
   StepItemSourceDestRow,
   SubstepIdentifier,
 } from '../../../../steplist'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 
 interface MultichannelSubstepProps {
   trashName: AdditionalEquipmentName | null

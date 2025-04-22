@@ -1,15 +1,14 @@
 import isEqual from 'lodash/isEqual'
-
 import {
   FLEX_STAGING_ADDRESSABLE_AREAS,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
+import type { LabwareLocationInfoWithLocSeq } from '.'
 import type {
   LabwareDefinition2,
   LabwareLocationSequence,
 } from '@opentrons/shared-data'
-import type { LabwareLocationInfoWithLocSeq } from '.'
 
 // Appends the labware location combo if it is "unique" to the existing list of combos
 // and "valid".

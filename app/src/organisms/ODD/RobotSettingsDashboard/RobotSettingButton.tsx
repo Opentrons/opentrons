@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -19,8 +18,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;

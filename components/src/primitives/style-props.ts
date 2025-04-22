@@ -4,7 +4,6 @@
 import pick from 'lodash/pick'
 
 import type * as Types from './types'
-
 import type { CSSObject } from 'styled-components'
 
 type Text = string | number

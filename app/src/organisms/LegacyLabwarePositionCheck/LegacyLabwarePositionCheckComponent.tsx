@@ -1,10 +1,9 @@
-import { useState, useEffect, useReducer, useMemo } from 'react'
+import { useEffect, useMemo, useReducer, useState } from 'react'
 import { createPortal } from 'react-dom'
-import isEqual from 'lodash/isEqual'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
-import { useConditionalConfirm, ModalShell } from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
+import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import {
   useAddLabwareOffsetToRunMutation,
   useCreateMaintenanceCommandMutation,
@@ -18,26 +17,34 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-// import { useTrackEvent } from '/app/redux/analytics'
-import { IntroScreen } from './IntroScreen'
-import { ExitConfirmation } from './ExitConfirmation'
-import { CheckItem } from './CheckItem'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
-import { AttachProbe } from './AttachProbe'
-import { DetachProbe } from './DetachProbe'
-import { PickUpTip } from './PickUpTip'
-import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
-import { FatalError } from './FatalErrorModal'
-import { RobotMotionLoader } from './RobotMotionLoader'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 
+import { AttachProbe } from './AttachProbe'
+import { CheckItem } from './CheckItem'
+import { DetachProbe } from './DetachProbe'
+import { ExitConfirmation } from './ExitConfirmation'
+import { FatalError } from './FatalErrorModal'
+import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+// import { useTrackEvent } from '/app/redux/analytics'
+import { IntroScreen } from './IntroScreen'
+import { PickUpTip } from './PickUpTip'
+import { ResultsSummary } from './ResultsSummary'
+import { ReturnTip } from './ReturnTip'
+import { RobotMotionLoader } from './RobotMotionLoader'
+
+import type { RegisterPositionAction, WorkingOffset } from './types'
+import type {
+  CommandData,
+  LabwareOffset,
+  LegacyLabwareOffsetCreateData,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   Coordinates,
@@ -45,14 +52,7 @@ import type {
   DropTipCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import type {
-  LegacyLabwareOffsetCreateData,
-  LabwareOffset,
-  CommandData,
-  LegacyLabwareOffsetLocation,
-} from '@opentrons/api-client'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
-import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds

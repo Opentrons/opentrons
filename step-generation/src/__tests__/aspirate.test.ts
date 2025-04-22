@@ -1,39 +1,40 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, vi, it, expect, afterEach } from 'vitest'
-import { expectTimelineError } from '../__utils__/testMatchers'
-import { aspirate } from '../commandCreators/atomic/aspirate'
 import {
-  OT2_ROBOT_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
+  OT2_ROBOT_TYPE,
   fixtureTiprack10ul as tip10,
   fixtureTiprack1000ul as tip1000,
 } from '@opentrons/shared-data'
 
+import { expectTimelineError } from '../__utils__/testMatchers'
+import { aspirate } from '../commandCreators/atomic/aspirate'
 import {
-  pipetteIntoHeaterShakerLatchOpen,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
-  getInitialRobotStateStandard,
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
+  getErrorResult,
+  getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
+  SOURCE_LABWARE,
 } from '../fixtures'
-import type {
-  LabwareDefinition2,
-  AspDispAirgapParams,
-} from '@opentrons/shared-data'
+import {
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
 import type { InvariantContext, RobotState } from '../'
+import type {
+  AspDispAirgapParams,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 const fixtureTiprack10ul = tip10 as LabwareDefinition2
 const fixtureTiprack1000ul = tip1000 as LabwareDefinition2

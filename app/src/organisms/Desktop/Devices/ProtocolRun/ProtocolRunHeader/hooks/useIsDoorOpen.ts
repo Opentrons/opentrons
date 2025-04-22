@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux'
-
 import { useDoorQuery } from '@opentrons/react-api-client'
 
-import { getRobotSettings } from '/app/redux/robot-settings'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { getRobotSettings } from '/app/redux/robot-settings'
+
 import { EQUIPMENT_POLL_MS } from '../constants'
 
 import type { State } from '/app/redux/types'

@@ -1,16 +1,17 @@
 import path from 'path'
-import glob from 'glob'
 import Ajv from 'ajv'
-import { describe, expect, it, beforeAll, test } from 'vitest'
+import glob from 'glob'
+import range from 'lodash/range'
+import { beforeAll, describe, expect, it, test } from 'vitest'
 
 import schema from '../../labware/schemas/2.json'
+import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
+
 import type {
   InnerWellGeometry,
   LabwareDefinition2,
   LabwareWell,
 } from '../types'
-import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
-import range from 'lodash/range'
 
 const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/2')

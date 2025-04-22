@@ -1,6 +1,6 @@
-import type { RunCommandSummary } from '@opentrons/api-client'
 import type { ERROR_KINDS, INVALID, RECOVERY_MAP } from './constants'
 import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
+import type { RunCommandSummary } from '@opentrons/api-client'
 import type {
   DropTipFlowsRoute,
   DropTipFlowsStep,

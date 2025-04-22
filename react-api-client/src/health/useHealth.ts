@@ -1,10 +1,11 @@
 import { useQuery } from 'react-query'
 import { getHealth } from '@opentrons/api-client'
+
 import { useHost } from '../api'
 
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { AxiosResponse, AxiosError } from 'axios'
 import type { Health, HostConfig } from '@opentrons/api-client'
+import type { AxiosError, AxiosResponse } from 'axios'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export function useHealthQuery(
   options: UseQueryOptions<AxiosResponse<Health>, AxiosError> = {}

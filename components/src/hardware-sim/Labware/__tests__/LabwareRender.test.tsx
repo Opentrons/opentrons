@@ -1,13 +1,17 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fixture12Trough } from '@opentrons/shared-data'
+
 import {
   StaticLabwareComponent as StaticLabware,
-  WellLabelsComponent as WellLabels,
   StrokedWellsComponent as StrokedWells,
+  WellLabelsComponent as WellLabels,
 } from '../labwareInternals'
 import { LabwareRender, WELL_LABEL_OPTIONS } from '../LabwareRender'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../labwareInternals')

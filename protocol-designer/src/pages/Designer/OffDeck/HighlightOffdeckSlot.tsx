@@ -1,12 +1,14 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { DeckLabelSet, Flex, POSITION_RELATIVE } from '@opentrons/components'
+
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
-import type { CoordinateTuple } from '@opentrons/shared-data'
+
 import type { LabwareOnDeck } from '../../../step-forms'
+import type { CoordinateTuple } from '@opentrons/shared-data'
 
 interface HighlightOffdeckSlotProps {
   labwareOnDeck?: LabwareOnDeck

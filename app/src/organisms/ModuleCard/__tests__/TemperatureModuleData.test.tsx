@@ -1,11 +1,12 @@
-import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
 import { StatusLabel } from '/app/atoms/StatusLabel'
-import { TemperatureModuleData } from '../TemperatureModuleData'
+import { i18n } from '/app/i18n'
 import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
+
+import { TemperatureModuleData } from '../TemperatureModuleData'
 
 import type { ComponentProps } from 'react'
 

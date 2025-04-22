@@ -1,7 +1,9 @@
 import reduce from 'lodash/reduce'
+
 import { uuid } from '../../../utils'
-import type { LoadLiquidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
 import type { DismissedWarningState } from '../../../dismiss/reducers'
+import type { LoadLiquidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { LiquidEntities } from '@opentrons/step-generation'
 
 export interface DesignerApplicationData {

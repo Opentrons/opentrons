@@ -1,8 +1,10 @@
-import type * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
+
 import styles from './styles.module.css'
+
 import type { IconName } from '@opentrons/components'
+import type * as React from 'react'
 
 export interface ClickableIconProps {
   name: IconName

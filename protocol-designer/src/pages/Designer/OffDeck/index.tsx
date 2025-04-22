@@ -16,11 +16,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+
 import { getOnlyLatestDefs } from '../../../labware-defs'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'

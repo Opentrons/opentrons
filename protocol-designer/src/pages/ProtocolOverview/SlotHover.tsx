@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -11,20 +10,22 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   THERMOCYCLER_MODULE_TYPE,
-  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import {
   getFlexHoverDimensions,
   getOT2HoverDimensions,
 } from '../Designer/DeckSetup/utils'
+
 import type {
+  AddressableAreaName,
   CoordinateTuple,
   DeckSlotId,
-  AddressableAreaName,
   RobotType,
 } from '@opentrons/shared-data'
 import type { Dispatch, SetStateAction } from 'react'

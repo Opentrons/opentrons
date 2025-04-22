@@ -1,23 +1,24 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { useWifiList } from '/app/resources/networking/hooks'
-import * as RobotApi from '/app/redux/robot-api'
-import * as Networking from '/app/redux/networking'
 import { getModalPortalEl } from '/app/App/portal'
-import { SelectSsid } from './ConnectNetwork/SelectSsid'
-import { ConnectModal } from './ConnectNetwork/ConnectModal'
-import { ResultModal } from './ConnectNetwork/ResultModal'
-import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
+import * as Networking from '/app/redux/networking'
+import * as RobotApi from '/app/redux/robot-api'
+import { useWifiList } from '/app/resources/networking/hooks'
 
-import type { State, Dispatch } from '/app/redux/types'
-import type { WifiNetwork } from '/app/redux/networking/types'
+import { ConnectModal } from './ConnectNetwork/ConnectModal'
+import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
+import { ResultModal } from './ConnectNetwork/ResultModal'
+import { SelectSsid } from './ConnectNetwork/SelectSsid'
+
 import type {
-  WifiConfigureRequest,
   NetworkChangeState,
+  WifiConfigureRequest,
 } from './ConnectNetwork/types'
+import type { WifiNetwork } from '/app/redux/networking/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface SelectNetworkProps {
   robotName: string

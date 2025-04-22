@@ -1,6 +1,6 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { act, screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -11,14 +11,14 @@ import {
 import { LPCLabwareDetails } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails'
 import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectSelectedLwOverview,
-  selectSelectedLwDisplayName,
-  selectWorkingOffsetsByUri,
-  selectIsDefaultOffsetAbsent,
-  selectStepInfo,
-  goBackEditOffsetSubstep,
   applyWorkingOffsets,
+  goBackEditOffsetSubstep,
   selectIsAnyOffsetHardCoded,
+  selectIsDefaultOffsetAbsent,
+  selectSelectedLwDisplayName,
+  selectSelectedLwOverview,
+  selectStepInfo,
+  selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
 
 import type { ComponentProps } from 'react'

@@ -1,8 +1,8 @@
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 
-import type { SVGProps } from 'react'
 import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
+import type { SVGProps } from 'react'
 
 export type StagingAreaLocation =
   | 'cutoutA3'

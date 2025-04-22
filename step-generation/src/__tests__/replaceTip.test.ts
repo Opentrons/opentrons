@@ -1,28 +1,30 @@
-import { beforeEach, describe, it, expect } from 'vitest'
 import merge from 'lodash/merge'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   COLUMN,
-  fixtureTiprack1000ul,
   fixtureTiprack300ul,
+  fixtureTiprack1000ul,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getTiprackTipstate,
-  getTipColumn,
-  getSuccessResult,
-  pickUpTipHelper,
-  dropTipHelper,
-  dropTipInPlaceHelper,
-  moveToAddressableAreaHelper,
-  DEFAULT_PIPETTE,
-  PIPETTE_96,
-} from '../fixtures'
+
 import { replaceTip } from '../commandCreators/compound/replaceTip'
 import { FIXED_TRASH_ID } from '../constants'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  DEFAULT_PIPETTE,
+  dropTipHelper,
+  dropTipInPlaceHelper,
+  getInitialRobotStateStandard,
+  getSuccessResult,
+  getTipColumn,
+  getTiprackTipstate,
+  makeContext,
+  moveToAddressableAreaHelper,
+  pickUpTipHelper,
+  PIPETTE_96,
+} from '../fixtures'
+
 import type { InvariantContext, RobotState } from '../types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'

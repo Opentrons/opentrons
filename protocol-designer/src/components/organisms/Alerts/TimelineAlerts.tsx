@@ -1,5 +1,4 @@
 import { memo } from 'react'
-
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -8,12 +7,13 @@ import {
   Flex,
   StyledText,
 } from '@opentrons/components'
+
 import { getRobotStateTimeline } from '../../../file-data/selectors'
 import { ErrorContents } from './ErrorContents'
 
+import type { MakeAlert } from './types'
 import type { StyleProps } from '@opentrons/components'
 import type { CommandCreatorError } from '@opentrons/step-generation'
-import type { MakeAlert } from './types'
 
 function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
   const { t } = useTranslation('alert')

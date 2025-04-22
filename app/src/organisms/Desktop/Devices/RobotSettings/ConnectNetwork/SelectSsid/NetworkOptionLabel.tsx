@@ -1,10 +1,11 @@
 import styled from 'styled-components'
-import { Icon, FONT_BODY_1_DARK, SPACING } from '@opentrons/components'
+import { FONT_BODY_1_DARK, Icon, SPACING } from '@opentrons/components'
+
 import { SECURITY_NONE } from '/app/redux/networking'
 
-import type { StyledComponent } from 'styled-components'
 import type { IconName } from '@opentrons/components'
 import type { WifiNetwork } from '/app/redux/networking/types'
+import type { StyledComponent } from 'styled-components'
 
 const SIGNAL_LEVEL_LOW: number = 25
 const SIGNAL_LEVEL_MED: number = 50

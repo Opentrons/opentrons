@@ -1,5 +1,5 @@
-import type { MoveRelativeRunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from '../types'
+import type { MoveRelativeRunTimeCommand } from '@opentrons/shared-data/command'
 
 export function getMoveRelativeCommandText({
   command,

@@ -1,28 +1,28 @@
 import { useEffect } from 'react'
-
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useErrorRecoverySettings } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
-import { useProtocolDropTipModal } from '../modals'
+import { useTipAttachmentStatus } from '/app/resources/instruments'
 import {
   useCloseCurrentRun,
   useCurrentRunCommands,
   useIsRunCurrent,
 } from '/app/resources/runs'
-import { isTerminalRunStatus } from '../../utils'
-import { useTipAttachmentStatus } from '/app/resources/instruments'
-import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 
-import type { RobotType } from '@opentrons/shared-data'
+import { isTerminalRunStatus } from '../../utils'
+import { useProtocolDropTipModal } from '../modals'
+
+import type { UseProtocolDropTipModalResult } from '../modals'
 import type { Run, RunStatus } from '@opentrons/api-client'
+import type { RobotType } from '@opentrons/shared-data'
+import type { DropTipWizardFlowsProps } from '/app/organisms/DropTipWizardFlows'
 import type {
   PipetteWithTip,
   TipAttachmentStatusResult,
 } from '/app/resources/instruments'
-import type { DropTipWizardFlowsProps } from '/app/organisms/DropTipWizardFlows'
-import type { UseProtocolDropTipModalResult } from '../modals'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
 export type RunHeaderDropTipWizProps =

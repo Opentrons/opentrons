@@ -1,18 +1,20 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../assets/localization'
-import {
-  getMagneticLabwareOptions,
-  getMagnetLabwareEngageHeight,
-} from '../../../../../../ui/modules/selectors'
 import {
   getInitialDeckSetup,
   getModuleEntities,
 } from '../../../../../../step-forms/selectors'
+import {
+  getMagneticLabwareOptions,
+  getMagnetLabwareEngageHeight,
+} from '../../../../../../ui/modules/selectors'
 import { MagnetTools } from '../MagnetTools'
-import type { ComponentProps } from 'react'
+
 import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../step-forms/selectors')
 

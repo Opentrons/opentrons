@@ -7,28 +7,29 @@ import {
   StyledText,
   Toolbox,
 } from '@opentrons/components'
+
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import {
+  changeBatchEditField,
+  resetBatchEditFieldChanges,
+  saveStepFormsMulti,
+} from '../../../../step-forms/actions'
+import { getBatchEditFormHasUnsavedChanges } from '../../../../step-forms/selectors'
+import { maskField } from '../../../../steplist/fieldLevel'
+import { deselectAllSteps } from '../../../../ui/steps/actions/actions'
 import {
   getBatchEditSelectedStepTypes,
   getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
   getMultiSelectItemIds,
 } from '../../../../ui/steps/selectors'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
-import { deselectAllSteps } from '../../../../ui/steps/actions/actions'
-import {
-  changeBatchEditField,
-  resetBatchEditFieldChanges,
-  saveStepFormsMulti,
-} from '../../../../step-forms/actions'
-import { maskField } from '../../../../steplist/fieldLevel'
-import { getBatchEditFormHasUnsavedChanges } from '../../../../step-forms/selectors'
-import { makeBatchEditFieldProps } from './utils'
-import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
 import { BatchEditMixTools } from './BatchEditMixTools'
+import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
+import { makeBatchEditFieldProps } from './utils'
 
-import type { ThunkDispatch } from 'redux-thunk'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { BaseState } from '../../../../types'
+import type { ThunkDispatch } from 'redux-thunk'
 
 export const BatchEditToolbox = (): JSX.Element | null => {
   const { t } = useTranslation(['tooltip', 'protocol_steps', 'shared'])

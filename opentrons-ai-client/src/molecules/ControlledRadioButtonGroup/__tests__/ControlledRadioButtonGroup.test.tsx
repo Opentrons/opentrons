@@ -1,9 +1,10 @@
+import { FormProvider, useForm } from 'react-hook-form'
+import { describe, expect, it } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ControlledRadioButtonGroup } from '../index'
-import { describe, it, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-import { FormProvider, useForm } from 'react-hook-form'
 
 const radioButtonsMock = [
   {

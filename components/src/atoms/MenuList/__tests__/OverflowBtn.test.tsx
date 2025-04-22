@@ -1,4 +1,4 @@
-import { vi, it, expect, describe } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { COLORS } from '../../../helix-design-system'

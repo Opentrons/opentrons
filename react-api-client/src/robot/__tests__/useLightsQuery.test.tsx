@@ -1,16 +1,15 @@
 // tests for the useLights hooks
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { getLights } from '@opentrons/api-client'
 import { renderHook, waitFor } from '@testing-library/react'
 
-import { getLights } from '@opentrons/api-client'
-import { useHost } from '../../api'
 import { useLightsQuery } from '..'
+import { useHost } from '../../api'
 
-import type { HostConfig, Response, Lights } from '@opentrons/api-client'
 import type { UseLightsQueryOptions } from '../useLightsQuery'
+import type { HostConfig, Lights, Response } from '@opentrons/api-client'
+import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

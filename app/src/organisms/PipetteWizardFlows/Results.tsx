@@ -1,34 +1,36 @@
 import { useState } from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   Btn,
   COLORS,
+  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LEFT, RIGHT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
+
 import { SmallButton } from '/app/atoms/buttons'
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { usePipetteNameSpecs } from '/app/local-resources/instruments'
+
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { PipetteWizardStepProps } from './types'
 import type {
   LoadedPipette,
   MotorAxes,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { PipetteWizardStepProps } from './types'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void

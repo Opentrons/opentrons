@@ -26,14 +26,15 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
 import { FixedTrashText } from '../../components/molecules'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { CutoutId, DeckSlotId, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { Dispatch, SetStateAction } from 'react'
 
 const RIGHT_COLUMN_FIXTURE_PADDING = 50 // mm
 const WASTE_CHUTE_SPACE = 30

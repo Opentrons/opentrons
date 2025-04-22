@@ -5,13 +5,15 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+
 import { StatusLabel } from '/app/atoms/StatusLabel'
+
 import type {
   LatchStatus,
   SpeedStatus,

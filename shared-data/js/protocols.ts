@@ -4,24 +4,24 @@
 
 import Ajv from 'ajv'
 
-import commandSchema10 from '../command/schemas/10.json'
-import commandSchema9 from '../command/schemas/9.json'
-import commandSchema8 from '../command/schemas/8.json'
 import commandSchema7 from '../command/schemas/7.json'
+import commandSchema8 from '../command/schemas/8.json'
+import commandSchema9 from '../command/schemas/9.json'
+import commandSchema10 from '../command/schemas/10.json'
 import commandAnnotationSchema1 from '../commandAnnotation/schemas/1.json'
-import liquidSchema1 from '../liquid/schemas/1.json'
 import labwareSchema2 from '../labware/schemas/2.json'
-
-import protocolSchema8 from '../protocol/schemas/8.json'
-import protocolSchema7 from '../protocol/schemas/7.json'
-import protocolSchema6 from '../protocol/schemas/6.json'
-import protocolSchema5 from '../protocol/schemas/5.json'
-import protocolSchema4 from '../protocol/schemas/4.json'
-import protocolSchema3 from '../protocol/schemas/3.json'
+import liquidSchema1 from '../liquid/schemas/1.json'
 import protocolSchema1 from '../protocol/schemas/1.json'
-import type * as ProtocolSchemas from '../protocol'
+import protocolSchema3 from '../protocol/schemas/3.json'
+import protocolSchema4 from '../protocol/schemas/4.json'
+import protocolSchema5 from '../protocol/schemas/5.json'
+import protocolSchema6 from '../protocol/schemas/6.json'
+import protocolSchema7 from '../protocol/schemas/7.json'
+import protocolSchema8 from '../protocol/schemas/8.json'
+
 import type { CreateCommand } from '../command/types'
 import type { CommandAnnotation } from '../commandAnnotation/types'
+import type * as ProtocolSchemas from '../protocol'
 
 export type { ProtocolSchemas }
 

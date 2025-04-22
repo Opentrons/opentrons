@@ -1,9 +1,9 @@
 import { POST, request } from '../request'
 
+import type { SessionType } from '.'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type { Session } from './types'
-import type { SessionType } from '.'
 
 export interface CreateSessionData {
   sessionType: SessionType

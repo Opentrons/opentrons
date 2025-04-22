@@ -1,6 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
-
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   FLEX_ROBOT_TYPE,
   MOVABLE_TRASH_D3_ADDRESSABLE_AREA,
@@ -8,14 +6,16 @@ import {
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { FixtureTable } from '../FixtureTable'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+
+import { FixtureTable } from '../FixtureTable'
 
 import type { ComponentProps } from 'react'
 

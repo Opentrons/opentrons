@@ -1,7 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
-
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Flex,
   JUSTIFY_END,
@@ -11,23 +10,23 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { getRobotType } from '../../../file-data/selectors'
+import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,
   getPipetteEntities,
 } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
-import { getRobotType } from '../../../file-data/selectors'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import { HandleEnter } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 import { editPipettes } from './editPipettes'
-import { HandleEnter } from '../../atoms'
-import { PipetteOverview } from './PipetteOverview'
 import { PipetteConfiguration } from './PipetteConfiguration'
+import { PipetteOverview } from './PipetteOverview'
 import { usePipetteConfig } from './usePipetteConfig'
 
-import type { PipetteName } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
+import type { PipetteName } from '@opentrons/shared-data'
 
 interface EditInstrumentsModalProps {
   onClose: () => void

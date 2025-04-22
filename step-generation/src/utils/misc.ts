@@ -3,45 +3,37 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import {
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
   getWellNamePerMultiTip,
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  getDeckDefFromRobotType,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
-  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { reduceCommandCreators } from './index'
+
 import {
   delay,
   dispense,
   moveToAddressableArea,
   moveToWell,
 } from '../commandCreators/atomic'
+import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import {
   airGapInTrash,
-  blowOutInTrash,
-  dispenseInTrash,
-  airGapInWell,
   airGapInWasteChute,
+  airGapInWell,
+  blowOutInTrash,
   blowOutInWasteChute,
+  dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
 import { ZERO_OFFSET } from '../constants'
-import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import { curryCommandCreator } from './curryCommandCreator'
-import type {
-  AddressableAreaName,
-  LabwareDefinition2,
-  BlowoutParams,
-  PipetteChannels,
-  NozzleConfigurationStyle,
-  CutoutFixtureId,
-  RobotType,
-  CutoutId,
-} from '@opentrons/shared-data'
+import { reduceCommandCreators } from './index'
+
 import type {
   CommandCreator,
   CurriedCommandCreator,
@@ -57,6 +49,17 @@ import type {
   WasteChuteEntities,
   WasteChuteEntity,
 } from '../types'
+import type {
+  AddressableAreaName,
+  BlowoutParams,
+  CutoutFixtureId,
+  CutoutId,
+  LabwareDefinition2,
+  NozzleConfigurationStyle,
+  PipetteChannels,
+  RobotType,
+} from '@opentrons/shared-data'
+
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'

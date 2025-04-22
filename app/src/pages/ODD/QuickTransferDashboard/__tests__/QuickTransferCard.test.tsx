@@ -1,21 +1,23 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
+import { act, fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { QuickTransferCard } from '../QuickTransferCard'
+
 import { LongPressModal } from '../LongPressModal'
-import type { NavigateFunction } from 'react-router-dom'
-import type { UseQueryResult } from 'react-query'
+import { QuickTransferCard } from '../QuickTransferCard'
+
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 

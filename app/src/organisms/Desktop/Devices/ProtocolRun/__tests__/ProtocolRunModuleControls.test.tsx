@@ -1,22 +1,23 @@
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 import {
+  mockHeaterShaker,
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
-  mockHeaterShaker,
 } from '/app/redux/modules/__fixtures__'
+import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
-import type { ComponentProps } from 'react'
+import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
+
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ModuleCard')

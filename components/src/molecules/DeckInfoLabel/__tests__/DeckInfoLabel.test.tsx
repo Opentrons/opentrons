@@ -1,10 +1,10 @@
-import { describe, it, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../testing/utils'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
-import { SPACING } from '../../../ui-style-constants'
-import { BORDERS, COLORS } from '../../../helix-design-system'
 
 import { DeckInfoLabel } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING } from '../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 

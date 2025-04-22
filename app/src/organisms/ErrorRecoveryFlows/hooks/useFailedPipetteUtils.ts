@@ -2,13 +2,13 @@ import { useRunCurrentState } from '@opentrons/react-api-client'
 
 import { isPartialTipConfig } from '/app/local-resources/instruments'
 
-import type {
-  NozzleLayoutValues,
-  Instruments,
-  Run,
-  PipetteData,
-} from '@opentrons/api-client'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
+import type {
+  Instruments,
+  NozzleLayoutValues,
+  PipetteData,
+  Run,
+} from '@opentrons/api-client'
 
 export interface UseFailedPipetteUtilsParams
   extends UseFailedCommandPipetteInfoProps {

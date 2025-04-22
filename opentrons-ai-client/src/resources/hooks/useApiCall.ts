@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios'
+
 import type { AxiosRequestConfig } from 'axios'
 
 interface UseApiCallResult<T> {

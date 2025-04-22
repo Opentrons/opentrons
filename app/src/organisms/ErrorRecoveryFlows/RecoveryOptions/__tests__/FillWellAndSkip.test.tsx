@@ -1,14 +1,15 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { FillWellAndSkip, FillWell, SkipToNextStep } from '../FillWellAndSkip'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { clickButtonLabeled } from '../../__tests__/util'
 import { RECOVERY_MAP } from '../../constants'
 import { CancelRun } from '../CancelRun'
+import { FillWell, FillWellAndSkip, SkipToNextStep } from '../FillWellAndSkip'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
-import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'

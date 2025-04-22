@@ -1,17 +1,15 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createRunAction } from '@opentrons/api-client'
 import { act, renderHook, waitFor } from '@testing-library/react'
 
-import { createRunAction } from '@opentrons/api-client'
-
-import { useHost } from '../../api'
 import { useResumeRunFromRecoveryAssumingFalsePositiveMutation } from '..'
+import { mockResumeFromRecoveryAction, RUN_ID_1 } from '../__fixtures__'
+import { useHost } from '../../api'
 
-import { RUN_ID_1, mockResumeFromRecoveryAction } from '../__fixtures__'
-
-import type * as React from 'react'
-import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
 import type { UseResumeRunFromRecoveryAssumingFalsePositiveMutationOptions } from '../useResumeFromRecoveryAssumingFalsePositiveMutation'
+import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
+import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

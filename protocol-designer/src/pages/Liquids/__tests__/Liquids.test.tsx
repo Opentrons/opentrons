@@ -1,15 +1,16 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
+
+import { Liquids } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { i18n } from '../../../assets/localization'
 import {
   AssignLiquidsModal,
   DesignerNavigation,
 } from '../../../components/organisms'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { LiquidsOverflowMenu } from '../../Designer/LiquidsOverflowMenu'
-import { Liquids } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
 

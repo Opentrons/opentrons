@@ -5,11 +5,12 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
 } from '@opentrons/components'
+
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { OddModal } from '/app/molecules/OddModal'
 

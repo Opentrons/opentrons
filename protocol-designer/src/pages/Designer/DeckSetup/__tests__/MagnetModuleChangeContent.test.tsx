@@ -1,7 +1,8 @@
 import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 import { MagnetModuleChangeContent } from '../MagnetModuleChangeContent'
 
 const render = () => {

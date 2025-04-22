@@ -1,16 +1,18 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { deleteCalibration } from '@opentrons/api-client'
-import { useHost } from '../../api'
+import { act, renderHook, waitFor } from '@testing-library/react'
+
 import { useDeleteCalibrationMutation } from '..'
+import { useHost } from '../../api'
+
 import type {
   DeleteCalRequestParams,
+  EmptyResponse,
   HostConfig,
   Response,
-  EmptyResponse,
 } from '@opentrons/api-client'
+import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

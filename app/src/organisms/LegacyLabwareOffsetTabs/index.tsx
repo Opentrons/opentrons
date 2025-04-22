@@ -6,8 +6,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Tabs,
   SPACING,
+  Tabs,
 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -21,9 +20,9 @@ import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
 import type { DeckSlot } from '../../types'
+import type { RobotType } from '@opentrons/shared-data'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface StartingDeckProps {
   robotType: RobotType

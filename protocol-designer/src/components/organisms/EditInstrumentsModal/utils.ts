@@ -1,16 +1,17 @@
 import {
-  getPipetteSpecsV2,
   getLabwareDefURI,
   getLabwareDisplayName,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
+
 import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type {
-  PipetteName,
-  PipetteV2Specs,
-  PipetteMount,
-} from '@opentrons/shared-data'
 import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
 import type { PipetteOnDeck } from '../../../step-forms'
+import type {
+  PipetteMount,
+  PipetteName,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
 
 export interface PipetteSections {
   type: PipetteType

@@ -6,17 +6,17 @@ import {
   COLORS,
   DeckInfoLabel,
   Flex,
+  LegacyStyledText,
   ModuleIcon,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
+  getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
-  getFixtureDisplayName,
   GRIPPER_V1_2,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
@@ -29,13 +29,14 @@ import {
   usePipetteNameSpecs,
 } from '/app/local-resources/instruments'
 import { useRequiredProtocolHardware } from '/app/resources/protocols'
+
 import { EmptySection } from './EmptySection'
 
-import type { TFunction } from 'i18next'
 import type {
   ProtocolHardware,
   ProtocolPipette,
 } from '/app/transformations/commands'
+import type { TFunction } from 'i18next'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}

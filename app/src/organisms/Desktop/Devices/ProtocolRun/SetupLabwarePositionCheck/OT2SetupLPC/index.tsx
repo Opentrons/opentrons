@@ -1,34 +1,34 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  TOOLTIP_LEFT,
   Tooltip,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
-  Icon,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { LegacyCurrentOffsetsTable } from './LegacyCurrentOffsetsTable'
-import { getLatestCurrentOffsets } from '/app/transformations/runs'
-import {
-  useNotifyRunQuery,
-  useMostRecentCompletedAnalysis,
-  useLPCDisabledReason,
-} from '/app/resources/runs'
+import { LPCFlows, useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useRobotType } from '/app/redux-resources/robots'
-import { useLPCFlows, LPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import {
+  useLPCDisabledReason,
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
+
+import { LegacyCurrentOffsetsTable } from './LegacyCurrentOffsetsTable'
 
 import type { SetupLabwarePositionCheckProps } from '..'
 import type { LabwareOffset } from '@opentrons/api-client'

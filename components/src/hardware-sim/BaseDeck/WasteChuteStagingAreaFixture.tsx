@@ -5,9 +5,9 @@ import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 import { WasteChute } from './WasteChuteFixture'
 
-import type { SVGProps } from 'react'
-import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 import type { DeckLabelProps } from '../../molecules'
+import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
+import type { SVGProps } from 'react'
 
 interface WasteChuteStagingAreaFixtureProps extends SVGProps<SVGGElement> {
   cutoutId: typeof WASTE_CHUTE_CUTOUT

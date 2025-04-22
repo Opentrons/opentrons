@@ -5,12 +5,15 @@ import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { selectors } from '../../../labware-ingred/selectors'
+
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { ModuleLabel } from './ModuleLabel'
+import { selectors } from '../../../labware-ingred/selectors'
 import { LabwareLabel } from '../LabwareLabel'
 import { FixtureRender } from './FixtureRender'
+import { ModuleLabel } from './ModuleLabel'
+
+import type { Fixture } from './constants'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -18,7 +21,6 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type { Fixture } from './constants'
 
 interface HoveredLabwareProps {
   deckDef: DeckDefinition

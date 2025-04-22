@@ -1,7 +1,7 @@
 import type {
-  ModuleType,
   Coordinates,
   ModuleModel,
+  ModuleType,
 } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'

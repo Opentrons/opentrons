@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+
 import { C_SELECTED_DARK, C_TRANSPARENT } from '../../../styles'
-import { EmanatingNozzle } from '../EmanatingNozzle'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from '../constants'
+import { EmanatingNozzle } from '../EmanatingNozzle'
 
 describe('EmanatingNozzle', () => {
   it('should render an small origin circle', () => {

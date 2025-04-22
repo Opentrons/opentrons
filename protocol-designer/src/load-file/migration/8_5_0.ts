@@ -1,18 +1,20 @@
 import floor from 'lodash/floor'
 import { getPipetteSpecsV2, WELL_BOTTOM } from '@opentrons/shared-data'
-import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
+
 import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
+import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
 import { getDefaultPushOutVolume } from '../../utils'
-import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
+
+import type { PDMetadata } from '../../file-types'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
-import type { PDMetadata } from '../../file-types'
 
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>

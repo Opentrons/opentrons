@@ -1,5 +1,5 @@
 import { css } from 'styled-components'
-import { COLORS, Box } from '@opentrons/components'
+import { Box, COLORS } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'

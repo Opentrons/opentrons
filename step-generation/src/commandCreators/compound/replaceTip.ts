@@ -5,9 +5,9 @@ import {
   OT2_ROBOT_TYPE,
   SINGLE,
 } from '@opentrons/shared-data'
-import { getNextTiprack } from '../../robotStateSelectors'
+
 import * as errorCreators from '../../errorCreators'
-import { dropTipInTrash } from './dropTipInTrash'
+import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   getIsHeaterShakerEastWestMultiChannelPipette,
@@ -15,16 +15,17 @@ import {
   getLabwareSlot,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
-  reduceCommandCreators,
   PRIMARY_NOZZLE,
+  reduceCommandCreators,
 } from '../../utils'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
+import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
 import { dropTip } from '../atomic/dropTip'
 import { pickUpTip } from '../atomic/pickUpTip'
-import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
+import { dropTipInTrash } from './dropTipInTrash'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
-import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
+import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
 
 interface ReplaceTipArgs {
   pipette: string

@@ -1,25 +1,26 @@
-import { when } from 'vitest-when'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react'
 
 import {
-  DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_BAD_CALIBRATION,
   DECK_CAL_STATUS_IDENTITY,
+  DECK_CAL_STATUS_OK,
 } from '/app/redux/calibration'
-import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { useDispatchApiRequest } from '/app/redux/robot-api'
-import { useDeckCalibrationData } from '..'
+import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { useDispatchApiRequest } from '/app/redux/robot-api'
 
+import { useDeckCalibrationData } from '..'
+
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/calibration')

@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   EmptySelectorButton,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   InfoScreen,
   JUSTIFY_FLEX_END,
   Modal,
@@ -18,11 +18,11 @@ import {
 import { ThermocyclerCycle } from './ThermocyclerCycle'
 import { ThermocyclerStep } from './ThermocyclerStep'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
 import type { ThermocyclerCycleType } from './ThermocyclerCycle'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
+import type { Dispatch, SetStateAction } from 'react'
 
 export type ThermocyclerStepTypeGeneral =
   | ThermocyclerCycleType

@@ -1,12 +1,11 @@
 import { css } from 'styled-components'
-
 import {
-  RESPONSIVENESS,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  RESPONSIVENESS,
+  SPACING,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 

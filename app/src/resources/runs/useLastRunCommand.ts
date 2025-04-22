@@ -2,12 +2,12 @@ import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 
 import { useNotifyAllCommandsQuery, useRunStatus } from '/app/resources/runs'
 
-import type { UseQueryOptions } from 'react-query'
 import type {
   CommandsData,
   RunCommandSummary,
   RunStatus,
 } from '@opentrons/api-client'
+import type { UseQueryOptions } from 'react-query'
 
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 

@@ -1,8 +1,9 @@
 // "table" of data, usually filled with LabelText and Value children
-import type * as React from 'react'
 import cx from 'classnames'
 
 import styles from './styles.module.css'
+
+import type * as React from 'react'
 
 export type TableDirection = 'row' | 'column'
 

@@ -1,21 +1,20 @@
-import * as Sessions from '../sessions'
-
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getViewableRobots, getRobotApiVersion } from '../discovery'
+import { getRobotApiVersion, getViewableRobots } from '../discovery'
 import {
-  getRobotUpdateVersion,
+  getRobotSystemType,
   getRobotUpdateRobot,
   getRobotUpdateSession,
-  getRobotSystemType,
+  getRobotUpdateVersion,
 } from '../robot-update'
+import * as Sessions from '../sessions'
 import { getRobotSessionById } from '../sessions/selectors'
 
 import type { State } from '../types'
 import type {
   AnalyticsConfig,
-  BuildrootAnalyticsData,
   AnalyticsSessionExitDetails,
+  BuildrootAnalyticsData,
   SessionInstrumentAnalyticsData,
 } from './types'
 import type { RobotType } from '@opentrons/shared-data'

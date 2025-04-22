@@ -1,9 +1,10 @@
-import { describe, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+
+import { HotKeyDisplay } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getUserOS } from '../../../../pages/Designer/ProtocolSteps/Timeline/utils'
-import { HotKeyDisplay } from '..'
 
 import type { ComponentProps } from 'react'
 

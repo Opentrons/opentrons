@@ -3,11 +3,12 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
-import { useNotifyRunQuery } from './useNotifyRunQuery'
-import { DEFAULT_STATUS_REFETCH_INTERVAL } from './constants'
 
+import { DEFAULT_STATUS_REFETCH_INTERVAL } from './constants'
+import { useNotifyRunQuery } from './useNotifyRunQuery'
+
+import type { Run, RunAction, RunStatus } from '@opentrons/api-client'
 import type { UseQueryOptions } from 'react-query'
-import type { RunStatus, RunAction, Run } from '@opentrons/api-client'
 
 export function useRunStatus(
   runId: string | null,

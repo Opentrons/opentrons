@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+
 import { HandleEnter } from '../../components/atoms'
 import { HardwareConfigurator } from '../../components/organisms/HardwareConfigurator'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { WizardBody } from './WizardBody'
 
 import type { WizardTileProps } from './types'

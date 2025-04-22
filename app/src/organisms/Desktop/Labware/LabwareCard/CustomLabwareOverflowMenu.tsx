@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import {
-  useTrackEvent,
-  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
-} from '/app/redux/analytics'
+import { useDispatch } from 'react-redux'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -29,15 +25,19 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '/app/App/portal'
+import { Divider } from '/app/atoms/structure'
+import {
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
-import type { MouseEventHandler } from 'react'
 import type { Dispatch } from '/app/redux/types'
+import type { MouseEventHandler } from 'react'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 

@@ -1,15 +1,15 @@
-import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { useDownloadRunLog } from '../../../../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
 
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-
-import type { ComponentProps } from 'react'
 import type { RunError } from '@opentrons/api-client'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../hooks')
 

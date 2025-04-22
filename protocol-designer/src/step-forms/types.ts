@@ -1,26 +1,26 @@
+import type { DeckSlot } from '../types'
 import type { Mount } from '@opentrons/components'
 import type {
-  ModuleType,
-  ModuleModel,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
+  CutoutId,
+  FlexModuleCutoutFixtureId,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  ModuleModel,
+  ModuleType,
   NozzleConfigurationStyle,
-  FlexModuleCutoutFixtureId,
-  CutoutId,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { DeckSlot } from '../types'
-
 import type {
-  TemperatureStatus,
+  AdditionalEquipmentEntity,
+  LabwareEntity,
   ModuleEntity,
   PipetteEntity,
-  LabwareEntity,
-  AdditionalEquipmentEntity,
+  TemperatureStatus,
 } from '@opentrons/step-generation'
+
 export interface FormPipette {
   pipetteName?: string | null
   tiprackDefURI?: string[] | null

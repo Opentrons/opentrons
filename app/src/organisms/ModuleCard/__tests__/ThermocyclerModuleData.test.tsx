@@ -1,5 +1,5 @@
-import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -7,10 +7,11 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
+
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
-import type { ComponentProps } from 'react'
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
+import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof ThermocyclerModuleData>) => {
   return renderWithProviders(<ThermocyclerModuleData {...props} />, {

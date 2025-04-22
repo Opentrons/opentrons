@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,

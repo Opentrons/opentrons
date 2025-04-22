@@ -1,50 +1,52 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import { useSelector } from 'react-redux'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { COLORS, LegacyStyledText, ModalShell } from '@opentrons/components'
+import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import {
-  getModuleType,
-  getModuleDisplayName,
   FLEX_CUTOUT_BY_SLOT_ID,
-  SINGLE_SLOT_FIXTURES,
-  getFixtureIdByCutoutIdFromModuleSlotName,
+  FLEX_ROBOT_TYPE,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
+  getFixtureIdByCutoutIdFromModuleSlotName,
+  getModuleDisplayName,
+  getModuleType,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
-import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
-import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
-import { BeforeBeginning } from './BeforeBeginning'
-import { AttachProbe } from './AttachProbe'
-import { PlaceAdapter } from './PlaceAdapter'
-import { SelectLocation } from './SelectLocation'
-import { Success } from './Success'
-import { DetachProbe } from './DetachProbe'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
-import type { SetStateAction } from 'react'
+import { AttachProbe } from './AttachProbe'
+import { BeforeBeginning } from './BeforeBeginning'
+import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
+import { DetachProbe } from './DetachProbe'
+import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
+import { PlaceAdapter } from './PlaceAdapter'
+import { SelectLocation } from './SelectLocation'
+import { Success } from './Success'
+
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type {
   CreateCommand,
   CutoutConfig,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
+import type { SetStateAction } from 'react'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule

@@ -1,8 +1,11 @@
 import mapValues from 'lodash/mapValues'
-import { uuid } from '../../utils'
-import { getOnlyLatestDefs } from '../../labware-defs'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { getOnlyLatestDefs } from '../../labware-defs'
+import { uuid } from '../../utils'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
+
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type {
   LabwareDefinition2,
   LabwareDefinitionsByUri,
@@ -10,19 +13,18 @@ import type {
   ProtocolFileV6,
 } from '@opentrons/shared-data'
 import type {
-  LoadPipetteCreateCommand,
-  LoadModuleCreateCommand,
-  LoadLabwareCreateCommand,
-  LabwareLocation,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
-import type {
-  LoadPipetteCreateCommand as LoadPipetteCommandV6,
-  LoadModuleCreateCommand as LoadModuleCommandV6,
   LoadLabwareCreateCommand as LoadLabwareCommandV6,
   LoadLiquidCreateCommand as LoadLiquidCommandV6,
+  LoadModuleCreateCommand as LoadModuleCommandV6,
+  LoadPipetteCreateCommand as LoadPipetteCommandV6,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
+import type {
+  LabwareLocation,
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/types/schemaV7'
 
 // NOTE: this migration removes pipettes, labware, and modules as top level keys and adds necessary
 // params to the load commands. Also, this migrates previous combined

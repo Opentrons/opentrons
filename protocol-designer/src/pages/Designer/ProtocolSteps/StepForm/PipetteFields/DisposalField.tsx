@@ -1,17 +1,18 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
-import { getMaxDisposalVolumeForMultidispense } from '../../../../../steplist/formLevel/handleFormChange/utils'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+
 import {
   CheckboxExpandStepFormField,
   DropdownStepFormField,
   InputStepFormField,
 } from '../../../../../components/molecules'
+import { selectors as stepFormSelectors } from '../../../../../step-forms'
+import { getMaxDisposalVolumeForMultidispense } from '../../../../../steplist/formLevel/handleFormChange/utils'
+import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
-import { FlowRateField } from './FlowRateField'
 import { BlowoutOffsetField } from './BlowoutOffsetField'
+import { FlowRateField } from './FlowRateField'
 
 import type { PathOption, StepType } from '../../../../../form-types'
 import type { FieldPropsByName } from '../types'

@@ -1,7 +1,7 @@
 import { getAddressableAreaDisplayName } from '../getAddressableAreaDisplayName'
 
-import type { MoveToAddressableAreaRunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from '../types'
+import type { MoveToAddressableAreaRunTimeCommand } from '@opentrons/shared-data/command'
 
 export function getMoveToAddressableAreaCommandText({
   command,

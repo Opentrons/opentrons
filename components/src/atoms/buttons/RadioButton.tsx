@@ -1,7 +1,5 @@
 import styled, { css } from 'styled-components'
-import { Flex } from '../../primitives'
-import { COLORS, BORDERS } from '../../helix-design-system'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+
 import {
   ALIGN_CENTER,
   ALIGN_START,
@@ -11,15 +9,18 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Icon,
-  Tag,
   JUSTIFY_SPACE_BETWEEN,
   StyledText,
+  Tag,
 } from '../..'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
-import type { ChangeEventHandler, ReactNode } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
+import type { ChangeEventHandler, ReactNode } from 'react'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface RadioButtonSubLabel {
   /* Optional subtext */

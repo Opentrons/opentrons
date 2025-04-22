@@ -1,9 +1,10 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
+
 import { useIsLegacySessionInProgress } from '../useIsLegacySessionInProgress'
 
-import type { UseQueryResult } from 'react-query'
 import type { Sessions } from '@opentrons/api-client'
+import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 

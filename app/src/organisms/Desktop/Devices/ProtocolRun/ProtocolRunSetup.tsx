@@ -1,74 +1,74 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  NO_WRAP,
   DIRECTION_ROW,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
-  StyledText,
   LegacyStyledText,
+  NO_WRAP,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   parseAllRequiredModuleModels,
 } from '@opentrons/shared-data'
-import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { Line } from '/app/atoms/structure'
 import { InfoMessage } from '/app/molecules/InfoMessage'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
+import {
+  appliedOffsetsToRun,
+  getMissingSetupSteps,
+  LABWARE_SETUP_STEP_KEY,
+  LPC_STEP_KEY,
+  MODULE_SETUP_STEP_KEY,
+  ROBOT_CALIBRATION_STEP_KEY,
+  selectAreOffsetsApplied,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectTotalCountLocationSpecificOffsets,
+  updateRunSetupStepsComplete,
+} from '/app/redux/protocol-runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useUpdateClientLPC } from '/app/resources/client_data'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
+  useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
-  useRunPipetteInfoByMount,
+  useNotifyRunQuery,
+  useProtocolAnalysisErrors,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-  useNotifyRunQuery,
 } from '/app/resources/runs'
-import {
-  ROBOT_CALIBRATION_STEP_KEY,
-  MODULE_SETUP_STEP_KEY,
-  LPC_STEP_KEY,
-  LABWARE_SETUP_STEP_KEY,
-  updateRunSetupStepsComplete,
-  getMissingSetupSteps,
-  selectIsAnyNecessaryDefaultOffsetMissing,
-  appliedOffsetsToRun,
-  selectAreOffsetsApplied,
-  selectTotalCountLocationSpecificOffsets,
-} from '/app/redux/protocol-runs'
-import { SetupLabware } from './SetupLabware'
-import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
-import { SetupRobotCalibration } from './SetupRobotCalibration'
-import { SetupModuleAndDeck } from './SetupModuleAndDeck'
-import { SetupStep } from './SetupStep'
+
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
-import { useUpdateClientLPC } from '/app/resources/client_data'
+import { SetupLabware } from './SetupLabware'
+import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
+import { SetupModuleAndDeck } from './SetupModuleAndDeck'
+import { SetupRobotCalibration } from './SetupRobotCalibration'
+import { SetupStep } from './SetupStep'
 
-import type { RefObject } from 'react'
-import type { Dispatch, State } from '/app/redux/types'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { Dispatch, State } from '/app/redux/types'
+import type { RefObject } from 'react'
 
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: RefObject<HTMLDivElement> | null

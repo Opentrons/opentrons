@@ -1,12 +1,11 @@
 import { Trans, useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import { useSelector } from 'react-redux'
-
+import styled from 'styled-components'
 import { LegacyStyledText, StyledText } from '@opentrons/components'
 
+import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { selectActivePipetteChannelCount } from '/app/redux/protocol-runs'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 

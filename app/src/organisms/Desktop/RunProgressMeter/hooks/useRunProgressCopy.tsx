@@ -1,25 +1,25 @@
 import { useMemo } from 'react'
-
+import { useTranslation } from 'react-i18next'
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
-import { useTranslation } from 'react-i18next'
 import {
-  LegacyStyledText,
   CommandText,
   getCommandTextData,
   getLabwareDefinitionsFromCommands,
+  LegacyStyledText,
 } from '@opentrons/components'
+
 import { TERMINAL_RUN_STATUSES } from '../constants'
 
-import type { ReactNode } from 'react'
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { ReactNode } from 'react'
 
 interface UseRunProgressResult {
   currentStepContents: ReactNode

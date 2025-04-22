@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
   RadioButton,
   SPACING,
 } from '@opentrons/components'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import type { ComponentProps, Dispatch } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
 import type {
   PathOption,
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
+import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps, Dispatch } from 'react'
 
 interface SelectPipettePathProps {
   onNext: () => void

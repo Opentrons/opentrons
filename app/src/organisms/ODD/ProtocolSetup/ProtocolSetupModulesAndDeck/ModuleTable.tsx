@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
   Chip,
+  COLORS,
   DeckInfoLabel,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   getModuleDisplayName,
@@ -24,28 +24,27 @@ import {
   NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { getModulePrepCommands } from '/app/local-resources/modules'
-import { getModuleTooHot } from '/app/transformations/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useChainLiveCommands,
   useRunCalibrationStatus,
 } from '/app/resources/runs'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import type { Dispatch, SetStateAction } from 'react'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

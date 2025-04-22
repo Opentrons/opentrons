@@ -1,21 +1,21 @@
 import { Trans, useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
+import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+
 import { RECOVERY_MAP } from '../constants'
-import { CancelRun } from './CancelRun'
 import {
+  LeftColumnLabwareInfo,
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
-  LeftColumnLabwareInfo,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
-import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
+import { CancelRun } from './CancelRun'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'

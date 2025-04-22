@@ -1,10 +1,11 @@
 import cx from 'classnames'
-import { Icon } from '../icons'
+
 import { IconButton } from '../buttons'
+import { Icon } from '../icons'
 import styles from './alerts.module.css'
 
-import type { ReactNode } from 'react'
 import type { IconProps } from '../icons'
+import type { ReactNode } from 'react'
 
 export type AlertType = 'success' | 'warning' | 'error' | 'info'
 

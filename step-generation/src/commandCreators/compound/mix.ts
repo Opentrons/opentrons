@@ -1,20 +1,21 @@
 import flatMap from 'lodash/flatMap'
 import {
-  LOW_VOLUME_PIPETTES,
-  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
+
+import * as errorCreators from '../../errorCreators'
 import {
   blowoutLocationHelper,
   curryCommandCreator,
-  reduceCommandCreators,
-  getIsSafePipetteMovement,
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
+  getIsSafePipetteMovement,
   indentPyLines,
+  reduceCommandCreators,
 } from '../../utils'
-import * as errorCreators from '../../errorCreators'
 import {
   aspirate,
   configureForVolume,
@@ -25,15 +26,16 @@ import {
 import { replaceTip } from './replaceTip'
 
 import type {
-  NozzleConfigurationStyle,
-  WellLocation,
-} from '@opentrons/shared-data'
-import type {
-  MixArgs,
   CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
+  MixArgs,
 } from '../../types'
+import type {
+  NozzleConfigurationStyle,
+  WellLocation,
+} from '@opentrons/shared-data'
+
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {
   pipette: string

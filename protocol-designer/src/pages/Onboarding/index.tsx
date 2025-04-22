@@ -1,14 +1,14 @@
-import * as Yup from 'yup'
 import { useState } from 'react'
-import reduce from 'lodash/reduce'
-import omit from 'lodash/omit'
-import uniq from 'lodash/uniq'
-import mapValues from 'lodash/mapValues'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { useDispatch, useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import reduce from 'lodash/reduce'
+import uniq from 'lodash/uniq'
+import * as Yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Box, COLORS } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getAreSlotsAdjacent,
@@ -20,39 +20,38 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { Box, COLORS } from '@opentrons/components'
 
-import { actions as fileActions } from '../../load-file'
-import { uuid } from '../../utils'
-import * as labwareDefSelectors from '../../labware-defs/selectors'
-import * as labwareDefActions from '../../labware-defs/actions'
-import * as labwareIngredActions from '../../labware-ingred/actions'
-import { actions as steplistActions } from '../../steplist'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import * as labwareDefActions from '../../labware-defs/actions'
+import * as labwareDefSelectors from '../../labware-defs/selectors'
+import * as labwareIngredActions from '../../labware-ingred/actions'
+import { actions as fileActions } from '../../load-file'
 import { actions as stepFormActions } from '../../step-forms'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
-import { SelectOt2Modules } from './SelectOt2Modules'
+import { actions as steplistActions } from '../../steplist'
+import { uuid } from '../../utils'
 import { AddMetadata } from './AddMetadata'
 import { SelectBasics } from './SelectBasics'
 import { SelectHardware } from './SelectFlexHardware'
+import { SelectOt2Modules } from './SelectOt2Modules'
 
-import type { ThunkDispatch } from 'redux-thunk'
-import type { NormalizedPipette } from '@opentrons/step-generation'
-import type {
-  ModuleModel,
-  ModuleType,
-  PipetteName,
-} from '@opentrons/shared-data'
-import type { BaseState } from '../../types'
+import type { WizardFormState } from '../../components/organisms'
 import type {
   FormPipette,
   FormPipettesByMount,
   PipetteOnDeck,
 } from '../../step-forms'
-import type { WizardFormState } from '../../components/organisms'
+import type { BaseState } from '../../types'
+import type {
+  ModuleModel,
+  ModuleType,
+  PipetteName,
+} from '@opentrons/shared-data'
+import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { ThunkDispatch } from 'redux-thunk'
 
 type WizardStep = 'basics' | 'modules' | 'metadata'
 const WIZARD_STEPS: WizardStep[] = ['basics', 'modules', 'metadata']

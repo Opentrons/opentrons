@@ -1,35 +1,35 @@
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
-
+import { css } from 'styled-components'
 import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
+import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
-import FLEX_PNG from '/app/assets/images/FLEX.png'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
-import type { Dispatch as ReactDispatch } from 'react'
-import type { IconName } from '@opentrons/components'
+import type { RobotBusyStatusAction } from '.'
 import type { Runs } from '@opentrons/api-client'
+import type { IconName } from '@opentrons/components'
 import type { Robot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
-import type { RobotBusyStatusAction } from '.'
+import type { Dispatch as ReactDispatch } from 'react'
+
+import FLEX_PNG from '/app/assets/images/FLEX.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 
 interface AvailableRobotOptionProps {
   robot: Robot

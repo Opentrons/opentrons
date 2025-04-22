@@ -1,11 +1,10 @@
 import isEqual from 'lodash/isEqual'
-
+import { getLabwareDisplayLocation } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getLabwareDefURI,
   THERMOCYCLER_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
-import { getLabwareDisplayLocation } from '@opentrons/components'
 
 import {
   OFFSET_KIND_DEFAULT,
@@ -16,17 +15,17 @@ import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { State } from '/app/redux/types'
 import type {
-  LwGeometryDetails,
-  LocationSpecificOffsetDetails,
-  LPCLabwareInfo,
-  LocationSpecificOffsetLocationDetails,
-  WorkingOffset,
-  LPCOffsetKind,
   DefaultOffsetDetails,
+  LocationSpecificOffsetDetails,
+  LocationSpecificOffsetLocationDetails,
+  LPCLabwareInfo,
+  LPCOffsetKind,
+  LwGeometryDetails,
   OffsetLocationDetails,
+  WorkingOffset,
 } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
 import type { TFunction } from 'i18next'
 
 export const getFlexSlotNameOnly = (

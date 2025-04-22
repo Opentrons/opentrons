@@ -2,23 +2,23 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import i18n from 'i18next'
 import { css } from 'styled-components'
-
 import {
-  SPACING,
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
   RadioButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { ODD_ONLY, DESKTOP_ONLY, RECOVERY_MAP } from '../constants'
 import { RecoveryRadioGroup } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryRadioGroup'
 
-import type { JSX } from 'react'
-import type { TFunction } from 'i18next'
+import { DESKTOP_ONLY, ODD_ONLY, RECOVERY_MAP } from '../constants'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
+
 import type { RecoveryContentProps } from '../types'
+import type { TFunction } from 'i18next'
+import type { JSX } from 'react'
 
 type HoldingLabwareOption = 'yes' | 'no'
 export const HOLDING_LABWARE_OPTIONS: HoldingLabwareOption[] = [

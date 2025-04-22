@@ -8,10 +8,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   truncateString,
 } from '@opentrons/components'
+
 import type { CsvFileParameter, RunTimeParameter } from '@opentrons/shared-data'
 
 interface FileCardProps {

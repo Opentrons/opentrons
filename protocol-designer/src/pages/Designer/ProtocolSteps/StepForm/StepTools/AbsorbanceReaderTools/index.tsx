@@ -9,25 +9,26 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
+import { DropdownStepFormField } from '../../../../../../components/molecules'
 import {
   ABSORBANCE_READER_INITIALIZE,
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
 } from '../../../../../../constants'
-import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labware-locations'
 import { getAbsorbanceReaderLabwareOptions } from '../../../../../../ui/modules/selectors'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import { useAbsorbanceReaderCommandType } from '../../hooks'
 import { getFormErrorsMappedToField } from '../../utils'
-import { InitializationSettings } from './InitializationSettings'
 import { Initialization } from './Initialization'
+import { InitializationSettings } from './InitializationSettings'
 import { LidControls } from './LidControls'
 import { ReadSettings } from './ReadSettings'
 
-import type { AbsorbanceReaderState } from '@opentrons/step-generation'
 import type { AbsorbanceReaderFormType } from '../../../../../../form-types'
 import type { StepFormProps } from '../../types'
+import type { AbsorbanceReaderState } from '@opentrons/step-generation'
 
 export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
   const {

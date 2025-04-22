@@ -1,16 +1,16 @@
 import isEqual from 'lodash/isEqual'
-
-import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
 import { ANY_LOCATION } from '@opentrons/api-client'
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
+
+import type { GetLPCLabwareInfoForURI } from '.'
 import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
-import type { GetLPCLabwareInfoForURI } from '.'
 
 export function getLocationSpecificOffsetDetailsForLabware({
   currentOffsets,

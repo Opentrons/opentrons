@@ -1,31 +1,34 @@
 import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   absorbanceReaderCollision,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  uuid,
-  getIsSafePipetteMovement,
   formatPyStr,
   formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
   indentPyLines,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
-import type {
-  CreateCommand,
-  NozzleConfigurationStyle,
-  AspDispAirgapParams,
-} from '@opentrons/shared-data'
+
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { Point } from '../../utils'
+import type {
+  AspDispAirgapParams,
+  CreateCommand,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
+
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
   nozzles: NozzleConfigurationStyle | null

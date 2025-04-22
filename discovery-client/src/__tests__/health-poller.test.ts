@@ -1,12 +1,12 @@
-import nodeFetch from 'node-fetch'
 import isError from 'lodash/isError'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import nodeFetch from 'node-fetch'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Fixtures from '../fixtures'
 import { createHealthPoller } from '../health-poller'
 
-import type { RequestInit, Response } from 'node-fetch'
 import type { HealthPoller } from '../types'
+import type { RequestInit, Response } from 'node-fetch'
 
 // TODO(mc, 2020-07-13): remove __mocks__/node-fetch
 vi.mock('node-fetch')

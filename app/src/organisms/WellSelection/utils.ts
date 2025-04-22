@@ -3,9 +3,9 @@ import {
   makeWellSetHelpers,
 } from '@opentrons/shared-data'
 
+import type { BoundingRect, GenericRect } from './types'
 import type { WellGroup } from '@opentrons/components'
 import type { WellSetHelpers } from '@opentrons/shared-data'
-import type { BoundingRect, GenericRect } from './types'
 
 // Collision detection for SelectionRect / WellSelection
 export const rectCollision = (

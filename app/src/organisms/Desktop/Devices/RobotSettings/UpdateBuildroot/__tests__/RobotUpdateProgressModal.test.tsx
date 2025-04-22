@@ -1,28 +1,33 @@
-import { i18n } from '/app/i18n'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+
+import { i18n } from '/app/i18n'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import {
-  RobotUpdateProgressModal,
-  TIME_BEFORE_ALLOWING_EXIT,
-  TIME_BEFORE_ALLOWING_EXIT_INIT,
-} from '../RobotUpdateProgressModal'
-import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   getRobotSessionIsManualFile,
   getRobotUpdateDownloadError,
 } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import {
-  useRobotInitializationStatus,
   INIT_STATUS,
+  useRobotInitializationStatus,
 } from '/app/resources/health/hooks'
 
-import type { ComponentProps } from 'react'
+import {
+  RobotUpdateProgressModal,
+  TIME_BEFORE_ALLOWING_EXIT,
+  TIME_BEFORE_ALLOWING_EXIT_INIT,
+} from '../RobotUpdateProgressModal'
+import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
+
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')

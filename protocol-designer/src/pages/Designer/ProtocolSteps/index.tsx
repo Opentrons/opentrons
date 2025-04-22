@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
+import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_AUTO,
@@ -16,34 +15,36 @@ import {
   StyledText,
   ToggleGroup,
 } from '@opentrons/components'
-import {
-  getSavedStepForms,
-  getUnsavedForm,
-} from '../../../step-forms/selectors'
-import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
-import {
-  getIsMultiSelectMode,
-  getSelectedSubstep,
-  getHoveredStepId,
-  getHoveredTerminalItemId,
-  getActiveItem,
-} from '../../../ui/steps/selectors'
-import { DeckSetupContainer } from '../DeckSetup'
-import { OffDeck } from '../OffDeck'
-import { SubStepsToolbox } from './Timeline'
-import { StepForm } from './StepForm'
-import { StepSummary } from './StepSummary'
-import { BatchEditToolbox } from './BatchEditToolbox'
-import {
-  getRobotStateTimeline,
-  getRobotType,
-} from '../../../file-data/selectors'
+
 import { HotKeyDisplay } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
   TimelineAlerts,
 } from '../../../components/organisms'
+import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
+import {
+  getRobotStateTimeline,
+  getRobotType,
+} from '../../../file-data/selectors'
+import {
+  getSavedStepForms,
+  getUnsavedForm,
+} from '../../../step-forms/selectors'
+import {
+  getActiveItem,
+  getHoveredStepId,
+  getHoveredTerminalItemId,
+  getIsMultiSelectMode,
+  getSelectedSubstep,
+} from '../../../ui/steps/selectors'
+import { DeckSetupContainer } from '../DeckSetup'
+import { OffDeck } from '../OffDeck'
+import { BatchEditToolbox } from './BatchEditToolbox'
 import { DraggableSidebar } from './DraggableSidebar'
+import { StepForm } from './StepForm'
+import { StepSummary } from './StepSummary'
+import { SubStepsToolbox } from './Timeline'
+
 import type { DeckSlot } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'

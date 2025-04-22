@@ -1,11 +1,13 @@
 import { FLEX_MODULE_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
+
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+
+import type { ProtocolFixture, ProtocolHardware, ProtocolModule } from './types'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import type { ProtocolHardware, ProtocolModule, ProtocolFixture } from './types'
 
 /**
  * Returns an array of ProtocolHardware objects that are required by the given protocol ID,

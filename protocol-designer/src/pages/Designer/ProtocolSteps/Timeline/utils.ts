@@ -2,8 +2,8 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { UAParser } from 'ua-parser-js'
 
-import type { MouseEvent } from 'react'
 import type { StepIdType } from '../../../../form-types'
+import type { MouseEvent } from 'react'
 
 export const capitalizeFirstLetterAfterNumber = (title: string): string =>
   title.replace(

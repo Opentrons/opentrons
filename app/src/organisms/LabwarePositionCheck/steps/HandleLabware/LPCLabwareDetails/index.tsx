@@ -1,8 +1,7 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -10,8 +9,13 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
-import { DefaultLocationOffset } from './DefaultLocationOffset'
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import {
+  handleUnsavedOffsetsModalODD,
+  UnsavedOffsetsDesktop,
+} from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
@@ -21,13 +25,9 @@ import {
   selectSelectedLwOverview,
   selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import {
-  handleUnsavedOffsetsModalODD,
-  UnsavedOffsetsDesktop,
-} from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
-import { getIsOnDevice } from '/app/redux/config'
+
+import { DefaultLocationOffset } from './DefaultLocationOffset'
+import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 

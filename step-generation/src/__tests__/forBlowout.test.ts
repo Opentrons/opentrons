@@ -1,14 +1,16 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
 import { forBlowout as _forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
-import { makeImmutableStateUpdater } from '../__utils__'
-import type { BlowoutParams } from '@opentrons/shared-data'
+
 import type { InvariantContext, RobotState } from '../types'
+import type { BlowoutParams } from '@opentrons/shared-data'
 
 const forBlowout = makeImmutableStateUpdater(_forBlowout)
 let invariantContext: InvariantContext

@@ -1,12 +1,14 @@
 import { useQuery } from 'react-query'
 import { getPipettes } from '@opentrons/api-client'
+
 import { useHost } from '../api'
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
+
 import type {
+  GetPipettesParams,
   HostConfig,
   Pipettes,
-  GetPipettesParams,
 } from '@opentrons/api-client'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export const DEFAULT_PARAMS: GetPipettesParams = {
   refresh: false,

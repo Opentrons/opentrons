@@ -1,15 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { useFormikContext } from 'formik'
-import { fireEvent, screen, render } from '@testing-library/react'
 import {
-  getAllDefinitions,
-  fixtureTiprackAdapter,
   fixture96Plate,
+  fixtureTiprackAdapter,
+  getAllDefinitions,
 } from '@opentrons/shared-data'
+import { fireEvent, render, screen } from '@testing-library/react'
+
 import { StackingOffsets } from '../components/sections/StackingOffsets'
-import type * as Formik from 'formik'
+
 import type * as SharedData from '@opentrons/shared-data'
+import type * as Formik from 'formik'
 
 vi.mock('formik', async importOriginal => {
   const actual = await importOriginal<typeof Formik>()

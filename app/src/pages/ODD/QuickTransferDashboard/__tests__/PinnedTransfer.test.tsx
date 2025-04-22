@@ -1,9 +1,10 @@
-import { vi, it, describe, expect } from 'vitest'
-import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { PinnedTransfer } from '../PinnedTransfer'
 
 import type { ProtocolResource } from '@opentrons/shared-data'

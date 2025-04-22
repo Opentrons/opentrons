@@ -1,7 +1,7 @@
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
+import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -19,12 +19,13 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
-import { getLiquidEntities } from '../../step-forms/selectors'
-import * as labwareIngredActions from '../../labware-ingred/actions'
 
-import type { MouseEvent, RefObject } from 'react'
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
+import * as labwareIngredActions from '../../labware-ingred/actions'
+import { getLiquidEntities } from '../../step-forms/selectors'
+
 import type { ThunkDispatch } from '../../types'
+import type { MouseEvent, RefObject } from 'react'
 
 const NAV_HEIGHT = '64px'
 

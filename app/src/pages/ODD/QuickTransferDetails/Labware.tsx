@@ -13,6 +13,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
 
 const Table = styled('table')`

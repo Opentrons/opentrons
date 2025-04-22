@@ -1,26 +1,26 @@
 import { useState } from 'react'
-
 import {
   BaseDeck,
-  getWellFillFromLabwareId,
-  getLabwareInfoByLiquidId,
-  Flex,
   Box,
   DIRECTION_COLUMN,
+  Flex,
+  getLabwareInfoByLiquidId,
+  getWellFillFromLabwareId,
   SPACING,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  getAllDefinitions,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
-  getAllDefinitions,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { SlotDetailModal } from './SlotDetailModal'
 

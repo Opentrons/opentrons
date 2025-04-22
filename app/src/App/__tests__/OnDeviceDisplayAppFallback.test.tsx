@@ -1,12 +1,13 @@
-import { vi, describe, beforeEach, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '/app/__testing-utils__'
 
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { i18n } from '/app/i18n'
 import { appRestart } from '/app/redux/shell'
-import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '/app/redux/analytics'
+
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
 import type { FallbackProps } from 'react-error-boundary'

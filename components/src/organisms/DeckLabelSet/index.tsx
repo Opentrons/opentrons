@@ -1,14 +1,14 @@
 import { forwardRef } from 'react'
 import styled from 'styled-components'
-import { Box } from '../../primitives'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { RobotCoordsForeignDiv } from '../../hardware-sim'
 
+import { RobotCoordsForeignDiv } from '../../hardware-sim'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { DeckLabel } from '../../molecules/DeckLabel'
+import { Box } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 
-import type { ForwardedRef } from 'react'
 import type { DeckLabelProps } from '../../molecules/DeckLabel'
+import type { ForwardedRef } from 'react'
 
 interface DeckLabelSetProps {
   deckLabels: DeckLabelProps[]

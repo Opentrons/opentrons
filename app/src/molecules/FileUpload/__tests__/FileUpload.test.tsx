@@ -3,10 +3,12 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { FileUpload } from '..'
-import testFile from './test-file.png'
 
 import type { ComponentProps } from 'react'
+
+import testFile from './test-file.png'
 
 const render = (props: ComponentProps<typeof FileUpload>) => {
   return renderWithProviders(<FileUpload {...props} />, {

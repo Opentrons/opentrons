@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { css } from 'styled-components'
-
 import {
   Btn,
   COLORS,
@@ -13,8 +12,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import type { ReactNode } from 'react'
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;

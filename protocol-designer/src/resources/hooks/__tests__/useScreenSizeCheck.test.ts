@@ -1,5 +1,6 @@
-import { describe, it, vi, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
+
 import { useScreenSizeCheck } from '../useScreenSizeCheck'
 
 describe('useScreenSizeCheck', () => {

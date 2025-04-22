@@ -1,21 +1,21 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useAllProtocolsQuery } from '@opentrons/react-api-client'
-
 import { i18n } from '/app/i18n'
-import {
-  RecentRunProtocolCarousel,
-  EmptyRecentRun,
-} from '/app/organisms/ODD/RobotDashboard'
 import { Navigation } from '/app/organisms/ODD/Navigation'
-import { useMissingProtocolHardware } from '/app/transformations/commands'
+import {
+  EmptyRecentRun,
+  RecentRunProtocolCarousel,
+} from '/app/organisms/ODD/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '/app/redux/config'
-import { WelcomeModal } from '../WelcomeModal'
-import { RobotDashboard } from '..'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+
+import { RobotDashboard } from '..'
+import { WelcomeModal } from '../WelcomeModal'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { NavigateFunction } from 'react-router-dom'

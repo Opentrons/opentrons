@@ -1,9 +1,13 @@
 import { describe, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fixture12Trough } from '@opentrons/shared-data'
+
 import { StrokedWells } from '../StrokedWells'
 import { WellComponent as Well } from '../Well'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../Well')

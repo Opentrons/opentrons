@@ -1,12 +1,14 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { aspirateInPlace } from '../commandCreators/atomic'
 import {
-  makeContext,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeContext,
 } from '../fixtures'
-import { aspirateInPlace } from '../commandCreators/atomic'
+
+import type { InvariantContext, RobotState } from '../types'
 import type { AspirateInPlaceParams } from '@opentrons/shared-data'
-import type { RobotState, InvariantContext } from '../types'
 
 describe('aspirateInPlace', () => {
   let invariantContext: InvariantContext

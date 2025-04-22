@@ -1,30 +1,30 @@
-import { vi, describe, expect, it, beforeEach } from 'vitest'
-import { screen, renderHook } from '@testing-library/react'
-
-import { useHost } from '@opentrons/react-api-client'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
+import { useHost } from '@opentrons/react-api-client'
+import { renderHook, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockFailedCommand } from '../__fixtures__'
+import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
+import { getIsOnDevice } from '/app/redux/config'
+import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
+import { mockFailedCommand } from '../__fixtures__'
+import { ErrorRecoveryWizard, useERWizard } from '../ErrorRecoveryWizard'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
   useRecoveryTakeover,
 } from '../hooks'
-import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
-import { getIsOnDevice } from '/app/redux/config'
-import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
-import { useRecoverySplash, RecoverySplash } from '../RecoverySplash'
-import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+import { RecoverySplash, useRecoverySplash } from '../RecoverySplash'
 
-import type { ComponentProps } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
+import type { ComponentProps } from 'react'
 
 vi.mock('../ErrorRecoveryWizard')
 vi.mock('../hooks')

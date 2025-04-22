@@ -1,14 +1,15 @@
-import { renderHook } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { renderHook } from '@testing-library/react'
 
 import { getIsOnDevice, getOnDeviceDisplaySettings } from '/app/redux/config'
+
 import { useIsUnboxingFlowOngoing } from '../useIsUnboxingFlowOngoing'
 
+import type { State } from '/app/redux/types'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/config')
 

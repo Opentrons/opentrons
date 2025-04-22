@@ -1,62 +1,44 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import {
-  orderedStepIds,
+  INITIAL_DECK_SETUP_STEP_ID,
+  PAUSE_UNTIL_TEMP,
+  SPAN7_8_10_11_SLOT,
+} from '../../constants'
+import { moveDeckItem } from '../../labware-ingred/actions'
+import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  batchEditFormChanges,
   labwareInvariantProperties,
   moduleInvariantProperties,
+  orderedStepIds,
   presavedStepForm,
   savedStepForms,
   unsavedForm,
-  batchEditFormChanges,
 } from '../reducers'
 import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
 } from '../selectors'
-import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
-import { moveDeckItem } from '../../labware-ingred/actions'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-  PAUSE_UNTIL_TEMP,
-} from '../../constants'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 
-import type { ModuleEntity } from '@opentrons/step-generation'
-import type { DeckSlot } from '../../types'
+import type { FormData, StepType } from '../../form-types'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
   ChangeFormInputAction,
   DeleteMultipleStepsAction,
 } from '../../steplist/actions'
-import type { FormData, StepType } from '../../form-types'
-import type {
-  SavedStepFormsActions,
-  UnsavedFormActions,
-  RootState,
-  PresavedStepFormState,
-  PresavedStepFormAction,
-} from '../reducers'
-import type {
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-} from '../actions/pipettes'
-import type {
-  CreateModuleAction,
-  DeleteModuleAction,
-  EditModuleAction,
-} from '../actions/modules'
+import type { DeckSlot } from '../../types'
 import type {
   AddStepAction,
   DuplicateMultipleStepsAction,
@@ -67,9 +49,26 @@ import type {
 } from '../../ui/steps'
 import type {
   ChangeBatchEditFieldAction,
-  SaveStepFormsMultiAction,
   ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
 } from '../actions'
+import type {
+  CreateModuleAction,
+  DeleteModuleAction,
+  EditModuleAction,
+} from '../actions/modules'
+import type {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
+import type {
+  PresavedStepFormAction,
+  PresavedStepFormState,
+  RootState,
+  SavedStepFormsActions,
+  UnsavedFormActions,
+} from '../reducers'
+import type { ModuleEntity } from '@opentrons/step-generation'
 
 vi.mock('../../labware-defs/utils')
 vi.mock('../selectors')

@@ -1,9 +1,11 @@
-import { describe, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { DispenseSettingItem } from '../../Dispense/DispenseSettingItem'
+
 import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof DispenseSettingItem>) => {

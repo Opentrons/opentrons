@@ -1,10 +1,11 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ManualMoveLwAndSkip } from '../ManualMoveLwAndSkip'
+
 import { RECOVERY_MAP } from '../../constants'
+import { ManualMoveLwAndSkip } from '../ManualMoveLwAndSkip'
 
 import type { ComponentProps } from 'react'
 

@@ -1,26 +1,26 @@
 import { Trans, useTranslation } from 'react-i18next'
-
 import {
-  DIRECTION_COLUMN,
-  COLORS,
-  SPACING,
-  Flex,
-  StyledText,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   Icon,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
+import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
+import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
+
 import {
-  RECOVERY_MAP,
   FLEX_WIDTH_ALERT_INFO_STYLE,
   ICON_SIZE_ALERT_INFO_STYLE,
+  RECOVERY_MAP,
 } from '../constants'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
 } from '../shared'
-import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
-import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'

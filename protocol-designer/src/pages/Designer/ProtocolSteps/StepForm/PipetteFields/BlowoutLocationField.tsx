@@ -1,9 +1,11 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
+import { useSelector } from 'react-redux'
+
 import { DropdownStepFormField } from '../../../../../components/molecules'
-import type { DropdownOption } from '@opentrons/components'
+import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
+
 import type { FieldProps } from '../types'
+import type { DropdownOption } from '@opentrons/components'
 
 type BlowoutLocationDropdownProps = FieldProps & {
   options: DropdownOption[]

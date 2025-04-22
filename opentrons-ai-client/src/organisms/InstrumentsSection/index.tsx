@@ -1,3 +1,7 @@
+import { useMemo } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -5,18 +9,15 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
-import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
-import { useMemo } from 'react'
 import {
   getAllPipetteNames,
   getPipetteSpecsV2,
   OT2_PIPETTES,
   OT3_PIPETTES,
 } from '@opentrons/shared-data'
+
+import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
+import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
 
 export const ROBOT_FIELD_NAME = 'instruments.robot'
 export const PIPETTES_FIELD_NAME = 'instruments.pipettes'

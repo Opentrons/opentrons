@@ -1,6 +1,8 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+
 import { getLatestLabwareDef } from '/app/assets/labware/getLabware'
+
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
 export const RUN_LOG_WINDOW_SIZE = 60 // number of command items rendered at a time
 

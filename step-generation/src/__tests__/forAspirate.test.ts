@@ -1,15 +1,17 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../fixtures'
-import { AIR, createTipLiquidState } from '../utils/misc'
-import { makeImmutableStateUpdater } from '../__utils__'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
+import { AIR, createTipLiquidState } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
+
 import type {
   CommandCreatorWarning,
   InvariantContext,

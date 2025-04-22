@@ -1,9 +1,8 @@
 import { css } from 'styled-components'
+import { Btn, COLORS, Flex, Icon } from '@opentrons/components'
 
-import { Btn, Icon, COLORS, Flex } from '@opentrons/components'
-
-import type { MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import type { MouseEvent } from 'react'
 
 const TOGGLE_DISABLED_STYLES = css`
   color: ${COLORS.grey50};

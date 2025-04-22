@@ -1,6 +1,7 @@
 import { AlertItem } from '@opentrons/components'
-import type { FormikTouched } from 'formik'
+
 import type { LabwareFields } from '../../fields'
+import type { FormikTouched } from 'formik'
 
 export interface Props {
   values: LabwareFields

@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from 'react-query'
-
 import { deleteLabwareOffset } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { UseMutationResult, UseMutateAsyncFunction } from 'react-query'
 import type { HostConfig, StoredLabwareOffset } from '@opentrons/api-client'
+import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 
 export type UseDeleteLabwareOffsetMutationResult = UseMutationResult<
   StoredLabwareOffset,

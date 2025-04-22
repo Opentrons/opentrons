@@ -1,17 +1,20 @@
 import groupBy from 'lodash/groupBy'
 import {
-  getAllPipetteNames,
-  getPipetteNameSpecs,
+  FLEX,
   GEN1,
   GEN2,
-  FLEX,
+  getAllPipetteNames,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+
+import { CONTEXT_VALUE, Select } from '../forms'
 import { Flex } from '../primitives'
-import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.module.css'
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
+
 import type { SelectOption } from '../forms'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
+
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
   pipetteName?: string | null

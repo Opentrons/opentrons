@@ -1,4 +1,5 @@
 import Ajv from 'ajv'
+
 import labwareV2Schema from '../../labware/schemas/2.json'
 import protocolSchemaV1 from '../../protocol/schemas/1.json'
 import protocolSchemaV2 from '../../protocol/schemas/2.json'
@@ -6,8 +7,8 @@ import protocolSchemaV3 from '../../protocol/schemas/3.json'
 import protocolSchemaV4 from '../../protocol/schemas/4.json'
 import protocolSchemaV5 from '../../protocol/schemas/5.json'
 
-import type { ErrorObject } from 'ajv'
 import type { JsonProtocolFile } from '../../protocol'
+import type { ErrorObject } from 'ajv'
 
 export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 

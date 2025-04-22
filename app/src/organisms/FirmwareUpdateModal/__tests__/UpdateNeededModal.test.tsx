@@ -1,21 +1,25 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { UpdateNeededModal } from '../UpdateNeededModal'
+
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
+import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateResultsModal } from '../UpdateResultsModal'
 
-import type { ComponentProps } from 'react'
 import type {
   BadPipette,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../UpdateInProgressModal')

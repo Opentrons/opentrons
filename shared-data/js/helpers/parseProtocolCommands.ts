@@ -1,25 +1,25 @@
 // set of functions that parse details out of a protocol record and its internals
 import reduce from 'lodash/reduce'
 
-import { DEFAULT_LIQUID_COLORS } from '../constants'
 import { getLabwareDefURI } from '..'
+import { DEFAULT_LIQUID_COLORS } from '../constants'
 
 import type {
+  LabwareLocation,
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
   RunTimeCommand,
-  LabwareLocation,
 } from '../../command/types'
 import type { PipetteName } from '../pipettes'
 import type {
+  LabwareDefinition2,
   Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
   ModuleModel,
-  LabwareDefinition2,
 } from '../types'
 
 interface PipetteNamesByMount {

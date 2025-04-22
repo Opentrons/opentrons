@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { Navigation } from '/app/organisms/ODD/Navigation'
-import { AttachedInstrumentMountItem } from '/app/organisms/ODD/InstrumentMountItem'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+import { AttachedInstrumentMountItem } from '/app/organisms/ODD/InstrumentMountItem'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecalibrationODDWarning'
-import type { ComponentProps } from 'react'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+
 import type { GripperData, PipetteData } from '@opentrons/api-client'
+import type { ComponentProps } from 'react'
 
 const FETCH_PIPETTE_CAL_POLL = 10000
 

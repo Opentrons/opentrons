@@ -1,26 +1,26 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
-import { Provider } from 'react-redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { useRobot } from '/app/redux-resources/robots'
-import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
-import { getAttachedPipettes } from '/app/redux/pipettes'
-import { getRobotSettings } from '/app/redux/robot-settings'
-import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotSerialNumber,
 } from '/app/redux/discovery'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { getAttachedPipettes } from '/app/redux/pipettes'
+import { getRobotSettings } from '/app/redux/robot-settings'
 
-import type { FunctionComponent, ReactNode } from 'react'
-import type { Store } from 'redux'
+import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
+
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { Store } from 'redux'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../hooks')

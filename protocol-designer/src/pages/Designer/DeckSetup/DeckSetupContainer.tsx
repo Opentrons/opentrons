@@ -1,4 +1,4 @@
-import { useMemo, useState, Fragment } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
 import {
@@ -27,13 +27,14 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+
 import { FixedTrashText } from '../../../components/molecules'
-import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { DECK_SETUP_TOOLS_WIDTH_REM, DeckSetupTools } from './DeckSetupTools'
 import {
@@ -43,7 +44,7 @@ import {
   zoomInOnCoordinate,
 } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Fixture } from './constants'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -52,7 +53,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import type { Fixture } from './constants'
+import type { Dispatch, SetStateAction } from 'react'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60

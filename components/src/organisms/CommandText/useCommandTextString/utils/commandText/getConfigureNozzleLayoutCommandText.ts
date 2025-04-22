@@ -1,7 +1,7 @@
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
-import type { ConfigureNozzleLayoutRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
+import type { ConfigureNozzleLayoutRunTimeCommand } from '@opentrons/shared-data'
 
 export function getConfigureNozzleLayoutCommandText({
   command,

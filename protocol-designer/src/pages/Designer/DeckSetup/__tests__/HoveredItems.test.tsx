@@ -1,22 +1,25 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../__testing-utils__'
+
+import { LabwareRender, Module } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  TEMPERATURE_MODULE_V2,
   getDeckDefFromRobotType,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
-import { LabwareRender, Module } from '@opentrons/components'
-import { selectors } from '../../../../labware-ingred/selectors'
+import { screen } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { FixtureRender } from '../FixtureRender'
 import { HoveredItems } from '../HoveredItems'
 import { ModuleLabel } from '../ModuleLabel'
 
-import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
+import type { ComponentProps } from 'react'
 
 vi.mock('../FixtureRender')
 vi.mock('../../../../labware-ingred/selectors')

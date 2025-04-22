@@ -1,10 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '/app/i18n'
+import '@testing-library/jest-dom/vitest'
+
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { FloatingActionButton } from '..'
 
 import type { ComponentProps } from 'react'

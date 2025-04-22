@@ -1,40 +1,40 @@
 import { useEffect, useMemo, useState } from 'react'
-import without from 'lodash/without'
 import { useTranslation } from 'react-i18next'
-
+import without from 'lodash/without'
+import {
+  getLabwareDisplayLocation,
+  getLoadedLabware,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
+
+import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
+import { getErrorKind } from '../utils'
+
+import type { ErrorRecoveryFlowsProps } from '..'
+import type { ErrorKind } from '../types'
+import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
+import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
   DisplayLocationSlotOnlyParams,
   WellGroup,
 } from '@opentrons/components'
-import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
-  LabwareDefinition2,
-  LoadedLabware,
-  PickUpTipRunTimeCommand,
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
-  LiquidProbeRunTimeCommand,
-  MoveLabwareRunTimeCommand,
   FlexStackerRetrieveRunTimeCommand,
+  LabwareDefinition2,
   LabwareLocation,
+  LiquidProbeRunTimeCommand,
+  LoadedLabware,
   LoadedModule,
+  MoveLabwareRunTimeCommand,
+  PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
-
-import {
-  getLoadedLabware,
-  getLabwareDisplayLocation,
-} from '@opentrons/components'
-import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
-import { getErrorKind } from '../utils'
-import type { ErrorRecoveryFlowsProps } from '..'
-import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
-import type { ErrorKind } from '../types'
 
 interface UseFailedLabwareUtilsProps {
   failedCommand: FailedCommandBySource | null

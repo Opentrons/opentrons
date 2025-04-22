@@ -1,6 +1,8 @@
 import { uuid } from '../../utils'
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
+
 import type { CommandCreator } from '../../types'
+import type { ModuleOnlyParams } from '@opentrons/shared-data'
+
 export const thermocyclerOpenLid: CommandCreator<ModuleOnlyParams> = (
   args,
   invariantContext,

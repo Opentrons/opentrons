@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components'
+
 import { Text } from '../../primitives'
-import { TYPOGRAPHY, RESPONSIVENESS } from '../../ui-style-constants'
+import { RESPONSIVENESS, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'

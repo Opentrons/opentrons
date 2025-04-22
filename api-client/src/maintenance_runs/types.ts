@@ -1,16 +1,16 @@
 import type {
+  LabwareOffsetCreateData,
+  LegacyLabwareOffsetCreateData,
+  RunAction,
+  RunCommandSummary,
+  RunStatus,
+} from '../runs'
+import type {
   Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type {
-  RunCommandSummary,
-  LegacyLabwareOffsetCreateData,
-  LabwareOffsetCreateData,
-  RunStatus,
-  RunAction,
-} from '../runs'
 
 export interface MaintenanceRunData {
   id: string

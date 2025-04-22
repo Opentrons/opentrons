@@ -1,11 +1,11 @@
+import type { HandlesCommands } from '../types'
 import type {
-  AbsorbanceReaderOpenLidRunTimeCommand,
   AbsorbanceReaderCloseLidRunTimeCommand,
   AbsorbanceReaderInitializeRunTimeCommand,
+  AbsorbanceReaderOpenLidRunTimeCommand,
   AbsorbanceReaderReadRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { HandlesCommands } from '../types'
 
 export type AbsorbanceCreateCommand =
   | AbsorbanceReaderOpenLidRunTimeCommand

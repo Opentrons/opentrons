@@ -1,16 +1,17 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { renderHook } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
-import { useDispatchStartRobotUpdate } from '../hooks'
-import { startRobotUpdate, clearRobotUpdateSession } from '../actions'
 
+import { clearRobotUpdateSession, startRobotUpdate } from '../actions'
+import { useDispatchStartRobotUpdate } from '../hooks'
+
+import type { State } from '../../types'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
-import type { State } from '../../types'
 
 describe('useDispatchStartRobotUpdate', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>

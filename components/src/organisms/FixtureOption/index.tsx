@@ -1,4 +1,8 @@
 import styled from 'styled-components'
+
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -8,9 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/StyledText'
+
 import type { MouseEventHandler } from 'react'
 
 interface FixtureOptionProps {

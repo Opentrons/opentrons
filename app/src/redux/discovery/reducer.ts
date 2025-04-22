@@ -1,5 +1,6 @@
 // robot discovery state
 import keyBy from 'lodash/keyBy'
+
 import { UI_INITIALIZED } from '../shell'
 import * as actions from './actions'
 

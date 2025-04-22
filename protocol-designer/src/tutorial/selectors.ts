@@ -1,17 +1,19 @@
+import isEmpty from 'lodash/isEmpty'
 import { createSelector } from 'reselect'
 import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
+
 import {
-  getUnsavedForm,
-  getOrderedStepIds,
   getAdditionalEquipmentEntities,
+  getOrderedStepIds,
+  getUnsavedForm,
 } from '../step-forms/selectors'
-import isEmpty from 'lodash/isEmpty'
-import type { BaseState, Selector } from '../types'
+import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
+
 import type { HintKey } from '.'
+import type { BaseState, Selector } from '../types'
 
 const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 

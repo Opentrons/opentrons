@@ -1,13 +1,14 @@
-import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import userEvent from '@testing-library/user-event'
+
 import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  useTrackEvent,
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import {
   mockPipetteOffsetCalibration1,
@@ -18,18 +19,19 @@ import {
   mockTipLengthCalibration2,
 } from '/app/redux/calibration/tip-length/__fixtures__'
 import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
-import { useRunStatuses } from '/app/resources/runs'
 import {
-  useAttachedPipettes,
   useAttachedPipetteCalibrations,
+  useAttachedPipettes,
 } from '/app/resources/instruments'
+import { useRunStatuses } from '/app/resources/runs'
+
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 
-import type { ComponentProps } from 'react'
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '/app/redux/pipettes/types'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')

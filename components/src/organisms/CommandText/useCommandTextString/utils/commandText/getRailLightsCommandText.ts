@@ -1,5 +1,5 @@
-import type { RunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from '../types'
+import type { RunTimeCommand } from '@opentrons/shared-data/command'
 
 type HandledCommands = Extract<RunTimeCommand, { commandType: 'setRailLights' }>
 

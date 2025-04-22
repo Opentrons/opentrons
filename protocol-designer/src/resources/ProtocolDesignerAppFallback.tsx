@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
-
 import {
   AlertPrimaryButton,
   ALIGN_FLEX_END,
@@ -13,12 +12,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions } from '../load-file'
 import { analyticsEvent } from '../analytics/actions'
+import { actions } from '../load-file'
 
-import type { FallbackProps } from 'react-error-boundary'
-import type { ThunkDispatch } from '../types'
 import type { AnalyticsEvent } from '../analytics/mixpanel'
+import type { ThunkDispatch } from '../types'
+import type { FallbackProps } from 'react-error-boundary'
 
 export function ProtocolDesignerAppFallback({
   error,

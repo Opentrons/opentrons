@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { useForm, Controller } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
-
+import { useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -28,10 +27,10 @@ import { FileUpload } from '/app/molecules/FileUpload'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { restartRobot } from '/app/redux/robot-admin'
 
-import type { ChangeEvent, MouseEventHandler } from 'react'
-import type { FieldError, Resolver } from 'react-hook-form'
 import type { RobotSettingsField } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
+import type { ChangeEvent, MouseEventHandler } from 'react'
+import type { FieldError, Resolver } from 'react-hook-form'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean

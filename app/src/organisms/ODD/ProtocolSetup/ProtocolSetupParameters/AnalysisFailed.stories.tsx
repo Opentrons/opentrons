@@ -1,9 +1,8 @@
-import type * as React from 'react'
-
 import { VIEWPORT } from '../../../../../../components/src/ui-style-constants'
 import { AnalysisFailedModal } from './AnalysisFailedModal'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'ODD/Organisms/AnalysisFailedModal',

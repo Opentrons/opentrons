@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { DeckLocationSelect as DeckLocationSelectComponent } from './'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import { DeckLocationSelect as DeckLocationSelectComponent } from './'
+
 import type { RobotType } from '@opentrons/shared-data'
+import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<React.ComponentProps<typeof DeckLocationSelectComponent>> = {
   component: DeckLocationSelectComponent,

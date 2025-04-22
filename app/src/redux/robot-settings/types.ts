@@ -1,9 +1,9 @@
+import type { RobotApiRequestMeta } from '../robot-api/types'
 import type {
   RobotSettings,
   RobotSettingsField,
   RobotSettingsResponse,
 } from '@opentrons/api-client'
-import type { RobotApiRequestMeta } from '../robot-api/types'
 
 export interface PerRobotRobotSettingsState {
   settings: RobotSettings

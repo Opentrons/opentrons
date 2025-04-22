@@ -1,15 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
-  Btn,
-  Tag,
+  ALIGN_FLEX_END,
   Box,
+  Btn,
   COLORS,
   DeckInfoLabel,
-  ListButton,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -17,42 +15,45 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  ListButton,
   MODULE_ICON_NAME_BY_TYPE,
   SIZE_AUTO,
   SPACING,
   StyledText,
+  Tag,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  getModuleType,
   getAllDefinitions,
+  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
+
 import { ToggleButton } from '/app/atoms/buttons'
+import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
+
 import { SecureLabwareModal } from './SecureLabwareModal'
 
-import type { MouseEvent } from 'react'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import type { LabwareByLiquidId } from '@opentrons/components'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  ModuleType,
   LabwareDefinition2,
+  ModuleType,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
-  StackItem,
-  ModuleInStack,
   LabwareInStack,
+  ModuleInStack,
+  StackItem,
 } from '/app/transformations/commands'
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import type { MouseEvent } from 'react'
 
 interface LabwareListItemProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }

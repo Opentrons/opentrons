@@ -1,14 +1,14 @@
 import { useQuery, useQueryClient } from 'react-query'
-
 import { getCurrentSubsystemUpdate } from '@opentrons/api-client'
+
 import { useHost } from '../api'
 
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type {
   HostConfig,
   Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export function useCurrentSubsystemUpdateQuery<TError = Error>(
   subsystem: string | null,

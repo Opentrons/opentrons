@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -11,8 +11,8 @@ import { LPCFatalError } from '/app/organisms/LabwarePositionCheck/LPCFatalError
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { ComponentProps } from 'react'
-import type { Mock } from 'vitest'
 import type { useSelector } from 'react-redux'
+import type { Mock } from 'vitest'
 
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal<typeof useSelector>()

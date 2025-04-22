@@ -1,28 +1,28 @@
 import type {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from './constants'
+import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
+  HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
-  ModuleType,
-  ModuleModel,
-  PipetteName,
-  NozzleConfigurationStyle,
   LabwareLocation,
+  LabwareMovementStrategy,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  ModuleModel,
+  ModuleType,
   PipetteMount as Mount,
+  NozzleConfigurationStyle,
+  PipetteName,
   PipetteV2Specs,
   ShakeSpeedParams,
-  LabwareMovementStrategy,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type {
-  TEMPERATURE_DEACTIVATED,
-  TEMPERATURE_AT_TARGET,
-  TEMPERATURE_APPROACHING_TARGET,
-} from './constants'
 
 // Copied from PD
 export type DeckSlot = string

@@ -1,6 +1,6 @@
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
 import type { UseLPCCommandsProps } from '.'
+import type { CommandData } from '@opentrons/api-client'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 export interface UseLPCCommandChildProps extends UseLPCCommandsProps {}
 

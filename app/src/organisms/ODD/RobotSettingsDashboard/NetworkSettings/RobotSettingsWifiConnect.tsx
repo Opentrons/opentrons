@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
-
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
 import { FAILURE, PENDING, SUCCESS } from '/app/redux/robot-api'
+
+import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
 
 import type { SetSettingOption } from '../types'
 import type { RequestState } from '/app/redux/robot-api/types'

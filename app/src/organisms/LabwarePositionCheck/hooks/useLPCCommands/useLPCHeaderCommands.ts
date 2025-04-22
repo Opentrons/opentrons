@@ -2,8 +2,8 @@ import { useSelector } from 'react-redux'
 
 import { LPC_STEP, selectActivePipette } from '/app/redux/protocol-runs'
 
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { UseLPCCommandsResult } from '/app/organisms/LabwarePositionCheck/hooks'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export type UseLPCHeaderCommandsProps = Omit<
   LPCWizardContentProps,

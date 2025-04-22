@@ -1,15 +1,16 @@
-import { describe, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
-import { TipPositionEntry } from '../../QuickTransferAdvancedSettings/TipPosition'
-import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
-import { Delay } from '../../QuickTransferAdvancedSettings/Delay'
-import { TouchTip } from '../../QuickTransferAdvancedSettings/TouchTip'
-import { AirGap } from '../../QuickTransferAdvancedSettings/AirGap'
+
 import { AspirateSettingDetail } from '../../Aspirate/AspirateSettingDetail'
+import { AirGap } from '../../QuickTransferAdvancedSettings/AirGap'
+import { Delay } from '../../QuickTransferAdvancedSettings/Delay'
+import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
+import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
+import { TipPositionEntry } from '../../QuickTransferAdvancedSettings/TipPosition'
+import { TouchTip } from '../../QuickTransferAdvancedSettings/TouchTip'
 
 import type { ComponentProps } from 'react'
 

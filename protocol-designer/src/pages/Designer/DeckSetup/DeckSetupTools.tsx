@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -32,14 +32,18 @@ import {
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getRobotType } from '../../../file-data/selectors'
 import {
-  createDeckFixture,
-  deleteDeckFixture,
-} from '../../../step-forms/actions/additionalItems'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { deleteModule } from '../../../modules'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+  LINK_BUTTON_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '../../../components/atoms'
+import {
+  ConfirmDeleteEntityInUseModal,
+  ConfirmDeleteStagingAreaModal,
+} from '../../../components/organisms'
+import { useBlockingHint } from '../../../components/organisms/BlockingHintModal/useBlockingHint'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { getEnableMutlipleTempsOT2 } from '../../../feature-flags/selectors'
+import { getRobotType } from '../../../file-data/selectors'
 import {
   createContainer,
   deleteContainer,
@@ -50,42 +54,38 @@ import {
   selectNestedLabware,
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
-import { getEnableMutlipleTempsOT2 } from '../../../feature-flags/selectors'
-import { useBlockingHint } from '../../../components/organisms/BlockingHintModal/useBlockingHint'
 import { selectors } from '../../../labware-ingred/selectors'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
-import { getDismissedHints } from '../../../tutorial/selectors'
+import { deleteModule } from '../../../modules'
 import {
-  LINK_BUTTON_STYLE,
-  NAV_BAR_HEIGHT_REM,
-} from '../../../components/atoms'
+  createDeckFixture,
+  deleteDeckFixture,
+} from '../../../step-forms/actions/additionalItems'
 import {
   createContainerAboveModule,
   createModuleEntityAndChangeForm,
 } from '../../../step-forms/actions/thunks'
-import {
-  ConfirmDeleteEntityInUseModal,
-  ConfirmDeleteStagingAreaModal,
-} from '../../../components/organisms'
+import { getSavedStepForms } from '../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getDismissedHints } from '../../../tutorial/selectors'
 import { getSlotInformation } from '../utils'
 import { ALL_ORDERED_CATEGORIES, FIXTURES, MOAM_MODELS } from './constants'
 import { LabwareTools } from './LabwareTools'
 import { MagnetModuleChangeContent } from './MagnetModuleChangeContent'
 import {
-  getModuleModelsBySlot,
   getDeckErrors,
   getIsEntityOnSlotInUse,
+  getModuleModelsBySlot,
 } from './utils'
 
+import type { StepType } from '../../../form-types'
+import type { ThunkDispatch } from '../../../types'
+import type { Fixture } from './constants'
+import type { ModuleModelExtended } from './utils'
 import type {
   AddressableAreaName,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { StepType } from '../../../form-types'
-import type { ThunkDispatch } from '../../../types'
-import type { Fixture } from './constants'
-import type { ModuleModelExtended } from './utils'
 
 //  @ts-expect-error: add flexStackerType and stepType
 const mapModTypeToStepType: Record<ModuleType, StepType> = {

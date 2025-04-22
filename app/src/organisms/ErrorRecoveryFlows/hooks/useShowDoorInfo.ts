@@ -5,9 +5,9 @@ import {
 
 import { GRIPPER_MOVE_STEPS, RECOVERY_MAP_METADATA } from '../constants'
 
-import type { RunStatus } from '@opentrons/api-client'
 import type { ErrorRecoveryFlowsProps } from '../index'
 import type { IRecoveryMap, RouteStep } from '../types'
+import type { RunStatus } from '@opentrons/api-client'
 
 const DOOR_OPEN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,

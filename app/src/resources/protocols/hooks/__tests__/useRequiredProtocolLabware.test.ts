@@ -1,22 +1,21 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+import {
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import { renderHook } from '@testing-library/react'
 
 import {
-  PROTOCOL_ID,
-  PROTOCOL_ANALYSIS,
   NULL_PROTOCOL_ANALYSIS,
+  PROTOCOL_ANALYSIS,
+  PROTOCOL_ID,
 } from '../__fixtures__'
-
-import {
-  useProtocolQuery,
-  useProtocolAnalysisAsDocumentQuery,
-} from '@opentrons/react-api-client'
 import { useRequiredProtocolLabware } from '../useRequiredProtocolLabware'
 
-import type { UseQueryResult } from 'react-query'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { Protocol } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 

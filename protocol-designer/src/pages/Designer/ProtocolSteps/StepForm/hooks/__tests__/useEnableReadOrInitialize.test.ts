@@ -2,13 +2,15 @@ import { useSelector } from 'react-redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 import { renderHook } from '@testing-library/react'
-import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labware-locations'
-import { useAbsorbanceReaderCommandType } from '../useAbsorbanceReaderCommandType'
-import type { Initialization, TimelineFrame } from '@opentrons/step-generation'
+
 import {
   ABSORBANCE_READER_INITIALIZE,
   ABSORBANCE_READER_READ,
 } from '../../../../../../constants'
+import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labware-locations'
+import { useAbsorbanceReaderCommandType } from '../useAbsorbanceReaderCommandType'
+
+import type { Initialization, TimelineFrame } from '@opentrons/step-generation'
 
 vi.mock('../../../../../../top-selectors/labware-locations')
 vi.mock('react-redux', () => ({

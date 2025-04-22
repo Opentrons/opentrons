@@ -1,4 +1,4 @@
-import { describe, expect, vi, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { getSortedLiquidClassDefs } from '..'
 import { getAllLiquidClassDefs } from '../../liquidClasses'

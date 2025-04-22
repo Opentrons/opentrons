@@ -1,12 +1,12 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useLightsQuery,
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react'
 
 import { useLights } from '../useLights'
 

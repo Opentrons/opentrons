@@ -1,12 +1,13 @@
-import { it, describe, beforeEach } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { ChosenTipRackRender } from '../ChosenTipRackRender'
 
-import type { ComponentProps } from 'react'
 import type { SelectOption } from '/app/atoms/SelectField/Select'
+import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof ChosenTipRackRender>) => {
   return renderWithProviders(<ChosenTipRackRender {...props} />, {

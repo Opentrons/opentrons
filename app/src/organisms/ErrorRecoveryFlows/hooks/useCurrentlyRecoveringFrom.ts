@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
-
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
@@ -10,8 +9,8 @@ import { useCommandQuery, useHost } from '@opentrons/react-api-client'
 
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
-import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand } from '../types'
+import type { RunStatus } from '@opentrons/api-client'
 
 const ALL_COMMANDS_POLL_MS = 5000
 

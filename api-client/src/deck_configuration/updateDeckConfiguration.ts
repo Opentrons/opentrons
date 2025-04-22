@@ -1,12 +1,12 @@
 import { PUT, request } from '../request'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type {
   DeckConfigurationResponse,
   UpdateDeckConfigurationRequest,
 } from './types'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export function updateDeckConfiguration(
   config: HostConfig,

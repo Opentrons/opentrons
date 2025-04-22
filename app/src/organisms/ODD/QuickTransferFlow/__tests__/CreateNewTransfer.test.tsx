@@ -1,13 +1,14 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeckConfigurator } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { CreateNewTransfer } from '../CreateNewTransfer'
 
-import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()

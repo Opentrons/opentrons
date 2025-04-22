@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import noop from 'lodash/noop'
 import {
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
@@ -12,10 +12,11 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+
 import { formatVolume } from './utils'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 
 import type { SubstepIdentifier, SubstepWellData } from '../../../../steplist'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 
 interface SubstepProps {
   trashName: AdditionalEquipmentName | null

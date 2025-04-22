@@ -1,18 +1,19 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   getModules,
   mockModulesResponse,
   mockUnknownModuleResponse,
   v2MockModulesResponse,
 } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useModulesQuery } from '..'
+import { renderHook, waitFor } from '@testing-library/react'
 
-import type { HostConfig, Response, Modules } from '@opentrons/api-client'
+import { useModulesQuery } from '..'
+import { useHost } from '../../api'
+
 import type { UseModulesQueryOptions } from '../useModulesQuery'
+import type { HostConfig, Modules, Response } from '@opentrons/api-client'
+import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

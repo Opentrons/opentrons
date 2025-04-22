@@ -1,8 +1,11 @@
-import { beforeEach, describe, it, expect } from 'vitest'
-import { getStateAndContextTempTCModules } from '../fixtures'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
+import { getStateAndContextTempTCModules } from '../fixtures'
+
 import type { InvariantContext, RobotState } from '../types'
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
+
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 let invariantContext: InvariantContext

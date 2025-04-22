@@ -1,6 +1,6 @@
-import type { RunCommandSummary } from '@opentrons/api-client'
 import type { ErrorRecoveryFlowsProps } from '../'
 import type { ERUtilsProps } from '../hooks/useERUtils'
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 // Return the next protocol step given the failedCommand, if any.
 export const getNextStep = (

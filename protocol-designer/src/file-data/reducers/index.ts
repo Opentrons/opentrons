@@ -1,15 +1,17 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
-import type { Reducer } from 'redux'
-import type { Timeline } from '@opentrons/step-generation'
-import type { RobotType } from '@opentrons/shared-data'
-import type { Action } from '../../types'
+
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 import type { Substeps } from '../../steplist/types'
+import type { Action } from '../../types'
 import type { ComputeRobotStateTimelineSuccessAction } from '../actions'
 import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
+import type { RobotType } from '@opentrons/shared-data'
+import type { Timeline } from '@opentrons/step-generation'
+import type { Reducer } from 'redux'
 
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {

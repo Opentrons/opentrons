@@ -1,16 +1,17 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { formatLastCalibrated } from '../CalibrationDetails/utils'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+
+import { formatLastCalibrated } from '../CalibrationDetails/utils'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
 
-import type { ComponentProps } from 'react'
 import type { GripperData } from '@opentrons/api-client'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('../CalibrationDetails/utils')

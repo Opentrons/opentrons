@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { Link as RouterLink } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   Banner,
@@ -8,8 +7,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'

@@ -5,6 +5,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { KnowledgeLink } from '../../../components/organisms'
 
 export function MagnetModuleChangeContent(): JSX.Element {

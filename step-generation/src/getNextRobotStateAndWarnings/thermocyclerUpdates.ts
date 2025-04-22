@@ -1,18 +1,20 @@
 import last from 'lodash/last'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+
 import { getModuleState } from '../robotStateSelectors'
+
+import type {
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+  ThermocyclerModuleState,
+} from '../types'
 import type {
   ModuleOnlyParams,
   TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type {
-  InvariantContext,
-  RobotStateAndWarnings,
-  RobotState,
-  ThermocyclerModuleState,
-} from '../types'
 
 const _getThermocyclerModuleState = (
   robotState: RobotState,

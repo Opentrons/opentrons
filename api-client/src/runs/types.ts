@@ -1,23 +1,24 @@
 import type {
+  ErrorDetails,
+  LabwareOffsetLocationSequence,
+  ResourceLink,
+} from '../types'
+import type {
+  LabwareDefinition1,
+  LabwareDefinition2,
+  LabwareDefinition3,
   Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
   ModuleModel,
+  NozzleLayoutConfig,
+  OnDeckLabwareLocation,
   RunCommandError,
   RunTimeCommand,
   RunTimeParameter,
-  NozzleLayoutConfig,
-  OnDeckLabwareLocation,
-  LabwareDefinition1,
-  LabwareDefinition2,
-  LabwareDefinition3,
 } from '@opentrons/shared-data'
-import type {
-  ResourceLink,
-  ErrorDetails,
-  LabwareOffsetLocationSequence,
-} from '../types'
+
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const

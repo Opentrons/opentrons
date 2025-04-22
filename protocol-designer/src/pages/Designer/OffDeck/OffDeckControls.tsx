@@ -7,15 +7,16 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
+
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { DeckSetupTerminalIdType } from '../types'
 import type {
   CoordinateTuple,
   DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
-import type { DeckSetupTerminalIdType } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface OffDeckControlsProps extends DeckSetupTerminalIdType {
   hover: string | null

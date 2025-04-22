@@ -1,9 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import * as auth0 from '@auth0/auth0-react'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { Header } from '../index'
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-import * as auth0 from '@auth0/auth0-react'
 
 vi.mock('@auth0/auth0-react')
 const mockLogout = vi.fn()

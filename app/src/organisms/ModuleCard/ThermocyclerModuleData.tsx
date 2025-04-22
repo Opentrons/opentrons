@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   Box,
   COLORS,
@@ -7,11 +6,13 @@ import {
   DIRECTION_ROW,
   Flex,
   FONT_WEIGHT_REGULAR,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+
+import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import type { ThermocyclerData } from '/app/redux/modules/api-types'
 

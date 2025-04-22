@@ -1,9 +1,9 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { getRobotModelByName } from '/app/redux/discovery'
 

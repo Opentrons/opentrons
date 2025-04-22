@@ -1,9 +1,10 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 import { DraggableSidebar } from '../DraggableSidebar'
+
 import type { ComponentProps } from 'react'
 
 vi.mock('../../../../step-forms/selectors')

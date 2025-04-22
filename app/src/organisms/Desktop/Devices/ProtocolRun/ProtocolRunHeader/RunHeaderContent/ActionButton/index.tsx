@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux'
-
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -14,23 +13,25 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
+  useModuleCalibrationStatus,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
 } from '/app/resources/runs'
-import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
-import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
 
-import type { MutableRefObject } from 'react'
+import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
+import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
+
 import type { RunHeaderContentProps } from '..'
+import type { MutableRefObject } from 'react'
+
 export type BaseActionButtonProps = RunHeaderContentProps
 
 interface ActionButtonProps extends BaseActionButtonProps {

@@ -1,24 +1,23 @@
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { useResetFormOnSecurityChange } from './form-state'
 import {
+  connectFormToConfigureRequest,
   getConnectFormFields,
   validateConnectFormFields,
-  connectFormToConfigureRequest,
 } from './form-fields'
-
+import { useResetFormOnSecurityChange } from './form-state'
 import { FormModal } from './FormModal'
 
-import type { Control, Resolver } from 'react-hook-form'
-import type { TFunction } from 'i18next'
 import type {
   ConnectFormValues,
-  WifiConfigureRequest,
-  WifiNetwork,
-  WifiKey,
   EapOption,
+  WifiConfigureRequest,
+  WifiKey,
+  WifiNetwork,
 } from '../types'
+import type { TFunction } from 'i18next'
+import type { Control, Resolver } from 'react-hook-form'
 
 export interface ConnectModalProps {
   robotName: string

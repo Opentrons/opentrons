@@ -1,34 +1,35 @@
-import { useState, useReducer } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import {
   POSITION_STICKY,
   StepMeter,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { ANALYTICS_QUICK_TRANSFER_EXIT_EARLY } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { ConfirmExitModal } from './ConfirmExitModal'
-import { CreateNewTransfer } from './CreateNewTransfer'
-import { SelectPipette } from './SelectPipette'
-import { SelectTipRack } from './SelectTipRack'
-import { SelectSourceLabware } from './SelectSourceLabware'
-import { SelectSourceWells } from './SelectSourceWells'
-import { SelectDestLabware } from './SelectDestLabware'
-import { SelectDestWells } from './SelectDestWells'
-import { VolumeEntry } from './VolumeEntry'
-import { SelectPipettePath } from './SelectPipettePath'
-import { SelectTipFrequency } from './SelectTipFrequency'
-import { SelectTipDropLocation } from './SelectTipDropLocation'
-import { SelectLiquidClass } from './SelectLiquidClass'
-import { SummaryAndSettings } from './SummaryAndSettings'
-import { quickTransferWizardReducer } from './reducers'
 
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_EXIT_EARLY } from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 
-import type { ComponentProps } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import { ConfirmExitModal } from './ConfirmExitModal'
+import { CreateNewTransfer } from './CreateNewTransfer'
+import { quickTransferWizardReducer } from './reducers'
+import { SelectDestLabware } from './SelectDestLabware'
+import { SelectDestWells } from './SelectDestWells'
+import { SelectLiquidClass } from './SelectLiquidClass'
+import { SelectPipette } from './SelectPipette'
+import { SelectPipettePath } from './SelectPipettePath'
+import { SelectSourceLabware } from './SelectSourceLabware'
+import { SelectSourceWells } from './SelectSourceWells'
+import { SelectTipDropLocation } from './SelectTipDropLocation'
+import { SelectTipFrequency } from './SelectTipFrequency'
+import { SelectTipRack } from './SelectTipRack'
+import { SummaryAndSettings } from './SummaryAndSettings'
+import { VolumeEntry } from './VolumeEntry'
+
 import type { QuickTransferWizardState } from './types'
+import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps } from 'react'
 
 // const QUICK_TRANSFER_WIZARD_STEPS = 8
 const initialQuickTransferState: QuickTransferWizardState = {}

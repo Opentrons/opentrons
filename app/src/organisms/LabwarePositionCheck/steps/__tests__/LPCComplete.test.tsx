@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -9,10 +9,10 @@ import { LPCComplete } from '/app/organisms/LabwarePositionCheck/steps'
 import { getIsOnDevice } from '/app/redux/config'
 import { selectStepInfo } from '/app/redux/protocol-runs'
 
-import SuccessIcon from '/app/assets/images/icon_success.png'
-
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+
+import SuccessIcon from '/app/assets/images/icon_success.png'
 
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
   LPCContentContainer: MockLPCContentContainer,

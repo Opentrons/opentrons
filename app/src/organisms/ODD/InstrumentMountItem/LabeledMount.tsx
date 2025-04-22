@@ -9,14 +9,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { MouseEventHandler } from 'react'
 import type { Mount } from '/app/redux/pipettes/types'
+import type { MouseEventHandler } from 'react'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
   display: flex;

@@ -7,8 +7,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import type { ReactNode } from 'react'
 
 interface MiniCardProps extends StyleProps {
   onClick: () => void

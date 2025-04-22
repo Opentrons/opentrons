@@ -1,15 +1,15 @@
-import type * as React from 'react'
-
-import { css } from 'styled-components'
-import { CategorizedStepContent, TwoColumn } from '.'
-import type { CategorizedStepContentProps } from './CategorizedStepContent'
-import { StandInContent } from './story-utils/StandIn'
-import { Box, RESPONSIVENESS, BORDERS } from '@opentrons/components'
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import { uniq } from 'lodash'
+import { css } from 'styled-components'
+import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
 
+import { CategorizedStepContent, TwoColumn } from '.'
 import * as Fixtures from '../Command/__fixtures__'
+import { StandInContent } from './story-utils/StandIn'
+
+import type { CategorizedStepContentProps } from './CategorizedStepContent'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
 
 type CommandType = RunTimeCommand['commandType']
 

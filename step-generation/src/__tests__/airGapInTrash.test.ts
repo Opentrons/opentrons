@@ -1,13 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import { airGapInTrash } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { airGapInTrash } from '../commandCreators/compound'
-import type { CutoutId } from '@opentrons/shared-data'
+
 import type { InvariantContext, RobotState } from '../types'
+import type { CutoutId } from '@opentrons/shared-data'
 
 const mockCutout: CutoutId = 'cutoutA3'
 const mockTrashId = 'mockTrashId'

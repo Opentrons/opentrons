@@ -1,15 +1,14 @@
-import { useState, Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
@@ -20,9 +19,9 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { resetConfig } from '/app/redux/robot-admin'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type { SetSettingOption } from './types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 
 interface LabelProps {
   isSelected?: boolean

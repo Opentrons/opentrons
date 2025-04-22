@@ -1,5 +1,6 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../assets/localization'
 import {
@@ -8,8 +9,8 @@ import {
 } from '../../../../../../ui/modules/selectors'
 import { TemperatureTools } from '../TemperatureTools'
 
-import type { ComponentProps } from 'react'
 import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../ui/modules/selectors', async importOriginal => {
   const actualFields = await importOriginal<typeof ModulesSelectors>()

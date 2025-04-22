@@ -5,12 +5,12 @@ import { getIsCustomTubeRack } from './utils'
 
 import type { ProcessedLabwareFields } from './fields'
 import type {
-  LabwareWellGroup,
   //   createIrregularLabware,
   LabwareDefinition2,
   LabwareDisplayCategory,
-  LabwareWellProperties,
   LabwareOffset,
+  LabwareWellGroup,
+  LabwareWellProperties,
   ModuleModel,
 } from '@opentrons/shared-data'
 

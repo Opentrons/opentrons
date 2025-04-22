@@ -4,14 +4,14 @@ import {
   savePositionCommands,
 } from './commands'
 
+import type { UseLPCCommandWithChainRunChildProps } from './types'
+import type { VectorOffset } from '@opentrons/api-client'
 import type {
-  MoveLabwareCreateCommand,
   Coordinates,
   CreateCommand,
   LabwareLocation,
+  MoveLabwareCreateCommand,
 } from '@opentrons/shared-data'
-import type { VectorOffset } from '@opentrons/api-client'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 export interface UseHandleConfirmPlacementProps

@@ -1,20 +1,32 @@
-import reduce from 'lodash/reduce'
-import values from 'lodash/values'
 import find from 'lodash/find'
 import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
+import values from 'lodash/values'
 import {
-  getPipetteSpecsV2,
+  FLEX_ROBOT_TYPE,
   GEN_ONE_MULTI_PIPETTES,
+  getPipetteSpecsV2,
+  OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
+
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
+
+import type { FormData, HydratedFormData } from '../../form-types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { DeckSlot } from '../../types'
+import type {
+  AdditionalEquipmentOnDeck,
+  FormPipette,
+  FormPipettesByMount,
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../types'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -27,22 +39,13 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   NormalizedPipette,
   NormalizedPipetteById,
-  PipetteEntity,
   PipetteEntities,
-  InvariantContext,
+  PipetteEntity,
 } from '@opentrons/step-generation'
-import type { DeckSlot } from '../../types'
-import type { FormData, HydratedFormData } from '../../form-types'
-import type {
-  AdditionalEquipmentOnDeck,
-  InitialDeckSetup,
-  ModuleOnDeck,
-  FormPipettesByMount,
-  FormPipette,
-  LabwareOnDeck as LabwareOnDeckType,
-} from '../types'
+
 export { createPresavedStepForm } from './createPresavedStepForm'
 
 const MOVABLE_TRASH_CUTOUTS = [

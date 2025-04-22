@@ -1,6 +1,5 @@
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-
+import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -11,17 +10,17 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import type { ComponentProps } from 'react'
-import type { IconName, ChipType } from '@opentrons/components'
-import type { NetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import type { SetSettingOption } from '../types'
+import type { ChipType, IconName } from '@opentrons/components'
+import type { NetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
+import type { ComponentProps } from 'react'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
 

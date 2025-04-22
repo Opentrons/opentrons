@@ -7,9 +7,11 @@ import {
   StyledText,
   WRAP,
 } from '@opentrons/components'
+
 import { PIPETTE_GENS } from '../../../pages/Onboarding/constants'
-import type { Dispatch, SetStateAction } from 'react'
+
 import type { Gen } from '../../../pages/Onboarding/types'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface SelectPipetteGenProps {
   setPipetteGen: Dispatch<SetStateAction<'flex' | Gen>>

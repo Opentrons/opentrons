@@ -1,35 +1,34 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  Modal,
   OVERFLOW_AUTO,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
   TYPOGRAPHY,
-  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { useDownloadRunLog } from '../../../../hooks'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
-import type { MouseEventHandler } from 'react'
+import type { UseRunErrorsResult } from '../../hooks'
 import type { RunStatus } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type { RunCommandError } from '@opentrons/shared-data'
-import type { UseRunErrorsResult } from '../../hooks'
+import type { MouseEventHandler } from 'react'
 
 // Note(kk:08/07/2023)
 // This modal and run failed modal for Touchscreen app will be merged into one component like EstopModals.

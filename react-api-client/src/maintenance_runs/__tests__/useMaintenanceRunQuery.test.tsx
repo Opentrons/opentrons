@@ -1,17 +1,18 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getMaintenanceRun } from '@opentrons/api-client'
-import { useHost } from '../../api'
+import { renderHook, waitFor } from '@testing-library/react'
+
 import { useMaintenanceRunQuery } from '..'
 import { MAINTENANCE_RUN_ID } from '../__fixtures__'
+import { useHost } from '../../api'
 
 import type {
   HostConfig,
-  Response,
   MaintenanceRun,
+  Response,
 } from '@opentrons/api-client'
+import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

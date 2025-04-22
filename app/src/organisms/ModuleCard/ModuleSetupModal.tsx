@@ -1,21 +1,23 @@
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
-import helpCenterQRCode from '/app/assets/images/module_instruction_code.png'
-import absorbanceReaderManualQRCode from '/app/assets/images/absorbance_reader_instruction_manual_code.png'
+import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '/app/App/portal'
+
+import absorbanceReaderManualQRCode from '/app/assets/images/absorbance_reader_instruction_manual_code.png'
+import helpCenterQRCode from '/app/assets/images/module_instruction_code.png'
 
 const MODULE_SETUP_URL = 'https://support.opentrons.com/s/modules'
 const ABSORBANCE_READER_MANUAL_URL =

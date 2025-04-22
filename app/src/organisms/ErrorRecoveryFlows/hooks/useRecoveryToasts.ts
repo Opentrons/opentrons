@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
 
-import { useToaster } from '../../ToasterOven'
-import { RECOVERY_MAP } from '../constants'
 import { useCommandTextString } from '/app/local-resources/commands'
 
-import type { StepCounts } from '/app/resources/protocols/hooks'
+import { useToaster } from '../../ToasterOven'
+import { RECOVERY_MAP } from '../constants'
+
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { UseCommandTextStringParams } from '/app/local-resources/commands'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 
 export type BuildToast = Omit<UseCommandTextStringParams, 'command'> & {
   isOnDevice: boolean

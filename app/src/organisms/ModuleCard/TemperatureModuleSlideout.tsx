@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -11,6 +9,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CELSIUS,
   getModuleDisplayName,
@@ -18,8 +17,8 @@ import {
   TEMP_MIN,
 } from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
 
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { TemperatureModule } from '/app/redux/modules/types'

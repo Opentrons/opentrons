@@ -1,13 +1,13 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 
-import { i18n } from '../../../../assets/localization'
+import { Navigation } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 import { getHasUnsavedChanges } from '../../../../load-file/selectors'
 import { toggleNewProtocolModal } from '../../../../navigation/actions'
 import { SettingsIcon } from '../../SettingsIcon'
-import { Navigation } from '..'
 
 vi.mock('../../SettingsIcon')
 vi.mock('../../../../navigation/actions')

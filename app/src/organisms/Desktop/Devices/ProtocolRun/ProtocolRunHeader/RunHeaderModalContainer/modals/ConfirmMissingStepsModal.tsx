@@ -5,19 +5,21 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
+
 import {
-  LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
+  LPC_STEP_KEY,
   MODULE_SETUP_STEP_KEY,
   ROBOT_CALIBRATION_STEP_KEY,
 } from '/app/redux/protocol-runs'
+
 import type { StepKey } from '/app/redux/protocol-runs'
 
 const STEP_KEY_TO_I18N_KEY = {

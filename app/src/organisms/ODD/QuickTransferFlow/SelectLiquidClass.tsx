@@ -1,6 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import type { ComponentProps, Dispatch } from 'react'
-
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -10,13 +8,15 @@ import {
   //   StyledText,
   //   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import type { SmallButton } from '/app/atoms/buttons'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
+import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps, Dispatch } from 'react'
 
 interface SelectLiquidClassProps {
   onNext: () => void

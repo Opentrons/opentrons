@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next'
-
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
 import { WifiConnectionDetails } from './WifiConnectionDetails'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SetSettingOption } from '../types'
+import type { WifiSecurityType } from '@opentrons/api-client'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface RobotSettingsWifiProps {
   setSelectedSsid: Dispatch<SetStateAction<string>>

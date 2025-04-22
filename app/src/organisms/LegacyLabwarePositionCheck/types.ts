@@ -1,9 +1,9 @@
 import type { SECTIONS } from './constants'
-import type { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type {
   LegacyLabwareOffsetLocation,
   VectorOffset,
 } from '@opentrons/api-client'
+import type { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export type LabwarePositionCheckStep =

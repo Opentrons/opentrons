@@ -1,18 +1,20 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   fixture_96_plate,
-  fixture_trash,
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
+  fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
+
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
 import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
+
+import type { FormData } from '../../../../form-types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../../../form-types'
 
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixtureTrash = fixture_trash as LabwareDefinition2

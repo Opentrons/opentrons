@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { uuid } from '@opentrons/step-generation'
 import {
   Btn,
   COLORS,
@@ -24,11 +23,14 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { uuid } from '@opentrons/step-generation'
+
 import { useKitchen } from '../Kitchen/hooks'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
-import type { UseFormSetValue } from 'react-hook-form'
-import type { Dispatch, SetStateAction } from 'react'
+import type { FormModules } from '../../../step-forms'
+import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
+import type { ModalProps } from '@opentrons/components'
 import type {
   CutoutConfig,
   CutoutId,
@@ -36,9 +38,8 @@ import type {
   FlexModuleCutoutFixtureId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ModalProps } from '@opentrons/components'
-import type { FormModules } from '../../../step-forms'
-import type { FixtureName, WizardFixtureType, WizardFormState } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId

@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import {
   fixture96Plate,
   fixtureTiprack1000ul,
@@ -16,11 +15,12 @@ import {
 } from './__fixtures__'
 import { BaseDeck as BaseDeckComponent } from './BaseDeck'
 
-import type { Meta, StoryObj } from '@storybook/react'
 import type {
   DeckConfiguration,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
 
 const meta: Meta<React.ComponentProps<typeof BaseDeckComponent>> = {
   component: BaseDeckComponent,

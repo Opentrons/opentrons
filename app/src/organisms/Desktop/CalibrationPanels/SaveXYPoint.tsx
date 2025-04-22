@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   ALIGN_STRETCH,
@@ -8,21 +8,32 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { useLogger } from '/app/logger'
-import * as Sessions from '/app/redux/sessions'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
 } from '/app/molecules/JogControls'
-import { formatJogVector } from './utils'
-import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import * as Sessions from '/app/redux/sessions'
+
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { formatJogVector } from './utils'
+
+import type { CalibrationPanelProps } from './types'
+import type { Mount } from '@opentrons/components'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type {
+  CalibrationLabware,
+  CalibrationSessionStep,
+  SessionCommandString,
+  SessionType,
+} from '/app/redux/sessions/types'
 
 import slot1LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
@@ -36,16 +47,6 @@ import slot7LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT
 import slot7LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_SINGLE_X-Y.webm'
 import slot7RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
 import slot7RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
-
-import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
-import type { CalibrationPanelProps } from './types'
-import type {
-  SessionType,
-  CalibrationSessionStep,
-  SessionCommandString,
-  CalibrationLabware,
-} from '/app/redux/sessions/types'
-import type { Mount } from '@opentrons/components'
 
 const assetMap: Record<
   CalibrationLabware['slot'],

@@ -4,14 +4,16 @@ import {
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
+  getLabwareDefIsStandard,
   getLabwareDefURI,
   getTiprackVolume,
   orderWells,
-  THERMOCYCLER_MODULE_TYPE,
   SINGLE,
-  getLabwareDefIsStandard,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import { COLUMN_4_SLOTS } from './constants'
+
 import type {
   AbsorbanceReaderState,
   InvariantContext,

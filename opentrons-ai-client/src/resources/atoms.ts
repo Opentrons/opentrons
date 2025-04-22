@@ -1,5 +1,6 @@
 // jotai's atoms
 import { atom } from 'jotai'
+
 import type {
   Chat,
   ChatData,

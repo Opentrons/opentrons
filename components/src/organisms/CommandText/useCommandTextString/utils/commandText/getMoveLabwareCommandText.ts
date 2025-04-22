@@ -4,8 +4,8 @@ import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getLabwareName } from '../getLabwareName'
 
-import type { MoveLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
+import type { MoveLabwareRunTimeCommand } from '@opentrons/shared-data'
 
 export function getMoveLabwareCommandText({
   command,

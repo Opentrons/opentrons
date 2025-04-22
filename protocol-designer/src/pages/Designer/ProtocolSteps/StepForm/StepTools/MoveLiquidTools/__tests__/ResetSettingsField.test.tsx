@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { COLORS } from '@opentrons/components'
-import { i18n } from '../../../../../../../assets/localization'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../../assets/localization'
 import { ResetSettingsField } from '../ResetSettingsField'
 
 import type { ComponentProps } from 'react'

@@ -1,23 +1,25 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { FlexTrash } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
-
+import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
+import { getRobotType } from '../../../../file-data/selectors'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../../ui/steps/selectors'
-import { getSelectedTerminalItemId } from '../../../../ui/steps'
-import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
+import { DeckSetupContainer } from '../DeckSetupContainer'
 import { DeckSetupDetails } from '../DeckSetupDetails'
 import { DeckSetupTools } from '../DeckSetupTools'
-import { DeckSetupContainer } from '../DeckSetupContainer'
+
 import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../../../../ui/steps/selectors')

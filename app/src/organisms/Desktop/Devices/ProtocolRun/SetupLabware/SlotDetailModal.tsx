@@ -1,42 +1,42 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
-  Box,
-  getWellFillFromLabwareId,
-  COLORS,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  Box,
+  COLORS,
+  DeckInfoLabel,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LabwareRender,
-  SPACING,
-  DeckInfoLabel,
-  Tag,
-  StyledText,
-  TYPOGRAPHY,
-  Modal,
+  getWellFillFromLabwareId,
   JUSTIFY_CENTER,
+  LabwareRender,
+  Modal,
+  SPACING,
+  StyledText,
+  Tag,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getAllDefinitions,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
+import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
 import {
+  getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
-  getDisabledWellGroupForLiquidId,
 } from '/app/transformations/analysis'
 
+import type { LabwareByLiquidId } from '@opentrons/components/'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components/'
-import type { StackItem, LabwareInStack } from '/app/transformations/commands'
+import type { LabwareInStack, StackItem } from '/app/transformations/commands'
 
 interface SlotDetailModalProps {
   closeModal: () => void

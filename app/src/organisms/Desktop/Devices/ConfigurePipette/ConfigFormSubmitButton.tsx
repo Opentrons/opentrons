@@ -3,9 +3,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  TEXT_TRANSFORM_UPPERCASE,
   PrimaryButton,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
+
 export interface ConfigFormSubmitButtonProps {
   disabled: boolean
   formId: string

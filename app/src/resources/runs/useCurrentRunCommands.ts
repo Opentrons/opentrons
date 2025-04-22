@@ -1,10 +1,11 @@
 import { useCurrentRunId, useRunCommands } from '/app/resources/runs'
-import type { UseQueryOptions } from 'react-query'
+
 import type {
   CommandsData,
-  RunCommandSummary,
   GetRunCommandsParams,
+  RunCommandSummary,
 } from '@opentrons/api-client'
+import type { UseQueryOptions } from 'react-query'
 
 export function useCurrentRunCommands(
   params?: GetRunCommandsParams,

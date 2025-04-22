@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -12,18 +12,18 @@ import {
 } from '@opentrons/components'
 
 import { NAV_BAR_HEIGHT_REM } from '../../../../components/atoms'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { getUnsavedForm } from '../../../../step-forms/selectors'
 import {
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
   actions as steplistActions,
 } from '../../../../steplist'
 import { actions as stepsActions } from '../../../../ui/steps'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getUnsavedForm } from '../../../../step-forms/selectors'
-import { TerminalItemStep } from './TerminalItemStep'
 import { AddStepButton } from './AddStepButton'
-import { PresavedStep } from './PresavedStep'
 import { DraggableSteps } from './DraggableSteps'
+import { PresavedStep } from './PresavedStep'
+import { TerminalItemStep } from './TerminalItemStep'
 
 import type { StepIdType } from '../../../../form-types'
 import type { ThunkDispatch } from '../../../../types'

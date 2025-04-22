@@ -1,13 +1,13 @@
 import {
+  ALIGN_CENTER,
+  COLORS,
   Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   ListItem,
+  SPACING,
   StyledText,
   TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  ALIGN_CENTER,
-  Icon,
 } from '@opentrons/components'
 
 type DispenseSettingOption =

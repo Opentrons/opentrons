@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-
+import { getLabwareLocation } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -10,32 +10,32 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from '@opentrons/components'
+
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
 } from '/app/organisms/InterventionModal/utils'
 
+import type { ErrorRecoveryFlowsProps } from '..'
+import type { ERUtilsProps } from './useERUtils'
+import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { Run } from '@opentrons/api-client'
 import type {
-  DeckDefinition,
-  ModuleDefinition,
-  LabwareDefinition2,
-  ModuleModel,
-  LabwareLocation,
   CutoutConfigProtocolSpec,
-  LoadedLabware,
-  RobotType,
+  DeckDefinition,
+  LabwareDefinition2,
   LabwareDefinitionsByUri,
+  LabwareLocation,
+  LoadedLabware,
   LoadedModule,
+  ModuleDefinition,
+  ModuleModel,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { ErrorRecoveryFlowsProps } from '..'
-import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type {
   RunLabwareInfo,
   RunModuleInfo,
 } from '/app/organisms/InterventionModal/utils'
-import type { ERUtilsProps } from './useERUtils'
 
 interface UseDeckMapUtilsProps {
   runId: ErrorRecoveryFlowsProps['runId']

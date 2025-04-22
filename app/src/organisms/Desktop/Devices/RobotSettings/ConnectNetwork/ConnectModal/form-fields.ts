@@ -2,22 +2,22 @@ import get from 'lodash/get'
 
 import * as Constants from '../constants'
 
-import type { FieldError } from 'react-hook-form'
-import type { TFunction } from 'i18next'
 import type {
-  WifiNetwork,
-  WifiKey,
+  ConnectFormErrors,
+  ConnectFormField,
+  ConnectFormSecurityField,
+  ConnectFormTextField,
+  ConnectFormValues,
   EapOption,
   WifiAuthField,
   WifiConfigureRequest,
-  WifiSecurityType,
   WifiEapConfig,
-  ConnectFormValues,
-  ConnectFormErrors,
-  ConnectFormField,
-  ConnectFormTextField,
-  ConnectFormSecurityField,
+  WifiKey,
+  WifiNetwork,
+  WifiSecurityType,
 } from '../types'
+import type { TFunction } from 'i18next'
+import type { FieldError } from 'react-hook-form'
 
 type Errors = Record<string, FieldError>
 

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   getLabwareDefinitionsFromCommands,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -16,27 +17,18 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
-import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import { TipConfirmation } from './TipConfirmation'
-import { getLabwareDef } from './utils/labware'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '/app/redux/config'
 
-import type { Dispatch } from 'react'
-import type {
-  CompletedProtocolAnalysis,
-  CreateCommand,
-  MoveLabwareCreateCommand,
-  RobotType,
-  Coordinates,
-} from '@opentrons/shared-data'
-import type { useChainRunCommands } from '/app/resources/runs'
-import type { Jog } from '/app/molecules/JogControls/types'
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import { getIsOnDevice } from '/app/redux/config'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
+
+import { JogToWell } from './JogToWell'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { TipConfirmation } from './TipConfirmation'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
+
 import type {
   PickUpTipStep,
   RegisterPositionAction,
@@ -46,7 +38,17 @@ import type {
   LabwareOffset,
   LegacyLabwareOffsetLocation,
 } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  Coordinates,
+  CreateCommand,
+  MoveLabwareCreateCommand,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { Jog } from '/app/molecules/JogControls/types'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type { TFunction } from 'i18next'
+import type { Dispatch } from 'react'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis

@@ -1,10 +1,12 @@
 import uniq from 'lodash/uniq'
+
 import { Command as CommandComponent } from '.'
-import * as Fixtures from './__fixtures__'
-import type { CommandState } from './Command'
 import { customViewports } from '../../../../.storybook/preview'
-import type { Meta, StoryObj } from '@storybook/react'
+import * as Fixtures from './__fixtures__'
+
+import type { CommandState } from './Command'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { Meta, StoryObj } from '@storybook/react'
 
 type CommandType = RunTimeCommand['commandType']
 

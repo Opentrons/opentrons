@@ -5,12 +5,12 @@ import {
   savePositionCommands,
 } from './commands'
 
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type {
-  LoadedPipette,
   Coordinates,
   CreateCommand,
+  LoadedPipette,
 } from '@opentrons/shared-data'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 interface UseHandleConfirmPositionProps

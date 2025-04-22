@@ -1,23 +1,23 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
+  mockDefaultOffsetDetails,
   mockLPCContentProps,
   mockOffset,
-  mockDefaultOffsetDetails,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { DefaultLocationOffset } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/DefaultLocationOffset'
 import {
-  selectSelectedLwDefaultOffsetDetails,
-  selectMostRecentVectorOffsetForLwWithOffsetDetails,
-  setSelectedLabware,
   proceedEditOffsetSubstep,
+  selectMostRecentVectorOffsetForLwWithOffsetDetails,
+  selectSelectedLwDefaultOffsetDetails,
   selectSelectedLwDisplayName,
+  setSelectedLabware,
 } from '/app/redux/protocol-runs'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'

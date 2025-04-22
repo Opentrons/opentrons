@@ -1,27 +1,25 @@
 import { Fragment, memo } from 'react'
-import styled from 'styled-components'
 import map from 'lodash/map'
+import styled from 'styled-components'
 
 import { COLORS } from '../../helix-design-system'
-
+import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import {
   LabwareOutline,
   LabwareWellLabels,
   STYLE_BY_WELL_CONTENTS,
   Well,
 } from './labwareInternals'
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
-  WellMouseEvent,
   WellFill,
+  WellMouseEvent,
   WellStroke,
 } from './labwareInternals/types'
-
+import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { RefObject } from 'react'
-import type { LabwareAdapterLoadName } from './LabwareAdapter'
 
 export interface LabwareProps {
   /** Labware definition to render */

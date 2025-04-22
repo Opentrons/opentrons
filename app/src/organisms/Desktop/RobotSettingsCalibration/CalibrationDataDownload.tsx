@@ -1,15 +1,14 @@
+import { Trans, useTranslation } from 'react-i18next'
 import { saveAs } from 'file-saver'
-import { useTranslation, Trans } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -24,11 +23,11 @@ import {
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '/app/organisms/Desktop/Devices/hooks'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
-  useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+  useTrackEvent,
 } from '/app/redux/analytics'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { MouseEventHandler } from 'react'

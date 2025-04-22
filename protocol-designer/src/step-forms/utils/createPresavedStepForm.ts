@@ -7,6 +7,13 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import {
+  ABSORBANCE_READER_INITIALIZE,
+  ABSORBANCE_READER_LID,
+  ABSORBANCE_READER_READ,
+} from '../../constants'
+import { maskField } from '../../steplist/fieldLevel'
 import {
   createBlankForm,
   getNextDefaultEngageHeight,
@@ -17,27 +24,22 @@ import {
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
-  getModuleOnDeckByType,
   getMagnetLabwareEngageHeight,
+  getModuleOnDeckByType,
 } from '../../ui/modules/utils'
-import { maskField } from '../../steplist/fieldLevel'
+
+import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { FormPatch } from '../../steplist/actions/types'
+import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
+import type { InitialDeckSetup } from '../types'
 import type {
-  PipetteEntities,
+  AbsorbanceReaderState,
+  AdditionalEquipmentEntities,
   LabwareEntities,
+  PipetteEntities,
   RobotState,
   Timeline,
-  AdditionalEquipmentEntities,
-  AbsorbanceReaderState,
 } from '@opentrons/step-generation'
-import type { FormData, StepType, StepIdType } from '../../form-types'
-import type { InitialDeckSetup } from '../types'
-import type { FormPatch } from '../../steplist/actions/types'
-import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
-import {
-  ABSORBANCE_READER_READ,
-  ABSORBANCE_READER_INITIALIZE,
-  ABSORBANCE_READER_LID,
-} from '../../constants'
 
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType

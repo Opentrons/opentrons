@@ -7,15 +7,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import type { ComponentProps, Dispatch } from 'react'
+import type {
+  QuickTransferWizardAction,
+  QuickTransferWizardState,
+} from './types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
-import type {
-  QuickTransferWizardState,
-  QuickTransferWizardAction,
-} from './types'
+import type { ComponentProps, Dispatch } from 'react'
 
 interface SelectTipRackProps {
   onNext: () => void

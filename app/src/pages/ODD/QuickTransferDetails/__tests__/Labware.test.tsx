@@ -1,18 +1,20 @@
-import { vi, it, describe, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { screen } from '@testing-library/react'
 import {
+  fixture96Plate,
   fixtureTiprack10ul,
   fixtureTiprack300ul,
-  fixture96Plate,
 } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
+
 import { Labware } from '../Labware'
 
-import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/resources/protocols')
 

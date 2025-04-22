@@ -10,9 +10,9 @@ import {
 
 import { PinnedTransfer } from './PinnedTransfer'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { CardSizeType } from './PinnedTransfer'
+import type { ProtocolResource } from '@opentrons/shared-data'
+import type { Dispatch, SetStateAction } from 'react'
 
 export function PinnedTransferCarousel(props: {
   pinnedTransfers: ProtocolResource[]

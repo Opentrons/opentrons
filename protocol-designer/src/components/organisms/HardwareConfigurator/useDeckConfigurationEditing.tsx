@@ -29,17 +29,19 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
+
 import { AddFixtureModal } from './AddFixtureModal'
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
+
+import type { FormModules } from '../../../step-forms'
+import type { WizardFixtureType, WizardFormState } from '../types'
+import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
-import type { FormModules } from '../../../step-forms'
-import type { WizardFixtureType, WizardFormState } from '../types'
-import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
 
 interface DeckConfigurationEditingProps {
   addFixtureToCutout: (cutoutId: CutoutId) => void

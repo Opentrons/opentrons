@@ -1,29 +1,29 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OverflowMenu } from './OverflowMenu'
-import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
 import { LEFT } from '/app/redux/pipettes'
 import {
   useAttachedPipettes,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/resources/instruments'
-import { useIsFlex } from '/app/redux-resources/robots'
 
-import type { State } from '/app/redux/types'
+import { OverflowMenu } from './OverflowMenu'
+import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
+
 import type { FormattedPipetteOffsetCalibration } from '..'
+import type { State } from '/app/redux/types'
 
 const StyledTable = styled.table`
   width: 100%;

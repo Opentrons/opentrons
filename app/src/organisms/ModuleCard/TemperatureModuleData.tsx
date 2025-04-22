@@ -3,11 +3,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { StatusLabel } from '/app/atoms/StatusLabel'
+
 import type { TemperatureStatus } from '/app/redux/modules/api-types'
 
 interface TemperatureModuleProps {

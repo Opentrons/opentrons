@@ -1,12 +1,10 @@
 import * as Constants from '../constants'
 import { LPCReducer } from './lpc'
-
-import type { Reducer } from 'redux'
+import { setupReducer } from './setup'
 
 import type { Action } from '../../types'
 import type { ProtocolRunState } from '../types'
-
-import { setupReducer } from './setup'
+import type { Reducer } from 'redux'
 
 const INITIAL_STATE: ProtocolRunState = {}
 

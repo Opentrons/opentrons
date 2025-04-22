@@ -1,11 +1,12 @@
-import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
 import { StatusLabel } from '/app/atoms/StatusLabel'
-import { MagneticModuleData } from '../MagneticModuleData'
+import { i18n } from '/app/i18n'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
+
+import { MagneticModuleData } from '../MagneticModuleData'
 
 import type { ComponentProps } from 'react'
 

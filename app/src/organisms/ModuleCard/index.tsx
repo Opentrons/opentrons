@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_START,
   Banner,
@@ -16,67 +16,67 @@ import {
   ModuleIcon,
   OverflowBtn,
   SPACING,
+  SUCCESS_TOAST,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
-  SUCCESS_TOAST,
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  MODULE_MODELS_OT2_ONLY,
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
+import { getModulePrepCommands } from '/app/local-resources/modules'
+import { UpdateBanner } from '/app/molecules/UpdateBanner'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
-  getRequestById,
-  PENDING,
+  dismissRequest,
   FAILURE,
   getErrorResponseMessage,
-  dismissRequest,
+  getRequestById,
+  PENDING,
   SUCCESS,
 } from '/app/redux/robot-api'
-import { UpdateBanner } from '/app/molecules/UpdateBanner'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useChainLiveCommands } from '/app/resources/runs'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { getModuleTooHot } from '/app/transformations/modules'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { MagneticModuleData } from './MagneticModuleData'
-import { TemperatureModuleData } from './TemperatureModuleData'
-import { ThermocyclerModuleData } from './ThermocyclerModuleData'
-import { ModuleOverflowMenu } from './ModuleOverflowMenu'
-import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
-import { MagneticModuleSlideout } from './MagneticModuleSlideout'
-import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+
 import { AboutModuleSlideout } from './AboutModuleSlideout'
+import { AbsorbanceReaderData } from './AbsorbanceReaderData'
+import { ErrorInfo } from './ErrorInfo'
+import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
+import { FlexStackerModuleData } from './FlexStackerModuleData'
 import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
-import { TestShakeSlideout } from './TestShakeSlideout'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { getModulePrepCommands } from '/app/local-resources/modules'
-import { getModuleCardImage } from './utils'
-import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
-import { ErrorInfo } from './ErrorInfo'
+import { MagneticModuleData } from './MagneticModuleData'
+import { MagneticModuleSlideout } from './MagneticModuleSlideout'
+import { ModuleOverflowMenu } from './ModuleOverflowMenu'
 import { ModuleSetupModal } from './ModuleSetupModal'
-import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { TemperatureModuleData } from './TemperatureModuleData'
+import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+import { TestShakeSlideout } from './TestShakeSlideout'
+import { ThermocyclerModuleData } from './ThermocyclerModuleData'
+import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { getModuleCardImage } from './utils'
 
 import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,
 } from '/app/redux/modules/types'
-import type { State, Dispatch } from '/app/redux/types'
 import type { RequestState } from '/app/redux/robot-api/types'
-import { AbsorbanceReaderData } from './AbsorbanceReaderData'
-import { FlexStackerModuleData } from './FlexStackerModuleData'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface ModuleCardProps {
   module: AttachedModule

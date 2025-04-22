@@ -1,14 +1,14 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getDoorStatus } from '@opentrons/api-client'
 import { renderHook, waitFor } from '@testing-library/react'
 
-import { getDoorStatus } from '@opentrons/api-client'
-import { useHost } from '../../api'
 import { useDoorQuery } from '..'
+import { useHost } from '../../api'
 
-import type { HostConfig, Response, DoorStatus } from '@opentrons/api-client'
 import type { UseDoorQueryOptions } from '../useDoorQuery'
+import type { DoorStatus, HostConfig, Response } from '@opentrons/api-client'
+import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

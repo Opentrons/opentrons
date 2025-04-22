@@ -3,15 +3,16 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { mockDropTipWizardContainerProps } from '../__fixtures__'
 import {
-  useWizardExitHeader,
   DropTipWizardHeader,
+  useWizardExitHeader,
 } from '../DropTipWizardHeader'
 
+import type { UseWizardExitHeaderProps } from '../DropTipWizardHeader'
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
-import type { UseWizardExitHeaderProps } from '../DropTipWizardHeader'
 
 const render = (props: ComponentProps<typeof DropTipWizardHeader>) => {
   return renderWithProviders(<DropTipWizardHeader {...props} />, {

@@ -1,3 +1,5 @@
+import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
+import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 import type {
   FlexAddressableAreaName,
   LabwareLocationSequence,
@@ -6,8 +8,6 @@ import type {
   OnLabwareLocationSequenceComponent,
   OnModuleLocationSequenceComponent,
 } from '@opentrons/shared-data'
-import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
-import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
 import type {
   LabwareModuleStackupDetail,
   LabwareModuleStackupDetails,

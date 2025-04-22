@@ -1,8 +1,10 @@
 import { useQuery } from 'react-query'
 import { getProtocolAnalyses } from '@opentrons/api-client'
+
 import { useHost } from '../api'
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
+
 import type { HostConfig, ProtocolAnalyses } from '@opentrons/api-client'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 const POLLING_INTERVAL = 1000
 

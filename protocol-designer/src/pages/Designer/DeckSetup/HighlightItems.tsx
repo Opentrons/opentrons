@@ -1,35 +1,37 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
+import { useSelector } from 'react-redux'
 import {
+  getAddressableAreaFromSlotId,
+  getPositionFromSlotId,
+  inferModuleOrientationFromXCoordinate,
   STANDARD_FLEX_SLOTS,
   STANDARD_OT2_SLOTS,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
-  getAddressableAreaFromSlotId,
-  getPositionFromSlotId,
-  inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
 import { LabwareLabel } from '../LabwareLabel'
-import { ModuleLabel } from './ModuleLabel'
-import { FixtureRender } from './FixtureRender'
 import { DeckItemHighlight } from './DeckItemHighlight'
+import { FixtureRender } from './FixtureRender'
+import { ModuleLabel } from './ModuleLabel'
 import { getHighlightLabwareAndModules } from './utils'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+
+import type { Fixture } from './constants'
 import type {
-  RobotType,
-  DeckDefinition,
-  CutoutId,
   AddressableAreaName,
   CoordinateTuple,
+  CutoutId,
+  DeckDefinition,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { Fixture } from './constants'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+
 interface HighlightItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType

@@ -1,20 +1,21 @@
+import { describe, expect, it, vi } from 'vitest'
+import { LEFT } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { ConfirmPipette } from '../ConfirmPipette'
 
-import type { ComponentProps } from 'react'
+import type { LevelingVideo } from '../LevelPipette'
 import type {
   PipetteModelSpecs,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
-import type { LevelingVideo } from '../LevelPipette'
+import type { ComponentProps } from 'react'
 
 vi.mock('../CheckPipettesButton')
 vi.mock('../LevelPipette', async importOriginal => {

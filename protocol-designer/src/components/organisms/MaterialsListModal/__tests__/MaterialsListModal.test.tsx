@@ -1,19 +1,18 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { i18n } from '../../../../assets/localization'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { getRobotType } from '../../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { MaterialsListModal } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { getRobotType } from '../../../../file-data/selectors'
+import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 
-import type { ComponentProps } from 'react'
-import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import type { InfoScreen } from '@opentrons/components'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../../step-forms'
+import type { InfoScreen } from '@opentrons/components'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../labware-ingred/selectors')

@@ -1,12 +1,12 @@
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 
-import type { SVGProps } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { SVGProps } from 'react'
 
 interface SingleSlotFixtureProps extends SVGProps<SVGGElement> {
   cutoutId: CutoutId

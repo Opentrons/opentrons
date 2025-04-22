@@ -4,19 +4,21 @@ import {
   getPipetteSpecsV2,
   splitLabwareDefURI,
 } from '@opentrons/shared-data'
-import type { PipetteName } from '@opentrons/shared-data'
+
 import { OTHER } from '../../organisms/ApplicationSection'
 import {
-  TWO_PIPETTES,
-  OPENTRONS_OT2,
-  OPENTRONS_FLEX,
   FLEX_GRIPPER,
   NO_PIPETTES,
+  OPENTRONS_FLEX,
+  OPENTRONS_OT2,
+  TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
-import type { UseFormWatch } from 'react-hook-form'
-import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import { getOnlyLatestDefs } from './labware'
+
+import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import type { CreatePrompt } from '../types'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { UseFormWatch } from 'react-hook-form'
 
 export function generatePromptPreviewApplicationItems(
   watch: UseFormWatch<CreateProtocolFormData>,

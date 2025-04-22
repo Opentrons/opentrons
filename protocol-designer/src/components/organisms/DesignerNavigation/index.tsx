@@ -1,8 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,14 +14,15 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getFileMetadata } from '../../../file-data/selectors'
 import {
   selectDropdownItem,
   selectTerminalItem,
 } from '../../../ui/steps/actions/actions'
 import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
-import { useKitchen } from '../Kitchen/hooks'
 import { LiquidButton } from '../../molecules/LiquidButton'
+import { useKitchen } from '../Kitchen/hooks'
 
 import type { StyleProps } from '@opentrons/components'
 

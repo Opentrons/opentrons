@@ -1,7 +1,8 @@
-import { uuid } from '../../utils'
 import { pipetteDoesNotExist } from '../../errorCreators'
-import type { AirGapInPlaceParams } from '@opentrons/shared-data'
+import { uuid } from '../../utils'
+
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { AirGapInPlaceParams } from '@opentrons/shared-data'
 
 export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
   args,

@@ -1,8 +1,8 @@
 import * as Constants from './constants'
 
-import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { RobotUpdateState, RobotUpdateSession } from './types'
+import type { RobotUpdateSession, RobotUpdateState } from './types'
+import type { Reducer } from 'redux'
 
 export const INITIAL_STATE: RobotUpdateState = {
   flex: {

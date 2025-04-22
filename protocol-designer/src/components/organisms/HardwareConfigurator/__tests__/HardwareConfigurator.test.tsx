@@ -1,16 +1,17 @@
-import { describe, beforeEach, it, vi } from 'vitest'
-import { screen } from '@testing-library/react'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { DeckConfigurator } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+
+import { HardwareConfigurator } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { useDeckConfigurationEditing } from '../useDeckConfigurationEditing'
-import { HardwareConfigurator } from '..'
 
-import type { ComponentProps } from 'react'
-import type * as OpentronsComponents from '@opentrons/components'
 import type { WizardTileProps } from '../../../../pages/Onboarding/types'
 import type { WizardFormState } from '../../types'
+import type * as OpentronsComponents from '@opentrons/components'
+import type { ComponentProps } from 'react'
 
 vi.mock('../useDeckConfigurationEditing')
 vi.mock('@opentrons/components', async importOriginal => {

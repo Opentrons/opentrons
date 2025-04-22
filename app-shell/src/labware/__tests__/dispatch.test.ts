@@ -1,19 +1,19 @@
-import fse from 'fs-extra'
 import electron from 'electron'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import fse from 'fs-extra'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
+import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
+import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
+
+import { registerLabware } from '..'
 import * as Cfg from '../../config'
 import * as Dialogs from '../../dialogs'
 import * as Defs from '../definitions'
 import * as Val from '../validation'
-import { registerLabware } from '..'
 
-import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
-import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
-import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
-
-import type { Mock } from 'vitest'
-import type { Config } from '@opentrons/app/src/redux/config/types'
 import type { Dispatch } from '../../types'
+import type { Config } from '@opentrons/app/src/redux/config/types'
+import type { Mock } from 'vitest'
 
 vi.mock('fs-extra')
 vi.mock('electron')

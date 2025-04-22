@@ -1,5 +1,5 @@
-import type { RunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from '../types'
+import type { RunTimeCommand } from '@opentrons/shared-data/command'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string

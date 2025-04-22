@@ -4,9 +4,9 @@ import {
   COLORS,
   Flex,
   Icon,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 interface RenderResultProps {

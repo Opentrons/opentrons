@@ -1,23 +1,23 @@
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-
 import {
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   RadioGroup,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import {
   resetUseTrashSurfaceForTipCal,
   setUseTrashSurfaceForTipCal,
 } from '/app/redux/calibration'
 import { getUseTrashSurfaceForTipCal } from '/app/redux/config'
 
-import type { ChangeEvent } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
+import type { ChangeEvent } from 'react'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'

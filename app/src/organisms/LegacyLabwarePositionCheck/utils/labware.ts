@@ -1,11 +1,14 @@
 import reduce from 'lodash/reduce'
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   getIsTiprack,
-  getTiprackVolume,
   getLabwareDefURI,
+  getTiprackVolume,
 } from '@opentrons/shared-data'
+
 import { getModuleInitialLoadInfo } from '/app/transformations/commands'
-import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
+
+import type { LabwareToOrder } from '../types'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
@@ -15,7 +18,6 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareToOrder } from '../types'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,

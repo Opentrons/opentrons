@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getInitialAndMovedLabwareInSlots } from '@opentrons/components'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreasInProtocol,
@@ -15,7 +16,12 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import type { ReactNode } from 'react'
+// TODO: return the arguments or something - don't instantiate ui in helper code like this
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
+import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
+
+import { useNotifyDeckConfigurationQuery } from './useNotifyDeckConfigurationQuery'
+
 import type {
   CompletedProtocolAnalysis,
   CutoutConfigProtocolSpec,
@@ -24,12 +30,7 @@ import type {
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'
-
-import { useNotifyDeckConfigurationQuery } from './useNotifyDeckConfigurationQuery'
-// TODO: return the arguments or something - don't instantiate ui in helper code like this
-/* eslint-disable-next-line opentrons/no-imports-across-applications */
-import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import type { ReactNode } from 'react'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

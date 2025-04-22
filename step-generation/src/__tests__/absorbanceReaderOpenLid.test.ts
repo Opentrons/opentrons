@@ -1,15 +1,17 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
 } from '@opentrons/shared-data'
+
+import { absorbanceReaderOpenLid } from '../commandCreators/atomic/absorbanceReaderOpenLid'
 import {
   getErrorResult,
-  makeContext,
   getInitialRobotStateStandard,
+  makeContext,
 } from '../fixtures'
-import { absorbanceReaderOpenLid } from '../commandCreators/atomic/absorbanceReaderOpenLid'
 import { absorbanceReaderStateGetter } from '../robotStateSelectors'
+
 import type {
   AbsorbanceReaderState,
   InvariantContext,

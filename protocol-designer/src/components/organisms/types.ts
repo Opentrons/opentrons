@@ -1,10 +1,10 @@
+import type { NewProtocolFields } from '../../load-file'
+import type { FormModules, FormPipettesByMount } from '../../step-forms'
 import type {
   CutoutFixtureId,
   CutoutId,
   OT2CutoutId,
 } from '@opentrons/shared-data'
-import type { NewProtocolFields } from '../../load-file'
-import type { FormModules, FormPipettesByMount } from '../../step-forms'
 
 export type FixtureName = 'wasteChute' | 'trashBin' | 'stagingArea'
 export interface FixtureInfo {

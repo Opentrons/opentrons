@@ -1,9 +1,11 @@
 import assert from 'assert'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
+import { uuid } from '../../utils'
+
 import type { CommandCreator } from '../../types'
+import type { ModuleOnlyParams } from '@opentrons/shared-data'
 
 /** Disengage magnet of specified magnetic module. */
 export const disengageMagnet: CommandCreator<ModuleOnlyParams> = (

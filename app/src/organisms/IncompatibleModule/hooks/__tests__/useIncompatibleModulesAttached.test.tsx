@@ -1,15 +1,15 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
-
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useModulesQuery } from '@opentrons/react-api-client'
-import { useIncompatibleModulesAttached } from '..'
+import { renderHook } from '@testing-library/react'
 
+import { useIncompatibleModulesAttached } from '..'
 import * as Fixtures from '../__fixtures__'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Modules } from '@opentrons/api-client'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { UseQueryResult } from 'react-query'
+
 vi.mock('@opentrons/react-api-client')
 
 describe('useIncompatibleModulesAttached', () => {

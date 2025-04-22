@@ -5,17 +5,17 @@ import {
 } from '@opentrons/shared-data'
 
 import type {
-  LabwareDefinition2,
-  PipetteV2Specs,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
-import type { Mount } from '@opentrons/api-client'
-import type {
+  ChangeTipOptions,
+  PathOption,
   QuickTransferSummaryState,
   TransferType,
-  PathOption,
-  ChangeTipOptions,
 } from '../types'
+import type { Mount } from '@opentrons/api-client'
+import type {
+  DeckConfiguration,
+  LabwareDefinition2,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
 
 interface InitialSummaryStateProps {
   state: {

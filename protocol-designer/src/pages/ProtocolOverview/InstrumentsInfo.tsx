@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Btn,
@@ -13,13 +12,13 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getPipetteSpecsV2, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
+import type { PipetteOnDeck } from '../../step-forms'
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
-import type { PipetteOnDeck } from '../../step-forms'
 
 interface InstrumentsInfoProps {
   robotType: RobotType

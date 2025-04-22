@@ -1,12 +1,16 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+
+import { OffDeck } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { OffDeckDetails } from '../OffDeckDetails'
-import { OffDeck } from '..'
+
 import type * as Components from '@opentrons/components'
 
 vi.mock('../OffDeckDetails')

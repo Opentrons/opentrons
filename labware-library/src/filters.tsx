@@ -1,9 +1,9 @@
 // filter helpers
-import { useState, useLayoutEffect } from 'react'
-import queryString from 'query-string'
+import { useLayoutEffect, useState } from 'react'
 import flatMap from 'lodash/flatMap'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
+import queryString from 'query-string'
 
 import { getAllDefinitions } from './definitions'
 

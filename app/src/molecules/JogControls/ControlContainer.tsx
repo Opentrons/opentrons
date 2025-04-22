@@ -5,12 +5,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
-import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import type { ReactNode } from 'react'
 
 interface ControlContainerProps extends StyleProps {
   title: string

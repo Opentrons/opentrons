@@ -14,10 +14,11 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import {
-  setLocalStorageItem,
   getLocalStorageItem,
   localStorageAnnouncementKey,
+  setLocalStorageItem,
 } from '../../../persist'
 import { RELEASE_NOTES_URL } from '../KnowledgeLink'
 import { useAnnouncements } from './announcements'

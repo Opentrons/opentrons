@@ -1,18 +1,22 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
+import { isFlexPipette } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import {
   mockLeftProtoPipette,
   mockPipetteSettingsFieldsMap,
 } from '/app/redux/pipettes/__fixtures__'
-import { isFlexPipette } from '@opentrons/shared-data'
 
-import type { ComponentProps } from 'react'
+import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
+
 import type * as SharedData from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/config')
 vi.mock('@opentrons/shared-data', async importOriginal => {

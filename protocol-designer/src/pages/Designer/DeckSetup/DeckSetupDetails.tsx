@@ -1,9 +1,7 @@
-import values from 'lodash/values'
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
+import values from 'lodash/values'
 import { Module } from '@opentrons/components'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAddressableAreaFromSlotId,
   getAreSlotsVerticallyAdjacent,
@@ -15,36 +13,40 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+
+import { LabwareOnDeck } from '../../../components/organisms'
+import { getRobotType } from '../../../file-data/selectors'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { editSlotInfo } from '../../../labware-ingred/actions'
+import { selectors } from '../../../labware-ingred/selectors'
 import {
   getSlotIdsBlockedBySpanningForThermocycler,
   getSlotIsEmpty,
 } from '../../../step-forms'
-import { selectors } from '../../../labware-ingred/selectors'
 import { getStagingAreaAddressableAreas } from '../../../utils'
-import { editSlotInfo } from '../../../labware-ingred/actions'
-import { getRobotType } from '../../../file-data/selectors'
-import { LabwareOnDeck } from '../../../components/organisms'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getSlotInformation } from '../utils'
 import { HighlightLabware } from '../HighlightLabware'
-import { SlotOverflowMenu } from './SlotOverflowMenu'
+import { getSlotInformation } from '../utils'
+import { HighlightItems } from './HighlightItems'
 import { HoveredItems } from './HoveredItems'
+import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { SelectedHoveredItems } from './SelectedHoveredItems'
+import { SlotOverflowMenu } from './SlotOverflowMenu'
+import { SlotWarning } from './SlotWarning'
 import {
   getAdjacentLabware,
   getSwapBlockedAdapter,
   getSwapBlockedModule,
 } from './utils'
-import { SlotWarning } from './SlotWarning'
-import { HighlightItems } from './HighlightItems'
-import { SlotControls, AdapterControls, LabwareControls } from './Overlays'
 
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
-import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
-  ModuleTemporalProperties,
-  ThermocyclerModuleState,
-} from '@opentrons/step-generation'
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../../step-forms'
+import type { DeckSetupTerminalIdType } from '../types'
+import type { Fixture } from './constants'
+import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
   AddressableArea,
   AddressableAreaName,
@@ -54,12 +56,10 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type {
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../../step-forms'
-import type { DeckSetupTerminalIdType } from '../types'
-import type { Fixture } from './constants'
+  ModuleTemporalProperties,
+  ThermocyclerModuleState,
+} from '@opentrons/step-generation'
+import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup

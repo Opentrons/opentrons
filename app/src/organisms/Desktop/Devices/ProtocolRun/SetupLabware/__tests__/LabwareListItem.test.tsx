@@ -1,30 +1,30 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-
-import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
 import {
   mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModule,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
-import { SecureLabwareModal } from '../SecureLabwareModal'
-import { LabwareListItem } from '../LabwareListItem'
 
-import type { ComponentProps } from 'react'
+import { LabwareListItem } from '../LabwareListItem'
+import { SecureLabwareModal } from '../SecureLabwareModal'
+
 import type {
+  LabwareDefinition2,
   ModuleModel,
   ModuleType,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
+import type { ComponentProps } from 'react'
 
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')

@@ -1,11 +1,11 @@
-import { getWellRatio } from '../../../../../steplist/utils'
-import type { PathOption, StepType } from '../../../../../form-types'
 import { getPipetteCapacity } from '../../../../../pipettes/pipetteData'
-
 import {
-  volumeInCapacityForMultiDispense,
   volumeInCapacityForMultiAspirate,
+  volumeInCapacityForMultiDispense,
 } from '../../../../../steplist/formLevel/handleFormChange/utils'
+import { getWellRatio } from '../../../../../steplist/utils'
+
+import type { PathOption, StepType } from '../../../../../form-types'
 import type {
   ChangeTipOptions,
   PipetteEntities,

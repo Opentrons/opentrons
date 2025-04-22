@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_STRETCH,
   BORDERS,
@@ -7,10 +6,11 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { OddModal } from '/app/molecules/OddModal'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'

@@ -1,13 +1,14 @@
-import { getTimeFromForm } from '../../utils/getTimeFromForm'
 import {
-  PAUSE_UNTIL_TIME,
-  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
 } from '../../../constants'
+import { getTimeFromForm } from '../../utils/getTimeFromForm'
+
 import type { HydratedPauseFormData } from '../../../form-types'
 import type {
-  WaitForTemperatureArgs,
   PauseArgs,
+  WaitForTemperatureArgs,
 } from '@opentrons/step-generation'
 
 export const pauseFormToArgs = (

@@ -1,27 +1,27 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { fixture96Plate } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 
+import { MixTools } from '..'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import {
-  getLabwareEntities,
-  getPipetteEntities,
-} from '../../../../../../../step-forms/selectors'
 import {
   getEnableLiquidClasses,
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../../feature-flags/selectors'
+import {
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../../../../../step-forms/selectors'
 import { getFormErrorsMappedToField } from '../../../utils'
 import { LiquidClassesStepTools } from '../../MoveLiquidTools/LiquidClassesStepTools'
 import { FirstStepMixTools } from '../FirstStepMixTools'
 import { SecondStepMixTools } from '../SecondStepMixTools'
-import { MixTools } from '..'
 
-import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormData } from '../../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../../steplist'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../../../../../../../feature-flags/selectors')

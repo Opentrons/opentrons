@@ -1,23 +1,25 @@
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
+import * as errorCreators from '../../errorCreators'
 import {
-  uuid,
-  getLabwareSlot,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
   absorbanceReaderCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  pipetteAdjacentHeaterShakerWhileShaking,
+  formatPyStr,
+  formatPyWellLocation,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  formatPyStr,
-  formatPyWellLocation,
+  getLabwareSlot,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
-import * as errorCreators from '../../errorCreators'
-import type { CreateCommand, BlowoutParams } from '@opentrons/shared-data'
-import type { CommandCreatorError, CommandCreator } from '../../types'
+
+import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { BlowoutParams, CreateCommand } from '@opentrons/shared-data'
 
 export const blowOutInWell: CommandCreator<BlowoutParams> = (
   args,

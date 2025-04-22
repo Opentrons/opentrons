@@ -2,10 +2,11 @@ import { I18nextProvider } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 
-import { resources } from '/app/assets/localization'
 import { i18n, i18nCb, i18nConfig } from '/app/i18n'
 import { getAppLanguage } from '/app/redux/config'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
+
+import { resources } from '/app/assets/localization'
 
 import type { ReactNode } from 'react'
 

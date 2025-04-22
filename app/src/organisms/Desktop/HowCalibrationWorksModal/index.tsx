@@ -1,25 +1,25 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Box,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  Modal,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
+
+import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'

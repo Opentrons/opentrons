@@ -1,7 +1,7 @@
-import { useState, useLayoutEffect } from 'react'
+import { useLayoutEffect, useState } from 'react'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 // TODO(jh, 08-06-24): Revisit this. Can the server reasonably supply the failed command via useCurrentlyRecoveringFrom
 // during all states the app cares about?

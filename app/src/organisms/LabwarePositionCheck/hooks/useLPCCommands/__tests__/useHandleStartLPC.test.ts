@@ -1,4 +1,4 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 
 import {
@@ -6,8 +6,8 @@ import {
   moduleInitBeforeAnyLPCCommands,
   moveToMaintenancePosition,
 } from '../commands'
-import { mapFlexStackerLabware } from '../utils'
 import { useHandleStartLPC } from '../useHandleStartLPC'
+import { mapFlexStackerLabware } from '../utils'
 
 vi.mock('../commands')
 vi.mock('../utils')

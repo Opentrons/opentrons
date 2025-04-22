@@ -1,14 +1,14 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
 import { useQueryClient } from 'react-query'
-
-import { useCommandQuery } from '@opentrons/react-api-client'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react'
 
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
+
 import { useCurrentlyRecoveringFrom } from '../useCurrentlyRecoveringFrom'
 
 import type { Mock } from 'vitest'

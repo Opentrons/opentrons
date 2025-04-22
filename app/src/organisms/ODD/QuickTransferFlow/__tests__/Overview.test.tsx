@@ -1,10 +1,11 @@
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { describe, it, afterEach, vi, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useFeatureFlag } from '/app/redux/config'
+
 import { Overview } from '../Overview'
 
 import type { ComponentProps } from 'react'

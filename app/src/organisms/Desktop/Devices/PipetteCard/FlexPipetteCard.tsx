@@ -1,35 +1,35 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  CURSOR_POINTER,
   Banner,
+  CURSOR_POINTER,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-  FLEX_ROBOT_TYPE,
-  LEFT,
-} from '@opentrons/shared-data'
-import {
   useCurrentSubsystemUpdateQuery,
   useHost,
 } from '@opentrons/react-api-client'
+import {
+  FLEX_ROBOT_TYPE,
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
+
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
-import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
-import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
+import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
-import type { MouseEventHandler } from 'react'
 import type {
   BadPipette,
   HostConfig,
@@ -41,6 +41,7 @@ import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '/app/organisms/PipetteWizardFlows/types'
+import type { MouseEventHandler } from 'react'
 
 interface FlexPipetteCardProps {
   attachedPipette: PipetteData | BadPipette | null

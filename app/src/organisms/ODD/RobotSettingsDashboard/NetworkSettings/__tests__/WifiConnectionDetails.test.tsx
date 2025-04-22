@@ -1,18 +1,20 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
 import * as Networking from '/app/redux/networking'
+
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
+import type { State } from '/app/redux/types'
 import type { ComponentProps } from 'react'
 import type * as Dom from 'react-router-dom'
-import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/networking')

@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next'
-
-import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { SetWifiCred as SetWifiCredComponent } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { WifiScreenOption } from './'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface SetWifiCredProps {
   handleConnect: () => void

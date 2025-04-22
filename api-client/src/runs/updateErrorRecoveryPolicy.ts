@@ -1,7 +1,7 @@
 import { PUT, request } from '../request'
 
-import type { HostConfig } from '../types'
 import type { ResponsePromise } from '../request'
+import type { HostConfig } from '../types'
 import type {
   ErrorRecoveryPolicy,
   IfMatchType,

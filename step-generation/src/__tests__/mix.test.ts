@@ -1,37 +1,39 @@
-import { beforeEach, describe, it, expect } from 'vitest'
 import flatMap from 'lodash/flatMap'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   FIXED_TRASH_ID,
   fixtureTiprack300ul,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
+
 import { mix } from '../commandCreators/compound/mix'
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
-  replaceTipCommands,
-  getFlowRateAndOffsetParamsMix,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  makeAspirateHelper,
-  makeDispenseHelper,
   blowoutHelper,
-  makeTouchTipHelper,
+  DEFAULT_PIPETTE,
   delayCommand,
+  DEST_LABWARE,
+  getErrorResult,
+  getFlowRateAndOffsetParamsMix,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeAspirateHelper,
+  makeContext,
+  makeDispenseHelper,
+  makeTouchTipHelper,
+  replaceTipCommands,
+  SOURCE_LABWARE,
 } from '../fixtures'
-import type {
-  AspDispAirgapParams,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+
 import type {
   ChangeTipOptions,
   InvariantContext,
   MixArgs,
   RobotState,
 } from '../types'
+import type {
+  AspDispAirgapParams,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper({ labwareId: SOURCE_LABWARE })

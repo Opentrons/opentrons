@@ -1,9 +1,10 @@
 import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
+
 import type {
-  QuickTransferWizardState,
+  QuickTransferSummaryAction,
   QuickTransferSummaryState,
   QuickTransferWizardAction,
-  QuickTransferSummaryAction,
+  QuickTransferWizardState,
   TransferType,
 } from './types'
 

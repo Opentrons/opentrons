@@ -1,14 +1,17 @@
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
+
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
 import { SelectOt2Modules } from '../SelectOt2Modules'
 
-import type { ComponentProps } from 'react'
 import type { WizardFormState } from '../../../components/organisms'
 import type { WizardTileProps } from '../types'
+import type { ComponentProps } from 'react'
 
 vi.mock('../../../feature-flags/selectors')
 

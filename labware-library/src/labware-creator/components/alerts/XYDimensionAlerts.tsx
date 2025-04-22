@@ -1,13 +1,15 @@
 import { AlertItem } from '@opentrons/components'
+
 import {
-  SUGGESTED_X,
-  SUGGESTED_Y,
   LINK_CUSTOM_LABWARE_FORM,
+  SUGGESTED_X,
   SUGGESTED_XY_RANGE,
+  SUGGESTED_Y,
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
-import type { FormikTouched } from 'formik'
+
 import type { LabwareFields } from '../../fields'
+import type { FormikTouched } from 'formik'
 
 const xyMessage = (
   <div>

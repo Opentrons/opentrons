@@ -1,6 +1,7 @@
 import { getLoadedModule } from './getLoadedModule'
-import type { ModuleModel } from '@opentrons/shared-data'
+
 import type { LoadedModules } from './types'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 export function getModuleModel(
   loadedModules: LoadedModules,

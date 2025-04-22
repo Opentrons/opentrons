@@ -1,19 +1,18 @@
 import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_CENTER,
   Flex,
-  LiquidIcon,
   Icon,
-  SPACING,
+  JUSTIFY_CENTER,
   LegacyStyledText,
+  LiquidIcon,
+  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'

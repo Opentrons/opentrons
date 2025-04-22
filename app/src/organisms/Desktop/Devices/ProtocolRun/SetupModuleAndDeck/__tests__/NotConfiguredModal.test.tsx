@@ -1,16 +1,17 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { NotConfiguredModal } from '../NotConfiguredModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import { NotConfiguredModal } from '../NotConfiguredModal'
+
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')

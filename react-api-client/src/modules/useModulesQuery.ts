@@ -1,9 +1,11 @@
 import { useQuery } from 'react-query'
 import { getModules } from '@opentrons/api-client'
-import { useHost } from '../api'
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
-import type { HostConfig, Modules } from '@opentrons/api-client'
 import { MODULE_MODELS } from '@opentrons/shared-data'
+
+import { useHost } from '../api'
+
+import type { HostConfig, Modules } from '@opentrons/api-client'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export type UseModulesQueryOptions = UseQueryOptions<Modules>
 

@@ -1,5 +1,5 @@
-import type { WaitForDurationRunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from '../types'
+import type { WaitForDurationRunTimeCommand } from '@opentrons/shared-data/command'
 
 export function getWaitForDurationCommandText({
   command,

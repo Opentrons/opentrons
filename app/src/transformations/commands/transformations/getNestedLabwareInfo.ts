@@ -1,10 +1,10 @@
+import type { LabwareSetupItem } from './getLabwareSetupItemGroups'
 import type {
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareSetupItem } from './getLabwareSetupItemGroups'
 
 export interface NestedLabwareInfo {
   nestedLabwareDisplayName: string

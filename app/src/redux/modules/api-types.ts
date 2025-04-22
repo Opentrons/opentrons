@@ -1,14 +1,14 @@
 import type {
-  TEMPDECK,
-  MAGDECK,
-  THERMOCYCLER,
-  ModuleType,
-  MagneticModuleModel,
-  TemperatureModuleModel,
-  ThermocyclerModuleModel,
-  HeaterShakerModuleModel,
   AbsorbanceReaderModel,
+  HeaterShakerModuleModel,
+  MAGDECK,
+  MagneticModuleModel,
   ModuleModel,
+  ModuleType,
+  TEMPDECK,
+  TemperatureModuleModel,
+  THERMOCYCLER,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'

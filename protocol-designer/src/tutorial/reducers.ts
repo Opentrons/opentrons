@@ -1,12 +1,13 @@
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-import type { Reducer } from 'redux'
-import type { Action } from '../types'
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+
 import type { RehydratePersistedAction } from '../persist'
+import type { Action } from '../types'
 import type { AddHintAction, RemoveHintAction } from './actions'
 import type { HintKey } from './index'
+import type { Reducer } from 'redux'
 
 type HintReducerState = HintKey[]
 const hints = handleActions<HintReducerState>(

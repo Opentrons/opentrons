@@ -1,6 +1,5 @@
 import { createPortal } from 'react-dom'
 import { css } from 'styled-components'
-
 import {
   Flex,
   OVERFLOW_AUTO,
@@ -9,12 +8,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { InterventionModal } from '/app/molecules/InterventionModal'
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
+import { InterventionModal } from '/app/molecules/InterventionModal'
 
-import type { ComponentProps } from 'react'
-import type { ModalType } from '/app/molecules/InterventionModal'
 import type { DesktopSizeType } from '../types'
+import type { ModalType } from '/app/molecules/InterventionModal'
+import type { ComponentProps } from 'react'
 
 export type RecoveryInterventionModalProps = Omit<
   ComponentProps<typeof InterventionModal>,

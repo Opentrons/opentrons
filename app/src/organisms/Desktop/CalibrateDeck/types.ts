@@ -1,6 +1,7 @@
 import type { DispatchRequestsType } from '/app/redux/robot-api'
-import type { MutableRefObject } from 'react'
 import type { DeckCalibrationSession } from '/app/redux/sessions/types'
+import type { MutableRefObject } from 'react'
+
 export interface CalibrateDeckParentProps {
   robotName: string
   session: DeckCalibrationSession | null

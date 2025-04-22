@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -7,16 +7,16 @@ import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__f
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { AttachProbe } from '/app/organisms/LabwarePositionCheck/steps'
 import {
-  selectStepInfo,
   selectActivePipetteChannelCount,
+  selectStepInfo,
 } from '/app/redux/protocol-runs'
+
+import type { ComponentProps } from 'react'
+import type { Mock } from 'vitest'
 
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-
-import type { ComponentProps } from 'react'
-import type { Mock } from 'vitest'
 
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
   LPCContentContainer: MockLPCContentContainer,

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
-
+import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -24,33 +23,33 @@ import {
 
 import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 import { JogControls } from '/app/molecules/JogControls'
+import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
+import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
+import { LPCLabwareJogRender } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCLabwareJogRender'
+import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
+  getFlexSlotNameOnly,
+  goBackEditOffsetSubstep,
+  proceedEditOffsetSubstep,
   selectActivePipette,
   selectIsSelectedLwTipRack,
   selectSelectedLwOverview,
-  goBackEditOffsetSubstep,
-  proceedEditOffsetSubstep,
+  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
-  getFlexSlotNameOnly,
 } from '/app/redux/protocol-runs'
-import { getIsOnDevice } from '/app/redux/config'
-import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
-import { LPCLabwareJogRender } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCLabwareJogRender'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
-import type { TFunction } from 'i18next'
-import type { LoadedPipette, Coordinates } from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
+import type { Coordinates, LoadedPipette } from '@opentrons/shared-data'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type {
   LPCWizardState,
-  SelectedLwOverview,
   OffsetLocationDetails,
+  SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
+import type { TFunction } from 'i18next'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void

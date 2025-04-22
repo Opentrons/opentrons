@@ -1,4 +1,4 @@
-import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { ModuleModel, ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)

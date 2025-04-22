@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
-import type { ReactNode, MouseEventHandler } from 'react'
 import type { DragRect, GenericRect } from '../../../collision-types'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 const blueColor = '#5fd8ee'
 const blueColorAlpha = '#5fd8ee4d'

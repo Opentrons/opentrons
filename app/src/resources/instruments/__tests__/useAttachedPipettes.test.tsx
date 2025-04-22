@@ -1,18 +1,19 @@
-import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
-import { usePipettesQuery } from '@opentrons/react-api-client'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useAttachedPipettes } from '../useAttachedPipettes'
 import {
   pipetteResponseFixtureLeft,
   pipetteResponseFixtureRight,
 } from '@opentrons/api-client'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { renderHook } from '@testing-library/react'
 
-import type { FunctionComponent, ReactNode } from 'react'
-import type { UseQueryResult } from 'react-query'
+import { useAttachedPipettes } from '../useAttachedPipettes'
+
 import type { FetchPipettesResponseBody } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('@opentrons/shared-data')

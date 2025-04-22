@@ -1,7 +1,6 @@
+import { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useState, useLayoutEffect } from 'react'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -19,16 +18,19 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
+
+import type { RobotType } from '@opentrons/shared-data'
+import type { ReactNode } from 'react'
+
 import one from '../../assets/images/onboarding_animation_1.webm'
 import two from '../../assets/images/onboarding_animation_2.webm'
 import three from '../../assets/images/onboarding_animation_3.webm'
 import four from '../../assets/images/onboarding_animation_4.webm'
 import five from '../../assets/images/onboarding_animation_5.webm'
 import six from '../../assets/images/onboarding_animation_6.webm'
-import { LINK_BUTTON_STYLE } from '../../components/atoms'
-
-import type { ReactNode } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
 
 interface WizardBodyProps {
   stepNumber: number

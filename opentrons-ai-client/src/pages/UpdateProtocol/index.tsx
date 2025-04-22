@@ -1,35 +1,37 @@
+import { useEffect, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { CSSTransition } from 'react-transition-group'
+import { useAtom } from 'jotai'
 import styled from 'styled-components'
 import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DropdownMenu,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   LargeButton,
-  StyledText,
   Link as LinkComponent,
-  DropdownMenu,
+  StyledText,
 } from '@opentrons/components'
-import type { DropdownOption } from '@opentrons/components'
-import type { UpdateOptions } from '../../resources/types'
-import { UploadInput } from '../../molecules/UploadInput'
-import { useEffect, useState } from 'react'
-import type { ChangeEvent } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+
+import { TextAreaField } from '../../atoms/TextAreaField'
 import { FileUpload } from '../../molecules/FileUpload'
-import { useNavigate } from 'react-router-dom'
+import { UploadInput } from '../../molecules/UploadInput'
 import {
+  chatDataAtom,
   chatHistoryAtom,
   createProtocolChatAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
-  chatDataAtom,
 } from '../../resources/atoms'
-import { CSSTransition } from 'react-transition-group'
-import { useAtom } from 'jotai'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-import { TextAreaField } from '../../atoms/TextAreaField'
+
+import type { UpdateOptions } from '../../resources/types'
+import type { DropdownOption } from '@opentrons/components'
+import type { ChangeEvent } from 'react'
 
 interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions

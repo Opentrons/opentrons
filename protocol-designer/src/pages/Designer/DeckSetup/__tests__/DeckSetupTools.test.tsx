@@ -1,32 +1,35 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, screen } from '@testing-library/react'
+
 import {
   ABSORBANCE_READER_V1,
+  fixture96Plate,
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
-  fixture96Plate,
 } from '@opentrons/shared-data'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
-import { i18n } from '../../../../assets/localization'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { deleteContainer } from '../../../../labware-ingred/actions'
+import { i18n } from '../../../../assets/localization'
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { getRobotType } from '../../../../file-data/selectors'
+import { deleteContainer } from '../../../../labware-ingred/actions'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { deleteModule } from '../../../../modules'
+import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
-import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getDismissedHints } from '../../../../tutorial/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import { getDismissedHints } from '../../../../tutorial/selectors'
 import { DeckSetupTools } from '../DeckSetupTools'
 import { LabwareTools } from '../LabwareTools'
 
-import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 
 vi.mock('../LabwareTools')
 vi.mock('../../../../feature-flags/selectors')

@@ -1,21 +1,23 @@
-import toPairs from 'lodash/toPairs'
 import pick from 'lodash/pick'
+import toPairs from 'lodash/toPairs'
 import { AlertItem } from '@opentrons/components'
+
 import {
   getLabel,
   IRREGULAR_LABWARE_ERROR,
-  LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
-  LOOSE_TIP_FIT_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
   LINK_CUSTOM_LABWARE_FORM,
   LINK_REQUEST_ADAPTER_FORM,
+  LOOSE_TIP_FIT_ERROR,
   MUST_BE_A_NUMBER_ERROR,
   REQUIRED_FIELD_ERROR,
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
 
-import type { FormikTouched, FormikErrors } from 'formik'
 import type { LabwareFields } from '../../fields'
+import type { FormikErrors, FormikTouched } from 'formik'
+
 export interface Props {
   values: LabwareFields
   fieldList: Array<keyof LabwareFields>

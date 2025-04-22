@@ -1,10 +1,10 @@
-import { it, describe } from 'vitest'
+import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import * as Sessions from '/app/redux/sessions'
 
-import { i18n } from '/app/i18n'
 import { Body } from '../Body'
 
 import type { ComponentProps } from 'react'

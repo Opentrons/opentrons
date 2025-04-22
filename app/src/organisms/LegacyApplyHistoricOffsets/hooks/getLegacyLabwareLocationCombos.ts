@@ -4,12 +4,13 @@ import {
   getLabwareDefURI,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+
+import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
 import type {
   AddressableAreaName,
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
 
 export interface LegacyLabwareLocationCombo {
   location: LegacyLabwareOffsetLocation

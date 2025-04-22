@@ -1,7 +1,6 @@
 import { useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
-
 import {
   BORDERS,
   Btn,
@@ -11,6 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+
 import { getFileMetadata } from '../../../file-data/selectors'
 
 const BUTTON_NAME = 'SettingsIconButton'

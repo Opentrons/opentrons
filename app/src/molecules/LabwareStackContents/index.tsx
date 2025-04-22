@@ -1,21 +1,22 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
   RadioButton,
-  truncateString,
   SPACING,
+  StyledText,
   styleProps,
+  truncateString,
 } from '@opentrons/components'
+
 import { getIsOnDevice } from '/app/redux/config'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { LabwareInStack } from '/app/transformations/commands'
+import type { Dispatch, SetStateAction } from 'react'
 
 const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {

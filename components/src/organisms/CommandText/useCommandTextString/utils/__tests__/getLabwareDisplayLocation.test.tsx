@@ -1,23 +1,23 @@
-import { describe, it, expect, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useTranslation } from 'react-i18next'
-
+import { describe, expect, it, vi } from 'vitest'
 import {
   FLEX_ROBOT_TYPE,
+  getLabwareDefURI,
+  getLabwareDisplayName,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  getLabwareDefURI,
-  getLabwareDisplayName,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../../../testing/utils'
+import { screen } from '@testing-library/react'
+
 import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '../../../../../testing/utils'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getModuleDisplayLocation } from '../getModuleDisplayLocation'
 import { getModuleModel } from '../getModuleModel'
 
-import type { ComponentProps } from 'react'
 import type { LabwareLocation } from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 
 vi.mock('../getModuleModel')
 vi.mock('../getModuleDisplayLocation')

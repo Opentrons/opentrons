@@ -1,18 +1,20 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
+
 import { BORDERS } from '../../helix-design-system'
+import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
 import {
-  MULTI_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_HEIGHT,
-  MULTI_CHANNEL_PIPETTE_HEIGHT,
   MULTI_CHANNEL_CENTER_Y_NOZZLE,
+  MULTI_CHANNEL_PIPETTE_HEIGHT,
+  MULTI_CHANNEL_PIPETTE_WIDTH,
   MULTI_CHANNEL_Y_OFFSET,
   NINETY_SIX_CHANNEL_PIPETTE_WIDTH,
+  SINGLE_CHANNEL_PIPETTE_HEIGHT,
+  SINGLE_CHANNEL_PIPETTE_WIDTH,
 } from './constants'
-import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
+import { EmanatingNozzle } from './EmanatingNozzle'
+
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteRenderProps {

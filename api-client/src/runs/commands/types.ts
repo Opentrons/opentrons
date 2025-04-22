@@ -1,4 +1,4 @@
-import type { RunTimeCommand, RunCommandError } from '@opentrons/shared-data'
+import type { RunCommandError, RunTimeCommand } from '@opentrons/shared-data'
 
 export interface GetCommandsParams {
   pageLength: number // the number of items to include

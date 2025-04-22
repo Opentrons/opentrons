@@ -1,5 +1,5 @@
-import { CLI_PREFIX, JUPYTER_PREFIX, PYTHON_INDENT } from './constants'
 import { buildLoadCommandCopy } from './buildLoadCommandCopy'
+import { CLI_PREFIX, JUPYTER_PREFIX, PYTHON_INDENT } from './constants'
 
 import type { LabwareOffsetSnippetProps } from '/app/molecules/LabwareOffsetSnippet'
 

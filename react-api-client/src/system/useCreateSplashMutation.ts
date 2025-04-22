@@ -1,14 +1,15 @@
 import { useMutation } from 'react-query'
 import { createSplash } from '@opentrons/api-client'
+
 import { useHost } from '../api'
 
+import type { ErrorResponse, HostConfig } from '@opentrons/api-client'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type {
-  UseMutationResult,
-  UseMutationOptions,
   UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
 } from 'react-query'
-import type { ErrorResponse, HostConfig } from '@opentrons/api-client'
 
 export interface CreateSplashRequestData {
   file: File

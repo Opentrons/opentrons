@@ -1,17 +1,17 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
-
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
+import { act, renderHook } from '@testing-library/react'
+
+import {
+  GRIPPER_MOVE_STEPS,
+  RECOVERY_MAP,
+} from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import { useShowDoorInfo } from '../useShowDoorInfo'
-import {
-  RECOVERY_MAP,
-  GRIPPER_MOVE_STEPS,
-} from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { IRecoveryMap, RouteStep } from '../../types'
 

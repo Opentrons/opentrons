@@ -1,8 +1,8 @@
 import { WellSelection } from '../../WellSelection'
 
+import type { RecoveryContentProps } from '../types'
 import type { WellGroup } from '@opentrons/components'
 import type { NozzleLayoutDetails } from '@opentrons/shared-data'
-import type { RecoveryContentProps } from '../types'
 
 export type TipSelectionProps = RecoveryContentProps & {
   allowTipSelection: boolean

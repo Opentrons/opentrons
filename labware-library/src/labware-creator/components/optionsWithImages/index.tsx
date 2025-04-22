@@ -1,7 +1,8 @@
-import type * as React from 'react'
 import { wellBottomShapeOptions, wellShapeOptions } from '../../fields'
-import type { Options } from '../../fields'
 import styles from './optionsWithImages.module.css'
+
+import type { Options } from '../../fields'
+import type * as React from 'react'
 
 const WELL_SHAPE_IMAGES = {
   rectangular: new URL('../../../images/rectangularWell.svg', import.meta.url)

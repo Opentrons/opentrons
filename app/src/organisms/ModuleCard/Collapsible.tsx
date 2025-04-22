@@ -6,12 +6,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import type { IconName } from '@opentrons/components'
 
+import type { IconName } from '@opentrons/components'
 import type { ReactNode } from 'react'
 
 interface CollapsibleProps {

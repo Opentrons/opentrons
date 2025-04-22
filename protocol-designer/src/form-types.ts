@@ -20,6 +20,7 @@ import type {
   TrashBinEntity,
   WasteChuteEntity,
 } from '@opentrons/step-generation'
+
 export type StepIdType = string
 export type StepFieldName = string
 

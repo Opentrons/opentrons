@@ -1,20 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { renderHook, waitFor } from '@testing-library/react'
 import {
+  fixtureTiprack300ul,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
-  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
-import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
+import { renderHook, waitFor } from '@testing-library/react'
 
-import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 
-import type { FunctionComponent, ReactNode } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
+import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
+
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('../useAllHistoricOffsets')
 vi.mock('../getLegacyLabwareLocationCombos')

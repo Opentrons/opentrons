@@ -1,7 +1,9 @@
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { screen } from '@testing-library/react'
-import { COLORS, SPACING, TYPOGRAPHY, BORDERS } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { QuaternaryButton } from '..'

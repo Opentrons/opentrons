@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+
+import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
 
 import {
   retractPipetteAxesSequentiallyCommands,
   verifyProbeAttachmentAndHomeCommands,
 } from './commands'
-import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
 
-import type { CreateCommand, LoadedPipette } from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
+import type { CreateCommand, LoadedPipette } from '@opentrons/shared-data'
 
 export interface UseProbeCommandsResult {
   handleProbeAttachment: (pipette: LoadedPipette | null) => Promise<void>

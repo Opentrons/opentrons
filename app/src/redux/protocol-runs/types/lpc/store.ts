@@ -1,13 +1,13 @@
+import type { LPCLabwareInfo } from './labware'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type {
-  LPC_STEP,
   HANDLE_LW_SUBSTEP,
+  LPC_STEP,
 } from '/app/redux/protocol-runs/constants'
-import type { LPCLabwareInfo } from './labware'
 
 export interface LPCWizardState {
   steps: StepInfo

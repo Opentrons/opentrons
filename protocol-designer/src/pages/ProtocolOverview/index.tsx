@@ -1,10 +1,9 @@
-import { Fragment, useState, useEffect } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -20,41 +19,42 @@ import {
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { COLUMN_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
+import { EndUserAgreementFooter } from '../../components/molecules'
+import {
+  EditInstrumentsModal,
+  EditProtocolMetadataModal,
+} from '../../components/organisms'
+import { useBlockingHint } from '../../components/organisms/BlockingHintModal/useBlockingHint'
+import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
+import {
+  getEnablePythonExport,
+  getEnableTimelineScrubber,
+} from '../../feature-flags/selectors'
+import { selectors as fileSelectors } from '../../file-data'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { actions as loadFileActions } from '../../load-file'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
   getLiquidEntities,
 } from '../../step-forms/selectors'
-import { selectors as fileSelectors } from '../../file-data'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { actions as loadFileActions } from '../../load-file'
-import {
-  getEnablePythonExport,
-  getEnableTimelineScrubber,
-} from '../../feature-flags/selectors'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
-import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../components/atoms'
-import { EndUserAgreementFooter } from '../../components/molecules'
-import { useBlockingHint } from '../../components/organisms/BlockingHintModal/useBlockingHint'
-import {
-  EditProtocolMetadataModal,
-  EditInstrumentsModal,
-} from '../../components/organisms'
-import { getWarningContent } from './UnusedModalContent'
-import { ProtocolMetadata } from './ProtocolMetadata'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
-import { StepsInfo } from './StepsInfo'
+import { ProtocolMetadata } from './ProtocolMetadata'
+import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
+import { StepsInfo } from './StepsInfo'
+import { getWarningContent } from './UnusedModalContent'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
   getUnusedTrash,
 } from './utils'
-import { ScrubberContainer } from './ScrubberContainer'
-import type { CreateCommand } from '@opentrons/shared-data'
+
 import type { ThunkDispatch } from '../../types'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'

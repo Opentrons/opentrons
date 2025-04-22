@@ -1,7 +1,8 @@
+import { describe, expect, it } from 'vitest'
+import { screen } from '@testing-library/react'
+
 import { Footer } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
 import { i18n } from '../../../i18n'
 
 const render = (): ReturnType<typeof renderWithProviders> => {

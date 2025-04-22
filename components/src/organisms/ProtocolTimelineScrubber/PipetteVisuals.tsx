@@ -1,13 +1,15 @@
 import { useState } from 'react'
+
+import { LegacyStyledText } from '../../atoms'
+import { COLORS } from '../../helix-design-system'
 import { Box, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   TEXT_TRANSFORM_UPPERCASE,
 } from '../../styles'
-import { LegacyStyledText } from '../../atoms'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
+
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,

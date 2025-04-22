@@ -1,12 +1,11 @@
+import { beforeEach, describe, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi } from 'vitest'
 
+import { DesignerNavigation } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getFileMetadata } from '../../../../file-data/selectors'
 import { LiquidButton } from '../../../molecules'
-
-import { DesignerNavigation } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

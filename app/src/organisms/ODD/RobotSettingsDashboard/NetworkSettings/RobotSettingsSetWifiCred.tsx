@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
-
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
 import { SetWifiCred } from '../../NetworkSettings/SetWifiCred'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { SetSettingOption } from '../types'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface RobotSettingsSetWifiCredProps {
   handleConnect: () => void

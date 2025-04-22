@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
-import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { EmptyStateLinks } from './EmptyStateLinks'
+import { ProtocolUploadInput } from './ProtocolUploadInput'
+
 export function ProtocolsEmptyState(): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
   return (

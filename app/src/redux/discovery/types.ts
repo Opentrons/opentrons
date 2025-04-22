@@ -1,18 +1,17 @@
 import type {
+  CONNECTABLE,
+  HEALTH_STATUS_OK,
+  REACHABLE,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
+  UNREACHABLE,
+} from './constants'
+import type {
   DiscoveryClientRobot,
   DiscoveryClientRobotAddress,
   HealthResponse,
   HealthStatus,
 } from '@opentrons/discovery-client'
-
-import type {
-  HEALTH_STATUS_OK,
-  CONNECTABLE,
-  REACHABLE,
-  UNREACHABLE,
-  ROBOT_MODEL_OT2,
-  ROBOT_MODEL_OT3,
-} from './constants'
 
 export type { DiscoveryClientRobot, DiscoveryClientRobotAddress, HealthStatus }
 

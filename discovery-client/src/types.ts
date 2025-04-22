@@ -1,11 +1,10 @@
-import type { Agent } from 'http'
-
 import type {
-  RobotState,
-  HostState,
-  HealthStatus,
   Address,
+  HealthStatus,
+  HostState,
+  RobotState,
 } from './store/types'
+import type { Agent } from 'http'
 
 export type { RobotState, HostState, HealthStatus, Address }
 

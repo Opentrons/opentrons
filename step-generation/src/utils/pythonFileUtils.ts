@@ -1,20 +1,22 @@
 import {
+  FLEX_ROBOT_TYPE,
   getCutoutDisplayName,
+  getFlexNameConversion,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   isFlexPipette,
-  FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
-  getFlexNameConversion,
 } from '@opentrons/shared-data'
+
 import {
+  CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
   formatPyStr,
   indentPyLines,
-  CUSTOM_LABWARE_DICT_NAME,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
+
 import type {
   InvariantContext,
   LabwareEntities,

@@ -1,20 +1,21 @@
+import { mapFlexStackerLabware } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/utils'
+
 import {
   fullHomeCommands,
   moduleInitBeforeAnyLPCCommands,
   moveToMaintenancePosition,
 } from './commands'
-import { mapFlexStackerLabware } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/utils'
 
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
-  RunTimeCommand,
-  SetupRunTimeCommand,
   LoadedPipette,
   LoadLabwareCreateCommand,
+  RunTimeCommand,
   SetupCreateCommand,
+  SetupRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 export interface UseHandleStartLPCResult {
   handleStartLPC: (

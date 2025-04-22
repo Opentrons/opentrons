@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
-
 import { AlertPrimaryButton, SPACING } from '@opentrons/components'
 
-import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
 import { SmallButton } from '/app/atoms/buttons'
 
-import type { RunCommandError } from '@opentrons/shared-data'
+import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
+
 import type { ErrorDetails } from '../types'
+import type { RunCommandError } from '@opentrons/shared-data'
 
 export interface SetRobotErrorDetailsParams {
   message: string | null

@@ -1,7 +1,7 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -18,11 +18,12 @@ import {
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '/app/redux/networking'
-import { ChooseRobotSlideout } from '..'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 
-import type { ComponentProps } from 'react'
+import { ChooseRobotSlideout } from '..'
+
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')

@@ -1,12 +1,12 @@
+import type { HandlesCommands } from '../types'
 import type {
-  TemperatureModuleAwaitTemperatureCreateCommand,
-  TemperatureModuleSetTargetTemperatureCreateCommand,
-  TCSetTargetBlockTemperatureCreateCommand,
-  TCSetTargetLidTemperatureCreateCommand,
   HeaterShakerSetTargetTemperatureCreateCommand,
   RunTimeCommand,
+  TCSetTargetBlockTemperatureCreateCommand,
+  TCSetTargetLidTemperatureCreateCommand,
+  TemperatureModuleAwaitTemperatureCreateCommand,
+  TemperatureModuleSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data'
-import type { HandlesCommands } from '../types'
 
 export type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand

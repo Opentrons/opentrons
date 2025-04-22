@@ -1,4 +1,4 @@
-import { useEffect, useState, forwardRef } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import {
   ALIGN_CENTER,
@@ -17,6 +17,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import type { IconName } from '@opentrons/components'
 import type {
   ChangeEventHandler,
   FocusEvent,
@@ -24,7 +25,6 @@ import type {
   MutableRefObject,
 } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { IconName } from '@opentrons/components'
 
 const COLOR_WARNING_DARK = '#9e5e00' // ToDo (kk:08/13/2024) replace this with COLORS
 

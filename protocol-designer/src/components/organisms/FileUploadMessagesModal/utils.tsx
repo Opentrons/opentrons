@@ -7,8 +7,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { ReactNode } from 'react'
 import type { FileUploadMessage } from '../../../load-file'
+import type { ReactNode } from 'react'
 
 export interface ModalContents {
   title: string

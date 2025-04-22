@@ -12,4 +12,22 @@ module.exports = {
   jsxBracketSameLine: false, // default
   arrowParens: 'avoid', // default
   endOfLine: 'lf',
+  plugins: ['@ianvs/prettier-plugin-sort-imports'],
+  importOrder: [
+    '^(react)(.*)$',
+    // Special case for @ebay/nice-modal-react.
+    '^@ebay/nice-modal-react$',
+    '<THIRD_PARTY_MODULES>',
+    '^@(?!ebay/nice-modal-react)(.*)$',
+    '',
+    '^/app/(?!assets)(.*)$',
+    '',
+    '^[./](?!.*\\.(png|jpg|jpeg|gif|svg|webm|mp4)$)',
+    '',
+    '<TYPES>',
+    '',
+    '^/app/assets/.*\\.(png|jpg|jpeg|gif|svg|webm|mp4)$',
+    '.*\\.(png|jpg|jpeg|gif|svg|webm|mp4)$',
+  ],
+  importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
 }

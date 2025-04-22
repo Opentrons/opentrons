@@ -1,20 +1,22 @@
 import { getPositionFromSlotId } from '@opentrons/shared-data'
+
 import { getStagingAreaAddressableAreas } from '../../utils'
-import type {
-  AdditionalEquipmentName,
-  DeckSlot,
-} from '@opentrons/step-generation'
-import type {
-  CoordinateTuple,
-  CutoutId,
-  DeckDefinition,
-} from '@opentrons/shared-data'
+
 import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
   ModuleOnDeck,
 } from '../../step-forms'
 import type { Fixture } from './DeckSetup/constants'
+import type {
+  CoordinateTuple,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
+import type {
+  AdditionalEquipmentName,
+  DeckSlot,
+} from '@opentrons/step-generation'
 
 export interface AdditionalEquipment {
   name: AdditionalEquipmentName

@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+
+import { PrimaryButton } from '../../atoms'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Box, Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -7,13 +10,11 @@ import {
   NO_WRAP,
   POSITION_RELATIVE,
 } from '../../styles'
-import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING } from '../../ui-style-constants'
-import { PrimaryButton } from '../../atoms'
 import { textDecorationUnderline } from '../../ui-style-constants/typography'
 
-import type { ReactNode } from 'react'
 import type { StyleProps } from '../../primitives'
+import type { ReactNode } from 'react'
 
 export interface ToolboxProps extends StyleProps {
   title: JSX.Element

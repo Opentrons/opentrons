@@ -1,14 +1,15 @@
 import { css } from 'styled-components'
 import { getModuleType } from '@opentrons/shared-data'
+
+import { StyledText } from '../../atoms'
+import { COLORS } from '../../helix-design-system'
+import { ModuleIcon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, FLEX_MAX_CONTENT } from '../../styles'
-import { COLORS } from '../../helix-design-system'
 import { SPACING } from '../../ui-style-constants'
-import { StyledText } from '../../atoms'
-import { ModuleIcon } from '../../icons'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ModuleModel } from '@opentrons/shared-data'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface DeckLabelProps {
   isZoomed: boolean

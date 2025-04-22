@@ -1,31 +1,34 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, screen } from '@testing-library/react'
+
 import { fixture96Plate } from '@opentrons/shared-data'
-import { i18n } from '../../../../assets/localization'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
-import {
-  deleteContainer,
-  duplicateLabware,
-  openIngredientSelector,
-} from '../../../../labware-ingred/actions'
-import { deleteModule } from '../../../../modules'
+import { i18n } from '../../../../assets/localization'
 import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
 } from '../../../../components/organisms'
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
-import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import {
+  deleteContainer,
+  duplicateLabware,
+  openIngredientSelector,
+} from '../../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { getNextAvailableDeckSlot } from '../../../../labware-ingred/utils'
+import { deleteModule } from '../../../../modules'
+import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import { getSavedStepForms } from '../../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { SlotOverflowMenu } from '../SlotOverflowMenu'
 import { getIsEntityOnSlotInUse } from '../utils'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 

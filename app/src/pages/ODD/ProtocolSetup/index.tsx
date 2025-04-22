@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import last from 'lodash/last'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
+import last from 'lodash/last'
 import { css } from 'styled-components'
-
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -23,27 +22,25 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import {
-  useProtocolQuery,
-  useInstrumentsQuery,
   useDoorQuery,
+  useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
-  getModuleDisplayName,
   getFixtureDisplayName,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { useRobotType } from '/app/redux-resources/robots'
-import {
-  useRobotAnalyticsData,
-  useTrackProtocolRunEvent,
-} from '/app/redux-resources/analytics'
-import { useAttachedModules } from '/app/resources/modules'
-
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
+  getIncompleteInstrumentCount,
+  getUnmatchedModulesForProtocol,
   ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
@@ -52,41 +49,23 @@ import {
   ProtocolSetupStep,
   ProtocolSetupStepSkeleton,
   ProtocolSetupTitleSkeleton,
-  getUnmatchedModulesForProtocol,
-  getIncompleteInstrumentCount,
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
-import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
+import {
+  useRobotAnalyticsData,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
-import { ConfirmAttachedModal } from './ConfirmAttachedModal'
-import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
-import { CloseButton, PlayButton } from './Buttons'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
-import {
-  useNotifyRunQuery,
-  useRunStatus,
-  useLPCDisabledReason,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-} from '/app/resources/runs'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
-import {
-  getLabwareSetupItemGroups,
-  getProtocolUsesGripper,
-  useRequiredProtocolHardwareFromAnalysis,
-  useMissingProtocolHardwareFromAnalysis,
-} from '/app/transformations/commands'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
   OFFSETS_CONFLICT,
   selectAreOffsetsApplied,
@@ -95,23 +74,43 @@ import {
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
 } from '/app/redux/protocol-runs'
-import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useAttachedModules } from '/app/resources/modules'
+import {
+  useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useNotifyRunQuery,
+  useProtocolAnalysisErrors,
+  useRunStatus,
+} from '/app/resources/runs'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getLabwareSetupItemGroups,
+  getProtocolUsesGripper,
+  useMissingProtocolHardwareFromAnalysis,
+  useRequiredProtocolHardwareFromAnalysis,
+} from '/app/transformations/commands'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { FlattenSimpleInterpolation } from 'styled-components'
+import { CloseButton, PlayButton } from './Buttons'
+import { ConfirmAttachedModal } from './ConfirmAttachedModal'
+import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
+
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
+import type {
+  ProtocolSetupStepProps,
+  SetupScreens,
+} from '/app/organisms/ODD/ProtocolSetup'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
-  SetupScreens,
-  ProtocolSetupStepProps,
-} from '/app/organisms/ODD/ProtocolSetup'
-import type {
-  ProtocolHardware,
   ProtocolFixture,
+  ProtocolHardware,
 } from '/app/transformations/commands'
+import type { Dispatch, SetStateAction } from 'react'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 const FETCH_DURATION_MS = 5000
 

@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react'
-
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_FLEX_END,
   COLORS,
@@ -17,14 +15,15 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { getModuleTooHot } from '/app/transformations/modules'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
+import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
+import type { AttachedModule } from '/app/redux/modules/types'
+
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean
   attachedModule: AttachedModule

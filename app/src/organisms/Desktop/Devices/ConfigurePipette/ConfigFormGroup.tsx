@@ -9,11 +9,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import styles from './styles.module.css'
 
+import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 import type { ReactNode } from 'react'
 import type { Control } from 'react-hook-form'
-import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
 export interface FormColumnProps {
   children: ReactNode

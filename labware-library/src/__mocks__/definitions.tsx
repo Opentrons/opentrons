@@ -1,12 +1,12 @@
 import assert from 'assert'
-import { vi } from 'vitest'
 // replace webpack-specific require.context with Node-based glob in tests
 import path from 'path'
 import glob from 'glob'
 import uniq from 'lodash/uniq'
+import { vi } from 'vitest'
 
-import type { Mock } from 'vitest'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Mock } from 'vitest'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,

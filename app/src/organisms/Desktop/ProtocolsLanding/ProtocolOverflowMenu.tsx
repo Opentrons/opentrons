@@ -1,9 +1,8 @@
-import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
+import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   BORDERS,
@@ -22,9 +21,9 @@ import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_DELETE_PROTOCOL_FROM_APP,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 import {
@@ -32,12 +31,13 @@ import {
   removeProtocol,
   viewProtocolSourceFolder,
 } from '/app/redux/protocol-storage'
+
 import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
 
-import type { MouseEvent, MouseEventHandler } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { Dispatch } from '/app/redux/types'
+import type { MouseEvent, MouseEventHandler } from 'react'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void

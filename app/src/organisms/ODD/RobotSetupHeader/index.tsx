@@ -5,18 +5,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 
-import type { MouseEventHandler, ReactNode } from 'react'
 import type { InlineNotificationProps } from '/app/atoms/InlineNotification'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface RobotSetupHeaderProps {
   header: string

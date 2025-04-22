@@ -1,12 +1,13 @@
-import { vi, it, expect, describe } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import { mockModulesResponse } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react'
+
 import { useAttachedModules } from '..'
 
+import type { Modules } from '@opentrons/api-client'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 

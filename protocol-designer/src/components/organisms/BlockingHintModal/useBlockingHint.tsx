@@ -1,9 +1,10 @@
 import { useSelector } from 'react-redux'
+
 import { getDismissedHints } from '../../../tutorial/selectors'
 import { BlockingHintModal } from './index'
 
-import type { ReactNode } from 'react'
 import type { HintKey } from '../../../tutorial'
+import type { ReactNode } from 'react'
 
 export interface HintProps {
   /** `enabled` should be a condition that the parent uses to toggle whether the hint should be active or not.

@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import flatten from 'lodash/flatten'
-
 import {
   Checkbox,
   DIRECTION_COLUMN,
@@ -15,12 +14,12 @@ import {
 
 import { IconButton } from '/app/atoms/buttons/IconButton'
 
-import type { Dispatch, SetStateAction, ReactNode } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteChannels,
 } from '@opentrons/shared-data'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface Selection384WellsProps {
   allSelectedWells: WellGroup

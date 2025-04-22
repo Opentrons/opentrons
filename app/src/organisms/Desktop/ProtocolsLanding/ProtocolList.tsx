@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -23,24 +22,25 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { Slideout } from '/app/atoms/Slideout'
+import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
 import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
 } from '/app/redux/config'
-import { useSortedProtocols } from './hooks'
-import { Slideout } from '/app/atoms/Slideout'
-import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
-import { ProtocolUploadInput } from './ProtocolUploadInput'
-import { ProtocolCard } from './ProtocolCard'
-import { EmptyStateLinks } from './EmptyStateLinks'
 
-import type { MouseEventHandler } from 'react'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
+import { EmptyStateLinks } from './EmptyStateLinks'
+import { useSortedProtocols } from './hooks'
+import { ProtocolCard } from './ProtocolCard'
+import { ProtocolUploadInput } from './ProtocolUploadInput'
+
 import type {
-  StoredProtocolData,
   ProtocolSort,
+  StoredProtocolData,
 } from '/app/redux/protocol-storage'
 import type { Dispatch } from '/app/redux/types'
+import type { MouseEventHandler } from 'react'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};

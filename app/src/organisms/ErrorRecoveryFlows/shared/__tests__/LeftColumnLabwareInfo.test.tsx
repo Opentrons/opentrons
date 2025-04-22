@@ -1,11 +1,12 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { i18n } from '/app/i18n'
-import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 
 import type { ComponentProps } from 'react'
 

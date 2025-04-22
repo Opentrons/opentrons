@@ -1,12 +1,13 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getSessions } from '@opentrons/api-client'
-import { useHost } from '../../api'
+import { renderHook, waitFor } from '@testing-library/react'
+
 import { useSessionsByTypeQuery } from '..'
+import { useHost } from '../../api'
 
 import type { HostConfig, Response, Sessions } from '@opentrons/api-client'
+import type * as React from 'react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

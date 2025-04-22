@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import startCase from 'lodash/startCase'
+import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -33,23 +33,26 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '/app/i18n'
-import { getIsOnDevice } from '/app/redux/config'
+
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
-import { WizardHeader } from '/app/molecules/WizardHeader'
+import { i18n } from '/app/i18n'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
-import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'
-import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import { ExitModal } from './ExitModal'
+
 import { FLOWS } from './constants'
+import { ExitModal } from './ExitModal'
 import { getIsGantryEmpty } from './utils'
 
-import type { Dispatch, SetStateAction, ReactNode } from 'react'
+import type { SelectablePipettes } from './types'
 import type { StyleProps } from '@opentrons/components'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { SelectablePipettes } from './types'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+
+import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'
+import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};

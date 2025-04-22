@@ -1,19 +1,19 @@
 import { useDispatch } from 'react-redux'
-import { renderHook } from '@testing-library/react'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-
 import { useHost } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react'
+
+import { useTrackEvent } from '/app/redux/analytics'
+import { useFeatureFlag } from '/app/redux/config'
+import { notifySubscribeAction } from '/app/redux/shell'
+import { appShellListener } from '/app/redux/shell/remote'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
-import { appShellListener } from '/app/redux/shell/remote'
-import { useTrackEvent } from '/app/redux/analytics'
-import { notifySubscribeAction } from '/app/redux/shell'
-import { useFeatureFlag } from '/app/redux/config'
 
-import type { Mock } from 'vitest'
-import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
+import type { HostConfig } from '@opentrons/api-client'
+import type { Mock } from 'vitest'
 
 vi.unmock('../useNotifyDataReady')
 vi.mock('react-redux')

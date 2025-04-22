@@ -1,4 +1,5 @@
 import { Link } from '@opentrons/components'
+
 import type { ReactNode } from 'react'
 
 interface KnowledgeLinkProps {

@@ -1,15 +1,16 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
 import {
   getOrderedStepIds,
   getUnsavedForm,
 } from '../../../../../step-forms/selectors'
-import { TerminalItemStep } from '../TerminalItemStep'
+import { AddStepButton } from '../AddStepButton'
 import { DraggableSteps } from '../DraggableSteps'
 import { PresavedStep } from '../PresavedStep'
-import { AddStepButton } from '../AddStepButton'
+import { TerminalItemStep } from '../TerminalItemStep'
 import { TimelineToolbox } from '../TimelineToolbox'
 
 import type { ComponentProps } from 'react'

@@ -1,4 +1,4 @@
-import { ERROR_KINDS, DEFINED_ERROR_TYPES } from '../constants'
+import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../constants'
 
 import type { ErrorKind } from '../types'
 import type { FailedCommandBySource } from '/app/organisms/ErrorRecoveryFlows/hooks'

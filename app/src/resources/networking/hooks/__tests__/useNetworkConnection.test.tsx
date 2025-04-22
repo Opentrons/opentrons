@@ -1,15 +1,15 @@
-import { when } from 'vitest-when'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { I18nextProvider } from 'react-i18next'
 
 import { i18n } from '/app/i18n'
-import { useWifiList } from '/app/resources/networking/hooks'
 import * as Networking from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { getNetworkInterfaces } from '/app/redux/networking'
+import * as Fixtures from '/app/redux/networking/__fixtures__'
+import { useWifiList } from '/app/resources/networking/hooks'
 
 import { useNetworkConnection } from '../useNetworkConnection'
 

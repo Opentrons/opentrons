@@ -1,11 +1,10 @@
 import { Trans, useTranslation } from 'react-i18next'
-
 import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import {
-  TwoColLwInfoAndDeck,
   SelectTips,
+  TwoColLwInfoAndDeck,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'

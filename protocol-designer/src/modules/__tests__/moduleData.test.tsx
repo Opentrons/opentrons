@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getNextAvailableModuleSlot } from '../moduleData'
+
 import type { InitialDeckSetup } from '../../step-forms'
 
 describe('getNextAvailableModuleSlot', () => {

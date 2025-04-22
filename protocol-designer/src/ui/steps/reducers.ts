@@ -1,28 +1,30 @@
+import omit from 'lodash/omit'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
+
 import { getPDMetadata } from '../../file-types'
-import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../../steplist/types'
-import type { Reducer } from 'redux'
-import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
-import type {
-  DeleteStepAction,
-  DeleteMultipleStepsAction,
-} from '../../steplist/actions'
-import type { Action } from '../../types'
-import type { LoadFileAction } from '../../load-file'
+import { PRESAVED_STEP_ID, START_TERMINAL_ITEM_ID } from '../../steplist/types'
+
 import type { StepIdType } from '../../form-types'
+import type { LoadFileAction } from '../../load-file'
+import type {
+  DeleteMultipleStepsAction,
+  DeleteStepAction,
+} from '../../steplist/actions'
+import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import type { Action } from '../../types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
 import type {
   AddStepAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
   HoverOnTerminalItemAction,
-  SelectStepAction,
-  SelectMultipleStepsAction,
-  SelectTerminalItemAction,
   Selection,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
 } from './actions/types'
+import type { Reducer } from 'redux'
 
 export type CollapsedStepsState = Record<StepIdType, boolean>
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type

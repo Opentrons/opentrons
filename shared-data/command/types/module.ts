@@ -1,6 +1,6 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { LabwareLocationSequence } from './setup'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { LabwareDefinition2 } from '../../js'
+import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
   | MagneticModuleEngageMagnetRunTimeCommand

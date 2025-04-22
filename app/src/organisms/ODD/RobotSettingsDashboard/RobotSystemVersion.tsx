@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import {
   BORDERS,
   COLORS,
@@ -8,17 +7,18 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
-import type { RobotUpdateInfo } from '/app/redux/robot-update/types'
 import type { SetSettingOption } from './types'
+import type { RobotUpdateInfo } from '/app/redux/robot-update/types'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 

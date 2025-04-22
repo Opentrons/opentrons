@@ -1,15 +1,17 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockPipetteData1Channel } from '/app/redux/pipettes/__fixtures__'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { mockPipetteData1Channel } from '/app/redux/pipettes/__fixtures__'
+
 import { InstrumentInfo } from '..'
 
+import type { GripperData } from '@opentrons/api-client'
 import type { ComponentProps } from 'react'
 import type * as ReactRouterDom from 'react-router-dom'
-import type { GripperData } from '@opentrons/api-client'
 
 const mockNavigate = vi.fn()
 

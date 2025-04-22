@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -22,37 +22,36 @@ import {
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
+import {
+  ConfirmDeleteEntityInUseModal,
+  ConfirmDeleteStagingAreaModal,
+  EditNickNameModal,
+} from '../../../components/organisms'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   deleteContainer,
   duplicateLabware,
   openIngredientSelector,
 } from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { getNextAvailableDeckSlot } from '../../../labware-ingred/utils'
 import { deleteModule } from '../../../modules'
-import {
-  ConfirmDeleteEntityInUseModal,
-  ConfirmDeleteStagingAreaModal,
-  EditNickNameModal,
-} from '../../../components/organisms'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
+import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getStagingAreaAddressableAreas } from '../../../utils'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { getIsEntityOnSlotInUse } from './utils'
 
-import type { MouseEvent, SetStateAction } from 'react'
+import type { LabwareOnDeck } from '../../../step-forms'
+import type { ThunkDispatch } from '../../../types'
 import type {
   AddressableAreaName,
   CoordinateTuple,
   CutoutId,
   DeckSlotId,
 } from '@opentrons/shared-data'
-
-import type { LabwareOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+import type { MouseEvent, SetStateAction } from 'react'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
   'D1',

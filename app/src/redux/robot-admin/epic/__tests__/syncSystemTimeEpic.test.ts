@@ -1,17 +1,16 @@
-import { vi, describe, it, expect, afterEach } from 'vitest'
-
+import { differenceInSeconds, parseISO, subSeconds } from 'date-fns'
 import cloneDeep from 'lodash/cloneDeep'
-import set from 'lodash/set'
 import get from 'lodash/get'
-import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
+import set from 'lodash/set'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import { GET, PUT } from '../../../robot-api'
-import { syncSystemTime } from '../../actions'
 import {
-  mockFetchSystemTimeSuccess,
   mockFetchSystemTimeFailure,
+  mockFetchSystemTimeSuccess,
 } from '../../__fixtures__'
+import { GET, PUT } from '../../../robot-api'
+import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
+import { syncSystemTime } from '../../actions'
 import { syncSystemTimeEpic } from '../syncSystemTimeEpic'
 
 const createTimeSuccessResponse = (

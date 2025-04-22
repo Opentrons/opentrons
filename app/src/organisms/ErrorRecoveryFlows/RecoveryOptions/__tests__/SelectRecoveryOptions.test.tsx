@@ -1,26 +1,27 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import {
-  SelectRecoveryOption,
-  RecoveryOptions,
-  getRecoveryOptions,
-  GENERAL_ERROR_OPTIONS,
-  OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
-  OVERPRESSURE_PREPARE_TO_ASPIRATE,
-  OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
-  NO_LIQUID_DETECTED_OPTIONS,
-  TIP_NOT_DETECTED_OPTIONS,
-  TIP_DROP_FAILED_OPTIONS,
-  GRIPPER_ERROR_OPTIONS,
-  STALL_OR_COLLISION_OPTIONS,
-} from '../SelectRecoveryOption'
-import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
 import { clickButtonLabeled } from '../../__tests__/util'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
+import {
+  GENERAL_ERROR_OPTIONS,
+  getRecoveryOptions,
+  GRIPPER_ERROR_OPTIONS,
+  NO_LIQUID_DETECTED_OPTIONS,
+  OVERPRESSURE_PREPARE_TO_ASPIRATE,
+  OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
+  OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
+  RecoveryOptions,
+  SelectRecoveryOption,
+  STALL_OR_COLLISION_OPTIONS,
+  TIP_DROP_FAILED_OPTIONS,
+  TIP_NOT_DETECTED_OPTIONS,
+} from '../SelectRecoveryOption'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'

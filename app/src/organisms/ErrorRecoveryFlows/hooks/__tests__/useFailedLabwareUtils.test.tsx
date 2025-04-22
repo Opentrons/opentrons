@@ -1,22 +1,21 @@
-import { describe, it, expect } from 'vitest'
-import { screen, renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
+import { renderHook, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
-import type { RunCommandSummary } from '@opentrons/api-client'
-
-import {
-  getRelevantWellName,
-  getRelevantFailedLabwareCmdFrom,
-  useRelevantFailedLwLocations,
-  getFailedLabwareQuantity,
-} from '../useFailedLabwareUtils'
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
+import {
+  getFailedLabwareQuantity,
+  getRelevantFailedLabwareCmdFrom,
+  getRelevantWellName,
+  useRelevantFailedLwLocations,
+} from '../useFailedLabwareUtils'
 
-import type { ComponentProps } from 'react'
 import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
+import type { RunCommandSummary } from '@opentrons/api-client'
+import type { ComponentProps } from 'react'
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {

@@ -1,10 +1,11 @@
 import { createRef } from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { getLiquidEntities } from '../../../step-forms/selectors'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
+
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
+import * as labwareIngredActions from '../../../labware-ingred/actions'
+import { getLiquidEntities } from '../../../step-forms/selectors'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
 
 import type { ComponentProps } from 'react'
