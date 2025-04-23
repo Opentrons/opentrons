@@ -15,6 +15,7 @@ export default defineConfig(
   async (): Promise<UserConfig> => {
     const OT_PD_VERSION = await versionForProject('protocol-designer')
     const OT_PD_BUILD_DATE = new Date().toUTCString()
+    const mode = process.env.NODE_ENV ?? 'development'
     return {
       // this makes imports relative rather than absolute
       base: '',
@@ -48,8 +49,8 @@ export default defineConfig(
           sourcemaps: {
             assets: ['./dist/**'],
             ignore: ['./node_modules/**'],
-            // filesToDeleteAfterUpload:
-            //   mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+            filesToDeleteAfterUpload:
+              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
       ],
