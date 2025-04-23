@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from typing import Any, List, Optional, Sequence, Union, cast
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -12,7 +12,10 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types
-from opentrons.legacy_commands import commands as cmds
+from opentrons.legacy_commands import (
+    commands as cmds,
+    protocol_commands as protocol_cmds,
+)
 
 from opentrons.legacy_commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
@@ -477,12 +480,14 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def mix(
+    def mix(  # noqa: C901
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        aspirate_delay: Optional[float] = None,
+        dispense_delay: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a single location.
@@ -507,6 +512,8 @@ class InstrumentContext(publisher.CommandPublisher):
                      dispensing flow rate is calculated as ``rate`` multiplied by
                      :py:attr:`flow_rate.dispense <flow_rate>`. See
                      :ref:`new-plunger-flow-rates`.
+        :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
+        :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
         :returns: This instance.
 
@@ -519,6 +526,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
+        .. versionchanged:: 2.24
+            Adds the ``aspirate_delay`` and ``dispense_delay`` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -533,9 +542,43 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
 
-        dispense_kwargs: Dict[str, Any] = {}
-        if self.api_version >= APIVersion(2, 16):
-            dispense_kwargs["push_out"] = 0.0
+        if aspirate_delay and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="aspirate_delay",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+        if dispense_delay and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="dispense_delay",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+
+        def delay_with_publish(seconds: float) -> None:
+            # We don't have access to ProtocolContext.delay() which would automatically
+            # publish a message to the broker, so we have to do it manually:
+            with publisher.publish_context(
+                broker=self.broker,
+                command=protocol_cmds.delay(seconds=seconds, minutes=0, msg=None),
+            ):
+                self._protocol_core.delay(seconds=seconds, msg=None)
+
+        def aspirate_with_delay(
+            location: Optional[types.Location | labware.Well],
+        ) -> None:
+            self.aspirate(volume, location, rate)
+            if aspirate_delay:
+                delay_with_publish(aspirate_delay)
+
+        def dispense_with_delay(push_out: Optional[float]) -> None:
+            # protocol_api_old/test_context.py does not allow push_out at all, even if
+            # it's set to None, so we have to hide the argument to make the test pass.
+            # I don't know if the test is even valid, but I'm afraid to change the test.
+            dispense_kwargs = {"push_out": push_out} if push_out is not None else {}
+            self.dispense(volume, None, rate, **dispense_kwargs)
+            if dispense_delay:
+                delay_with_publish(dispense_delay)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -546,13 +589,19 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=location,
             ),
         ):
-            self.aspirate(volume, location, rate)
+            aspirate_with_delay(location=location)
             with AutoProbeDisable(self):
                 while repetitions - 1 > 0:
-                    self.dispense(volume, rate=rate, **dispense_kwargs)
-                    self.aspirate(volume, rate=rate)
+                    # starting in 2.16, we disable push_out on all but the last
+                    # dispense() to prevent the tip from jumping out of the liquid
+                    # during the mix (PR #14004):
+                    dispense_with_delay(
+                        push_out=0 if self.api_version >= APIVersion(2, 16) else None
+                    )
+                    # aspirate location was set above, do subsequent aspirates in-place:
+                    aspirate_with_delay(location=None)
                     repetitions -= 1
-                self.dispense(volume, rate=rate)
+                dispense_with_delay(push_out=None)
         return self
 
     @requires_version(2, 0)

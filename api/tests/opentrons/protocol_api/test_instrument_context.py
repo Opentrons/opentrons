@@ -1747,6 +1747,76 @@ def test_mix_with_lpd(
     )
 
 
+def test_mix_with_delay(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should delay after the aspirate/dispense in a mix."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        input_location,
+    )  # last location same as input_location, so in_place should be true
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1)).then_return(4.56)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1)).then_return(5.67)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.mix(
+        repetitions=2,
+        volume=10.0,
+        location=input_location,
+        aspirate_delay=3,
+        dispense_delay=4,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1,
+            flow_rate=4.56,
+            in_place=True,
+            meniscus_tracking=None,
+        ),
+        mock_protocol_core.delay(3, msg=None),  # aspirate delay
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1,
+            flow_rate=5.67,
+            in_place=True,
+            push_out=0.0,
+            meniscus_tracking=None,
+        ),
+        mock_protocol_core.delay(4, msg=None),  # dispense delay
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1,
+            flow_rate=4.56,
+            in_place=True,
+            meniscus_tracking=None,
+        ),
+        mock_protocol_core.delay(3, msg=None),  # aspirate delay
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1,
+            flow_rate=5.67,
+            in_place=True,
+            push_out=None,
+            meniscus_tracking=None,
+        ),
+        mock_protocol_core.delay(4, msg=None),  # dispense delay
+    )
+
+
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("clean,expected", [(True, 1), (False, 0)])
 def test_aspirate_with_lpd(
