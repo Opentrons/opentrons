@@ -267,9 +267,9 @@ describe('useGripperRelease', () => {
           RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH,
       },
       {
-        recoveryOption: RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
+        recoveryOption: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
         nextStep:
-          RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH,
+          RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH,
       },
     ])(
       'executes the full sequence of commands for $recoveryOption',
@@ -301,7 +301,7 @@ describe('useGripperRelease', () => {
 
         switch (recoveryOption) {
           case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-          case RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+          case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
             expect(releaseLabwareLatch).toHaveBeenCalledTimes(1)
             break
           default:

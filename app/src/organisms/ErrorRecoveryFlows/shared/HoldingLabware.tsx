@@ -45,7 +45,7 @@ export function HoldingLabware({
     MANUAL_MOVE_AND_SKIP,
     MANUAL_REPLACE_AND_RETRY,
     OPTION_SELECTION,
-    REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
 
@@ -56,7 +56,7 @@ export function HoldingLabware({
 
   const buildTitle = (): string => {
     switch (route) {
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return t('is_there_labware_stuck_on_the_stacker_latch')
       default:
@@ -81,10 +81,10 @@ export function HoldingLabware({
               MANUAL_REPLACE_AND_RETRY.ROUTE,
               MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
             )
-          case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+          case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
             return proceedToRouteAndStep(
-              REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
-              REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.CONFIRM_RETRY
+              REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+              REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.CONFIRM_RETRY
             )
           case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
             return proceedToRouteAndStep(

@@ -41,7 +41,7 @@ export function TwoColLwInfoAndDeck(
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
     HOPPER_MANUAL_LOAD_AND_RETRY,
     HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
-    REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
@@ -90,7 +90,7 @@ export function TwoColLwInfoAndDeck(
           step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
           step ===
             HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS
-              .HOOPER_MANUAL_REPLACE ||
+              .HOPPER_MANUAL_REPLACE ||
           step === MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
         ) {
           return t('load_labware_into_labware_shuttle')
@@ -98,7 +98,7 @@ export function TwoColLwInfoAndDeck(
           return t('ensure_stacker_has_labware')
         }
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
       case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
         return t('load_labware_into_stacker')
@@ -132,7 +132,7 @@ export function TwoColLwInfoAndDeck(
           step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
           step ===
             HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS
-              .HOOPER_MANUAL_REPLACE ||
+              .HOPPER_MANUAL_REPLACE ||
           step === MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
         ) {
           return null
@@ -140,7 +140,7 @@ export function TwoColLwInfoAndDeck(
           return t('make_sure_loaded_correct_number_of_labware_stacker')
         }
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
         return t('make_sure_loaded_correct_number_of_labware_stacker')
       default:
         console.error(
@@ -170,7 +170,7 @@ export function TwoColLwInfoAndDeck(
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
       case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
       case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         return 'stacked'
       default:

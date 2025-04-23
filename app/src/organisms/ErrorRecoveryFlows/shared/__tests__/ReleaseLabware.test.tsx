@@ -49,9 +49,9 @@ describe('ReleaseLabware', () => {
 
   it('renders latch copy', () => {
     props.recoveryMap = {
-      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE,
+      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
       step:
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS
           .CONFIRM_LABWARE_IN_LATCH,
     }
     render(props)
