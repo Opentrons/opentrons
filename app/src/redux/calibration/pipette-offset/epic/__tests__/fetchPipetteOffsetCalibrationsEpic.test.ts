@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import { pipetteOffsetCalibrationsEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
-import {
-  runEpicTest,
-  setupEpicTestMocks,
-} from '../../../../robot-api/__utils__'
 import * as Actions from '../../actions'
 
-import type { Action } from '../../../../types'
+import type { Action } from '/app/redux/types'
 
 const makeTriggerActionAllCalibrations = (robotName: string) =>
   Actions.fetchPipetteOffsetCalibrations(robotName)

@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import * as discoverySelectors from '../../../discovery/selectors'
-import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
 import * as Actions from '../../actions'
 import * as robotAdminSelectors from '../../selectors'
 import { trackRestartsEpic } from '../trackRestartsEpic'

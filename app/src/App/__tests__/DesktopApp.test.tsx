@@ -6,7 +6,6 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocalizationProvider } from '/app/LocalizationProvider'
-import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
 import { GeneralSettings } from '/app/pages/Desktop/AppSettings/GeneralSettings'
@@ -15,8 +14,13 @@ import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
-import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
+
+// TODO(jh, 04-23-25): Prettier import order affects testing. Investigate further.
+// prettier-ignore
+import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
+
+import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 

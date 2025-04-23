@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import { networkingEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
-import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
 import * as Actions from '../../actions'
 
 import type { Action } from '../../../types'

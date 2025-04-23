@@ -11,10 +11,8 @@ import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
-import {
-  useDeckConfigurationEditingTools,
-  useNotifyDeckConfigurationQuery,
-} from '/app/resources/deck_configuration'
+import { useDeckConfigurationEditingTools } from '/app/resources/deck_configuration/hooks/useDeckConfigurationEditingTools'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useRunStatuses } from '/app/resources/runs'
@@ -41,7 +39,10 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('/app/resources/deck_configuration')
+vi.mock(
+  '/app/resources/deck_configuration/hooks/useDeckConfigurationEditingTools'
+)
+vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')
 
 const mockDeckConfig = [
   {

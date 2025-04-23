@@ -1,6 +1,6 @@
 import { FLEX_MODULE_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks/useDeckConfigurationCompatibility'
 
 import type {
   CompletedProtocolAnalysis,

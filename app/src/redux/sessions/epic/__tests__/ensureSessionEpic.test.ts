@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import { sessionsEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
-import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
 import * as RobotApiHttp from '../../../robot-api/http'
 import * as Actions from '../../actions'
 

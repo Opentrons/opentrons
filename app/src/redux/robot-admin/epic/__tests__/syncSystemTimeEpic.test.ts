@@ -4,12 +4,13 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import {
   mockFetchSystemTimeFailure,
   mockFetchSystemTimeSuccess,
 } from '../../__fixtures__'
 import { GET, PUT } from '../../../robot-api'
-import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
 import { syncSystemTime } from '../../actions'
 import { syncSystemTimeEpic } from '../syncSystemTimeEpic'
 

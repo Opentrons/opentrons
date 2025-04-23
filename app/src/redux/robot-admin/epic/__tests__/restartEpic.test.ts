@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import * as Fixtures from '../../__fixtures__'
 import * as DiscoveryActions from '../../../discovery/actions'
-import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
 import * as SettingsSelectors from '../../../robot-settings/selectors'
 import * as Actions from '../../actions'
 import { restartEpic, startDiscoveryOnRestartEpic } from '../restartEpic'
