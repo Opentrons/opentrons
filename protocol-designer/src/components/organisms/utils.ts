@@ -2,8 +2,9 @@ import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAreSlotsVerticallyAdjacent,
   getModuleType,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../utils/labwareModuleCompatibility'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { DEFAULT_SLOT_MAP_OT2 } from '../../pages/Onboarding/constants'
 import { ALL_MODULE_SLOTS_OT2 } from '../../modules'
 import type {
@@ -50,11 +51,17 @@ export const getIsLabwareCompatibleWithModule = (
   cutoutId: CutoutId
 ): boolean => {
   const slot = cutoutId.split('cutout')[1]
+  const isThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
   const labwareOnSlot = Object.values(labware).find(lw => lw.slot === slot)
+  const isLabwareOnA1 = isThermocycler
+    ? Object.values(labware).some(lw => lw.slot === 'A1')
+    : false
+
+  if (isLabwareOnA1) {
+    return false
+  }
   return labwareOnSlot != null
-    ? COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
-        labwareOnSlot.def.parameters.loadName
-      )
+    ? getLabwareIsCompatible(labwareOnSlot.def, moduleType)
     : true
 }
 
