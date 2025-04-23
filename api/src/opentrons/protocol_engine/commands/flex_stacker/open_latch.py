@@ -61,7 +61,6 @@ class OpenLatch(BaseCommand[OpenLatchParams, OpenLatchResult, ErrorOccurrence]):
     _ImplementationCls: Type[OpenLatchImpl] = OpenLatchImpl
 
 
-# TODO(tz, 4-17-2025): move under unsafe domain when BE has moved as well
 class OpenLatchCreate(BaseCommandCreate[OpenLatchParams]):
     """A request to execute a Flex Stacker OpenLatch command."""
 
