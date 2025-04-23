@@ -9,9 +9,19 @@ import { InputPrompt } from '../index'
 import type { ReactNode } from 'react'
 
 const mockTrackEvent = vi.fn()
+const mockCallApi = vi.fn().mockResolvedValue(undefined)
 
 vi.mock('../../../resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockTrackEvent,
+}))
+
+vi.mock('../../../resources/hooks/useApiCall', () => ({
+  useApiCall: () => ({
+    data: null,
+    error: null,
+    isLoading: false,
+    callApi: mockCallApi,
+  }),
 }))
 
 const WrappingForm = (wrappedComponent: {
@@ -72,14 +82,17 @@ describe('InputPrompt', () => {
     expect(sendButton).not.toBeDisabled() // Double check before clicking
     fireEvent.click(sendButton)
 
-    // Wait specifically for the trackEvent call
+    // Wait for callApi to be called first, since that happens before trackEvent
     await waitFor(() => {
-      expect(mockTrackEvent).toHaveBeenCalledWith({
-        name: 'chat-submitted',
-        properties: {
-          chat: 'test',
-        },
-      })
+      expect(mockCallApi).toHaveBeenCalled()
+    })
+
+    // Then check if trackEvent was called with the expected arguments
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'chat-submitted',
+      properties: {
+        chat: 'test',
+      },
     })
   })
 })
