@@ -3,7 +3,10 @@ import re
 import base64
 from typing import List, Optional
 
-from opentrons.drivers.asyncio.communication.errors import GCodeCacheFull, NoResponse
+from opentrons.drivers.asyncio.communication.errors import (
+    NoResponse,
+    TaskInitializing,
+)
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
@@ -670,7 +673,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
 
     async def get_tof_sensor_status(self, sensor: TOFSensor) -> TOFSensorStatus:
         """Get the status of the tof sensor."""
-        # This can fail because the TOF sensor task cannot respond to messages
+        # This can fail early because the TOF sensor task cannot respond to messages
         # while the TOF sensors are initializing.
         try:
             response = await self._connection.send_command(
@@ -678,7 +681,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
                 timeout=FS_TOF_INIT_TIMEOUT,
             )
             return self.parse_tof_sensor_status(response)
-        except (NoResponse, GCodeCacheFull):
+        except (TaskInitializing):
             return TOFSensorStatus(
                 sensor, TOFSensorState.INITIALIZING, TOFSensorMode.UNKNOWN, False
             )

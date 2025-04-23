@@ -481,7 +481,7 @@ class FlexStacker(mod_abc.AbstractModule):
         is useful when we want the shuttle to be out of the way for error
         recovery (e.g. when the latch is stuck open).
         """
-        await self._reader.read()
+        await self._reader.get_limit_switch_status()
         # we should always be able to home the X axis first
         await self.home_axis(StackerAxis.X, Direction.RETRACT)
         # If latch is open, we must first close it
@@ -525,7 +525,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
     async def verify_shuttle_location(self, expected: PlatformState) -> None:
         """Verify the shuttle is present and in the expected location."""
-        await self._reader.read()
+        await self._reader.get_platform_sensor_state()
         # Validate the platform state matches, ignore EXTENDED checks on EVT
         if self.platform_state != expected:
             if (
@@ -624,10 +624,10 @@ class FlexStackerReader(Reader):
 
     async def read(self) -> None:
         await self.get_door_closed()
+        await self.get_platform_sensor_state()
         if not self.initialized:
             initialized = True
             await self.get_limit_switch_status()
-            await self.get_platform_sensor_state()
             await self.get_motion_parameters()
             for sensor, status in self.tof_sensor_status.items():
                 if status.state == TOFSensorState.INITIALIZING:
