@@ -368,7 +368,7 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         # Move platform along the X then Z axis
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
 
         # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
         # reading the platform sensor on the extended side. This is a temporary
@@ -390,7 +390,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
         return True
 
     async def store_labware(
@@ -404,7 +404,7 @@ class FlexStacker(mod_abc.AbstractModule):
         # Move X then Z axis
         offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
         distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
 
         # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
         # reading the platform sensor on the extended side. This is a temporary
@@ -434,7 +434,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, False)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
         return True
 
     async def _move_and_home_axis(
