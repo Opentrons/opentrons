@@ -13,13 +13,14 @@ import { getBlowoutLocationOptionsForForm, getFormLevelError } from '../utils'
 import { FlowRateField } from './FlowRateField'
 import { BlowoutOffsetField } from './BlowoutOffsetField'
 
-import type { PathOption, StepType } from '../../../../../form-types'
+import type { FormData, PathOption, StepType } from '../../../../../form-types'
 import type { FormError } from '../../../../../steplist/formLevel/errors'
 import type { FieldPropsByName } from '../types'
 
 interface DisposalFieldProps {
   path: PathOption
   pipette: string | null
+  formData: FormData
   propsForFields: FieldPropsByName
   stepType: StepType
   volume: string | null
@@ -40,6 +41,7 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
     aspirate_airGap_volume,
     tipRack,
     mappedErrorsToField,
+    formData,
   } = props
   const { t } = useTranslation(['application', 'form'])
 
@@ -107,6 +109,7 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
             volume={propsForFields.volume?.value ?? 0}
             padding="0"
             tiprack={propsForFields.tipRack.value}
+            formData={formData}
           />
           <BlowoutOffsetField
             {...propsForFields.blowout_z_offset}
