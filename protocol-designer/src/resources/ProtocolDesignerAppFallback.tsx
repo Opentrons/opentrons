@@ -22,6 +22,8 @@ import type { FallbackProps } from 'react-error-boundary'
 import type { ThunkDispatch } from '../types'
 import type { AnalyticsEvent } from '../analytics/mixpanel'
 
+const LOG_LEVEL = 'error'
+
 export function ProtocolDesignerAppFallback({
   error,
   resetErrorBoundary,
@@ -51,7 +53,7 @@ export function ProtocolDesignerAppFallback({
 
   useEffect(() => {
     if (error) {
-      captureException(error, { extra: { errorId } })
+      captureException(error, { extra: { errorId }, level: LOG_LEVEL })
     }
   }, [error, errorId])
 
