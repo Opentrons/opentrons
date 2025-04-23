@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { Flex, Divider, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  Divider,
+  DIRECTION_COLUMN,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -172,15 +178,30 @@ export function FirstStepMoveLiquidTools({
         title={t('pipette_path')}
       />
       <Divider marginY="0" />
-      <ChangeTipField
-        {...propsForFields.changeTip}
-        aspirateWells={formData.aspirate_wells}
-        dispenseWells={formData.dispense_wells}
-        path={formData.path}
-        stepType={formData.stepType}
-        isDisposalLocation={isDisposalLocation}
-        tooltipContent={null}
-      />
+      <Flex
+        paddingX={SPACING.spacing16}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+      >
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t('tip_management')}
+        </StyledText>
+        <ChangeTipField
+          {...propsForFields.changeTip}
+          aspirateWells={formData.aspirate_wells}
+          dispenseWells={formData.dispense_wells}
+          path={formData.path}
+          stepType={formData.stepType}
+          isDisposalLocation={isDisposalLocation}
+          tooltipContent={null}
+          padding="0"
+        />
+        <DropTipField
+          {...propsForFields.dropTip_location}
+          tooltipContent={null}
+          padding="0"
+        />
+      </Flex>
       {enableReturnTip ? (
         <>
           <Divider marginY="0" />
@@ -201,11 +222,6 @@ export function FirstStepMoveLiquidTools({
           ) : null}
         </>
       ) : null}
-      <Divider marginY="0" />
-      <DropTipField
-        {...propsForFields.dropTip_location}
-        tooltipContent={null}
-      />
       {userSelectedDropTipLocation && enableReturnTip ? (
         <>
           <Divider marginY="0" />

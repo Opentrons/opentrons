@@ -9,7 +9,6 @@ const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',
   'once',
   'perSource',
-  'perDest',
   'never',
 ]
 
@@ -44,8 +43,9 @@ export function ChangeTipField(
       {...props}
       options={options}
       value={value}
-      title={t('tip_handling')}
+      title={t('tip_handling.title')}
       width="100%"
+      tooltipContent={t('tip_handling.tooltip')}
     />
   )
 }

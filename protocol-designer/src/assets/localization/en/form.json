@@ -144,11 +144,10 @@
       "change_tip": {
         "label": "change tip",
         "option": {
-          "always": "Before every aspirate",
+          "always": "Always",
           "never": "Never",
-          "once": "Once at the start of step",
-          "perDest": "Per destination well",
-          "perSource": "Per source well"
+          "once": "Once",
+          "perSource": "Per source"
         },
         "option_tooltip": {
           "always": "Always aspirate with a fresh tip.",
