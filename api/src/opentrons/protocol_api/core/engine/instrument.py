@@ -1958,8 +1958,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         aspirate_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=source_well,
-                position_reference=aspirate_props.position_reference,
-                offset=aspirate_props.offset,
+                position_reference=aspirate_props.aspirate_position.position_reference,
+                offset=aspirate_props.aspirate_position.offset,
             )
         )
         aspirate_location = Location(aspirate_point, labware=source_loc.labware)
@@ -2069,8 +2069,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dispense_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=dest_well,
-                position_reference=dispense_props.position_reference,
-                offset=dispense_props.offset,
+                position_reference=dispense_props.dispense_position.position_reference,
+                offset=dispense_props.dispense_position.offset,
             )
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)
@@ -2151,8 +2151,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dispense_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=dest_well,
-                position_reference=dispense_props.position_reference,
-                offset=dispense_props.offset,
+                position_reference=dispense_props.dispense_position.position_reference,
+                offset=dispense_props.dispense_position.offset,
             )
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)

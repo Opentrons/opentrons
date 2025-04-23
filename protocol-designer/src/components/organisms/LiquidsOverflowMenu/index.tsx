@@ -19,6 +19,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { selectors } from '../../../labware-ingred/selectors'
 import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import {
   getLiquidEntities,
@@ -44,16 +45,19 @@ export function LiquidsOverflowMenu(
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const zoomIn = useSelector(selectors.getZoomedInSlot)
 
+  let right: string = SPACING.spacing12
+  if (formData != null || location.pathname === '/liquids') {
+    right = '23.4rem'
+  } else if (zoomIn?.slot === 'offDeck') {
+    right = '24.75rem'
+  }
   return (
     <Flex
       position={POSITION_ABSOLUTE}
       zIndex={12}
-      right={
-        formData != null || location.pathname === '/liquids'
-          ? '23.4rem'
-          : SPACING.spacing12
-      }
+      right={right}
       top={`calc(${NAV_BAR_HEIGHT_REM}rem + 3.1rem)`}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}

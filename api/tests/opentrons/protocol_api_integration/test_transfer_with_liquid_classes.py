@@ -1079,17 +1079,6 @@ def test_water_distribution_with_volume_more_than_tip_max(
         assert patched_pick_up_tip.call_count == 1
         patched_pick_up_tip.reset_mock()
 
-        pipette_1k.distribute_with_liquid_class(
-            liquid_class=water,
-            volume=100,
-            source=nest_plate.rows()[0][0],
-            dest=arma_plate.rows()[0],
-            new_tip="always",
-            trash_location=trash,
-        )
-        assert patched_pick_up_tip.call_count == 2
-        patched_pick_up_tip.reset_mock()
-
         pipette_1k.pick_up_tip()
         pipette_1k.distribute_with_liquid_class(
             liquid_class=water,

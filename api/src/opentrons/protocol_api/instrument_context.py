@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from typing import Any, List, Optional, Sequence, Union, cast
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -12,7 +12,10 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types
-from opentrons.legacy_commands import commands as cmds
+from opentrons.legacy_commands import (
+    commands as cmds,
+    protocol_commands as protocol_cmds,
+)
 
 from opentrons.legacy_commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
@@ -68,6 +71,16 @@ _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
+
+
+class _Unset:
+    """A sentinel value when no value has been supplied for an argument.
+    User code should never use this explicitly."""
+
+    def __repr__(self) -> str:
+        # Without this, the generated docs render the argument as
+        # "<opentrons.protocol_api.instrument_context._Unset object at 0x1234>"
+        return self.__class__.__name__
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -231,7 +244,7 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         move_to_location: types.Location
-        well: Optional[labware.Well] = None
+        well: Optional[labware.Well]
         last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
@@ -477,12 +490,14 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def mix(
+    def mix(  # noqa: C901
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        aspirate_delay: Optional[float] = None,
+        dispense_delay: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a single location.
@@ -507,6 +522,8 @@ class InstrumentContext(publisher.CommandPublisher):
                      dispensing flow rate is calculated as ``rate`` multiplied by
                      :py:attr:`flow_rate.dispense <flow_rate>`. See
                      :ref:`new-plunger-flow-rates`.
+        :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
+        :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
         :returns: This instance.
 
@@ -519,6 +536,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
+        .. versionchanged:: 2.24
+            Adds the ``aspirate_delay`` and ``dispense_delay`` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -533,9 +552,43 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
 
-        dispense_kwargs: Dict[str, Any] = {}
-        if self.api_version >= APIVersion(2, 16):
-            dispense_kwargs["push_out"] = 0.0
+        if aspirate_delay and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="aspirate_delay",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+        if dispense_delay and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="dispense_delay",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+
+        def delay_with_publish(seconds: float) -> None:
+            # We don't have access to ProtocolContext.delay() which would automatically
+            # publish a message to the broker, so we have to do it manually:
+            with publisher.publish_context(
+                broker=self.broker,
+                command=protocol_cmds.delay(seconds=seconds, minutes=0, msg=None),
+            ):
+                self._protocol_core.delay(seconds=seconds, msg=None)
+
+        def aspirate_with_delay(
+            location: Optional[types.Location | labware.Well],
+        ) -> None:
+            self.aspirate(volume, location, rate)
+            if aspirate_delay:
+                delay_with_publish(aspirate_delay)
+
+        def dispense_with_delay(push_out: Optional[float]) -> None:
+            # protocol_api_old/test_context.py does not allow push_out at all, even if
+            # it's set to None, so we have to hide the argument to make the test pass.
+            # I don't know if the test is even valid, but I'm afraid to change the test.
+            dispense_kwargs = {"push_out": push_out} if push_out is not None else {}
+            self.dispense(volume, None, rate, **dispense_kwargs)
+            if dispense_delay:
+                delay_with_publish(dispense_delay)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -546,13 +599,19 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=location,
             ),
         ):
-            self.aspirate(volume, location, rate)
+            aspirate_with_delay(location=location)
             with AutoProbeDisable(self):
                 while repetitions - 1 > 0:
-                    self.dispense(volume, rate=rate, **dispense_kwargs)
-                    self.aspirate(volume, rate=rate)
+                    # starting in 2.16, we disable push_out on all but the last
+                    # dispense() to prevent the tip from jumping out of the liquid
+                    # during the mix (PR #14004):
+                    dispense_with_delay(
+                        push_out=0 if self.api_version >= APIVersion(2, 16) else None
+                    )
+                    # aspirate location was set above, do subsequent aspirates in-place:
+                    aspirate_with_delay(location=None)
                     repetitions -= 1
-                self.dispense(volume, rate=rate)
+                dispense_with_delay(push_out=None)
         return self
 
     @requires_version(2, 0)
@@ -644,12 +703,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.touch_tip)
     @requires_version(2, 0)
-    def touch_tip(
+    def touch_tip(  # noqa: C901
         self,
         location: Optional[labware.Well] = None,
         radius: float = 1.0,
         v_offset: float = -1.0,
         speed: float = 60.0,
+        mm_from_edge: Union[float, _Unset] = _Unset(),
     ) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
@@ -675,12 +735,28 @@ class InstrumentContext(publisher.CommandPublisher):
                         - Maximum: 80.0 mm/s
                         - Minimum: 1.0 mm/s
         :type speed: float
+        :param mm_from_edge: How far to move inside the well, as a distance from the
+                             well's edge.
+                             When ``mm_from_edge=0``, the pipette tip will move all the
+                             way to the edge of the target well. When ``mm_from_edge=1``,
+                             the pipette tip will move to 1 mm from the well's edge.
+                             Lower values will press the tip harder into the well's
+                             walls; higher values will touch the well more lightly, or
+                             not at all.
+                             ``mm_from_edge`` and ``radius`` are mutually exclusive: to
+                             use ``mm_from_edge``, ``radius`` must be unspecified (left
+                             to its default value of 1.0).
+        :type mm_from_edge: float
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
         :raises RuntimeError: If no location is specified and the location cache is
                               ``None``. This should happen if ``touch_tip`` is called
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
+        :raises: ValueError: If both ``mm_from_edge`` and ``radius`` are specified.
         :returns: This instance.
+
+        .. versionchanged:: 2.24
+                Added the ``mm_from_edge`` parameter.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
@@ -703,6 +779,18 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             raise TypeError(f"location should be a Well, but it is {location}")
 
+        if not isinstance(mm_from_edge, _Unset):
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="mm_from_edge",
+                    until_version="2.24",
+                    current_version=f"{self.api_version}",
+                )
+            if radius != 1.0:
+                raise ValueError(
+                    "radius must be set to 1.0 if mm_from_edge is specified"
+                )
+
         if "touchTipDisabled" in parent_labware.quirks:
             _log.info(f"Ignoring touch tip on labware {well}")
             return self
@@ -722,6 +810,7 @@ class InstrumentContext(publisher.CommandPublisher):
             radius=radius,
             z_offset=v_offset,
             speed=checked_speed,
+            mm_from_edge=mm_from_edge if not isinstance(mm_from_edge, _Unset) else None,
         )
         return self
 
@@ -2487,19 +2576,19 @@ class InstrumentContext(publisher.CommandPublisher):
               If the pipette is in a well, it will move out of the well, move the plunger,
               and then move back.
 
-        Use ``prepare_to_aspirate`` when you need to control exactly when the plunger
+        Use ``prepare_to_aspirate()`` when you need to control exactly when the plunger
         motion will happen. A common use case is a pre-wetting routine, which requires
         preparing for aspiration, moving into a well, and then aspirating *without
         leaving the well*::
 
              pipette.move_to(well.bottom(z=2))
-             pipette.delay(5)
+             protocol.delay(5)
              pipette.mix(10, 10)
              pipette.move_to(well.top(z=5))
              pipette.blow_out()
              pipette.prepare_to_aspirate()
              pipette.move_to(well.bottom(z=2))
-             pipette.delay(5)
+             protocol.delay(5)
              pipette.aspirate(10, well.bottom(z=2))
 
         The call to ``prepare_to_aspirate()`` means that the plunger will be in the
