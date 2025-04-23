@@ -28,8 +28,9 @@ import { OffDeckDetails } from './OffDeckDetails'
 import { LiquidButton } from '../../../components/molecules'
 import type { Dispatch, SetStateAction } from 'react'
 
-const STANDARD_X_WIDTH = '127.76px'
-const STANDARD_Y_HEIGHT = '85.48px'
+const STANDARD_X_WIDTH = 127.76
+const STANDARD_Y_HEIGHT = 85.48
+const SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL = 0.8
 
 interface OffDeckProps {
   setOverflowMenu: Dispatch<SetStateAction<boolean>>
@@ -56,14 +57,19 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
     selectedLabwareDefUri != null ? defs[selectedLabwareDefUri] ?? null : null
 
   let labware = (
-    <RobotWorkSpace key="emptyState" viewBox={`-15 -22 159.75 106.875`}>
+    <RobotWorkSpace
+      key="emptyState"
+      viewBox={`-15 -22 ${
+        STANDARD_X_WIDTH / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+      } ${STANDARD_Y_HEIGHT / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL}`}
+    >
       {() => (
         <RobotCoordsForeignDiv>
           <Box
             backgroundColor={COLORS.grey40}
             borderRadius={BORDERS.borderRadius8}
-            width={STANDARD_X_WIDTH}
-            height={STANDARD_Y_HEIGHT}
+            width={`${STANDARD_X_WIDTH}px`}
+            height={`${STANDARD_Y_HEIGHT}px`}
           />
         </RobotCoordsForeignDiv>
       )}
@@ -73,8 +79,12 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
     labware = (
       <RobotWorkSpace
         key={hoveredLabwareDef.parameters.loadName}
-        viewBox={`-15 -22 ${hoveredLabwareDef.dimensions.xDimension / 0.8} ${
-          hoveredLabwareDef.dimensions.yDimension / 0.8
+        viewBox={`-15 -22 ${
+          hoveredLabwareDef.dimensions.xDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+        } ${
+          hoveredLabwareDef.dimensions.yDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
         }`}
       >
         {() => (
@@ -95,9 +105,9 @@ export function OffDeck(props: OffDeckProps): JSX.Element {
     labware = (
       <RobotWorkSpace
         key={def.parameters.loadName}
-        viewBox={`-15 -22 ${def.dimensions.xDimension / 0.8} ${
-          def.dimensions.yDimension / 0.8
-        }`}
+        viewBox={`-15 -22 ${
+          def.dimensions.xDimension / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+        } ${def.dimensions.yDimension / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL}`}
       >
         {() => (
           <>
