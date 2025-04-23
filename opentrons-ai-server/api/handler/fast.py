@@ -270,71 +270,24 @@ async def create_chat_completion(
     """
     logger.info("POST /api/chat/completion", extra={"body": body.model_dump(), "user": user})
     try:
-        if not body.message or body.message == "":
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message="Request body is empty").model_dump()
-            )
+        _validate_request(body, "message")
 
-        if body.fake:
-            if body.fake_key is not None:
-                fake: FakeResponse = get_fake_response(body.fake_key)
-                return ChatResponse(
-                    reply=fake.chat_response.reply, fake=fake.chat_response.fake, protocol_content=fake.chat_response.protocol_content
-                )
-            return ChatResponse(reply="Default fake response.  ", fake=body.fake)
+        fake_response = _handle_fake_response(body.fake, getattr(body, "fake_key", None))
+        if fake_response:
+            return fake_response
 
-        response: Optional[str] = None
+        protocol_format = getattr(body, "protocol_format", ProtocolFormat.PYTHON)
+        protocol_action = _determine_protocol_action(body)
 
-        # Safely extract content from the first history message if available
-        first_message_content: Optional[str] = None
-        if body.history and len(body.history) > 0:
-            first_message = body.history[0]
-            # Assuming message structure is dict-like, check 'content' key
-            if isinstance(first_message, dict):
-                content_value = first_message.get("content")
-                if isinstance(content_value, str):
-                    first_message_content = content_value
-
-        # Determine protocol option based on content
-        protocol_option = "update"  # Default
-        if first_message_content and "Write a protocol using" in first_message_content:
-            protocol_option = "create"
-
-        is_pd_request = False
-        if first_message_content and "Protocol Designer" in first_message_content:
-            is_pd_request = True
-
-        if "openai" in settings.model.lower():
-            response = openai.predict(prompt=body.message, chat_completion_message_params=body.history)
-        else:
-            if protocol_option == "create":
-                if is_pd_request:
-                    response = claude.create_pd(
-                        user_id=str(user.sub), prompt=body.message, history=cast(Optional[List[MessageParam]], body.history)
-                    )
-                else:
-                    response = claude.create(
-                        user_id=str(user.sub), prompt=body.message, history=cast(Optional[List[MessageParam]], body.history)
-                    )
-            else:
-                response = claude.update(
-                    user_id=str(user.sub), prompt=body.message, history=cast(Optional[List[MessageParam]], body.history)
-                )
-
-        if response is None or response == "":
-            return ChatResponse(reply="No response was generated", fake=bool(body.fake))
-
-        if is_pd_request:  # Use the boolean flag here
-            try:
-                pd_protocol_content = json.loads(response)
-                return ChatResponse(
-                    reply="Here is your Protocol Designer protocol", fake=bool(body.fake), protocol_content=pd_protocol_content
-                )
-            except json.JSONDecodeError as e:
-                logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
-                return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(body.fake))
-        else:
-            return ChatResponse(reply=response, fake=bool(body.fake))
+        response = _generate_llm_response(
+            model_type=settings.model,
+            user_id=str(user.sub),
+            prompt=body.message,
+            history=body.history,
+            protocol_format=protocol_format,
+            protocol_action=protocol_action,
+        )
+        return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:
         logger.exception("Error processing chat completion")
@@ -382,46 +335,28 @@ async def create_protocol(
         # Special handling for fake_key with delay in createProtocol
         if body.fake_key is not None:
             await asyncio.sleep(6)  # Wait 6 seconds before returning to simulate actual behavior
-            fake: FakeResponse = get_fake_response(body.fake_key)
-            return ChatResponse(
-                reply=fake.chat_response.reply, fake=fake.chat_response.fake, protocol_content=fake.chat_response.protocol_content
+            fake_response = _handle_fake_response(True, body.fake_key)
+            return fake_response if fake_response else ChatResponse(reply="Fake response", fake=True)
+
+        fake_response = _handle_fake_response(bool(body.fake))
+        if fake_response:
+            return fake_response
+
+        protocol_format = body.protocol_format
+        logger.debug(f"Received protocol_format: {protocol_format.value}")
+
+        response = _generate_llm_response(
+            model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_format=protocol_format, protocol_action="create"
+        )
+
+        # Special handling for Protocol Designer with null response
+        if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER and response is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=InternalServerError(exception_object=Exception("No response received from LLM")).model_dump(),
             )
 
-        if body.fake:
-            return ChatResponse(reply="Fake response", fake=body.fake)
-        # import code
-        # code.interact(local=dict(globals(), **locals()))
-
-        response: Optional[str] = None
-        if "openai" in settings.model.lower():
-            response = openai.predict(prompt=str(body.model_dump()), chat_completion_message_params=None)
-        else:
-            if "Protocol Designer" in body.prompt:
-                response = claude.create_pd(user_id=str(user.sub), prompt=body.prompt, history=None)
-            else:
-                response = claude.create(user_id=str(user.sub), prompt=body.prompt, history=None)
-
-        if response is None or response == "":
-            return ChatResponse(reply="No response was generated", fake=bool(body.fake))
-
-        if "Protocol Designer" in body.prompt:
-
-            pd_protocol_content = response
-            try:
-                # pd_protocol_content = json.loads(pd_protocol_content)
-
-                # import code
-                # code.interact(local=dict(globals(), **locals()))
-
-                pd_compatible = claude.fillup_pd(pd_protocol_content)
-                pd_compatible = json.loads(pd_compatible)
-
-                return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(body.fake), protocol_content=pd_compatible)
-            except json.JSONDecodeError as e:
-                logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
-                return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(body.fake))
-        else:
-            return ChatResponse(reply=response, fake=bool(body.fake))
+        return _format_response(response, protocol_format, bool(body.fake))
 
     except Exception as e:
         logger.exception("Error processing protocol creation")
