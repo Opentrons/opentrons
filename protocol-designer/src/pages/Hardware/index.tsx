@@ -89,7 +89,7 @@ export function Hardware(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing16}
-          padding={SPACING.spacing80}
+          padding={`${SPACING.spacing80} ${SPACING.spacing80} 0 ${SPACING.spacing80}`}
         >
           <StyledText desktopStyle="displayBold">
             {robotType === FLEX_ROBOT_TYPE
