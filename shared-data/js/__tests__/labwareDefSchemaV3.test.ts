@@ -64,9 +64,7 @@ describe(`test labware definitions with schema v3`, () => {
   const allPaths = definitionPaths.concat(fixturePaths)
 
   test("paths didn't break, which would give false positives", () => {
-    // todo(mm, 2025-03-17): Update this to .toBeGreaterThan(0) when some
-    // schema 3 definitions exist.
-    expect(definitionPaths.length).toStrictEqual(0)
+    expect(definitionPaths.length).toBeGreaterThan(0)
 
     expect(fixturePaths.length).toBeGreaterThan(0)
   })
