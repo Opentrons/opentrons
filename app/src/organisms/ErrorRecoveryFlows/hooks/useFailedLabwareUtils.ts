@@ -345,13 +345,18 @@ export function getFailedLabwareQuantity(
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
+    
     const commandsBeforefailedCmd = runCommands?.data.slice(
       0,
       failedCommandIndex ?? 0
     )
-    const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
-      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+
+    const storeOrRetrieveLabwareLast = commandsBeforefailedCmd?.findLast(
+      cmd => cmd.commandType === 'flexStacker/retrieve' || cmd.commandType === 'flexStacker/store'
     )
+    if (storeOrRetrieveLabwareLast != null){
+      const quantity = storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve' ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length() : storeOrRetrieveLabwareLast?.result?.eventualDestinationLocationSequence.length()
+    }
     const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
       cmd => cmd.commandType === 'flexStacker/setStoredLabware'
     )
