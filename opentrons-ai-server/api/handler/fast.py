@@ -208,22 +208,17 @@ async def create_chat_completion(
 
         # Safely extract content from the first history message if available
         first_message_content: Optional[str] = None
-        if body.history and len(body.history) > 0:
-            first_message = body.history[0]
-            # Assuming message structure is dict-like, check 'content' key
-            if isinstance(first_message, dict):
-                content_value = first_message.get("content")
-                if isinstance(content_value, str):
-                    first_message_content = content_value
+        if body.history:
+            message = body.history[0]
+            if isinstance(message, dict) and "content" in message and message["content"] is not None:
+                first_message_content = str(message["content"])
 
         # Determine protocol option based on content
         protocol_option = "update"  # Default
         if first_message_content and "Write a protocol using" in first_message_content:
             protocol_option = "create"
 
-        is_pd_request = False
-        if first_message_content and "Protocol Designer" in first_message_content:
-            is_pd_request = True
+        is_pd_request = first_message_content and "Protocol Designer" in first_message_content
 
         if "openai" in settings.model.lower():
             response = openai.predict(prompt=body.message, chat_completion_message_params=body.history)
@@ -296,8 +291,6 @@ async def create_protocol(
 
         if body.fake:
             return ChatResponse(reply="Fake response", fake=body.fake)
-        # import code
-        # code.interact(local=dict(globals(), **locals()))
 
         response: Optional[str] = None
         if "openai" in settings.model.lower():
@@ -315,15 +308,10 @@ async def create_protocol(
 
             pd_protocol_content = response
             try:
-                # pd_protocol_content = json.loads(pd_protocol_content)
+                pd_content = claude.fillup_pd(pd_protocol_content)
+                pd_json = json.loads(pd_content)
 
-                # import code
-                # code.interact(local=dict(globals(), **locals()))
-
-                pd_compatible = claude.fillup_pd(pd_protocol_content)
-                pd_compatible = json.loads(pd_compatible)
-
-                return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(body.fake), protocol_content=pd_compatible)
+                return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(body.fake), protocol_content=pd_json)
             except json.JSONDecodeError as e:
                 logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
                 return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(body.fake))
