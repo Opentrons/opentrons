@@ -130,7 +130,7 @@ export function getLabwareLocationFromSequence(
           }
         }
       }
-      // TODO(tz, 4-16-25): add inHooperLocation when logic is merged
+      // TODO(tz, 4-16-25): add inHopperLocation when logic is merged
       else if (detailLevel === 'full') {
         const { allRunDefs } = params as SequenceFullParams
         if (sequenceItem.kind === 'onLabware' && acc.adapterName == null) {

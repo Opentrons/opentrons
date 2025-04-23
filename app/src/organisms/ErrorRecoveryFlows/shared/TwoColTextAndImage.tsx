@@ -21,7 +21,7 @@ export function TwoColTextAndImage(
   const { routeUpdateActions, recoveryMap, recoveryCommands } = props
   const {
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
-    REPLACE_LABWARE_IN_HOOPER_AND_RETRY,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
     ROBOT_IN_MOTION,
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
@@ -36,12 +36,12 @@ export function TwoColTextAndImage(
 
   const reengageLatchRoutes: RouteStep[] = [
     MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH,
-    REPLACE_LABWARE_IN_HOOPER_AND_RETRY.STEPS.REENGAGE_LATCH,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH,
   ]
 
   const primaryOnClick = (): void => {
     switch (route) {
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
         if (reengageLatchRoutes.includes(step)) {
           void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
             void closeLabwareLatch().then(() => {
@@ -62,7 +62,7 @@ export function TwoColTextAndImage(
     switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('load_labware_shuttle_onto_track')
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         if (reengageLatchRoutes.includes(step)) {
           return t('prepare_for_stacker_latch_reengage')
@@ -81,7 +81,7 @@ export function TwoColTextAndImage(
     switch (route) {
       case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
         return t('take_any_necessary_precautions_before_loading_shuttle')
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         if (reengageLatchRoutes.includes(step)) {
           return t('stacker_latch_will_reengage')
@@ -98,7 +98,7 @@ export function TwoColTextAndImage(
 
   const buildButtonText = (): string => {
     switch (route) {
-      case REPLACE_LABWARE_IN_HOOPER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         if (reengageLatchRoutes.includes(step)) {
           return t('re_engage_latch')
