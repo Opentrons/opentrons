@@ -10,8 +10,8 @@ import type { BaseState } from '../types'
 let isSentryInitialized = false
 
 const sentryDsn = getIsProduction()
-  ? process.env.OT_SENTRY_DNS
-  : process.env.OT_SENTRY_OT_SENTRY_DEV_DNS
+  ? process.env.OT_PD_SENTRY_DNS
+  : process.env.OT_PD_SENTRY_DEV_DNS
 
 export const initializeSentry = (state: BaseState): void => {
   const optedIn = getHasOptedIn(state)?.hasOptedIn ?? false
@@ -34,8 +34,8 @@ export const initializeSentry = (state: BaseState): void => {
           'localhost',
           /^https:\/\/designer\.opentrons\.com/,
         ],
-        replaysSessionSampleRate: 0.0, // ToDo (kk: 04/22/2025) modify the rate later
-        replaysOnErrorSampleRate: 1.0, // ToDo (kk: 04/22/2025) modify the rate later
+        replaysSessionSampleRate: 0.0, // No Session Replay
+        replaysOnErrorSampleRate: 0.0, // No Session Replay
       })
       isSentryInitialized = true
       console.log('Sentry.init done')
@@ -46,5 +46,3 @@ export const initializeSentry = (state: BaseState): void => {
     console.debug('User has opted out of Sentry; stopping Sentry')
   }
 }
-
-export const getIsSentryInitialized = (): boolean => isSentryInitialized
