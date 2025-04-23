@@ -1,4 +1,6 @@
 import {
+  FlexStackerSetStoredLabwareRunTimeCommand,
+  FlexStackerFillRunTimeCommand,
   getAllDefinitions,
   getCutoutDisplayName,
   getLabwareDefURI,
@@ -10,6 +12,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getLiquidsByIdForLabware } from '../../analysis'
+import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
 
 import type { LabwareByLiquidId } from '@opentrons/components'
 import type {
@@ -59,6 +62,10 @@ export interface LabwareLiquidRenderInfo extends LabwareInStack {
   liquids: number
 }
 
+function getStackerLocationFromSlotName(slotName: string): string {
+  return `STACKER ${slotName.charAt(0)}`
+}
+
 /**
  * This function parses all commands that load labware in reverse order and makes a map of
  * shape [slotName]: ordered list of stacked items in slot at the start of a protocol, returning
@@ -75,7 +82,7 @@ export function getStackedItemsOnStartingDeck(
   loadedLabware: LoadedLabware[],
   loadedModules: LoadedModule[]
 ): StackedItemsOnDeck {
-  const labwareDefinitions = getAllDefinitions()
+  const labwareDefinitions = getLabwareDefinitionsByURIForProtocol(commands)
   const loadLidCommands = commands.filter(
     (command): command is LoadLidOnLabwareCommad =>
       command.commandType === 'loadLid' &&
@@ -83,7 +90,7 @@ export function getStackedItemsOnStartingDeck(
       command.params.location !== 'systemLocation' &&
       'labwareId' in command.params.location
   )
-  return commands
+  const labwareAndLidOnDeck = commands
     .filter((command): command is
       | LoadLabwareRunTimeCommand
       | LoadLidStackRunTimeCommand =>
@@ -289,6 +296,95 @@ export function getStackedItemsOnStartingDeck(
       }
       return { ...acc, [location]: stackFromCommand }
     }, {})
+
+  // add stacker labware after as we don't want the order of these commands reversed
+  return commands
+    .filter((command): command is
+      | FlexStackerSetStoredLabwareRunTimeCommand
+      | FlexStackerFillRunTimeCommand =>
+      ['flexStacker/setStoredLabware', 'flexStacker/fill'].includes(
+        command.commandType
+      )
+    )
+    .reduce<StackedItemsOnDeck>((acc, command) => {
+      if (command.result == null) return acc
+      let stackFromCommand: StackItem[] = []
+      let location = ''
+      const offDeckArray = Object.keys(acc).includes('offDeck')
+        ? acc.offDeck
+        : []
+      if (command.commandType === 'flexStacker/setStoredLabware') {
+        const definitionUri = getLabwareDefURI(
+          command.result.primaryLabwareDefinition
+        )
+        const displayName =
+          command.result.primaryLabwareDefinition.metadata.displayName
+        const lidDisplayName =
+          command.result.lidLabwareDefinition != null
+            ? command.result.lidLabwareDefinition.metadata.displayName
+            : undefined
+        const stackerModule = loadedModules.find(
+          module => module.id === command.params.moduleId
+        )
+        if (stackerModule == null) return acc
+        const hopperLocation = getStackerLocationFromSlotName(
+          stackerModule.location.slotName
+        )
+        // after the first setStoredLabware, future labware will be treated as offdeck
+        if (Object.keys(acc).includes(hopperLocation)) {
+          command.result.storedLabware?.forEach(labwareGroup => {
+            offDeckArray.push({
+              definitionUri,
+              displayName,
+              labwareId: labwareGroup.primaryLabwareId,
+              lidDisplayName,
+              lidId: labwareGroup.lidLabwareId ?? undefined,
+            })
+          })
+          return { ...acc, offDeck: offDeckArray }
+        } else {
+          // reverse the order of this array so we add the labware in top to bottom
+          const labwareInHopper = command.result.storedLabware
+            ?.toReversed()
+            .map(labwareGroup => {
+              return {
+                definitionUri,
+                displayName,
+                labwareId: labwareGroup.primaryLabwareId,
+                lidDisplayName,
+                lidId: labwareGroup.lidLabwareId ?? undefined,
+              }
+            })
+          labwareInHopper.push({
+            moduleModel: stackerModule.model,
+            moduleId: command.params.moduleId,
+          })
+
+          return { ...acc, [hopperLocation]: labwareInHopper }
+        }
+      } else if (command.commandType === 'flexStacker/fill') {
+        location = 'offDeck'
+        const definitionUri = command.result.primaryLabwareURI
+        const displayName =
+          labwareDefinitions[definitionUri].metadata.displayName
+        const lidDefinitionUri = command.result.lidLabwareURI
+        const lidDisplayName =
+          lidDefinitionUri != null
+            ? labwareDefinitions[lidDefinitionUri].metadata.displayName
+            : undefined
+        command.result.addedLabware?.forEach(labwareGroup => {
+          offDeckArray.push({
+            definitionUri,
+            displayName,
+            labwareId: labwareGroup.primaryLabwareId,
+            lidDisplayName,
+            lidId: labwareGroup.lidLabwareId ?? undefined,
+          })
+        })
+        return { ...acc, offDeck: offDeckArray }
+      }
+      return { ...acc, [location]: stackFromCommand }
+    }, labwareAndLidOnDeck)
 }
 
 export function getLabwareLiquidRenderInfoFromStack(
