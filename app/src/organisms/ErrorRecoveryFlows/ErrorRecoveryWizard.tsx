@@ -12,7 +12,7 @@ import {
   CancelRun,
   RetryNewTips,
   ManageTips,
-  FillWellAndSkip,
+  FillWellAndRetrySameTips,
   RetrySameTips,
   SkipStepSameTips,
   SkipStepNewTips,
@@ -20,6 +20,7 @@ import {
   ManualMoveLwAndSkip,
   ManualReplaceLwAndRetry,
   HomeAndRetry,
+  FillWellAndRetryNewTips,
 } from './RecoveryOptions'
 import {
   useErrorDetailsModal,
@@ -194,8 +195,12 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RetrySameTips {...props} />
   }
 
-  const buildFillWellAndSkip = (): JSX.Element => {
-    return <FillWellAndSkip {...props} />
+  const buildFillWellAndRetrySameTips = (): JSX.Element => {
+    return <FillWellAndRetrySameTips {...props} />
+  }
+
+  const buildFillWellAndRetryNewTips = (): JSX.Element => {
+    return <FillWellAndRetryNewTips {...props} />
   }
 
   const buildSkipStepSameTips = (): JSX.Element => {
@@ -245,8 +250,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildRetryNewTips()
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
       return buildRetrySameTips()
-    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
-      return buildFillWellAndSkip()
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
+      return buildFillWellAndRetrySameTips()
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+      return buildFillWellAndRetryNewTips()
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
       return buildSkipStepSameTips()
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:

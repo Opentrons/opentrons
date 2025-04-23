@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -11,17 +10,15 @@ import {
   Icon,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { getFileMetadata } from '../../../file-data/selectors'
 
 const BUTTON_NAME = 'SettingsIconButton'
 
 export const SettingsIcon = (): JSX.Element => {
   const location = useLocation()
   const navigate = useNavigate()
-  const metadata = useSelector(getFileMetadata)
 
   const handleNavigate = (): void => {
-    if (metadata?.created != null && location.pathname === '/settings') {
+    if (location.pathname === '/settings') {
       navigate(-1)
     } else if (location.pathname !== '/settings') {
       navigate('/settings')

@@ -4,7 +4,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolSectionsContainer } from '..'
 import { FormProvider, useForm } from 'react-hook-form'
-import { fillApplicationSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
+import { fillProtocolFormatSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
 
 const TestFormProviderComponent = () => {
   const methods = useForm({
@@ -27,7 +27,7 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 describe('ProtocolSectionsContainer', () => {
   it('should render all five accordions for each step of Protocol Creation', () => {
     render()
-
+    expect(screen.getByText('Protocol Format')).toBeInTheDocument()
     expect(screen.getByText('Application')).toBeInTheDocument()
     expect(screen.getByText('Instruments')).toBeInTheDocument()
     expect(screen.getByText('Modules')).toBeInTheDocument()
@@ -35,13 +35,12 @@ describe('ProtocolSectionsContainer', () => {
     expect(screen.getByText('Steps')).toBeInTheDocument()
   })
 
-  it('should render the ApplicationSection opened by default', () => {
+  it('should render the Protocol Format section opened by default', () => {
     render()
 
-    expect(screen.getByRole('button', { name: 'Application' })).toHaveAttribute(
-      'aria-expanded',
-      'true'
-    )
+    expect(
+      screen.getByRole('button', { name: 'Protocol Format' })
+    ).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('should render all the other sections closed by default', () => {
@@ -67,20 +66,20 @@ describe('ProtocolSectionsContainer', () => {
   it('should go back to previous section when clicking on the previous section', async () => {
     render()
 
-    const applicationButton = screen.getByRole('button', {
-      name: 'Application',
+    const protocolFormatButton = screen.getByRole('button', {
+      name: 'Protocol Format',
     })
-    expect(applicationButton).toHaveAttribute('aria-expanded', 'true')
+    expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'true')
 
-    await fillApplicationSectionAndClickConfirm()
+    await fillProtocolFormatSectionAndClickConfirm()
 
     await waitFor(() => {
-      expect(applicationButton).toHaveAttribute('aria-expanded', 'false')
+      expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'false')
     })
-    fireEvent.click(applicationButton)
+    fireEvent.click(protocolFormatButton)
 
     await waitFor(() => {
-      expect(applicationButton).toHaveAttribute('aria-expanded', 'true')
+      expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'true')
     })
   })
 

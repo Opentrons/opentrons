@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
@@ -7,12 +7,11 @@ import mapValues from 'lodash/mapValues'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch, useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
   FLEX_ROBOT_TYPE,
   getAreSlotsAdjacent,
-  ABSORBANCE_READER_MODELS,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -29,41 +28,36 @@ import * as labwareDefSelectors from '../../labware-defs/selectors'
 import * as labwareDefActions from '../../labware-defs/actions'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { actions as steplistActions } from '../../steplist'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  STAGING_AREA_CUTOUTS_ORDERED,
-} from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { actions as stepFormActions } from '../../step-forms'
-import { createModuleWithNoSlot } from '../../modules'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
-import { SelectModules } from '../../components/organisms/SelectModules'
+import { toggleNewProtocolModal } from '../../navigation/actions'
+import { SelectOt2Modules } from './SelectOt2Modules'
 import { AddMetadata } from './AddMetadata'
-import { getTrashSlot } from './utils'
 import { SelectBasics } from './SelectBasics'
-import { SelectFixtures } from './SelectFixtures'
+import { SelectHardware } from './SelectFlexHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { NormalizedPipette } from '@opentrons/step-generation'
+import type {
+  ModuleModel,
+  ModuleType,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { BaseState } from '../../types'
 import type {
   FormPipette,
   FormPipettesByMount,
   PipetteOnDeck,
 } from '../../step-forms'
-import type {
-  ModuleModel,
-  ModuleType,
-  PipetteName,
-} from '@opentrons/shared-data'
-import type { WizardFormState } from './types'
+import type { WizardFormState } from '../../components/organisms'
 
-type WizardStep = 'basics' | 'modules' | 'fixtures' | 'metadata'
-const WIZARD_STEPS: WizardStep[] = ['basics', 'modules', 'fixtures', 'metadata']
-const WIZARD_STEPS_OT2: WizardStep[] = ['basics', 'modules', 'metadata']
+type WizardStep = 'basics' | 'modules' | 'metadata'
+const WIZARD_STEPS: WizardStep[] = ['basics', 'modules', 'metadata']
 
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
@@ -83,16 +77,17 @@ const initialFormState: WizardFormState = {
     name: undefined,
     description: undefined,
     organizationOrAuthor: undefined,
-    robotType: undefined,
+    robotType: FLEX_ROBOT_TYPE,
   },
   pipettesByMount: {
     left: { pipetteName: undefined, tiprackDefURI: undefined },
     right: { pipetteName: undefined, tiprackDefURI: undefined },
   },
   modules: {},
-  //  defaulting to selecting trashBin already to avoid user having to
-  //  click to add a trash bin/waste chute. Delete once we support returnTip()
-  additionalEquipment: ['trashBin'],
+  hasGripper: null,
+  fixtures: {},
+  hasThermocycler: null,
+  hasWasteChute: null,
 }
 
 const pipetteValidationShape = Yup.object().shape({
@@ -141,7 +136,7 @@ export function Onboarding(): JSX.Element | null {
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
-  const [wizardSteps, setWizardSteps] = useState<WizardStep[]>(WIZARD_STEPS)
+  const wizardSteps = WIZARD_STEPS
 
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
@@ -184,15 +179,18 @@ export function Onboarding(): JSX.Element | null {
             []
           )
         : []
-    const heaterShakerIndex = modules.findIndex(
-      mod => mod.type === HEATERSHAKER_MODULE_TYPE
-    )
-    const magModIndex = modules.findIndex(
-      mod => mod.type === MAGNETIC_MODULE_TYPE
-    )
-    if (heaterShakerIndex > -1 && magModIndex > -1) {
-      // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
-      modules[magModIndex].slot = '9'
+
+    if (values.fields.robotType === OT2_ROBOT_TYPE) {
+      const heaterShakerIndex = modules.findIndex(
+        mod => mod.type === HEATERSHAKER_MODULE_TYPE
+      )
+      const magModIndex = modules.findIndex(
+        mod => mod.type === MAGNETIC_MODULE_TYPE
+      )
+      if (heaterShakerIndex > -1 && magModIndex > -1) {
+        // if both are present, move the Magnetic module to slot 9, since both can't be in slot 1
+        modules[magModIndex].slot = '9'
+      }
     }
     const newProtocolFields = values.fields
 
@@ -235,71 +233,40 @@ export function Onboarding(): JSX.Element | null {
       })
     )
 
+    const trashFixture = Object.values(values.fixtures).find(
+      fixture => fixture.name === 'trashBin'
+    )
     //  add trash
-    if (values.additionalEquipment.includes('trashBin')) {
-      // defaulting trash to appropriate locations
-      dispatch(
-        createDeckFixture(
-          'trashBin',
-          values.fields.robotType === FLEX_ROBOT_TYPE
-            ? getTrashSlot(values)
-            : 'cutout12'
-        )
-      )
+    if (trashFixture != null) {
+      dispatch(createDeckFixture('trashBin', trashFixture.cutoutId))
     }
 
     // add waste chute
-    if (values.additionalEquipment.includes('wasteChute')) {
+    if (
+      Object.values(values.fixtures).some(
+        fixture => fixture.name === 'wasteChute'
+      )
+    ) {
       dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
     }
     //  add staging areas
-    const stagingAreas = values.additionalEquipment.filter(
-      equipment => equipment === 'stagingArea'
+    const stagingAreas = Object.values(values.fixtures).filter(
+      fixture => fixture.name === 'stagingArea'
     )
 
     if (stagingAreas.length > 0) {
-      // Note: when plate reader is present, cutoutB3 is not available for StagingArea
-      const hasPlateReader = modules.some(
-        module => module.model === ABSORBANCE_READER_MODELS[0]
-      )
-      stagingAreas.forEach((_, index) => {
-        const stagingAreaCutout = hasPlateReader
-          ? STAGING_AREA_CUTOUTS_ORDERED.filter(
-              cutout => cutout !== 'cutoutB3'
-            )[index]
-          : STAGING_AREA_CUTOUTS_ORDERED[index]
-
-        return dispatch(createDeckFixture('stagingArea', stagingAreaCutout))
+      stagingAreas.forEach(info => {
+        return dispatch(createDeckFixture('stagingArea', info.cutoutId))
       })
     }
 
     // create modules
-    // sort so modules with slot are created first
-    // then modules without a slot are generated in remaining available slots
-    modules.sort((a, b) => {
-      if (a.slot == null && b.slot != null) {
-        return 1
-      }
-      if (b.slot == null && a.slot != null) {
-        return -1
-      }
-      return 0
-    })
-
     modules.forEach(moduleArgs => {
-      return moduleArgs.slot != null
-        ? dispatch(stepFormActions.createModule(moduleArgs))
-        : dispatch(
-            createModuleWithNoSlot({
-              model: moduleArgs.model,
-              type: moduleArgs.type,
-              isMagneticBlock: moduleArgs.type === MAGNETIC_BLOCK_TYPE,
-            })
-          )
+      return dispatch(stepFormActions.createModule(moduleArgs))
     })
 
     // add gripper
-    if (values.additionalEquipment.includes('gripper')) {
+    if (values.hasGripper) {
       dispatch(toggleIsGripperRequired())
     }
 
@@ -360,9 +327,9 @@ export function Onboarding(): JSX.Element | null {
         currentWizardStep={currentWizardStep}
         createProtocolFile={createProtocolFile}
         proceed={proceed}
-        setWizardSteps={setWizardSteps}
         goBack={goBack}
         analyticsStartTime={analyticsStartTime}
+        setCurrentStepIndex={setCurrentStepIndex}
       />
     </Box>
   )
@@ -373,8 +340,8 @@ interface CreateFileFormProps {
   createProtocolFile: (values: WizardFormState) => void
   goBack: () => void
   proceed: () => void
-  setWizardSteps: Dispatch<SetStateAction<WizardStep[]>>
   analyticsStartTime: Date
+  setCurrentStepIndex: Dispatch<SetStateAction<number>>
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
@@ -384,43 +351,39 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     proceed,
     goBack,
     analyticsStartTime,
-    setWizardSteps,
+    setCurrentStepIndex,
   } = props
+  const location = useLocation()
   const { ...formProps } = useForm<WizardFormState>({
     defaultValues: initialFormState,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
   })
+  const dispatch = useDispatch()
+  const robotType = formProps.watch('fields').robotType
 
-  const handleProceedRobotType = (robotType: string): void => {
-    if (robotType === OT2_ROBOT_TYPE) {
-      setWizardSteps(WIZARD_STEPS_OT2)
-    } else {
-      setWizardSteps(WIZARD_STEPS)
+  // for resetting the onboarding page back to empty and page 1 when you hit "create new"
+  //  from the nav bar
+  useEffect(() => {
+    if (location.state?.modalResetKey) {
+      formProps.reset()
+      setCurrentStepIndex(0)
+      dispatch(toggleNewProtocolModal(true))
     }
-  }
+  }, [location.state?.modalResetKey])
 
   return (
     <form onSubmit={formProps.handleSubmit(() => {})}>
       {(() => {
         switch (currentWizardStep) {
           case 'basics':
-            return (
-              <SelectBasics
-                {...formProps}
-                goBack={goBack}
-                proceed={() => {
-                  handleProceedRobotType(
-                    formProps.getValues().fields.robotType ?? OT2_ROBOT_TYPE
-                  )
-                  proceed()
-                }}
-              />
-            )
+            return <SelectBasics {...{ ...formProps, proceed, goBack }} />
           case 'modules':
-            return <SelectModules {...{ ...formProps, proceed, goBack }} />
-          case 'fixtures':
-            return <SelectFixtures {...{ ...formProps, proceed, goBack }} />
+            return robotType === OT2_ROBOT_TYPE ? (
+              <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />
+            ) : (
+              <SelectHardware {...{ ...formProps, proceed, goBack }} />
+            )
           case 'metadata':
             return (
               <AddMetadata

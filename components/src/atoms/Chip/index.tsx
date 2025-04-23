@@ -26,6 +26,8 @@ interface ChipProps extends StyleProps {
   hasIcon?: boolean
   /** Chip size medium is the default size */
   chipSize?: ChipSize
+  /** icon should pulse */
+  pulseIcon?: boolean
 }
 
 const CHIP_PROPS_BY_TYPE: Record<
@@ -79,6 +81,7 @@ export function Chip(props: ChipProps): JSX.Element {
     text,
     hasIcon = true,
     chipSize = 'medium',
+    pulseIcon = false,
     ...styleProps
   } = props
   const backgroundColor =
@@ -86,6 +89,7 @@ export function Chip(props: ChipProps): JSX.Element {
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
+  const iconColor = CHIP_PROPS_BY_TYPE[type].iconColor
 
   const MEDIUM_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
@@ -109,9 +113,10 @@ export function Chip(props: ChipProps): JSX.Element {
     }
   `
 
+  const smallSize = iconName === 'connection-status' ? '0.5rem' : '0.75rem'
   const ICON_STYLE = css`
-    width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
-    height: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
+    width: ${chipSize === 'medium' ? '1rem' : smallSize};
+    height: ${chipSize === 'medium' ? '1rem' : smallSize};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
@@ -145,10 +150,21 @@ export function Chip(props: ChipProps): JSX.Element {
       {hasIcon ? (
         <Icon
           name={icon}
-          color={CHIP_PROPS_BY_TYPE[type].iconColor}
+          color={iconColor}
           aria-label={`icon_${text}`}
           css={ICON_STYLE}
-        />
+        >
+          {pulseIcon ? (
+            <animate
+              attributeName="fill"
+              values={`${iconColor}; transparent`}
+              dur="1s"
+              calcMode="discrete"
+              repeatCount="indefinite"
+              data-testid={`Chip_${type}_icon_animate`}
+            />
+          ) : null}
+        </Icon>
       ) : null}
       <LegacyStyledText
         css={TEXT_STYLE}
@@ -166,7 +182,7 @@ const WEB_MEDIUM_TEXT_STYLE = css`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 const WEB_SMALL_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeLabel};
-  line-height: ${TYPOGRAPHY.lineHeight12};
+  font-size: ${TYPOGRAPHY.fontSizeP};
+  line-height: ${TYPOGRAPHY.lineHeight16};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `

@@ -21,5 +21,8 @@ export { RetryStepInfo } from './RetryStepInfo'
 export { SkipStepInfo } from './SkipStepInfo'
 export { HoldingLabware } from './HoldingLabware'
 export { RecoveryDoorOpenSpecial } from './RecoveryDoorOpenSpecial'
+export { FillWell } from './FillWell'
+export { RetryWithSameTips } from './RetryWithSameTips'
+export { RetryWithNewTips } from './RetryWithNewTips'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'

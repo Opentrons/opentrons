@@ -8,7 +8,6 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
   useProtocolQuery,
-  useDoorQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
@@ -72,6 +71,10 @@ import {
   selectOffsetSource,
 } from '/app/redux/protocol-runs'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import {
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -125,6 +128,7 @@ vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -187,10 +191,8 @@ const mockOffset = {
 }
 
 const mockDoorStatus = {
-  data: {
-    status: 'closed',
-    doorRequiredClosedForProtocol: true,
-  },
+  isDoorOpen: false,
+  moduleDoorLocation: null,
 }
 const mockFixture = {
   cutoutId: 'cutoutD1',
@@ -299,7 +301,9 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .thenReturn({ data: { data: [] } } as any)
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
-    vi.mocked(useDoorQuery).mockReturnValue({ data: mockDoorStatus } as any)
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockDoorStatus)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
@@ -503,16 +507,30 @@ describe('ProtocolSetup', () => {
 
   it('should render toast and make a button disabled when a robot door is open', () => {
     const mockOpenDoorStatus = {
-      data: {
-        status: 'open',
-        doorRequiredClosedForProtocol: true,
-      },
+      isDoorOpen: true,
+      moduleDoorLocation: null,
     }
-    vi.mocked(useDoorQuery).mockReturnValue({ data: mockOpenDoorStatus } as any)
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockOpenDoorStatus)
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run.'
+    )
+  })
+  it('should render toast and make a button disabled when a stacker door is open', () => {
+    const mockOpenDoorStatus = {
+      isDoorOpen: true,
+      moduleDoorLocation: NOT_CONFIGURED,
+    }
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockOpenDoorStatus)
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
+      'A stacker door is open. Close the stacker door before starting the run.'
     )
   })
 

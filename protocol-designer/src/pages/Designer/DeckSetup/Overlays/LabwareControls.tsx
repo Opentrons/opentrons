@@ -15,6 +15,7 @@ import {
   WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
 import { DND_TYPES } from '../../../../constants'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
@@ -45,7 +46,7 @@ export const LabwareControls = (
     setHover,
     setShowMenuListForId,
     isSelected,
-    tab,
+    terminalItemId,
     itemId,
   } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -109,7 +110,11 @@ export const LabwareControls = (
 
   drag(drop(ref))
 
-  if (tab === 'protocolSteps' || isSelected || slotPosition == null) {
+  if (
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
+    isSelected ||
+    slotPosition == null
+  ) {
     return null
   }
   const isLabwareSwapping =

@@ -23,7 +23,7 @@ export function IncompatibleTipsModal(
 ): JSX.Element {
   const { onClose } = props
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
 
   const handleShowAllTips = (): void => {
     onClose()

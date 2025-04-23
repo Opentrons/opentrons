@@ -707,6 +707,28 @@ const updatePatchOnConditioningVolumeChange = (
   return patch
 }
 
+const updatePatchOnPathChange = (
+  patch: FormPatch,
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
+): FormPatch => {
+  if (
+    fieldHasChanged(rawForm, patch, 'path') &&
+    rawForm.path === 'multiDispense'
+  ) {
+    return {
+      ...patch,
+      ...getDefaultFields(
+        'disposalVolume_checkbox',
+        'disposalVolume_volume',
+        'conditioning_checkbox',
+        'conditioning_volume'
+      ),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -747,5 +769,6 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch =>
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnConditioningVolumeChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnPathChange(chainPatch, rawForm, pipetteEntities),
   ])
 }

@@ -17,7 +17,11 @@ import {
   InputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { WELL_BOTTOM, WELL_CENTER, WELL_TOP } from '@opentrons/shared-data'
+import {
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
 import { prefixMap } from '../../../resources/utils'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
@@ -88,7 +92,11 @@ export function TipPositionModal(
 
   const [zValue, setZValue] = useState<string | null>(
     zSpec?.value == null
-      ? String(referenceSpec?.value === WELL_BOTTOM ? defaultMmFromBottom : 0)
+      ? String(
+          referenceSpec?.value === POSITION_REFERENCE_BOTTOM
+            ? defaultMmFromBottom
+            : 0
+        )
       : String(zSpec?.value)
   )
   const [yValue, setYValue] = useState<string | null>(
@@ -125,10 +133,10 @@ export function TipPositionModal(
     }
     let [min, max]: [number, number] = [0, wellDepthMm]
     switch (reference) {
-      case WELL_CENTER:
+      case POSITION_REFERENCE_CENTER:
         ;[min, max] = [-wellDepth / 2, wellDepth / 2]
         break
-      case WELL_TOP:
+      case POSITION_REFERENCE_TOP:
         ;[min, max] = [-wellDepth, 0]
         break
       default:
@@ -253,7 +261,7 @@ export function TipPositionModal(
               setXValue('0')
               setYValue('0')
               setZValue('1')
-              setReference(WELL_BOTTOM)
+              setReference(POSITION_REFERENCE_BOTTOM)
             }}
             css={LINK_BUTTON_STYLE}
           >

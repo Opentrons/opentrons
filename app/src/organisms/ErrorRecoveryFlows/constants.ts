@@ -30,7 +30,7 @@ export const DEFINED_ERROR_TYPES = {
   HOPPER_LABWARE_MISSING: 'flexStackerHopperLabwareFailed',
   SHUTTLE_MISSING: 'flexStackerShuttleMissing',
   LABWARE_MISSING_IN_SHUTTLE: 'flexStackerLabwareRetrieveFailed',
-}
+} as const
 
 // Client-defined error-handling flows.
 export const ERROR_KINDS = {
@@ -54,7 +54,7 @@ export const STACKER_ERROR_KINDS: ErrorKind[] = [
   ERROR_KINDS.SHUTTLE_MISSING,
   ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
   ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE,
-]
+] as const
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.
@@ -162,11 +162,21 @@ export const RECOVERY_MAP = {
     ROUTE: 'ignore-and-skip-step',
     STEPS: { SELECT_IGNORE_KIND: 'select-ignore', SKIP_STEP: 'skip-step' },
   },
-  MANUAL_FILL_AND_SKIP: {
-    ROUTE: 'manual-fill-well-and-skip',
+  MANUAL_FILL_AND_RETRY_SAME_TIPS: {
+    ROUTE: 'manual-fill-well-and-retry-same-tips',
     STEPS: {
       MANUAL_FILL: 'manual-fill',
-      SKIP: 'skip',
+      RETRY_SAME_TIPS: 'retry-same-tips',
+    },
+  },
+  MANUAL_FILL_AND_RETRY_NEW_TIPS: {
+    ROUTE: 'manual-fill-well-and-retry-new-tips',
+    STEPS: {
+      MANUAL_FILL: 'manual-fill',
+      DROP_TIPS: 'drop-tips',
+      REPLACE_TIPS: 'replace-tips',
+      SELECT_TIPS: 'select-tips',
+      RETRY: 'retry',
     },
   },
   MANUAL_MOVE_AND_SKIP: {
@@ -314,7 +324,8 @@ const {
   RETRY_NEW_TIPS,
   RETRY_SAME_TIPS,
   ERROR_WHILE_RECOVERING,
-  MANUAL_FILL_AND_SKIP,
+  MANUAL_FILL_AND_RETRY_SAME_TIPS,
+  MANUAL_FILL_AND_RETRY_NEW_TIPS,
   MANUAL_MOVE_AND_SKIP,
   MANUAL_REPLACE_AND_RETRY,
   MANUAL_REPLACE_STACKER_AND_RETRY,
@@ -373,9 +384,16 @@ export const STEP_ORDER: StepOrder = {
     IGNORE_AND_SKIP.STEPS.SKIP_STEP,
   ],
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
-  [MANUAL_FILL_AND_SKIP.ROUTE]: [
-    MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL,
-    MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+  [MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE]: [
+    MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL,
+    MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
+  ],
+  [MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE]: [
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.MANUAL_FILL,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.DROP_TIPS,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.RETRY,
   ],
   [MANUAL_MOVE_AND_SKIP.ROUTE]: [
     MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_HOLDING_LABWARE,
@@ -538,11 +556,30 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     },
     [IGNORE_AND_SKIP.STEPS.SKIP_STEP]: { allowDoorOpen: false },
   },
-  [MANUAL_FILL_AND_SKIP.ROUTE]: {
-    [MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL]: {
+  [MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE]: {
+    [MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.MANUAL_FILL]: {
       allowDoorOpen: true,
     },
-    [MANUAL_FILL_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: true },
+    [MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS]: {
+      allowDoorOpen: true,
+    },
+  },
+  [MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE]: {
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.MANUAL_FILL]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.DROP_TIPS]: {
+      allowDoorOpen: false,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.SELECT_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.RETRY]: {
+      allowDoorOpen: true,
+    },
   },
   [MANUAL_MOVE_AND_SKIP.ROUTE]: {
     [MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_HOLDING_LABWARE]: {

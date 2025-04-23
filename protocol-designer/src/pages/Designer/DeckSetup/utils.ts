@@ -249,9 +249,9 @@ export function zoomInOnCoordinate(props: ZoomInOnCoordinateProps): string {
   const newWidth = width * zoomFactor
   const newHeight = height * zoomFactor
 
-  //  +125 and +50 to get the approximate center of the screen point
+  //  +20 to get the approximate center of the screen point
   const newMinX = x - newWidth / 2 + 20
-  const newMinY = y - newHeight / 2 + 50
+  const newMinY = y - newHeight / 2
 
   return `${newMinX} ${newMinY} ${newWidth} ${newHeight + 70}`
 }
@@ -508,13 +508,12 @@ export const getOT2HoverDimensions = (
 
 export const getSVGContainerWidth = (
   robotType: RobotType,
-  tab: string,
   isZoomed: boolean
 ): string => {
-  if (robotType === OT2_ROBOT_TYPE && tab === 'startingDeck' && !isZoomed) {
+  if (robotType === OT2_ROBOT_TYPE && !isZoomed) {
     return '78.5%'
   }
-  if (robotType !== OT2_ROBOT_TYPE && !isZoomed && tab !== 'protocolSteps') {
+  if (robotType !== OT2_ROBOT_TYPE && !isZoomed) {
     return '70%'
   }
   return '100%'
@@ -636,12 +635,26 @@ const getIsLabwareInUse = (
   )
 }
 
-export function getIsEntityOnSlotInUse(
+export function getIsLabwareOnSlotInUse(
+  savedSteps: SavedStepFormState,
+  createdLabwareForSlot?: LabwareOnDeck,
+  createdNestedLabwareForSlot?: LabwareOnDeck
+): boolean {
+  const isCurrentLabwareInUse = [
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+  ]
+    .map(lw => getIsLabwareInUse(savedSteps, lw))
+    .includes(true)
+
+  return isCurrentLabwareInUse
+}
+
+//  NOTE: This will be used for editing hardware Flex
+export function getIsHardwareOnSlotInUse(
   savedSteps: SavedStepFormState,
   matchingLabwareFor4thColumn: LabwareOnDeck | null,
   createdModuleForSlot?: ModuleOnDeck,
-  createdLabwareForSlot?: LabwareOnDeck,
-  createdNestedLabwareForSlot?: LabwareOnDeck,
   createdFixtureForSlots?: AdditionalEquipment[]
 ): boolean {
   const isCurrentModuleInUse =
@@ -656,13 +669,10 @@ export function getIsEntityOnSlotInUse(
         //  moving a labware from the module location
         ('labware' in step && step.labware === createdModuleForSlot.id)
     ) != null
-  const isCurrentLabwareInUse = [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
-    matchingLabwareFor4thColumn,
-  ]
-    .map(lw => getIsLabwareInUse(savedSteps, lw))
-    .includes(true)
+  const isCurrentLabwareInUse =
+    matchingLabwareFor4thColumn != null
+      ? getIsLabwareInUse(savedSteps, matchingLabwareFor4thColumn)
+      : false
 
   const isCurrentFixtureInUse =
     createdFixtureForSlots != null &&

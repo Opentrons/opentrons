@@ -94,7 +94,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
         },
         {
           option: t('liquid_class'),
-          value: 'Dummy liquid class',
+          value: state.liquidClass.displayName,
         },
       ]
     : [

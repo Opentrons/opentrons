@@ -21,7 +21,7 @@ export function ConfirmDeleteEntityInUseModal(
   props: ConfirmDeleteEntityInUseModalProps
 ): JSX.Element {
   const { onClose, onConfirm, type } = props
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
 
   return createPortal(
     <HandleEnter onEnter={onConfirm}>

@@ -49,6 +49,10 @@ import {
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
+import {
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')
@@ -62,6 +66,7 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/ErrorRecoveryFlows')
 vi.mock('/app/organisms/InterventionModal')
+vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -72,6 +77,10 @@ const PROTOCOL_ANALYSIS = {
   status: 'completed',
   labware: [],
 } as any
+const DOOR_RESULT = {
+  isDoorOpen: true,
+  moduleDoorLocation: null,
+}
 const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()
 const mockStopRun = vi.fn()
@@ -199,8 +208,50 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID, { refetchInterval: 5000 })
       .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(DOOR_RESULT)
     render(`/runs/${RUN_ID}/run`)
-    expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalled()
+    expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalledWith(
+      { moduleDoorLocation: null },
+      {}
+    )
+  })
+
+  it('should render open stacker door alert modal, when run staus is blocked by open stacker door', () => {
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    const mockOpenStacker = {
+      isDoorOpen: true,
+      moduleDoorLocation: 'A4',
+    }
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockOpenStacker)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalledWith(
+      { moduleDoorLocation: mockOpenStacker.moduleDoorLocation },
+      {}
+    )
+  })
+
+  it('should render open unconfigured stacker door alert modal, when run staus is blocked by open stacker door not in the deck config', () => {
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    const mockUnconfiguredOpenStacker = {
+      isDoorOpen: true,
+      moduleDoorLocation: NOT_CONFIGURED,
+    }
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockUnconfiguredOpenStacker)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalledWith(
+      { moduleDoorLocation: NOT_CONFIGURED },
+      {}
+    )
   })
 
   it(`should render not open door alert modal, when run status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {

@@ -2,6 +2,7 @@ import type { Mount } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   LabwareDefinition2,
+  LiquidClass,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
@@ -23,6 +24,11 @@ export interface QuickTransferWizardState {
   destinationWells?: string[]
   transferType?: TransferType
   volume?: number
+  // Note added for liquid classes in Quick Transfer
+  path?: PathOption
+  changeTip?: ChangeTipOptions
+  dropTipLocation?: CutoutConfig
+  liquidClass?: LiquidClass
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -85,6 +91,7 @@ export interface QuickTransferSummaryState {
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
+  liquidClass: LiquidClass
 }
 
 export type TransferType =
@@ -100,6 +107,10 @@ export type QuickTransferWizardAction =
   | SetDestLabwareAction
   | SetDestWellsAction
   | SetVolumeAction
+  | SetPipettePath
+  | SetChangeTip
+  | SetDropTipLocation
+  | SetLiquidClassAction
 
 export type QuickTransferSummaryAction =
   | SetAspirateFlowRateAction
@@ -196,6 +207,12 @@ interface SetDropTipLocation {
   type: typeof ACTIONS.SET_DROP_TIP_LOCATION
   location: CutoutConfig
 }
+
+interface SetLiquidClassAction {
+  type: typeof ACTIONS.SET_LIQUID_CLASS
+  liquidClass: LiquidClass
+}
+
 interface SelectPipetteAction {
   type: typeof ACTIONS.SELECT_PIPETTE
   mount: Mount
