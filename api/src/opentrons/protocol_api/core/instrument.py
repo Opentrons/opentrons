@@ -364,7 +364,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, WellCoreType]],
-        dest: List[Tuple[types.Location, WellCoreType]],
+        dest: Union[List[Tuple[types.Location, WellCoreType]], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
         starting_tip: Optional[WellCoreType],
