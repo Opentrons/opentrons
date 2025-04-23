@@ -5,6 +5,7 @@ import { i18n } from '../../../../assets/localization'
 import { getLiquidEntities } from '../../../../step-forms/selectors'
 import * as labwareIngredActions from '../../../../labware-ingred/actions'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { LiquidsOverflowMenu } from '..'
 
 import type { ComponentProps } from 'react'
@@ -38,6 +39,10 @@ describe('SlotOverflowMenu', () => {
       showLiquidsModal: vi.fn(),
       overflowWrapperRef: createRef(),
     }
+    vi.mocked(selectors.getZoomedInSlot).mockReturnValue({
+      slot: null,
+      cutout: null,
+    })
     vi.mocked(getLiquidEntities).mockReturnValue({
       '0': {
         displayColor: 'mockColor',
