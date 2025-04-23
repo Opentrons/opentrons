@@ -680,6 +680,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   const volume = Number(rawVolume)
   const {
     flowRateByVolume: aspirateFlowRateByVolume,
+    aspiratePosition,
     preWet,
     mix: aspirateMix,
     delay: aspirateDelay,
@@ -687,7 +688,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   const {
     positionReference: aspiratePositionReference,
     offset: aspirateOffset,
-  } = aspirate.aspiratePosition
+  } = aspiratePosition
 
   const dispense =
     multiDispense != null && path === 'multiDispense'
@@ -695,12 +696,13 @@ const getLiquidClassValuesMoveLiquid = (args: {
       : singleDispense
   const {
     flowRateByVolume: dispenseFlowRateByVolume,
+    dispensePosition,
     delay: dispenseDelay,
   } = dispense
   const {
     positionReference: dispensePositionReference,
     offset: dispenseOffset,
-  } = dispense.dispensePosition
+  } = dispensePosition
   const { pushOutByVolume } = singleDispense // always get pushOut from singleDispense
   const dispenseMix = 'mix' in dispense ? dispense.mix : null
   const {
@@ -876,9 +878,10 @@ const getLiquidClassValuesMix = (args: {
   const { aspirate, singleDispense } = liquidClassValuesForTip
   const {
     flowRateByVolume: aspirateFlowRateByVolume,
+    aspiratePosition,
     delay: aspirateDelay,
   } = aspirate
-  const { positionReference, offset } = aspirate.aspiratePosition
+  const { positionReference, offset } = aspiratePosition
   const {
     flowRateByVolume: dispenseFlowRateByVolume,
     delay: dispenseDelay,
