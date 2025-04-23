@@ -11,7 +11,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
-    FlexStackerLabwareRetrieveError
+    FlexStackerLabwareRetrieveError,
 )
 
 from ..command import (
@@ -275,7 +275,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 FlexStackerStallError,
                 FlexStackerShuttleMissingError,
                 FlexStackerHopperLabwareError,
-                FlexStackerLabwareRetrieveError
+                FlexStackerLabwareRetrieveError,
             ) as e:
                 return self.handle_recoverable_error(
                     e, to_retrieve.primaryLabwareId, state_update

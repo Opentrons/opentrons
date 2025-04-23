@@ -684,7 +684,11 @@ async def test_retrieve_raises_recoverable_error(
     stacker_hardware: FlexStacker,
     shared_data_error: Exception,
     protocol_engine_error: Type[
-        Union[FlexStackerStallOrCollisionError, FlexStackerShuttleError, FlexStackerLabwareRetrieveError]
+        Union[
+            FlexStackerStallOrCollisionError,
+            FlexStackerShuttleError,
+            FlexStackerLabwareRetrieveError,
+        ]
     ],
 ) -> None:
     """It should raise a stall error."""

@@ -62,6 +62,7 @@ class CloseLatch(BaseCommand[CloseLatchParams, CloseLatchResult, ErrorOccurrence
 
     _ImplementationCls: Type[CloseLatchImpl] = CloseLatchImpl
 
+
 class CloseLatchCreate(BaseCommandCreate[CloseLatchParams]):
     """A request to execute a Flex Stacker CloseLatch command."""
 

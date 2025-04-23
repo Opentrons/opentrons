@@ -135,6 +135,19 @@ class FlexStackerHopperError(ErrorOccurrence):
     errorInfo: FailedLabware
 
 
+class FlexStackerLabwareRetrieveError(ErrorOccurrence):
+    """Returned when the labware was not able to get to the shuttle."""
+
+    isDefined: bool = True
+    errorType: Literal[
+        "flexStackerLabwareRetrieveFailed"
+    ] = "flexStackerLabwareRetrieveFailed"
+
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
+    errorInfo: FailedLabware
+
+
 @dataclass
 class _LabwareDefPair:
     definition: LabwareDefinition
