@@ -10,6 +10,7 @@ import type {
   LocationLiquidState,
   LabwareLiquidState,
   LiquidEntities,
+  LiquidEntity,
 } from '@opentrons/step-generation'
 import type { Action, DeckSlot } from '../../types'
 import type {

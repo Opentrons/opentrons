@@ -22,12 +22,9 @@ import type {
   CutoutFixtureId,
   RobotType,
   SupportedTip,
-<<<<<<< HEAD
   LabwareDefinition2,
-=======
   ModuleType,
   LabwareDisplayCategory,
->>>>>>> a800ba5dff (feat(protocol-designer, step-generation, app): introduce pythonName to each entity (#17463))
 } from '@opentrons/shared-data'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
