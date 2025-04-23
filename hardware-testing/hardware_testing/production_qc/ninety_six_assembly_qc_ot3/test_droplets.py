@@ -205,20 +205,20 @@ async def run(
     for trial in range(2):
         ui.print_header("JOG to 96-Tip RACK")
         if trial == 0:
-            tip_rack = str(pipette) + "ul"
+            tip_rack = pipette
             test_volume: int = pipette
         else:
-            tip_rack = "50ul"
+            tip_rack = 50
             test_volume = 1 if pipette == 200 else 5
         if not api.is_simulator:
-            ui.get_user_ready(f"ADD 96 tip-rack-{tip_rack} to slot #{TIP_RACK_96_SLOT}")
+            ui.get_user_ready(f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}")
         await helpers_ot3.move_to_arched_ot3(
             api, OT3Mount.LEFT, tip_rack_96_a1_nominal + Point(z=30)
         )
         await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
         print("picking up tips")
         await api.pick_up_tip(
-            OT3Mount.LEFT, helpers_ot3.get_default_tip_length(pipette)
+            OT3Mount.LEFT, helpers_ot3.get_default_tip_length(tip_rack)
         )
         await api.home_z(OT3Mount.LEFT)
         if reservoir_a1_actual is None:
