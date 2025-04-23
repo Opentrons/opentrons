@@ -7,9 +7,10 @@ import type { DisabledChangeTipArgs } from './utils'
 
 const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',
-  'once',
-  'perSource',
   'never',
+  'once',
+  'perDest',
+  'perSource',
 ]
 
 export function ChangeTipField(

@@ -147,7 +147,8 @@
           "always": "Always",
           "never": "Never",
           "once": "Once",
-          "perSource": "Per source"
+          "perSource": "Per source",
+          "perDest": "Per destination"
         },
         "option_tooltip": {
           "always": "Always aspirate with a fresh tip.",
