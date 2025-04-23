@@ -716,7 +716,7 @@ class InstrumentContext(publisher.CommandPublisher):
                               ``None``. This should happen if ``touch_tip`` is called
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
-        :raises: ValueError: If both ``mm_to_edge`` and ``radius`` are specified.
+        :raises: ValueError: If both ``mm_from_edge`` and ``radius`` are specified.
         :returns: This instance.
 
         .. versionchanged:: 2.24

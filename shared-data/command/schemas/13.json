@@ -262,6 +262,10 @@
     "AspirateProperties": {
       "description": "Properties specific to the aspirate function.",
       "properties": {
+        "aspiratePosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Tip position during aspirate."
+        },
         "correctionByVolume": {
           "description": "Settings for volume correction keyed by by target aspiration volume, representing additional volume the plunger should move to accurately hit target volume.",
           "items": {
@@ -340,14 +344,6 @@
           "$ref": "#/$defs/MixProperties",
           "description": "Mixing settings for before an aspirate"
         },
-        "offset": {
-          "$ref": "#/$defs/Coordinate",
-          "description": "Relative offset for aspiration."
-        },
-        "positionReference": {
-          "$ref": "#/$defs/PositionReference",
-          "description": "Position reference for aspiration."
-        },
         "preWet": {
           "description": "Whether to perform a pre-wet action.",
           "title": "Prewet",
@@ -365,8 +361,7 @@
       "required": [
         "submerge",
         "retract",
-        "positionReference",
-        "offset",
+        "aspiratePosition",
         "flowRateByVolume",
         "correctionByVolume",
         "preWet",
@@ -2491,7 +2486,7 @@
     "LiquidClassTouchTipParams": {
       "description": "Parameters for touch-tip.",
       "properties": {
-        "mmToEdge": {
+        "mmFromEdge": {
           "anyOf": [
             {
               "type": "integer"
@@ -2501,7 +2496,7 @@
             }
           ],
           "description": "Offset away from the the well edge, in millimeters.",
-          "title": "Mmtoedge"
+          "title": "Mmfromedge"
         },
         "speed": {
           "anyOf": [
@@ -2530,7 +2525,7 @@
           "title": "Zoffset"
         }
       },
-      "required": ["zOffset", "mmToEdge", "speed"],
+      "required": ["zOffset", "mmFromEdge", "speed"],
       "title": "LiquidClassTouchTipParams",
       "type": "object"
     },
@@ -3908,6 +3903,10 @@
           "$ref": "#/$defs/DelayProperties",
           "description": "Delay settings after each dispense"
         },
+        "dispensePosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Tip position during dispense."
+        },
         "disposalByVolume": {
           "description": "Settings for disposal volume keyed by target dispense volume.",
           "items": {
@@ -3980,14 +3979,6 @@
           "title": "Flowratebyvolume",
           "type": "array"
         },
-        "offset": {
-          "$ref": "#/$defs/Coordinate",
-          "description": "Relative offset for single multi-dispense."
-        },
-        "positionReference": {
-          "$ref": "#/$defs/PositionReference",
-          "description": "Position reference for multi-dispense."
-        },
         "retract": {
           "$ref": "#/$defs/RetractDispense",
           "description": "Pipette retract settings after a multi-dispense."
@@ -4000,8 +3991,7 @@
       "required": [
         "submerge",
         "retract",
-        "positionReference",
-        "offset",
+        "dispensePosition",
         "flowRateByVolume",
         "correctionByVolume",
         "conditioningByVolume",
@@ -4503,13 +4493,9 @@
           "$ref": "#/$defs/DelayProperties",
           "description": "Delay settings for retract after aspirate."
         },
-        "offset": {
-          "$ref": "#/$defs/Coordinate",
-          "description": "Relative offset for retract after aspirate."
-        },
-        "positionReference": {
-          "$ref": "#/$defs/PositionReference",
-          "description": "Position reference for retract after aspirate."
+        "endPosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Tip position at the end of the retract."
         },
         "speed": {
           "anyOf": [
@@ -4531,8 +4517,7 @@
         }
       },
       "required": [
-        "positionReference",
-        "offset",
+        "endPosition",
         "speed",
         "airGapByVolume",
         "touchTip",
@@ -4628,13 +4613,9 @@
           "$ref": "#/$defs/DelayProperties",
           "description": "Delay settings for retract after dispense."
         },
-        "offset": {
-          "$ref": "#/$defs/Coordinate",
-          "description": "Relative offset for retract after dispense."
-        },
-        "positionReference": {
-          "$ref": "#/$defs/PositionReference",
-          "description": "Position reference for retract after dispense."
+        "endPosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Tip position at the end of the retract."
         },
         "speed": {
           "anyOf": [
@@ -4656,8 +4637,7 @@
         }
       },
       "required": [
-        "positionReference",
-        "offset",
+        "endPosition",
         "speed",
         "airGapByVolume",
         "blowout",
@@ -5286,6 +5266,10 @@
           "$ref": "#/$defs/DelayProperties",
           "description": "Delay after dispense, in seconds."
         },
+        "dispensePosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Tip position during dispense."
+        },
         "flowRateByVolume": {
           "description": "Settings for flow rate keyed by target dispense volume.",
           "items": {
@@ -5325,14 +5309,6 @@
         "mix": {
           "$ref": "#/$defs/MixProperties",
           "description": "Mixing settings for after a dispense"
-        },
-        "offset": {
-          "$ref": "#/$defs/Coordinate",
-          "description": "Relative offset for single dispense."
-        },
-        "positionReference": {
-          "$ref": "#/$defs/PositionReference",
-          "description": "Position reference for single dispense."
         },
         "pushOutByVolume": {
           "description": "Settings for pushout keyed by target dispense volume.",
@@ -5382,8 +5358,7 @@
       "required": [
         "submerge",
         "retract",
-        "positionReference",
-        "offset",
+        "dispensePosition",
         "flowRateByVolume",
         "correctionByVolume",
         "mix",
@@ -5497,14 +5472,6 @@
           "$ref": "#/$defs/DelayProperties",
           "description": "Delay settings for submerge."
         },
-        "offset": {
-          "$ref": "#/$defs/Coordinate",
-          "description": "Relative offset for submerge."
-        },
-        "positionReference": {
-          "$ref": "#/$defs/PositionReference",
-          "description": "Position reference for submerge."
-        },
         "speed": {
           "anyOf": [
             {
@@ -5518,9 +5485,13 @@
           ],
           "description": "Speed of submerging, in millimeters per second.",
           "title": "Speed"
+        },
+        "startPosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Tip position before starting the submerge."
         }
       },
-      "required": ["positionReference", "offset", "speed", "delay"],
+      "required": ["startPosition", "speed", "delay"],
       "title": "Submerge",
       "type": "object"
     },
@@ -5547,6 +5518,22 @@
         }
       },
       "title": "TipPickUpParams",
+      "type": "object"
+    },
+    "TipPosition": {
+      "description": "Properties for tip position reference and relative offset.",
+      "properties": {
+        "offset": {
+          "$ref": "#/$defs/Coordinate",
+          "description": "Relative offset from position reference."
+        },
+        "positionReference": {
+          "$ref": "#/$defs/PositionReference",
+          "description": "Position reference for tip position."
+        }
+      },
+      "required": ["positionReference", "offset"],
+      "title": "TipPosition",
       "type": "object"
     },
     "TipPresenceStatus": {
