@@ -727,13 +727,17 @@ type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {
   duration: number
 }
+export interface TipPosition {
+  positionReference: PositionReference
+  offset: Coordinates
+}
 export interface DelayProperties {
   enable: boolean
   params?: DelayParams
 }
 interface TouchTipParams {
   zOffset: number
-  mmToEdge: number
+  mmFromEdge: number
   speed: number
 }
 export interface TouchTipProperties {
@@ -758,14 +762,12 @@ export interface BlowoutProperties {
   params?: BlowoutParams
 }
 export interface Submerge {
-  positionReference: PositionReference
-  offset: Coordinates
+  startPosition: TipPosition
   speed: number
   delay: DelayProperties
 }
 interface BaseRetract {
-  positionReference: PositionReference
-  offset: Coordinates
+  endPosition: TipPosition
   speed: number
   airGapByVolume: LiquidHandlingPropertyByVolume
   touchTip: TouchTipProperties
@@ -778,24 +780,25 @@ export interface RetractDispense extends BaseRetract {
 interface BaseLiquidHandlingProperties<RetractType> {
   submerge: Submerge
   retract: RetractType
-  positionReference: PositionReference
-  offset: Coordinates
   flowRateByVolume: LiquidHandlingPropertyByVolume
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
 export interface AspirateProperties
   extends BaseLiquidHandlingProperties<RetractAspirate> {
+  aspiratePosition: TipPosition
   preWet: boolean
   mix: MixProperties
 }
 export interface SingleDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
+  dispensePosition: TipPosition
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
 export interface MultiDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
+  dispensePosition: TipPosition
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }

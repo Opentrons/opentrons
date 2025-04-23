@@ -145,8 +145,8 @@ class TransferComponentsExecutor:
         """
         submerge_start_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=submerge_properties.position_reference,
-            offset=submerge_properties.offset,
+            position_reference=submerge_properties.start_position.position_reference,
+            offset=submerge_properties.start_position.offset,
         )
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
@@ -332,8 +332,8 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.aspirate.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -363,7 +363,7 @@ class TransferComponentsExecutor:
             assert (
                 touch_tip_props.speed is not None
                 and touch_tip_props.z_offset is not None
-                and touch_tip_props.mm_to_edge is not None
+                and touch_tip_props.mm_from_edge is not None
             )
             self._instrument.touch_tip(
                 location=retract_location,
@@ -371,7 +371,7 @@ class TransferComponentsExecutor:
                 radius=1,
                 z_offset=touch_tip_props.z_offset,
                 speed=touch_tip_props.speed,
-                mm_from_edge=touch_tip_props.mm_to_edge,
+                mm_from_edge=touch_tip_props.mm_from_edge,
             )
             self._instrument.move_to(
                 location=retract_location,
@@ -429,8 +429,8 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.dispense.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -568,8 +568,8 @@ class TransferComponentsExecutor:
         retract_props = self._transfer_properties.multi_dispense.retract
         retract_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
-            position_reference=retract_props.position_reference,
-            offset=retract_props.offset,
+            position_reference=retract_props.end_position.position_reference,
+            offset=retract_props.end_position.offset,
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -724,7 +724,7 @@ class TransferComponentsExecutor:
             assert (
                 touch_tip_properties.speed is not None
                 and touch_tip_properties.z_offset is not None
-                and touch_tip_properties.mm_to_edge is not None
+                and touch_tip_properties.mm_from_edge is not None
             )
             # TODO:, check that when blow out is a non-dest-well,
             #  whether the touch tip params from transfer props should be used for
@@ -737,7 +737,7 @@ class TransferComponentsExecutor:
                         radius=1,
                         z_offset=touch_tip_properties.z_offset,
                         speed=touch_tip_properties.speed,
-                        mm_from_edge=touch_tip_properties.mm_to_edge,
+                        mm_from_edge=touch_tip_properties.mm_from_edge,
                     )
                 except TouchTipDisabledError:
                     # TODO: log a warning
