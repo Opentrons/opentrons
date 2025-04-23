@@ -28,7 +28,7 @@ export interface UpdateLPCDeckAction {
 
 export interface UpdateLPCLabwareAction {
   type: 'UPDATE_LPC_LABWARE'
-  payload: { runId: string; labware: LPCLabwareInfo }
+  payload: { runId: string; labware: LPCLabwareInfo['labware'] }
 }
 
 export interface FinishLPCAction {
@@ -70,7 +70,7 @@ export interface InitialPositionAction {
 
 export interface FinalPositionAction {
   type: 'SET_FINAL_POSITION'
-  payload: PositionParams & { runId: string }
+  payload: PositionParams & { runId: string; isOnDevice: boolean }
 }
 
 export interface ClearSelectedLabwareWorkingOffsetsAction {
@@ -127,6 +127,11 @@ export interface ToggleDefaultOffsetInfoBanner {
   payload: { runId: string }
 }
 
+export interface ClearSnackbarStatus {
+  type: 'CLEAR_SNACKBAR_STATUS'
+  payload: { runId: string }
+}
+
 export type LPCWizardAction =
   | UpdateLPCAction
   | UpdateLPCDeckAction
@@ -148,3 +153,4 @@ export type LPCWizardAction =
   | SourceOffsetsFromDatabaseAction
   | UpdateConflictTimestampAction
   | ToggleDefaultOffsetInfoBanner
+  | ClearSnackbarStatus

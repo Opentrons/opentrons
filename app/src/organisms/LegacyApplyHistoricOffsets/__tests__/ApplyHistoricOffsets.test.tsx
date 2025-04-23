@@ -120,7 +120,7 @@ describe('ApplyHistoricOffsets', () => {
       screen.getByRole('link', { name: 'See how labware offsets work' })
     ).toHaveAttribute(
       'href',
-      'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+      'https://support.opentrons.com/s/article/creating-labware-offsets'
     )
 
     // first candidate table row
@@ -161,7 +161,7 @@ describe('ApplyHistoricOffsets', () => {
       screen.getByRole('link', { name: 'See how labware offsets work' })
     ).toHaveAttribute(
       'href',
-      'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+      'https://support.opentrons.com/s/article/creating-labware-offsets'
     )
     expect(screen.queryByText('location')).toBeNull()
   })

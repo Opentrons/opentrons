@@ -131,8 +131,8 @@ def test_default_labware_version_dependent_on_api_version(
         "nest_96_wellplate_2ml_deep",
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         "biorad_96_wellplate_200ul_pcr",
-        "evotips_opentrons_96_labware",
-        "evotips_flex_96_tiprack_adapter",
+        "ev_resin_tips_flex_96_labware",
+        "ev_resin_tips_flex_96_tiprack_adapter",
     ],
 )
 @pytest.mark.parametrize("namespace", [OPENTRONS_NAMESPACE, None])

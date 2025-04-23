@@ -48,6 +48,9 @@ vi.mock(
 vi.mock('/app/resources/useNotifyDataReady')
 vi.mock('/app/resources/runs')
 
+// note for auto scroll to top
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
 const render = (
   props: ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
 ) => {

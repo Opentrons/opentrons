@@ -130,7 +130,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
 
   // this labware has a lip
-  'evotip_flex_96_labware/1.json': standard96WellNames,
+  'ev_resin_tips_flex_96_labware/1.json': standard96WellNames,
 
   // Presumably a bug. Fixed in v3 of this labware.
   'nest_1_reservoir_195ml/1.json': new Set(['A1']),
