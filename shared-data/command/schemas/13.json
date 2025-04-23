@@ -264,7 +264,7 @@
       "properties": {
         "aspiratePosition": {
           "$ref": "#/$defs/TipPosition",
-          "description": "Position reference for tip position during aspirate."
+          "description": "Tip position during aspirate."
         },
         "correctionByVolume": {
           "description": "Settings for volume correction keyed by by target aspiration volume, representing additional volume the plunger should move to accurately hit target volume.",
@@ -3734,7 +3734,7 @@
         },
         "dispensePosition": {
           "$ref": "#/$defs/TipPosition",
-          "description": "Position reference for tip position during dispense."
+          "description": "Tip position during dispense."
         },
         "disposalByVolume": {
           "description": "Settings for disposal volume keyed by target dispense volume.",
@@ -4404,7 +4404,7 @@
         },
         "endPosition": {
           "$ref": "#/$defs/TipPosition",
-          "description": "Position reference for tip position after retract."
+          "description": "Tip position at the end of the retract."
         },
         "speed": {
           "anyOf": [
@@ -4524,7 +4524,7 @@
         },
         "endPosition": {
           "$ref": "#/$defs/TipPosition",
-          "description": "Position reference for tip position after retract."
+          "description": "Tip position at the end of the retract."
         },
         "speed": {
           "anyOf": [
@@ -5232,7 +5232,7 @@
         },
         "dispensePosition": {
           "$ref": "#/$defs/TipPosition",
-          "description": "Position reference for tip position during dispense."
+          "description": "Tip position during dispense."
         },
         "flowRateByVolume": {
           "description": "Settings for flow rate keyed by target dispense volume.",
@@ -5452,7 +5452,7 @@
         },
         "startPosition": {
           "$ref": "#/$defs/TipPosition",
-          "description": "Position reference for tip position before submerge."
+          "description": "Tip position before starting the submerge."
         }
       },
       "required": ["startPosition", "speed", "delay"],

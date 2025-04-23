@@ -215,7 +215,7 @@ class Submerge(BaseModel):
     """Shared properties for the submerge function before aspiration or dispense."""
 
     startPosition: TipPosition = Field(
-        ..., description="Position reference for tip position before submerge."
+        ..., description="Tip position before starting the submerge."
     )
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of submerging, in millimeters per second."
@@ -227,7 +227,7 @@ class RetractAspirate(BaseModel):
     """Shared properties for the retract function after aspiration."""
 
     endPosition: TipPosition = Field(
-        ..., description="Position reference for tip position after retract."
+        ..., description="Tip position at the end of the retract."
     )
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of retraction, in millimeters per second."
@@ -247,7 +247,7 @@ class RetractDispense(BaseModel):
     """Shared properties for the retract function after dispense."""
 
     endPosition: TipPosition = Field(
-        ..., description="Position reference for tip position after retract."
+        ..., description="Tip position at the end of the retract."
     )
     speed: _NonNegativeNumber = Field(
         ..., description="Speed of retraction, in millimeters per second."
@@ -274,7 +274,7 @@ class AspirateProperties(BaseModel):
         ..., description="Pipette retract settings after an aspirate."
     )
     aspiratePosition: TipPosition = Field(
-        ..., description="Position reference for tip position during aspirate."
+        ..., description="Tip position during aspirate."
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
@@ -302,7 +302,7 @@ class SingleDispenseProperties(BaseModel):
         ..., description="Pipette retract settings after a single dispense."
     )
     dispensePosition: TipPosition = Field(
-        ..., description="Position reference for tip position during dispense."
+        ..., description="Tip position during dispense."
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
@@ -328,7 +328,7 @@ class MultiDispenseProperties(BaseModel):
         ..., description="Pipette retract settings after a multi-dispense."
     )
     dispensePosition: TipPosition = Field(
-        ..., description="Position reference for tip position during dispense."
+        ..., description="Tip position during dispense."
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
