@@ -32,6 +32,17 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.4.0 or newer.
 
+## Opentrons Protocol Designer Changes in 8.4.4
+
+**Welcome to Protocol Designer 8.4.4!**
+
+This release includes changes to internal data.
+
+### Bug Fixes
+
+- If you export a protocol with a Staging Area not in use, it will be preserved upon importing.
+- If you export a protocol with an unused Trash Bin, it will be preserved upon importing.
+
 ## Opentrons Protocol Designer Changes in 8.4.3
 
 **Welcome to Protocol Designer 8.4.3!**
