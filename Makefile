@@ -262,13 +262,20 @@ clean-ts:
 	yarn tsc --build --clean
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
+JS_CIRCULAR_DEPENDENCIES_ROOTS := \
+	$(PROTOCOL_DESIGNER_DIR)/src/index.tsx \
+	$(STEP_GENERATION_DIR)/src/index.ts \
+	$(LABWARE_LIBRARY_DIR)/src/index.tsx \
+	$(APP_DIR)/src/index.tsx \
+	$(COMPONENTS_DIR)/src/index.ts
+
+JS_CIRCULAR_DEPENDENCIES_TARGETS := $(addsuffix -circular-dependencies-js, $(JS_CIRCULAR_DEPENDENCIES_ROOTS))
+
 .PHONY: circular-dependencies-js
-circular-dependencies-js:
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
+circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
+
+%-circular-dependencies-js:
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular $*
 
 .PHONY: test-js-internal
 test-js-internal:
