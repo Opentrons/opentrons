@@ -1,3 +1,4 @@
+import round from 'lodash/round'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getPipetteCapacity } from '../../../../../pipettes/pipetteData'
@@ -187,12 +188,15 @@ export function getDisabledPathMap(
 }
 
 // Copied from opentrons/api/src/opentrons/config/defaults_ot3.py
-const MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S = 15
-const MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S = 70
+export const MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S = 15
+export const MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S = 70
 // Copied from opentrons/api/src/opentrons/config/defaults_ot2.py
-const MAX_PLUNGER_SPEED_OT2 = 125
+export const MAX_PLUNGER_SPEED_OT2 = 125
 
-const CHANNELS_MAPPED_TO_MAX_PLUNGER_SPEED: Record<PipetteChannels, number> = {
+export const CHANNELS_MAPPED_TO_MAX_PLUNGER_SPEED: Record<
+  PipetteChannels,
+  number
+> = {
   1: MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S,
   8: MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S,
   96: MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S,
@@ -246,5 +250,5 @@ export const getMaxUiFlowRate = (args: {
   const correctionMultiplier = 1.0 + correctionVolume / targetVolume
   const travelMm = targetVolume / pipetteAccuracyUlPerMm
   const travelMmCorrected = travelMm * correctionMultiplier
-  return targetVolume / (travelMmCorrected / maxPlungerSpeed)
+  return round(targetVolume / (travelMmCorrected / maxPlungerSpeed))
 }
