@@ -19,7 +19,7 @@ import {
   createDeckFixture,
   deleteDeckFixture,
 } from '../../../step-forms/actions/additionalItems'
-import { getIsLabwareCompatibleWithModule, getSlotHasLabware } from '../utils'
+import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -40,27 +40,43 @@ const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
   cutoutD3: 'D4',
 }
 
-export const updateInitialDeckState = (
-  values: CutoutConfigExtended[],
-  initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
-  dispatch: ThunkDispatch<any>,
+interface UpdateInitialDeckSetupProps {
+  values: CutoutConfigExtended[]
+  initialDeckSetup: AllTemporalPropertiesForTimelineFrame
+  dispatch: ThunkDispatch<any>
   setShowDeleteEntityModal: Dispatch<
     SetStateAction<{
       ids: string[]
       deckConfig: DeckConfiguration
     } | null>
-  >,
+  >
   setShowDeleteStagingAreaModal: Dispatch<
     SetStateAction<{
       ids: string[]
       deckConfig: DeckConfiguration
     } | null>
-  >,
-  savedSteps: SavedStepFormState,
-  makeSnackbar: MakeSnackbar,
-  t: any,
+  >
+  savedSteps: SavedStepFormState
+  makeSnackbar: MakeSnackbar
+  t: any
   deckConfig?: DeckConfiguration
+}
+
+export const updateInitialDeckState = (
+  props: UpdateInitialDeckSetupProps
 ): void => {
+  const {
+    values,
+    initialDeckSetup,
+    dispatch,
+    setShowDeleteEntityModal,
+    setShowDeleteStagingAreaModal,
+    savedSteps,
+    makeSnackbar,
+    t,
+    deckConfig,
+  } = props
+
   const {
     additionalEquipmentOnDeck,
     modules: moduleOnDeck,
@@ -170,14 +186,15 @@ export const updateInitialDeckState = (
         matchingModuleForAboveStaging,
         matchingStagingArea != null ? [matchingStagingArea] : undefined
       )
-      const isLabwareCompatible =
+      const labwareNotCompatible =
         matchingModuleForAboveStaging != null
-          ? getIsLabwareCompatibleWithModule(
+          ? getLabwareNotCompatibleWithModule(
               matchingModuleForAboveStaging.type,
               labwareOnDeck,
-              value.cutoutId
+              value.cutoutId,
+              'A1'
             )
-          : true
+          : { isCompatible: true, slot: '' }
       //  if deleting staging area where labware is in 4th column slot
       if (
         matchingStagingArea != null &&
@@ -229,7 +246,7 @@ export const updateInitialDeckState = (
         //   creating module
       } else {
         const slot = value.cutoutId.split('cutout')[1]
-        if (isLabwareCompatible) {
+        if (labwareNotCompatible == null) {
           dispatch(
             createModule({
               slot,
@@ -323,14 +340,15 @@ export const updateInitialDeckState = (
       } else {
         const type = getModuleType(value.type as ModuleModel)
         const model = value.type as ModuleModel
-        const isLabwareCompatible = getIsLabwareCompatibleWithModule(
+        const labwareNotCompatible = getLabwareNotCompatibleWithModule(
           type,
           labwareOnDeck,
-          value.cutoutId
+          value.cutoutId,
+          'A1'
         )
         const slot = value.cutoutId.split('cutout')[1]
         //   creating module
-        if (isLabwareCompatible) {
+        if (labwareNotCompatible == null) {
           dispatch(
             createModule({
               slot,
@@ -340,7 +358,11 @@ export const updateInitialDeckState = (
           )
           //   if adding module to slot with incompatible labware
         } else {
-          makeSnackbar(t('module_incompatible', { slot }) as string)
+          makeSnackbar(
+            t('module_incompatible', {
+              slot: labwareNotCompatible,
+            }) as string
+          )
         }
       }
     }

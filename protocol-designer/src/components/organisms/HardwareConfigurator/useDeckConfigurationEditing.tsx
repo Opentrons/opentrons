@@ -328,7 +328,7 @@ export const getNewConfig = (
   }
 
   const fixtureGroup =
-    deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
+    deckDef.cutoutFixtures.find(({ id }) => id === cutoutFixtureId)
       ?.fixtureGroup ?? {}
 
   let newDeckConfig = deckConfig

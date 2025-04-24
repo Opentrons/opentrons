@@ -30,7 +30,7 @@ import { uuid } from '@opentrons/step-generation'
 import { editDeckConfiguration } from '../../../step-forms/actions'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { useKitchen } from '../Kitchen/hooks'
-import { getIsLabwareCompatibleWithModule, getSlotHasLabware } from '../utils'
+import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
 import type { UseFormSetValue } from 'react-hook-form'
@@ -282,23 +282,24 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         }
         setValue?.('fixtures', updatedFixtures)
       }
-      const isLabwareCompatible =
+      const labwareNotCompatible =
         newModule != null
-          ? getIsLabwareCompatibleWithModule(
+          ? getLabwareNotCompatibleWithModule(
               newModule.type === 'stagingAreaAndMagneticBlock'
                 ? MAGNETIC_BLOCK_TYPE
                 : getModuleType(newModule.type as ModuleModel),
               labware,
-              newModule?.cutoutId
+              newModule.cutoutId,
+              'B1'
             )
-          : true
+          : null
       const hasLabware =
         newFixture != null
           ? (newFixture.type === 'wasteChute' ||
               newFixture.type === 'trashBin') &&
             getSlotHasLabware(labware, cutoutId)
           : false
-      if (isLabwareCompatible && !hasLabware) {
+      if (labwareNotCompatible == null && !hasLabware) {
         dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
       }
       updateInitialDeckState?.(addedCutoutConfigs)

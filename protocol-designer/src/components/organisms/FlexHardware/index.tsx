@@ -202,8 +202,8 @@ export function FlexHardware(): JSX.Element {
         fixtures={fixtures}
         hasGripper={hasGripper}
         updateInitialDeckState={(value, deckConfig) => {
-          updateInitialDeckState(
-            value,
+          updateInitialDeckState({
+            values: value,
             initialDeckSetup,
             dispatch,
             setShowDeleteEntityModal,
@@ -211,8 +211,8 @@ export function FlexHardware(): JSX.Element {
             savedSteps,
             makeSnackbar,
             t,
-            deckConfig
-          )
+            deckConfig,
+          })
         }}
       />
     </>

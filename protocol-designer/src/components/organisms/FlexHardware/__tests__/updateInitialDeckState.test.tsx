@@ -80,22 +80,22 @@ const mockDeckConfig: DeckConfiguration = []
 
 describe('updateInitialDeckState', () => {
   it('creates a module', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
-      mockEmptyIntialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockEmptyIntialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(
         createModule({
@@ -107,15 +107,15 @@ describe('updateInitialDeckState', () => {
     )
   })
   it('creates calls the snackbar when trying to create a module with an incompatible labware in the slot', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
-      {
+      initialDeckSetup: {
         pipettes: {},
         labware: {
           labware: {
@@ -129,32 +129,32 @@ describe('updateInitialDeckState', () => {
         modules: {},
         additionalEquipmentOnDeck: {},
       },
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockMakeSnackbar).toHaveBeenCalledWith('module_incompatible')
   })
   it('deletes a module', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
-      mockInitialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(
         deleteModule({
@@ -164,56 +164,56 @@ describe('updateInitialDeckState', () => {
     )
   })
   it('deletes a module that is in use', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
-      mockInitialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedStepsWithHSStep,
-      mockMakeSnackbar,
-      mockT,
-      mockDeckConfig
-    )
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedStepsWithHSStep,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+      deckConfig: mockDeckConfig,
+    })
     expect(mockSetShowDeleteEntityModal).toHaveBeenCalled()
   })
   it('creates deck fixture', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
           type: 'trashBin',
         },
       ],
-      mockEmptyIntialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockEmptyIntialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(createDeckFixture('trashBin', 'cutoutA3'))
     )
   })
   it('renders snackbar when there is a labware on the slot', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
           type: 'trashBin',
         },
       ],
-      {
+      initialDeckSetup: {
         ...mockEmptyIntialDeckSetup,
         labware: {
           labware: {
@@ -225,55 +225,55 @@ describe('updateInitialDeckState', () => {
           },
         },
       },
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
       'conflict_on_slot_labware_fixture'
     )
   })
   it('deletes deck fixture', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
           type: 'trashBin',
         },
       ],
-      mockInitialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(deleteDeckFixture('trash'))
     )
   })
   it('creates staging area and magnetic block', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
           type: 'stagingAreaAndMagneticBlock',
         },
       ],
-      mockEmptyIntialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockEmptyIntialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
       createDeckFixture('stagingArea', 'cutoutB3')
@@ -288,22 +288,22 @@ describe('updateInitialDeckState', () => {
     )
   })
   it('deletes staging area and magnetic block', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
           type: 'stagingAreaAndMagneticBlock',
         },
       ],
-      mockInitialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
       vi.mocked(deleteDeckFixture('staging'))
@@ -317,15 +317,15 @@ describe('updateInitialDeckState', () => {
     )
   })
   it('deletes staging area and magnetic block but there is a labware in the 4th column', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
           type: 'stagingAreaAndMagneticBlock',
         },
       ],
-      {
+      initialDeckSetup: {
         ...mockInitialDeckSetup,
         labware: {
           labware: {
@@ -337,33 +337,33 @@ describe('updateInitialDeckState', () => {
           },
         },
       },
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT,
-      mockDeckConfig
-    )
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+      deckConfig: mockDeckConfig,
+    })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
   it('creates staging area and waste chute', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           type: 'stagingAreaAndWasteChute',
         },
       ],
-      mockEmptyIntialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockEmptyIntialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
       createDeckFixture('stagingArea', 'cutoutD3')
@@ -374,22 +374,22 @@ describe('updateInitialDeckState', () => {
     )
   })
   it('deletes staging area and waste chute', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           type: 'stagingAreaAndWasteChute',
         },
       ],
-      mockInitialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT
-    )
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+    })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
       vi.mocked(deleteDeckFixture('staging2'))
@@ -399,15 +399,15 @@ describe('updateInitialDeckState', () => {
     )
   })
   it('tries to delete staging area and waste chute but there is labware in 4th column slot', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           type: 'stagingAreaAndWasteChute',
         },
       ],
-      {
+      initialDeckSetup: {
         ...mockInitialDeckSetup,
         labware: {
           labware: {
@@ -419,19 +419,19 @@ describe('updateInitialDeckState', () => {
           },
         },
       },
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedSteps,
-      mockMakeSnackbar,
-      mockT,
-      mockDeckConfig
-    )
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+      deckConfig: mockDeckConfig,
+    })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
   it('tries to delete staging area and waste chute but something is in use', () => {
-    updateInitialDeckState(
-      [
+    updateInitialDeckState({
+      values: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -439,15 +439,15 @@ describe('updateInitialDeckState', () => {
         },
       ],
 
-      mockInitialDeckSetup,
-      mockDispatch,
-      mockSetShowDeleteEntityModal,
-      mockSetShowDeleteStagingAreaModal,
-      mockSavedStepsWithHSStep,
-      mockMakeSnackbar,
-      mockT,
-      mockDeckConfig
-    )
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedStepsWithHSStep,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+      deckConfig: mockDeckConfig,
+    })
     expect(mockSetShowDeleteEntityModal).toHaveBeenCalled()
   })
 })

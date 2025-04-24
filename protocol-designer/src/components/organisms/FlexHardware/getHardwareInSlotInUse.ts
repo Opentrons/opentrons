@@ -1,6 +1,6 @@
 import { getIsLabwareInUse } from '../../../pages/Designer/DeckSetup/utils'
 
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import type {
   LabwareOnDeck,
   ModuleOnDeck,
@@ -17,16 +17,11 @@ export function getHardwareInSlotInUse(
   savedSteps: SavedStepFormState,
   matchingLabwareFor4thColumn: LabwareOnDeck | null,
   moduleOnDeck?: ModuleOnDeck,
-  fixturesOnDeck?: Array<{
-    name: AdditionalEquipmentName
-    id: string
-    location: string
-    pythonName?: string
-  }>
+  fixturesOnDeck?: AdditionalEquipmentEntity[]
 ): HardwareInSlotInfo {
   const isModuleInUse =
     moduleOnDeck != null &&
-    Object.values(savedSteps).find(
+    Object.values(savedSteps).some(
       step =>
         //  module step
         ('moduleId' in step && step.moduleId === moduleOnDeck.id) ||
@@ -34,7 +29,7 @@ export function getHardwareInSlotInUse(
         ('newLocation' in step && step.newlocation === moduleOnDeck.id) ||
         //  moving a labware from the module location
         ('labware' in step && step.labware === moduleOnDeck.id)
-    ) != null
+    )
   const isLabwareInUse =
     matchingLabwareFor4thColumn != null
       ? getIsLabwareInUse(savedSteps, matchingLabwareFor4thColumn)
@@ -43,24 +38,22 @@ export function getHardwareInSlotInUse(
   const isFixtureInUse =
     fixturesOnDeck != null &&
     fixturesOnDeck.length > 0 &&
-    Object.values(savedSteps).find(
+    Object.values(savedSteps).some(
       step =>
         //  mix & moveLiquid
         ('dropTip_location' in step &&
-          fixturesOnDeck.find(
+          fixturesOnDeck.some(
             fixture => fixture.id === step.dropTip_location
-          ) != null) ||
+          )) ||
         //  dispensing in trash
         ('dispense_labware' in step &&
-          fixturesOnDeck.find(
+          fixturesOnDeck.some(
             fixture => fixture.id === step.dispense_labware
-          ) != null) ||
+          )) ||
         //  moving to wasteChute or 4th column slot
         ('newLocation' in step &&
-          fixturesOnDeck.find(
-            fixture => fixture.location === step.newLocation
-          ) != null)
-    ) != null
+          fixturesOnDeck.some(fixture => fixture.location === step.newLocation))
+    )
   const fixtureIds =
     fixturesOnDeck != null ? fixturesOnDeck.map(fixture => fixture.id) : null
 

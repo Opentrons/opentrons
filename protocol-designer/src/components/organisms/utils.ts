@@ -47,24 +47,28 @@ export const getSlotsWithCollisions = (
   )
 }
 
-export const getIsLabwareCompatibleWithModule = (
+export const getLabwareNotCompatibleWithModule = (
   moduleType: ModuleType,
   labware: AllTemporalPropertiesForTimelineFrame['labware'],
-  cutoutId: CutoutId
-): boolean => {
+  cutoutId: CutoutId,
+  tcSlot: string
+): string | null => {
   const slot = cutoutId.split('cutout')[1]
   const isThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
   const labwareOnSlot = Object.values(labware).find(lw => lw.slot === slot)
-  const isLabwareOnA1 = isThermocycler
-    ? Object.values(labware).some(lw => lw.slot === 'A1')
+  const isLabwareOnOtherTCSlot = isThermocycler
+    ? Object.values(labware).some(({ slot }) => slot === tcSlot)
     : false
 
-  if (isLabwareOnA1) {
-    return false
+  if (isLabwareOnOtherTCSlot) {
+    return tcSlot
+  } else {
+    const isCompatible =
+      labwareOnSlot != null
+        ? getLabwareIsCompatible(labwareOnSlot.def, moduleType)
+        : true
+    return isCompatible ? null : slot
   }
-  return labwareOnSlot != null
-    ? getLabwareIsCompatible(labwareOnSlot.def, moduleType)
-    : true
 }
 
 export const getSlotHasLabware = (
