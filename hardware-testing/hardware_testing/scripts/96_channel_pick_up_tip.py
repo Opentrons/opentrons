@@ -264,18 +264,19 @@ async def _main() -> None:
     await hw_api.set_lights(rails=True)
     x_direction, y_direction = 1, 1
     if args.partial_tip_config is not None:
-        print("Partial Tip Config\n")
         partial_tip_dict = {
-            "left-col": ["A1", "H1", 12, -1, 0],
-            "right-col": ["A12", "H12", 12, 1, 0],
-            "top-row": ["A1", "A12", 8, 0, -1],
-            "bottom-row": ["H1", "H12", 8, 0, 1],
-            "A1": ["A1", "A1", 12, -1, 0],
-            "H12": ["H12", "H12", 12, 1, 0],
+            "left-col": ["A1", "H1", 12, -1, 0, 1],
+            "right-col": ["A12", "H12", 12, 1, 0, 1],
+            "top-row": ["A1", "A12", 8, 0, -1, 12],
+            "bottom-row": ["H1", "H12", 8, 0, 1, 12],
+            "A1": ["A1", "A1", 12, -1, 0, 12],
+            "H12": ["H12", "H12", 12, 1, 0, 12],
         }
         back_left_nozzle = partial_tip_dict[args.partial_tip_config][0]
         front_right_nozzle = partial_tip_dict[args.partial_tip_config][1]
-        PIPETTE_CHANNELS = int(96 / partial_tip_dict[args.partial_tip_config][2])
+        CYCLES = partial_tip_dict[args.partial_tip_config][2]
+        PIPETTE_CHANNELS = int(96 / CYCLES)
+        NOZZLE_COLUMNS = partial_tip_dict[args.partial_tip_config][5]
         x_direction = partial_tip_dict[args.partial_tip_config][3]
         y_direction = partial_tip_dict[args.partial_tip_config][4]
     await hw_api.update_nozzle_configuration_for_mount(mount, starting_nozzle=back_left_nozzle,
@@ -381,9 +382,10 @@ async def _main() -> None:
         log_file.writeheader()
         try:
             x_offset, y_offset = 0, 0
-            while True:
-                measurements = []
-                cp = CriticalPoint.TIP
+            measurements = []
+            cp = CriticalPoint.TIP
+            for i in range(CYCLES):
+                print(f"=== CYCLE: {i + 1} ===\n")
                 for tip_count in range(1, PIPETTE_CHANNELS + 1):
                     cp = CriticalPoint.TIP
                     x_offset -= 9
@@ -423,7 +425,7 @@ async def _main() -> None:
                 if keyboard_input == 'q':
                     break
                 cp = CriticalPoint.NOZZLE
-                if i < args.cycles - 1:
+                if i < CYCLES - 1:
                     tiprack_loc = Point(pickup_loc[0]+ (NOZZLE_TO_NOZZLE_MM * (i + 1) * x_direction),
                                         pickup_loc[1]+ (NOZZLE_TO_NOZZLE_MM * (i + 1) * y_direction),
                                         pickup_loc[2])
@@ -431,11 +433,11 @@ async def _main() -> None:
                     await hw_api.pick_up_tip(
                         mount, tip_length=(tip_length[args.tip_size] - tip_overlap))
                     y_offset = 0
-                await move_to_point(hw_api, mount, pickup_loc, cp)
-                initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
-                print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
-                await hw_api.pick_up_tip(mount,
-                                        tip_length=(tip_length[args.tip_size]-tip_overlap))
+                # await move_to_point(hw_api, mount, pickup_loc, cp)
+                # initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
+                # print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
+                # await hw_api.pick_up_tip(mount,
+                #                         tip_length=(tip_length[args.tip_size]-tip_overlap))
 
         except KeyboardInterrupt:
             await hw_api.disengage_axes([Axis.X, Axis.Y])
