@@ -110,7 +110,7 @@ class Stacker_TOF_Validation_Test:
                         test_data.update(bins_dict)
                         test_data = self.dict_values_to_line(test_data)
                         for test_file in self.test_files:
-                            if self.stackers[i] and axis.lower() in test_file:
+                            if self.stackers[i] in test_file and axis.lower() in test_file:
                                 data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
                     time.sleep(self.interval)
                 print("")
