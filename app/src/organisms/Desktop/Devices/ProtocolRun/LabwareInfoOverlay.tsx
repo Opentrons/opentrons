@@ -76,18 +76,28 @@ interface LabwareInfoOverlayProps {
   runId: string
   labwareHasLiquid?: boolean
   hover?: boolean
+  xOffset?: number
+  yOffset?: number
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { definition, labwareId, displayName, runId, labwareHasLiquid } = props
+  const {
+    definition,
+    labwareId,
+    displayName,
+    runId,
+    labwareHasLiquid,
+    xOffset,
+    yOffset,
+  } = props
 
   const width = definition.dimensions.xDimension
   const height = definition.dimensions.yDimension
   return (
     <RobotCoordsForeignDiv
-      x={definition.cornerOffsetFromSlot.x}
-      y={definition.cornerOffsetFromSlot.y}
+      x={definition.cornerOffsetFromSlot.x + xOffset ?? 0}
+      y={definition.cornerOffsetFromSlot.y + yOffset ?? 0}
       {...{ width, height }}
       innerDivProps={{
         display: DISPLAY_FLEX,

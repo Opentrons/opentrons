@@ -74,21 +74,22 @@ export interface ModuleOnDeck {
   highlightLabware?: boolean
   highlightShadowLabware?: boolean
   stacked?: boolean
+  hopperLabware?: HopperLabwareProps
 }
-export interface StackerOnDeck {
-  stackerLocation: ModuleLocation
-  shuttleLabwareDef?: LabwareDefinition2 | null
-  shuttleLabwareWellFill?: WellFill
-  hopperLabwareDef?: LabwareDefinition2 | null
-  hopperLabwareWellFill?: WellFill
-  innerProps?: ComponentProps<typeof Module>['innerProps']
-  /** generic prop to render self-positioned children for each module */
-  moduleChildren?: ReactNode
-  onLabwareClick?: () => void
-  highlightLabware?: boolean
-  highlightShadowLabware?: boolean
-  stacked?: boolean
+export interface HopperLabwareProps {
+  hopperLabwareDef: LabwareDefinition2 | null
+  hopperLabwareWellFill: WellFill
+  hopperOnLabwareClick: () => void
+  hopperHighlightLabware: boolean
+  hopperStacked: boolean
 }
+
+// these ugly consts are unfortunately necessary as the stacker and hopper locations
+// exist outside of our deck definition so the render doesn't follow our normal conventions
+export const STACKER_MODULE_X_OFFSET = 165
+export const STACKER_MODULE_Y_OFFSET = -6
+export const STACKER_HOPPER_LABWARE_X_OFFSET = 178.5
+export const STACKER_HOPPER_LABWARE_Y_OFFSET = 7
 
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
@@ -353,8 +354,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 <Module
                   key={`${moduleModel} ${moduleLocation.slotName}`}
                   def={moduleDef}
-                  x={slotPosition[0] + 170}
-                  y={slotPosition[1] - 6}
+                  x={slotPosition[0] + STACKER_MODULE_X_OFFSET}
+                  y={slotPosition[1] + STACKER_MODULE_Y_OFFSET}
                   orientation={inferModuleOrientationFromXCoordinate(
                     slotPosition[0]
                   )}
@@ -363,26 +364,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   {nestedLabwareDef != null ? (
                     <g
                       cursor={onLabwareClick != null ? 'pointer' : ''}
-                      transform="translate(178.5, 7)"
-                    >
-                      <LabwareRender
-                        definition={nestedLabwareDef}
-                        onLabwareClick={onLabwareClick}
-                        wellFill={nestedLabwareWellFill}
-                        shouldRotateAdapterOrientation={
-                          inferModuleOrientationFromXCoordinate(
-                            slotPosition[0]
-                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                        }
-                        highlight={highlightLabware}
-                        highlightShadow={highlightShadowLabware}
-                      />
-                    </g>
-                  ) : null}
-                  {nestedLabwareDef != null ? (
-                    <g
-                      cursor={onLabwareClick != null ? 'pointer' : ''}
-                      transform="translate(0,7)"
+                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
                     >
                       <LabwareRender
                         definition={nestedLabwareDef}
@@ -459,12 +441,16 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               deckDef
             )
             const moduleDef = getModuleDef2(moduleModel)
-
-            const {
+            let {
               x: nestedLabwareOffsetX,
               y: nestedLabwareOffsetY,
             } = moduleDef.labwareOffset
-
+            if (moduleDef.model === FLEX_STACKER_MODULE_V1) {
+              nestedLabwareOffsetX +=
+                STACKER_MODULE_X_OFFSET + STACKER_HOPPER_LABWARE_X_OFFSET
+              nestedLabwareOffsetY +=
+                STACKER_MODULE_Y_OFFSET + STACKER_HOPPER_LABWARE_Y_OFFSET
+            }
             // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
             const clampedLabwareOffsetX =
               Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD

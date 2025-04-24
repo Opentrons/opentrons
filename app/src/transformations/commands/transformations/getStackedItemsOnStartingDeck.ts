@@ -1,7 +1,7 @@
 import {
-  FlexStackerSetStoredLabwareRunTimeCommand,
+  FLEX_STACKER_MODULE_V1,
   FlexStackerFillRunTimeCommand,
-  getAllDefinitions,
+  FlexStackerSetStoredLabwareRunTimeCommand,
   getCutoutDisplayName,
   getLabwareDefURI,
   getSlotFromAddressableAreaName,
@@ -214,7 +214,9 @@ export function getStackedItemsOnStartingDeck(
               return sequenceAcc
             } else if (sequenceItem.kind === 'onModule') {
               const module = loadedModules.find(
-                lm => lm.id === sequenceItem.moduleId
+                lm =>
+                  lm.id === sequenceItem.moduleId &&
+                  lm.model !== FLEX_STACKER_MODULE_V1
               )
               if (module == null) return sequenceAcc
               const moduleStackItem: ModuleInStack = {

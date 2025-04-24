@@ -232,12 +232,9 @@ export function LabwareListItem(
       type="noActive"
       gridGap={SPACING.spacing24}
       padding={SPACING.spacing12}
+      alignItems={ALIGN_CENTER}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing2}
-        width="6.25rem"
-      >
+      <Flex gridGap={SPACING.spacing2} flexWrap="wrap" width="6.25rem">
         {isFlex ? (
           <DeckInfoLabel deckLabel={slotInfo} />
         ) : (

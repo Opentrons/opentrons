@@ -8,12 +8,15 @@ import {
   getLabwareInfoByLiquidId,
   getWellFillFromLabwareId,
   SPACING,
+  STACKER_HOPPER_LABWARE_X_OFFSET,
+  STACKER_HOPPER_LABWARE_Y_OFFSET,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
+  FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
@@ -146,6 +149,16 @@ export function SetupLabwareMap({
               displayName={topLabwareDisplayName}
               runId={runId}
               labwareHasLiquid={Object.values(wellFill).length > 0}
+              xOffset={
+                module.moduleDef.model === FLEX_STACKER_MODULE_V1
+                  ? STACKER_HOPPER_LABWARE_X_OFFSET
+                  : 0
+              }
+              yOffset={
+                module.moduleDef.model === FLEX_STACKER_MODULE_V1
+                  ? STACKER_HOPPER_LABWARE_Y_OFFSET
+                  : 0
+              }
             />
           ) : null}
         </g>

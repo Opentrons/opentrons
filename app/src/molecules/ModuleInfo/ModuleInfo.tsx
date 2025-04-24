@@ -17,6 +17,7 @@ import {
   getModuleDef2,
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1,
+  FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { useRunHasStarted } from '/app/resources/runs'
@@ -59,8 +60,8 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
 
   return (
     <RobotCoordsForeignObject
-      x={0}
-      y={0}
+      x={moduleModel === FLEX_STACKER_MODULE_V1 ? 178.5 : 0}
+      y={moduleModel === FLEX_STACKER_MODULE_V1 ? 7 : 0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
       flexProps={{
