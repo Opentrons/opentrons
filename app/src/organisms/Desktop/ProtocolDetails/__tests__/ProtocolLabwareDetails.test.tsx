@@ -1,12 +1,14 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
 import type { ComponentProps } from 'react'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { InfoScreen } from '@opentrons/components'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()

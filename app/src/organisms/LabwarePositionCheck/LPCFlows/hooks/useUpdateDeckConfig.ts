@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { updateLPCDeck } from '/app/redux/protocol-runs'
 import { useDispatch } from 'react-redux'
+
+import { updateLPCDeck } from '/app/redux/protocol-runs'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
 

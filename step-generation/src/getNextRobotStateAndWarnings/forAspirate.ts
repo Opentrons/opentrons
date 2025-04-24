@@ -1,17 +1,20 @@
-import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
+import range from 'lodash/range'
 import uniq from 'lodash/uniq'
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
+
 import {
   AIR,
+  getLocationTotalVolume,
+  getWellsForTips,
   mergeLiquid,
   splitLiquid,
-  getWellsForTips,
-  getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 import type { AspDispAirgapParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 export function forAspirate(
   params: AspDispAirgapParams,
   invariantContext: InvariantContext,

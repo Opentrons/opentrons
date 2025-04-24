@@ -1,9 +1,9 @@
-import { MixSteps, MixVerifications } from '../support/MixSteps'
-import { UniversalSteps } from '../support/UniversalSteps'
-import { TestFilePath, getTestFile } from '../support/TestFiles'
 import { verifyImportProtocolPage } from '../support/Import'
-import { StepBuilder } from '../support/StepBuilder'
+import { MixSteps, MixVerifications } from '../support/MixSteps'
 import { SetupSteps } from '../support/SetupSteps'
+import { StepBuilder } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Redesigned Mixing Steps - Happy Path', () => {
   beforeEach(() => {

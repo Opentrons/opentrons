@@ -1,4 +1,5 @@
 import { OT2_ROBOT_TYPE, THERMOCYCLER_MODULE_TYPE } from '..'
+
 import type { ModuleType, RobotType } from '..'
 
 export function getOccludedSlotCountForModule(

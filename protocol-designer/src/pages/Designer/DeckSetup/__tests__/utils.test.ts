@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
@@ -12,6 +12,8 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
 import {
   getDeckErrors,
   getIsHardwareOnSlotInUse,
@@ -19,7 +21,7 @@ import {
   getModuleModelsBySlot,
   getSVGContainerWidth,
 } from '../utils'
-import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
+
 import type {
   LabwareOnDeck,
   ModuleOnDeck,

@@ -11,12 +11,13 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+
 import { InputStepFormField } from '../../../../../../components/molecules'
 import { PositionField } from '../../PipetteFields'
 
-import type { FieldPropsByName } from '../../types'
-import type { MoveLiquidPrefixType } from '../../../../../../resources/types'
 import type { ReferenceFields } from '../../../../../../form-types'
+import type { MoveLiquidPrefixType } from '../../../../../../resources/types'
+import type { FieldPropsByName } from '../../types'
 
 export interface StepInputFieldProps {
   fieldTitle: string

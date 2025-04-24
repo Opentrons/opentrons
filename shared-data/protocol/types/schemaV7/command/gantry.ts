@@ -1,9 +1,9 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type {
-  Vector3D,
+  GantryMount,
   MotorAxes,
   MotorAxis,
-  GantryMount,
+  Vector3D,
 } from '../../../../js/types'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {

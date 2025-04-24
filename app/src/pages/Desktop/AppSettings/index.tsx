@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Navigate, useParams } from 'react-router-dom'
-
 import {
   ALIGN_START,
   BORDERS,
@@ -9,20 +8,21 @@ import {
   COLORS,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { Line } from '/app/atoms/structure'
+import { NavTab } from '/app/molecules/NavTab'
+import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import * as Config from '/app/redux/config'
+
+import { AdvancedSettings } from './AdvancedSettings'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
-import { AdvancedSettings } from './AdvancedSettings'
-import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
-import { NavTab } from '/app/molecules/NavTab'
-import { Line } from '/app/atoms/structure'
 
-import type { DesktopRouteParams, AppSettingsTab } from '/app/App/types'
+import type { AppSettingsTab, DesktopRouteParams } from '/app/App/types'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')

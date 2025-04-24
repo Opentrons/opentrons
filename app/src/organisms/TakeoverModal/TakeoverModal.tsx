@@ -1,6 +1,5 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

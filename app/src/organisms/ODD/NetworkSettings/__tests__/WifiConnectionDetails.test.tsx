@@ -4,9 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useWifiList } from '/app/resources/networking/hooks'
 import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
+import { useWifiList } from '/app/resources/networking/hooks'
+
 import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 

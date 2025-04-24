@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

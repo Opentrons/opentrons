@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { getSuccessResult } from '../fixtures'
+import { describe, expect, it } from 'vitest'
+
 import { moveToAddressableAreaForDropTip } from '../commandCreators/atomic'
+import { getSuccessResult } from '../fixtures'
 
 const getRobotInitialState = (): any => {
   return {}

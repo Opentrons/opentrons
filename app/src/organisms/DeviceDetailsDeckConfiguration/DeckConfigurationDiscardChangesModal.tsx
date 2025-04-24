@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'

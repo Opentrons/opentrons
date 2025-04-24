@@ -1,6 +1,6 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { act, screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { act, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -8,26 +8,26 @@ import {
   MockLPCContentContainer,
   mockLPCContentProps,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
+import {
+  useLPCSnackbars,
+  useLPCToasts,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 import { LPCLabwareDetails } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails'
 import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectSelectedLwOverview,
-  selectSelectedLwDisplayName,
-  selectWorkingOffsetsByUri,
-  selectIsDefaultOffsetAbsent,
-  selectStepInfo,
-  goBackEditOffsetSubstep,
   applyWorkingOffsets,
+  goBackEditOffsetSubstep,
   selectIsAnyOffsetHardCoded,
+  selectIsDefaultOffsetAbsent,
+  selectSelectedLwDisplayName,
+  selectSelectedLwOverview,
   selectSnackbarStatus,
+  selectStepInfo,
+  selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
-import {
-  useLPCToasts,
-  useLPCSnackbars,
-} from '/app/organisms/LabwarePositionCheck/hooks'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/DefaultLocationOffset',

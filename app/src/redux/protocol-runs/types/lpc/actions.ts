@@ -1,3 +1,5 @@
+import type { VectorOffset } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   ConflictTimestampInfo,
   LocationSpecificOffsetLocationDetails,
@@ -7,8 +9,6 @@ import type {
   OffsetLocationDetails,
   SavedOffsets,
 } from '/app/redux/protocol-runs/types/lpc'
-import type { VectorOffset } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export interface PositionParams {
   labwareUri: string

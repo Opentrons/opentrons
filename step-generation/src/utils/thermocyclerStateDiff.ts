@@ -2,6 +2,7 @@ import type {
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
 } from '../types'
+
 export interface Diff {
   lidOpen: boolean
   lidClosed: boolean

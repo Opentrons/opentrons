@@ -1,8 +1,9 @@
 import { memo } from 'react'
+
+import { COLORS } from '../../../helix-design-system'
 import { C_BLACK, C_BLUE } from '../../../styles/colors'
 import { RobotCoordsText } from '../../Deck'
 import { WELL_LABEL_OPTIONS } from '../LabwareRender'
-import { COLORS } from '../../../helix-design-system'
 
 import type { MemoExoticComponent } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

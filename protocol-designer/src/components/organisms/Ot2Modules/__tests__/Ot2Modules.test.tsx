@@ -1,5 +1,6 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { DeckFromLayers } from '@opentrons/components'
 import {
   fixture96Plate,
   MAGNETIC_MODULE_TYPE,
@@ -9,28 +10,29 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { DeckFromLayers } from '@opentrons/components'
+
+import { Ot2Modules } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
+import {
+  getDisableModuleRestrictions,
+  getEnableMutlipleTempsOT2,
+} from '../../../../feature-flags/selectors'
+import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../../modules'
+import { createModule } from '../../../../step-forms/actions'
+import { createModuleEntityAndChangeForm } from '../../../../step-forms/actions/thunks'
 import {
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { getDismissedHints } from '../../../../tutorial/selectors'
-import {
-  getDisableModuleRestrictions,
-  getEnableMutlipleTempsOT2,
-} from '../../../../feature-flags/selectors'
-import { createModuleEntityAndChangeForm } from '../../../../step-forms/actions/thunks'
-import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../../modules'
-import { createModule } from '../../../../step-forms/actions'
 import { MagnetModuleChangeContent } from '../../../molecules'
-import { useKitchen } from '../../Kitchen/hooks'
 import { ConfirmDeleteEntityInUseModal } from '../../ConfirmDeleteEntityInUseModal'
+import { useKitchen } from '../../Kitchen/hooks'
 import { getModuleOnSlot } from '../util'
-import { Ot2Modules } from '..'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 import type * as Components from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../step-forms/selectors')

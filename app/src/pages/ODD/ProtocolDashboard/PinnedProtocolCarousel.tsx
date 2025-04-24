@@ -7,6 +7,7 @@ import {
 } from '@opentrons/components'
 
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
+
 import { PinnedProtocol } from './PinnedProtocol'
 
 import type { Dispatch, SetStateAction } from 'react'

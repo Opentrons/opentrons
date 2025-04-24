@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual'
-
 import {
   FLEX_STAGING_ADDRESSABLE_AREAS,
   getLabwareDefURI,

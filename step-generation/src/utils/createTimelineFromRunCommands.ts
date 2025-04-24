@@ -1,7 +1,7 @@
 import { getModuleDef2 } from '@opentrons/shared-data'
 
-import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
+import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import { makeInitialRobotState } from './misc'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'

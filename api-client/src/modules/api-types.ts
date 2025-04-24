@@ -1,4 +1,8 @@
-import type { ModuleType, Vector3D, ModuleModel } from '@opentrons/shared-data'
+import type {
+  ModuleModel,
+  ModuleType,
+  Vector3D,
+} from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {

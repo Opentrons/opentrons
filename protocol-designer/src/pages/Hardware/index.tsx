@@ -1,6 +1,6 @@
-import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
@@ -13,11 +13,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
+import { FlexHardware, Ot2Modules } from '../../components/organisms'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
-import { FlexHardware, Ot2Modules } from '../../components/organisms'
-import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 
 export function Hardware(): JSX.Element {
   const { t } = useTranslation([

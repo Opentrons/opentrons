@@ -8,6 +8,7 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
 import { deleteModule } from '../../modules'
 import { createModule } from '../../step-forms/actions'
 import {
@@ -15,11 +16,12 @@ import {
   deleteDeckFixture,
 } from '../../step-forms/actions/additionalItems'
 import { FIXTURES } from '../Designer/DeckSetup/constants'
+
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { CutoutConfigExtended } from '../../components/organisms/HardwareConfigurator/AddFixtureModal'
-import type { ThunkDispatch } from '../../types'
-import type { DeckFixture } from '../../step-forms/actions/additionalItems'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
+import type { DeckFixture } from '../../step-forms/actions/additionalItems'
+import type { ThunkDispatch } from '../../types'
 
 export const updateInitialDeckState = (
   values: CutoutConfigExtended[],

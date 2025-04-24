@@ -1,15 +1,14 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

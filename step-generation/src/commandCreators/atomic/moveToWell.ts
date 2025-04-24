@@ -1,21 +1,23 @@
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   absorbanceReaderCollision,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  uuid,
   formatPyStr,
   formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getLabwareSlot,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
+
 import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 

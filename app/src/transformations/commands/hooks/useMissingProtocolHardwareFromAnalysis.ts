@@ -1,9 +1,10 @@
-import type {
-  RobotType,
-  CompletedProtocolAnalysis,
-} from '@opentrons/shared-data'
-import { useRequiredProtocolHardwareFromAnalysis } from './useRequiredProtocolHardwareFromAnalysis'
 import { useMissingProtocolHardwareFromRequiredProtocolHardware } from './useMissingProtocolHardwareFromRequiredProtocolHardware'
+import { useRequiredProtocolHardwareFromAnalysis } from './useRequiredProtocolHardwareFromAnalysis'
+
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { ProtocolHardware } from './types'
 
 export const useMissingProtocolHardwareFromAnalysis = (

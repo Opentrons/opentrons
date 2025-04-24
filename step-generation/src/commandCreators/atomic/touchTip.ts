@@ -1,5 +1,6 @@
-import { formatPyStr, uuid } from '../../utils'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
+import { formatPyStr, uuid } from '../../utils'
+
 import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 

@@ -1,18 +1,18 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-
-import { opentrons96PcrAdapterV1, fixture96Plate } from '@opentrons/shared-data'
-
-import { i18n } from '/app/i18n'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+import { describe, expect, it, vi } from 'vitest'
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
+import { fixture96Plate, opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+
 import { LegacyApplyHistoricOffsets } from '..'
 
 import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
-import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

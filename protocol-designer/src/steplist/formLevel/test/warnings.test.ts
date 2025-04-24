@@ -1,15 +1,17 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { fixture24Tuberack, fixture96Plate } from '@opentrons/shared-data'
+
 import {
   _minAirGapVolume,
   belowPipetteMinimumVolume,
-  minDisposalVolume,
   maxDispenseWellVolume,
-  tipPositionInTube,
+  minDisposalVolume,
   mixTipPositionInTube,
+  tipPositionInTube,
 } from '../warnings'
-import type { LabwareEntity } from '@opentrons/step-generation'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareEntity } from '@opentrons/step-generation'
 
 type CheckboxFields = 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox'
 type VolumeFields = 'aspirate_airGap_volume' | 'dispense_airGap_volume'

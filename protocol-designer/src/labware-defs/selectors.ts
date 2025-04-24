@@ -1,10 +1,13 @@
 import { createSelector } from 'reselect'
+
 import { _getSharedLabware, getAllDefinitions } from './utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BaseState, Selector } from '../types'
-import type { LabwareDefByDefURI, LabwareUploadMessage } from './types'
-import type { RootState } from './reducers'
 import type { RootState as StepFormRootState } from '../step-forms'
+import type { BaseState, Selector } from '../types'
+import type { RootState } from './reducers'
+import type { LabwareDefByDefURI, LabwareUploadMessage } from './types'
+
 // NOTE: labware-defs/ state is nested inside step-forms
 export const rootSelector = (state: BaseState): RootState =>
   state.stepForms.labwareDefs

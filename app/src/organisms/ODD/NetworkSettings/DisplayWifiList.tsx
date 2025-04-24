@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,12 +11,13 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
+
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 
 import type { WifiNetwork } from '/app/redux/networking/types'

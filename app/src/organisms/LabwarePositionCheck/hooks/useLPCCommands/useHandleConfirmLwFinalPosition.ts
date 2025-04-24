@@ -6,12 +6,12 @@ import {
 } from './commands'
 
 import type {
+  CreateCommand,
   LoadedPipette,
   Vector3D,
-  CreateCommand,
 } from '@opentrons/shared-data'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 interface UseHandleConfirmPositionProps
   extends UseLPCCommandWithChainRunChildProps {

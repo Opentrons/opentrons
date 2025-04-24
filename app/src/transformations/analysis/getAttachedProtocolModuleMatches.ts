@@ -1,15 +1,15 @@
 import {
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   checkModuleCompatibility,
+  FLEX_ROBOT_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   getDeckDefFromRobotType,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import type { DeckConfiguration, RobotType } from '@opentrons/shared-data'
-import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type { AttachedModule } from '/app/redux/modules/types'
+import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 
 export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {
   attachedModuleMatch: AttachedModule | null

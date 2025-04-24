@@ -1,30 +1,34 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { Route, MemoryRouter, Routes } from 'react-router-dom'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
   useHost,
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRunTimeParameters } from '/app/resources/protocols'
-import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
+import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
+import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { useRunTimeParameters } from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
+
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
 
 import type { HostConfig } from '@opentrons/api-client'
 

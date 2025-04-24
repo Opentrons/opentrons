@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual'
-
 import {
   getVectorDifference,
   getVectorSum,
@@ -11,12 +10,12 @@ import { RESET_TO_DEFAULT } from '../constants'
 import type { VectorOffset } from '@opentrons/api-client'
 import type {
   DefaultOffsetDetails,
-  LocationSpecificOffsetDetails,
-  WorkingOffset,
   ExistingOffset,
+  LocationSpecificOffsetDetails,
+  OffsetLocationDetails,
   WorkingDefaultOffset,
   WorkingLocationSpecificOffset,
-  OffsetLocationDetails,
+  WorkingOffset,
 } from '../types'
 
 // Returns the most recent vector offset from offset details.

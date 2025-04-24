@@ -1,16 +1,15 @@
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
-
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   SIZE_2,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

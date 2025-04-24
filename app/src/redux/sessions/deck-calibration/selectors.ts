@@ -1,7 +1,8 @@
-import type { State } from '../../types'
 import { SESSION_TYPE_DECK_CALIBRATION } from '../constants'
-import type { Session, DeckCalibrationSession } from '../types'
 import { getRobotSessionOfType } from '../selectors'
+
+import type { State } from '../../types'
+import type { DeckCalibrationSession, Session } from '../types'
 
 export const getDeckCalibrationSession: (
   state: State,

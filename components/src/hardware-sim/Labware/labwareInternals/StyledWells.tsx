@@ -1,6 +1,7 @@
 import { memo } from 'react'
-import { Well } from './Well'
+
 import { COLORS } from '../../../helix-design-system'
+import { Well } from './Well'
 
 import type { CSSProperties, MemoExoticComponent } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

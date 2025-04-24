@@ -1,7 +1,8 @@
 import { css } from 'styled-components'
+
+import { PrimaryButton } from '../../atoms/buttons/PrimaryButton'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
-import { PrimaryButton } from '../../atoms/buttons/PrimaryButton'
 import { spacing8 } from '../../ui-style-constants/spacing'
 import { StyledText } from '../StyledText'
 

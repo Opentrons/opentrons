@@ -1,16 +1,16 @@
 // fetch wrapper to throw if response is not ok
 import fs from 'fs'
-import { remove } from 'fs-extra'
-import pump from 'pump'
-import _fetch from 'node-fetch'
-import FormData from 'form-data'
 import { Transform } from 'stream'
+import FormData from 'form-data'
+import { remove } from 'fs-extra'
+import _fetch from 'node-fetch'
+import pump from 'pump'
 
 import { HTTP_API_VERSION } from './constants'
 import { createLogger } from './log'
 
-import type { Readable } from 'stream'
 import type { Request, RequestInit, Response } from 'node-fetch'
+import type { Readable } from 'stream'
 
 const log = createLogger('http')
 

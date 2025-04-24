@@ -1,28 +1,30 @@
-import { useTranslation, Trans } from 'react-i18next'
-import { EXTENSION } from '@opentrons/shared-data'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   COLORS,
-  TYPOGRAPHY,
-  SPACING,
   Flex,
   LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { css } from 'styled-components'
+import { EXTENSION } from '@opentrons/shared-data'
+
+import calibratingFrontJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_FRONT_JAW.webm'
+import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
+import movePinFrontToRear from '/app/assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
+import movePinRearToStorage from '/app/assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
+import movePinStorageToFront from '/app/assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
 } from './constants'
-import movePinStorageToFront from '/app/assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
-import movePinFrontToRear from '/app/assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
-import movePinRearToStorage from '/app/assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
-import calibratingFrontJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_FRONT_JAW.webm'
-import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { ReactNode } from 'react'
 import type { Vector3D } from '@opentrons/shared-data'

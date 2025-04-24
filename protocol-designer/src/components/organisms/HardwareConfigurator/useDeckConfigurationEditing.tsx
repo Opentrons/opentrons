@@ -30,9 +30,11 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
+
 import { AddFixtureModal } from './AddFixtureModal'
-import type { UseFormSetValue } from 'react-hook-form'
+
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutFixtureId,
   CutoutId,

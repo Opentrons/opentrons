@@ -1,7 +1,7 @@
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useDrag, useDrop } from 'react-dnd'
 import { useEffect, useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,9 +14,10 @@ import {
   TYPOGRAPHY,
   WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
+
 import { DND_TYPES } from '../../../../constants'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
@@ -24,7 +25,7 @@ import { SlotOverlay } from './SlotOverlay'
 import type { DropTargetMonitor } from 'react-dnd'
 import type { LabwareOnDeck } from '../../../../step-forms'
 import type { ThunkDispatch } from '../../../../types'
-import type { SharedControlsType, DroppedItem } from '../types'
+import type { DroppedItem, SharedControlsType } from '../types'
 
 interface LabwareControlsProps extends SharedControlsType {
   labwareOnDeck: LabwareOnDeck

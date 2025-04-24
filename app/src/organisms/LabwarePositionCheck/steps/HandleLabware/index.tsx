@@ -1,12 +1,13 @@
 import { useSelector } from 'react-redux'
 
+import { EditOffset } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import {
   HANDLE_LW_SUBSTEP,
   selectCurrentSubstep,
 } from '/app/redux/protocol-runs'
-import { LPCLabwareList } from './LPCLabwareList'
+
 import { LPCLabwareDetails } from './LPCLabwareDetails'
-import { EditOffset } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import { LPCLabwareList } from './LPCLabwareList'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 

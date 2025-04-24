@@ -1,14 +1,15 @@
 import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { ModuleType } from '@opentrons/shared-data'
+
 import type { DropdownOption } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
 
 export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   HEATERSHAKER_MODULE_TYPE,

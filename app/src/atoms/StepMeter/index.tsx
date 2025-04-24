@@ -3,10 +3,10 @@ import { css } from 'styled-components'
 import {
   Box,
   COLORS,
-  SPACING,
-  POSITION_RELATIVE,
   POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
   RESPONSIVENESS,
+  SPACING,
 } from '@opentrons/components'
 
 interface StepMeterProps {
