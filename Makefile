@@ -75,7 +75,6 @@ PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 setup-py: setup-py-toolchain
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
-
 %-py-setup:
 	$(MAKE) -C $* setup
 
@@ -189,19 +188,17 @@ test-e2e:
 	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
-.PHONY: test-py-windows
-test-py-windows:
-	$(MAKE) -C $(HARDWARE_DIR) test
-	$(MAKE) -C $(API_DIR) test
-	$(MAKE) -C $(SHARED_DATA_DIR) test-py
+PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
+WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR))
 
 .PHONY: test-py
-test-py: test-py-windows
-	$(MAKE) -C $(UPDATE_SERVER_DIR) test
-	$(MAKE) -C $(ROBOT_SERVER_DIR) test
-	$(MAKE) -C $(SERVER_UTILS_DIR) test
-	$(MAKE) -C $(G_CODE_TESTING_DIR) test
-	$(MAKE) -C $(USB_BRIDGE_DIR) test
+test-py: $(PYTHON_TEST_TARGETS)
+
+.PHONY: test-py-windows
+test-py-windows: $(WINDOWS_PYTHON_TEST_TARGETS)
+
+%-py-test:
+	$(MAKE) -C $* test
 
 .PHONY: test-js
 test-js: test-js-internal
