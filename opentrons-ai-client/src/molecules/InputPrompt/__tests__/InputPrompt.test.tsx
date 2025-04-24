@@ -92,6 +92,7 @@ describe('InputPrompt', () => {
       name: 'chat-submitted',
       properties: {
         chat: 'test',
+        protocol_format: 'Python',
       },
     })
   })

@@ -39,6 +39,7 @@ import {
 import { useApiCall } from '../../resources/hooks'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { calcTextAreaHeight } from '../../resources/utils'
+import { detectProtocolFormat } from '../../resources/utils/protocolFormat'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -67,7 +68,7 @@ export function InputPrompt(): JSX.Element {
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [token] = useAtom(tokenAtom)
   const [submitted, setSubmitted] = useState<boolean>(false)
-  const watchUserPrompt = watch('userPrompt') ?? ''
+  const watchUserPrompt = (watch('userPrompt') ?? '') as string
 
   const { data, isLoading, callApi } = useApiCall()
 
@@ -112,10 +113,15 @@ export function InputPrompt(): JSX.Element {
   ): Promise<void> => {
     const newRequestId = uuidv4() + getPreFixText(isUpdateOrCreateRequest)
     setRequestId(newRequestId)
+    const currentProtocolFormat = detectProtocolFormat(
+      watchUserPrompt,
+      chatHistory
+    )
     const userInput: ChatData = {
       requestId: newRequestId,
       role: 'user',
       reply: watchUserPrompt,
+      protocol_format: currentProtocolFormat,
     }
     reset()
     setChatData(chatData => [...chatData, userInput])
@@ -144,6 +150,7 @@ export function InputPrompt(): JSX.Element {
               fake: false,
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
               pd_protocol_content: pdProtocolContent,
+              protocol_format: currentProtocolFormat,
             },
       }
 
@@ -156,6 +163,7 @@ export function InputPrompt(): JSX.Element {
         name: 'chat-submitted',
         properties: {
           chat: watchUserPrompt,
+          protocol_format: currentProtocolFormat,
         },
       })
       setSubmitted(true)
@@ -170,6 +178,14 @@ export function InputPrompt(): JSX.Element {
   ): CreatePrompt | UpdatePrompt => {
     createProtocol.regenerate = isRegenerateRequest
     updateProtocol.regenerate = isRegenerateRequest
+
+    // If it's a new protocol, set the protocol_format property
+    if (isNewProtocol) {
+      createProtocol.protocol_format = detectProtocolFormat(
+        String(createProtocol.prompt)
+      )
+    }
+
     return isNewProtocol ? createProtocol : updateProtocol
   }
 
@@ -222,7 +238,7 @@ export function InputPrompt(): JSX.Element {
     <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
         <LegacyStyledTextarea
-          rows={calcTextAreaHeight(watchUserPrompt as string)}
+          rows={calcTextAreaHeight(watchUserPrompt)}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />

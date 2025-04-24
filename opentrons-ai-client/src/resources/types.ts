@@ -1,6 +1,8 @@
 import type { FC } from 'react'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
+export type ProtocolFormat = 'Protocol Designer' | 'Python'
+
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
 
@@ -15,6 +17,8 @@ export interface ChatData {
   requestId: string
   /** structured JSON protocol content */
   protocol_content?: ProtocolFile
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export interface CreatePrompt {
@@ -32,6 +36,8 @@ export interface CreatePrompt {
   steps: string[]
   fake?: boolean
   fake_key?: string
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export type UpdateOptions =
@@ -48,6 +54,8 @@ export interface UpdatePrompt {
   update_type: UpdateOptions
   update_details: string
   fake: boolean
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export interface Chat {
@@ -57,6 +65,8 @@ export interface Chat {
   content: string
   /** structured protocol content */
   protocol_content?: string
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export interface RouteProps {
