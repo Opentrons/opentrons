@@ -4255,7 +4255,6 @@ def test_get_liquid_handling_z_change(
     mock_well_view: WellView,
 ) -> None:
     """Test for get_liquid_handling_z_change math."""
-
     pip_type = PipetteNameType.P300_SINGLE
     decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
         get_default_nozzle_map(pip_type)
