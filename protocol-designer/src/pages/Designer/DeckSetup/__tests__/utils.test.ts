@@ -19,6 +19,7 @@ import {
   getModuleModelsBySlot,
   getSVGContainerWidth,
 } from '../utils'
+
 import type { LabwareOnDeck, SavedStepFormState } from '../../../../step-forms'
 
 describe('getModuleModelsBySlot', () => {

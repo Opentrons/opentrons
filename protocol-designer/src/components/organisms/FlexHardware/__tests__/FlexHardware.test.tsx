@@ -6,6 +6,7 @@ import {
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
 
+import { FlexHardware } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import {
@@ -15,7 +16,6 @@ import {
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { useKitchen } from '../../Kitchen/hooks'
-import { FlexHardware } from '..'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../Kitchen/hooks')

@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { editDeckConfiguration } from '../../../../step-forms/actions'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'

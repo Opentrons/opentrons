@@ -1,4 +1,5 @@
 import { getIsLabwareInUse } from '../../../pages/Designer/DeckSetup/utils'
+
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   LabwareOnDeck,

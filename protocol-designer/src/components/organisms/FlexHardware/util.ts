@@ -8,7 +8,9 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
 import { deleteModule } from '../../../modules'
+import { FIXTURES } from '../../../pages/Designer/DeckSetup/constants'
 import {
   createModule,
   editDeckConfiguration,
@@ -17,19 +19,19 @@ import {
   createDeckFixture,
   deleteDeckFixture,
 } from '../../../step-forms/actions/additionalItems'
-import { FIXTURES } from '../../../pages/Designer/DeckSetup/constants'
 import { getIsLabwareCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { DeckConfiguration, ModuleModel } from '@opentrons/shared-data'
-import type { ThunkDispatch } from '../../../types'
-import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
 } from '../../../step-forms'
-import type { MakeSnackbar } from '../Kitchen/KitchenContext'
+import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import type { ThunkDispatch } from '../../../types'
 import type { CutoutConfigExtended } from '../HardwareConfigurator/AddFixtureModal'
+import type { MakeSnackbar } from '../Kitchen/KitchenContext'
 
 const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
   cutoutA3: 'A4',

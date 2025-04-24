@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SIMPLEST_DECK_CONFIG,
@@ -8,6 +9,10 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
+
+import { editDeckConfiguration } from '../../../step-forms/actions'
+import { getDeckConfiguration } from '../../../step-forms/selectors'
+import { HardwareConfiguratorContainer } from './HardwareConfiguratorContainer'
 
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
@@ -22,10 +27,6 @@ import type {
   InitialDeckStateModules,
   ModuleExtended,
 } from './AddFixtureModal'
-import { useDispatch, useSelector } from 'react-redux'
-import { getDeckConfiguration } from '../../../step-forms/selectors'
-import { editDeckConfiguration } from '../../../step-forms/actions'
-import { HardwareConfiguratorContainer } from './HardwareConfiguratorContainer'
 
 interface HardwareConfiguratorProps {
   modules: FormModules | InitialDeckStateModules

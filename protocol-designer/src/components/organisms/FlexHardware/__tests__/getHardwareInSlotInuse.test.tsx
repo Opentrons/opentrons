@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest'
-
+import { describe, expect, it } from 'vitest'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
 import { getHardwareInSlotInUse } from '../getHardwareInSlotInUse'
+
 import type {
   LabwareOnDeck,
   ModuleOnDeck,

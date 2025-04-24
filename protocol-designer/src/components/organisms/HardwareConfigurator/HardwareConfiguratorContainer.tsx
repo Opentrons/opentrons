@@ -1,5 +1,7 @@
 import { DeckConfigurator } from '@opentrons/components'
+
 import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
+
 import type { UseFormSetValue } from 'react-hook-form'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { FormModules } from '../../../step-forms'

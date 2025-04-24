@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForSlotName,
@@ -13,22 +13,22 @@ import {
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import { deleteModule } from '../../../modules'
-import { deleteContainer } from '../../../labware-ingred/actions'
-import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 
+import { deleteContainer } from '../../../labware-ingred/actions'
+import { deleteModule } from '../../../modules'
+import { editDeckConfiguration } from '../../../step-forms/actions'
+import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../step-forms/selectors'
-import { editDeckConfiguration } from '../../../step-forms/actions'
 import { uuid } from '../../../utils'
-import { useKitchen } from '../Kitchen/hooks'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { ConfirmDeleteStagingAreaModal } from '../ConfirmDeleteStagingAreaModal'
-import { updateInitialDeckState } from './util'
 import { HardwareConfigurator } from '../HardwareConfigurator'
+import { useKitchen } from '../Kitchen/hooks'
+import { updateInitialDeckState } from './util'
 
 import type {
   CutoutFixtureId,

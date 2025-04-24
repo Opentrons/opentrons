@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { uuid } from '@opentrons/step-generation'
 import {
   Btn,
   COLORS,
@@ -26,11 +25,14 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { uuid } from '@opentrons/step-generation'
+
 import { editDeckConfiguration } from '../../../step-forms/actions'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { useKitchen } from '../Kitchen/hooks'
 import { getIsLabwareCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
+
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
