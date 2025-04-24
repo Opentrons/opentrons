@@ -19,10 +19,8 @@ from . import validation
 @dataclass
 class TransferInfo:
 
-    sources_list: List[Well]
-    destinations_list: Union[
-        List[Well], TrashBin, WasteChute
-    ]  # TODO rename this maybe?
+    source: List[Well]
+    dest: Union[List[Well], TrashBin, WasteChute]
     tip_policy: TransferTipPolicyV2
     tip_racks: List[Labware]
     trash_location: Union[Location, TrashBin, WasteChute]
@@ -89,10 +87,8 @@ def verify_and_normalize_transfer_args(
     )
 
     return TransferInfo(
-        sources_list=flat_sources_list,
-        destinations_list=flat_dests_list
-        if not isinstance(dest, (TrashBin, WasteChute))
-        else dest,
+        source=flat_sources_list,
+        dest=flat_dests_list if not isinstance(dest, (TrashBin, WasteChute)) else dest,
         tip_policy=valid_new_tip,
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,

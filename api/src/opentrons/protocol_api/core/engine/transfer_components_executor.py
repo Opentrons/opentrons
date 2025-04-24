@@ -150,6 +150,9 @@ class TransferComponentsExecutor:
             For reference pos of anything else, do not allow submerge position to be below aspirate position
         2. move to aspirate/dispense position at desired speed
         3. delay
+
+        If target location is a trash bin or waste chute, the pipette will move to the disposal location given,
+        remove air gap and delay
         """
         submerge_start_location: Union[Location, TrashBin, WasteChute]
         if isinstance(self._target_location, Location):
@@ -290,7 +293,7 @@ class TransferComponentsExecutor:
         We should mention in our docs that users should adjust this property according to their application.
         """
         if not mix_properties.enabled or not isinstance(
-            self._target_location, Location,
+            self._target_location, Location
         ):
             return
         # Assertion only for mypy purposes
@@ -453,6 +456,9 @@ class TransferComponentsExecutor:
             - Prepare-to-aspirate (top of well)
             - Do air-gap (top of well)
         7. If drop tip, move to drop tip location, drop tip
+
+        If target location is a trash bin or waste chute, the retract movement step is skipped along with touch tip,
+        even if it is enabled.
         """
         # TODO: Raise error if retract is below the meniscus
         retract_props = self._transfer_properties.dispense.retract
