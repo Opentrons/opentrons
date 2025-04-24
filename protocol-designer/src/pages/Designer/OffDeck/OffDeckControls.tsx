@@ -7,6 +7,7 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
+
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 

@@ -1,26 +1,26 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { useDispatch } from 'react-redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  mockLPCContentProps,
   mockLocationSpecificOffsetDetails,
+  mockLPCContentProps,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
+import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 import { LabwareLocationItem } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/LocationSpecificOffsetsContainer/LabwareLocationItem'
 import {
-  selectMostRecentVectorOffsetForLwWithOffsetDetails,
-  selectIsDefaultOffsetAbsent,
-  setSelectedLabware,
-  proceedEditOffsetSubstep,
-  resetLocationSpecificOffsetToDefault,
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
+  proceedEditOffsetSubstep,
+  resetLocationSpecificOffsetToDefault,
+  selectIsDefaultOffsetAbsent,
+  selectMostRecentVectorOffsetForLwWithOffsetDetails,
+  setSelectedLabware,
 } from '/app/redux/protocol-runs'
-import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const OffsetTagMock = vi.fn(() => <div data-testid="offset-tag" />)
 const MultiDeckLabelTagBtnsMock = vi.fn(props => (

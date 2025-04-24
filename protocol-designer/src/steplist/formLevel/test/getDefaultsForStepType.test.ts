@@ -1,4 +1,6 @@
-import { vi, it, describe, expect, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import { getDefaultsForStepType } from '..'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -6,7 +8,6 @@ import {
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
 } from '../../../constants'
-import { getDefaultsForStepType } from '..'
 
 describe('getDefaultsForStepType', () => {
   afterEach(() => {

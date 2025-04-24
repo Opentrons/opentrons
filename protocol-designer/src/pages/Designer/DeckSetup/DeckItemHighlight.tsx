@@ -5,18 +5,20 @@ import {
   BORDERS,
   COLORS,
   CURSOR_POINTER,
-  DISPLAY_FLEX,
   DeckLabelSet,
+  DISPLAY_FLEX,
   POSITION_ABSOLUTE,
   PRODUCT,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
+
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
   getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
+
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 
 interface DeckItemHighlightProps {

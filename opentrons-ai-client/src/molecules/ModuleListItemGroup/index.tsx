@@ -1,13 +1,15 @@
+import { useMemo } from 'react'
+import { Controller, useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  SPACING,
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
   ListItem,
   ListItemCustomize,
+  SPACING,
 } from '@opentrons/components'
-import type { DropdownBorder } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
   getModuleDisplayName,
@@ -17,14 +19,14 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { ModuleType } from '@opentrons/shared-data'
-import { Controller, useFormContext } from 'react-hook-form'
-import { ModuleDiagram } from '../ModelDiagram'
+
 import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
-import type { DisplayModules } from '../../organisms/ModulesSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
-import { useTranslation } from 'react-i18next'
-import { useMemo } from 'react'
+import { ModuleDiagram } from '../ModelDiagram'
+
+import type { DropdownBorder } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
+import type { DisplayModules } from '../../organisms/ModulesSection'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [

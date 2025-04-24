@@ -2,7 +2,7 @@ import { COLOR_WARNING } from '../styles'
 import { Icon } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
-import type { IconProps, IconName } from './Icon'
+import type { IconName, IconProps } from './Icon'
 
 export interface NotificationIconProps extends IconProps {
   /** name constant of the optional notifcation icon to display */

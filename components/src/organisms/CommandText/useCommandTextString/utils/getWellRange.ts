@@ -1,8 +1,9 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
 import type {
+  ConfigureNozzleLayoutRunTimeCommand,
   PipetteName,
   RunTimeCommand,
-  ConfigureNozzleLayoutRunTimeCommand,
 } from '@opentrons/shared-data'
 
 const usedChannelsFromCommand = (

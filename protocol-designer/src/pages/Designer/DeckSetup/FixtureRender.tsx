@@ -11,19 +11,21 @@ import {
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
-  OT2_ROBOT_TYPE,
   getModuleDef2,
   getPositionFromSlotId,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareSlot } from '@opentrons/step-generation'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
+
 import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
-import { lightFill, darkFill } from './DeckSetupContainer'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { darkFill, lightFill } from './DeckSetupContainer'
 import { getAdjacentSlots } from './utils'
+
 import type {
-  TrashCutoutId,
-  StagingAreaLocation,
   DeckLabelProps,
+  StagingAreaLocation,
+  TrashCutoutId,
 } from '@opentrons/components'
 import type {
   AddressableAreaName,

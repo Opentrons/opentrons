@@ -1,13 +1,3 @@
-import type {
-  ABSORBANCE_READER_INITIALIZE,
-  ABSORBANCE_READER_INITIALIZE_MODE_MULTI,
-  ABSORBANCE_READER_INITIALIZE_MODE_SINGLE,
-  ABSORBANCE_READER_LID,
-  ABSORBANCE_READER_READ,
-  PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TEMP,
-  PAUSE_UNTIL_TIME,
-} from './constants'
 import type { IconName } from '@opentrons/components'
 import type {
   LabwareLocation,
@@ -21,6 +11,17 @@ import type {
   TrashBinEntity,
   WasteChuteEntity,
 } from '@opentrons/step-generation'
+import type {
+  ABSORBANCE_READER_INITIALIZE,
+  ABSORBANCE_READER_INITIALIZE_MODE_MULTI,
+  ABSORBANCE_READER_INITIALIZE_MODE_SINGLE,
+  ABSORBANCE_READER_LID,
+  ABSORBANCE_READER_READ,
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
+} from './constants'
+
 export type StepIdType = string
 export type StepFieldName = string
 

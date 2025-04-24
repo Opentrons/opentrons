@@ -1,15 +1,19 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+
+import { OffDeck } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { getSelectedTerminalItemId } from '../../../../ui/steps'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { LiquidButton } from '../../../../components/molecules'
+import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { selectors } from '../../../../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { DeckSetupToolbox } from '../../DeckSetup/DeckSetupToolbox'
 import { OffDeckDetails } from '../OffDeckDetails'
-import { OffDeck } from '..'
+
 import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
 

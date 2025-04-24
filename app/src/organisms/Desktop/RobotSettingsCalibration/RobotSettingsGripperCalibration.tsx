@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -22,8 +21,9 @@ import {
 } from '@opentrons/components'
 
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { formatLastCalibrated } from './CalibrationDetails/utils'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+
+import { formatLastCalibrated } from './CalibrationDetails/utils'
 
 import type { GripperData } from '@opentrons/api-client'
 

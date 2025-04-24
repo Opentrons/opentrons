@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect'
-
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type { Selector } from 'reselect'

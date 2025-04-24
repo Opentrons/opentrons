@@ -1,12 +1,12 @@
-import { useRef, useLayoutEffect } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { createPopper } from '@popperjs/core'
 
 import type {
+  HandleStateUpdate,
+  PopperModifer,
+  PopperOptions,
   UsePopperOptions,
   UsePopperResult,
-  PopperOptions,
-  PopperModifer,
-  HandleStateUpdate,
 } from './types'
 
 const DISABLED_APPLY_STYLES_MODIFIER = {

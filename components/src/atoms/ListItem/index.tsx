@@ -1,8 +1,9 @@
 import { css } from 'styled-components'
-import { Flex } from '../../primitives'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 import type { ReactNode } from 'react'
 import type { StyleProps } from '../../primitives'

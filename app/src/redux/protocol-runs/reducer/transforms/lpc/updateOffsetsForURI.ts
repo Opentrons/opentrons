@@ -1,17 +1,18 @@
 import {
-  createUpdatedWorkingDefaultOffset,
-  createUpdatedWorkingLocationSpecificOffset,
-  findLocationSpecificOffsetWithFallbacks,
-  findMatchingLocationOffset,
-  vectorEqualsDefault,
-} from '../../../utils'
-import {
   CLEAR_WORKING_OFFSETS,
   OFFSET_KIND_DEFAULT,
   RESET_OFFSET_TO_DEFAULT,
   RESET_TO_DEFAULT,
   SET_FINAL_POSITION,
 } from '/app/redux/protocol-runs'
+
+import {
+  createUpdatedWorkingDefaultOffset,
+  createUpdatedWorkingLocationSpecificOffset,
+  findLocationSpecificOffsetWithFallbacks,
+  findMatchingLocationOffset,
+  vectorEqualsDefault,
+} from '../../../utils'
 
 import type {
   DefaultOffsetDetails,
@@ -21,9 +22,9 @@ import type {
   LwGeometryDetails,
 } from '../../../types'
 import type {
-  UpdateOffsetsAction,
   PositionAction,
   ResetPositionAction,
+  UpdateOffsetsAction,
 } from './types'
 
 // Handle vector position updates, only updating the appropriate working/existing offsets.

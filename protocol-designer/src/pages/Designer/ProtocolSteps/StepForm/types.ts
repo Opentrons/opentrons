@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { FormData, StepFieldName } from '../../../../form-types'
 import type { StepFormErrors } from '../../../../steplist'
+
 export interface FocusHandlers {
   focusedField: StepFieldName | null
   dirtyFields: StepFieldName[]

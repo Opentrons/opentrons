@@ -1,7 +1,10 @@
 import { useSelector } from 'react-redux'
+
 import { getValidCustomLabware } from '/app/redux/custom-labware'
+
 import { getAllDefinitions } from '../utils'
-import type { LabwareSort, LabwareFilter, LabwareDefAndDate } from '../types'
+
+import type { LabwareDefAndDate, LabwareFilter, LabwareSort } from '../types'
 
 const LABWARE_LOADNAME_BLOCKLIST: string[] = []
 

@@ -1,9 +1,9 @@
-import { vi, describe, it, expect } from 'vitest'
-
 import noop from 'lodash/noop'
-import * as Selectors from '../selectors'
-import * as Constants from '../constants'
+import { describe, expect, it, vi } from 'vitest'
+
 import * as Fixtures from '../__fixtures__'
+import * as Constants from '../constants'
+import * as Selectors from '../selectors'
 
 import type { State } from '../../types'
 

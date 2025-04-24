@@ -1,20 +1,20 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-
 import {
-  Flex,
-  StyledText,
-  SPACING,
   DIRECTION_COLUMN,
+  Flex,
   ListTable,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import {
   selectSelectedLwOverview,
   selectSortedLSOffsetDetailsWithCopy,
 } from '/app/redux/protocol-runs'
+
 import { LabwareLocationItem } from './LabwareLocationItem'
 import { OffsetTableHeaders } from './OffsetTableHeaders'
 

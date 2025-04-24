@@ -1,13 +1,15 @@
 import {
-  getModuleInitialLoadInfo,
   getLabwareLocation,
+  getModuleInitialLoadInfo,
 } from '/app/transformations/commands'
+
 import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
 import type {
-  LoadedModule,
   LoadedLabware,
+  LoadedModule,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+
 // this logic to derive the LabwareOffsetLocation from the LabwareLocation
 // is required because the backend needs to know a module's model (not its ID)
 // in order to apply offsets. This logic should be removed once the backend can

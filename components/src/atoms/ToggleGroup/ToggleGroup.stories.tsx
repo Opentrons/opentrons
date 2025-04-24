@@ -1,5 +1,7 @@
 import * as React from 'react'
+
 import { ToggleGroup as ToggleGroupComponent } from './index'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ToggleGroupComponent> = {

@@ -1,10 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
-import {
-  formatRunTimeParameterValue,
-  sortRuntimeParameters,
-} from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,13 +8,18 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { SetupScreens } from '../types'

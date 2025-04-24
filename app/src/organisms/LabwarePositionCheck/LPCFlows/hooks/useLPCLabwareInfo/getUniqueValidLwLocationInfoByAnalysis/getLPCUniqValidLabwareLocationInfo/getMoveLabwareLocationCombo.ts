@@ -1,12 +1,13 @@
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+
 import {
+  getAddressableAreaNameFrom,
   getClosestBeneathAdapterId,
   getClosestBeneathModuleId,
   getClosestBeneathModuleModel,
   getLabwareDefURIFrom,
   getLwModStackupDetails,
-  getAddressableAreaNameFrom,
 } from './helpers'
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 
 import type {
   LoadedLabware,

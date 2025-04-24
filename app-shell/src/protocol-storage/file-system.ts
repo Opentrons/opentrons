@@ -1,12 +1,12 @@
 import path from 'path'
+import { app, shell } from 'electron'
 import fs from 'fs-extra'
 import uuid from 'uuid/v4'
 
-import { app, shell } from 'electron'
-
-import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
-import type { Dirent } from 'fs'
 import { analyzeProtocolSource } from '../protocol-analysis'
+
+import type { Dirent } from 'fs'
+import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 
 /**
  * Module for managing local protocol files on the host filesystem

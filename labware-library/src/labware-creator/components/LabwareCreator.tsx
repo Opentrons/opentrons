@@ -1,6 +1,7 @@
-import type * as React from 'react'
-import { Nav, Breadcrumbs } from '../../components/Nav'
+import { Breadcrumbs, Nav } from '../../components/Nav'
 import styles from './LabwareCreator.module.css'
+
+import type * as React from 'react'
 
 interface Props {
   children: React.ReactNode

@@ -1,22 +1,22 @@
 import { useEffect } from 'react'
 import { css } from 'styled-components'
 import {
-  Box,
   BaseDeck,
-  RobotCoordsForeignDiv,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   JUSTIFY_FLEX_END,
+  RobotCoordsForeignDiv,
   useDeckLocationSelect,
 } from '@opentrons/components'
 
 import type { ComponentProps } from 'react'
 import type {
   LabwareDefinition2,
-  RobotType,
-  ModuleLocation,
   LabwareLocation,
+  ModuleLocation,
+  RobotType,
 } from '@opentrons/shared-data'
 
 export type MapKind = 'intervention' | 'deck-config'

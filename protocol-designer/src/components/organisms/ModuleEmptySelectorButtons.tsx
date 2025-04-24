@@ -10,6 +10,7 @@ import {
   getModuleDisplayName,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
+
 import type { ModuleModel } from '@opentrons/shared-data'
 
 interface ModuleEmptSelectorButtonProps {

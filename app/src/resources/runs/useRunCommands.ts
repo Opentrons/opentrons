@@ -3,8 +3,8 @@ import { useNotifyAllCommandsQuery } from './useNotifyAllCommandsQuery'
 import type { UseQueryOptions } from 'react-query'
 import type {
   CommandsData,
-  RunCommandSummary,
   GetRunCommandsParams,
+  RunCommandSummary,
 } from '@opentrons/api-client'
 
 const REFETCH_INTERVAL = 3000

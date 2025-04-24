@@ -1,30 +1,30 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-
 import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
+// TODO: refactor this so helper code doesn't spawn UI
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
+import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
+import { getIsOnDevice } from '/app/redux/config'
+
 import {
   chainLiveCommandsRecursive,
   chainRunCommandsRecursive,
   setCommandIntent,
 } from './utils'
-import { getIsOnDevice } from '/app/redux/config'
-// TODO: refactor this so helper code doesn't spawn UI
-/* eslint-disable-next-line opentrons/no-imports-across-applications */
-import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 
-import type { CreateCommand } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
 import type {
   CreateMaintenanceRunType,
+  useCreateMaintenanceCommandMutation,
   UseCreateMaintenanceRunMutationOptions,
   UseCreateMaintenanceRunMutationResult,
-  useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 export type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation

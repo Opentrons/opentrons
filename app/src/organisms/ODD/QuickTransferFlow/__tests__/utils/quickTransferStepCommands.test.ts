@@ -1,18 +1,20 @@
-import { describe, it, expect } from 'vitest'
-import { quickTransferStepCommands } from '../../utils/pythonDef'
+import { describe, expect, it } from 'vitest'
 import {
   fixture96Plate,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
+
+import { quickTransferStepCommands } from '../../utils/pythonDef'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  InvariantContext,
-  TimelineFrame,
   ConsolidateArgs,
   DistributeArgs,
+  InvariantContext,
+  TimelineFrame,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockInvariantContext: InvariantContext = {
   moduleEntities: {},

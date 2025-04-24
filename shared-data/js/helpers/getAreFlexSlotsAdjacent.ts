@@ -1,4 +1,5 @@
 import { FLEX_GRID } from './getFlexSurroundingSlots'
+
 import type { DeckSlotId } from '../types'
 
 export const getAreFlexSlotsAdjacent = (

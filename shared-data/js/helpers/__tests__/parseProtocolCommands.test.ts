@@ -1,18 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import {
-  parsePipetteEntity,
-  parseInitialPipetteNamesByMount,
-  parseAllRequiredModuleModels,
-  parseRequiredModulesEntity,
-  parseInitialLoadedLabwareEntity,
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedModulesBySlot,
-  parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
-  parseInitialLoadedLabwareByAdapter,
-} from '../parseProtocolCommands'
+
 import { simpleAnalysisFileFixture } from '../__fixtures__'
+import {
+  parseAllRequiredModuleModels,
+  parseInitialLoadedLabwareByAdapter,
+  parseInitialLoadedLabwareByModuleId,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedLabwareEntity,
+  parseInitialLoadedModulesBySlot,
+  parseInitialPipetteNamesByMount,
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
+  parsePipetteEntity,
+  parseRequiredModulesEntity,
+} from '../parseProtocolCommands'
 
 import type { RunTimeCommand } from '../../../command/types'
 

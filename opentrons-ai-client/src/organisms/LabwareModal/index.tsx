@@ -1,4 +1,8 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { reduce } from 'lodash'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -12,21 +16,18 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { createPortal } from 'react-dom'
-import { reduce } from 'lodash'
+
 import { ListButtonCheckbox } from '../../atoms/ListButtonCheckbox/ListButtonCheckbox'
-import { LABWARES_FIELD_NAME } from '../LabwareLiquidsSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
+import { LABWARES_FIELD_NAME } from '../LabwareLiquidsSection'
 
 import type { ChangeEvent } from 'react'
-import type { DisplayLabware } from '../LabwareLiquidsSection'
 import type {
   LabwareDefByDefURI,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { DisplayLabware } from '../LabwareLiquidsSection'
 
 const ORDERED_CATEGORIES: string[] = [
   'tipRack',

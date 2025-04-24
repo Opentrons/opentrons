@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_COLUMN,

@@ -3,13 +3,15 @@ import {
   getPipetteSpecsV2,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+
 import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
 import { getDefaultPushOutVolume } from '../../utils'
-import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
+
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,

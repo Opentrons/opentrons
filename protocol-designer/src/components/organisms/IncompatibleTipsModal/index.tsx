@@ -1,5 +1,5 @@
-import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import {
   Flex,
   JUSTIFY_END,
@@ -9,6 +9,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { setFeatureFlags } from '../../../feature-flags/actions'
 import { HandleEnter } from '../../atoms'
 

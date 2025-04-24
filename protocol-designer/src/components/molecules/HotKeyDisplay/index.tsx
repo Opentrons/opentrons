@@ -6,6 +6,7 @@ import {
   SPACING,
   Tag,
 } from '@opentrons/components'
+
 import { getUserOS } from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
 
 interface HotKeyDisplayProps {

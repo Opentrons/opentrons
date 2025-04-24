@@ -1,5 +1,6 @@
 import isEqual from 'lodash/isEqual'
 
+import { FAILURE_STATUSES } from '../constants'
 import { connectionStore } from './store'
 
 import type {
@@ -9,7 +10,6 @@ import type {
   NotifyTopic,
   NotifyUnsubscribeData,
 } from '@opentrons/app/src/redux/shell/types'
-import { FAILURE_STATUSES } from '../constants'
 
 const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
   { refetch: true },

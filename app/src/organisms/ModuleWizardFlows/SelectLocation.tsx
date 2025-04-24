@@ -1,37 +1,39 @@
-import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import {
-  getModuleDisplayName,
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-  getCutoutFixturesForModuleModel,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_CENTER_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_CUTOUTS,
-  SINGLE_RIGHT_SLOT_FIXTURE,
-  getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
-  SINGLE_SLOT_FIXTURES,
-} from '@opentrons/shared-data'
 import {
   Banner,
   DeckConfigurator,
+  LegacyStyledText,
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  FLEX_ROBOT_TYPE,
+  getCutoutFixturesForModuleModel,
+  getDeckDefFromRobotType,
+  getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
+  getModuleDisplayName,
+  SINGLE_CENTER_CUTOUTS,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_CUTOUTS,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_SLOT_FIXTURES,
+} from '@opentrons/shared-data'
+
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import type { ModuleCalibrationWizardStepProps } from './types'
+
 import type {
   CutoutConfig,
-  DeckConfiguration,
   CutoutFixtureId,
   CutoutId,
+  DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { ModuleCalibrationWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};

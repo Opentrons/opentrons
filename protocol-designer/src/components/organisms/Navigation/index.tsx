@@ -1,8 +1,7 @@
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Btn,
@@ -13,9 +12,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { toggleNewProtocolModal } from '../../../navigation/actions'
+
 import { actions as loadFileActions } from '../../../load-file'
 import { getHasUnsavedChanges } from '../../../load-file/selectors'
+import { toggleNewProtocolModal } from '../../../navigation/actions'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { SettingsIcon } from '../SettingsIcon'
 

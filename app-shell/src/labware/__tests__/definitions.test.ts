@@ -1,15 +1,15 @@
 // tests for labware directory utilities
 
 import path from 'path'
+import Electron from 'electron'
 import fs from 'fs-extra'
 import tempy from 'tempy'
-import Electron from 'electron'
-import { describe, it, expect, afterAll, vi } from 'vitest'
+import { afterAll, describe, expect, it, vi } from 'vitest'
 
 import {
-  readLabwareDirectory,
-  parseLabwareFiles,
   addLabwareFile,
+  parseLabwareFiles,
+  readLabwareDirectory,
   removeLabwareFile,
 } from '../definitions'
 

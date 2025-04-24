@@ -1,13 +1,15 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { getAdditionalEquipmentEntities } from '../../../../../../step-forms/selectors'
 import {
   getRobotStateAtActiveItem,
   getUnoccupiedLabwareLocationOptions,
 } from '../../../../../../top-selectors/labware-locations'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { DropdownStepFormField } from '../../../../../../components/molecules'
+
 import type { FieldProps } from '../../types'
 
 interface LabwareLocationFieldProps extends FieldProps {

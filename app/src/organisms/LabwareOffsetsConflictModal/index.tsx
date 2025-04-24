@@ -2,30 +2,29 @@ import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
+  ModalHeader,
+  ModalShell,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
   StyledText,
-  ModalShell,
-  ModalHeader,
-  PrimaryButton,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_END,
-  SecondaryButton,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 import {
   selectConflictTimestampInfo,
   sourceOffsetsFromDatabase,
   sourceOffsetsFromRun,
 } from '/app/redux/protocol-runs'
-import { SmallButton } from '/app/atoms/buttons'
-import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
 import { formatTimestamp } from '/app/transformations/runs'
 
 import type { IconProps } from '@opentrons/components'

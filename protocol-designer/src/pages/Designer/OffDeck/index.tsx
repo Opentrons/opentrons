@@ -17,15 +17,17 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+
+import { LiquidButton } from '../../../components/molecules'
 import { getOnlyLatestDefs } from '../../../labware-defs'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupToolbox } from '../DeckSetup/DeckSetupToolbox'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
-import { LiquidButton } from '../../../components/molecules'
+
 import type { Dispatch, SetStateAction } from 'react'
 
 const STANDARD_X_WIDTH = 127.76

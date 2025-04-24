@@ -2,11 +2,12 @@ import { Fragment } from 'react'
 import { action } from '@storybook/addon-actions'
 import {
   COLORS,
+  LegacyStyledText,
   PrimaryBtn,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { Slideout as SlideoutComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'

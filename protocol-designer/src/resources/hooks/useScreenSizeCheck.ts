@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const BREAKPOINT_HEIGHT = 650
 const BREAKPOINT_WIDTH = 768

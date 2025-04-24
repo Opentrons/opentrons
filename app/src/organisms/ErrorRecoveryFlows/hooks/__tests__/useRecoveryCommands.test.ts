@@ -1,27 +1,27 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
-
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
-  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '@opentrons/react-api-client'
 
+import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
   useUpdateRecoveryPolicyWithStrategy,
 } from '/app/resources/runs'
+
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import {
-  useRecoveryCommands,
-  HOME_PIPETTE_Z_AXES,
-  RELEASE_GRIPPER_JAW,
-  buildPickUpTips,
   buildIgnorePolicyRules,
-  isAssumeFalsePositiveResumeKind,
+  buildPickUpTips,
   HOME_EXCEPT_PLUNGERS,
+  HOME_PIPETTE_Z_AXES,
+  isAssumeFalsePositiveResumeKind,
+  RELEASE_GRIPPER_JAW,
+  useRecoveryCommands,
 } from '../useRecoveryCommands'
-import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
-import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')

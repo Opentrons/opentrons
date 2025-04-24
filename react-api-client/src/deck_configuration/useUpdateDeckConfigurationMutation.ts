@@ -1,14 +1,13 @@
 import { useMutation, useQueryClient } from 'react-query'
-
 import { updateDeckConfiguration } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
-  UseMutationResult,
-  UseMutationOptions,
   UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
 } from 'react-query'
 import type { ErrorResponse, HostConfig } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'

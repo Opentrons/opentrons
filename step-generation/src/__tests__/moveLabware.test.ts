@@ -1,20 +1,21 @@
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { moveLabware } from '../commandCreators/atomic'
 import {
+  DEST_LABWARE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   getStateAndContextTempTCModules,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
   TIPRACK_1,
-  DEST_LABWARE,
 } from '../fixtures'
-import { moveLabware } from '../commandCreators/atomic'
 
 import type {
   LabwareDefinition2,

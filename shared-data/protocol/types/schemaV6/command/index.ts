@@ -1,12 +1,12 @@
-import type {
-  PipettingRunTimeCommand,
-  PipettingCreateCommand,
-} from './pipetting'
-import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
-import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
-import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
-import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
 import type { CommandIntent } from '../../../../command'
+import type { GantryCreateCommand, GantryRunTimeCommand } from './gantry'
+import type { ModuleCreateCommand, ModuleRunTimeCommand } from './module'
+import type {
+  PipettingCreateCommand,
+  PipettingRunTimeCommand,
+} from './pipetting'
+import type { SetupCreateCommand, SetupRunTimeCommand } from './setup'
+import type { TimingCreateCommand, TimingRunTimeCommand } from './timing'
 
 export * from './pipetting'
 export * from './gantry'

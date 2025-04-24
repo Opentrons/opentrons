@@ -5,9 +5,9 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  useTrackEvent,
-  ANALYTICS_MODULE_COMMAND_ERROR,
   ANALYTICS_MODULE_COMMAND_COMPLETED,
+  ANALYTICS_MODULE_COMMAND_ERROR,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
@@ -15,15 +15,15 @@ import {
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
 
+import type { CommandData } from '@opentrons/api-client'
 import type {
   CommandStatus,
+  CompletedProtocolAnalysis,
   ModuleOnlyParams,
   ModuleType,
-  TemperatureParams,
   RunTimeCommand,
-  CompletedProtocolAnalysis,
+  TemperatureParams,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',

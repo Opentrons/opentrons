@@ -1,22 +1,23 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-
-import {
-  getLoadedLabwareDefinitionsByUri,
-  getPositionFromSlotId,
-  fixture96Plate,
-  TEMPERATURE_MODULE_V2,
-  getModuleDef2,
-} from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getLabwareLocation } from '@opentrons/components'
-import { mockPickUpTipLabware } from '../../__fixtures__'
+import {
+  fixture96Plate,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleDef2,
+  getPositionFromSlotId,
+  TEMPERATURE_MODULE_V2,
+} from '@opentrons/shared-data'
+
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
+
+import { mockPickUpTipLabware } from '../../__fixtures__'
 import {
   getIsLabwareMatch,
-  getSlotNameAndLwLocFrom,
   getRunCurrentLabwareInfo,
-  getRunCurrentModulesInfo,
   getRunCurrentLabwareOnDeck,
+  getRunCurrentModulesInfo,
   getRunCurrentModulesOnDeck,
+  getSlotNameAndLwLocFrom,
   updateLabwareInModules,
 } from '../useDeckMapUtils'
 

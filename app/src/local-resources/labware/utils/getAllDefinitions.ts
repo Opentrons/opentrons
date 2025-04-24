@@ -1,5 +1,4 @@
 import groupBy from 'lodash/groupBy'
-
 import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
 
 import { getAllDefs } from './getAllDefs'

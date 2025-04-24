@@ -1,6 +1,5 @@
 import { css } from 'styled-components'
-
-import { Btn, Icon, COLORS, Flex } from '@opentrons/components'
+import { Btn, COLORS, Flex, Icon } from '@opentrons/components'
 
 import type { MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
