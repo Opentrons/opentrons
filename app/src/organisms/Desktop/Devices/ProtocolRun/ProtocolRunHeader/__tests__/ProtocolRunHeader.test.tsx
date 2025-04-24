@@ -13,6 +13,7 @@ import {
   useRunStatus,
   useProtocolDetailsForRun,
   useNotifyRunQuery,
+  useCloseCurrentRun,
 } from '/app/resources/runs'
 import { RunHeaderModalContainer } from '../RunHeaderModalContainer'
 import { RunHeaderBannerContainer } from '../RunHeaderBannerContainer'
@@ -68,6 +69,10 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
     } as any)
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      isClosingCurrentRun: false,
+      closeCurrentRun: vi.fn(),
+    })
     vi.mocked(useRunAnalytics).mockImplementation(() => {})
     vi.mocked(useRunErrors).mockReturnValue([] as any)
     vi.mocked(useRunHeaderRunControls).mockReturnValue({} as any)

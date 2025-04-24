@@ -156,7 +156,14 @@ Use the following API load names for the auto-sealing lid and deck riser:
   * - Opentrons Flex Deck Riser
     - ``opentrons_flex_deck_riser``
 
-Load the riser directly onto the deck with :py:meth:`.ProtocolContext.load_adapter`. Load the auto-sealing lid onto a compatible location (the deck, the riser, or another lid) with the appropriate ``load_labware()`` method. You can create a stack of up to five auto-sealing lids. If you try to stack more than five lids, the API will raise an error.
+Load the riser directly onto the deck with :py:meth:`.ProtocolContext.load_adapter`.
+
+You can load auto-sealing lids in a few ways:
+    - Load a single auto-sealing lid onto a compatible location (the deck, the riser, or another lid) with the appropriate ``load_labware()`` method.
+    - Use :py:meth:`.ProtocolContext.load_lid_stack` to create a stack of up to five auto-sealing lids directly on the deck.
+    - Use :py:meth:`.Labware.load_lid_stack` to create a stack of up to five auto-sealing lids on the riser.
+
+If you try to stack more than five lids, either by loading or moving them, the API will raise an error.
 
 Setting up the riser and preparing a lid to use on the Thermocycler generally consists of the following steps:
 
@@ -175,18 +182,21 @@ The following code sample shows how to perform these steps, using the riser and 
         load_name="opentrons_flex_deck_riser", location="A2"
     )
 
-    # load three lids
-    lid_1 = riser.load_labware("opentrons_tough_pcr_auto_sealing_lid")
-    lid_2 = lid_1.load_labware("opentrons_tough_pcr_auto_sealing_lid")
-    lid_3 = lid_2.load_labware("opentrons_tough_pcr_auto_sealing_lid")
-
-    # load plate on Thermocycler
-    plate = protocol.load_labware(
-        load_name="opentrons_96_wellplate_200ul_pcr_full_skirt", location=tc_mod
+    # load a stack of three lids
+    lid_stack = riser.load_lid_stack(
+        load_name="opentrons_tough_pcr_auto_sealing_lid",
+        quantity=3
     )
 
+    # load plate on Thermocycler
+    plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
+
     # move lid to PCR plate
-    protocol.move_labware(labware=lid_3, new_location=plate, use_gripper=True)
+    protocol.move_lid(
+        source_location=lid_stack,
+        new_location=plate,
+        use_gripper=True
+    )
 
     # close Thermocycler
     tc_mod.close_lid()
@@ -197,10 +207,16 @@ The following code sample shows how to perform these steps, using the riser and 
 When you're finished with a lid, use the gripper to dispose of it in either the waste chute or a trash bin::
 
     tc_mod.open_lid()
-    protocol.move_labware(labware=lid_3, new_location=trash, use_gripper=True)
+    protocol.move_lid(
+        source_location=plate,
+        new_location=trash, 
+        use_gripper=True)
 
 .. versionadded:: 2.16
     :py:class:`.TrashBin` and :py:class:`.WasteChute` objects can accept lids.
+
+.. versionadded:: 2.23
+    Use :py:meth:`.ProtocolContext.load_lid_stack` and :py:meth:`.ProtocolContext.move_lid` to stack and move auto-sealing lids in your protocol. 
 
 You can then move the PCR plate off of the Thermocycler. The Flex Gripper can't move a plate that has a lid on top of it. Always move the lid first, then the plate.
 

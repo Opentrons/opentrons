@@ -27,6 +27,7 @@ export function useRecoveryToasts({
   ...rest
 }: BuildToast): RecoveryToasts {
   const { currentStepNumber, hasRunDiverged } = stepCounts
+  const { i18n, t } = useTranslation('shared')
   const { makeToast } = useToaster()
   const displayType = isOnDevice ? 'odd' : 'desktop'
 
@@ -53,6 +54,10 @@ export function useRecoveryToasts({
   const makeSuccessToast = (): void => {
     if (selectedRecoveryOption !== RECOVERY_MAP.CANCEL_RUN.ROUTE) {
       makeToast(bodyText, 'success', {
+        buttonText:
+          displayType === 'odd'
+            ? i18n.format(t('shared:close'), 'capitalize')
+            : undefined,
         closeButton: true,
         disableTimeout: true,
         displayType,
@@ -159,11 +164,13 @@ function handleRecoveryOptionAction<T>(
   nextStepReturnVal: T
 ): T | null {
   switch (selectedRecoveryOption) {
-    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
     case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
       return nextStepReturnVal
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:

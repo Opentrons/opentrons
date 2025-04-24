@@ -161,6 +161,7 @@ const getHighestVersion = (
   path: string,
   pipetteModel: string,
   channels: Channels | null,
+  oemString: string,
   majorVersion: number,
   highestVersion: string
 ): string => {
@@ -174,10 +175,10 @@ const getHighestVersion = (
     //  and make sure the given model, channels, and major/minor versions
     //  are found in the path
     if (
-      minorPathVersion > minorHighestVersion &&
+      minorPathVersion >= minorHighestVersion &&
       path.includes(`${majorPathVersion}_${minorPathVersion}`) &&
       path.includes(pipetteModel) &&
-      path.includes(channels ?? '')
+      path.includes(channels != null ? `${channels}${oemString}` : '')
     ) {
       highestVersion = `${majorPathVersion}_${minorPathVersion}`
     }
@@ -239,6 +240,7 @@ export const getPipetteSpecsV2 = (
         path,
         pipetteModel,
         channels,
+        oemString,
         majorVersion,
         highestVersion
       )
@@ -285,4 +287,14 @@ export const getPipetteSpecsV2 = (
   }
 
   return pipetteV2Specs
+}
+
+const DEFAULT_LIQUID_TYPE = 'default'
+//  Flex pipette api names are different from pipetteName
+//  p1000_multi_flex -> flex_8channel_1000
+//  we do not need to worry about -_em pipette in PD
+export const getFlexNameConversion = (pipetteSpec: PipetteV2Specs): string => {
+  const channels = pipetteSpec.channels
+  const maxVolume = pipetteSpec.liquids[DEFAULT_LIQUID_TYPE].maxVolume
+  return `flex_${channels}channel_${maxVolume}`
 }

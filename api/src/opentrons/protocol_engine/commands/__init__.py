@@ -397,6 +397,36 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipParams,
+    SealPipetteToTipCreate,
+    SealPipetteToTipResult,
+    SealPipetteToTipCommandType,
+)
+from .unseal_pipette_from_tip import (
+    UnsealPipetteFromTip,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipCommandType,
+)
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseParams,
+    PressureDispenseCreate,
+    PressureDispenseResult,
+    PressureDispenseCommandType,
+)
+
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -514,6 +544,12 @@ __all__ = [
     "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
+    # identify module command models
+    "IdentifyModule",
+    "IdentifyModuleParams",
+    "IdentifyModuleCreate",
+    "IdentifyModuleResult",
+    "IdentifyModuleCommandType",
     # load pipette command models
     "LoadPipette",
     "LoadPipetteCreate",
@@ -700,4 +736,22 @@ __all__ = [
     "TryLiquidProbeCreate",
     "TryLiquidProbeResult",
     "TryLiquidProbeCommandType",
+    # seal command bundle
+    "SealPipetteToTip",
+    "SealPipetteToTipParams",
+    "SealPipetteToTipCreate",
+    "SealPipetteToTipResult",
+    "SealPipetteToTipCommandType",
+    # unseal command bundle
+    "UnsealPipetteFromTip",
+    "UnsealPipetteFromTipParams",
+    "UnsealPipetteFromTipCreate",
+    "UnsealPipetteFromTipResult",
+    "UnsealPipetteFromTipCommandType",
+    # pressure dispense command bundle
+    "PressureDispense",
+    "PressureDispenseParams",
+    "PressureDispenseCreate",
+    "PressureDispenseResult",
+    "PressureDispenseCommandType",
 ]

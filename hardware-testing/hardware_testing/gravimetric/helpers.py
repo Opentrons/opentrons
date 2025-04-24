@@ -18,6 +18,7 @@ from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
@@ -30,8 +31,15 @@ from opentrons_shared_data.labware.types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
-from .workarounds import get_sync_hw_api
-from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
+from opentrons.protocol_api.labware import SET_OFFSET_RESTORED_API_VERSION
+from .workarounds import (
+    get_sync_hw_api,
+    get_latest_offset_for_labware,
+)
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    clear_pipette_ul_per_mm,
+)
+from opentrons.protocol_engine.types import LabwareOffset
 
 import opentrons.protocol_engine.execution.pipetting as PE_pipetting
 from opentrons.protocol_engine.notes import CommandNoteAdder
@@ -358,19 +366,7 @@ def _drop_tip(
     if return_tip:
         pipette.return_tip(home_after=False)
     else:
-        if offset is not None:
-            # we don't actually need the offset, if this is an 8 channel we always center channel
-            # a1 over the back of the trash
-            trash_well = pipette.trash_container.well(0)  # type: ignore[union-attr]
-            trash_container = trash_well.center().move(
-                Point(0, trash_well.width / 2, 0)  # type: ignore[union-attr, operator]
-            )
-            pipette.drop_tip(
-                trash_container,
-                home_after=False,
-            )
-        else:
-            pipette.drop_tip(home_after=False)
+        pipette.drop_tip(home_after=False)
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
         if cur_location is not None:
@@ -432,7 +428,6 @@ def _load_pipette(
     if pipette_mount in loaded_pipettes.keys():
         return loaded_pipettes[pipette_mount]
 
-    trash = ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
     pipette = ctx.load_instrument(pip_name, pipette_mount)
     loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
@@ -455,7 +450,12 @@ def _load_pipette(
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement
         )
-    pipette.trash_container = trash
+    try:
+        trash = pipette.trash_container
+    except NoTrashDefinedError:
+        trash = ctx.load_trash_bin("A3")
+        pipette.trash_container = trash
+        pass
     return pipette
 
 
@@ -471,6 +471,12 @@ def _get_tag_from_pipette(
     else:
         pipette_tag += "-qc"
     return pipette_tag
+
+
+def _get_offsets_from_ctx(ctx: ProtocolContext) -> List[LabwareOffset]:
+    state = ctx._core._engine_client._transport._engine.state_view  # type: ignore[attr-defined]
+    ctx_offsets = state._labware_store._state.labware_offsets_by_id
+    return [_o for _o in ctx_offsets.values()]
 
 
 def _load_tipracks(
@@ -525,6 +531,11 @@ def _load_tipracks(
             )
         else:
             tipracks.append(ctx.load_labware(ls[1], location=ls[0], adapter=adapter))
+
+    if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        for tiprack in tipracks:
+            offset = get_latest_offset_for_labware(_get_offsets_from_ctx(ctx), tiprack)
+            tiprack.set_offset(offset.x, offset.y, offset.z)
     return tipracks
 
 

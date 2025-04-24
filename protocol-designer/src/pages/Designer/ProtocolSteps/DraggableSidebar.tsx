@@ -11,7 +11,7 @@ import {
 import { TimelineToolbox } from './Timeline/TimelineToolbox'
 
 const INITIAL_SIDEBAR_WIDTH = 235
-const MIN_SIDEBAR_WIDTH = 80
+const MIN_SIDEBAR_WIDTH = 170
 const MAX_SIDEBAR_WIDTH = 350
 
 interface DraggableSidebarProps {

@@ -89,6 +89,30 @@ export function quickTransferWizardReducer(
         volume: action.volume,
       }
     }
+    case 'SET_PIPETTE_PATH': {
+      return {
+        ...state,
+        path: action.path,
+      }
+    }
+    case 'SET_CHANGE_TIP': {
+      return {
+        ...state,
+        changeTip: action.changeTip,
+      }
+    }
+    case 'SET_DROP_TIP_LOCATION': {
+      return {
+        ...state,
+        dropTipLocation: action.location,
+      }
+    }
+    case 'SET_LIQUID_CLASS': {
+      return {
+        ...state,
+        liquidClass: action.liquidClass,
+      }
+    }
   }
 }
 

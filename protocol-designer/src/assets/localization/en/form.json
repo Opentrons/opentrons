@@ -2,6 +2,39 @@
   "batch_edit_form": {
     "settings_for": "settings for {{prefix}}"
   },
+  "field_update_confirmation_modal": {
+    "fields": {
+      "path": "pipette path",
+      "pipette": "pipette",
+      "tipRack": "tips",
+      "volume": "volume"
+    },
+    "footer": {
+      "update_settings": "Update settings",
+      "use_current_settings": "Use current settings"
+    },
+    "liquid_class": {
+      "title": "Apply {{liquidClass}} liquid class settings",
+      "body": "Continuing will update this {{stepType}} step’s pipetting settings to the values of the {{liquidClass}} liquid class."
+    },
+    "no_liquid_class": {
+      "title": "Don’t use liquid class settings",
+      "body": "Continuing will undo any changes and clear all pipetting settings associated with the previously selected liquid class."
+    },
+    "other_fields": {
+      "title": "Update {{liquidClass}} liquid class settings?",
+      "body": "We noticed you changed the {{fieldNames}} in this {{stepType}} step. Do you want to use the current pipetting settings or update to the values of the {{liquidClass}} liquid class?"
+    },
+    "steps": {
+      "mix": "mix",
+      "moveLiquid": "transfer"
+    },
+    "string_helpers": {
+      "and_comma_spaces": ", and ",
+      "and_spaces": " and ",
+      "comma_space": ", "
+    }
+  },
   "generic": {
     "default_protocol_name": "Untitled",
     "error": {
@@ -128,6 +161,13 @@
       "comment": {
         "label": "comment"
       },
+      "conditioning": {
+        "conditioning_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Conditioning volume"
+        },
+        "title": "Condition"
+      },
       "delay": {
         "label": "delay"
       },
@@ -198,7 +238,7 @@
           "COLUMN": "Column"
         },
         "option_tooltip": {
-          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
+          "partial": "To use partial tip pickup, a tiprack without an adapter must be placed on the deck."
         }
       },
       "path": {
@@ -234,6 +274,13 @@
       },
       "preWetTip": {
         "label": "pre-wet tip"
+      },
+      "pushOut": {
+        "pushOut_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Push out volume"
+        },
+        "title": "Push out"
       },
       "setTemperature": {
         "options": {
@@ -314,6 +361,13 @@
       },
       "touchTip": {
         "label": "touch tip"
+      },
+      "touchTip_speed": {
+        "label": "Touch tip speed"
+      },
+      "touchTip_mmFromEdge": {
+        "caption": "Valid range between {{min}} - {{max}}mm",
+        "label": "Distance from edge"
       },
       "useGripper": {
         "label": "use gripper",

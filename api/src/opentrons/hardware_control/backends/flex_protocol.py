@@ -36,6 +36,8 @@ from opentrons.hardware_control.types import (
     HepaFanState,
     HepaUVState,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     PipetteSensorResponseQueue,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -424,6 +426,11 @@ class FlexBackend(Protocol):
     def get_status_bar_state(self) -> StatusBarState:
         ...
 
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        ...
+
     @property
     def estop_status(self) -> EstopOverallStatus:
         ...
@@ -461,4 +468,8 @@ class FlexBackend(Protocol):
         ...
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        ...
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
         ...

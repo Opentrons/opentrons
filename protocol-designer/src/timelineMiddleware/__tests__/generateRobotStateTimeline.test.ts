@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+  POSITION_REFERENCE_BOTTOM,
+} from '@opentrons/shared-data'
+import {
   getInitialRobotStateStandard,
   makeContext,
   DEFAULT_PIPETTE,
@@ -8,7 +13,6 @@ import {
   DEST_LABWARE,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StepArgsAndErrorsById } from '../../steplist'
@@ -40,9 +44,11 @@ describe('generateRobotStateTimeline', () => {
           dispenseAirGapVolume: null,
           mixInDestination: null,
           touchTipAfterAspirate: false,
-          touchTipAfterAspirateOffsetMmFromBottom: 13.81,
+          touchTipAfterAspirateOffsetMmFromTop: -13.81,
+          touchTipAfterAspirateSpeed: null,
           touchTipAfterDispense: false,
-          touchTipAfterDispenseOffsetMmFromBottom: 13.81,
+          touchTipAfterDispenseOffsetMmFromTop: -13.81,
+          touchTipAfterDispenseSpeed: null,
           name: 'transfer',
           commandCreatorFnName: 'transfer',
           blowoutLocation: null,
@@ -56,6 +62,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
         },
       },
       b: {
@@ -80,9 +87,11 @@ describe('generateRobotStateTimeline', () => {
           dispenseAirGapVolume: null,
           mixInDestination: null,
           touchTipAfterAspirate: false,
-          touchTipAfterAspirateOffsetMmFromBottom: 13.81,
+          touchTipAfterAspirateOffsetMmFromTop: -13.81,
+          touchTipAfterAspirateSpeed: null,
           touchTipAfterDispense: false,
-          touchTipAfterDispenseOffsetMmFromBottom: 13.81,
+          touchTipAfterDispenseOffsetMmFromTop: -13.81,
+          touchTipAfterDispenseSpeed: null,
           name: 'transfer',
           commandCreatorFnName: 'transfer',
           blowoutLocation: null,
@@ -96,6 +105,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateYOffset: 0,
           dispenseXOffset: 0,
           dispenseYOffset: 0,
+          pushOut: null,
         },
       },
       c: {
@@ -110,7 +120,7 @@ describe('generateRobotStateTimeline', () => {
           volume: 5,
           times: 2,
           touchTip: false,
-          touchTipMmFromBottom: 13.81,
+          touchTipMmFromTop: -13.81,
           changeTip: 'always',
           blowoutLocation: null,
           pipette: DEFAULT_PIPETTE,
@@ -125,6 +135,9 @@ describe('generateRobotStateTimeline', () => {
           tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           xOffset: 0,
           yOffset: 0,
+          finalPushOut: 0,
+          zOffset: 0,
+          positionReference: POSITION_REFERENCE_BOTTOM,
         },
       },
     }
@@ -179,5 +192,43 @@ describe('generateRobotStateTimeline', () => {
         ],
       ]
     `)
+
+    // The regex elides all the indented arguments in the Python code
+    const pythonCommandsOverview = result.timeline.map(frame =>
+      frame.python?.replaceAll(/(\n\s+.*)+\n/g, '...')
+    )
+    expect(pythonCommandsOverview).toEqual([
+      // Step a:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+      // Step b:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+      // Step c:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+    ])
   })
 })

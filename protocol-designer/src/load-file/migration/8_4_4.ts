@@ -1,4 +1,4 @@
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import type { ProtocolFile } from '@opentrons/shared-data'

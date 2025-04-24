@@ -17,6 +17,10 @@ from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 if TYPE_CHECKING:
     from _pytest.mark import ParameterSet
 
+
+pytestmark = pytest.mark.slow
+
+
 # Allow plenty of time for database migrations, which can take a while in our CI runners.
 _STARTUP_TIMEOUT = 60
 
@@ -240,6 +244,13 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
                     assert run["data"].get("dataError") is None
                 else:
                     assert run["data"].get("dataError") is not None
+
+                # This .location field migrated to .locationSequence.
+                # The new field should always exist and always be non-empty.
+                for labware_offset in run["data"]["labwareOffsets"]:
+                    location_sequence = labware_offset.get("locationSequence", None)
+                    assert isinstance(location_sequence, list)
+                    assert len(location_sequence) > 0
 
                 all_command_summaries = (
                     await robot_client.get_run_commands(

@@ -96,4 +96,22 @@ describe('RadioButton', () => {
     )
     expect(buttonLabelIdRadioButton).not.toBeInTheDocument()
   })
+
+  it('renders subtext if supplied', () => {
+    props = { ...props, buttonSubLabel: { label: 'test label' } }
+
+    render(props)
+  })
+
+  it('onClick is called when ariaDisabled is true', () => {
+    props = {
+      ...props,
+      ariaDisabled: true,
+      onClick: vi.fn(),
+    }
+    render(props)
+    const label = screen.getByRole('label')
+    label.click()
+    expect(props.onClick).toHaveBeenCalled()
+  })
 })

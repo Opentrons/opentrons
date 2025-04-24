@@ -5,6 +5,7 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import {
+  getAllDefinitions,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -12,8 +13,9 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
-import { GRIPPER_LOCATION, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
@@ -22,7 +24,11 @@ import {
 import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { getLabwareOnModule } from '../../ui/modules/utils'
-import { getLabwarePythonName, getModulePythonName } from '../../utils'
+import {
+  getAdditionalEquipmentPythonName,
+  getLabwarePythonName,
+  getModulePythonName,
+} from '../../utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import {
   _getPipetteEntitiesRootState,
@@ -57,7 +63,6 @@ import type {
   CreatePipettesAction,
   DeleteModuleAction,
   DeletePipettesAction,
-  EditModuleAction,
   SubstituteStepFormPipettesAction,
   ChangeBatchEditFieldAction,
   ResetBatchEditFieldChangesAction,
@@ -119,7 +124,6 @@ export type UnsavedFormActions =
   | CreateModuleAction
   | DeleteModuleAction
   | SelectTerminalItemAction
-  | EditModuleAction
   | SubstituteStepFormPipettesAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
@@ -185,7 +189,6 @@ export const unsavedForm = (
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
-    case 'EDIT_MODULE':
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
@@ -260,7 +263,6 @@ export type SavedStepFormsActions =
   | DuplicateLabwareAction
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
-  | EditModuleAction
   | ToggleIsGripperRequiredAction
   | CreateDeckFixtureAction
   | DeleteDeckFixtureAction
@@ -516,19 +518,6 @@ export const savedStepForms = (
 
         return savedForm
       })
-    }
-
-    case 'EDIT_MODULE': {
-      const moduleId = action.payload.id
-      return mapValues(savedStepForms, (savedForm: FormData, formId) =>
-        _editModuleFormUpdate({
-          moduleId,
-          savedForm,
-          formId,
-          rootState,
-          nextModuleModel: action.payload.model,
-        })
-      )
     }
 
     case 'MOVE_DECK_ITEM': {
@@ -1011,35 +1000,45 @@ export const labwareInvariantProperties: Reducer<
     ): NormalizedLabwareById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const labwareDefinitions = file.labwareDefinitions
+      const labwareDefinitionsFromFile = file.labwareDefinitions
+      const allLabware = getAllDefinitions()
+      let labware: NormalizedLabwareById = {}
 
-      const labware: NormalizedLabwareById = Object.entries(
-        metadata.labware
-      ).reduce((acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
-        if (labwareDefinitions[labwareLoadInfo.labwareDefURI] == null) {
-          console.error(
-            `expected to find matching labware definiton with labwareDefURI ${labwareLoadInfo.labwareDefURI} but could not`
-          )
-        }
-        const displayCategory =
-          labwareDefinitions[labwareLoadInfo.labwareDefURI]?.metadata
-            .displayCategory ?? 'otherLabware'
+      labware = Object.entries(metadata.labware).reduce(
+        (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
+          const labwareDefURI = labwareLoadInfo.labwareDefURI
+          const definition =
+            //  labwareDefinitionsFromFile from file are either customLabware for py
+            //  or all labwareDefs for JSON
+            labwareDefinitionsFromFile?.[labwareDefURI] ??
+            allLabware[labwareDefURI]
 
-        const displayCategoryCount = Object.values(acc).filter(
-          lw => lw.displayCategory === displayCategory
-        ).length
+          if (definition == null) {
+            console.error(
+              `Expected to find matching labware definition in the JSON file or Opentrons labware library but could not with labwareDefUri ${labwareDefURI}`
+            )
+          }
 
-        acc[id] = {
-          labwareDefURI: labwareLoadInfo.labwareDefURI,
-          pythonName: getLabwarePythonName(
+          const displayCategory =
+            definition?.metadata.displayCategory ?? 'otherLabware'
+
+          const displayCategoryCount = Object.values(acc).filter(
+            lw => lw.displayCategory === displayCategory
+          ).length
+
+          acc[id] = {
+            labwareDefURI,
+            pythonName: getLabwarePythonName(
+              displayCategory,
+              displayCategoryCount + 1
+            ),
             displayCategory,
-            displayCategoryCount + 1
-          ),
-          displayCategory,
-        }
+          }
 
-        return acc
-      }, {})
+          return acc
+        },
+        {}
+      )
 
       return { ...labware, ...state }
     },
@@ -1109,17 +1108,6 @@ export const moduleInvariantProperties: Reducer<
         },
       }
     },
-
-    EDIT_MODULE: (
-      state: ModuleEntities,
-      action: EditModuleAction
-    ): ModuleEntities => ({
-      ...state,
-      [action.payload.id]: {
-        ...state[action.payload.id],
-        model: action.payload.model,
-      },
-    }),
     DELETE_MODULE: (
       state: ModuleEntities,
       action: DeleteModuleAction
@@ -1246,14 +1234,22 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       }
       let trashBin
       if (Object.keys(trashBinLocationUpdate).length > 0) {
-        const id = Object.keys(trashBinLocationUpdate)[0]
-        trashBin = {
-          [id]: {
-            name: 'trashBin' as const,
-            id,
-            location: Object.values(trashBinLocationUpdate)[0],
-          },
-        }
+        trashBin = Object.entries(trashBinLocationUpdate).reduce(
+          (acc, [id, location], index) => ({
+            ...acc,
+            [id]: {
+              name: 'trashBin' as const,
+              id,
+              location,
+              pythonName: getAdditionalEquipmentPythonName(
+                'trashBin',
+                index + 1,
+                location
+              ),
+            },
+          }),
+          {}
+        )
       }
       let wasteChute
       if (Object.keys(wasteChuteLocationUpdate).length > 0) {
@@ -1263,6 +1259,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
             name: 'wasteChute' as const,
             id,
             location: Object.values(wasteChuteLocationUpdate)[0],
+            pythonName: getAdditionalEquipmentPythonName('wasteChute', 1),
           },
         }
       }
@@ -1308,6 +1305,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           [id]: {
             name: 'gripper' as const,
             id,
+            location: GRIPPER_LOCATION,
           },
         }
       }
@@ -1319,12 +1317,19 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       action: CreateDeckFixtureAction
     ): NormalizedAdditionalEquipmentById => {
       const { location, id, name } = action.payload
+      const typeCount = Object.values(state).filter(aE => aE.name === name)
+        .length
+
       return {
         ...state,
         [id]: {
           name,
           id,
           location,
+          pythonName:
+            name === 'stagingArea'
+              ? undefined
+              : getAdditionalEquipmentPythonName(name, typeCount + 1, location),
         },
       }
     },

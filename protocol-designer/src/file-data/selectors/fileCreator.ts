@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect'
 import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
-import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import {
   FLEX_ROBOT_TYPE,
@@ -10,12 +10,19 @@ import {
   OT2_STANDARD_MODEL,
   FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
-
+import {
+  pythonCustomLabwareDict,
+  pythonDefRun,
+  pythonImports,
+  pythonMetadata,
+  pythonRequirements,
+} from '@opentrons/step-generation'
 import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getStepGroups } from '../../step-forms/selectors'
 import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -46,8 +53,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
-import type { PDMetadata } from '../../file-types'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import type {
+  PDMetadata,
+  PDPythonFile,
+  PythonDesignerApplication,
+} from '../../file-types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -93,34 +103,34 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   getRobotStateTimeline,
   getRobotType,
   dismissSelectors.getAllDismissedWarnings,
-  stepFormSelectors.getLiquidEntities,
   ingredSelectors.getLiquidsByLabwareId,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getOrderedStepIds,
-  stepFormSelectors.getLabwareEntities,
-  stepFormSelectors.getModuleEntities,
-  stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
   getStepGroups,
+  stepFormSelectors.getInvariantContext,
   (
     fileMetadata,
     initialRobotState,
     robotStateTimeline,
     robotType,
     dismissedWarnings,
-    liquidEntities,
     ingredLocations,
     savedStepForms,
     orderedStepIds,
-    labwareEntities,
-    moduleEntities,
-    pipetteEntities,
     labwareNicknamesById,
     labwareDefsByURI,
-    stepGroups
+    stepGroups,
+    invariantContext
   ) => {
-    const { author, description, created } = fileMetadata
+    const { author, description, created, source } = fileMetadata
+    const {
+      pipetteEntities,
+      labwareEntities,
+      liquidEntities,
+      moduleEntities,
+    } = invariantContext
 
     const loadCommands = getLoadCommands(
       initialRobotState,
@@ -183,11 +193,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labware: getLabwareLoadInfo(labwareEntities, labwareNicknamesById),
       },
     }
-    const labwareDefinitions = getLabwareDefinitionsInUse(
-      labwareEntities,
-      pipetteEntities,
-      labwareDefsByURI
-    )
 
     const liquids: ProtocolFile['liquids'] = reduce(
       liquidEntities,
@@ -202,6 +207,12 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         }
       },
       {}
+    )
+
+    const labwareDefinitions = getLabwareDefinitionsInUse(
+      labwareEntities,
+      pipetteEntities,
+      labwareDefsByURI
     )
 
     const nonLoadCommands: CreateCommand[] = flatMap(
@@ -279,6 +290,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         description,
         created,
         lastModified,
+        source,
         // TODO LATER
         category: null,
         subcategory: null,
@@ -295,5 +307,97 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...commandv10Mixin,
       ...commandAnnotionaV1Mixin,
     }
+  }
+)
+
+export const createPythonFile: Selector<PDPythonFile> = createSelector(
+  getFileMetadata,
+  getInitialRobotState,
+  getRobotStateTimeline,
+  getRobotType,
+  dismissSelectors.getAllDismissedWarnings,
+  ingredSelectors.getLiquidsByLabwareId,
+  stepFormSelectors.getSavedStepForms,
+  stepFormSelectors.getOrderedStepIds,
+  uiLabwareSelectors.getLabwareNicknamesById,
+  stepFormSelectors.getInvariantContext,
+  (
+    fileMetadata,
+    robotState,
+    robotStateTimeline,
+    robotType,
+    dismissedWarnings,
+    ingredLocations,
+    savedStepForms,
+    orderedStepIds,
+    labwareNicknamesById,
+    invariantContext
+  ) => {
+    const {
+      pipetteEntities,
+      moduleEntities,
+      labwareEntities,
+      liquidEntities,
+    } = invariantContext
+
+    const savedOrderedStepIds = orderedStepIds.filter(
+      stepId => savedStepForms[stepId]
+    )
+
+    const ingredients: Ingredients = Object.fromEntries(
+      Object.entries(
+        liquidEntities
+      ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
+    )
+
+    const designerApplication: PythonDesignerApplication = {
+      robot: {
+        model: robotType,
+      },
+      designerApplication: {
+        name: 'opentrons/protocol-designer',
+        //  hardcoding this version in to avoid unnecessary migrating
+        //  TODO: remember to update to the applicationVersion const
+        version: '8.5.0',
+        data: {
+          pipetteTiprackAssignments: mapValues(
+            pipetteEntities,
+            (
+              p: typeof pipetteEntities[keyof typeof pipetteEntities]
+            ): string[] => p.tiprackDefURI
+          ),
+          dismissedWarnings,
+          ingredients,
+          ingredLocations,
+          savedStepForms,
+          orderedStepIds: savedOrderedStepIds,
+          pipettes: getPipettesLoadInfo(pipetteEntities),
+          modules: getModulesLoadInfo(moduleEntities),
+          labware: getLabwareLoadInfo(labwareEntities, labwareNicknamesById),
+        },
+      },
+      metadata: fileMetadata,
+    }
+
+    const pythonProtocol =
+      [
+        // Here are the sections of the Python file:
+        pythonImports(),
+        pythonMetadata(fileMetadata),
+        pythonRequirements(robotType),
+        pythonDefRun(
+          invariantContext,
+          robotState,
+          robotStateTimeline,
+          ingredLocations,
+          labwareNicknamesById,
+          robotType
+        ),
+        pythonCustomLabwareDict(invariantContext.labwareEntities),
+      ]
+        .filter(section => section) // skip any blank sections
+        .join('\n\n') + '\n'
+
+    return { pythonProtocol, designerApplication }
   }
 )

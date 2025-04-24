@@ -5,7 +5,7 @@ const { unsavedChanges } = _allReducers
 describe('unsavedChanges', () => {
   it('should return true when an action changes the protocol', () => {
     const actionTypes = [
-      'CREATE_NEW_PROTOCOL',
+      'TOGGLE_NEW_PROTOCOL_MODAL',
       'DISMISS_FORM_WARNING',
       'DISMISS_TIMELINE_WARNING',
       'CREATE_CONTAINER',
@@ -26,7 +26,6 @@ describe('unsavedChanges', () => {
       'REPLACE_CUSTOM_LABWARE_DEF',
       'CREATE_MODULE',
       'DELETE_MODULE',
-      'EDIT_MODULE',
     ]
     expect.assertions(actionTypes.length)
     actionTypes.forEach(actionType => {

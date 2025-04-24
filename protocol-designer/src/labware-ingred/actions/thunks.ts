@@ -77,7 +77,7 @@ export const createContainer: (
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]
-  const displayCategory = labwareDef.metadata.displayCategory
+  const labwareDisplayCategory = labwareDef.metadata.displayCategory
   const slot =
     args.slot ||
     getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
@@ -90,6 +90,9 @@ export const createContainer: (
         : null
 
     if (adapterId != null && args.adapterUnderLabwareDefURI != null) {
+      const adapterDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+        args.adapterUnderLabwareDefURI
+      ]
       dispatch({
         type: 'CREATE_CONTAINER',
         payload: {
@@ -97,7 +100,7 @@ export const createContainer: (
           labwareDefURI: args.adapterUnderLabwareDefURI,
           id: adapterId,
           slot,
-          displayCategory,
+          displayCategory: adapterDef.metadata.displayCategory,
         },
       })
       dispatch({
@@ -106,13 +109,13 @@ export const createContainer: (
           ...args,
           id,
           slot: adapterId,
-          displayCategory,
+          displayCategory: labwareDisplayCategory,
         },
       })
     } else {
       dispatch({
         type: 'CREATE_CONTAINER',
-        payload: { ...args, id, slot, displayCategory },
+        payload: { ...args, id, slot, displayCategory: labwareDisplayCategory },
       })
     }
     if (isTiprack) {
@@ -195,9 +198,9 @@ export const duplicateLabware: (
 }
 
 interface EditSlotInfo {
-  createdModuleForSlot?: ModuleOnDeck | null
   createdLabwareForSlot?: LabwareOnDeck | null
   createdNestedLabwareForSlot?: LabwareOnDeck | null
+  createdModuleForSlot?: ModuleOnDeck | null
   preSelectedFixture?: Fixture | null
 }
 

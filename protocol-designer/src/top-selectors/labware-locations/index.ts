@@ -15,14 +15,15 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS, getHasWasteChute } from '@opentrons/step-generation'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
+  HARDWARE_ID,
 } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { getActiveItem } from '../../ui/steps'
+import { getActiveItem, getSelectedStepId } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
@@ -32,6 +33,7 @@ import {
   getPipetteEntities,
   getAdditionalEquipmentEntities,
 } from '../../step-forms/selectors'
+import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
 import { getIsAdapter } from '../../utils'
 import type { CutoutId, AddressableAreaName } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
@@ -49,17 +51,24 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
   getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.lastValidRobotState,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
   (
     orderedStepIds,
     robotStateTimeline,
     activeItem,
     initialRobotState,
-    lastValidRobotState
+    lastValidRobotState,
+    selectedStepId,
+    selectedTerminalItemId
   ) => {
     let robotState = null
     if (activeItem == null) return null
 
-    if (activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE) {
+    if (
+      activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE &&
+      activeItem.id !== HARDWARE_ID
+    ) {
       const terminalId = activeItem.id
 
       if (terminalId === START_TERMINAL_ITEM_ID) {
@@ -74,15 +83,31 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
           `Invalid terminalId ${terminalId}, could not robotState of active item`
         )
       }
+    } else if (
+      activeItem.id === HARDWARE_ID &&
+      selectedTerminalItemId === START_TERMINAL_ITEM_ID
+    ) {
+      robotState = initialRobotState
+    } else if (
+      activeItem.id === HARDWARE_ID &&
+      (selectedTerminalItemId === END_TERMINAL_ITEM_ID ||
+        selectedTerminalItemId === PRESAVED_STEP_ID)
+    ) {
+      robotState = lastValidRobotState
     } else {
-      const stepId = activeItem.id
+      const stepId =
+        activeItem.id === HARDWARE_ID && selectedStepId != null
+          ? selectedStepId
+          : activeItem.id
       const timeline = robotStateTimeline.timeline
       const timelineIdx = orderedStepIds.includes(stepId)
         ? orderedStepIds.findIndex(id => id === stepId)
         : null
 
-      if (timelineIdx == null) {
-        console.error(`Expected non-null timelineIdx for step ${stepId}`)
+      if (timelineIdx == null || stepId === HARDWARE_ID) {
+        if (stepId !== HARDWARE_ID) {
+          console.error(`Expected non-null timelineIdx for step ${stepId}`)
+        }
         return null
       }
       if (timelineIdx === 0) {
@@ -115,7 +140,10 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const hasWasteChute =
+      Object.values(additionalEquipmentEntities).find(
+        ae => ae.name === 'wasteChute'
+      ) != null
     const allSlotIds = deckDef.locations.addressableAreas.reduce<
       AddressableAreaName[]
     >((acc, slot) => {

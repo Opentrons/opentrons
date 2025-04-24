@@ -32,7 +32,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { LINK_BUTTON_STYLE } from '../../../atoms'
+import { LINK_BUTTON_STYLE } from '../../../components/atoms'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
@@ -45,6 +45,7 @@ import { getRobotType } from '../../../file-data/selectors'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getEnableStacking } from '../../../feature-flags/selectors'
 import {
   selectLabware,
   selectNestedLabware,
@@ -64,7 +65,7 @@ import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { CategoryExpand } from './DeckSetupTools'
+import type { CategoryExpand } from './DeckSetupToolbox'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
@@ -103,6 +104,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
+  const enableStacking = useSelector(getEnableStacking)
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -381,8 +383,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                             />
 
                             {uri === selectedLabwareDefUri &&
-                              getLabwareCompatibleWithAdapter(defs, loadName)
-                                ?.length > 0 && (
+                              getLabwareCompatibleWithAdapter(
+                                defs,
+                                enableStacking,
+                                loadName
+                              )?.length > 0 && (
                                 <ListButtonAccordionContainer
                                   id={`nestedAccordionContainer_${loadName}`}
                                 >
@@ -433,6 +438,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                         )
                                       : getLabwareCompatibleWithAdapter(
                                           { ...defs, ...customLabwareDefs },
+                                          enableStacking,
                                           loadName
                                         ).map(nestedDefUri => {
                                           const nestedDef =

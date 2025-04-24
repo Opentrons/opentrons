@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import {
   useConfirmCancelModal,
@@ -12,7 +13,7 @@ import {
   useRunHeaderDropTip,
 } from './hooks'
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
-import { useProtocolDetailsForRun } from '/app/resources/runs'
+import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -24,6 +25,7 @@ import {
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import { OFFSETS_CONFLICT, selectOffsetSource } from '/app/redux/protocol-runs'
 
 import type { AttachedModule, RunStatus, Run } from '@opentrons/api-client'
 import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
@@ -42,12 +44,17 @@ import type { ProtocolRunHeaderProps } from '..'
 import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { UseRunErrorsResult } from '../hooks'
 
+interface OffsetCOnflictModalUtils {
+  showModal: boolean
+}
+
 interface UseRunHeaderModalContainerProps extends ProtocolRunHeaderProps {
   attachedModules: AttachedModule[]
   protocolRunControls: RunControls
   runStatus: RunStatus | null
   runRecord: Run | null
   runErrors: UseRunErrorsResult
+  closeCurrentRun: () => void
 }
 
 export interface UseRunHeaderModalContainerResult {
@@ -59,6 +66,7 @@ export interface UseRunHeaderModalContainerResult {
   missingStepsModalUtils: UseMissingStepsModalResult
   dropTipUtils: UseRunHeaderDropTipResult
   recoveryModalUtils: UseErrorRecoveryResult
+  offsetConflictModalUtils: OffsetCOnflictModalUtils
 }
 
 // Provides all the utilities used by the various modals that render in ProtocolRunHeader.
@@ -70,6 +78,7 @@ export function useRunHeaderModalContainer({
   attachedModules,
   protocolRunControls,
   runErrors,
+  closeCurrentRun,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
   const navigate = useNavigate()
 
@@ -80,6 +89,9 @@ export function useRunHeaderModalContainer({
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
+  const isLabwareOffsetConflict =
+    useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
+  const isThisRunCurrent = runId === useCurrentRunId()
 
   function handleProceedToRunClick(): void {
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
@@ -122,6 +134,7 @@ export function useRunHeaderModalContainer({
     runStatus,
     runRecord,
     robotType,
+    closeCurrentRun,
   })
 
   const recoveryModalUtils = useErrorRecoveryFlows(runId, runStatus)
@@ -135,5 +148,8 @@ export function useRunHeaderModalContainer({
     recoveryModalUtils,
     missingStepsModalUtils,
     dropTipUtils,
+    offsetConflictModalUtils: {
+      showModal: isLabwareOffsetConflict && isThisRunCurrent,
+    },
   }
 }

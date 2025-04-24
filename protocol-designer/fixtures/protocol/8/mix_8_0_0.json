@@ -6,16 +6,17 @@
     "author": "",
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
-    "lastModified": 1745429034595,
+    "lastModified": 1714570500165,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.4.4",
+    "version": "8.5.0",
     "data": {
-      "_internalAppBuildDate": "Wed, 23 Apr 2025 17:19:38 GMT",
+      "_internalAppBuildDate": "Wed, 01 May 2024 13:32:34 GMT",
       "pipetteTiprackAssignments": {
         "pipetteId": ["opentrons/opentrons_96_tiprack_10ul/1"]
       },
@@ -32,12 +33,6 @@
             "fe572c50-fc3a-11ea-8809-e959e7d61d96:opentrons/biorad_96_wellplate_200ul_pcr/1": "7"
           },
           "moduleLocationUpdate": {},
-          "pipetteLocationUpdate": {
-            "pipetteId": "left"
-          },
-          "trashBinLocationUpdate": {
-            "5d7e3a0c-0191-46ce-92be-80bfbfa0325a:trashBin": "cutout12"
-          },
           "wasteChuteLocationUpdate": {},
           "stagingAreaLocationUpdate": {},
           "gripperLocationUpdate": {},

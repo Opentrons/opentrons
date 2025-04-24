@@ -34,10 +34,13 @@ const customDefs: Reducer<LabwareDefByDefURI, Action> = handleActions(
       [getLabwareDefURI(action.payload.newDef)]: action.payload.newDef,
     }),
     LOAD_FILE: (state: LabwareDefByDefURI, action: LoadFileAction) => {
-      const customDefsFromFile = pickBy(
-        action.payload.file.labwareDefinitions,
-        def => !getLabwareDefIsStandard(def) // assume if it's not standard, it's custom
-      )
+      const customDefsFromFile =
+        action.payload.file?.labwareDefinitions != null
+          ? pickBy(
+              action.payload.file.labwareDefinitions,
+              def => !getLabwareDefIsStandard(def) // assume if it's not standard, it's custom
+            )
+          : {}
       return { ...state, ...customDefsFromFile }
     },
   },

@@ -45,7 +45,7 @@ const unsavedChanges = (
     case 'SAVE_PROTOCOL_FILE':
       return false
 
-    case 'CREATE_NEW_PROTOCOL':
+    case 'TOGGLE_NEW_PROTOCOL_MODAL':
     case 'DISMISS_FORM_WARNING':
     case 'DISMISS_TIMELINE_WARNING':
     case 'CREATE_CONTAINER':
@@ -66,7 +66,6 @@ const unsavedChanges = (
     case 'REPLACE_CUSTOM_LABWARE_DEF':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
-    case 'EDIT_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'DELETE_DECK_FIXTURE':
     case 'CREATE_DECK_FIXTURE':

@@ -7,10 +7,12 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/redux-resources/analytics')
 
 const render = (props: ComponentProps<typeof HeaterShakerSlideout>) => {
   return renderWithProviders(<HeaterShakerSlideout {...props} />, {
@@ -27,6 +29,9 @@ describe('HeaterShakerSlideout', () => {
     mockCreateLiveCommand.mockResolvedValue(null)
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
     } as any)
   })
 

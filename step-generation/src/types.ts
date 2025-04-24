@@ -16,6 +16,7 @@ import type {
   PipetteV2Specs,
   ShakeSpeedParams,
   LabwareMovementStrategy,
+  PositionReference,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
@@ -149,13 +150,47 @@ export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
     id: string
-    location?: string
+    location: string
+    //  Note: leaving as optional since gripper and stagingArea
+    //  will never need a pythonName
+    pythonName?: string
   }
 }
 
 export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
 export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
+}
+
+interface TrashEntity {
+  id: string
+  location: string
+  pythonName: string
+}
+
+export type WasteChuteEntity = TrashEntity
+export interface WasteChuteEntities {
+  [wasteChuteId: string]: WasteChuteEntity
+}
+
+export type TrashBinEntity = TrashEntity
+export interface TrashBinEntities {
+  [trashBinId: string]: TrashBinEntity
+}
+
+export interface StagingAreaEntity {
+  id: string
+  location: string
+}
+export interface StagingAreaEntities {
+  [stagingAreaId: string]: StagingAreaEntity
+}
+
+export interface GripperEntity {
+  id: string
+}
+export interface GripperEntities {
+  [gripperId: string]: GripperEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
@@ -216,7 +251,9 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Touch tip after every aspirate */
   touchTipAfterAspirate: boolean
   /** Optional offset for touch tip after aspirate (if null, use PD default) */
-  touchTipAfterAspirateOffsetMmFromBottom: number
+  touchTipAfterAspirateOffsetMmFromTop: number
+  /** Optional speed for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateSpeed: number | null
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions
   /** Delay after every aspirate */
@@ -240,7 +277,9 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
-  touchTipAfterDispenseOffsetMmFromBottom: number
+  touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional speed for touch tip after dispense (if null, use PD default) */
+  touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
@@ -249,6 +288,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseXOffset: number
   /** y offset mm */
   dispenseYOffset: number
+  /** will be non-null once introduced to quick transfer */
+  pushOut: number | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -316,7 +357,7 @@ export type MixArgs = CommonArgs & {
   times: number
   /** Touch tip after mixing */
   touchTip: boolean
-  touchTipMmFromBottom: number
+  touchTipMmFromTop: number
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions
   /** drop tip location entity id */
@@ -333,11 +374,14 @@ export type MixArgs = CommonArgs & {
   /** y offset */
   yOffset: number
   /** flow rates in uL/sec */
+  zOffset: number
+  positionReference: PositionReference
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
   aspirateDelaySeconds: number | null | undefined
   dispenseDelaySeconds: number | null | undefined
+  finalPushOut: number
 }
 
 export type PauseArgs = CommonArgs & {
@@ -535,7 +579,10 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities
+  trashBinEntities: TrashBinEntities
+  stagingAreaEntities: StagingAreaEntities
+  gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
   config: Config
 }
@@ -574,9 +621,11 @@ export interface TimelineFrame {
         [well: string]: LocationLiquidState
       }
     }
-    additionalEquipment: {
-      /** for the waste chute and trash bin */
-      [additionalEquipmentId: string]: LocationLiquidState
+    trashBins: {
+      [trashBinId: string]: LocationLiquidState
+    }
+    wasteChute: {
+      [wasteChuteId: string]: LocationLiquidState
     }
   }
 }
@@ -641,6 +690,7 @@ export interface CommandsAndRobotState {
   commands: CreateCommand[]
   robotState: RobotState
   warnings?: CommandCreatorWarning[]
+  python?: string
 }
 
 export interface CommandCreatorErrorResponse {
@@ -651,6 +701,7 @@ export interface CommandCreatorErrorResponse {
 export interface CommandsAndWarnings {
   commands: CreateCommand[]
   warnings?: CommandCreatorWarning[]
+  python?: string
 }
 export type CommandCreatorResult =
   | CommandsAndWarnings

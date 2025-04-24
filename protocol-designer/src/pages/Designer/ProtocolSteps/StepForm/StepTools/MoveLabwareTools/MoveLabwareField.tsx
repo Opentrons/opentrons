@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getMoveLabwareOptions } from '../../../../../../ui/labware/selectors'
-import { DropdownStepFormField } from '../../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import type { FieldProps } from '../../types'
 
@@ -14,6 +14,7 @@ export function MoveLabwareField(props: FieldProps): JSX.Element {
       {...props}
       options={options}
       title={t('select_labware')}
+      width="100%"
       onEnter={(id: string) => {
         dispatch(hoverSelection({ id, text: t('application:select') }))
       }}

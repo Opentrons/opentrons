@@ -80,20 +80,19 @@ def _old_slot_to_ot3_slot(old_api_slot: str) -> str:
 
 
 def get_latest_offset_for_labware(
-    labware_offsets: List[dict], labware: Labware
+    labware_offsets: List[LabwareOffset], labware: Labware
 ) -> Point:
     """Get latest offset for labware."""
     lw_uri = str(labware.uri)
-    lw_slot = _old_slot_to_ot3_slot(str(labware.parent))
 
-    def _is_offset_present(_o: dict) -> bool:
-        _v = _o["vector"]
-        return _v["x"] != 0 or _v["y"] != 0 or _v["z"] != 0
+    def _is_offset_present(_o: LabwareOffset) -> bool:
+        _v = _o.vector
+        return _v.x != 0 or _v.y != 0 or _v.z != 0
 
-    def _offset_applies_to_labware(_o: dict) -> bool:
-        if _o["location"]["slotName"] != lw_slot:
+    def _offset_applies_to_labware(_o: LabwareOffset) -> bool:
+        if _o.location.slotName.value != labware.parent:
             return False
-        offset_uri = _o["definitionUri"]
+        offset_uri = _o.definitionUri
         if offset_uri[0:-1] != lw_uri[0:-1]:  # drop schema version number
             # ui.print_info(f"{_o} does not apply {offset_uri} != {lw_uri}")
             # NOTE: we're allowing tip-rack adapters to share offsets
@@ -108,16 +107,15 @@ def get_latest_offset_for_labware(
     lw_offsets = [
         offset for offset in labware_offsets if _offset_applies_to_labware(offset)
     ]
-
     if not lw_offsets:
         return Point()
 
-    def _sort_by_created_at(_offset: dict) -> datetime:
-        return datetime.fromisoformat(_offset["createdAt"])
+    def _sort_by_created_at(_offset: LabwareOffset) -> datetime:
+        return _offset.createdAt
 
     lw_offsets.sort(key=_sort_by_created_at)
-    v = lw_offsets[-1]["vector"]
-    return Point(x=v["x"], y=v["y"], z=v["z"])
+    v = lw_offsets[-1].vector
+    return Point(x=v.x, y=v.y, z=v.z)
 
 
 def get_sync_hw_api(ctx: ProtocolContext) -> SyncHardwareAPI:

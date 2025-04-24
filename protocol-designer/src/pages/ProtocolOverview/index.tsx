@@ -28,27 +28,32 @@ import {
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as loadFileActions } from '../../load-file'
+import {
+  getEnablePythonExport,
+  getEnableTimelineScrubber,
+} from '../../feature-flags/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { MaterialsListModal } from '../../organisms/MaterialsListModal'
-import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../atoms'
-import { EndUserAgreementFooter } from '../../molecules'
-import { useBlockingHint } from '../../organisms/BlockingHintModal/useBlockingHint'
+import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
+import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../components/atoms'
+import { EndUserAgreementFooter } from '../../components/molecules'
+import { useBlockingHint } from '../../components/organisms/BlockingHintModal/useBlockingHint'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
-} from '../../organisms'
+} from '../../components/organisms'
 import { getWarningContent } from './UnusedModalContent'
 import { ProtocolMetadata } from './ProtocolMetadata'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 import { StepsInfo } from './StepsInfo'
 import { StartingDeck } from './StartingDeck'
+import { HardwareInfo } from './HardwareInfo'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
   getUnusedTrash,
 } from './utils'
-
+import { ScrubberContainer } from './ScrubberContainer'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
 
@@ -81,6 +86,8 @@ export function ProtocolOverview(): JSX.Element {
     showEditInstrumentsModal,
     setShowEditInstrumentsModal,
   ] = useState<boolean>(false)
+  const enablePythonExport = useSelector(getEnablePythonExport)
+  const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
     false
   )
@@ -292,6 +299,21 @@ export function ProtocolOverview(): JSX.Element {
               whiteSpace={NO_WRAP}
               height="3.5rem"
             />
+            {enablePythonExport ? (
+              <LargeButton
+                buttonType="stroke"
+                buttonText="Export Python"
+                onClick={() => {
+                  dispatch(loadFileActions.savePythonProtocolFile())
+                }}
+                whiteSpace={NO_WRAP}
+                height="3.5rem"
+                iconName="arrow-right"
+                css={css`
+                  border: 2px solid ${COLORS.blue50};
+                `}
+              />
+            ) : null}
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
@@ -311,6 +333,11 @@ export function ProtocolOverview(): JSX.Element {
               additionalEquipment={additionalEquipment}
               setShowEditInstrumentsModal={setShowEditInstrumentsModal}
             />
+            <HardwareInfo
+              robotType={robotType}
+              modules={Object.values(modulesOnDeck)}
+              additionalEquipment={additionalEquipmentOnDeck}
+            />
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />
@@ -321,6 +348,7 @@ export function ProtocolOverview(): JSX.Element {
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
           >
+            {enableTimelineScrubber ? <ScrubberContainer /> : null}
             <StartingDeck
               robotType={robotType}
               setShowMaterialsListModal={setShowMaterialsListModal}

@@ -131,8 +131,8 @@ describe('IgnoreErrorStepHome', () => {
     clickButtonLabeled('Continue')
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.SKIP
       )
     })
   })
@@ -158,8 +158,8 @@ describe('IgnoreErrorStepHome', () => {
     })
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
-        RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS
       )
     })
   })

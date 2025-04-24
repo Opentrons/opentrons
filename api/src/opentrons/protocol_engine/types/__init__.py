@@ -65,6 +65,8 @@ from .module import (
     ABSMeasureMode,
     ModuleOffsetVector,
     ModuleOffsetData,
+    StackerFillEmptyStrategy,
+    StackerStoredLabwareGroup,
 )
 from .location import (
     DeckSlotLocation,
@@ -78,15 +80,34 @@ from .location import (
     OnDeckLabwareLocation,
     NonStackedLocation,
     DeckPoint,
+    InStackerHopperLocation,
+    OnLabwareLocationSequenceComponent,
+    OnModuleLocationSequenceComponent,
+    OnAddressableAreaLocationSequenceComponent,
+    NotOnDeckLocationSequenceComponent,
+    OnCutoutFixtureLocationSequenceComponent,
+    LabwareLocationSequence,
+    LoadableLabwareLocation,
+    labware_location_is_system,
+    labware_location_is_off_deck,
 )
 from .labware import (
     OverlapOffset,
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    LabwareOffsetCreateInternal,
     LoadedLabware,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
-from .labware_offset_location import LabwareOffsetLocation
+from .labware_offset_location import (
+    LegacyLabwareOffsetLocation,
+    LabwareOffsetLocationSequence,
+    OnLabwareOffsetLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    LabwareOffsetLocationSequenceComponents,
+)
 from .labware_offset_vector import LabwareOffsetVector
 from .well_position import (
     WellOrigin,
@@ -97,6 +118,8 @@ from .well_position import (
     LiquidHandlingWellLocation,
     PickUpTipWellLocation,
     DropTipWellLocation,
+    WellLocationType,
+    WellLocationFunction,
 )
 from .instrument import (
     LoadedPipette,
@@ -112,6 +135,7 @@ from .liquid_level_detection import (
     ProbedVolumeInfo,
     WellInfoSummary,
     WellLiquidInfo,
+    LiquidTrackingType,
 )
 from .liquid_handling import FlowRates
 from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
@@ -181,6 +205,8 @@ __all__ = [
     "ABSMeasureMode",
     "ModuleOffsetVector",
     "ModuleOffsetData",
+    "StackerFillEmptyStrategy",
+    "StackerStoredLabwareGroup",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -193,14 +219,33 @@ __all__ = [
     "OnDeckLabwareLocation",
     "NonStackedLocation",
     "DeckPoint",
+    "OffDeckLocationType",
+    "SystemLocationType",
+    "InStackerHopperLocation",
+    "OnLabwareLocationSequenceComponent",
+    "OnModuleLocationSequenceComponent",
+    "OnAddressableAreaLocationSequenceComponent",
+    "NotOnDeckLocationSequenceComponent",
+    "OnCutoutFixtureLocationSequenceComponent",
+    "LabwareLocationSequence",
+    "LoadableLabwareLocation",
+    "labware_location_is_off_deck",
+    "labware_location_is_system",
     # Labware offset location
-    "LabwareOffsetLocation",
+    "LegacyLabwareOffsetLocation",
+    "LabwareOffsetLocationSequence",
+    "LabwareOffsetLocationSequenceComponents",
+    "OnLabwareOffsetLocationSequenceComponent",
+    "OnModuleOffsetLocationSequenceComponent",
+    "OnAddressableAreaOffsetLocationSequenceComponent",
     # Labware offset vector
     "LabwareOffsetVector",
     # Labware
     "OverlapOffset",
     "LabwareOffset",
     "LabwareOffsetCreate",
+    "LegacyLabwareOffsetCreate",
+    "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
     # Liquids
@@ -219,6 +264,8 @@ __all__ = [
     "LiquidHandlingWellLocation",
     "PickUpTipWellLocation",
     "DropTipWellLocation",
+    "WellLocationType",
+    "WellLocationFunction",
     # Execution
     "EngineStatus",
     "PostRunHardwareState",
@@ -234,6 +281,7 @@ __all__ = [
     "ProbedVolumeInfo",
     "WellInfoSummary",
     "WellLiquidInfo",
+    "LiquidTrackingType",
     # Liquid handling
     "FlowRates",
     # Labware movement

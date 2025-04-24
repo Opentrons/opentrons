@@ -262,14 +262,14 @@ describe('useRecoveryCommands', () => {
       params: { ...mockFailedCommand.params, pipetteId: 'MOCK_ID' },
     }
 
-    const mockFailedLabware = {
+    const mockRelevantPickUpTipLabware = {
       id: 'MOCK_LW_ID',
     } as any
 
     const buildPickUpTipsCmd = buildPickUpTips(
       mockFailedLabwareUtils.selectedTipLocations,
       mockFailedCmdWithPipetteId,
-      mockFailedLabware
+      mockRelevantPickUpTipLabware
     )
 
     const testProps = {
@@ -277,7 +277,7 @@ describe('useRecoveryCommands', () => {
       unvalidatedFailedCommand: mockFailedCmdWithPipetteId,
       failedLabwareUtils: {
         ...mockFailedLabwareUtils,
-        failedLabware: mockFailedLabware,
+        relevantPickUpTipLabware: mockRelevantPickUpTipLabware,
       },
     }
 
@@ -293,6 +293,33 @@ describe('useRecoveryCommands', () => {
     )
   })
 
+  it('should reject with error and call proceedToRouteAndStep when pickUpTips has invalid input', async () => {
+    const testProps = {
+      ...props,
+      failedLabwareUtils: {
+        ...mockFailedLabwareUtils,
+        selectedTipLocations: null,
+        relevantPickUpTipLabware: null,
+      },
+    }
+
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
+
+    await act(async () => {
+      await expect(result.current.pickUpTips()).rejects.toThrow(
+        'Invalid use of pickUpTips command'
+      )
+    })
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
+    )
+    expect(mockReportActionSelectedResult).toHaveBeenCalledWith(
+      RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+      'failed'
+    )
+  })
+
   it('should call releaseGripperJaws and resolve the promise', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
@@ -302,6 +329,63 @@ describe('useRecoveryCommands', () => {
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [RELEASE_GRIPPER_JAW],
+      false
+    )
+  })
+
+  it('should call flexStacker/perpareShuttle and resolve the promise', async () => {
+    const mockFailedCommandWithError = {
+      ...mockFailedCommand,
+      commandType: 'flexStacker/prepareShuttle',
+      params: {
+        moduleId: '123',
+      },
+      error: {
+        errorType: 'mockErrorType',
+      },
+    }
+
+    const testProps = {
+      ...props,
+      unvalidatedFailedCommand: mockFailedCommandWithError,
+    }
+    const { result } = renderHook(() => useRecoveryCommands(testProps))
+
+    await act(async () => {
+      await result.current.homeShuttle()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'flexStacker/prepareShuttle',
+          params: {
+            moduleId: '123',
+          },
+          intent: 'fixit',
+        },
+      ],
+      false
+    )
+  })
+
+  it('should call flexStacker/perpareShuttle without moduleId', async () => {
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    await act(async () => {
+      await result.current.homeShuttle()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'flexStacker/prepareShuttle',
+          params: {
+            moduleId: '',
+          },
+          intent: 'fixit',
+        },
+      ],
       false
     )
   })

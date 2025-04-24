@@ -1,5 +1,6 @@
-import uuidv1 from 'uuid/v4'
+import round from 'lodash/round'
 import snakeCase from 'lodash/snakeCase'
+import uuidv1 from 'uuid/v4'
 import {
   makeWellSetHelpers,
   getDeckDefFromRobotType,
@@ -8,7 +9,9 @@ import {
   isAddressableAreaStandardSlot,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   LOW_VOLUME_PIPETTES,
+  getTiprackVolume,
 } from '@opentrons/shared-data'
+import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
@@ -16,15 +19,14 @@ import type {
   PipetteEntity,
 } from '@opentrons/step-generation'
 import type {
-  WellSetHelpers,
   AddressableAreaName,
   CutoutId,
-  CutoutFixtureId,
-  RobotType,
-  SupportedTip,
   LabwareDefinition2,
   ModuleType,
   LabwareDisplayCategory,
+  PipetteV2Specs,
+  SupportedTip,
+  WellSetHelpers,
 } from '@opentrons/shared-data'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
@@ -172,44 +174,6 @@ export const getStagingAreaAddressableAreas = (
   return addressableAreasRaw
 }
 
-export const getCutoutIdByAddressableArea = (
-  addressableAreaName: AddressableAreaName,
-  cutoutFixtureId: CutoutFixtureId,
-  robotType: RobotType
-): CutoutId => {
-  const deckDef = getDeckDefFromRobotType(robotType)
-  const cutoutFixtures = deckDef.cutoutFixtures
-  const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
-    cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)
-  )?.providesAddressableAreas
-
-  const findCutoutIdByAddressableArea = (
-    addressableAreaName: AddressableAreaName
-  ): CutoutId | null => {
-    if (providesAddressableAreasForAddressableArea != null) {
-      for (const cutoutId in providesAddressableAreasForAddressableArea) {
-        if (
-          providesAddressableAreasForAddressableArea[
-            cutoutId as keyof typeof providesAddressableAreasForAddressableArea
-          ].includes(addressableAreaName)
-        ) {
-          return cutoutId as CutoutId
-        }
-      }
-    }
-    return null
-  }
-
-  const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
-
-  if (cutoutId == null) {
-    throw Error(
-      `expected to find cutoutId from addressableAreaName ${addressableAreaName} but could not`
-    )
-  }
-  return cutoutId
-}
-
 export function getMatchingTipLiquidSpecs(
   pipetteEntity: PipetteEntity,
   volume: number,
@@ -307,4 +271,100 @@ export const getLabwarePythonName = (
   typeCount: number
 ): string => {
   return `${snakeCase(labwareDisplayCategory)}_${typeCount}`
+}
+
+export const getAdditionalEquipmentPythonName = (
+  fixtureName: 'wasteChute' | 'trashBin',
+  typeCount: number,
+  location?: string
+): string => {
+  switch (fixtureName) {
+    case 'wasteChute': {
+      return snakeCase(fixtureName)
+    }
+    case 'trashBin': {
+      if (location === 'cutout12') {
+        return `${PROTOCOL_CONTEXT_NAME}.fixed_trash`
+      } else {
+        return `${snakeCase(fixtureName)}_${typeCount}`
+      }
+    }
+  }
+}
+
+/**
+ * Gets maximum pushout volume for a given transfer plan given transfer volume and pipette spec
+ *
+ * @param {number} transferVolume - The transfer volume for the transfer plan
+ * @param {PipetteV2Specs} - The specs for the pipette used for the transfer
+ * @returns {number} - The maximum supported push out volume for each dispense
+ */
+export const getMaxPushOutVolume = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs
+): number => {
+  const { liquids, plungerPositionsConfigurations, shaftULperMM } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const { bottom, blowout } = isInLowVolumeMode
+    ? plungerPositionsConfigurations.lowVolumeDefault ??
+      plungerPositionsConfigurations.default
+    : plungerPositionsConfigurations.default
+  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
+  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
+}
+
+export const getDefaultPushOutVolume = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs,
+  tiprackDefinition: LabwareDefinition2
+): number => {
+  const { liquids } = pipetteSpecs
+  if (tiprackDefinition == null) {
+    return 0
+  }
+  console.assert(
+    tiprackDefinition.metadata.displayCategory === 'tipRack',
+    'Specified labware entity must be tiprack'
+  )
+  const tipVolume = Object.values(tiprackDefinition.wells)[0].totalLiquidVolume
+  const lookupKey =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+      ? 'lowVolumeDefalt'
+      : 'default'
+  const tipVolumeKey = `t${tipVolume}`
+  return (
+    liquids[lookupKey].supportedTips[tipVolumeKey]?.defaultPushOutVolume ?? 0
+  )
+}
+
+export const getMaxConditioningVolume = (args: {
+  transferVolume: number
+  disposalVolume: number
+  tiprackDefUri: string
+  labwareEntities: LabwareEntities
+  pipetteSpecs: PipetteV2Specs
+}): number => {
+  const {
+    transferVolume,
+    disposalVolume,
+    labwareEntities,
+    tiprackDefUri,
+    pipetteSpecs,
+  } = args
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
+  )
+  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+
+  const maxWorkingVolume = Math.min(
+    isInLowVolumeMode
+      ? liquids.lowVolumeDefault.maxVolume
+      : liquids.default.maxVolume,
+    ...(tipMaxVolume != null ? [tipMaxVolume] : [])
+  )
+  return maxWorkingVolume - disposalVolume - transferVolume
 }

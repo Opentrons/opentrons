@@ -44,6 +44,15 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_1000ul',
   'opentrons_ot3_96_tiprack_50ul',
   'opentrons_flex_lid_absorbance_plate_reader_module',
+  'protocol_engine_lid_stack_object',
+  // temporarily blocking 20 uL Flex tip racks until they launch
+  'opentrons_flex_96_tiprack_20ul',
+  'opentrons_flex_96_filtertiprack_20ul',
+  // temporarily blocking tough labware until geometry and collateral is finalized
+  'opentrons_tough_1_reservoir_300ml',
+  'opentrons_tough_4_reservoir_72ml',
+  'opentrons_tough_12_reservoir_22ml',
+  'opentrons_tough_universal_lid',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // or the adapter/labware combos since we migrated to splitting them up
@@ -57,9 +66,25 @@ export const PD_DO_NOT_LIST = [
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
   'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
   'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
+  'protocol_engine_lid_stack_object',
   //  temporarily blocking TC lid adapter and deck riser until it is supported in PD
   'opentrons_tough_pcr_auto_sealing_lid',
   'opentrons_flex_deck_riser',
+  // evotip is not supported in PD
+  'ev_resin_tips_flex_96_tiprack_adapter',
+  'ev_resin_tips_flex_96_labware',
+  'ev_resin_tips_flex_tall_adapter',
+  'ev_resin_tips_flex_short_adapter',
+  // temporarily blocking tiprack lids until stacker launches
+  'opentrons_flex_tiprack_lid',
+  // temporarily blocking 20 uL Flex tip racks until they launch
+  'opentrons_flex_96_tiprack_20ul',
+  'opentrons_flex_96_filtertiprack_20ul',
+  // temporarily blocking tough labware until geometry and collateral is finalized
+  'opentrons_tough_1_reservoir_300ml',
+  'opentrons_tough_4_reservoir_72ml',
+  'opentrons_tough_12_reservoir_22ml',
+  'opentrons_tough_universal_lid',
 ]
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {

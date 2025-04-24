@@ -1,6 +1,7 @@
 """
 Coordinate subsystem detection and updates.
 """
+
 import asyncio
 from contextlib import contextmanager, ExitStack
 from dataclasses import dataclass
@@ -57,7 +58,7 @@ class SubsystemManager:
     _expected_core_targets: Set[FirmwareTarget]
     _present_tools: tools.types.ToolSummary
     _tool_task_condition: asyncio.Condition
-    _tool_task_state: Union[bool, Exception]
+    _tool_task_state: Union[bool, BaseException]
     _updates_required: Dict[FirmwareTarget, FirmwareUpdateRequirements]
     _updates_ongoing: Dict[SubSystem, UpdateStatus]
     _update_bag: FirmwareUpdate
@@ -369,7 +370,8 @@ class SubsystemManager:
     async def _tool_detection_task_main(self) -> None:
         try:
             await self._tool_detection_task_protected()
-        except Exception as e:
+        except BaseException as e:
+            log.exception("Tool reader task failed")
             async with self._tool_task_condition:
                 self._tool_task_state = e
                 self._tool_task_condition.notify_all()
@@ -390,11 +392,12 @@ class SubsystemManager:
                 tool_nodes.add(NodeId.pipette_right)
             if update.gripper != ToolType.nothing_attached:
                 tool_nodes.add(NodeId.gripper)
-            base_nodes: Set[FirmwareTarget] = {
+            base_can_nodes: List[NodeId] = [
                 NodeId.pipette_left,
                 NodeId.pipette_right,
                 NodeId.gripper,
-            }
+            ]
+            base_nodes: Set[FirmwareTarget] = {n for n in base_can_nodes}
             try:
                 self._network_info.mark_absent(base_nodes - tool_nodes)
                 await self._probe_network_and_cache_fw_updates(
@@ -412,6 +415,7 @@ class SubsystemManager:
             )
             self._present_tools = await self._tool_detector.resolve(to_resolve, 10.0)
             log.info(f"Present tools are now {self._present_tools}")
+            await network.log_motor_usage_data(self._can_messenger)
             async with self._tool_task_condition:
                 self._tool_task_state = True
                 self._tool_task_condition.notify_all()

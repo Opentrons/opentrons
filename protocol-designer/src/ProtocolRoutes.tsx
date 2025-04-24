@@ -2,10 +2,11 @@ import { Route, Navigate, Routes, useNavigate } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Box } from '@opentrons/components'
 import {
-  CreateNewProtocolWizard,
   Designer,
+  Hardware,
   Landing,
   Liquids,
+  Onboarding,
   ProtocolOverview,
   Settings,
 } from './pages'
@@ -15,7 +16,8 @@ import {
   Kitchen,
   LabwareUploadModal,
   Navigation,
-} from './organisms'
+  HintsModal,
+} from './components/organisms'
 import { ProtocolDesignerAppFallback } from './resources/ProtocolDesignerAppFallback'
 
 import type { RouteProps } from './types'
@@ -40,7 +42,7 @@ const pdRoutes: RouteProps[] = [
     path: '/designer',
   },
   {
-    Component: CreateNewProtocolWizard,
+    Component: Onboarding,
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',
@@ -50,6 +52,12 @@ const pdRoutes: RouteProps[] = [
     name: 'Settings',
     navLinkTo: '/settings',
     path: '/settings',
+  },
+  {
+    Component: Hardware,
+    name: 'Hardware',
+    navLinkTo: '/hardware',
+    path: '/hardware',
   },
 ]
 
@@ -77,6 +85,7 @@ export function ProtocolRoutes(): JSX.Element {
           <GateModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
+          <HintsModal />
           <Routes>
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />

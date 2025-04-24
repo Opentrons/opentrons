@@ -12,7 +12,7 @@ import {
   CancelRun,
   RetryNewTips,
   ManageTips,
-  FillWellAndSkip,
+  FillWellAndRetrySameTips,
   RetrySameTips,
   SkipStepSameTips,
   SkipStepNewTips,
@@ -20,6 +20,7 @@ import {
   ManualMoveLwAndSkip,
   ManualReplaceLwAndRetry,
   HomeAndRetry,
+  FillWellAndRetryNewTips,
 } from './RecoveryOptions'
 import {
   useErrorDetailsModal,
@@ -194,8 +195,12 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RetrySameTips {...props} />
   }
 
-  const buildFillWellAndSkip = (): JSX.Element => {
-    return <FillWellAndSkip {...props} />
+  const buildFillWellAndRetrySameTips = (): JSX.Element => {
+    return <FillWellAndRetrySameTips {...props} />
+  }
+
+  const buildFillWellAndRetryNewTips = (): JSX.Element => {
+    return <FillWellAndRetryNewTips {...props} />
   }
 
   const buildSkipStepSameTips = (): JSX.Element => {
@@ -245,8 +250,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildRetryNewTips()
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
       return buildRetrySameTips()
-    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
-      return buildFillWellAndSkip()
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
+      return buildFillWellAndRetrySameTips()
+    case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+      return buildFillWellAndRetryNewTips()
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
       return buildSkipStepSameTips()
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
@@ -256,6 +263,11 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       return buildManualMoveLwAndSkip()
     case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+    case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
       return buildManualReplaceLwAndRetry()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
       return buildRecoveryDoorOpenSpecial()
@@ -272,6 +284,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
       return buildHomeAndRetry()
     default:
+      console.error('route: ' + props.recoveryMap.route + 'was not found')
       return buildSelectRecoveryOption()
   }
 }
