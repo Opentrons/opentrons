@@ -14,7 +14,6 @@ import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import type {
   BlowoutProperties,
   ByTipTypeSetting,
-  Vector3D,
   DelayProperties,
   LabwareDefinition2,
   LiquidHandlingPropertyByVolume,
@@ -26,6 +25,7 @@ import type {
   RetractDispense,
   Submerge,
   TouchTipProperties,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,

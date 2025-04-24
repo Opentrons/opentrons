@@ -46,10 +46,10 @@ import type {
 } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  Vector3D,
   CreateCommand,
   DropTipCreateCommand,
   RobotType,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'

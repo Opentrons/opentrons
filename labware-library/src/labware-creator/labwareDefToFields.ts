@@ -1,9 +1,9 @@
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 
 import type {
-  Vector3D,
   LabwareDefinition2,
   LabwareWellGroup,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type { BooleanString, LabwareFields } from './fields'
 
