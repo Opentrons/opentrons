@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { ALL, COLUMN, fixtureP100096V2Specs } from '@opentrons/shared-data'
 
 import { configureNozzleLayout } from '../commandCreators/atomic/configureNozzleLayout'

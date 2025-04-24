@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'

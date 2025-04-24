@@ -2,6 +2,7 @@ import omit from 'lodash/omit'
 import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import {
   getLabwareDefIsStandard,
   getLabwareDefURI,

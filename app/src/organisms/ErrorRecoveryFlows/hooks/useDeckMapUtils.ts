@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+
 import { getLabwareLocation } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,

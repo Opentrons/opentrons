@@ -1,5 +1,6 @@
 import last from 'lodash/last'
 import pick from 'lodash/pick'
+
 import {
   ALL,
   COLUMN,

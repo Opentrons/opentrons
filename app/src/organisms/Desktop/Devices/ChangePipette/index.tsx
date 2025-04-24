@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
+
 import {
   LegacyStyledText,
   ModalShell,

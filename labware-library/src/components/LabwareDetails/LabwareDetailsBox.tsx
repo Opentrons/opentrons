@@ -1,5 +1,6 @@
 // full-width labware details
 import { Fragment } from 'react'
+
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 
 import {

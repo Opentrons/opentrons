@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+
 import {
   Banner,
   COLORS,

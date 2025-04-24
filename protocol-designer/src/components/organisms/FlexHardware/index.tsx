@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForSlotName,

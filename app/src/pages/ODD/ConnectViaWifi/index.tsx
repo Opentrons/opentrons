@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
+
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'

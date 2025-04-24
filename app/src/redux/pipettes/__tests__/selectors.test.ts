@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import * as Fixtures from '../__fixtures__'

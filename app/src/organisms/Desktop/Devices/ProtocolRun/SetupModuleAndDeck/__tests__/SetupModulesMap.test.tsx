@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'

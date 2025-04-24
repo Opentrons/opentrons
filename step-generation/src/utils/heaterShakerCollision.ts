@@ -1,4 +1,5 @@
 import some from 'lodash/some'
+
 import {
   getAreFlexSlotsAdjacent,
   getAreSlotsAdjacent,

@@ -1,4 +1,5 @@
 import last from 'lodash/last'
+
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'

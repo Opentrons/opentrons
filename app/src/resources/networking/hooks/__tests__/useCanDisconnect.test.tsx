@@ -3,6 +3,7 @@ import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 
 import { useIsFlex } from '/app/redux-resources/robots'

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   Banner,

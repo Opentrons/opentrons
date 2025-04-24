@@ -8,6 +8,7 @@ import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import * as Yup from 'yup'
+
 import { Box, COLORS } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,

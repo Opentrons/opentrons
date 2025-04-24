@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
+
 import {
   ABSORBANCE_READER_TYPE,
   getLabwareDefURI,

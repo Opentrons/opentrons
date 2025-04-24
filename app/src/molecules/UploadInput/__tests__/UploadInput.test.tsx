@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+
 import {
   DIRECTION_ROW,
   Flex,

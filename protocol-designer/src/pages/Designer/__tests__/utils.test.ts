@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
   fixture96Plate,
   HEATERSHAKER_MODULE_TYPE,

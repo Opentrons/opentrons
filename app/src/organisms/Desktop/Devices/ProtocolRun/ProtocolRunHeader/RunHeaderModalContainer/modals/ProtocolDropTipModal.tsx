@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,

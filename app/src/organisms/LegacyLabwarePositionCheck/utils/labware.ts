@@ -1,4 +1,5 @@
 import reduce from 'lodash/reduce'
+
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   getIsTiprack,

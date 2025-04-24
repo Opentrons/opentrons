@@ -2,6 +2,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
+
 import {
   consolidate,
   curryCommandCreator,

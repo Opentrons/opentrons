@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Hardware } from '..'

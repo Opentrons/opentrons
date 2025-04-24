@@ -1,6 +1,7 @@
 import round from 'lodash/round'
 import snakeCase from 'lodash/snakeCase'
 import uuidv1 from 'uuid/v4'
+
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,

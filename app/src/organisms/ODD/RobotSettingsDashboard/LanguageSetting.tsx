@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import uuidv1 from 'uuid/v4'
+
 import {
   BORDERS,
   COLORS,

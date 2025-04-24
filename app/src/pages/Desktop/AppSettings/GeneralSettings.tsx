@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import uuidv1 from 'uuid/v4'
+
 import {
   ALIGN_CENTER,
   ALIGN_START,

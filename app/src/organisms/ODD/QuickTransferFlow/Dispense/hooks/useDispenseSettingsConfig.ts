@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,

@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import {
   pipetteResponseFixtureLeft,
   pipetteResponseFixtureRight,

@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import sum from 'lodash/sum'
+
 import {
   ALIGN_CENTER,
   COLORS,

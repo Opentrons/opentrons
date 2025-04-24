@@ -1,6 +1,7 @@
 // custom labware selectors
 import sortBy from 'lodash/sortBy'
 import { createSelector } from 'reselect'
+
 import { getIsTiprack } from '@opentrons/shared-data'
 
 import { getConfig } from '../config'

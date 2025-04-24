@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
+
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,

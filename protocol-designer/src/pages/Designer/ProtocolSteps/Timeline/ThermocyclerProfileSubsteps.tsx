@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,

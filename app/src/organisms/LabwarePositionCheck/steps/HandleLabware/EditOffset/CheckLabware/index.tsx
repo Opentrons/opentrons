@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,

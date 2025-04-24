@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'

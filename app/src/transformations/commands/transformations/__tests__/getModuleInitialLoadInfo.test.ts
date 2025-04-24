@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { transfer_settings } from '@opentrons/shared-data'
 
 import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'

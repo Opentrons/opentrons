@@ -1,5 +1,6 @@
 import reduce from 'lodash/reduce'
 import some from 'lodash/some'
+
 import {
   FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,

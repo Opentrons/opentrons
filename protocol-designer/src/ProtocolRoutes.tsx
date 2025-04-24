@@ -1,5 +1,6 @@
 import { ErrorBoundary } from 'react-error-boundary'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+
 import { Box } from '@opentrons/components'
 
 import {

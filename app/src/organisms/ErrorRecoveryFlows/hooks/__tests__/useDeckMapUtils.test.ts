@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getLabwareLocation } from '@opentrons/components'
 import {
   fixture96Plate,

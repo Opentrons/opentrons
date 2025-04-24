@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ipcMain } from 'electron'
 import FormData from 'form-data'
+
 import {
   DEFAULT_PRODUCT_ID,
   DEFAULT_VENDOR_ID,

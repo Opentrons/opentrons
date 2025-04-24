@@ -1,4 +1,5 @@
 import pick from 'lodash/pick'
+
 import {
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,

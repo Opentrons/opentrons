@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { multiple_tipracks, one_tiprack } from '@opentrons/shared-data'
 
 import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'

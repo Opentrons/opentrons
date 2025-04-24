@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { OPENTRONS_USB, UNREACHABLE } from '/app/redux/discovery'

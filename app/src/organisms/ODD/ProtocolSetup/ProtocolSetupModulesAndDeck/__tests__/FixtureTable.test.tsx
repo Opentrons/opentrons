@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   FLEX_ROBOT_TYPE,
   MOVABLE_TRASH_D3_ADDRESSABLE_AREA,

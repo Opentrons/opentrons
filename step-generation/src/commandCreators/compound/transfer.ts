@@ -1,5 +1,6 @@
 import assert from 'assert'
 import zip from 'lodash/zip'
+
 import {
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,

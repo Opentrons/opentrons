@@ -1,4 +1,5 @@
 import capitalize from 'lodash/capitalize'
+
 import {
   ALIGN_CENTER,
   BORDERS,

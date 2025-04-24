@@ -1,6 +1,7 @@
 import isEmpty from 'lodash/isEmpty'
 import range from 'lodash/range'
 import uniq from 'lodash/uniq'
+
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
 
 import {

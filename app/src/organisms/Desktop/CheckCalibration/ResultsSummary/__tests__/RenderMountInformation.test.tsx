@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
