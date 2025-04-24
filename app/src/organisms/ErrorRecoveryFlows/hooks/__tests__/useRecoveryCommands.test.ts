@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
@@ -91,6 +92,7 @@ describe('useRecoveryCommands', () => {
     ).mockReturnValue({
       mutateAsync: mockResumeRunFromRecoveryAssumingFalsePositive,
     } as any)
+    vi.mocked(useErrorRecoveryPolicy).mockReturnValue({} as any)
   })
 
   it('should call chainRunRecoveryCommands with continuePastCommandFailure set to false', async () => {
