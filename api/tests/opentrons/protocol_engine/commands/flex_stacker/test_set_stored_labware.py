@@ -47,6 +47,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons.protocol_engine.errors import (
     FlexStackerNotLogicallyEmptyError,
 )
@@ -620,23 +621,6 @@ async def test_set_stored_labware_requires_empty_hopper(
             ],
             does_not_raise(),
         ),
-        (
-            3,
-            None,
-            [
-                StackerStoredLabwareGroup(
-                    primaryLabwareId="labware-1",
-                    adapterLabwareId=None,
-                    lidLabwareId=None,
-                ),
-                StackerStoredLabwareGroup(
-                    primaryLabwareId="labware-2",
-                    adapterLabwareId=None,
-                    lidLabwareId=None,
-                ),
-            ],
-            does_not_raise(),
-        ),
     ],
 )
 async def test_set_stored_labware_limits_count(
@@ -815,3 +799,95 @@ async def test_set_stored_labware_limits_count(
             labware_lid=LabwareLidUpdate(parent_labware_ids=[], lid_ids=[]),
         ),
     )
+
+
+@pytest.mark.parametrize(
+    "input_count,input_labware",
+    [
+        (3, None),
+        (
+            None,
+            [
+                StackerStoredLabwareGroup(
+                    primaryLabwareId="labware-1",
+                    adapterLabwareId=None,
+                    lidLabwareId=None,
+                ),
+                StackerStoredLabwareGroup(
+                    primaryLabwareId="labware-2",
+                    adapterLabwareId=None,
+                    lidLabwareId=None,
+                ),
+                StackerStoredLabwareGroup(
+                    primaryLabwareId="labware-3",
+                    adapterLabwareId=None,
+                    lidLabwareId=None,
+                ),
+            ],
+        ),
+    ],
+)
+async def test_set_stored_labware_exceeding_max(
+    input_count: int | None,
+    input_labware: list[StackerStoredLabwareGroup] | None,
+    decoy: Decoy,
+    state_view: StateView,
+    equipment: EquipmentHandler,
+    subject: SetStoredLabwareImpl,
+    model_utils: ModelUtils,
+    flex_50uL_tiprack: LabwareDefinition,
+) -> None:
+    """It should default and limit the input count."""
+    module_id = "module-id"
+    params = SetStoredLabwareParams(
+        moduleId=module_id,
+        primaryLabware=StackerStoredLabwareDetails(
+            loadName="opentrons_flex_96_filtertiprack_50ul",
+            namespace="opentrons",
+            version=1,
+        ),
+        lidLabware=None,
+        adapterLabware=None,
+        initialCount=input_count,
+        initialStoredLabware=input_labware,
+    )
+
+    decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
+        FlexStackerSubState(
+            module_id=cast(FlexStackerId, module_id),
+            pool_primary_definition=None,
+            pool_adapter_definition=None,
+            pool_lid_definition=None,
+            contained_labware_bottom_first=[],
+            max_pool_count=0,
+            pool_overlap=0,
+        )
+    )
+    decoy.when(
+        await equipment.load_definition_for_details(
+            load_name="opentrons_flex_96_filtertiprack_50ul",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return(
+        (flex_50uL_tiprack, "opentrons/opentrons_flex_96_filtertiprack_50ul/1")
+    )
+
+    decoy.when(
+        state_view._labware.get_labware_overlap_offsets(
+            flex_50uL_tiprack, "opentrons_flex_96_filtertiprack_50ul"
+        )
+    ).then_return(OverlapOffset(x=0, y=0, z=0))
+
+    decoy.when(
+        state_view.geometry.get_height_of_labware_stack([flex_50uL_tiprack])
+    ).then_return(sentinel.pool_height)
+
+    decoy.when(
+        state_view.modules.stacker_max_pool_count_by_height(
+            module_id, sentinel.pool_height, 0.0
+        )
+    ).then_return(2)
+
+    with pytest.raises(CommandPreconditionViolated):
+        result = await subject.execute(params)
