@@ -6,16 +6,17 @@
     "author": "",
     "description": "",
     "created": 1701805621086,
-    "lastModified": 1745429070382,
+    "lastModified": 1741896303527,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.4.4",
+    "version": "8.4.3",
     "data": {
-      "_internalAppBuildDate": "Wed, 23 Apr 2025 17:19:38 GMT",
+      "_internalAppBuildDate": "Mon, 10 Mar 2025 14:05:38 GMT",
       "pipetteTiprackAssignments": {
         "de7da440-95ec-43e8-8723-851321fbd6f9": [
           "opentrons/opentrons_flex_96_tiprack_50ul/1"
@@ -77,6 +78,7 @@
           "aspirate_submerge_position_reference": "well-bottom",
           "aspirate_touchTip_checkbox": false,
           "aspirate_touchTip_mmFromEdge": 0,
+          "aspirate_touchTip_mmFromTop": null,
           "aspirate_touchTip_speed": null,
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -108,12 +110,14 @@
           "dispense_retract_y_position": 0,
           "dispense_retract_position_reference": "well-bottom",
           "dispense_submerge_delay_seconds": null,
+          "dispense_submerge_speed": null,
           "dispense_submerge_mmFromBottom": null,
           "dispense_submerge_x_position": null,
           "dispense_submerge_y_position": null,
           "dispense_submerge_position_reference": "well-bottom",
           "dispense_touchTip_checkbox": false,
           "dispense_touchTip_mmFromEdge": 0,
+          "dispense_touchTip_mmFromTop": null,
           "dispense_touchTip_speed": null,
           "dispense_wellOrder_first": "t2b",
           "dispense_wellOrder_second": "l2r",
