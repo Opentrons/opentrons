@@ -315,8 +315,8 @@ async def _main() -> None:
             # Iterate each nozzle onto the dial indicator to measure the flatness
             for nozzle_count in range(1, PIPETTE_CHANNELS + 1):
                 cp = CriticalPoint.NOZZLE
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset * y_direction,
-                                        nozzle_loc[Axis.Y] + y_offset * x_direction,
+                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset * -y_direction,
+                                        nozzle_loc[Axis.Y] + y_offset * -x_direction,
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
                 await asyncio.sleep(2)
@@ -397,8 +397,8 @@ async def _main() -> None:
                     tip_measurement = gauge.read()
                     print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
                     print("\r", end="")
-                    tip_position = Point(dial_loc[0] + x_offset * y_direction,
-                                            dial_loc[1] + y_offset * x_direction,
+                    tip_position = Point(dial_loc[0] + x_offset * -y_direction,
+                                            dial_loc[1] + y_offset * -x_direction,
                                             dial_loc[2])
                     measurements.append(tip_measurement)
                     if tip_count % NOZZLE_COLUMNS == 0:
@@ -419,7 +419,10 @@ async def _main() -> None:
                     tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
                     print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
                 drop_tip_location =  Point(30 , 60 , 110.5)
-                await move_to_point(hw_api, mount, Point(pickup_loc.x, pickup_loc.y, pickup_loc.z - 20), cp)
+                if args.partial_tip_config is not None:
+                    await move_to_point(hw_api, mount, drop_tip_location, cp)
+                else:
+                    await move_to_point(hw_api, mount, Point(pickup_loc.x, pickup_loc.y, pickup_loc.z - 20), cp)
                 await hw_api.drop_tip(mount)
                 keyboard_input = input("Press Enter or Press 'q' to quit")
                 if keyboard_input == 'q':
