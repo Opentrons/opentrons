@@ -141,7 +141,8 @@ export function useRunProgressCopy({
     },
     errorDetails: runCommandDetails?.data?.error?.errorType ?? '',
     params: runCommandDetails?.data?.params ?? undefined,
-    runId: runId ?? '',
+    analysis,
+    runId,
   })
 
   return {

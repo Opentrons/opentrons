@@ -653,7 +653,7 @@ function PrepareToRun({
               onClickSetupStep={() => {
                 setSetupScreen('offsets')
               }}
-              title={t('labware_position_check')}
+              title={t('labware_offsets')}
               {...lpcSetupStepProps()}
             />
             <ProtocolSetupStep

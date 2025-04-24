@@ -11,9 +11,9 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Icon,
+  Tag,
   JUSTIFY_SPACE_BETWEEN,
   StyledText,
-  Tag,
 } from '../..'
 
 import type { ChangeEventHandler, ReactNode, MouseEventHandler } from 'react'

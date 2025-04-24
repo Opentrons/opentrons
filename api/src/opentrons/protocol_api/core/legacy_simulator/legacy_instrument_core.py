@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional, Union, List, Tuple
+from typing import TYPE_CHECKING, Optional, Union, List, Tuple, Literal
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -325,6 +325,7 @@ class LegacyInstrumentCoreSimulator(
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
+        check_for_movement_conflicts: bool = False,  # Not used in this implementation
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
         if isinstance(location, (TrashBin, WasteChute)):
@@ -534,7 +535,7 @@ class LegacyInstrumentCoreSimulator(
         volume: float,
         source: Tuple[types.Location, LegacyWellCore],
         dest: List[Tuple[types.Location, LegacyWellCore]],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
@@ -549,7 +550,7 @@ class LegacyInstrumentCoreSimulator(
         volume: float,
         source: List[Tuple[types.Location, LegacyWellCore]],
         dest: Tuple[types.Location, LegacyWellCore],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],

@@ -35,6 +35,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
             axes: ['rightZ'],
           },
         },
+        {
+          commandType: 'unsafe/updatePositionEstimators' as const,
+          params: {
+            axes: ['x', 'y'],
+          },
+        },
       ],
       false
     )

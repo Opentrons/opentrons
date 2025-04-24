@@ -1967,7 +1967,7 @@
             }
           ],
           "default": null,
-          "description": "The number of labware that should be initially stored in the stacker. This number will be silently clamped to\nthe maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker.\n\nThis field works with the initialStoredLabware field in a complex way.\n\nThe following must be true for initialCount to be valid:\n  - It is not specified, and initialStoredLabware is not specified, in which case the stacker will start empty\n  - It is not specified, and initialStoredLabware is specified, in which case the contents of the stacker are entirely\n    determined by initialStoredLabware.\n  - It is specified, and initialStoredLabware is specified, in which case the length of initialStoredLabware must be\n    exactly initialCount, and the contents of the stacker will be determined by initialStoredLabware.\n",
+          "description": "How full the labware pool should now be. If None, default to the maximum amount of the currently-configured labware the pool can hold. If this number is larger than the maximum the pool can hold, it will be clamped to the maximum. If this number is smaller than the current amount of labware the pool holds, it will be clamped to that minimum. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
           "title": "Count"
         },
         "labwareToStore": {
