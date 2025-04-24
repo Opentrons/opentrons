@@ -723,7 +723,7 @@ def _count_from_lw_list_or_initial_count(
     if initial_count is not None:
         if initial_lw and len(initial_lw) != initial_count:
             raise CommandPreconditionViolated(
-                "If initialCount and initialStoredLabware are both specified, the number of labware must be less than or equal to the count"
+                "If initialCount and initialStoredLabware are both specified, the number of labware must equal the count"
             )
         to_store_count = initial_count
     elif initial_lw is not None:
