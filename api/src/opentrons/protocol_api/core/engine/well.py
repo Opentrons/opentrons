@@ -188,7 +188,6 @@ class WellCore(AbstractWellCore):
         """Return an estimate of liquid height after pipetting without raising an error."""
         labware_id = self.labware_id
         well_name = self._name
-        # get pipette_id from mount
         mount_type = MountType.from_hw_mount(mount)
         pipette_from_mount = self._engine_client.state.pipettes.get_by_mount(mount_type)
         if pipette_from_mount is None:

@@ -1956,7 +1956,6 @@ def test_get_well_position_raises_validation_error(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
     ).then_return(0.5)
 
-
     with pytest.raises(errors.OperationLocationNotInWellError):
         subject.get_well_position(
             labware_id="labware-id",
