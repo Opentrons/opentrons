@@ -42,6 +42,7 @@ export function TwoColTextAndImage(
   const primaryOnClick = (): void => {
     switch (route) {
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
         if (reengageLatchRoutes.includes(step)) {
           void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
             void closeLabwareLatch().then(() => {

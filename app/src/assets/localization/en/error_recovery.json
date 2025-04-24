@@ -55,7 +55,7 @@
   "ignore_similar_errors_later_in_run": "Ignore similar errors later in the run?",
   "inspect_the_robot": "<block>First, inspect the robot to ensure it's prepared to continue the run from the next step.</block><block>Then, close the robot door before proceeding.</block>",
   "is_there_labware_stuck_on_the_stacker_latch": "Is there labware stuck on the stacker latch?",
-  "labware_not_retrieved": "Labware not retrieved",
+  "labware_not_retrieved": "Stacker latch jammed",
   "labware_released_from_current_height": "The labware will be released from its current height.",
   "latch_releasing_labware": "Latch releasing labware",
   "latch_will_release_in_s": "Latch will release labware in {{seconds}} seconds",

@@ -187,6 +187,7 @@ export function useReleaseLabware({
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null
 
+    console.log('recoveryMap.route: ', recoveryMap.route)
     switch (recoveryMap.route) {
       case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
       case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
@@ -233,7 +234,6 @@ export function useReleaseLabware({
                 })
               }
             }
-
             return updatedCountdown
           })
         }, 1000)

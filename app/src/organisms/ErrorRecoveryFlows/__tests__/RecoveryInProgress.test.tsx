@@ -140,13 +140,13 @@ describe('RecoveryInProgress', () => {
     props = {
       ...props,
       recoveryMap: {
-        route: ROBOT_RELEASING_LABWARE.ROUTE,
+        route: ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
         step: ROBOT_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH,
       },
     }
     render(props)
 
-    screen.getByText('Labware latch will release labware in 3 seconds')
+    screen.getByText('Latch will release labware in 3 seconds')
   })
 
   it('updates countdown for gripper release', () => {
@@ -202,7 +202,7 @@ describe('RecoveryInProgress', () => {
   })
 })
 
-describe('useGripperRelease', () => {
+describe('useReleaseLabware', () => {
   const mockProps = {
     recoveryMap: {
       route: RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
@@ -255,31 +255,38 @@ describe('useGripperRelease', () => {
     it.each([
       {
         recoveryOption: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
         nextStep: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE,
       },
       {
         recoveryOption: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
         nextStep: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE,
       },
       {
         recoveryOption: RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
         nextStep:
           RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH,
       },
       {
         recoveryOption: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
         nextStep:
           RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH,
       },
     ])(
       'executes the full sequence of commands for $recoveryOption',
-      async ({ recoveryOption, nextStep }) => {
+      async ({ recoveryOption, nextStep, currentRoute }) => {
         const props = {
           ...mockProps,
           currentRecoveryOptionUtils: {
             selectedRecoveryOption: recoveryOption,
           },
           doorStatusUtils: { isDoorOpen: false },
+          recoveryMap: {
+            route: currentRoute,
+          },
         }
 
         renderHook(() => useReleaseLabware(props))
