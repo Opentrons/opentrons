@@ -19,7 +19,6 @@ import { PYTHON } from '../constants'
 import { getOnlyLatestDefs } from './labware'
 
 import type { UseFormWatch } from 'react-hook-form'
-import { PYTHON } from '../../organisms/ProtocolFormatSection'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import type { CreatePrompt } from '../types'
