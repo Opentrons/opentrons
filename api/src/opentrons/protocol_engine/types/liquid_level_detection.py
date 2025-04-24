@@ -1,9 +1,10 @@
 """Protocol Engine types to do with liquid level detection."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, List
-from pydantic import BaseModel, model_serializer, field_validator
+from typing import Optional, List, Any
+from pydantic import BaseModel, model_serializer, field_validator, model_validator
 
 
 class SimulatedProbeResult(BaseModel):
@@ -16,6 +17,14 @@ class SimulatedProbeResult(BaseModel):
     def serialize_model(self) -> str:
         """Serialize instances of this class as a string."""
         return "SimulatedProbeResult"
+
+    @model_validator(mode="before")
+    @classmethod
+    def model_validator(cls, data: Any) -> Any:
+        """Handle deserializing from a simulated probe result."""
+        if isinstance(data, str) and data == "SimulatedProbeResult":
+            return {}
+        return data
 
     def __add__(
         self, other: float | SimulatedProbeResult

@@ -1,8 +1,9 @@
 """Test protocol engine types."""
-import pytest
-from pydantic import ValidationError
 
-from opentrons.protocol_engine.types import HexColor
+import pytest
+from pydantic import ValidationError, BaseModel
+
+from opentrons.protocol_engine.types import HexColor, SimulatedProbeResult
 
 
 @pytest.mark.parametrize("hex_color", ["#F00", "#FFCC00CC", "#FC0C", "#98e2d1"])
@@ -20,3 +21,15 @@ def test_handles_invalid_hex(invalid_hex_color: str) -> None:
         HexColor(invalid_hex_color)
     with pytest.raises(ValidationError):
         HexColor.model_validate_json(f'"{invalid_hex_color}"')
+
+
+class TestModel(BaseModel):
+    value: float | SimulatedProbeResult
+
+
+def test_deserializes_simulated_liquid_probe() -> None:
+    """Should be able to roundtrip our simulated results."""
+    base = TestModel(value=SimulatedProbeResult())
+    serialized = base.model_dump_json()
+    deserialized = TestModel.model_validate_json(serialized)
+    assert isinstance(deserialized.value, SimulatedProbeResult)
