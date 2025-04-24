@@ -7,11 +7,11 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   ACTIONS,
+  ASPIRATE_SETTING_OPTIONS,
   CONSOLIDATE,
+  DISPENSE_SETTING_OPTIONS,
   DISTRIBUTE,
   TRANSFER,
-  ASPIRATE_SETTING_OPTIONS,
-  DISPENSE_SETTING_OPTIONS,
 } from './constants'
 
 export interface QuickTransferWizardState {

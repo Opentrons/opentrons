@@ -3,9 +3,12 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+
 import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
+
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RequiredLabwareDetails } from '/app/transformations/commands'
+
 /**
  * Returns an array of RequiredLabwareDetails objects that are required by the given protocol ID.
  *

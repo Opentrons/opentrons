@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
-  DIRECTION_COLUMN,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
   LINE_CLAMP_TEXT_STYLE,
@@ -13,7 +13,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { selectDropdownItem } from '../../../ui/steps/actions/actions'
+
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
 

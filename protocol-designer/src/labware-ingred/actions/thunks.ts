@@ -1,36 +1,38 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-import { getLabwarePythonName, uuid } from '../../utils'
-import { getLabwareEntities } from '../../step-forms/selectors'
+
+import { getRobotType } from '../../file-data/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { getLabwareEntities } from '../../step-forms/selectors'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import { getRobotType } from '../../file-data/selectors'
-import type { LabwareEntities } from '@opentrons/step-generation'
 import {
-  selectNestedLabware,
+  selectFixture,
   selectLabware,
   selectModule,
-  selectFixture,
+  selectNestedLabware,
 } from './actions'
+
+import type { LabwareEntities } from '@opentrons/step-generation'
 import type {
   LabwareOnDeck,
   ModuleOnDeck,
   NormalizedLabware,
   NormalizedLabwareById,
 } from '../../step-forms'
-import type {
-  CreateContainerArgs,
-  CreateContainerAction,
-  DuplicateLabwareAction,
-  SelectNestedLabwareAction,
-  SelectLabwareAction,
-  SelectModuleAction,
-  SelectFixtureAction,
-  DeleteContainerAction,
-} from './actions'
 import type { ThunkAction } from '../../types'
 import type { Fixture } from '../types'
+import type {
+  CreateContainerAction,
+  CreateContainerArgs,
+  DeleteContainerAction,
+  DuplicateLabwareAction,
+  SelectFixtureAction,
+  SelectLabwareAction,
+  SelectModuleAction,
+  SelectNestedLabwareAction,
+} from './actions'
 
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'

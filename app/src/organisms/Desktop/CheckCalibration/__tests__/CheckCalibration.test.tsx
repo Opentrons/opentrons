@@ -1,7 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-
 import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'

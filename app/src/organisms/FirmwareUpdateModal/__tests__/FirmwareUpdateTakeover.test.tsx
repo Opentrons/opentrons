@@ -1,19 +1,22 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import {
-  useInstrumentsQuery,
   useCurrentAllSubsystemUpdatesQuery,
+  useInstrumentsQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { UpdateNeededModal } from '../UpdateNeededModal'
-import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
-import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+
+import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
+import { UpdateInProgressModal } from '../UpdateInProgressModal'
+import { UpdateNeededModal } from '../UpdateNeededModal'
 
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 

@@ -1,24 +1,26 @@
 import * as Yup from 'yup'
-import { getAllLoadNames, getAllDisplayNames } from '../definitions'
-import { getDefaultLoadName, getDefaultDisplayName } from './formSelectors'
+
+import { getAllDisplayNames, getAllLoadNames } from '../definitions'
 import {
-  labwareTypeOptions,
-  wellBottomShapeOptions,
-  wellShapeOptions,
   DEFAULT_RACK_BRAND,
   IRREGULAR_LABWARE_ERROR,
-  LABWARE_TOO_SMALL_ERROR,
-  LABWARE_TOO_LARGE_ERROR,
   LABELS,
+  LABWARE_TOO_LARGE_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
+  labwareTypeOptions,
   LOOSE_TIP_FIT_ERROR,
   MAX_X_DIMENSION,
   MAX_Y_DIMENSION,
   MAX_Z_DIMENSION,
   MIN_X_DIMENSION,
   MIN_Y_DIMENSION,
-  REQUIRED_FIELD_ERROR,
   MUST_BE_A_NUMBER_ERROR,
+  REQUIRED_FIELD_ERROR,
+  wellBottomShapeOptions,
+  wellShapeOptions,
 } from './fields'
+import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
+
 import type {
   LabwareFields,
   LabwareType,

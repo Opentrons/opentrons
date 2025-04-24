@@ -1,7 +1,7 @@
 import { appendUniqValidLocCombo } from './appendUniqValidLocCombo'
+import { scanAllCommandsForAllLwUrisByLwId } from './getAllPossibleLwURIsInRun'
 import { getLoadLabwareLocationCombo } from './getLoadLabwareLocationCombo'
 import { getMoveLabwareLocationCombo } from './getMoveLabwareLocationCombo'
-import { scanAllCommandsForAllLwUrisByLwId } from './getAllPossibleLwURIsInRun'
 
 import type {
   CompletedProtocolAnalysis,

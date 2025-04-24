@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { ToggleField as ToggleFieldComponent } from './ToggleField'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 const Template: Story<
   React.ComponentProps<typeof ToggleFieldComponent>

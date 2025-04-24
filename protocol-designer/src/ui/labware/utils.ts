@@ -5,6 +5,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import type { RobotType } from '@opentrons/shared-data'
 import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
 

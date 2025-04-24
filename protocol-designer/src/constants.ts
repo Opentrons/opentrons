@@ -16,6 +16,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+
 import type {
   CutoutId,
   DeckSlot as DeckDefSlot,

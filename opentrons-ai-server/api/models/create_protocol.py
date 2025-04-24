@@ -16,5 +16,4 @@ class CreateProtocol(BaseModel):
     liquids: List[str] = Field(..., description="List of required liquids")
     steps: List[str] = Field(..., description="The steps of the protocol")
     fake: Optional[bool] = Field(False, description="Fake response?")
-    fake_id: Optional[int] = Field(..., description="type of response")
     fake_key: Optional[str] = None

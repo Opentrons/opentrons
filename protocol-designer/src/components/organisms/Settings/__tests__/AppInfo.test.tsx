@@ -1,9 +1,10 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { AppInfo } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { DOC_URL } from '../../KnowledgeLink'
-import { AppInfo } from '..'
 
 import type { ComponentProps } from 'react'
 

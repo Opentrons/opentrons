@@ -1,5 +1,6 @@
 import { generateRobotStateTimeline } from './generateRobotStateTimeline'
 import { generateSubsteps } from './generateSubsteps'
+
 import type { Timeline } from '@opentrons/step-generation'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { GenerateSubstepsArgs } from './generateSubsteps'

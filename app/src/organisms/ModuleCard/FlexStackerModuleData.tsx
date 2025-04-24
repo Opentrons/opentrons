@@ -1,15 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import {
-  StyledText,
-  COLORS,
-  TYPOGRAPHY,
-  SPACING,
-  Flex,
-  WRAP,
-  DIRECTION_COLUMN,
-} from '@opentrons/components'
-import { StatusLabel } from '/app/atoms/StatusLabel'
+import { Chip, Flex, StyledText } from '@opentrons/components'
 
+import {
+  MODULE_INFO_CONTAINER_STYLE,
+  MODULE_INFO_HEADER_TEXT_STYLE,
+  MODULE_INFO_SUB_CONTAINER_STYLE,
+} from './constants'
+
+import type { ChipType } from '@opentrons/components'
 import type { FlexStackerModule } from '/app/redux/modules/types'
 
 interface FlexStackerModuleProps {
@@ -34,7 +32,6 @@ export function FlexStackerModuleData(
   }
 
   const shuttleDisplayStatus = i18n.format(getShuttleStatusText(), 'capitalize')
-
   const doorDisplayStatus = i18n.format(
     moduleData.hopperDoorState === 'closed'
       ? t('shared:closed')
@@ -42,73 +39,51 @@ export function FlexStackerModuleData(
     'capitalize'
   )
 
-  const ShuttleStatusLabelProps = {
-    status: shuttleDisplayStatus,
-    backgroundColor: COLORS.grey30,
-    iconColor: COLORS.grey60,
-    textColor: COLORS.grey60,
-    pulse: false,
-  }
+  const doorType = moduleData.hopperDoorState === 'opened' ? 'info' : 'neutral'
 
+  let shuttleType: ChipType
   switch (moduleData.platformState) {
-    case 'extended':
-    case 'retracted': {
-      ShuttleStatusLabelProps.backgroundColor = COLORS.blue30
-      ShuttleStatusLabelProps.iconColor = COLORS.blue60
-      ShuttleStatusLabelProps.textColor = COLORS.blue60
+    case 'missing':
+      shuttleType = 'error'
       break
-    }
-    case 'missing': {
-      ShuttleStatusLabelProps.backgroundColor = COLORS.red30
-      ShuttleStatusLabelProps.iconColor = COLORS.red60
-      ShuttleStatusLabelProps.textColor = COLORS.red60
+    case 'unknown':
+      shuttleType = 'neutral'
       break
-    }
+    default:
+      shuttleType = 'info'
+      break
   }
-
-  const DoorStatusLabelProps = {
-    status: doorDisplayStatus,
-    backgroundColor: COLORS.grey30,
-    iconColor: COLORS.grey60,
-    textColor: COLORS.grey60,
-    pulse: false,
-  }
-
-  if (moduleData.hopperDoorState === 'opened') {
-    DoorStatusLabelProps.backgroundColor = COLORS.blue30
-    DoorStatusLabelProps.iconColor = COLORS.blue60
-    DoorStatusLabelProps.textColor = COLORS.blue60
-  }
-
   return (
-    <Flex
-      flexWrap={WRAP}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}
-    >
+    <Flex css={MODULE_INFO_CONTAINER_STYLE}>
       <Flex
-        flexDirection={DIRECTION_COLUMN}
+        css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="stacker_door_data"
-        paddingTop={SPACING.spacing8}
       >
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_door_status')}
         </StyledText>
-        <StatusLabel {...DoorStatusLabelProps} />
+        <Chip
+          data-testid="stacker_door_label"
+          text={doorDisplayStatus}
+          chipSize="small"
+          type={doorType}
+          hasIcon={false}
+        />
       </Flex>
       <Flex
-        flexDirection={DIRECTION_COLUMN}
+        css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="stacker_shuttle_data"
-        paddingTop={SPACING.spacing8}
       >
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
+        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_shuttle_status')}
         </StyledText>
-        <StatusLabel {...ShuttleStatusLabelProps} />
+        <Chip
+          data-testid="stacker_shuttle_label"
+          text={shuttleDisplayStatus}
+          chipSize="small"
+          type={shuttleType}
+          iconName="connection-status"
+        />
       </Flex>
     </Flex>
   )

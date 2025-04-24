@@ -1,9 +1,9 @@
 import cx from 'classnames'
+
 import { Icon } from '../icons'
+import styles from './forms.module.css'
 
 import type { ChangeEvent } from 'react'
-
-import styles from './forms.module.css'
 
 export interface ToggleFieldProps {
   /** change handler */

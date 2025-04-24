@@ -1,41 +1,42 @@
 import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
+import { useAtom } from 'jotai'
+import { delay } from 'lodash'
+import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
+  OVERFLOW_AUTO,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
   StyledText,
-  DIRECTION_ROW,
-  OVERFLOW_AUTO,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import smallLogo from '../../assets/images/opentrons_logo_small.svg'
-
-import type { ChatData } from '../../resources/types'
-import { useAtom } from 'jotai'
 import {
   chatDataAtom,
+  createProtocolChatAtom,
   feedbackModalAtom,
   regenerateProtocolAtom,
   scrollToBottomAtom,
-  createProtocolChatAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
-import { delay } from 'lodash'
-import { useFormContext } from 'react-hook-form'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+
+import type { ChatData } from '../../resources/types'
+
+import smallLogo from '../../assets/images/opentrons_logo_small.svg'
 
 interface ChatDisplayProps {
   chat: ChatData
@@ -215,6 +216,10 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
     return <CodeWrapper {...props} id={chatId} />
   }
 
+  const protocolName =
+    chatdata.findLast(chat => chat.protocol_content != null)?.protocol_content
+      ?.metadata.protocolName ?? 'protocol.json'
+
   const ProtocolContentBadge = (props: {
     onClick: () => void
   }): JSX.Element => {
@@ -225,7 +230,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           <IconWrapper>
             <img src={smallLogo} alt="Opentrons logo" width="24" height="24" />
           </IconWrapper>
-          <FileName>protocol.json</FileName>
+          <FileName>{protocolName}</FileName>
           <HoverShadow
             onClick={(e: Event) => {
               e.stopPropagation()

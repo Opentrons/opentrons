@@ -35,6 +35,7 @@ import { editDeckConfiguration } from '../../../step-forms/actions'
 import { AddFixtureModal } from './AddFixtureModal'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ReactNode } from 'react'
+
 import type {
   CutoutFixtureId,
   CutoutId,

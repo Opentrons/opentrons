@@ -1,20 +1,21 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Flex,
   JUSTIFY_END,
   Modal,
   PrimaryButton,
-  SPACING,
   SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
-import { getFileUploadMessages } from '../../../load-file/selectors'
+
+import { getEnablePythonExport } from '../../../feature-flags/selectors'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
 } from '../../../load-file/actions'
+import { getFileUploadMessages } from '../../../load-file/selectors'
 import { useFileUploadModalContents } from './utils'
-import { getEnablePythonExport } from '../../../feature-flags/selectors'
 
 export function FileUploadMessagesModal(): JSX.Element | null {
   const message = useSelector(getFileUploadMessages)

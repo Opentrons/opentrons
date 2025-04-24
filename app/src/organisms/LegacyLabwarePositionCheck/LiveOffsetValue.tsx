@@ -1,4 +1,6 @@
 import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -6,14 +8,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { StyleProps } from '@opentrons/components'

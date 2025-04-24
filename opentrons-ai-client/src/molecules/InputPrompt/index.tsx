@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
+import styled, { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,6 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { SendButton } from '../../atoms/SendButton'
 import {
   chatDataAtom,
@@ -24,27 +24,28 @@ import {
   tokenAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
-import { useApiCall } from '../../resources/hooks'
-import { calcTextAreaHeight } from '../../resources/utils'
 import {
-  STAGING_END_POINT,
-  PROD_END_POINT,
+  LOCAL_CREATE_PROTOCOL_END_POINT,
   LOCAL_END_POINT,
   LOCAL_UPDATE_PROTOCOL_END_POINT,
-  PROD_UPDATE_PROTOCOL_END_POINT,
-  STAGING_UPDATE_PROTOCOL_END_POINT,
-  LOCAL_CREATE_PROTOCOL_END_POINT,
   PROD_CREATE_PROTOCOL_END_POINT,
+  PROD_END_POINT,
+  PROD_UPDATE_PROTOCOL_END_POINT,
   STAGING_CREATE_PROTOCOL_END_POINT,
+  STAGING_END_POINT,
+  STAGING_UPDATE_PROTOCOL_END_POINT,
 } from '../../resources/constants'
+import { useApiCall } from '../../resources/hooks'
+import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+import { calcTextAreaHeight } from '../../resources/utils'
 
 import type { AxiosRequestConfig } from 'axios'
+import type { ProtocolFile } from '@opentrons/shared-data'
 import type {
   ChatData,
   CreatePrompt,
   UpdatePrompt,
 } from '../../resources/types'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -68,6 +69,12 @@ export function InputPrompt(): JSX.Element {
   const watchUserPrompt = watch('userPrompt') ?? ''
 
   const { data, isLoading, callApi } = useApiCall()
+
+  let pdProtocolContent: null | ProtocolFile = null
+  if (data != null && typeof data === 'object' && 'protocol_content' in data) {
+    pdProtocolContent = data.protocol_content as ProtocolFile
+  }
+
   const [requestId, setRequestId] = useState<string>(uuidv4())
 
   // This is to autofill the input field for when we navigate to the chat page from the existing/new protocol generator pages
@@ -122,17 +129,20 @@ export function InputPrompt(): JSX.Element {
         ? getCreateOrUpdateEndpoint()
         : getChatEndpoint()
 
+      const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
+
       const config = {
         url,
         method: 'POST',
         headers,
         data: isUpdateOrCreateRequest
-          ? getUpdateOrCreatePrompt(isRegenerateRequest)
+          ? promptData
           : {
               message: watchUserPrompt,
               history: chatHistory,
-              fake: true,
+              fake: false,
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
+              pd_protocol_content: pdProtocolContent,
             },
       }
 

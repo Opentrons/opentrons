@@ -1,16 +1,16 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { robotControlsEpic } from '..'
+import * as Fixtures from '../../__fixtures__'
+import * as DiscoverySelectors from '../../../discovery/selectors'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 import * as RobotApiHttp from '../../../robot-api/http'
-import * as DiscoverySelectors from '../../../discovery/selectors'
-import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import type * as Types from '../../types'
-import { robotControlsEpic } from '..'
 
-import type { Action, State } from '../../../types'
 import type { RobotApiRequestMeta } from '../../../robot-api/types'
+import type { Action, State } from '../../../types'
+import type * as Types from '../../types'
 
 vi.mock('../../../robot-api/http')
 vi.mock('../../../discovery/selectors')

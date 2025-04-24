@@ -1,6 +1,6 @@
-import nodeFetch from 'node-fetch'
 import isError from 'lodash/isError'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import nodeFetch from 'node-fetch'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Fixtures from '../fixtures'
 import { createHealthPoller } from '../health-poller'

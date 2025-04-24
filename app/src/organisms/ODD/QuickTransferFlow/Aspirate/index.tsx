@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { AspirateSettingItem } from './AspirateSettingItem'
+
 import { AspirateSettingDetail } from './AspirateSettingDetail'
+import { AspirateSettingItem } from './AspirateSettingItem'
 import { useAspirateSettingsConfig } from './hooks/useAspirateSettingsConfig'
 
 import type { Dispatch } from 'react'

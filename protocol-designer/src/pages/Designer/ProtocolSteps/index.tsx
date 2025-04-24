@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
+import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -17,44 +16,46 @@ import {
   StyledText,
   ToggleGroup,
 } from '@opentrons/components'
-import {
-  getSavedStepForms,
-  getUnsavedForm,
-} from '../../../step-forms/selectors'
-import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
-import {
-  getIsMultiSelectMode,
-  getSelectedSubstep,
-  getHoveredTerminalItemId,
-  getActiveItem,
-  getSelectedTerminalItemId,
-  getSelectedStepId,
-} from '../../../ui/steps/selectors'
-import { DeckSetupContainer } from '../DeckSetup'
-import { OffDeck } from '../OffDeck'
-import { SubStepsToolbox } from './Timeline'
-import { StepForm } from './StepForm'
-import { StepSummary } from './StepSummary'
-import { BatchEditToolbox } from './BatchEditToolbox'
-import {
-  getRobotStateTimeline,
-  getRobotType,
-} from '../../../file-data/selectors'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
-import { HARDWARE_ID, START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { HotKeyDisplay, LiquidButton } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
   TimelineAlerts,
 } from '../../../components/organisms'
+import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
+import {
+  getRobotStateTimeline,
+  getRobotType,
+} from '../../../file-data/selectors'
+import {
+  getSavedStepForms,
+  getUnsavedForm,
+} from '../../../step-forms/selectors'
+import { HARDWARE_ID, START_TERMINAL_ITEM_ID } from '../../../steplist'
+import {
+  getActiveItem,
+  getHoveredTerminalItemId,
+  getIsMultiSelectMode,
+  getSelectedStepId,
+  getSelectedSubstep,
+  getSelectedTerminalItemId,
+} from '../../../ui/steps/selectors'
+import { DeckSetupContainer } from '../DeckSetup'
+import { OffDeck } from '../OffDeck'
+import { BatchEditToolbox } from './BatchEditToolbox'
 import { DraggableSidebar } from './DraggableSidebar'
+import { StepForm } from './StepForm'
+import { StepSummary } from './StepSummary'
+import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { DeckSlot } from '../../../types'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
-const STEP_SUMMARY_HEIGHT = '14.7rem'
+const STEP_SUMMARY_HEIGHT = '18.2rem'
 
 interface ProtocolStepsProps {
   isZoomedIn: boolean
@@ -80,6 +81,8 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
+  const isOffDeck = deckView === rightString
+
   // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
 
@@ -148,10 +151,12 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing24}
             width={
-              isZoomedIn ||
+              (isZoomedIn && !isOffDeck) ||
               (selectedTerminalItemId === HARDWARE_ID &&
                 robotType === OT2_ROBOT_TYPE)
                 ? '90%'
+                : isZoomedIn && isOffDeck
+                ? '100%'
                 : CONTENT_MAX_WIDTH
             }
             justifyContent={JUSTIFY_CENTER}
@@ -200,7 +205,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                   robotType={robotType}
                 />
               ) : (
-                <OffDeck />
+                <OffDeck setOverflowMenu={showLiquidOverflowMenu} />
               )}
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                 <>

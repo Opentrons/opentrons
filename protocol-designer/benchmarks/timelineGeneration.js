@@ -3,9 +3,10 @@ import bench from 'nanobench'
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
-  mix,
   getStateAndContextTempTCModules,
+  mix,
 } from '@opentrons/step-generation'
+
 // TODO IMMEDIATELY: figure out a better way to import fixtures from step generation
 const times = 200
 

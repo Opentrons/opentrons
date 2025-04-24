@@ -1,12 +1,12 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '../../../../assets/localization'
+import { Navigation } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 import { getHasUnsavedChanges } from '../../../../load-file/selectors'
 import { SettingsIcon } from '../../SettingsIcon'
-import { Navigation } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
 

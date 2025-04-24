@@ -1,9 +1,11 @@
-import { beforeEach, describe, it, expect } from 'vitest'
-import { getLabwareDefURI, fixtureTiprack300ul } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+
 import { consolidate } from '../commandCreators/compound/consolidate'
 import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  blowoutInPlaceHelper,
   DEFAULT_PIPETTE,
   delayCommand,
   delayWithOffset,
@@ -15,18 +17,18 @@ import {
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
   getSuccessResult,
+  makeAirGapAfterAspirateHelper,
   makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseHelper,
+  makeMoveToWellHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  blowoutInPlaceHelper,
-  makeMoveToWellHelper,
-  makeAirGapAfterAspirateHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
+
 import type {
   AspDispAirgapParams,
   CreateCommand,

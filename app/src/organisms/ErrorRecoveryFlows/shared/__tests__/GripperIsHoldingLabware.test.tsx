@@ -1,19 +1,20 @@
-import { expect, describe, it, vi, beforeEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import capitalize from 'lodash/capitalize'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/__fixtures__'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
+import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
+
 import {
   GripperIsHoldingLabware,
   HOLDING_LABWARE_OPTIONS,
 } from '../GripperIsHoldingLabware'
-import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof GripperIsHoldingLabware>) => {
   return renderWithProviders(<GripperIsHoldingLabware {...props} />, {

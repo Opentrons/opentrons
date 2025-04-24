@@ -1,19 +1,21 @@
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
-  Flex,
-  StyledText,
-  LargeButton,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  SIZE_AUTO,
-  DIRECTION_ROW,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  LargeButton,
+  SIZE_AUTO,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
+
 import { PromptPreviewSection } from '../PromptPreviewSection'
+
 import type { PromptPreviewSectionProps } from '../PromptPreviewSection'
-import { useTranslation } from 'react-i18next'
 
 interface PromptPreviewProps {
   isSubmitButtonEnabled?: boolean

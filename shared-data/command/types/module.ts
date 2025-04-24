@@ -1,6 +1,10 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { LabwareLocationSequence } from './setup'
+import type {
+  CommonCommandCreateInfo,
+  CommonCommandRunTimeInfo,
+  RunCommandFlexStackerError,
+} from '.'
 import type { LabwareDefinition2 } from '../../js'
+import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
   | MagneticModuleEngageMagnetRunTimeCommand
@@ -400,12 +404,34 @@ export interface FlexStackerStoredLabwareDetails {
   version: number
 }
 
+export interface FlexStackerStoredLabwareGroup {
+  primaryLabwareId: string
+  adapterLabwareId: string | null
+  lidLabwareId: string | null
+}
+
+interface StackerStoredLabwareLocationSequences {
+  originalPrimaryLabwareLocationSequences?: LabwareLocationSequence[] | null
+  originalAdapterLabwareLocationSequences?: LabwareLocationSequence[] | null
+  originalLidLabwareLocationSequences?: LabwareLocationSequence[] | null
+  newPrimaryLabwareLocationSequences?: LabwareLocationSequence[] | null
+  newAdapterLabwareLocationSequences?: LabwareLocationSequence[] | null
+  newLidLabwareLocationSequences?: LabwareLocationSequence[] | null
+}
+
+interface StackerStoredLabwareDefinitionURIs {
+  primaryLabwareURI: string
+  adapterLabwareURI?: string | null
+  lidLabwareURI?: string | null
+}
+
 export interface FlexStackerSetStoredLabwareCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'flexStacker/setStoredLabware'
   params: {
     moduleId: string
-    initialCount: number
+    initialCount?: number | null
+    initialStoredLabware?: FlexStackerStoredLabwareGroup[] | null
     primaryLabware: FlexStackerStoredLabwareDetails
     lidLabware: FlexStackerStoredLabwareDetails | null
     adapterLabware: FlexStackerStoredLabwareDetails | null
@@ -420,7 +446,8 @@ export interface FlexStackerSetStoredLabwareRunTimeCommand
     lidLabwareDefinition?: LabwareDefinition2 | null
     adapterLabwareDefinition?: LabwareDefinition2 | null
     count: number
-  }
+    storedLabware: FlexStackerStoredLabwareGroup[]
+  } & StackerStoredLabwareLocationSequences
 }
 
 export interface FlexStackerRetrieveCreateCommand
@@ -428,10 +455,6 @@ export interface FlexStackerRetrieveCreateCommand
   commandType: 'flexStacker/retrieve'
   params: {
     moduleId: string
-    labwareId?: string
-    displayName?: string
-    adapterId?: string
-    lidId?: string
   }
 }
 
@@ -447,6 +470,7 @@ export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
     strategy: 'manualWithPause' | 'logical'
     message?: string
     count?: number
+    labwareToStore?: FlexStackerStoredLabwareGroup[]
   }
 }
 
@@ -472,36 +496,41 @@ export interface FlexStackerPrepareShuttleCreateCommand
 interface RetrieveResultPrimary {
   labwareId: string
   primaryLocationSequence: LabwareLocationSequence
+  originalPrimaryLocationSequence: LabwareLocationSequence
   primaryLabwareURI: string
 }
 
 interface RetrieveResultNoLid {
   lidId?: null
   lidLocationSequence?: null
+  originalLidLocationSequence?: null
   lidLabwareURI?: null
 }
 
 interface RetrieveResultLid {
   lidId: string
   lidLocationSequence: LabwareLocationSequence
+  originalLidLocationSequence: LabwareLocationSequence
   lidLabwareURI: string
 }
 
 interface RetrieveResultAdapter {
   adapterId: string
   adapterLocationSequence: LabwareLocationSequence
+  originalAdapterLocationSequence: LabwareLocationSequence
   adapterLabwareURI: string
 }
 
 interface RetrieveResultNoAdapter {
   adapterId?: null
   adapterLocationSequence?: null
+  originalAdapterLocationSequence?: null
   adapterLabwareURI?: null
 }
 
 export interface FlexStackerRetrieveRunTimeCommand
   extends FlexStackerRetrieveCreateCommand,
-    CommonCommandRunTimeInfo {
+    CommonCommandRunTimeInfo<RunCommandFlexStackerError> {
   result?:
     | (RetrieveResultPrimary & RetrieveResultNoLid & RetrieveResultNoAdapter)
     | (RetrieveResultPrimary & RetrieveResultLid & RetrieveResultNoAdapter)
@@ -511,7 +540,7 @@ export interface FlexStackerRetrieveRunTimeCommand
 
 export interface FlexStackerStoreRunTimeCommand
   extends FlexStackerStoreCreateCommand,
-    CommonCommandRunTimeInfo {
+    CommonCommandRunTimeInfo<RunCommandFlexStackerError> {
   result?: {
     eventualDestinationLocationSequence?: LabwareLocationSequence
     primaryOriginLocationSequence?: LabwareLocationSequence
@@ -520,7 +549,7 @@ export interface FlexStackerStoreRunTimeCommand
     adapterLabwareId?: string
     lidOriginLocationSequence?: LabwareLocationSequence
     lidLabwareId?: LabwareLocationSequence
-  }
+  } & StackerStoredLabwareDefinitionURIs
 }
 
 export interface FlexStackerFillRunTimeCommand
@@ -528,8 +557,10 @@ export interface FlexStackerFillRunTimeCommand
     CommonCommandRunTimeInfo {
   result?: {
     count: number
-    lidLabwareURI?: string
-  }
+    storedLabware?: FlexStackerStoredLabwareGroup[] | null
+    addedLabware?: FlexStackerStoredLabwareGroup[] | null
+  } & StackerStoredLabwareLocationSequences &
+    StackerStoredLabwareDefinitionURIs
 }
 
 export interface FlexStackerEmptyRunTimeCommand
@@ -537,5 +568,8 @@ export interface FlexStackerEmptyRunTimeCommand
     CommonCommandRunTimeInfo {
   result?: {
     count: number
-  }
+    storedLabware?: FlexStackerStoredLabwareGroup[] | null
+    removedLabware?: FlexStackerStoredLabwareGroup[] | null
+  } & StackerStoredLabwareLocationSequences &
+    StackerStoredLabwareDefinitionURIs
 }

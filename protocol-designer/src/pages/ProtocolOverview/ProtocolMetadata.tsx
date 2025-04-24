@@ -14,8 +14,8 @@ import {
 } from '@opentrons/components'
 
 import {
-  LINK_BUTTON_STYLE,
   LINE_CLAMP_TEXT_STYLE,
+  LINK_BUTTON_STYLE,
 } from '../../components/atoms'
 
 const REQUIRED_APP_VERSION = '8.4.0'

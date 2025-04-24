@@ -1,17 +1,17 @@
-import some from 'lodash/some'
 import { useEffect, useState } from 'react'
+import some from 'lodash/some'
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getAreSlotsAdjacent,
+  getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
-  getAreSlotsAdjacent,
-  getModuleType,
 } from '@opentrons/shared-data'
 
 import { getIsAdapter, getStagingAreaAddressableAreas } from '../../../utils'

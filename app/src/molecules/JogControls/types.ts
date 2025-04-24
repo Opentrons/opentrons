@@ -1,10 +1,10 @@
 import type {
   HORIZONTAL_PLANE,
-  VERTICAL_PLANE,
+  LARGE_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
   NULL_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
-  MEDIUM_STEP_SIZE_MM,
-  LARGE_STEP_SIZE_MM,
+  VERTICAL_PLANE,
 } from './constants'
 
 export type Axis = 'x' | 'y' | 'z'

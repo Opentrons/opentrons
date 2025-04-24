@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import { useToaster } from '/app/organisms/ToasterOven'
-
 import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type {
   DispenseSettingOption,

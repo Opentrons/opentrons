@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
+
 import type { EffectCallback } from 'react'
+
 /**
  * React hook to call a function on component mount and unmount
  *

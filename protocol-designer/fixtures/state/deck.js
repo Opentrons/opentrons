@@ -1,13 +1,13 @@
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import {
-  MAGNETIC_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_DEACTIVATED,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_DEACTIVATED,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 
 const mockMagneticModule = {
   id: 'mag_mod',

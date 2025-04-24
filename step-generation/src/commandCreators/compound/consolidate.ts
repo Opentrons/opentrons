@@ -1,20 +1,20 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {
-  LOW_VOLUME_PIPETTES,
-  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
+
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { dropTipInTrash } from './dropTipInTrash'
 import {
   airGapLocationHelper,
   blowoutLocationHelper,
   curryCommandCreator,
+  delayLocationHelper,
   dispenseLocationHelper,
   getIsSafePipetteMovement,
-  delayLocationHelper,
   reduceCommandCreators,
 } from '../../utils'
 import {
@@ -24,16 +24,18 @@ import {
   dropTip,
   touchTip,
 } from '../atomic'
+import { airGapInWell } from './airGapInWell'
+import { dropTipInTrash } from './dropTipInTrash'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
+
 import type { CutoutId } from '@opentrons/shared-data'
 import type {
-  ConsolidateArgs,
   CommandCreator,
+  ConsolidateArgs,
   CurriedCommandCreator,
 } from '../../types'
-import { airGapInWell } from './airGapInWell'
 
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,

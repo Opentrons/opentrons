@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
   Flex,
@@ -8,13 +8,14 @@ import {
   OVERFLOW_HIDDEN,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { generateNewProtocol } from '../../labware-ingred/actions'
+
 import { DefineLiquidsModal } from '../../components/organisms'
-import { getFileMetadata } from '../../file-data/selectors'
-import { selectors } from '../../labware-ingred/selectors'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
+import { getFileMetadata } from '../../file-data/selectors'
+import { generateNewProtocol } from '../../labware-ingred/actions'
+import { selectors } from '../../labware-ingred/selectors'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { ProtocolSteps } from './ProtocolSteps'
 
 import type { CutoutId } from '@opentrons/shared-data'

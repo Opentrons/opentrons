@@ -16,6 +16,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '/app/App/portal'
 import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 

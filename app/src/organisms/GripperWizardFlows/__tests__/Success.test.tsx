@@ -1,9 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { Success } from '../Success'
 import {
   SECTIONS,
   SUCCESSFULLY_ATTACHED,
@@ -11,6 +11,7 @@ import {
   SUCCESSFULLY_CALIBRATED,
   SUCCESSFULLY_DETACHED,
 } from '../constants'
+import { Success } from '../Success'
 
 import type { ComponentProps } from 'react'
 

@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, vi, afterEach, beforeEach, expect } from 'vitest'
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -15,6 +17,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { getSystemLanguage } from '/app/redux/shell'
+
 import { SystemLanguagePreferenceModal } from '..'
 
 vi.mock('react-router-dom')

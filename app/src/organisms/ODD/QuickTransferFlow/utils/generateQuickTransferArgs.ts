@@ -1,37 +1,39 @@
-import uuidv1 from 'uuid/v4'
 import intersection from 'lodash/intersection'
+import uuidv1 from 'uuid/v4'
 import {
-  orderWells,
   getAllDefinitions,
   getLabwareDefURI,
   getTipTypeFromTipRackDefinition,
+  orderWells,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
+
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../constants'
+
 import type {
   CutoutConfig,
-  LabwareDefinition2,
   DeckConfiguration,
-  PipetteName,
+  LabwareDefinition2,
   NozzleConfigurationStyle,
+  PipetteName,
 } from '@opentrons/shared-data'
-import type { QuickTransferSummaryState } from '../types'
 import type {
   ConsolidateArgs,
   DistributeArgs,
-  TransferArgs,
   InvariantContext,
-  PipetteEntities,
   LabwareEntities,
+  PipetteEntities,
   RobotState,
+  TransferArgs,
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
+import type { QuickTransferSummaryState } from '../types'
 
 export type MoveLiquidStepArgs =
   | ConsolidateArgs

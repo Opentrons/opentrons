@@ -1,5 +1,4 @@
 import ReactSelect, { components } from 'react-select'
-
 import {
   BORDERS,
   Box,
@@ -13,11 +12,11 @@ import {
 } from '@opentrons/components'
 
 import type {
-  Props as ReactSelectProps,
-  StylesConfig,
-  OptionProps,
   CSSObjectWithLabel,
   DropdownIndicatorProps,
+  OptionProps,
+  Props as ReactSelectProps,
+  StylesConfig,
 } from 'react-select'
 import type { DropdownBorder } from '@opentrons/components'
 

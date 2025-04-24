@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -17,22 +17,22 @@ import {
 } from '@opentrons/components'
 import { FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
+import {
+  ConfirmDeleteEntityInUseModal,
+  ConfirmDeleteStagingAreaModal,
+  EditNickNameModal,
+} from '../../../components/organisms'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   deleteContainer,
   duplicateLabware,
   openIngredientSelector,
 } from '../../../labware-ingred/actions'
-import { getNextAvailableDeckSlot } from '../../../labware-ingred/utils'
-import {
-  ConfirmDeleteEntityInUseModal,
-  ConfirmDeleteStagingAreaModal,
-  EditNickNameModal,
-} from '../../../components/organisms'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { getNextAvailableDeckSlot } from '../../../labware-ingred/utils'
+import { getSavedStepForms } from '../../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { MouseEvent, SetStateAction } from 'react'
@@ -41,7 +41,6 @@ import type {
   CoordinateTuple,
   DeckSlotId,
 } from '@opentrons/shared-data'
-
 import type { ThunkDispatch } from '../../../types'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [

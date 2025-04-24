@@ -1,10 +1,11 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+
 import { getLiquidEntities } from '../../../step-forms/selectors'
-import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { SlotInformation } from '../SlotInformation'
 
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'

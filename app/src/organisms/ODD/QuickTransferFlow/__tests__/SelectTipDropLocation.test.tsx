@@ -1,6 +1,5 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'

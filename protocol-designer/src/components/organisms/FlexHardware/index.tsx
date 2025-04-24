@@ -16,6 +16,7 @@ import {
 import { deleteModule } from '../../../modules'
 import { deleteContainer } from '../../../labware-ingred/actions'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
+
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
@@ -24,19 +25,20 @@ import {
 import { editDeckConfiguration } from '../../../step-forms/actions'
 import { uuid } from '../../../utils'
 import { useKitchen } from '../Kitchen/hooks'
-import { HardwareConfigurator } from '../HardwareConfigurator'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { ConfirmDeleteStagingAreaModal } from '../ConfirmDeleteStagingAreaModal'
 import { updateInitialDeckState } from './util'
+import { HardwareConfigurator } from '../HardwareConfigurator'
+
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
   FlexModuleCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
+import type { FixtureName, Fixtures } from '..'
 import type { ThunkDispatch } from '../../../types'
-import type { Fixtures, FixtureName } from '..'
+import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
 
 export function FlexHardware(): JSX.Element {
   const { t } = useTranslation('protocol_overview')

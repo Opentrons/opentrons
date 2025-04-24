@@ -1,8 +1,9 @@
 import { getBatchEditFieldChanges } from '../selectors'
 import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { StepFieldName, StepIdType } from '../../form-types'
 import type { ThunkAction } from '../../types'
-import type { StepIdType, StepFieldName } from '../../form-types'
 import type { BatchEditFormChangesState } from '../reducers'
+
 export * from './modules'
 export * from './pipettes'
 export interface ChangeBatchEditFieldAction {

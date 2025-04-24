@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_START,
   Banner,
@@ -12,71 +12,76 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   ModuleIcon,
   OverflowBtn,
   SPACING,
+  StyledText,
+  SUCCESS_TOAST,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
-  SUCCESS_TOAST,
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  MODULE_MODELS_OT2_ONLY,
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
+import { getModulePrepCommands } from '/app/local-resources/modules'
+import { UpdateBanner } from '/app/molecules/UpdateBanner'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
-  getRequestById,
-  PENDING,
+  dismissRequest,
   FAILURE,
   getErrorResponseMessage,
-  dismissRequest,
+  getRequestById,
+  PENDING,
   SUCCESS,
 } from '/app/redux/robot-api'
-import { UpdateBanner } from '/app/molecules/UpdateBanner'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useChainLiveCommands } from '/app/resources/runs'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { getModuleTooHot } from '/app/transformations/modules'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { MagneticModuleData } from './MagneticModuleData'
-import { TemperatureModuleData } from './TemperatureModuleData'
-import { ThermocyclerModuleData } from './ThermocyclerModuleData'
-import { ModuleOverflowMenu } from './ModuleOverflowMenu'
-import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
-import { MagneticModuleSlideout } from './MagneticModuleSlideout'
-import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+
 import { AboutModuleSlideout } from './AboutModuleSlideout'
+import { AbsorbanceReaderData } from './AbsorbanceReaderData'
+import {
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+  MODULE_INFO_HEADER_TEXT_STYLE,
+  MODULE_INFO_SUB_CONTAINER_STYLE,
+} from './constants'
+import { ErrorInfo } from './ErrorInfo'
+import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
+import { FlexStackerModuleData } from './FlexStackerModuleData'
 import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
-import { TestShakeSlideout } from './TestShakeSlideout'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { getModulePrepCommands } from '/app/local-resources/modules'
-import { getModuleCardImage } from './utils'
-import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
-import { ErrorInfo } from './ErrorInfo'
+import { MagneticModuleData } from './MagneticModuleData'
+import { MagneticModuleSlideout } from './MagneticModuleSlideout'
+import { ModuleOverflowMenu } from './ModuleOverflowMenu'
 import { ModuleSetupModal } from './ModuleSetupModal'
-import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { TemperatureModuleData } from './TemperatureModuleData'
+import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+import { TestShakeSlideout } from './TestShakeSlideout'
+import { ThermocyclerModuleData } from './ThermocyclerModuleData'
+import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { getModuleCardImage } from './utils'
 
 import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,
 } from '/app/redux/modules/types'
-import type { State, Dispatch } from '/app/redux/types'
 import type { RequestState } from '/app/redux/robot-api/types'
-import { AbsorbanceReaderData } from './AbsorbanceReaderData'
-import { FlexStackerModuleData } from './FlexStackerModuleData'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -317,8 +322,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           }}
         />
       )}
-      <Box padding={SPACING.spacing16} width="100%">
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
+      <Box
+        paddingY={SPACING.spacing16}
+        paddingLeft={SPACING.spacing16}
+        width="100%"
+      >
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
               width="60px"
@@ -330,7 +339,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
-            paddingLeft={SPACING.spacing8}
+            gridGap={SPACING.spacing8}
           >
             <ErrorInfo attachedModule={module} />
             {latestRequest != null && latestRequest.status === FAILURE && (
@@ -384,9 +393,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     i18nKey="hot_to_the_touch"
                     components={{
                       bold: <strong />,
-                      block: (
-                        <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP} />
-                      ),
+                      block: <StyledText fontSize={TYPOGRAPHY.fontSizeP} />,
                     }}
                   />
                 </Banner>
@@ -405,18 +412,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   aria-label="ot-spinner"
                   color={COLORS.grey60}
                 />
-                <LegacyStyledText marginLeft={SPACING.spacing8}>
+                <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             ) : (
-              <>
-                <LegacyStyledText
+              <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
+                <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.grey60}
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  fontSize={TYPOGRAPHY.fontSizeH6}
-                  paddingBottom={SPACING.spacing4}
+                  css={MODULE_INFO_HEADER_TEXT_STYLE}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
@@ -432,23 +436,22 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                             : '',
                       })
                     : t('usb_port_not_connected')}
-                </LegacyStyledText>
+                </StyledText>
                 <Flex
-                  paddingBottom={SPACING.spacing4}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
-                  fontSize={TYPOGRAPHY.fontSizeP}
                 >
                   <ModuleIcon
                     moduleType={module.moduleType}
                     size="1rem"
-                    marginRight={SPACING.spacing2}
+                    marginTop={SPACING.spacing2}
+                    marginRight={SPACING.spacing4}
                     color={COLORS.grey60}
                   />
-                  <LegacyStyledText>
+                  <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
                     {getModuleDisplayName(module.moduleModel)}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
-              </>
+              </Flex>
             )}
             <Flex
               opacity={isPending ? '50%' : '100%'}

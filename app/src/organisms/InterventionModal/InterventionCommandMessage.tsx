@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,

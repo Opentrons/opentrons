@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   fetchSettings,
   getRobotSettings,
   updateSetting,
 } from '/app/redux/robot-settings'
+
 import type { RobotSettings } from '/app/redux/robot-settings/types'
 import type { Dispatch, State } from '/app/redux/types'
 

@@ -11,17 +11,16 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { AnnouncementModal } from '../../components/organisms'
 import { selectors as analyticsSelectors } from '../../analytics'
-import { selectors as tutorialSelectors } from '../../tutorial'
-import { getFeatureFlagData } from '../../feature-flags/selectors'
-
+import { AnnouncementModal } from '../../components/organisms'
 import {
   AppInfo,
   FeatureFlag,
   Privacy,
   UserSettings,
 } from '../../components/organisms/Settings'
+import { getFeatureFlagData } from '../../feature-flags/selectors'
+import { selectors as tutorialSelectors } from '../../tutorial'
 
 const SETTINGS_MAX_WIDTH = '56rem'
 

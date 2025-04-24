@@ -1,5 +1,7 @@
 'use strict'
+
 import { vi } from 'vitest'
+
 import * as filters from '../filters'
 
 vi.mock('../definitions')

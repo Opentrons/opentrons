@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { WELL_BOTTOM } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
+import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
+
 import { _castForm } from '../index'
+
 import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedMagnetFormData,
@@ -62,22 +64,22 @@ describe('form casting', () => {
       nozzles: null,
       tipRack: 'some tiprack',
       liquidClassesSupported: true,
-      aspirate_retract_position_reference: WELL_BOTTOM,
+      aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
       aspirate_submerge_mmFromBottom: 1,
       aspirate_submerge_x_position: 0,
       aspirate_submerge_y_position: 0,
       aspirate_position_reference: 'well-top',
-      dispense_retract_position_reference: WELL_BOTTOM,
+      dispense_retract_position_reference: POSITION_REFERENCE_BOTTOM,
       dispense_submerge_mmFromBottom: 4,
       dispense_submerge_x_position: 1,
       dispense_submerge_y_position: -1,
-      dispense_position_reference: WELL_BOTTOM,
+      dispense_position_reference: POSITION_REFERENCE_BOTTOM,
       pushOut_volume: null,
       pushOut_checkbox: false,
       conditioning_checkbox: false,
       conditioning_volume: null,
-      aspirate_submerge_position_reference: WELL_BOTTOM,
-      dispense_submerge_position_reference: WELL_BOTTOM,
+      aspirate_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
+      dispense_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
     }
     expect(_castForm(input)).toEqual({
       ...input,
@@ -116,7 +118,7 @@ describe('form casting', () => {
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,
-      mix_position_reference: WELL_BOTTOM,
+      mix_position_reference: POSITION_REFERENCE_BOTTOM,
     }
 
     expect(_castForm(input)).toEqual({

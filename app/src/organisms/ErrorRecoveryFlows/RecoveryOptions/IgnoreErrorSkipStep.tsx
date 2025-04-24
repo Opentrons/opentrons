@@ -1,31 +1,30 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
 import {
   DIRECTION_COLUMN,
   Flex,
+  RadioButton,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
-  RESPONSIVENESS,
-  RadioButton,
 } from '@opentrons/components'
 
 import {
-  ODD_SECTION_TITLE_STYLE,
-  RECOVERY_MAP,
-  ODD_ONLY,
   DESKTOP_ONLY,
   ERROR_KINDS,
+  ODD_ONLY,
+  ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
 } from '../constants'
-import { SelectRecoveryOption } from './SelectRecoveryOption'
 import {
   RecoveryFooterButtons,
-  RecoverySingleColumnContentWrapper,
   RecoveryRadioGroup,
+  RecoverySingleColumnContentWrapper,
   SkipStepInfo,
 } from '../shared'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { ChangeEvent } from 'react'
 import type { RecoveryContentProps } from '../types'
@@ -83,7 +82,7 @@ export function IgnoreErrorStepHome({
       case ERROR_KINDS.NO_LIQUID_DETECTED:
         void proceedToRouteAndStep(
           RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
-          RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS
+          RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.SKIP
         )
         break
       default:

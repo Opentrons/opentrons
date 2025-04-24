@@ -1,12 +1,13 @@
 import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
+
 import type {
   CompletedProtocolAnalysis,
-  LoadLabwareRunTimeCommand,
-  MoveLabwareRunTimeCommand,
-  ProtocolAnalysisOutput,
   LabwareDefinition2,
+  LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
+  MoveLabwareRunTimeCommand,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 interface LabwareInSlot {

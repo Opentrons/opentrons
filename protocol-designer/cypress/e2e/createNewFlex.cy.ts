@@ -1,10 +1,10 @@
-import { UniversalSteps } from '../support/UniversalSteps'
 import {
+  CompositeSetupSteps,
   SetupSteps,
   SetupVerifications,
-  CompositeSetupSteps,
 } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Create new Flex', () => {
   beforeEach(() => {

@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import { DEFAULT_PIPETTE, getSuccessResult, makeContext } from '../fixtures'
+
 import { dropTipInWasteChute } from '../commandCreators'
+import { DEFAULT_PIPETTE, getSuccessResult, makeContext } from '../fixtures'
 
 import type { InvariantContext, RobotState } from '../types'
 

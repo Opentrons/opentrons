@@ -1,10 +1,9 @@
 import { css } from 'styled-components'
-
 import {
   COLORS,
   Flex,
-  ModuleIcon as SharedModuleIcon,
   POSITION_RELATIVE,
+  ModuleIcon as SharedModuleIcon,
   SPACING,
   Tooltip,
   useHoverTooltip,

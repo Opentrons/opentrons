@@ -1,10 +1,10 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
 
 import { SlotInformation } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

@@ -178,7 +178,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         self._run_control = run_control
 
     async def _labware_movement_stacker_validation(
-        self, module_id: str
+        self, module_id: str, labware_to_move: str
     ) -> FlexStackerShuttleError | None:
         # Validate that a Flex Stacker is in position to receive labware
         stacker_sub = self._state_view.modules.get_flex_stacker_substate(module_id)
@@ -197,6 +197,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                             error=e,
                         )
                     ],
+                    errorInfo={"labwareId": labware_to_move},
                 )
 
         return None
@@ -340,7 +341,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 and module.model == ModuleModel.FLEX_STACKER_MODULE_V1
             ):
                 module_location_error = await self._labware_movement_stacker_validation(
-                    module.id
+                    module.id, params.labwareId
                 )
 
         # Allow propagation of ModuleNotLoadedError.

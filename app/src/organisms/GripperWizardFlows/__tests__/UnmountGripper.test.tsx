@@ -1,14 +1,13 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { UnmountGripper } from '../UnmountGripper'
 import { GRIPPER_FLOW_TYPES } from '../constants'
+import { UnmountGripper } from '../UnmountGripper'
 
 import type { ComponentProps } from 'react'
 

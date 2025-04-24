@@ -2,24 +2,25 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
-import {
   ALIGN_START,
   Banner,
   Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Modal,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
 
 import type { AttachedModule } from '/app/redux/modules/types'

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
@@ -11,13 +11,14 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+
+import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
 import {
   getDeckErrors,
   getIsLabwareOnSlotInUse,
   getModuleModelsBySlot,
   getSVGContainerWidth,
 } from '../utils'
-import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
 import type { LabwareOnDeck, SavedStepFormState } from '../../../../step-forms'
 
 describe('getModuleModelsBySlot', () => {

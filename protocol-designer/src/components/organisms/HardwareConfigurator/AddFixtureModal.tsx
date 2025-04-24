@@ -32,6 +32,7 @@ import { useKitchen } from '../Kitchen/hooks'
 import { getIsLabwareCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 import type { UseFormSetValue } from 'react-hook-form'
+import type { ModalProps } from '@opentrons/components'
 import type {
   CutoutConfig,
   CutoutId,
@@ -39,10 +40,9 @@ import type {
   FlexModuleCutoutFixtureId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ModalProps } from '@opentrons/components'
 import type { FormModules, ModuleOnDeck } from '../../../step-forms'
-import type { Fixtures, WizardFormState } from '../types'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import type { Fixtures, WizardFormState } from '../types'
 
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId

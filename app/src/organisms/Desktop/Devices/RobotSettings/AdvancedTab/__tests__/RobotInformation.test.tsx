@@ -1,16 +1,19 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useRobot } from '/app/redux-resources/robots'
 import {
-  getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
+  getRobotSerialNumber,
 } from '/app/redux/discovery'
-import { useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+
 import { RobotInformation } from '../RobotInformation'
 
 vi.mock('/app/redux-resources/robots')

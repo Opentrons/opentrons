@@ -1,18 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  StyledText,
-  PrimaryButton,
   JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
   ModalHeader,
   ModalShell,
+  PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'

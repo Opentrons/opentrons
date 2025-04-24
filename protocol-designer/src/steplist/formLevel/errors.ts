@@ -9,13 +9,13 @@ import {
   ABSORBANCE_READER_MAX_WAVELENGTH_NM,
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
   ABSORBANCE_READER_READ,
-  MIN_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V1,
-  MIN_ENGAGE_HEIGHT_V2,
   MAX_ENGAGE_HEIGHT_V2,
+  MIN_ENGAGE_HEIGHT_V1,
+  MIN_ENGAGE_HEIGHT_V2,
   PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
@@ -43,8 +43,9 @@ import type {
   HydratedThermocyclerFormData,
   StepFieldName,
 } from '../../form-types'
-import type { ModuleEntities } from '../../step-forms'
 import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
+import type { ModuleEntities } from '../../step-forms'
+
 /*******************
  ** Error Messages **
  ********************/
@@ -377,7 +378,7 @@ const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
   tab: 'dispense',
 }
 const BLOWOUT_LOCATION_REQUIRED: FormError = {
-  title: 'Volume required',
+  title: 'Blowout location required',
   dependentFields: ['blowout_checkbox', 'blowout_location'],
   showAtForm: false,
   showAtField: true,
@@ -503,7 +504,7 @@ const CONDITIONING_VOLUME_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
-  tab: 'dispense',
+  tab: 'aspirate',
 }
 const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   title: 'Conditioning volume out of range',
@@ -511,7 +512,7 @@ const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
-  tab: 'dispense',
+  tab: 'aspirate',
 }
 
 export type FormErrorChecker = (
@@ -962,7 +963,12 @@ export const blowoutLocationRequired = (
   fields: HydratedMixFormData | HydratedMoveLiquidFormData
 ): FormError | null => {
   const { blowout_checkbox, blowout_location } = fields
-  return blowout_checkbox && !blowout_location
+  const isDisposalChecked =
+    'disposalVolume_checkbox' in fields &&
+    'path' in fields &&
+    fields.disposalVolume_checkbox &&
+    fields.path === 'multiDispense'
+  return (blowout_checkbox || isDisposalChecked) && blowout_location == null
     ? BLOWOUT_LOCATION_REQUIRED
     : null
 }

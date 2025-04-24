@@ -1,12 +1,13 @@
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAreSlotsVerticallyAdjacent,
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { DEFAULT_SLOT_MAP_OT2 } from '../../pages/Onboarding/constants'
 import { ALL_MODULE_SLOTS_OT2 } from '../../modules'
+
 import type {
   AddressableArea,
   AddressableAreaName,

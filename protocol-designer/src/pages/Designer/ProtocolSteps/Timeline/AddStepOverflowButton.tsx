@@ -7,7 +7,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { stepIconsByType } from '../../../../form-types'
+
 import type { StepType } from '../../../../form-types'
 
 export interface AddStepOverflowButtonProps {
