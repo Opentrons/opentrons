@@ -264,6 +264,7 @@ async def _main() -> None:
     await hw_api.set_lights(rails=True)
     x_direction, y_direction = 1, 1
     if args.partial_tip_config is not None:
+        print("Partial Tip Config\n")
         partial_tip_dict = {
             "left-col": ["A1", "H1", 12, -1, 0],
             "right-col": ["A12", "H12", 12, 1, 0],
@@ -274,7 +275,7 @@ async def _main() -> None:
         }
         back_left_nozzle = partial_tip_dict[args.partial_tip_config][0]
         front_right_nozzle = partial_tip_dict[args.partial_tip_config][1]
-        PIPETTE_CHANNELS = partial_tip_dict[args.partial_tip_config][2]
+        PIPETTE_CHANNELS = int(96 / partial_tip_dict[args.partial_tip_config][2])
         x_direction = partial_tip_dict[args.partial_tip_config][3]
         y_direction = partial_tip_dict[args.partial_tip_config][4]
     await hw_api.update_nozzle_configuration_for_mount(mount, starting_nozzle=back_left_nozzle,
@@ -313,8 +314,8 @@ async def _main() -> None:
             # Iterate each nozzle onto the dial indicator to measure the flatness
             for nozzle_count in range(1, PIPETTE_CHANNELS + 1):
                 cp = CriticalPoint.NOZZLE
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset * x_direction,
-                                        nozzle_loc[Axis.Y] + y_offset * y_direction,
+                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset * y_direction,
+                                        nozzle_loc[Axis.Y] + y_offset * x_direction,
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
                 await asyncio.sleep(2)
@@ -394,8 +395,8 @@ async def _main() -> None:
                     tip_measurement = gauge.read()
                     print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
                     print("\r", end="")
-                    tip_position = Point(dial_loc[0] + x_offset * x_direction,
-                                            dial_loc[1] + y_offset * y_direction,
+                    tip_position = Point(dial_loc[0] + x_offset * y_direction,
+                                            dial_loc[1] + y_offset * x_direction,
                                             dial_loc[2])
                     measurements.append(tip_measurement)
                     if tip_count % NOZZLE_COLUMNS == 0:
@@ -422,6 +423,14 @@ async def _main() -> None:
                 if keyboard_input == 'q':
                     break
                 cp = CriticalPoint.NOZZLE
+                if i < args.cycles - 1:
+                    tiprack_loc = Point(pickup_loc[0]+ (NOZZLE_TO_NOZZLE_MM * (i + 1) * x_direction),
+                                        pickup_loc[1]+ (NOZZLE_TO_NOZZLE_MM * (i + 1) * y_direction),
+                                        pickup_loc[2])
+                    await move_to_point(hw_api, mount, tiprack_loc, cp)
+                    await hw_api.pick_up_tip(
+                        mount, tip_length=(tip_length[args.tip_size] - tip_overlap))
+                    y_offset = 0
                 await move_to_point(hw_api, mount, pickup_loc, cp)
                 initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
                 print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
