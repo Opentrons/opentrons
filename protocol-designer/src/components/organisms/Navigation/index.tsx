@@ -39,13 +39,11 @@ export function Navigation(): JSX.Element | null {
       !hasUnsavedChanges ||
       window.confirm(t('alert:confirm_create_new') as string)
     ) {
-      dispatch(toggleNewProtocolModal(true))
-      navigate('/createNew')
+      navigate('/createNew', { state: { modalResetKey: Date.now() } })
     }
   }
 
-  return location.pathname === '/designer' ||
-    location.pathname === '/liquids' ? null : (
+  return (
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
@@ -59,13 +57,11 @@ export function Navigation(): JSX.Element | null {
         </StyledText>
       </Flex>
       <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
-        {location.pathname === '/createNew' ? null : (
-          <Btn onClick={handleCreateNew} css={LINK_BUTTON_STYLE}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('create_new')}
-            </StyledText>
-          </Btn>
-        )}
+        <Btn onClick={handleCreateNew} css={LINK_BUTTON_STYLE}>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('create_new')}
+          </StyledText>
+        </Btn>
         <StyledLabel>
           <Flex css={LINK_BUTTON_STYLE}>
             <StyledText desktopStyle="bodyDefaultRegular">

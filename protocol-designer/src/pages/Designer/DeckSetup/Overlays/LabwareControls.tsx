@@ -17,6 +17,7 @@ import {
 
 import { DND_TYPES } from '../../../../constants'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
@@ -111,7 +112,7 @@ export const LabwareControls = (
   drag(drop(ref))
 
   if (
-    terminalItemId !== '__initial_setup__' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected ||
     slotPosition == null
   ) {

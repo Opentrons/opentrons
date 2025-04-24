@@ -1,9 +1,11 @@
+import { CUSTOM_LABWARE_DICT_NAME } from '@opentrons/step-generation'
+
 import { selectors as fileDataSelectors } from '../file-data'
 import { migration } from './migration'
 import { saveFile, savePythonFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
-import type { PDProtocolFile, PDPythonFile } from '../file-types'
+import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type {
   FileUploadErrorType,
@@ -30,7 +32,7 @@ export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
 })
 // expects valid, parsed JSON protocol.
 export const loadFileAction = (
-  payload: PDProtocolFile | PDPythonFile
+  payload: PDProtocolFile | PythonDesignerApplication
 ): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migration(payload),
@@ -90,7 +92,29 @@ export const loadProtocolFile = (
           const designerApplicationString = designerApplication[1]
           const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
 
-          dispatch(loadFileAction(designerApplicationJson as PDPythonFile))
+          const customLabwareRegex = new RegExp(
+            `^${CUSTOM_LABWARE_DICT_NAME}\\s*=\\s*json.loads\\("""(.*)"""\\)`,
+            'm'
+          )
+          const customLabware = result.match(customLabwareRegex)
+          let customLabwareJson
+          if (customLabware != null && customLabware[1]) {
+            const customLabwareString = customLabware[1]
+            customLabwareJson = JSON.parse(customLabwareString)
+          }
+          dispatch(
+            loadFileAction(
+              (customLabwareJson != null
+                ? {
+                    ...designerApplicationJson,
+                    //  NOTE: labwareDefinitions contain custom labware only
+                    //  other labwareDefinitions are populated via mapping through
+                    //  the labware key in the labwareInvariantProperties reducer
+                    labwareDefinitions: customLabwareJson,
+                  }
+                : designerApplicationJson) as PythonDesignerApplication
+            )
+          )
         } else {
           fileError('INVALID_PYTHON_FILE')
         }

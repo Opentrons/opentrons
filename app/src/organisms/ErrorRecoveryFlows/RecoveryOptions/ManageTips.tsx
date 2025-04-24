@@ -76,6 +76,7 @@ export function BeginRemoval({
     ROBOT_CANCELING,
     RETRY_NEW_TIPS,
     HOME_AND_RETRY,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS,
     DROP_TIP_FLOWS,
   } = RECOVERY_MAP
   const mount = aPipetteWithTip?.mount
@@ -101,6 +102,13 @@ export function BeginRemoval({
       void proceedToRouteAndStep(
         HOME_AND_RETRY.ROUTE,
         HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
+      )
+    } else if (
+      selectedRecoveryOption === MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE
+    ) {
+      void proceedToRouteAndStep(
+        MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
       )
     } else {
       void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
@@ -175,6 +183,7 @@ function DropTipFlowsContainer(
     ROBOT_CANCELING,
     RETRY_NEW_TIPS,
     HOME_AND_RETRY,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
@@ -193,6 +202,13 @@ function DropTipFlowsContainer(
       void proceedToRouteAndStep(
         HOME_AND_RETRY.ROUTE,
         HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
+      )
+    } else if (
+      selectedRecoveryOption === MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE
+    ) {
+      void proceedToRouteAndStep(
+        MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
       )
     } else {
       void setTipStatusResolved(onEmptyCache, onTipsDetected)
@@ -240,6 +256,7 @@ export function useDropTipFlowUtils({
     ERROR_WHILE_RECOVERING,
     DROP_TIP_FLOWS,
     HOME_AND_RETRY,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
   const { runId, gripperErrorFirstPipetteWithTip } = tipStatusUtils
   const { step } = recoveryMap
@@ -253,6 +270,7 @@ export function useDropTipFlowUtils({
       case RETRY_NEW_TIPS.ROUTE:
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
       case HOME_AND_RETRY.ROUTE:
+      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
         return t('proceed_to_tip_selection')
       default:
         return t('proceed_to_cancel')
@@ -279,6 +297,13 @@ export function useDropTipFlowUtils({
       case HOME_AND_RETRY.ROUTE:
         return () => {
           routeTo(selectedRecoveryOption, HOME_AND_RETRY.STEPS.REPLACE_TIPS)
+        }
+      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+        return () => {
+          routeTo(
+            selectedRecoveryOption,
+            MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+          )
         }
       default:
         return null
@@ -374,6 +399,7 @@ function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
     SKIP_STEP_WITH_NEW_TIPS,
     OPTION_SELECTION,
     HOME_AND_RETRY,
+    MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
 
   if (tipStatusUtils.aPipetteWithTip == null)
@@ -396,6 +422,13 @@ function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
         proceedToRouteAndStep(
           selectedRecoveryOption,
           HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
+        )
+        break
+      }
+      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE: {
+        proceedToRouteAndStep(
+          selectedRecoveryOption,
+          MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
         )
         break
       }

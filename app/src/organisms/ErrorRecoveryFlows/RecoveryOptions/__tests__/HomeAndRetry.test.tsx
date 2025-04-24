@@ -76,11 +76,13 @@ describe('HomeAndRetry', () => {
       },
       failedLabwareUtils: {
         ...props.failedLabwareUtils,
-        relevantWellName: 'A2',
+        relevantPickUpTipWellName: 'A2',
         failedLabwareLocations: {
           ...props.failedLabwareUtils.failedLabwareLocations,
           displayNameCurrentLoc: 'B2',
         },
+        failedLabwareNames: { name: 'Mock name', nickName: 'mock nickname' },
+        relevantPickUpTipLwLocs: { displayNameCurrentLoc: 'B2' } as any,
       },
     }
 
@@ -100,6 +102,8 @@ describe('HomeAndRetry', () => {
           ...props.failedLabwareUtils.failedLabwareLocations,
           displayNameCurrentLoc: 'B2',
         },
+        failedLabwareNames: { name: 'Mock name', nickName: 'mock nickname' },
+        relevantPickUpTipLwLocs: { displayNameCurrentLoc: 'B2' } as any,
       },
     }
     render(props)

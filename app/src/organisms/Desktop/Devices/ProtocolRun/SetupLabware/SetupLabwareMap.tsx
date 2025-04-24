@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   BaseDeck,
   Box,
@@ -10,7 +10,6 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  getAllDefinitions,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
@@ -18,7 +17,10 @@ import {
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+import {
+  getLabwareDefinitionsByURIForProtocol,
+  getStackedItemsOnStartingDeck,
+} from '/app/transformations/commands'
 
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
@@ -45,10 +47,19 @@ export function SetupLabwareMap({
     stack: StackItem[]
   } | null>(null)
   const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
-  const startingDeck = getStackedItemsOnStartingDeck(
-    protocolAnalysis?.commands ?? [],
-    protocolAnalysis?.labware ?? [],
-    protocolAnalysis?.modules ?? []
+  const startingDeck = useMemo(
+    () =>
+      getStackedItemsOnStartingDeck(
+        protocolAnalysis?.commands ?? [],
+        protocolAnalysis?.labware ?? [],
+        protocolAnalysis?.modules ?? []
+      ),
+    [protocolAnalysis]
+  )
+  const labwareDefinitionsByURI = useMemo(
+    () =>
+      getLabwareDefinitionsByURIForProtocol(protocolAnalysis?.commands ?? []),
+    [protocolAnalysis]
   )
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
     ? startingDeck.offDeck
@@ -76,7 +87,7 @@ export function SetupLabwareMap({
     const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
     const topLabwareDefinition =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
-        ? getAllDefinitions()[topLabwareInfo.definitionUri]
+        ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
         : null
     const topLabwareId =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -157,7 +168,7 @@ export function SetupLabwareMap({
       const topLabwareInfo = stackedItems[0]
       const topLabwareDefinition =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo
-          ? getAllDefinitions()[topLabwareInfo.definitionUri]
+          ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
           : null
       const topLabwareId =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -231,6 +242,7 @@ export function SetupLabwareMap({
             labwareItems={offDeckItems}
             isFlex={robotType === FLEX_ROBOT_TYPE}
             setSelectedStack={setSelectedStack}
+            definitionsByURI={labwareDefinitionsByURI}
           />
         ) : null}
       </Flex>

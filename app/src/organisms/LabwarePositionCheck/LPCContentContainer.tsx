@@ -19,6 +19,7 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  truncateString,
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
@@ -100,6 +101,7 @@ export function LPCContentContainer(
               {...rest}
               css={CHILD_NAV_STYLE}
               buttonIsDisabled={rest.buttonIsDisabled}
+              header={truncateString(rest.header, 40)}
             />
           </Flex>
           <Flex css={contentStyle ?? ODD_CHILDREN_CONTAINER_STYLE}>

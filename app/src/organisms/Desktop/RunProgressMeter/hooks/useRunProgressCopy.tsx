@@ -11,6 +11,8 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
+
 import { TERMINAL_RUN_STATUSES } from '../constants'
 
 import type { ReactNode } from 'react'
@@ -28,6 +30,7 @@ interface UseRunProgressResult {
 }
 
 interface UseRunProgressProps {
+  runId: string | null
   runStatus: RunStatus | null
   currentStepNumber: number | null
   totalStepCount: number | null
@@ -41,6 +44,7 @@ interface UseRunProgressProps {
 // TODO(jh, 08-05-24): Testing is sufficiently covered by RunProgressMeter, but we should migrate relevant tests to this
 // hook after devising a better way to test i18n outside of a component.
 export function useRunProgressCopy({
+  runId,
   runStatus,
   currentStepNumber,
   totalStepCount,
@@ -127,6 +131,20 @@ export function useRunProgressCopy({
       }
     }
   })()
+  const { reportModuleCommand } = useModuleCommandAnalytics()
+
+  reportModuleCommand({
+    kind: 'protocolCommand',
+    analyticCommand: runCommandDetails?.data?.commandType ?? '',
+    result: {
+      status: runCommandDetails?.data?.status ?? undefined,
+      data: runCommandDetails?.data?.result,
+    },
+    errorDetails: runCommandDetails?.data?.error?.errorType ?? '',
+    params: runCommandDetails?.data?.params ?? undefined,
+    analysis,
+    runId,
+  })
 
   return {
     currentStepContents,

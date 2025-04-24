@@ -19,6 +19,7 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { MouseEventHandler } from 'react'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
@@ -39,6 +40,7 @@ export const HeaterShakerSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = t('temperature')
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   const sendSetTemperatureCommand: MouseEventHandler<HTMLInputElement> = e => {
     e.preventDefault()
@@ -54,16 +56,40 @@ export const HeaterShakerSlideout = (
       }
       createLiveCommand({
         command: setTempCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
-        )
       })
-    }
-    setHsValue(null)
-    onCloseClick()
-  }
+        .then(() => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: setTempCommand.commandType,
+            result: { status: 'succeeded', data: undefined },
+            serialNumber: module.serialNumber,
+            temperature: hsValue,
+            errorDetails: '',
+            firmwareVersion: module.firmwareVersion,
+          })
+        })
+        .catch((e: Error) => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: setTempCommand.commandType,
+            result: { status: 'failed', data: undefined },
+            errorDetails: e.message,
+            serialNumber: module.serialNumber,
+            temperature: hsValue,
+            firmwareVersion: module.firmwareVersion,
+          })
 
+          console.error(
+            `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
+          )
+        })
+
+      setHsValue(null)
+      onCloseClick()
+    }
+  }
   const errorMessage =
     hsValue != null && (hsValue < HS_TEMP_MIN || hsValue > HS_TEMP_MAX)
       ? t('input_out_of_range')

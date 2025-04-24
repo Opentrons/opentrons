@@ -195,7 +195,9 @@ async def create_chat_completion(
         if body.fake:
             if body.fake_key is not None:
                 fake: FakeResponse = get_fake_response(body.fake_key)
-                return ChatResponse(reply=fake.chat_response.reply, fake=fake.chat_response.fake)
+                return ChatResponse(
+                    reply=fake.chat_response.reply, fake=fake.chat_response.fake, protocol_content=fake.chat_response.protocol_content
+                )
             return ChatResponse(reply="Default fake response.  ", fake=body.fake)
 
         response: Optional[str] = None
@@ -247,6 +249,12 @@ async def create_protocol(
         if not body.prompt or body.prompt == "":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message="Request body is empty").model_dump()
+            )
+        if body.fake_key is not None:
+            await asyncio.sleep(6)  # Wait 6 seconds before returning to simulate actual behavior
+            fake: FakeResponse = get_fake_response(body.fake_key)
+            return ChatResponse(
+                reply=fake.chat_response.reply, fake=fake.chat_response.fake, protocol_content=fake.chat_response.protocol_content
             )
 
         if body.fake:

@@ -9,6 +9,7 @@ import { LabwareListItem } from '../LabwareListItem'
 import { OffDeckLabwareList } from '../OffDeckLabwareList'
 
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../LabwareListItem')
 
@@ -33,6 +34,7 @@ describe('OffDeckLabwareList', () => {
     render({
       labwareItems: [],
       isFlex: false,
+      definitionsByURI: {},
       setSelectedStack: vi.fn(),
     })
     expect(screen.queryAllByText('Additional Off-Deck Labware')).toHaveLength(0)
@@ -47,6 +49,7 @@ describe('OffDeckLabwareList', () => {
         },
       ],
       isFlex: false,
+      definitionsByURI: { 'mock def uri': {} as LabwareDefinition2 },
       setSelectedStack: vi.fn(),
     })
     screen.getByText('Additional Off-Deck Labware')

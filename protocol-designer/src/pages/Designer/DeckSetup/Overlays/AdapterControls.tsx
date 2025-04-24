@@ -17,6 +17,7 @@ import { DND_TYPES } from '../../../../constants'
 import { selectors as labwareDefSelectors } from '../../../../labware-defs'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
 import { getLabwareEntities } from '../../../../step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { getLabwareIsCustom } from '../../../../utils/labwareModuleCompatibility'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
@@ -113,7 +114,7 @@ export const AdapterControls = (
 
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
-    terminalItemId !== '__initial_setup__' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected ||
     slotPosition == null
   ) {

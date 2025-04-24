@@ -5,12 +5,14 @@ import { Box } from '@opentrons/components'
 import {
   FileUploadMessagesModal,
   GateModal,
+  HintsModal,
   Kitchen,
   LabwareUploadModal,
   Navigation,
 } from './components/organisms'
 import {
   Designer,
+  Hardware,
   Landing,
   Liquids,
   Onboarding,
@@ -52,6 +54,12 @@ const pdRoutes: RouteProps[] = [
     navLinkTo: '/settings',
     path: '/settings',
   },
+  {
+    Component: Hardware,
+    name: 'Hardware',
+    navLinkTo: '/hardware',
+    path: '/hardware',
+  },
 ]
 
 export function ProtocolRoutes(): JSX.Element {
@@ -78,6 +86,7 @@ export function ProtocolRoutes(): JSX.Element {
           <GateModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
+          <HintsModal />
           <Routes>
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />

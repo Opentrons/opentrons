@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from contextlib import contextmanager
+from itertools import dropwhile
 from typing import (
     Optional,
     TYPE_CHECKING,
@@ -11,6 +12,7 @@ from typing import (
     Tuple,
     NamedTuple,
     Generator,
+    Literal,
 )
 from opentrons.types import (
     Location,
@@ -48,8 +50,17 @@ from opentrons.protocol_engine.types import (
     AddressableOffsetVector,
     LiquidClassRecord,
     NextTipInfo,
+    PickUpTipWellLocation,
+    LiquidHandlingWellLocation,
 )
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import (
+    LiquidTrackingType,
+    WellLocationFunction,
+)
+from opentrons.protocol_engine.types.automatic_tip_selection import (
+    NoTipAvailable,
+    NoTipReason,
+)
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -59,6 +70,7 @@ from opentrons_shared_data.pipette.types import (
 )
 from opentrons_shared_data.errors.exceptions import (
     UnsupportedHardwareCommand,
+    CommandPreconditionViolated,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import BlowoutLocation
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
@@ -222,10 +234,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 dynamic_liquid_tracking,
-            ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+            ) = self._engine_client.state.geometry.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
+                location_type=WellLocationFunction.LIQUID_HANDLING,
                 meniscus_tracking=meniscus_tracking,
             )
             pipette_movement_conflict.check_safe_for_pipette_movement(
@@ -235,8 +248,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
+            assert isinstance(well_location, LiquidHandlingWellLocation)
             if dynamic_liquid_tracking:
-
                 self._engine_client.execute_command(
                     cmd.AspirateWhileTrackingParams(
                         pipetteId=self._pipette_id,
@@ -334,12 +347,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 dynamic_liquid_tracking,
-            ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+            ) = self._engine_client.state.geometry.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
+                location_type=WellLocationFunction.LIQUID_HANDLING,
                 meniscus_tracking=meniscus_tracking,
             )
+            assert isinstance(well_location, LiquidHandlingWellLocation)
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
@@ -425,13 +440,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
-            well_location = (
-                self._engine_client.state.geometry.get_relative_well_location(
-                    labware_id=labware_id,
-                    well_name=well_name,
-                    absolute_point=location.point,
-                )
+            (
+                well_location,
+                _,
+            ) = self._engine_client.state.geometry.get_relative_well_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                absolute_point=location.point,
+                location_type=WellLocationFunction.BASE,
             )
+
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
@@ -439,6 +457,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
+            assert isinstance(well_location, WellLocation)
             self._engine_client.execute_command(
                 cmd.BlowOutParams(
                     pipetteId=self._pipette_id,
@@ -533,12 +552,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
-        well_location = (
-            self._engine_client.state.geometry.get_relative_pick_up_tip_well_location(
-                labware_id=labware_id,
-                well_name=well_name,
-                absolute_point=location.point,
-            )
+        (
+            well_location,
+            _,
+        ) = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+            location_type=WellLocationFunction.PICK_UP_TIP,
         )
         pipette_movement_conflict.check_safe_for_tip_pickup_and_return(
             engine_state=self._engine_client.state,
@@ -552,7 +573,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_name=well_name,
             well_location=well_location,
         )
-
+        assert isinstance(well_location, PickUpTipWellLocation)
         self._engine_client.execute_command(
             cmd.PickUpTipParams(
                 pipetteId=self._pipette_id,
@@ -590,12 +611,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         scrape_tips = False
 
         if location is not None:
-            relative_well_location = (
-                self._engine_client.state.geometry.get_relative_well_location(
-                    labware_id=labware_id,
-                    well_name=well_name,
-                    absolute_point=location.point,
-                )
+            (
+                relative_well_location,
+                _,
+            ) = self._engine_client.state.geometry.get_relative_well_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                absolute_point=location.point,
+                location_type=WellLocationFunction.DROP_TIP,
             )
 
             well_location = DropTipWellLocation(
@@ -725,20 +748,33 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
+        check_for_movement_conflicts: bool = True,
     ) -> None:
         if well_core is not None:
             if isinstance(location, (TrashBin, WasteChute)):
                 raise ValueError("Trash Bin and Waste Chute have no Wells.")
             labware_id = well_core.labware_id
             well_name = well_core.get_name()
-            well_location = (
-                self._engine_client.state.geometry.get_relative_well_location(
+            (
+                well_location,
+                _,
+            ) = self._engine_client.state.geometry.get_relative_well_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                absolute_point=location.point,
+                location_type=WellLocationFunction.LIQUID_HANDLING,
+            )
+            assert isinstance(well_location, LiquidHandlingWellLocation)
+            if well_location.volumeOffset and well_location.volumeOffset != 0:
+                raise ValueError("volume offset not supported with move_to")
+            if check_for_movement_conflicts:
+                pipette_movement_conflict.check_safe_for_pipette_movement(
+                    engine_state=self._engine_client.state,
+                    pipette_id=self._pipette_id,
                     labware_id=labware_id,
                     well_name=well_name,
-                    absolute_point=location.point,
+                    well_location=well_location,
                 )
-            )
-
             self._engine_client.execute_command(
                 cmd.MoveToWellParams(
                     pipetteId=self._pipette_id,
@@ -779,16 +815,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     ) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
-        well_location = (
-            self._engine_client.state.geometry.get_relative_pick_up_tip_well_location(
-                labware_id=labware_id,
-                well_name=well_name,
-                absolute_point=location.point,
-            )
+        (
+            well_location,
+            _,
+        ) = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+            location_type=WellLocationFunction.PICK_UP_TIP,
         )
-
+        assert isinstance(well_location, PickUpTipWellLocation)
         self._engine_client.execute_command(
-            cmd.EvotipSealPipetteParams(
+            cmd.SealPipetteToTipParams(
                 pipetteId=self._pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -801,12 +839,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         labware_id = well_core.labware_id
 
         if location is not None:
-            relative_well_location = (
-                self._engine_client.state.geometry.get_relative_well_location(
-                    labware_id=labware_id,
-                    well_name=well_name,
-                    absolute_point=location.point,
-                )
+            (
+                relative_well_location,
+                _,
+            ) = self._engine_client.state.geometry.get_relative_well_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                absolute_point=location.point,
+                location_type=WellLocationFunction.BASE,
             )
 
             well_location = DropTipWellLocation(
@@ -824,7 +864,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_location=well_location,
         )
         self._engine_client.execute_command(
-            cmd.EvotipUnsealPipetteParams(
+            cmd.UnsealPipetteFromTipParams(
                 pipetteId=self._pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -860,10 +900,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         (
             well_location,
             dynamic_tracking,
-        ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        ) = self._engine_client.state.geometry.get_relative_well_location(
             labware_id=labware_id,
             well_name=well_name,
             absolute_point=location.point,
+            location_type=WellLocationFunction.LIQUID_HANDLING,
         )
         pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
@@ -872,8 +913,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_name=well_name,
             well_location=well_location,
         )
+        assert isinstance(well_location, LiquidHandlingWellLocation)
         self._engine_client.execute_command(
-            cmd.EvotipDispenseParams(
+            cmd.PressureDispenseParams(
                 pipetteId=self._pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -1115,9 +1157,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack=tiprack_uri,
             aspirate=transfer_properties.aspirate.as_shared_data_model(),
             singleDispense=transfer_properties.dispense.as_shared_data_model(),
-            multiDispense=transfer_properties.multi_dispense.as_shared_data_model()
-            if transfer_properties.multi_dispense
-            else None,
+            multiDispense=(
+                transfer_properties.multi_dispense.as_shared_data_model()
+                if transfer_properties.multi_dispense
+                else None
+            ),
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLiquidClassParams(
@@ -1127,19 +1171,39 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         return result.liquidClassId
 
     def get_next_tip(
-        self, tip_racks: List[LabwareCore], starting_well: Optional[str]
+        self, tip_racks: List[LabwareCore], starting_well: Optional[WellCore]
     ) -> Optional[NextTipInfo]:
         """Get the next tip to pick up."""
+        if starting_well is not None:
+            # Drop tip racks until the one with the starting tip is reached (if any)
+            valid_tip_racks = list(
+                dropwhile(
+                    lambda tr: starting_well.labware_id != tr.labware_id, tip_racks
+                )
+            )
+        else:
+            valid_tip_racks = tip_racks
+
         result = self._engine_client.execute_command_without_recovery(
             cmd.GetNextTipParams(
                 pipetteId=self._pipette_id,
-                labwareIds=[tip_rack.labware_id for tip_rack in tip_racks],
-                startingTipWell=starting_well,
+                labwareIds=[tip_rack.labware_id for tip_rack in valid_tip_racks],
+                startingTipWell=starting_well.get_name()
+                if starting_well is not None
+                else None,
             )
         )
-        return (
-            result.nextTipInfo if isinstance(result.nextTipInfo, NextTipInfo) else None
-        )
+        next_tip_info = result.nextTipInfo
+        if isinstance(next_tip_info, NoTipAvailable):
+            if next_tip_info.noTipReason == NoTipReason.STARTING_TIP_WITH_PARTIAL:
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available when using a partial pipette"
+                    " nozzle configuration and InstrumentContext.starting_tip."
+                    " Switch to a full configuration or set starting_tip to None."
+                )
+            return None
+        else:
+            return next_tip_info
 
     def transfer_with_liquid_class(  # noqa: C901
         self,
@@ -1149,6 +1213,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest: List[Tuple[Location, WellCore]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1234,11 +1299,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available among {tip_racks} for this transfer."
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
@@ -1325,9 +1391,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     transfer_properties=transfer_props,
                     transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
                     tip_contents=post_asp_tip_contents,
-                    add_final_air_gap=False
-                    if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                    else True,
+                    add_final_air_gap=(
+                        False
+                        if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                        else True
+                    ),
                     trash_location=trash_location,
                 )
             prev_src = step_source
@@ -1341,8 +1409,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         volume: float,
         source: Tuple[Location, WellCore],
         dest: List[Tuple[Location, WellCore]],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1356,8 +1425,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             dest: List of destination wells, with each well represented as a tuple of
                     types.Location and WellCore.
                     types.Location is only necessary for saving the last accessed location.
-            new_tip: Whether the transfer should use a new tip 'once', 'never', 'always',
-                     or 'per source'.
+            new_tip: Whether the transfer should use a new tip 'once' or 'never'.
             tiprack_uri: The URI of the tiprack that the transfer settings are for.
             tip_drop_location: Location where the tip will be dropped (if appropriate).
 
@@ -1373,6 +1441,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
             )
+        assert new_tip in [TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE]
+
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
         working_volume = min(
             self.get_max_volume(),
@@ -1424,6 +1494,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 dest=dest,
                 new_tip=new_tip,
                 tip_racks=tip_racks,
+                starting_tip=starting_tip,
                 trash_location=trash_location,
                 return_tip=return_tip,
             )
@@ -1474,11 +1545,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available among {tip_racks} for this transfer."
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
@@ -1498,7 +1570,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             return tip_well
 
-        tip_used = False
         if new_tip != TransferTipPolicyV2.NEVER:
             last_tip_picked_up_from = _pick_up_tip()
 
@@ -1543,16 +1614,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 )
             )
 
-            if new_tip == TransferTipPolicyV2.ALWAYS and tip_used:
-                _drop_tip()
-                last_tip_picked_up_from = _pick_up_tip()
-                tip_contents = [
-                    tx_comps_executor.LiquidAndAirGapPair(
-                        liquid=0,
-                        air_gap=0,
-                    )
-                ]
-
             use_single_dispense = False
             if total_aspirate_volume == volume and len(vol_dest_combo) == 1:
                 # We are only doing a single transfer. Either because this is the last
@@ -1569,7 +1630,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 and not transfer_props.multi_dispense.retract.blowout.enabled
             ):
                 raise RuntimeError(
-                    "Distribute liquid uses a disposal volume but location for disposing of"
+                    "Distribute uses a disposal volume but location for disposing of"
                     " the disposal volume cannot be found when blowout is disabled."
                     " Specify a blowout location and enable blowout when using a disposal volume."
                 )
@@ -1610,9 +1671,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
                         tip_contents=tip_contents,
-                        add_final_air_gap=False
-                        if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                        else True,
+                        add_final_air_gap=(
+                            False
+                            if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                            else True
+                        ),
                         trash_location=trash_location,
                     )
                 else:
@@ -1623,15 +1686,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
                         tip_contents=tip_contents,
-                        add_final_air_gap=False
-                        if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                        else True,
+                        add_final_air_gap=(
+                            False
+                            if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                            else True
+                        ),
                         trash_location=trash_location,
                         conditioning_volume=conditioning_vol,
                         disposal_volume=disposal_vol,
                     )
                 is_first_step = False
-            tip_used = True
 
         if new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
@@ -1663,8 +1727,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         volume: float,
         source: List[Tuple[Location, WellCore]],
         dest: Tuple[Location, WellCore],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[Location, LabwareCore]],
+        starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -1672,7 +1737,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
             )
-
+        assert new_tip in [TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE]
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
         try:
             transfer_props = liquid_class.get_for(
@@ -1747,11 +1812,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         def _pick_up_tip() -> WellCore:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
-                starting_well=None,
+                starting_well=starting_tip,
             )
             if next_tip is None:
                 raise RuntimeError(
-                    f"No tip available among {tip_racks} for this transfer."
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[ f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
                 )
             (
                 tiprack_loc,
@@ -1774,7 +1840,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if new_tip == TransferTipPolicyV2.ONCE:
             last_tip_picked_up_from = _pick_up_tip()
 
-        prev_src: Optional[Tuple[Location, WellCore]] = None
         tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
                 liquid=0,
@@ -1782,6 +1847,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         ]
         next_step_volume, next_source = next(source_per_volume_step)
+        is_first_step = True
         is_last_step = False
         while not is_last_step:
             total_dispense_volume = 0.0
@@ -1796,31 +1862,29 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     is_last_step = True
                     break
 
-            if new_tip == TransferTipPolicyV2.ALWAYS:
-                if prev_src is not None:
-                    _drop_tip()
-                last_tip_picked_up_from = _pick_up_tip()
-                tip_contents = [
-                    tx_comps_executor.LiquidAndAirGapPair(
-                        liquid=0,
-                        air_gap=0,
-                    )
-                ]
-            # TODO (spp, 2025-03-24): add LPD feature when 'per source' tip policy is added for consolidate_liquid
-            with self.lpd_for_transfer(enable=False):
-                for step_num, (step_volume, step_source) in enumerate(
-                    vol_aspirate_combo
-                ):
+            if (
+                self.get_liquid_presence_detection()
+                and new_tip != TransferTipPolicyV2.NEVER
+                and is_first_step
+            ):
+                enable_lpd = True
+            else:
+                enable_lpd = False
+
+            for step_num, (step_volume, step_source) in enumerate(vol_aspirate_combo):
+                with self.lpd_for_transfer(enable=enable_lpd):
                     tip_contents = self.aspirate_liquid_class(
                         volume=step_volume,
                         source=step_source,
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
                         tip_contents=tip_contents,
-                        volume_for_pipette_mode_configuration=total_dispense_volume
-                        if step_num == 0
-                        else None,
+                        volume_for_pipette_mode_configuration=(
+                            total_dispense_volume if step_num == 0 else None
+                        ),
                     )
+                is_first_step = False
+                enable_lpd = False
             tip_contents = self.dispense_liquid_class(
                 volume=total_dispense_volume,
                 dest=dest,
@@ -1828,12 +1892,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 transfer_properties=transfer_props,
                 transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
                 tip_contents=tip_contents,
-                add_final_air_gap=False
-                if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                else True,
+                add_final_air_gap=(
+                    False
+                    if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                    else True
+                ),
                 trash_location=trash_location,
             )
-            prev_src = next_source
         if new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
 
@@ -1881,9 +1946,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         aspirate_props = transfer_properties.aspirate
         tx_commons.check_valid_liquid_class_volume_parameters(
             aspirate_volume=volume,
-            air_gap=aspirate_props.retract.air_gap_by_volume.get_for_volume(volume)
-            if conditioning_volume is None
-            else 0,
+            air_gap=(
+                aspirate_props.retract.air_gap_by_volume.get_for_volume(volume)
+                if conditioning_volume is None
+                else 0
+            ),
             disposal_volume=0,  # Disposal volume is accounted for in aspirate vol
             max_volume=self.get_working_volume(),
         )
@@ -1891,8 +1958,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         aspirate_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=source_well,
-                position_reference=aspirate_props.position_reference,
-                offset=aspirate_props.offset,
+                position_reference=aspirate_props.aspirate_position.position_reference,
+                offset=aspirate_props.aspirate_position.offset,
             )
         )
         aspirate_location = Location(aspirate_point, labware=source_loc.labware)
@@ -2002,8 +2069,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dispense_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=dest_well,
-                position_reference=dispense_props.position_reference,
-                offset=dispense_props.offset,
+                position_reference=dispense_props.dispense_position.position_reference,
+                offset=dispense_props.dispense_position.offset,
             )
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)
@@ -2084,8 +2151,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dispense_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=dest_well,
-                position_reference=dispense_props.position_reference,
-                offset=dispense_props.offset,
+                position_reference=dispense_props.dispense_position.position_reference,
+                offset=dispense_props.dispense_position.offset,
             )
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)

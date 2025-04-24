@@ -20,7 +20,7 @@ export type ModuleIconName =
   | 'ot-magnet-v2'
   | 'ot-thermocycler'
   | 'ot-absorbance'
-  | 'stacked'
+  | 'ot-flex-stacker'
 
 export const MODULE_ICON_NAME_BY_TYPE: {
   [type in ModuleType]: ModuleIconName
@@ -31,7 +31,7 @@ export const MODULE_ICON_NAME_BY_TYPE: {
   [MAGNETIC_MODULE_TYPE]: 'ot-magnet-v2',
   [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
   [ABSORBANCE_READER_TYPE]: 'ot-absorbance',
-  [FLEX_STACKER_MODULE_TYPE]: 'stacked',
+  [FLEX_STACKER_MODULE_TYPE]: 'ot-flex-stacker',
 }
 
 interface ModuleIconProps extends StyleProps {

@@ -1,4 +1,5 @@
 """Tests for the engine based Protocol API module core implementations."""
+
 import pytest
 from decoy import Decoy
 
@@ -10,6 +11,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import AbsorbanceReaderCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_engine.errors.exceptions import CannotPerformModuleAction
 from opentrons.protocol_engine.state.module_substates import AbsorbanceReaderSubState
@@ -34,9 +36,16 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncAbsorbanceReaderHardware:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
 def subject(
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncAbsorbanceReaderHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> AbsorbanceReaderCore:
     """Get a AbsorbanceReaderCore test subject."""
     return AbsorbanceReaderCore(
@@ -44,6 +53,7 @@ def subject(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -51,6 +61,7 @@ def test_create(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncAbsorbanceReaderHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should be able to create an absorbance plate reader module core."""
     result = AbsorbanceReaderCore(
@@ -58,6 +69,7 @@ def test_create(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
     assert result.module_id == "1234"

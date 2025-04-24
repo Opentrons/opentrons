@@ -26,6 +26,9 @@ import type {
   MoveLabwareParams,
   MoveToCoordinatesCreateCommand,
   PrepareToAspirateRunTimeCommand,
+  RunCommandError,
+  RunCommandErrorOverpressure,
+  RunCommandErrorTipPhysicallyAttached,
 } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
@@ -105,19 +108,23 @@ export function useRecoveryCommands({
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const { makeSuccessToast } = recoveryToastUtils
 
+  const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
+    console.warn(`Error executing "fixit" command: ${e}`)
+    analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
+    void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+
+    return Promise.reject(new Error(`Could not execute command: ${e}`))
+  }
+
   // TODO(jh, 11-21-24): Some commands return a 200 with an error body. We should catch these and propagate the error.
   const chainRunRecoveryCommands = useCallback(
     (
       commands: CreateCommand[],
       continuePastFailure: boolean = false
     ): Promise<CommandData[]> =>
-      chainRunCommands(commands, continuePastFailure).catch(e => {
-        console.warn(`Error executing "fixit" command: ${e}`)
-        analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
+      chainRunCommands(commands, continuePastFailure)
         // the catch never occurs if continuePastCommandFailure is "true"
-        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
-        return Promise.reject(new Error(`Could not execute command: ${e}`))
-      }),
+        .catch((e: Error) => reportAndRouteFailedCmd(e)),
     [analytics, selectedRecoveryOption]
   )
 
@@ -137,42 +144,41 @@ export function useRecoveryCommands({
       'prepareToAspirate',
     ] as const
 
-    const RETRY_ERROR_TYPES = [
-      DEFINED_ERROR_TYPES.OVERPRESSURE,
-      DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED,
-    ] as const
-
     const isInPlace = (
-      failedCommand: FailedCommand
+      failedCommand: FailedCommand | null
     ): failedCommand is InPlaceCommand =>
+      unvalidatedFailedCommand != null &&
       IN_PLACE_COMMAND_TYPES.includes(
         (failedCommand as InPlaceCommand).commandType
       )
 
-    return unvalidatedFailedCommand != null
-      ? isInPlace(unvalidatedFailedCommand)
-        ? unvalidatedFailedCommand.error?.isDefined &&
-          RETRY_ERROR_TYPES.includes(
-            unvalidatedFailedCommand.error?.errorType
-          ) &&
-          // Paranoia: this value comes from the wire and may be unevenly implemented
-          typeof unvalidatedFailedCommand.error?.errorInfo?.retryLocation?.at(
-            0
-          ) === 'number'
-          ? {
-              commandType: 'moveToCoordinates',
-              intent: 'fixit',
-              params: {
-                pipetteId: unvalidatedFailedCommand.params?.pipetteId,
-                coordinates: {
-                  x: unvalidatedFailedCommand.error.errorInfo.retryLocation[0],
-                  y: unvalidatedFailedCommand.error.errorInfo.retryLocation[1],
-                  z: unvalidatedFailedCommand.error.errorInfo.retryLocation[2],
-                },
-              },
-            }
-          : null
-        : null
+    const isTargetedError = (
+      error?: RunCommandError | null
+    ): error is
+      | RunCommandErrorOverpressure
+      | RunCommandErrorTipPhysicallyAttached =>
+      error != null &&
+      error.isDefined &&
+      (error.errorType === DEFINED_ERROR_TYPES.OVERPRESSURE ||
+        error.errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED)
+
+    return isInPlace(unvalidatedFailedCommand) &&
+      isTargetedError(unvalidatedFailedCommand.error) &&
+      // Paranoia: this value comes from the wire and may be unevenly implemented
+      typeof unvalidatedFailedCommand.error?.errorInfo?.retryLocation?.at(0) ===
+        'number'
+      ? {
+          commandType: 'moveToCoordinates',
+          intent: 'fixit',
+          params: {
+            pipetteId: unvalidatedFailedCommand.params?.pipetteId,
+            coordinates: {
+              x: unvalidatedFailedCommand.error.errorInfo.retryLocation[0],
+              y: unvalidatedFailedCommand.error.errorInfo.retryLocation[1],
+              z: unvalidatedFailedCommand.error.errorInfo.retryLocation[2],
+            },
+          },
+        }
       : null
   }
 
@@ -194,16 +200,21 @@ export function useRecoveryCommands({
 
   // Pick up the user-selected tips
   const pickUpTips = useCallback((): Promise<CommandData[]> => {
-    const { selectedTipLocations, failedLabware } = failedLabwareUtils
+    const {
+      selectedTipLocations,
+      relevantPickUpTipLabware,
+    } = failedLabwareUtils
 
     const pickUpTipCmd = buildPickUpTips(
       selectedTipLocations,
       unvalidatedFailedCommand,
-      failedLabware
+      relevantPickUpTipLabware
     )
 
     if (pickUpTipCmd == null) {
-      return Promise.reject(new Error('Invalid use of pickUpTips command'))
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of pickUpTips command')
+      )
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd])
     }
@@ -234,13 +245,12 @@ export function useRecoveryCommands({
         return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
           .then(() => Promise.resolve())
           .catch((e: Error) =>
-            Promise.reject(
+            reportAndRouteFailedCmd(
               new Error(`Failed to update recovery policy: ${e.message}`)
             )
           )
       } else {
-        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
-        return Promise.reject(
+        return reportAndRouteFailedCmd(
           new Error('Could not execute command. No failed command.')
         )
       }
@@ -329,7 +339,9 @@ export function useRecoveryCommands({
       unvalidatedFailedCommand
     )
     if (moveLabwareCmd == null) {
-      return Promise.reject(new Error('Invalid use of MoveLabware command'))
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of MoveLabware command')
+      )
     } else {
       return chainRunRecoveryCommands([moveLabwareCmd])
     }
@@ -359,6 +371,9 @@ export function isAssumeFalsePositiveResumeKind(
   switch (errorKind) {
     case ERROR_KINDS.TIP_NOT_DETECTED:
     case ERROR_KINDS.TIP_DROP_FAILED:
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+    case ERROR_KINDS.SHUTTLE_MISSING:
+    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
       return true
     default:
       return false

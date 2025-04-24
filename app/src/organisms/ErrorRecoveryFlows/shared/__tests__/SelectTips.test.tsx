@@ -58,6 +58,10 @@ describe('SelectTips', () => {
           displayNameNewLoc: null,
           displayNameCurrentLoc: 'A1',
         },
+        failedLabwareNames: {
+          name: 'mock name',
+          nickName: 'mock nickname',
+        },
       } as any,
     }
 
@@ -168,6 +172,10 @@ describe('SelectTips', () => {
         failedLabwareLocations: {
           displayNameNewLoc: null,
           displayNameCurrentLoc: '',
+        },
+        failedLabwareNames: {
+          name: 'mock name',
+          nickName: 'mock nickname',
         },
       } as any,
     }

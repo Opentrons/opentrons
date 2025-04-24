@@ -38,6 +38,7 @@ describe('useLPCHeaderCommands', () => {
   const mockPipette = { id: 'mock-pipette' }
   const mockRunId = 'mock-run-id'
   const mockProceedStep = vi.fn()
+  const mockHandleUnableToDetectProbe = vi.fn()
 
   beforeEach(() => {
     toggleRobotMovingPromise = Promise.resolve()
@@ -56,6 +57,7 @@ describe('useLPCHeaderCommands', () => {
       ),
       handleHomeAndClose: vi.fn(() => handleHomeAndClose),
       handleCloseNoHome: vi.fn(() => handleCloseNoHome),
+      toggleUnableToDetectProbe: mockHandleUnableToDetectProbe,
     } as any
 
     props = {
@@ -63,9 +65,6 @@ describe('useLPCHeaderCommands', () => {
       proceedStep: mockProceedStep,
       goBackLastStep: vi.fn(),
       runId: mockRunId,
-      bannerUtils: {
-        defaultOffsetInfoBanner: { showBanner: false, toggleBanner: vi.fn() },
-      },
     }
 
     store = createStore(vi.fn(), {})
@@ -196,6 +195,18 @@ describe('useLPCHeaderCommands', () => {
 
     await waitFor(() => {
       expect(mockLPCHandlerUtils.handleCloseNoHome).toHaveBeenCalled()
+    })
+  })
+
+  it('should contain a toggle for unable to detect probe', async () => {
+    const { result } = renderHook(() => useLPCHeaderCommands(props), {
+      wrapper,
+    })
+
+    result.current.handleUnableToDetectProbe()
+
+    await waitFor(() => {
+      expect(mockLPCHandlerUtils.toggleUnableToDetectProbe).toHaveBeenCalled()
     })
   })
 })

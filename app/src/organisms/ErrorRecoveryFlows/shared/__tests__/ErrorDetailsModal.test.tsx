@@ -10,6 +10,7 @@ import { mockRecoveryContentProps } from '../../__fixtures__'
 import {
   ErrorDetailsModal,
   GripperErrorBanner,
+  NoLiquidDetectedBanner,
   OverpressureBanner,
   StallErrorBanner,
   TipNotDetectedBanner,
@@ -221,6 +222,28 @@ describe('StallErrorBanner', () => {
         heading:
           "A stall or collision is detected when the robot's motors are blocked",
         message: 'The robot must return to its home position before proceeding',
+      }),
+      {}
+    )
+  })
+})
+
+describe('NoLiquidDectedBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<NoLiquidDetectedBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Droplets or liquid in the tips may cause liquid level detection to fail',
+        message: 'Use dry, unused tips for best results',
       }),
       {}
     )

@@ -22,7 +22,7 @@ import {
   useMonitorMaintenanceRunForDeletion,
   useOffsetConflictTimestamp,
   useUpdateDeckConfig,
-  useUpdateLabwareInfo,
+  useUpdateLabware,
 } from './hooks'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -97,9 +97,9 @@ export function useLPCFlows({
   })
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
-  useUpdateDeckConfig(runId, deckConfig)
-  useUpdateLabwareInfo(runId, maintenanceRunId, labwareInfo)
-  useHandleClientAppliedOffsets(runId)
+  useUpdateDeckConfig(isFlex, runId, deckConfig)
+  useUpdateLabware(isFlex, runId, maintenanceRunId, labwareInfo)
+  useHandleClientAppliedOffsets(isFlex, runId)
   useInitLPCStore({
     runId,
     runRecord,
@@ -109,7 +109,7 @@ export function useLPCFlows({
     labwareDefs,
     labwareInfo,
     deckConfig,
-    robotType,
+    isFlex,
     flexStoredOffsets: flexOffsets,
   })
 

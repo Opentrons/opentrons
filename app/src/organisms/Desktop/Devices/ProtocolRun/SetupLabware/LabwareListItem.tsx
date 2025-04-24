@@ -26,7 +26,6 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  getAllDefinitions,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -49,6 +48,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
+  LabwareDefinitionsByURI,
   LabwareInStack,
   ModuleInStack,
   StackItem,
@@ -64,6 +64,7 @@ interface LabwareListItemProps {
   onClick: () => void
   labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
+  definitionsByURI?: LabwareDefinitionsByURI
 }
 
 export function LabwareListItem(
@@ -77,6 +78,7 @@ export function LabwareListItem(
     isFlex,
     labwareByLiquidId,
     showLabwareSVG,
+    definitionsByURI,
     onClick,
   } = props
   const moduleInStack = stackedItems.find(
@@ -265,9 +267,9 @@ export function LabwareListItem(
             {labwareLiquidRenderInfo.map((labware, index) => (
               <>
                 <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-                  {showLabwareSVG ? (
+                  {showLabwareSVG && definitionsByURI != null ? (
                     <StandaloneLabware
-                      definition={getAllDefinitions()[labware.definitionUri]}
+                      definition={definitionsByURI[labware.definitionUri]}
                     />
                   ) : null}
                   <Flex

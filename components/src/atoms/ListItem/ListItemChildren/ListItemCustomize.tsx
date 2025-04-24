@@ -37,7 +37,12 @@ export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
     menuPlacement = 'auto',
   } = props
   return (
-    <Flex width="100%" alignItems={ALIGN_CENTER} padding={SPACING.spacing12}>
+    <Flex
+      width="100%"
+      alignItems={ALIGN_CENTER}
+      padding={SPACING.spacing12}
+      gridGap={SPACING.spacing8}
+    >
       <Flex gridGap={SPACING.spacing16} width="50%" alignItems={ALIGN_CENTER}>
         {leftHeaderItem != null ? (
           <Flex size="3.75rem">{leftHeaderItem}</Flex>

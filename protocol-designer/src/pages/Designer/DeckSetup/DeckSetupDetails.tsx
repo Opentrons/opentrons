@@ -4,7 +4,6 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getAreSlotsVerticallyAdjacent,
   getLabwareHasQuirk,
   getModuleDef2,
   getPositionFromSlotId,
@@ -13,9 +12,9 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '../../../components/organisms'
+import { getSlotsWithCollisions } from '../../../components/organisms/utils'
 import { getRobotType } from '../../../file-data/selectors'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { editSlotInfo } from '../../../labware-ingred/actions'
@@ -24,11 +23,12 @@ import {
   getSlotIdsBlockedBySpanningForThermocycler,
   getSlotIsEmpty,
 } from '../../../step-forms'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { getStagingAreaAddressableAreas } from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
-import { HoveredItems } from './HoveredItems'
+import { HoveredItem } from './HoveredItem'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { SelectedHoveredItems } from './SelectedHoveredItems'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
@@ -42,12 +42,10 @@ import {
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
-  AddressableArea,
   AddressableAreaName,
   CutoutId,
   DeckDefinition,
   DeckSlotId,
-  ModuleModel,
 } from '@opentrons/shared-data'
 import type {
   ModuleTemporalProperties,
@@ -59,16 +57,13 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
-import type { Fixture } from './constants'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
   hover: string | null
-  hoveredFixture: Fixture | null
   hoveredLabware: string | null
-  hoveredModule: ModuleModel | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
@@ -81,9 +76,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     addEquipment,
     deckDef,
     hover,
-    hoveredFixture,
     hoveredLabware: hoveredLabwareFromProp,
-    hoveredModule,
     selectedZoomInSlot,
     terminalItemId,
     setHover,
@@ -202,7 +195,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         ): ComponentProps<typeof Module>['innerProps'] => {
           if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
             let lidMotorState = 'unknown'
-            if (terminalItemId === '__initial_setup__' || moduleState.lidOpen) {
+            if (
+              terminalItemId === START_TERMINAL_ITEM_ID ||
+              moduleState.lidOpen
+            ) {
               lidMotorState = 'open'
             } else if (moduleState.lidOpen === false) {
               lidMotorState = 'closed'
@@ -237,7 +233,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           moduleOnDeck.type === THERMOCYCLER_MODULE_TYPE &&
           (moduleOnDeck.moduleState as ThermocyclerModuleState).lidOpen !==
             true &&
-          terminalItemId !== '__initial_setup__'
+          terminalItemId !== START_TERMINAL_ITEM_ID
 
         const tempInnerProps = getModuleInnerProps(moduleOnDeck.moduleState)
         const innerProps =
@@ -375,7 +371,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           return (
             addressableAreas &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
-            getSlotIsEmpty(activeDeckSetup, addressableArea.id, false, true)
+            getSlotIsEmpty(
+              activeDeckSetup,
+              addressableArea.id,
+              draggedLabware == null
+            )
           )
         })
         .map(addressableArea => {
@@ -556,20 +556,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       <SelectedHoveredItems
         deckDef={deckDef}
         robotType={robotType}
-        hoveredFixture={hoveredFixture}
         hoveredLabware={hoveredLabwareFromProp}
-        hoveredModule={hoveredModule}
         slotPosition={slotPosition}
       />
 
-      {/* hovered hardware + labware */}
-      <HoveredItems
+      {/* hovered  labware */}
+      <HoveredItem
         hoveredSlotPosition={slotPosition}
-        deckDef={deckDef}
-        robotType={robotType}
-        hoveredFixture={hoveredFixture}
         hoveredLabware={hoveredLabwareFromProp}
-        hoveredModule={hoveredModule}
       />
 
       {/* slot overflow menu */}
@@ -584,30 +578,5 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         />
       ) : null}
     </>
-  )
-}
-
-const getSlotsWithCollisions = (
-  deckDef: DeckDefinition,
-  allModules: ModuleOnDeck[]
-): AddressableAreaName[] => {
-  return deckDef.locations.addressableAreas.reduce(
-    (acc: AddressableAreaName[], aa: AddressableArea) => {
-      const modulesWithCollisionsOnDeck = allModules.filter(module =>
-        MODULES_WITH_COLLISION_ISSUES.includes(module.model)
-      )
-      if (modulesWithCollisionsOnDeck.length === 0) {
-        return acc
-      }
-
-      const hasCollision = modulesWithCollisionsOnDeck.some(module =>
-        getAreSlotsVerticallyAdjacent(module.slot, aa.id)
-      )
-      if (hasCollision) {
-        return [...acc, aa.id]
-      }
-      return acc
-    },
-    []
   )
 }

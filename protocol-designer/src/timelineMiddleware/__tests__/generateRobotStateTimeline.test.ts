@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+  POSITION_REFERENCE_BOTTOM,
+} from '@opentrons/shared-data'
 import {
   DEFAULT_PIPETTE,
   DEST_LABWARE,
@@ -134,6 +138,8 @@ describe('generateRobotStateTimeline', () => {
           xOffset: 0,
           yOffset: 0,
           finalPushOut: 0,
+          zOffset: 0,
+          positionReference: POSITION_REFERENCE_BOTTOM,
         },
       },
     }

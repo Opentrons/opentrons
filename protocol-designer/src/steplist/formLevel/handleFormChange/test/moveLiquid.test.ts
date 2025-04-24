@@ -257,6 +257,8 @@ describe('disposal volume should update...', () => {
       path: 'single',
       disposalVolume_checkbox: false,
       disposalVolume_volume: null,
+      conditioning_volume: null,
+      conditioning_checkbox: false,
     })
   })
 

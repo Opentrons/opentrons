@@ -124,24 +124,21 @@ export function createUpdatedWorkingLocationSpecificOffset(
       initialPosition: position,
       finalPosition: null,
     }
-  } else if (currentWorkingOffset.confirmedVector === RESET_TO_DEFAULT) {
-    return {
-      ...currentWorkingOffset,
-      finalPosition: null,
-      confirmedVector: RESET_TO_DEFAULT,
-    }
   }
   // Update final position and calculate confirmed vector.
   else {
+    const validConfirmedVector =
+      currentWorkingOffset.confirmedVector !== RESET_TO_DEFAULT
+        ? currentWorkingOffset.confirmedVector
+        : null
+
     return {
       ...currentWorkingOffset,
       finalPosition: position,
       confirmedVector: calculateConfirmedVector(
         currentWorkingOffset.initialPosition,
         position,
-        currentWorkingOffset.confirmedVector ??
-          mostValidVector ??
-          IDENTITY_VECTOR
+        validConfirmedVector ?? mostValidVector ?? IDENTITY_VECTOR
       ),
     }
   }

@@ -65,7 +65,7 @@ import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
-import type { CategoryExpand } from './DeckSetupTools'
+import type { CategoryExpand } from './DeckSetupToolbox'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48

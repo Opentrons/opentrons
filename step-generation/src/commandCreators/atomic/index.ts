@@ -18,6 +18,7 @@ import { dispenseInPlace } from './dispenseInPlace'
 import { dropTip } from './dropTip'
 import { dropTipInPlace } from './dropTipInPlace'
 import { engageMagnet } from './engageMagnet'
+import { liquidProbe } from './liquidProbe'
 import { moveLabware } from './moveLabware'
 import { moveToAddressableArea } from './moveToAddressableArea'
 import { moveToAddressableAreaForDropTip } from './moveToAddressableAreaForDropTip'
@@ -29,26 +30,27 @@ import { touchTip } from './touchTip'
 import { waitForTemperature } from './waitForTemperature'
 
 export {
-  airGapInPlace,
   absorbanceReaderCloseLid,
   absorbanceReaderInitialize,
   absorbanceReaderOpenLid,
   absorbanceReaderRead,
+  airGapInPlace,
   aspirate,
   aspirateInPlace,
-  blowOutInWell,
   blowOutInPlace,
+  blowOutInWell,
   comment,
   configureForVolume,
   configureNozzleLayout,
   deactivateTemperature,
   delay,
-  disengageMagnet,
   dispense,
   dispenseInPlace,
+  disengageMagnet,
   dropTip,
   dropTipInPlace,
   engageMagnet,
+  liquidProbe,
   moveLabware,
   moveToAddressableArea,
   moveToAddressableAreaForDropTip,

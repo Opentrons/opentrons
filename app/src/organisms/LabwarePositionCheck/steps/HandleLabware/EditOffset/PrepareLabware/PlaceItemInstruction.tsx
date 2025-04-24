@@ -84,6 +84,8 @@ export function PlaceItemInstruction(
               ...lwOnlyLocSeq.map((component, index) => (
                 <PlaceItemInstructionContent
                   key={`${slotOnlyDisplayLocation}-${index}`}
+                  isActivePipette96ch={isActivePipette96ch}
+                  isDefaultOffset={isDefaultOffset}
                   isLwTiprack={isLwTiprack}
                   slotOnlyDisplayLocation={slotOnlyDisplayLocation}
                   labwareInfo={selectedLwInfo}
@@ -117,6 +119,8 @@ const CONATINER_STYLE = css`
 
 interface PlaceItemInstructionContentProps extends LPCWizardContentProps {
   isLwTiprack: boolean
+  isDefaultOffset: boolean
+  isActivePipette96ch: boolean
   slotOnlyDisplayLocation: string
   labwareInfo: SelectedLwOverview
   lwComponent: LabwareStackupDetail
@@ -157,6 +161,8 @@ function PlaceItemInstructionContent({
   slotOnlyDisplayLocation,
   lwComponent,
   isFirstItemInStackup,
+  isActivePipette96ch,
+  isDefaultOffset,
 }: PlaceItemInstructionContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
@@ -164,15 +170,21 @@ function PlaceItemInstructionContent({
     selectLwDisplayName(runId, lwComponent.labwareUri)
   )
 
+  const buildIsLwTipRackCopy = (): string => {
+    if (isActivePipette96ch && isDefaultOffset) {
+      return 'place_a_full_tip_rack_in_location_96ch_default'
+    } else {
+      return isFirstItemInStackup
+        ? 'place_a_full_tip_rack_in_location'
+        : 'next_place_a_full_tip_rack_in_location'
+    }
+  }
+
   if (isLwTiprack) {
     return (
       <Trans
         t={t}
-        i18nKey={
-          isFirstItemInStackup
-            ? 'place_a_full_tip_rack_in_location'
-            : 'next_place_a_full_tip_rack_in_location'
-        }
+        i18nKey={buildIsLwTipRackCopy()}
         tOptions={{
           tip_rack: displayName,
           location: slotOnlyDisplayLocation,

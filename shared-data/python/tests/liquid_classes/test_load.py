@@ -6,6 +6,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
     PositionReference,
     Coordinate,
+    TipPosition,
     Submerge,
     DelayParams,
     DelayProperties,
@@ -27,8 +28,10 @@ def test_load_definition() -> None:
     assert type(water_definition) is LiquidClassSchemaV1
     assert water_definition.byPipette[0].pipetteModel == "flex_1channel_50"
     assert water_definition.byPipette[0].byTipType[0].aspirate.submerge == Submerge(
-        positionReference=PositionReference.WELL_TOP,
-        offset=Coordinate(x=0, y=0, z=2),
+        startPosition=TipPosition(
+            positionReference=PositionReference.WELL_TOP,
+            offset=Coordinate(x=0, y=0, z=2),
+        ),
         speed=100,
         delay=DelayProperties(enable=False, params=DelayParams(duration=0)),
     )

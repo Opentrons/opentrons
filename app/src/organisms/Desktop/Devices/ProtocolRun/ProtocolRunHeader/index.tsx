@@ -13,13 +13,14 @@ import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
+  useCloseCurrentRun,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
   useRunStatus,
 } from '/app/resources/runs'
 
+import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
 import { RunProgressMeter } from '../../../RunProgressMeter'
-import { EQUIPMENT_POLL_MS } from './constants'
 import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { RunHeaderContent } from './RunHeaderContent'
@@ -60,6 +61,7 @@ export function ProtocolRunHeader(
     runStatus,
     runId,
   })
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   const protocolRunControls = useRunHeaderRunControls(runId, robotName)
@@ -70,6 +72,7 @@ export function ProtocolRunHeader(
     protocolRunControls,
     runRecord: runRecord ?? null,
     runErrors,
+    closeCurrentRun,
   })
 
   useEffect(() => {
@@ -117,6 +120,7 @@ export function ProtocolRunHeader(
           attachedModules={attachedModules}
           protocolRunControls={protocolRunControls}
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
+          isClosingCurrentRun={isClosingCurrentRun}
           {...props}
         />
         <RunProgressMeter {...props} />

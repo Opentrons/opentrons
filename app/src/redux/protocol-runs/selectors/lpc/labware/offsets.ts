@@ -137,14 +137,18 @@ export const selectTotalOrMissingOffsetRequiredCountForLwCopy = (
         lsDetails
       )
 
-      if (countLSOffsetsTotal > 1) {
-        return isNecessaryDefaultOffsetMising
-          ? t('num_missing_offsets', { num: countLSOffsetsNoHC })
-          : t('num_offsets', { num: countLSOffsetsTotal })
+      if (isNecessaryDefaultOffsetMising) {
+        if (countLSOffsetsNoHC > 1) {
+          return t('num_missing_offsets', { num: countLSOffsetsNoHC })
+        } else {
+          return t('one_missing_offset')
+        }
       } else {
-        return isNecessaryDefaultOffsetMising
-          ? t('one_missing_offset')
-          : t('one_offset')
+        if (countLSOffsetsTotal > 1) {
+          return t('num_offsets', { num: countLSOffsetsTotal })
+        } else {
+          return t('one_offset')
+        }
       }
     }
   )

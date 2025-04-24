@@ -13,6 +13,7 @@ import type {
   NozzleConfigurationStyle,
   PipetteName,
   PipetteV2Specs,
+  PositionReference,
   ShakeSpeedParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -373,6 +374,8 @@ export type MixArgs = CommonArgs & {
   /** y offset */
   yOffset: number
   /** flow rates in uL/sec */
+  zOffset: number
+  positionReference: PositionReference
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */

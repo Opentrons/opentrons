@@ -22,7 +22,6 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import {
-  useDoorQuery,
   useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -34,6 +33,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { useScrollPosition } from '/app/local-resources/dom-utils'
+import {
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
@@ -99,7 +102,7 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
-import type { Run } from '@opentrons/api-client'
+import type { Run, RunStatus } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
@@ -117,6 +120,7 @@ const FETCH_DURATION_MS = 5000
 const ANALYSIS_POLL_MS = 5000
 interface PrepareToRunProps {
   runId: string
+  runStatus: RunStatus | null
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   confirmStepsComplete: () => void
@@ -130,6 +134,7 @@ interface PrepareToRunProps {
 
 function PrepareToRun({
   runId,
+  runStatus,
   setSetupScreen,
   confirmAttachment,
   play,
@@ -172,11 +177,6 @@ function PrepareToRun({
       refetchInterval: ANALYSIS_POLL_MS,
     }
   )
-
-  const runStatus = useRunStatus(runId)
-  if (runStatus === RUN_STATUS_STOPPED) {
-    navigate('/protocols')
-  }
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -352,8 +352,24 @@ function PrepareToRun({
     areFixturesReady &&
     offsetsConfirmed
   const onPlay = (): void => {
-    if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door') as string)
+    if (doorStatus.isDoorOpen) {
+      if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation !== NOT_CONFIGURED
+      ) {
+        makeSnackbar(
+          t('shared:close_stacker_door', {
+            module_door_location: doorStatus.moduleDoorLocation,
+          }) as string
+        )
+      } else if (
+        doorStatus.moduleDoorLocation !== null &&
+        doorStatus.moduleDoorLocation === NOT_CONFIGURED
+      ) {
+        makeSnackbar(t('shared:close_unconfigured_stacker_door') as string)
+      } else {
+        makeSnackbar(t('shared:close_robot_door') as string)
+      }
     } else {
       if (isReadyToRun) {
         if (runStatus === RUN_STATUS_IDLE && !labwareConfirmed) {
@@ -509,7 +525,10 @@ function PrepareToRun({
       }
     } else if (isAnyNecessaryDefaultOffsetMissing) {
       return {
-        detail: t('num_missing_offsets', { num: numMissingLSOffsets }),
+        detail:
+          numMissingLSOffsets > 1
+            ? t('num_missing_offsets', { num: numMissingLSOffsets })
+            : t('one_missing_offset'),
         status: 'not ready',
       }
     } else {
@@ -520,12 +539,7 @@ function PrepareToRun({
     }
   }
 
-  const { data: doorStatus } = useDoorQuery({
-    refetchInterval: FETCH_DURATION_MS,
-  })
-  const isDoorOpen =
-    doorStatus?.data.status === 'open' &&
-    doorStatus?.data.doorRequiredClosedForProtocol
+  const doorStatus = useIsDoorOpen(robotName)
 
   const parametersDetail = hasRunTimeParameters
     ? hasCustomRunTimeParameters
@@ -590,7 +604,7 @@ function PrepareToRun({
               disabled={isLoading}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={isDoorOpen}
+              isDoorOpen={doorStatus.isDoorOpen}
             />
           </Flex>
         </Flex>
@@ -638,7 +652,7 @@ function PrepareToRun({
               onClickSetupStep={() => {
                 setSetupScreen('offsets')
               }}
-              title={t('labware_position_check')}
+              title={t('labware_offsets')}
               {...lpcSetupStepProps()}
             />
             <ProtocolSetupStep
@@ -707,6 +721,12 @@ export function ProtocolSetup(): JSX.Element {
   const isMaintenanceRunActive =
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
+
+  const navigate = useNavigate()
+  const runStatus = useRunStatus(runId)
+  if (runStatus === RUN_STATUS_STOPPED) {
+    navigate('/protocols')
+  }
 
   const {
     data: mostRecentAnalysis = null,
@@ -794,7 +814,6 @@ export function ProtocolSetup(): JSX.Element {
     showConfirmation: showMissingStepsConfirmation,
     cancel: cancelExitMissingStepsConfirmation,
   } = useConditionalConfirm(handleProceedToRunClick, !labwareConfirmed)
-  const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const lpcLaunchProps = useLPCFlows({
     runId,
@@ -809,6 +828,7 @@ export function ProtocolSetup(): JSX.Element {
     'prepare to run': (
       <PrepareToRun
         runId={runId}
+        runStatus={runStatus}
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         confirmStepsComplete={confirmMissingSteps}

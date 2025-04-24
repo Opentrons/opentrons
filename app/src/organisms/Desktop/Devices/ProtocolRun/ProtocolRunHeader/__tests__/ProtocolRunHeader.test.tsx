@@ -8,6 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
+  useCloseCurrentRun,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
   useRunStatus,
@@ -68,6 +69,10 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
     } as any)
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      isClosingCurrentRun: false,
+      closeCurrentRun: vi.fn(),
+    })
     vi.mocked(useRunAnalytics).mockImplementation(() => {})
     vi.mocked(useRunErrors).mockReturnValue([] as any)
     vi.mocked(useRunHeaderRunControls).mockReturnValue({} as any)

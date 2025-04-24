@@ -321,14 +321,14 @@ describe('ProtocolRunSetup', () => {
       vi.clearAllMocks()
     })
 
-    it('renders calibration ready if robot is Flex and modules are calibrated', () => {
+    it('renders proper copy if robot is Flex and modules are calibrated', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: true })
 
       render()
-      expect(screen.getAllByText('Calibration ready').length).toEqual(2)
+      expect(screen.getAllByText('Instruments attached').length).toEqual(1)
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
@@ -338,7 +338,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Calibration needed')
     })
 
@@ -362,7 +362,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
 
@@ -395,13 +395,13 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
       render()
-      const moduleSetup = screen.getByText('Deck hardware')
+      const moduleSetup = screen.getByText('Deck Hardware')
       fireEvent.click(moduleSetup)
       screen.getByText('Mock SetupModules')
     })
@@ -413,7 +413,7 @@ describe('ProtocolRunSetup', () => {
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required modules.')
       screen.getByText('Labware & Liquids')
@@ -446,7 +446,7 @@ describe('ProtocolRunSetup', () => {
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required module.')
       screen.getByText('Labware & Liquids')
@@ -475,7 +475,7 @@ describe('ProtocolRunSetup', () => {
       ])
       render()
 
-      screen.getByText('Deck hardware')
+      screen.getByText('Deck Hardware')
       screen.getByText(
         'Install and calibrate the required modules. Install the required fixtures.'
       )

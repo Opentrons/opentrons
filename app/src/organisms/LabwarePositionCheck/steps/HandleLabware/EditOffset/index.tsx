@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { CheckLabware } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware'
 import { DesktopOffsetSuccess } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/DesktopOffsetSuccess'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   goBackEditOffsetSubstep,
   HANDLE_LW_SUBSTEP,
@@ -79,6 +80,7 @@ export function EditOffsetContent(props: EditOffsetContentProps): JSX.Element {
   const { toggleRobotMoving, handleConfirmLwFinalPosition } = props.commandUtils
   const currentSubStep = useSelector(selectCurrentSubstep(props.runId))
 
+  const isOnDevice = useSelector(getIsOnDevice)
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(props.runId)
   ) as SelectedLwOverview
@@ -90,7 +92,7 @@ export function EditOffsetContent(props: EditOffsetContentProps): JSX.Element {
       .then(() => handleConfirmLwFinalPosition(offsetLocationDetails, pipette))
       .then(position => {
         dispatch(
-          setFinalPosition(props.runId, {
+          setFinalPosition(props.runId, isOnDevice, {
             labwareUri: selectedLwInfo.uri,
             location: offsetLocationDetails,
             position,

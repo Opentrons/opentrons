@@ -16,6 +16,8 @@ import eppendorf_1_5ml_safelock_snapcap_tube from '/app/assets/images/labware/ep
 import eppendorf_2ml_safelock_snapcap_tube from '/app/assets/images/labware/eppendorf_2ml_safelock_snapcap_tube.jpg'
 import eppendorf_10ul_tips_eptips_side_view from '/app/assets/images/labware/eppendorf_10ul_tips_eptips_side_view.jpg'
 import eppendorf_1000ul_tip_eptips_side_view from '/app/assets/images/labware/eppendorf_1000ul_tip_eptips_side_view.jpg'
+import ev_resin_tips_flex_short_adapter_img from '/app/assets/images/labware/ev_resin_tips_flex_short_adapter.png'
+import ev_resin_tips_flex_tall_adapter_img from '/app/assets/images/labware/ev_resin_tips_flex_tall_adapter.png'
 import falcon_15ml_conical_tube from '/app/assets/images/labware/falcon_15ml_conical_tube.jpg'
 import falcon_50ml_15ml_conical_tubes from '/app/assets/images/labware/falcon_50ml_15ml_conical_tubes.jpg'
 import falcon_50ml_conical_tube from '/app/assets/images/labware/falcon_50ml_conical_tube.jpg'
@@ -51,8 +53,6 @@ import opentrons_96_deep_well_temp_mod_adapter_img from '/app/assets/images/labw
 import opentrons_96_tiprack_10ul_side_view from '/app/assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'
 import opentrons_96_tiprack_300ul_side_view from '/app/assets/images/labware/opentrons_96_tiprack_300ul_side_view.jpg'
 import opentrons_96_tiprack_1000ul_side_view from '/app/assets/images/labware/opentrons_96_tiprack_1000ul_side_view.jpg'
-import opentrons_evotip_short_adapter_img from '/app/assets/images/labware/opentrons_evotip_short_adapter.png'
-import opentrons_evotip_tall_adapter_img from '/app/assets/images/labware/opentrons_evotip_tall_adapter.png'
 import opentrons_flex_deck_riser_img from '/app/assets/images/labware/opentrons_flex_deck_riser.png'
 import pcr_plate_adapter from '/app/assets/images/labware/pcr_plate_adapter.jpg'
 import thermoscientificnunc_96_wellplate_1300ul from '/app/assets/images/labware/thermoscientificnunc_96_wellplate_1300ul.jpg'
@@ -259,6 +259,6 @@ export const labwareImages: Record<string, string[]> = {
     opentrons_96_deep_well_temp_mod_adapter_img,
   ],
   opentrons_flex_deck_riser: [opentrons_flex_deck_riser_img],
-  evotip_flex_tall_adapter: [opentrons_evotip_short_adapter_img],
-  evotip_flex_short_adapter: [opentrons_evotip_tall_adapter_img],
+  ev_resin_tips_flex_short_adapter: [ev_resin_tips_flex_short_adapter_img],
+  ev_resin_tips_flex_tall_adapter: [ev_resin_tips_flex_tall_adapter_img],
 }

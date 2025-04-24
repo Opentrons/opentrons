@@ -1,8 +1,14 @@
 import floor from 'lodash/floor'
-import { getPipetteSpecsV2, WELL_BOTTOM } from '@opentrons/shared-data'
+import {
+  getPipetteSpecsV2,
+  POSITION_REFERENCE_BOTTOM,
+} from '@opentrons/shared-data'
 
 import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
-import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
+import {
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+  PROTOCOL_DESIGNER_SOURCE,
+} from '../../constants'
 import { getDefaultPushOutVolume } from '../../utils'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
@@ -126,20 +132,20 @@ export const migrateFile = (
           dispense_submerge_speed: null,
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
-          aspirate_touchTip_mmFromEdge: 0, // this field and the following were previously not configurable and defaulted to 0mm
-          dispense_touchTip_mmFromEdge: 0,
-          aspirate_position_reference: WELL_BOTTOM,
-          aspirate_retract_position_reference: WELL_BOTTOM,
+          aspirate_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE, // this field and the following were previously not configurable and defaulted to 0mm
+          dispense_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
+          aspirate_position_reference: POSITION_REFERENCE_BOTTOM,
+          aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
           aspirate_submerge_mmFromBottom: null,
           aspirate_submerge_x_position: null,
           aspirate_submerge_y_position: null,
-          aspirate_submerge_position_reference: WELL_BOTTOM,
-          dispense_position_reference: WELL_BOTTOM,
-          dispense_retract_position_reference: WELL_BOTTOM,
+          aspirate_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
+          dispense_position_reference: POSITION_REFERENCE_BOTTOM,
+          dispense_retract_position_reference: POSITION_REFERENCE_BOTTOM,
           dispense_submerge_mmFromBottom: null,
           dispense_submerge_x_position: null,
           dispense_submerge_y_position: null,
-          dispense_submerge_position_reference: WELL_BOTTOM,
+          dispense_submerge_position_reference: POSITION_REFERENCE_BOTTOM,
           liquidClassesSupported: liquidClassesSupported ?? false,
           liquidClass: 'none',
           pushOut_checkbox:
@@ -197,7 +203,7 @@ export const migrateFile = (
                     mix_touchTip_mmFromBottom - matchingLabwareWellDepth,
                     1
                   ),
-            mix_position_reference: WELL_BOTTOM,
+            mix_position_reference: POSITION_REFERENCE_BOTTOM,
             liquidClassesSupported: liquidClassesSupported ?? false,
             liquidClass: 'none',
             pushOut_checkbox:

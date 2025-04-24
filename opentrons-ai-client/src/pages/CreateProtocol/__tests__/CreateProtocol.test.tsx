@@ -10,6 +10,7 @@ import {
   fillInstrumentsSectionAndClickConfirm,
   fillLabwareLiquidsSectionAndClickConfirm,
   fillModulesSectionAndClickConfirm,
+  fillProtocolFormatSectionAndClickConfirm,
 } from '../../../resources/utils/createProtocolTestUtils'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -51,7 +52,7 @@ describe('CreateProtocol', () => {
     const buttonsAndAccordions = screen.getAllByRole('button')
     expect(buttonsAndAccordions[0]).toHaveAttribute('aria-expanded', 'true')
 
-    await fillApplicationSectionAndClickConfirm()
+    await fillProtocolFormatSectionAndClickConfirm()
 
     await waitFor(() => {
       expect(buttonsAndAccordions[0]).toHaveAttribute('aria-expanded', 'false')
@@ -61,17 +62,20 @@ describe('CreateProtocol', () => {
   it('should display the Prompt preview correctly for Application section', async () => {
     render()
 
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    expect(previewItems).toHaveLength(4)
-    expect(previewItems[0]).toHaveTextContent('Basic aliquoting')
-    expect(previewItems[1]).toHaveTextContent('Test description')
+    expect(previewItems).toHaveLength(5)
+    expect(previewItems[0]).toHaveTextContent('Python')
+    expect(previewItems[1]).toHaveTextContent('Basic aliquoting')
+    expect(previewItems[2]).toHaveTextContent('Test description')
   })
 
-  it('should display the Prompt preview correctly for Application section if Other application is selected', () => {
+  it('should display the Prompt preview correctly for Application section if Other application is selected', async () => {
     render()
+    await fillProtocolFormatSectionAndClickConfirm()
 
     const applicationDropdown = screen.getByText('Select an option')
     fireEvent.click(applicationDropdown)
@@ -91,9 +95,9 @@ describe('CreateProtocol', () => {
     expect(promptPreview).toBeInTheDocument()
 
     const previewItems = screen.getAllByTestId('Tag_default')
-    expect(previewItems).toHaveLength(2)
-    expect(previewItems[0]).toHaveTextContent('Test Application')
-    expect(previewItems[1]).toHaveTextContent('Test description')
+    expect(previewItems[0]).toHaveTextContent('Python')
+    expect(previewItems[1]).toHaveTextContent('Test Application')
+    expect(previewItems[2]).toHaveTextContent('Test description')
   })
 
   it('should display a completed checkmark if the section is completed', async () => {
@@ -104,7 +108,7 @@ describe('CreateProtocol', () => {
     const buttonsAndAccordions = screen.getAllByRole('button')
     expect(buttonsAndAccordions[0]).toHaveAttribute('aria-expanded', 'true')
 
-    await fillApplicationSectionAndClickConfirm()
+    await fillProtocolFormatSectionAndClickConfirm()
 
     expect(screen.getByTestId('accordion-ot-check')).toBeInTheDocument()
   })
@@ -112,27 +116,29 @@ describe('CreateProtocol', () => {
   it('should display the Prompt preview correctly for Instruments section', async () => {
     render()
 
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    expect(previewItems).toHaveLength(6)
-    expect(previewItems[0]).toHaveTextContent('Basic aliquoting')
-    expect(previewItems[1]).toHaveTextContent('Test description')
-    expect(previewItems[2]).toHaveTextContent('Opentrons Flex')
-    expect(previewItems[3]).toHaveTextContent('Flex 1-Channel 50 µL')
-    expect(previewItems[4]).toHaveTextContent('Flex 8-Channel 50 µL')
+    expect(previewItems).toHaveLength(7)
+    expect(previewItems[0]).toHaveTextContent('Python')
+    expect(previewItems[1]).toHaveTextContent('Basic aliquoting')
+    expect(previewItems[2]).toHaveTextContent('Test description')
+    expect(previewItems[3]).toHaveTextContent('Opentrons Flex')
+    expect(previewItems[4]).toHaveTextContent('Flex 1-Channel 50 µL')
+    expect(previewItems[5]).toHaveTextContent('Flex 8-Channel 50 µL')
   })
 
   it('should open the Modules section when the Instruments section is completed', async () => {
     render()
+    await fillProtocolFormatSectionAndClickConfirm()
 
     expect(screen.getByRole('button', { name: 'Application' })).toHaveAttribute(
       'aria-expanded',
       'true'
     )
-
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
 
@@ -147,14 +153,15 @@ describe('CreateProtocol', () => {
   it('should display the Prompt preview correctly for Modules section', async () => {
     render()
 
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    expect(previewItems).toHaveLength(7)
-    expect(previewItems[6]).toHaveTextContent(
+    expect(previewItems).toHaveLength(8)
+    expect(previewItems[7]).toHaveTextContent(
       'Heater-Shaker Module GEN1 with Opentrons 96 Deep Well Heater-Shaker Adapter'
     )
   })
@@ -162,6 +169,7 @@ describe('CreateProtocol', () => {
   it('should open the Labware & Liquids section when the Modules section is completed', async () => {
     render()
 
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
@@ -176,6 +184,7 @@ describe('CreateProtocol', () => {
   it('should display the Prompt preview correctly for Labware & Liquids section', async () => {
     render()
 
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
@@ -183,16 +192,16 @@ describe('CreateProtocol', () => {
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    expect(previewItems).toHaveLength(9)
-    expect(previewItems[7]).toHaveTextContent(
+    expect(previewItems).toHaveLength(10)
+    expect(previewItems[8]).toHaveTextContent(
       'Opentrons Flex 96 Tip Rack 1000 µL'
     )
-    expect(previewItems[8]).toHaveTextContent('Test liquid')
+    expect(previewItems[9]).toHaveTextContent('Test liquid')
   })
 
   it('should open the Steps section when the Labware & Liquids section is completed', async () => {
     render()
-
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
@@ -209,6 +218,7 @@ describe('CreateProtocol', () => {
   it('should display the Prompt preview correctly for Steps section', async () => {
     render()
 
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
@@ -225,7 +235,7 @@ describe('CreateProtocol', () => {
     const previewItems = screen.getAllByTestId('Tag_default')
 
     // After filling the Steps section, there should be 9 items
-    expect(previewItems).toHaveLength(9)
+    expect(previewItems).toHaveLength(10)
 
     // The test step content is not added to the preview items
     // The submit button should be enabled even though the step doesn't appear in preview
@@ -235,6 +245,7 @@ describe('CreateProtocol', () => {
   it('should submit the prompt and redirect the user to the chat page when submit prompt button is clicked', async () => {
     render()
 
+    await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
@@ -251,7 +262,7 @@ describe('CreateProtocol', () => {
     const previewItems = screen.getAllByTestId('Tag_default')
 
     // After filling the Steps section, there should be 9 items
-    expect(previewItems).toHaveLength(9)
+    expect(previewItems).toHaveLength(10)
 
     // The test step content is not added to the preview items
     // But the submit button should be enabled after confirming the step

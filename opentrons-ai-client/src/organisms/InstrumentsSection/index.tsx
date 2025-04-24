@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -34,7 +34,19 @@ export const NO_PIPETTES = 'none'
 
 export function InstrumentsSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
-  const { watch } = useFormContext()
+  const { watch, trigger } = useFormContext()
+
+  // trigger form validation on mount for when users come back to this section after moving on
+  useEffect(() => {
+    void trigger([
+      ROBOT_FIELD_NAME,
+      PIPETTES_FIELD_NAME,
+      FLEX_GRIPPER_FIELD_NAME,
+      LEFT_PIPETTE_FIELD_NAME,
+      RIGHT_PIPETTE_FIELD_NAME,
+    ])
+  })
+
   const robotType = watch(ROBOT_FIELD_NAME)
   const isOtherPipettesSelected = watch(PIPETTES_FIELD_NAME) === TWO_PIPETTES
   const isOpentronsOT2Selected = robotType === OPENTRONS_OT2

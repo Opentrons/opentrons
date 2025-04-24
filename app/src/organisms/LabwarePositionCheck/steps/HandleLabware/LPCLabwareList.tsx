@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
   DISPLAY_NONE,
@@ -71,6 +72,8 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
       header={t('labware_position_check_title')}
       buttonText={t('exit')}
       {...primaryButtonProps()}
+      containerStyle={isOnDevice ? undefined : DESKTOP_CONTAINER_STYLE}
+      contentStyle={isOnDevice ? undefined : DESKTOP_CONTENT_CONTAINER_STYLE}
     >
       <LPCLabwareListContent
         {...props}
@@ -81,6 +84,28 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
     </LPCContentContainer>
   )
 }
+
+const DESKTOP_CONTAINER_STYLE = css`
+  height: 35.375rem;
+  width: 47rem;
+`
+
+const DESKTOP_CONTENT_CONTAINER_STYLE = css`
+  height: 31.625rem;
+  flex-direction: ${DIRECTION_COLUMN};
+  padding: ${SPACING.spacing24};
+  gap: ${SPACING.spacing24};
+  overflow-y: auto;
+
+  & > *:not(:last-child) {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  & > *:last-child {
+    flex-shrink: 0;
+  }
+`
 
 interface LPCLabwareListContentProps extends LPCWizardContentProps {
   selectedUri: string

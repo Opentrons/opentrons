@@ -1,6 +1,7 @@
 import {
   APPLIED_OFFSETS_TO_RUN,
   APPLY_WORKING_OFFSETS,
+  CLEAR_SNACKBAR_STATUS,
   CLEAR_WORKING_OFFSETS,
   FINISH_LPC,
   GO_BACK_HANDLE_LW_SUBSTEP,
@@ -14,6 +15,7 @@ import {
   SET_SELECTED_LABWARE_URI,
   SOURCE_OFFSETS_FROM_DATABASE,
   SOURCE_OFFSETS_FROM_RUN,
+  TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC,
   UPDATE_LPC_DECK,
@@ -25,6 +27,7 @@ import type {
   AppliedOffsetsToRunAction,
   ApplyWorkingOffsetsAction,
   ClearSelectedLabwareWorkingOffsetsAction,
+  ClearSnackbarStatus,
   ConflictTimestampInfo,
   FinalPositionAction,
   FinishLPCAction,
@@ -45,6 +48,7 @@ import type {
   SelectedLabwareNameAction,
   SourceOffsetsFromDatabaseAction,
   SourceOffsetsFromRunAction,
+  ToggleDefaultOffsetInfoBanner,
   UpdateConflictTimestampAction,
   UpdateLPCAction,
   UpdateLPCDeckAction,
@@ -98,10 +102,11 @@ export const setInitialPosition = (
 
 export const setFinalPosition = (
   runId: string,
+  isOnDevice: boolean,
   params: PositionParams
 ): FinalPositionAction => ({
   type: SET_FINAL_POSITION,
-  payload: { ...params, runId },
+  payload: { ...params, runId, isOnDevice },
 })
 
 export const resetLocationSpecificOffsetToDefault = (
@@ -147,7 +152,7 @@ export const updateLPCDeck = (
 
 export const updateLPCLabware = (
   runId: string,
-  labware: LPCLabwareInfo
+  labware: LPCLabwareInfo['labware']
 ): UpdateLPCLabwareAction => ({
   type: UPDATE_LPC_LABWARE,
   payload: { runId, labware },
@@ -200,4 +205,16 @@ export const updateConflictTimestamp = (
 ): UpdateConflictTimestampAction => ({
   type: UPDATE_CONFLICT_TIMESTAMP,
   payload: { runId, info },
+})
+
+export const toggleDefaultOffsetInfoBanner = (
+  runId: string
+): ToggleDefaultOffsetInfoBanner => ({
+  type: TOGGLE_DEFAULT_OFFSET_INFO_BANNER,
+  payload: { runId },
+})
+
+export const clearSnackbarStatus = (runId: string): ClearSnackbarStatus => ({
+  type: CLEAR_SNACKBAR_STATUS,
+  payload: { runId },
 })

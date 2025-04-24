@@ -29,7 +29,7 @@ export function LPCProbeNotAttached(props: LPCWizardContentProps): JSX.Element {
       {...props}
       header={t('labware_position_check_title')}
       buttonText={t('try_again')}
-      onClickButton={headerCommands.handleAttachProbeCheck}
+      onClickButton={headerCommands.handleUnableToDetectProbe}
       secondaryButtonProps={{
         buttonText: t('exit'),
         buttonCategory: 'rounded',

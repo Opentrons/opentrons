@@ -70,22 +70,30 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     )
     wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
   }
+
+  const activeViewBox = viewBox ?? wholeDeckViewBox
+
   return (
-    <Svg
-      viewBox={viewBox || wholeDeckViewBox}
-      ref={wrapperRef}
-      id={id}
-      /* reflect horizontally about the center of the DOM elem */
-      transform="scale(1, -1)"
-      {...styleProps}
-    >
-      {showDeckLayers ? (
-        <DeckFromLayers
-          layerBlocklist={deckLayerBlocklist}
-          robotType={OT2_ROBOT_TYPE}
-        />
-      ) : null}
-      {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
+    <Svg viewBox={activeViewBox} ref={wrapperRef} id={id} {...styleProps}>
+      <g
+        transform={
+          activeViewBox
+            ? `scale(1, -1) translate(0, ${
+                -1 *
+                (Number(activeViewBox?.split(' ')[3]) +
+                  2 * Number(activeViewBox?.split(' ')[1]))
+              })`
+            : undefined
+        }
+      >
+        {showDeckLayers ? (
+          <DeckFromLayers
+            layerBlocklist={deckLayerBlocklist}
+            robotType={OT2_ROBOT_TYPE}
+          />
+        ) : null}
+        {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
+      </g>
     </Svg>
   )
 }

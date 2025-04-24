@@ -9,6 +9,7 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getRobotType } from '../../../../file-data/selectors'
 import { selectors } from '../../../../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { getAllWellContentsForActiveItem } from '../../../../top-selectors/well-contents'
 import {
@@ -47,7 +48,7 @@ describe('OffDeckDetails', () => {
 
   beforeEach(() => {
     props = {
-      terminalItemId: '__initial_setup__',
+      terminalItemId: START_TERMINAL_ITEM_ID,
       addLabware: vi.fn(),
     }
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)

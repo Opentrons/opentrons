@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Any, Generic, Optional, TypeVar, Union, List, Tuple
+from typing import Any, Generic, Optional, TypeVar, Union, List, Tuple, Literal
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -11,7 +11,7 @@ from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
-from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from ..disposal_locations import TrashBin, WasteChute
 from .well import WellCoreType
@@ -190,6 +190,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
+        check_for_movement_conflicts: bool,
     ) -> None:
         ...
 
@@ -367,6 +368,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         dest: List[Tuple[types.Location, WellCoreType]],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
+        starting_tip: Optional[WellCoreType],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -380,8 +382,9 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         volume: float,
         source: Tuple[types.Location, WellCoreType],
         dest: List[Tuple[types.Location, WellCoreType]],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
+        starting_tip: Optional[WellCoreType],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:
@@ -398,8 +401,9 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         volume: float,
         source: List[Tuple[types.Location, WellCoreType]],
         dest: Tuple[types.Location, WellCoreType],
-        new_tip: TransferTipPolicyV2,
+        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
         tip_racks: List[Tuple[types.Location, LabwareCoreType]],
+        starting_tip: Optional[WellCoreType],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
     ) -> None:

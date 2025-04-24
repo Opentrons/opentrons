@@ -66,6 +66,7 @@ export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 export const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
 // NOTE: in the negative Z direction, to go down from top
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
+export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE = 0
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 export const DEFAULT_DELAY_SECONDS = 1
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
@@ -198,3 +199,5 @@ export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
 export const OFFDECK: 'offDeck' = 'offDeck'
 
 export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app
+
+export const DECK_SETUP_TOOLS_WIDTH_REM = 21.875

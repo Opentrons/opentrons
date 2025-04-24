@@ -10,6 +10,7 @@ import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  MODULE_MODELS,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -27,7 +28,7 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { AddFixtureModal } from './AddFixtureModal'
@@ -38,10 +39,15 @@ import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { FormModules } from '../../../step-forms'
-import type { WizardFixtureType, WizardFormState } from '../types'
-import type { CutoutConfigExtended, OptionStage } from './AddFixtureModal'
+import type { Fixtures, WizardFormState } from '../types'
+import type {
+  CutoutConfigExtended,
+  InitialDeckStateModules,
+  OptionStage,
+} from './AddFixtureModal'
 
 interface DeckConfigurationEditingProps {
   addFixtureToCutout: (cutoutId: CutoutId) => void
@@ -54,10 +60,11 @@ interface DeckConfigurationEditingProps {
 export function useDeckConfigurationEditing(
   deckConfig: DeckConfiguration,
   setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>,
-  setValue: UseFormSetValue<WizardFormState>,
-  modules: FormModules,
-  fixtures: WizardFixtureType,
-  hasGripper: boolean
+  modules: FormModules | InitialDeckStateModules,
+  fixtures: Fixtures,
+  hasGripper: boolean,
+  setValue?: UseFormSetValue<WizardFormState>,
+  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
 ): DeckConfigurationEditingProps {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
@@ -74,36 +81,24 @@ export function useDeckConfigurationEditing(
       cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
       cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
     const tcCutouts = ['cutoutA1', 'cutoutB1']
+
     //  remove any fixtures from that cutoutId
-    if (
-      Object.values(fixtures).some(fixture => fixture.cutoutId === cutoutId)
-    ) {
-      const filteredFixtures = Object.fromEntries(
-        Object.entries(fixtures).filter(
-          ([_, fixture]) => fixture.cutoutId !== cutoutId
-        )
+    const filteredFixtures = Object.fromEntries(
+      Object.entries(fixtures).filter(
+        ([_, fixture]) => fixture.cutoutId !== cutoutId
       )
-      setValue('fixtures', filteredFixtures)
-    }
+    )
+    setValue?.('fixtures', filteredFixtures)
+
     //  remove any modules from that cutoutId
-    if (
-      Object.values(modules).some(
-        module =>
-          module.cutoutId === cutoutId ||
-          //  special-casing for thermocycler since deck config adds to both cutouts
-          (thermocyclerCutoutFixtureId &&
-            tcCutouts.includes(module.cutoutId ?? 'cutoutA1'))
+    const fixturedModules = Object.fromEntries(
+      Object.entries(modules).filter(([_, module]) =>
+        thermocyclerCutoutFixtureId
+          ? !tcCutouts.includes((module.cutoutId as CutoutId) ?? 'cutoutA1')
+          : module.cutoutId !== cutoutId
       )
-    ) {
-      const fixturedModules = Object.fromEntries(
-        Object.entries(modules).filter(([_, module]) =>
-          thermocyclerCutoutFixtureId
-            ? !tcCutouts.includes(module.cutoutId ?? 'cutoutA1')
-            : module.cutoutId !== cutoutId
-        )
-      )
-      setValue('modules', fixturedModules)
-    }
+    )
+    setValue?.('modules', fixturedModules)
 
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
     if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
@@ -147,6 +142,25 @@ export function useDeckConfigurationEditing(
           : cutoutConfig
       )
     }
+    let type = 'stagingAreaAndMagneticBlock' as CutoutConfigExtended['type']
+    if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
+      type = cutoutFixtureId as ModuleModel
+    } else {
+      if (cutoutFixtureId === 'trashBinAdapter') {
+        type = 'trashBin'
+      } else if (cutoutFixtureId === 'wasteChuteRightAdapterNoCover') {
+        type = 'wasteChute'
+      } else if (thermocyclerCutoutFixtureId) {
+        type = 'thermocyclerModuleV2'
+      } else if (cutoutFixtureId === 'stagingAreaRightSlot') {
+        type = 'stagingArea'
+      } else if (
+        cutoutFixtureId === 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+      ) {
+        type = 'stagingAreaAndWasteChute'
+      }
+    }
+    updateInitialDeckState?.([{ cutoutId, cutoutFixtureId, type }])
     setUpdatedDeckConfig(newDeckConfig)
   }
 
@@ -166,6 +180,7 @@ export function useDeckConfigurationEditing(
           setUpdatedDeckConfig={setUpdatedDeckConfig}
           setValue={setValue}
           hasGripper={hasGripper}
+          updateInitialDeckState={updateInitialDeckState}
         />
       ) : null,
   }
@@ -287,13 +302,16 @@ export const getAvailableOptions = (
     }
   } else if (optionStage === 'wasteChuteOptions') {
     availableOptions = [
-      WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
     ].map(fixture => [
       {
         cutoutId,
         cutoutFixtureId: fixture,
-        type: 'wasteChute',
+        type:
+          fixture === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+            ? 'wasteChute'
+            : 'stagingAreaAndWasteChute',
       },
     ])
   }

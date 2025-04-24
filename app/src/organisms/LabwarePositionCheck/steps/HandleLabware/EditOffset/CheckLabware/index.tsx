@@ -23,7 +23,6 @@ import {
 
 import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 import { JogControls } from '/app/molecules/JogControls'
-import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
@@ -176,7 +175,6 @@ interface CheckLabwareContentProps extends CheckLabwareProps {
 
 function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
-  const { makeSuccessSnackbar } = useLPCSnackbars(props.runId)
   const {
     contentHeader,
     sectionHeader,
@@ -190,7 +188,6 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
 
   const handleProceed = (): void => {
     handleAddConfirmedWorkingVector()
-    makeSuccessSnackbar()
   }
 
   return (
@@ -210,9 +207,8 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
               </StyledText>
               <Trans
                 t={t}
-                i18nKey={'ensure_nozzle_position_odd'}
+                i18nKey={'ensure_probe_position_odd'}
                 values={{
-                  tip_type: t('calibration_probe'),
                   item_location: isLwTiprack
                     ? t('check_tip_location')
                     : t('check_well_location'),
@@ -300,9 +296,8 @@ function CheckLabwareContentDesktop(
             </StyledText>
             <Trans
               t={t}
-              i18nKey={'ensure_nozzle_position_desktop'}
+              i18nKey={'ensure_probe_position_desktop'}
               values={{
-                tip_type: t('calibration_probe'),
                 item_location: isLwTiprack
                   ? t('check_tip_location')
                   : t('check_well_location'),

@@ -88,6 +88,7 @@ export function SetupOffsetsHeader({
           buttonCategory="rounded"
           iconPlacement="startIcon"
           iconName={isApplyOffsets ? 'ot-spinner' : null}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         />
       )}
     </Flex>

@@ -5,7 +5,6 @@ import { when } from 'vitest-when'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
-  useDoorQuery,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -22,6 +21,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
+import {
+  NOT_CONFIGURED,
+  useIsDoorOpen,
+} from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
@@ -125,6 +128,7 @@ vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -187,10 +191,8 @@ const mockOffset = {
 }
 
 const mockDoorStatus = {
-  data: {
-    status: 'closed',
-    doorRequiredClosedForProtocol: true,
-  },
+  isDoorOpen: false,
+  moduleDoorLocation: null,
 }
 const mockFixture = {
   cutoutId: 'cutoutD1',
@@ -302,7 +304,9 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .thenReturn({ data: { data: [] } } as any)
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
-    vi.mocked(useDoorQuery).mockReturnValue({ data: mockDoorStatus } as any)
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockDoorStatus)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
@@ -343,7 +347,7 @@ describe('ProtocolSetup', () => {
     screen.getByText('Instruments')
     screen.getByText('Deck hardware')
     screen.getByText('Labware & Liquids')
-    screen.getByText('Labware Position Check')
+    screen.getByText('Labware Offsets')
   })
 
   it.skip('should play protocol when click play button', () => {
@@ -445,7 +449,7 @@ describe('ProtocolSetup', () => {
       vi.fn(() => <div>Mock ProtocolSetupOffsets</div>)
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware Position Check'))
+    fireEvent.click(screen.getByText('Labware Offsets'))
     expect(MockProtocolSetupOffsets).toHaveBeenCalled()
     screen.getByText(/Mock ProtocolSetupOffsets/)
   })
@@ -476,7 +480,7 @@ describe('ProtocolSetup', () => {
       })
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware Position Check'))
+    fireEvent.click(screen.getByText('Labware Offsets'))
     fireEvent.click(screen.getByText('Labware & Liquids'))
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
@@ -506,16 +510,30 @@ describe('ProtocolSetup', () => {
 
   it('should render toast and make a button disabled when a robot door is open', () => {
     const mockOpenDoorStatus = {
-      data: {
-        status: 'open',
-        doorRequiredClosedForProtocol: true,
-      },
+      isDoorOpen: true,
+      moduleDoorLocation: null,
     }
-    vi.mocked(useDoorQuery).mockReturnValue({ data: mockOpenDoorStatus } as any)
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockOpenDoorStatus)
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run.'
+    )
+  })
+  it('should render toast and make a button disabled when a stacker door is open', () => {
+    const mockOpenDoorStatus = {
+      isDoorOpen: true,
+      moduleDoorLocation: NOT_CONFIGURED,
+    }
+    when(vi.mocked(useIsDoorOpen))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockOpenDoorStatus)
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
+      'A stacker door is open. Close the stacker door before starting the run.'
     )
   })
 

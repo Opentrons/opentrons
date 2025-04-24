@@ -108,6 +108,15 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             axes: ['leftZ'],
           },
         },
+        // if the user shoved the gantry while detaching the pipette
+        // the gantry axes have lost position, so account for it without
+        // doing an annoying home
+        {
+          commandType: 'unsafe/updatePositionEstimators' as const,
+          params: {
+            axes: ['x', 'y'],
+          },
+        },
         {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {

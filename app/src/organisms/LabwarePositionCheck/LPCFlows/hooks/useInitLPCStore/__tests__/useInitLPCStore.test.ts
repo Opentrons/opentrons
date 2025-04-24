@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
 import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
@@ -68,6 +68,7 @@ describe('useInitLPCStore', () => {
     renderHook(() => {
       useInitLPCStore({
         runId: RUN_ID,
+        isFlex: true,
         analysis: MOCK_ANALYSIS,
         protocolName: PROTOCOL_NAME,
         deckConfig: MOCK_DECK_CONFIG,
@@ -75,7 +76,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
@@ -94,7 +94,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
@@ -113,7 +112,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
@@ -132,7 +130,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
@@ -151,7 +148,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
@@ -170,7 +166,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: undefined,
       } as any)
     })
@@ -189,7 +184,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: { data: {} } as any,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
@@ -216,10 +210,11 @@ describe('useInitLPCStore', () => {
     expect(MOCK_DISPATCH).not.toHaveBeenCalled()
   })
 
-  it('should dispatch updateLPC when all required conditions are met for Flex robot', () => {
+  it('should dispatch updateLPC when all required conditions are met for the Flex', () => {
     renderHook(() => {
       useInitLPCStore({
         runId: RUN_ID,
+        isFlex: true,
         analysis: MOCK_ANALYSIS,
         protocolName: PROTOCOL_NAME,
         deckConfig: MOCK_DECK_CONFIG,
@@ -227,7 +222,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
@@ -253,6 +247,7 @@ describe('useInitLPCStore', () => {
         lastStepIndices: null,
         currentSubstep: null,
       },
+      ui: { showDefaultOffsetInfoBanner: true, showSnackbar: null },
     })
     expect(sortRunRecordOffsets).toHaveBeenCalledWith(
       MOCK_RUN_RECORD.data.labwareOffsets
@@ -265,6 +260,7 @@ describe('useInitLPCStore', () => {
     renderHook(() => {
       useInitLPCStore({
         runId: RUN_ID,
+        isFlex: true,
         analysis: MOCK_ANALYSIS,
         protocolName: PROTOCOL_NAME,
         deckConfig: MOCK_DECK_CONFIG,
@@ -272,7 +268,6 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: FLEX_ROBOT_TYPE,
         flexStoredOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })

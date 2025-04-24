@@ -12,6 +12,7 @@ import {
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
 
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
@@ -45,7 +46,7 @@ export function DeckItemHighlight(
   )
 
   if (
-    terminalItemId === '__initial_setup__' ||
+    terminalItemId === START_TERMINAL_ITEM_ID ||
     slotPosition === null ||
     (!isHovered && !isSelected)
   ) {

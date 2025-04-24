@@ -86,7 +86,10 @@ describe('SelectRecoveryOption', () => {
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with new tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE, expect.any(String))
+      .calledWith(
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+        expect.any(String)
+      )
       .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
@@ -167,7 +170,7 @@ describe('SelectRecoveryOption', () => {
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE
+      RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE
     )
   })
 
@@ -284,7 +287,10 @@ describe('RecoveryOptions', () => {
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with new tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE, expect.any(String))
+      .calledWith(
+        RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+        expect.any(String)
+      )
       .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))

@@ -9,7 +9,10 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { InlineNotification } from '/app/atoms/InlineNotification'
+import {
+  useLPCSnackbars,
+  useLPCToasts,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   handleUnsavedOffsetsModalODD,
@@ -19,15 +22,14 @@ import { getIsOnDevice } from '/app/redux/config'
 import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
-  selectIsAnyOffsetHardCoded,
-  selectIsDefaultOffsetAbsent,
   selectSelectedLwDisplayName,
-  selectSelectedLwOverview,
+  selectSnackbarStatus,
   selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
 
 import { DefaultLocationOffset } from './DefaultLocationOffset'
 import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
+import { OffsetBannerContainer } from './OffsetBannerContainer'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -36,6 +38,7 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const { isSavingWorkingOffsetsLoading, saveWorkingOffsets } = commandUtils
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()
+
   const [showUnsavedOffsetsDesktop, setShowUnsavedOffsetsDesktop] = useState(
     false
   )
@@ -43,7 +46,14 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
   const selectedLwName = useSelector(selectSelectedLwDisplayName(runId))
   const workingOffsetsByUri = useSelector(selectWorkingOffsetsByUri(runId))
+  const snackbarStatus = useSelector(selectSnackbarStatus(runId))
+  const { makeSuccessToast } = useLPCToasts()
+  const { makeSuccessSnackbar } = useLPCSnackbars(runId)
   const doWorkingOffsetsExist = Object.keys(workingOffsetsByUri).length > 0
+
+  if (snackbarStatus != null) {
+    makeSuccessSnackbar(snackbarStatus)
+  }
 
   const onHeaderGoBack = (): void => {
     if (doWorkingOffsetsExist) {
@@ -62,6 +72,10 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
       void saveWorkingOffsets().then(updatedOffsetData => {
         dispatch(applyWorkingOffsets(runId, updatedOffsetData))
         dispatch(goBackEditOffsetSubstep(runId))
+
+        if (isOnDevice) {
+          makeSuccessToast(selectedLwName)
+        }
       })
     }
   }
@@ -100,71 +114,11 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
 }
 
 function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
-  const { t } = useTranslation('labware_position_check')
-  const { runId, bannerUtils } = props
-  const {
-    showBanner: showInfoBanner,
-    toggleBanner: toggleInfoBanner,
-  } = bannerUtils.defaultOffsetInfoBanner
-
-  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
-  const isOnDevice = useSelector(getIsOnDevice)
-  const uri = selectedLwInfo?.uri ?? ''
-  const isDefaultOffsetAbsent = useSelector(
-    selectIsDefaultOffsetAbsent(runId, uri)
-  )
-  const isAnyOffsetHardCoded = useSelector(
-    selectIsAnyOffsetHardCoded(runId, uri)
-  )
-
-  const [showDefaultBanner, setShowDefaultBanner] = useState(
-    isDefaultOffsetAbsent
-  )
-  const [showHardCodedBanner, setShowHardCodedBanner] = useState(
-    isAnyOffsetHardCoded
-  )
-
   return (
     <Flex css={LIST_CONTAINER_STYLE}>
-      {showDefaultBanner && (
-        <InlineNotification
-          type="alert"
-          heading={t('add_a_default_offset')}
-          message={t('specific_slots_can_be_adjusted')}
-          onCloseClick={
-            isOnDevice
-              ? undefined
-              : () => {
-                  setShowDefaultBanner(false)
-                }
-          }
-        />
-      )}
-      {showHardCodedBanner && (
-        <InlineNotification
-          type="neutral"
-          heading={t('changing_default_not_update_hardcoded')}
-          message={t('hardcoded_offsets_changed_in_python')}
-          onCloseClick={
-            isOnDevice
-              ? undefined
-              : () => {
-                  setShowHardCodedBanner(false)
-                }
-          }
-        />
-      )}
-      {showInfoBanner && (
-        <InlineNotification
-          type="neutral"
-          heading={t('default_offset_description')}
-          onCloseClick={toggleInfoBanner}
-        />
-      )}
+      <OffsetBannerContainer {...props} />
       <DefaultLocationOffset {...props} />
       <LocationSpecificOffsetsContainer {...props} />
-      {/* Accommodate scrolling on the ODD. */}
-      <Flex css={ODD_SCROLL_BUFFER} />
     </Flex>
   )
 }
@@ -175,12 +129,6 @@ export const LIST_CONTAINER_STYLE = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     gap: ${SPACING.spacing24};
-  }
-`
-
-const ODD_SCROLL_BUFFER = css`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: ${SPACING.spacing40};
   }
 `
 
@@ -195,4 +143,13 @@ const DESKTOP_CONTENT_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing24};
   gap: ${SPACING.spacing24};
   overflow-y: auto;
+
+  & > *:not(:last-child) {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  & > *:last-child {
+    flex-shrink: 0;
+  }
 `

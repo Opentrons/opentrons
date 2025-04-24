@@ -36,6 +36,8 @@ import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
 import type { ChatData } from '../../resources/types'
 
+import smallLogo from '../../assets/images/opentrons_logo_small.svg'
+
 interface ChatDisplayProps {
   chat: ChatData
   chatId: string
@@ -58,6 +60,40 @@ const StyledIcon = styled(Icon)`
   color: ${COLORS.blue50};
 `
 
+const OuterContainer = styled.div`
+  background-color: ${COLORS.white}
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 16px;
+`
+
+const FileContainer = styled.div`
+  background-color: ${COLORS.grey20};
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+`
+
+const IconWrapper = styled.div`
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const FileName = styled.span`
+  font-size: 14px;
+  color: ${COLORS.black90};
+  margin-right: auto;
+`
+
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const trackEvent = useTrackEvent()
@@ -69,7 +105,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { setValue } = useFormContext()
   const [chatdata] = useAtom(chatDataAtom)
   const [scrollToBottom, setScrollToBottom] = useAtom(scrollToBottomAtom)
-  const { role, reply, requestId } = chat
+
+  const [showProtocolContent, setShowProtocolContent] = useState(false)
+  const { role, reply, requestId, protocol_content } = chat
   const isUser = role === 'user'
 
   const setInputFieldToCorrespondingRequest = (): void => {
@@ -106,6 +144,20 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleFileDownload = (): void => {
+    if (protocol_content) {
+      const blob = new Blob([JSON.stringify(protocol_content, null, 2)], {
+        type: 'application/json',
+      })
+      const url = URL.createObjectURL(blob)
+
+      // Use a temporary anchor
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = 'protocol.json'
+      anchor.click()
+
+      URL.revokeObjectURL(url)
+    }
     const lastCodeBlock = document.querySelector(`#${chatId}`)
     const code = lastCodeBlock?.textContent?.trim() ?? ''
     // Don't proceed if code is empty, no need to download as a python file
@@ -138,9 +190,14 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleClickCopy = async (): Promise<void> => {
-    const lastCodeBlock = document.querySelector(`#${chatId}`)
-    const code = lastCodeBlock?.textContent ?? ''
-    await navigator.clipboard.writeText(code)
+    if (protocol_content) {
+      await navigator.clipboard.writeText(JSON.stringify(protocol_content))
+    } else {
+      const lastCodeBlock = document.querySelector(`#${chatId}`)
+      const code = lastCodeBlock?.textContent ?? ''
+      await navigator.clipboard.writeText(code)
+    }
+
     setIsCopied(true)
     trackEvent({
       name: 'copy-protocol',
@@ -157,6 +214,53 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
 
   function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
     return <CodeWrapper {...props} id={chatId} />
+  }
+
+  const protocolName =
+    chatdata.findLast(chat => chat.protocol_content != null)?.protocol_content
+      ?.metadata.protocolName ?? 'protocol.json'
+
+  const ProtocolContentBadge = (props: {
+    onClick: () => void
+  }): JSX.Element => {
+    const { onClick } = props
+    return (
+      <OuterContainer>
+        <FileContainer onClick={onClick}>
+          <IconWrapper>
+            <img src={smallLogo} alt="Opentrons logo" width="24" height="24" />
+          </IconWrapper>
+          <FileName>{protocolName}</FileName>
+          <HoverShadow
+            onClick={(e: Event) => {
+              e.stopPropagation()
+              setShowFeedbackModal(true)
+            }}
+          >
+            <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
+          </HoverShadow>
+          <HoverShadow
+            onClick={async (e: Event) => {
+              e.stopPropagation()
+              await handleClickCopy()
+            }}
+          >
+            <StyledIcon
+              size={SPACING.spacing20}
+              name={isCopied ? 'check' : 'content-copy'}
+            />
+          </HoverShadow>
+          <HoverShadow
+            onClick={(e: Event) => {
+              e.stopPropagation()
+              handleFileDownload()
+            }}
+          >
+            <StyledIcon size={SPACING.spacing20} name="download" />
+          </HoverShadow>
+        </FileContainer>
+      </OuterContainer>
+    )
   }
 
   return (
@@ -194,7 +298,24 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           {reply}
         </Markdown>
 
-        {!isUser ? (
+        {/* Display protocol_content badge and content */}
+        {!isUser && protocol_content && (
+          <>
+            <ProtocolContentBadge
+              onClick={() => {
+                setShowProtocolContent(!showProtocolContent)
+              }}
+            ></ProtocolContentBadge>
+
+            {showProtocolContent && (
+              <CodeWrapper>
+                {JSON.stringify(protocol_content, null, 2)}
+              </CodeWrapper>
+            )}
+          </>
+        )}
+
+        {!isUser && !protocol_content ? (
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_FLEX_END}

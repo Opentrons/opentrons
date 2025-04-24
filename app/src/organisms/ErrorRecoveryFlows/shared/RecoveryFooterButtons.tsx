@@ -8,6 +8,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_STICKY,
   PrimaryButton,
   RESPONSIVENESS,
   SecondaryButton,
@@ -31,6 +32,8 @@ interface RecoveryFooterButtonProps {
   tertiaryBtnDisabled?: boolean
   /* Use the style of the secondary button in the position typically used by the tertiary button. */
   secondaryAsTertiary?: boolean
+  /* Makes the footer buttons sticky to the bottom of their container. */
+  isSticky?: boolean
 }
 export function RecoveryFooterButtons(
   props: RecoveryFooterButtonProps
@@ -42,6 +45,7 @@ export function RecoveryFooterButtons(
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_FLEX_END}
       gridGap={SPACING.spacing8}
+      css={props.isSticky != null ? STICKY_FOOTER_STYLE : undefined}
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
         {!props.secondaryAsTertiary && <RecoveryGoBackButton {...props} />}
@@ -73,6 +77,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
     tertiaryBtnText,
     secondaryAsTertiary,
     secondaryBtnOnClick,
+    isSticky,
   } = props
 
   const renderTertiaryBtn =
@@ -82,7 +87,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
 
   if (!renderTertiaryBtn) {
     return (
-      <Flex>
+      <Flex marginTop={isSticky ? '1rem' : undefined}>
         <RecoveryPrimaryBtn {...props} />
       </Flex>
     )
@@ -91,6 +96,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
       <Flex
         gridGap={secondaryAsTertiary ? SPACING.spacing32 : SPACING.spacing8}
         marginLeft={secondaryAsTertiary ? 'auto' : undefined}
+        marginTop={isSticky ? '1rem' : undefined}
       >
         {secondaryAsTertiary ? (
           <RecoveryGoBackButton {...props} />
@@ -176,6 +182,13 @@ function RecoveryTertiaryBtn({
     </>
   )
 }
+
+const STICKY_FOOTER_STYLE = css`
+  position: ${POSITION_STICKY};
+  bottom: 0;
+  background-color: ${COLORS.white};
+  z-index: 1;
+`
 
 const PRESSED_LOADING_STATE = css`
   background-color: ${COLORS.blue60};

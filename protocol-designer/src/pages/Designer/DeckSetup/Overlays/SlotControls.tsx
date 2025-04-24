@@ -18,6 +18,7 @@ import { DND_TYPES } from '../../../../constants'
 import { selectors as labwareDefSelectors } from '../../../../labware-defs'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
@@ -132,7 +133,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
     slotPosition == null ||
-    terminalItemId !== '__initial_setup__' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected
   )
     return null

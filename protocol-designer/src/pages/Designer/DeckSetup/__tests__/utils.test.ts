@@ -16,7 +16,8 @@ import {
 import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
 import {
   getDeckErrors,
-  getIsEntityOnSlotInUse,
+  getIsHardwareOnSlotInUse,
+  getIsLabwareOnSlotInUse,
   getModuleModelsBySlot,
   getSVGContainerWidth,
 } from '../utils'
@@ -190,55 +191,42 @@ const mockFixtures: AdditionalEquipment[] = [
     location: WASTE_CHUTE_CUTOUT,
   },
 ]
-describe('getIsEntityOnSlotIsInUse', () => {
+describe('getIsHardwareOnSlotInUse', () => {
   it('returns true when there is a module in use', () => {
-    expect(getIsEntityOnSlotInUse(mockSavedSteps, null, mockModule)).toBe(true)
+    expect(getIsHardwareOnSlotInUse(mockSavedSteps, null, mockModule)).toBe(
+      true
+    )
   })
-  it('returns true when there is a labware in use', () => {
-    expect(
-      getIsEntityOnSlotInUse(mockSavedSteps, null, undefined, mockLabware)
-    ).toBe(true)
-  })
-  it('returns true when there is a nested labware in use', () => {
-    expect(
-      getIsEntityOnSlotInUse(
-        mockSavedSteps,
-        null,
-        undefined,
-        undefined,
-        mockLabware
-      )
-    ).toBe(true)
-  })
+
   it('returns true when there is a matchingLabwareFor4thColumn in use', () => {
     mockLabware = {
       ...mockLabware,
       slot: 'A4',
     }
-    expect(getIsEntityOnSlotInUse(mockSavedSteps, mockLabware)).toBe(true)
+    expect(getIsHardwareOnSlotInUse(mockSavedSteps, mockLabware)).toBe(true)
   })
   it('returns true when there is a fixture in use', () => {
     expect(
-      getIsEntityOnSlotInUse(
-        mockSavedSteps,
-        null,
-        undefined,
-        undefined,
-        undefined,
-        mockFixtures
-      )
+      getIsHardwareOnSlotInUse(mockSavedSteps, null, undefined, mockFixtures)
     ).toBe(true)
   })
   it('returns false when there are no steps use', () => {
     expect(
-      getIsEntityOnSlotInUse(
-        {},
-        mockLabware,
-        mockModule,
-        mockLabware,
-        mockLabware,
-        mockFixtures
-      )
+      getIsHardwareOnSlotInUse({}, mockLabware, mockModule, mockFixtures)
     ).toBe(false)
+  })
+})
+
+describe('getIsLabwareOnSlotInUse', () => {
+  it('returns true when there is a labware in use', () => {
+    expect(getIsLabwareOnSlotInUse(mockSavedSteps, mockLabware)).toBe(true)
+  })
+  it('returns true when there is a nested labware in use', () => {
+    expect(
+      getIsLabwareOnSlotInUse(mockSavedSteps, undefined, mockLabware)
+    ).toBe(true)
+  })
+  it('returns false when there are no steps use', () => {
+    expect(getIsLabwareOnSlotInUse({}, mockLabware, mockLabware)).toBe(false)
   })
 })

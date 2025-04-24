@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
@@ -124,6 +124,15 @@ export function ChooseProtocolSlideoutComponent(
     ) ?? false
   )
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const multiSlideoutRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (currentPage === 2 && multiSlideoutRef.current != null) {
+      multiSlideoutRef.current.scrollIntoView({
+        behavior: 'smooth',
+      })
+    }
+  }, [currentPage])
 
   useEffect(() => {
     setRunTimeParametersOverrides(
@@ -528,7 +537,11 @@ export function ChooseProtocolSlideoutComponent(
   }
 
   const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
+    <Flex
+      ref={multiSlideoutRef}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing10}
+    >
       <Flex justifyContent={JUSTIFY_END}>
         <LinkComponent
           textAlign={TYPOGRAPHY.textAlignRight}

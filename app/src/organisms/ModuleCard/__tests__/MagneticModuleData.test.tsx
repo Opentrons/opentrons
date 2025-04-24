@@ -1,16 +1,13 @@
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { StatusLabel } from '/app/atoms/StatusLabel'
 import { i18n } from '/app/i18n'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 
 import { MagneticModuleData } from '../MagneticModuleData'
 
 import type { ComponentProps } from 'react'
-
-vi.mock('/app/atoms/StatusLabel')
 
 const render = (props: ComponentProps<typeof MagneticModuleData>) => {
   return renderWithProviders(<MagneticModuleData {...props} />, {
@@ -26,16 +23,14 @@ describe('MagneticModuleData', () => {
       moduleModel: mockMagneticModule.moduleModel,
       moduleStatus: mockMagneticModule.data.status,
     }
-    vi.mocked(StatusLabel).mockReturnValue(<div>Mock StatusLabel</div>)
-  })
-  afterEach(() => {
-    vi.resetAllMocks()
   })
 
   it('renders a status', () => {
     render(props)
+    screen.getByTestId('mag_module_data')
 
-    screen.getByText('Mock StatusLabel')
+    const chip = screen.getByTestId('mag_module_chip')
+    expect(chip).toHaveTextContent(`${props.moduleStatus}`)
   })
 
   it('renders magnet height data', () => {

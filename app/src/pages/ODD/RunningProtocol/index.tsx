@@ -27,6 +27,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { StepMeter } from '/app/atoms/StepMeter'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
@@ -124,6 +125,7 @@ export function RunningProtocol(): JSX.Element {
     runId,
     runStatus
   )
+  const doorStatus = useIsDoorOpen(robotName)
   const {
     showModal: showIntervention,
     modalProps: interventionProps,
@@ -175,7 +177,9 @@ export function RunningProtocol(): JSX.Element {
         />
       ) : null}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && !showIntervention ? (
-        <OpenDoorAlertModal />
+        <OpenDoorAlertModal
+          moduleDoorLocation={doorStatus.moduleDoorLocation}
+        />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
       {/* note: this zindex is here to establish a zindex context for the bullets

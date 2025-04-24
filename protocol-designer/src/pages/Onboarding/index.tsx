@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -26,6 +26,7 @@ import * as labwareDefActions from '../../labware-defs/actions'
 import * as labwareDefSelectors from '../../labware-defs/selectors'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { actions as fileActions } from '../../load-file'
+import { toggleNewProtocolModal } from '../../navigation/actions'
 import { actions as stepFormActions } from '../../step-forms'
 import {
   createDeckFixture,
@@ -39,6 +40,7 @@ import { SelectHardware } from './SelectFlexHardware'
 import { SelectOt2Modules } from './SelectOt2Modules'
 
 import type { ThunkDispatch } from 'redux-thunk'
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   ModuleModel,
   ModuleType,
@@ -74,15 +76,17 @@ const initialFormState: WizardFormState = {
     name: undefined,
     description: undefined,
     organizationOrAuthor: undefined,
-    robotType: undefined,
+    robotType: FLEX_ROBOT_TYPE,
   },
   pipettesByMount: {
     left: { pipetteName: undefined, tiprackDefURI: undefined },
     right: { pipetteName: undefined, tiprackDefURI: undefined },
   },
   modules: {},
-  hasGripper: false,
+  hasGripper: null,
   fixtures: {},
+  hasThermocycler: null,
+  hasWasteChute: null,
 }
 
 const pipetteValidationShape = Yup.object().shape({
@@ -174,15 +178,18 @@ export function Onboarding(): JSX.Element | null {
             []
           )
         : []
-    const heaterShakerIndex = modules.findIndex(
-      mod => mod.type === HEATERSHAKER_MODULE_TYPE
-    )
-    const magModIndex = modules.findIndex(
-      mod => mod.type === MAGNETIC_MODULE_TYPE
-    )
-    if (heaterShakerIndex > -1 && magModIndex > -1) {
-      // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
-      modules[magModIndex].slot = '9'
+
+    if (values.fields.robotType === OT2_ROBOT_TYPE) {
+      const heaterShakerIndex = modules.findIndex(
+        mod => mod.type === HEATERSHAKER_MODULE_TYPE
+      )
+      const magModIndex = modules.findIndex(
+        mod => mod.type === MAGNETIC_MODULE_TYPE
+      )
+      if (heaterShakerIndex > -1 && magModIndex > -1) {
+        // if both are present, move the Magnetic module to slot 9, since both can't be in slot 1
+        modules[magModIndex].slot = '9'
+      }
     }
     const newProtocolFields = values.fields
 
@@ -321,6 +328,7 @@ export function Onboarding(): JSX.Element | null {
         proceed={proceed}
         goBack={goBack}
         analyticsStartTime={analyticsStartTime}
+        setCurrentStepIndex={setCurrentStepIndex}
       />
     </Box>
   )
@@ -332,6 +340,7 @@ interface CreateFileFormProps {
   goBack: () => void
   proceed: () => void
   analyticsStartTime: Date
+  setCurrentStepIndex: Dispatch<SetStateAction<number>>
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
@@ -341,14 +350,26 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     proceed,
     goBack,
     analyticsStartTime,
+    setCurrentStepIndex,
   } = props
+  const location = useLocation()
   const { ...formProps } = useForm<WizardFormState>({
     defaultValues: initialFormState,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
   })
-
+  const dispatch = useDispatch()
   const robotType = formProps.watch('fields').robotType
+
+  // for resetting the onboarding page back to empty and page 1 when you hit "create new"
+  //  from the nav bar
+  useEffect(() => {
+    if (location.state?.modalResetKey) {
+      formProps.reset()
+      setCurrentStepIndex(0)
+      dispatch(toggleNewProtocolModal(true))
+    }
+  }, [location.state?.modalResetKey])
 
   return (
     <form onSubmit={formProps.handleSubmit(() => {})}>

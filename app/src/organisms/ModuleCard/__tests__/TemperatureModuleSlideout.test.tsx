@@ -4,6 +4,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
@@ -14,6 +15,7 @@ import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/redux-resources/analytics')
 
 const render = (props: ComponentProps<typeof TemperatureModuleSlideout>) => {
   return renderWithProviders(<TemperatureModuleSlideout {...props} />, {
@@ -36,6 +38,9 @@ describe('TemperatureModuleSlideout', () => {
     }
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
     } as any)
   })
   afterEach(() => {

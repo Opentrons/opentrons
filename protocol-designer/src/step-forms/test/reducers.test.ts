@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   MAGNETIC_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -53,11 +52,7 @@ import type {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
-import type {
-  CreateModuleAction,
-  DeleteModuleAction,
-  EditModuleAction,
-} from '../actions/modules'
+import type { CreateModuleAction, DeleteModuleAction } from '../actions/modules'
 import type {
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
@@ -357,19 +352,6 @@ describe('moduleInvariantProperties reducer', () => {
         type: newModuleData.type,
         model: newModuleData.model,
       },
-    })
-  })
-  it('edit module (change its model)', () => {
-    const newModel = 'someDifferentModel'
-    const result = moduleInvariantProperties(prevState, {
-      type: 'EDIT_MODULE',
-      payload: {
-        id: existingModuleId,
-        model: newModel,
-      },
-    })
-    expect(result).toEqual({
-      [existingModuleId]: { ...prevState.existingModuleId, model: newModel },
     })
   })
   it('delete module', () => {
@@ -1365,95 +1347,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       ).toEqual(expectedState)
     })
   })
-  describe('EDIT_MODULE', () => {
-    it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
-      vi.mocked(_getInitialDeckSetupRootState).mockReturnValue({
-        labware: {
-          magPlateId: {
-            id: 'magPlateId',
-            slot: 'magModuleId',
-            def: {
-              // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
-              parameters: {
-                magneticModuleEngageHeight: 12,
-              },
-            },
-          },
-        },
-        pipettes: {},
-        modules: {
-          // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
-          magModuleId: {
-            id: 'magModuleId',
-            type: MAGNETIC_MODULE_TYPE,
-            model: MAGNETIC_MODULE_V1,
-            slot: '1',
-          },
-        },
-      })
-      const action: EditModuleAction = {
-        type: 'EDIT_MODULE',
-        payload: {
-          id: 'magModuleId',
-          model: 'magneticModuleV2',
-        },
-      }
-      const prevRootState: RootState = {
-        savedStepForms: {
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          magnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'magModuleId',
-            engageHeight: '24', // = 12 * 2 b/c we're going V1 -> V2
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          magnetDisengageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'disengage',
-            engageHeight: null,
-            moduleId: 'magModuleId',
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          nonDefaultMagnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'magModuleId',
-            engageHeight: '8',
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          unrelatedMagnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'otherMagModuleId',
-            // not 'magModuleId'
-            engageHeight: '8',
-          },
-        },
-      }
-      const result = savedStepForms(prevRootState, action)
-      expect(result).toEqual({
-        magnetEngageStepId: {
-          stepType: 'magnet',
-          magnetAction: 'engage',
-          engageHeight: '12',
-          // V2 units default
-          moduleId: 'magModuleId',
-        },
-        magnetDisengageStepId:
-          prevRootState.savedStepForms.magnetDisengageStepId,
-        nonDefaultMagnetEngageStepId: {
-          stepType: 'magnet',
-          magnetAction: 'engage',
-          moduleId: 'magModuleId',
-          engageHeight: null,
-        },
-        // module id not matching, unchanged
-        unrelatedMagnetEngageStepId:
-          prevRootState.savedStepForms.unrelatedMagnetEngageStepId,
-      })
-    })
-  })
   describe('saving multiple steps', () => {
     it('should apply the form patch to all of the step ids', () => {
       const prevState: RootState = {
@@ -1624,7 +1517,6 @@ describe('unsavedForm reducer', () => {
     'DELETE_MODULE',
     'DELETE_STEP',
     'DELETE_MULTIPLE_STEPS',
-    'EDIT_MODULE',
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
     'SELECT_MULTIPLE_STEPS',

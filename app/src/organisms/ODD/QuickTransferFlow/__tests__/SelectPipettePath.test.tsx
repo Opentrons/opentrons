@@ -79,7 +79,10 @@ describe('SelectPipettePath', () => {
     render(props)
     fireEvent.click(screen.getByText('Single transfers'))
     fireEvent.click(screen.getByText('Continue'))
-    expect(props.dispatch).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalledWith({
+      type: 'SET_PIPETTE_PATH',
+      path: 'single',
+    })
     expect(props.onNext).toHaveBeenCalled()
   })
 })

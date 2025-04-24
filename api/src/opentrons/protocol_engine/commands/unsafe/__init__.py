@@ -1,4 +1,20 @@
-"""Commands that will cause inaccuracy or incorrect behavior but are still necessary."""
+"""Commands that are "unsafe".
+
+"Unsafe" means that they can cause inaccuracy or incorrect behavior. They should
+therefore never be used in protocols, and should only be used otherwise as a last
+resort.
+
+These exist as a necessary evil for implementing things like error recovery.
+Even in those narrow contexts, these commands must be used with care.
+e.g. after an `UpdatePositionEstimators` command, there must be a `Home` command,
+or positioning will be subtly wrong. Each unsafe command should document its intended
+use case and its caveats.
+
+Because we don't expect unsafe commands to be used in any protocols whose behavior we
+must preserve, we may change the commands' semantics over time. We may also change
+their shapes if we're confident that it won't break something in robot-server's
+persistent storage.
+"""
 
 from .unsafe_blow_out_in_place import (
     UnsafeBlowOutInPlaceCommandType,

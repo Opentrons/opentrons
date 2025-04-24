@@ -54,7 +54,7 @@ export function getNextAvailableDeckSlot(
     const addressableAreaName = stagingAreaAddressableAreaNames.find(
       aa => aa === slot.id
     )
-    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id)
+    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id, true)
     if (addressableAreaName == null && COLUMN_4_SLOTS.includes(slot.id)) {
       isSlotEmpty = false
     } else if (

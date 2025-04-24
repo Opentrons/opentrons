@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useReducer, useState } from 'react'
+import { Fragment, useEffect, useReducer, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -164,6 +164,7 @@ export function ChooseRobotSlideout(
     setShowRestoreValuesTooltip,
   ] = useState<boolean>(false)
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const multiSlideoutRef = useRef<HTMLDivElement>(null)
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
@@ -225,6 +226,14 @@ export function ChooseRobotSlideout(
       setSelectedRobot(null)
     }
   }, [reducerAvailableRobots, selectedRobot, setSelectedRobot])
+
+  useEffect(() => {
+    if (multiSlideout?.currentPage === 2 && multiSlideoutRef.current != null) {
+      multiSlideoutRef.current.scrollIntoView({
+        behavior: 'smooth',
+      })
+    }
+  }, [multiSlideout?.currentPage])
 
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
@@ -616,7 +625,11 @@ export function ChooseRobotSlideout(
 
   const pageTwoBody =
     runTimeParametersOverrides != null ? (
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
+      <Flex
+        ref={multiSlideoutRef}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing10}
+      >
         <Flex justifyContent={JUSTIFY_END}>
           <Link
             textAlign={TYPOGRAPHY.textAlignRight}

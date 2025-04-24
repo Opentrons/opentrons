@@ -31,6 +31,8 @@ const values = {
   pipettesByMount: {} as any,
   fixtures: {},
   hasGripper: false,
+  hasThermocycler: false,
+  hasWasteChute: false,
 } as WizardFormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {

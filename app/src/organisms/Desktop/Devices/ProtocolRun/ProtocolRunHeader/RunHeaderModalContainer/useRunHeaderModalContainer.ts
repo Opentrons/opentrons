@@ -55,6 +55,7 @@ interface UseRunHeaderModalContainerProps extends ProtocolRunHeaderProps {
   runStatus: RunStatus | null
   runRecord: Run | null
   runErrors: UseRunErrorsResult
+  closeCurrentRun: () => void
 }
 
 export interface UseRunHeaderModalContainerResult {
@@ -78,6 +79,7 @@ export function useRunHeaderModalContainer({
   attachedModules,
   protocolRunControls,
   runErrors,
+  closeCurrentRun,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
   const navigate = useNavigate()
 
@@ -133,6 +135,7 @@ export function useRunHeaderModalContainer({
     runStatus,
     runRecord,
     robotType,
+    closeCurrentRun,
   })
 
   const recoveryModalUtils = useErrorRecoveryFlows(runId, runStatus)

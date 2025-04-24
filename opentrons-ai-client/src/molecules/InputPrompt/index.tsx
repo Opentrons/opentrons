@@ -40,6 +40,7 @@ import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { calcTextAreaHeight } from '../../resources/utils'
 
 import type { AxiosRequestConfig } from 'axios'
+import type { ProtocolFile } from '@opentrons/shared-data'
 import type {
   ChatData,
   CreatePrompt,
@@ -68,6 +69,12 @@ export function InputPrompt(): JSX.Element {
   const watchUserPrompt = watch('userPrompt') ?? ''
 
   const { data, isLoading, callApi } = useApiCall()
+
+  let pdProtocolContent: null | ProtocolFile = null
+  if (data != null && typeof data === 'object' && 'protocol_content' in data) {
+    pdProtocolContent = data.protocol_content as ProtocolFile
+  }
+
   const [requestId, setRequestId] = useState<string>(uuidv4())
 
   // This is to autofill the input field for when we navigate to the chat page from the existing/new protocol generator pages
@@ -122,16 +129,20 @@ export function InputPrompt(): JSX.Element {
         ? getCreateOrUpdateEndpoint()
         : getChatEndpoint()
 
+      const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
+
       const config = {
         url,
         method: 'POST',
         headers,
         data: isUpdateOrCreateRequest
-          ? getUpdateOrCreatePrompt(isRegenerateRequest)
+          ? promptData
           : {
               message: watchUserPrompt,
               history: chatHistory,
               fake: false,
+              chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
+              pd_protocol_content: pdProtocolContent,
             },
       }
 
@@ -179,15 +190,20 @@ export function InputPrompt(): JSX.Element {
 
   useEffect(() => {
     if (submitted && data != null && !isLoading) {
-      const { role, reply } = data as ChatData
+      const { role, reply, protocol_content } = data as ChatData
       const assistantResponse: ChatData = {
         requestId,
         role,
         reply,
+        protocol_content,
       }
       setChatHistory(chatHistory => [
         ...chatHistory,
-        { role: 'assistant', content: reply },
+        {
+          role: 'assistant',
+          content: reply,
+          protocol_content,
+        },
       ])
       setChatData(chatData => [...chatData, assistantResponse])
       trackEvent({

@@ -67,6 +67,23 @@ export function isRunAgainStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && RUN_AGAIN_STATUSES.includes(runStatus)
 }
 
+export function isValidRunAgainStatus(
+  runStatus: RunStatus | null,
+  isClosingCurrentRun: boolean
+): boolean {
+  if (runStatus !== null && RUN_AGAIN_STATUSES.includes(runStatus)) {
+    // The desktop app uncurrents the run when stopped, and to prevent server-side race conditions, we should wait
+    // until the run uncurrenting completes.
+    if (runStatus === RUN_STATUS_STOPPED) {
+      return !isClosingCurrentRun
+    } else {
+      return true
+    }
+  }
+
+  return false
+}
+
 export function isRecoveryStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && RECOVERY_STATUSES.includes(runStatus)
 }

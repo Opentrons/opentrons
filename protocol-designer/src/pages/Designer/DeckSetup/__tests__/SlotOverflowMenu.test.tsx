@@ -19,12 +19,10 @@ import {
 } from '../../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { getNextAvailableDeckSlot } from '../../../../labware-ingred/utils'
-import { deleteModule } from '../../../../modules'
-import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { SlotOverflowMenu } from '../SlotOverflowMenu'
-import { getIsEntityOnSlotInUse } from '../utils'
+import { getIsLabwareOnSlotInUse } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -37,12 +35,10 @@ vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../step-forms/actions/additionalItems')
 vi.mock('../../../../components/organisms')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/utils')
 vi.mock('../../../../components/organisms/Kitchen/hooks')
-vi.mock('../../../../modules')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -127,9 +123,7 @@ describe('SlotOverflowMenu', () => {
 
   it('should renders all buttons as enabled and clicking on them calls ctas', () => {
     render(props)
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Edit hardware/labware' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Edit labware' }))
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
@@ -140,23 +134,19 @@ describe('SlotOverflowMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Duplicate labware' }))
     expect(vi.mocked(duplicateLabware)).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Clear slot' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Clear labware' }))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
-    expect(vi.mocked(deleteModule)).toHaveBeenCalled()
-    expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
   })
   it('renders 3 buttons when there is nothing on the slot', () => {
     props.location = 'A1'
     render(props)
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Add hardware/labware' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Add labware' }))
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
     expect(screen.getAllByRole('button')).toHaveLength(3)
     expect(screen.getByRole('button', { name: 'Add liquid' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Clear slot' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Clear labware' })).toBeDisabled()
     screen.getByTestId('divider')
   })
   it('renders Edit liquid button when there is liquid on the labware', () => {
@@ -164,25 +154,19 @@ describe('SlotOverflowMenu', () => {
       labId2: { well1: { '0': { volume: 10 } } },
     })
     render(props)
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Edit hardware/labware' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Edit labware' }))
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit liquid' }))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
   })
-  it('deletes the staging area slot and all labware and modules on top of it', () => {
+  it('deletes the labware', () => {
     vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({
       labId2: { well1: { '0': { volume: 10 } } },
     })
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Clear slot' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Clear labware' }))
 
-    expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalledOnce()
-    expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalledWith(
-      MOCK_STAGING_AREA_ID
-    )
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     expect(vi.mocked(deleteContainer)).toHaveBeenNthCalledWith(1, {
       labwareId: 'labId',
@@ -190,8 +174,6 @@ describe('SlotOverflowMenu', () => {
     expect(vi.mocked(deleteContainer)).toHaveBeenNthCalledWith(2, {
       labwareId: 'labId2',
     })
-    expect(vi.mocked(deleteModule)).toHaveBeenCalledOnce()
-    expect(vi.mocked(deleteModule)).toHaveBeenCalledWith({ moduleId: 'modId' })
   })
 
   it('renders snackbar if duplicate is clicked and the deck is full', () => {
@@ -201,9 +183,9 @@ describe('SlotOverflowMenu', () => {
     expect(MOCK_MAKE_SNACKBAR).toHaveBeenCalled()
   })
   it('renders the ConfirmDeleteEntityInUseModal modal', () => {
-    vi.mocked(getIsEntityOnSlotInUse).mockReturnValue(true)
+    vi.mocked(getIsLabwareOnSlotInUse).mockReturnValue(true)
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Clear slot' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Clear labware' }))
     screen.getByText('mock ConfirmDeleteEntityInUseModal')
   })
 })

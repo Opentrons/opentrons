@@ -19,6 +19,7 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { TemperatureModule } from '/app/redux/modules/types'
@@ -37,6 +38,7 @@ export const TemperatureModuleSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = useState<number | null>(null)
+  const { reportModuleCommand } = useModuleCommandAnalytics()
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
@@ -48,11 +50,34 @@ export const TemperatureModuleSlideout = (
       }
       createLiveCommand({
         command: saveTempCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
-        )
       })
+        .then(() => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: saveTempCommand.commandType,
+            result: { status: 'succeeded', data: undefined },
+            serialNumber: module.serialNumber,
+            temperature: temperatureValue,
+            errorDetails: '',
+            firmwareVersion: module.firmwareVersion,
+          })
+        })
+        .catch((e: Error) => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: saveTempCommand.commandType,
+            result: { status: 'failed', data: undefined },
+            errorDetails: e.message,
+            serialNumber: module.serialNumber,
+            temperature: temperatureValue,
+            firmwareVersion: module.firmwareVersion,
+          })
+          console.error(
+            `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
+          )
+        })
     }
     setTemperatureValue(null)
     onCloseClick()

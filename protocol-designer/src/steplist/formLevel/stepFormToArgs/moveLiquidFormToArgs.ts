@@ -161,18 +161,38 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_volume',
     'dispense_mix_times'
   )
-  const aspirateDelay = getMoveLiquidDelayData(
+  const aspirateDelay = getMoveLiquidDelayData({
     hydratedFormData,
-    'aspirate_delay_checkbox',
-    'aspirate_delay_seconds',
-    'aspirate_delay_mmFromBottom'
-  )
-  const dispenseDelay = getMoveLiquidDelayData(
+    secondsField: 'aspirate_delay_seconds',
+    zPositionField: 'aspirate_mmFromBottom',
+    checkboxField: 'aspirate_delay_checkbox',
+  })
+  const dispenseDelay = getMoveLiquidDelayData({
     hydratedFormData,
-    'dispense_delay_checkbox',
-    'dispense_delay_seconds',
-    'dispense_delay_mmFromBottom'
-  )
+    secondsField: 'dispense_delay_seconds',
+    zPositionField: 'dispense_mmFromBottom',
+    checkboxField: 'dispense_delay_checkbox',
+  })
+  const aspirateSubmergeDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'aspirate_submerge_delay_seconds',
+    zPositionField: 'aspirate_submerge_mmFromBottom',
+  })
+  const dispenseSubmergeDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'dispense_submerge_delay_seconds',
+    zPositionField: 'dispense_submerge_mmFromBottom',
+  })
+  const aspirateRetractDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'aspirate_retract_delay_seconds',
+    zPositionField: 'aspirate_retract_mmFromBottom',
+  })
+  const dispenseRetractDelay = getMoveLiquidDelayData({
+    hydratedFormData,
+    secondsField: 'dispense_retract_delay_seconds',
+    zPositionField: 'dispense_retract_mmFromBottom',
+  })
   const blowoutLocation =
     (hydratedFormData.blowout_checkbox && hydratedFormData.blowout_location) ||
     (hydratedFormData.disposalVolume_checkbox &&
@@ -224,6 +244,10 @@ export const moveLiquidFormToArgs = (
     preWetTip: Boolean(hydratedFormData.preWetTip),
     aspirateDelay,
     dispenseDelay,
+    aspirateSubmergeDelay,
+    dispenseSubmergeDelay,
+    aspirateRetractDelay,
+    dispenseRetractDelay,
     aspirateAirGapVolume,
     dispenseAirGapVolume,
     touchTipAfterAspirate,
@@ -244,12 +268,29 @@ export const moveLiquidFormToArgs = (
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
     aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed,
-    aspirateRetractSpeed: hydratedFormData.aspirate_submerge_speed,
-    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed,
-    dispenseRetractSpeed: hydratedFormData.dispense_submerge_speed,
+    aspirateSubmergeXOffset: hydratedFormData.aspirate_submerge_x_position,
+    aspirateSubmergeYOffset: hydratedFormData.aspirate_submerge_y_position,
+    aspirateSubmergeZOffset: hydratedFormData.aspirate_submerge_mmFromBottom,
+    aspirateSubmergePositionReference:
+      hydratedFormData.aspirate_submerge_position_reference,
+    aspirateRetractSpeed: hydratedFormData.aspirate_retract_speed,
     aspirateRetractXOffset: hydratedFormData.aspirate_retract_x_position,
     aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position,
     aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom,
+    aspirateRetractPositionReference:
+      hydratedFormData.aspirate_position_reference,
+    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed,
+    dispenseSubmergeXOffset: hydratedFormData.dispense_submerge_x_position,
+    dispenseSubmergeYOffset: hydratedFormData.dispense_submerge_y_position,
+    dispenseSubmergeZOffset: hydratedFormData.dispense_submerge_mmFromBottom,
+    dispenseRetractSpeed: hydratedFormData.dispense_submerge_speed,
+    dispenseRetractYOffset: hydratedFormData.dispense_retract_y_position,
+    dispenseRetractZOffset: hydratedFormData.dispense_retract_mmFromBottom,
+    dispenseRetractPositionReference:
+      hydratedFormData.dispense_position_reference,
+    dispenseRetractXOffset: hydratedFormData.dispense_retract_x_position,
+    pushOut: pushOut_checkbox ? pushOut_volume : 0,
+    liquidClass: hydratedFormData.liquidClass,
   }
   console.assert(
     sourceWellsUnordered.length > 0,
@@ -282,7 +323,6 @@ export const moveLiquidFormToArgs = (
         destWells,
         mixBeforeAspirate,
         mixInDestination,
-        pushOut: pushOut_checkbox ? pushOut_volume : 0,
       }
       return transferStepArguments
     }
@@ -296,7 +336,6 @@ export const moveLiquidFormToArgs = (
         mixInDestination,
         sourceWells,
         destWell: destWells != null ? destWells[0] : null,
-        pushOut: pushOut_checkbox ? pushOut_volume : 0,
       }
       return consolidateStepArguments
     }
@@ -313,7 +352,6 @@ export const moveLiquidFormToArgs = (
         // cannot distribute into a waste chute so if destWells is null
         // there is an error
         destWells: destWells ?? [],
-        pushOut: pushOut_checkbox ? pushOut_volume : 0,
       }
       return distributeStepArguments
     }

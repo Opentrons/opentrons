@@ -36,6 +36,7 @@ import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { useDeckCalibrationData } from './hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 interface HistoricalProtocolRunDrawerProps {
   run: RunData
@@ -78,11 +79,6 @@ export function HistoricalProtocolRunDrawer(
       )
     }
   )
-  const sortedUniqueLwOffsets = uniqueLabwareOffsets.sort((a, b) =>
-    a.location.slotName.localeCompare(b.location.slotName, 'en', {
-      numeric: true,
-    })
-  )
 
   const deckCalibrationData = useDeckCalibrationData(robotName)
     .deckCalibrationData
@@ -91,6 +87,21 @@ export function HistoricalProtocolRunDrawer(
       ? deckCalibrationData.lastModified
       : null
   const protocolDetails = useMostRecentCompletedAnalysis(run.id)
+
+  const sortedUniqueLwOffsets = uniqueLabwareOffsets.sort((a, b) => {
+    const aLabwareName = getLabwareNameForOffset(a, protocolDetails)
+    const bLabwareName = getLabwareNameForOffset(b, protocolDetails)
+
+    const nameCompare = aLabwareName.localeCompare(bLabwareName, 'en')
+    // Use the original slot name comparison as secondary sort
+    if (nameCompare === 0) {
+      return a.location.slotName.localeCompare(b.location.slotName, 'en', {
+        numeric: true,
+      })
+    } else {
+      return nameCompare
+    }
+  })
 
   const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
@@ -181,7 +192,7 @@ export function HistoricalProtocolRunDrawer(
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
         >
           <Box
-            width="33%"
+            width="75%"
             paddingY={`${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing4}`}
           >
             <LegacyStyledText
@@ -191,7 +202,7 @@ export function HistoricalProtocolRunDrawer(
               {i18n.format(t('location'), 'capitalize')}
             </LegacyStyledText>
           </Box>
-          <Box width="33%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
+          <Box width="25%" padding={`${SPACING.spacing4} 0`}>
             <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_labwareTitle"
@@ -199,7 +210,7 @@ export function HistoricalProtocolRunDrawer(
               {i18n.format(t('labware'), 'capitalize')}
             </LegacyStyledText>
           </Box>
-          <Box width="34%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
+          <Box width="25%" padding={`${SPACING.spacing4} 0`}>
             <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_labwareOffsetDataTitle"
@@ -232,8 +243,13 @@ export function HistoricalProtocolRunDrawer(
                 borderRadius={BORDERS.borderRadius4}
                 gridGap={SPACING.spacing24}
               >
+                <Box width="75%">
+                  <LegacyStyledText as="p" title={labwareName}>
+                    {labwareName}
+                  </LegacyStyledText>
+                </Box>
                 <Flex
-                  width="33%"
+                  width="24%"
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
@@ -258,12 +274,7 @@ export function HistoricalProtocolRunDrawer(
                     />
                   )}
                 </Flex>
-                <Box width="33%">
-                  <LegacyStyledText as="p" title={labwareName}>
-                    {labwareName}
-                  </LegacyStyledText>
-                </Box>
-                <Box width="34%">
+                <Box width="25%">
                   <LegacyOffsetVector
                     {...offset.vector}
                     fontSize={TYPOGRAPHY.fontSizeLabel}
@@ -333,4 +344,20 @@ function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
       </Box>
     </Flex>
   )
+}
+
+const getLabwareNameForOffset = (
+  offset: LabwareOffset,
+  protocolDetails: CompletedProtocolAnalysis | null
+): string => {
+  const labwareDefinitions =
+    protocolDetails?.commands != null
+      ? getLoadedLabwareDefinitionsByUri(protocolDetails?.commands)
+      : {}
+  const definition = Object.values(labwareDefinitions).find(
+    def => getLabwareDefURI(def) === offset.definitionUri
+  )
+  return definition != null
+    ? getLabwareDisplayName(definition)
+    : offset.definitionUri
 }

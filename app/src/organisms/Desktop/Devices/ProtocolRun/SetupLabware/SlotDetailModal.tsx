@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -18,10 +18,7 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getAllDefinitions,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/shared-data'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
@@ -30,6 +27,7 @@ import {
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
 } from '/app/transformations/analysis'
+import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
 import type { LabwareByLiquidId } from '@opentrons/components/'
 import type {
@@ -64,7 +62,10 @@ export const SlotDetailModal = (
     isFlex,
   } = props
   const { t, i18n } = useTranslation('protocol_setup')
-  const labwareDefinitions = getAllDefinitions()
+  const definitionsByURI = useMemo(
+    () => getLabwareDefinitionsByURIForProtocol(protocolData.commands),
+    [protocolData]
+  )
 
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
@@ -80,7 +81,7 @@ export const SlotDetailModal = (
     labwareByLiquidId
   )
 
-  const labwareDefinition = labwareDefinitions[selectedLabware.definitionUri]
+  const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]
 
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(

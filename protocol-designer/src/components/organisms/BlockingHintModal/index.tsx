@@ -21,6 +21,7 @@ import { getMainPagePortalEl } from '../Portal'
 import type { ReactNode } from 'react'
 import type { HintKey } from '../../../tutorial'
 
+export * from './useBlockingHint'
 export interface HintProps {
   hintKey: HintKey
   handleCancel: () => void
@@ -47,6 +48,11 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
     dispatch(actions.removeHint(hintKey, rememberDismissal))
     handleContinue()
   }
+
+  const confirmButtonText =
+    hintKey === 'no_commands' || hintKey === 'unused_hardware'
+      ? 'continue_with_export'
+      : 'confirm'
 
   return createPortal(
     <Modal
@@ -76,7 +82,7 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
               {t('shared:cancel')}
             </SecondaryButton>
             <PrimaryButton onClick={onContinueClick}>
-              {i18n.format(t('shared:continue_with_export'), 'capitalize')}
+              {i18n.format(t(`shared:${confirmButtonText}`), 'capitalize')}
             </PrimaryButton>
           </Flex>
         </Flex>

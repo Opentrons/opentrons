@@ -95,7 +95,6 @@ export function useERUtils({
   // Note that pageLength: 999 is ok only because we fetch this on mount. We use 999 because it should hopefully
   // provide the commands necessary for ER without taxing the server too heavily. This is NOT intended for produciton!
   const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
-    cursor: 0,
     pageLength: 999,
   })
 
@@ -105,7 +104,7 @@ export function useERUtils({
         protocolAnalysis?.commands ?? [],
         failedCommand?.byRunRecord ?? null
       ),
-    [protocolAnalysis != null, failedCommand]
+    [protocolAnalysis, failedCommand]
   )
 
   const analytics = useRecoveryAnalytics()
@@ -181,6 +180,7 @@ export function useERUtils({
     protocolAnalysis,
     failedLabwareUtils,
     runLwDefsByUri,
+    recoveryMap,
   })
 
   const recoveryActionMutationUtils = useRecoveryActionMutation(

@@ -202,6 +202,79 @@ export const SecondStepsMoveLiquidTools = ({
     }
   }
 
+  const delayComponent = (
+    <CheckboxExpandStepFormField
+      title={i18n.format(
+        t('form:step_edit_form.field.delay.label'),
+        'capitalize'
+      )}
+      fieldProps={propsForFields[`${tab}_delay_checkbox`]}
+    >
+      {formData[`${tab}_delay_checkbox`] === true ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing6}
+          width="100^"
+        >
+          <InputStepFormField
+            showTooltip={false}
+            padding="0"
+            title={t('protocol_steps:delay_duration')}
+            {...propsForFields[`${tab}_delay_seconds`]}
+            units={t('application:units.seconds')}
+            errorToShow={getFormLevelError(
+              `${tab}_delay_seconds`,
+              mappedErrorsToField
+            )}
+          />
+        </Flex>
+      ) : null}
+    </CheckboxExpandStepFormField>
+  )
+  const mixComponent = (
+    <CheckboxExpandStepFormField
+      title={i18n.format(
+        t('form:step_edit_form.field.mix.label'),
+        'capitalize'
+      )}
+      fieldProps={propsForFields[`${tab}_mix_checkbox`]}
+      tooltipOverride={
+        tab === 'dispense' ? dispenseMixDisabledTooltipText : null
+      }
+    >
+      {formData[`${tab}_mix_checkbox`] === true ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing6}
+          width="100^"
+        >
+          <InputStepFormField
+            showTooltip={false}
+            padding="0"
+            title={t('protocol_steps:mix_volume')}
+            {...propsForFields[`${tab}_mix_volume`]}
+            units={t('application:units.microliter')}
+            errorToShow={getFormLevelError(
+              `${tab}_mix_volume`,
+              mappedErrorsToField
+            )}
+          />
+          <InputStepFormField
+            showTooltip={false}
+            padding="0"
+            title={t('protocol_steps:mix_times')}
+            {...propsForFields[`${tab}_mix_times`]}
+            units={t('application:units.times')}
+            errorToShow={getFormLevelError(
+              `${tab}_mix_times`,
+              mappedErrorsToField
+            )}
+          />
+        </Flex>
+      ) : null}
+    </CheckboxExpandStepFormField>
+  )
+
   return (
     <>
       {showResetModal ? (
@@ -338,169 +411,124 @@ export const SecondStepsMoveLiquidTools = ({
               tooltipContent={propsForFields.preWetTip.tooltipContent ?? null}
             />
           ) : null}
-          <CheckboxExpandStepFormField
-            title={i18n.format(
-              t('form:step_edit_form.field.mix.label'),
-              'capitalize'
-            )}
-            fieldProps={propsForFields[`${tab}_mix_checkbox`]}
-            tooltipOverride={
-              tab === 'dispense' ? dispenseMixDisabledTooltipText : null
-            }
-          >
-            {formData[`${tab}_mix_checkbox`] === true ? (
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing6}
-                width="100^"
-              >
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t('protocol_steps:mix_volume')}
-                  {...propsForFields[`${tab}_mix_volume`]}
-                  units={t('application:units.microliter')}
-                  errorToShow={getFormLevelError(
-                    `${tab}_mix_volume`,
-                    mappedErrorsToField
-                  )}
-                />
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t('protocol_steps:mix_times')}
-                  {...propsForFields[`${tab}_mix_times`]}
-                  units={t('application:units.times')}
-                  errorToShow={getFormLevelError(
-                    `${tab}_mix_times`,
-                    mappedErrorsToField
-                  )}
-                />
-              </Flex>
-            ) : null}
-          </CheckboxExpandStepFormField>
-          {tab === 'dispense' ? (
-            <CheckboxExpandStepFormField
-              title={i18n.format(
-                t('form:step_edit_form.field.pushOut.title'),
-                'capitalize'
-              )}
-              fieldProps={propsForFields.pushOut_checkbox}
-            >
-              {formData.pushOut_checkbox === true ? (
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t(
-                    'form:step_edit_form.field.pushOut.pushOut_volume.label'
-                  )}
-                  caption={t(
-                    'form:step_edit_form.field.pushOut.pushOut_volume.caption',
-                    { min: 0, max: maxPushoutVolume }
-                  )}
-                  {...propsForFields.pushOut_volume}
-                  units={t('application:units.microliter')}
-                  errorToShow={getFormLevelError(
-                    'pushOut_volume',
-                    mappedErrorsToField
-                  )}
-                />
-              ) : null}
-            </CheckboxExpandStepFormField>
-          ) : null}
-          <CheckboxExpandStepFormField
-            title={i18n.format(
-              t('form:step_edit_form.field.delay.label'),
-              'capitalize'
-            )}
-            fieldProps={propsForFields[`${tab}_delay_checkbox`]}
-          >
-            {formData[`${tab}_delay_checkbox`] === true ? (
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing6}
-                width="100^"
-              >
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t('protocol_steps:delay_duration')}
-                  {...propsForFields[`${tab}_delay_seconds`]}
-                  units={t('application:units.seconds')}
-                  errorToShow={getFormLevelError(
-                    `${tab}_delay_seconds`,
-                    mappedErrorsToField
-                  )}
-                />
-              </Flex>
-            ) : null}
-          </CheckboxExpandStepFormField>
-          {tab === 'dispense' && formData.path === 'multiDispense' ? (
-            <CheckboxExpandStepFormField
-              title={t('form:step_edit_form.field.conditioning.title')}
-              fieldProps={propsForFields.conditioning_checkbox}
-            >
-              {formData.conditioning_checkbox === true ? (
-                <InputStepFormField
-                  title={t(
-                    'form:step_edit_form.field.conditioning.conditioning_volume.label'
-                  )}
-                  caption={t(
-                    'form:step_edit_form.field.conditioning.conditioning_volume.caption',
-                    { min: 0, max: maxConditioningVolume }
-                  )}
-                  padding="0"
-                  {...propsForFields.conditioning_volume}
-                  showTooltip={false}
-                  errorToShow={getFormLevelError(
-                    'conditioning_volume',
-                    mappedErrorsToField
-                  )}
-                />
-              ) : null}
-            </CheckboxExpandStepFormField>
-          ) : null}
-          {tab === 'dispense' ? (
-            <CheckboxExpandStepFormField
-              title={i18n.format(
-                t('form:step_edit_form.field.blowout.label'),
-                'capitalize'
-              )}
-              fieldProps={propsForFields.blowout_checkbox}
-            >
-              {formData.blowout_checkbox === true ? (
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing6}
-                  width="100^"
+          {tab === 'aspirate' ? (
+            <>
+              {mixComponent}
+              {formData.path === 'multiDispense' ? (
+                <CheckboxExpandStepFormField
+                  title={t('form:step_edit_form.field.conditioning.title')}
+                  fieldProps={propsForFields.conditioning_checkbox}
                 >
-                  <BlowoutLocationField
-                    {...propsForFields.blowout_location}
-                    options={getBlowoutLocationOptionsForForm({
-                      path: formData.path,
-                      stepType: formData.stepType,
-                    })}
-                    padding="0"
-                  />
-                  <FlowRateField
-                    key="blowout_flowRate"
-                    {...propsForFields.blowout_flowRate}
-                    pipetteId={formData.pipette}
-                    flowRateType="blowout"
-                    volume={propsForFields.volume?.value ?? 0}
-                    tiprack={propsForFields.tipRack.value}
-                    padding="0"
-                  />
-                  <BlowoutOffsetField
-                    {...propsForFields.blowout_z_offset}
-                    sourceLabwareId={propsForFields.aspirate_labware.value}
-                    destLabwareId={propsForFields.dispense_labware.value}
-                    blowoutLabwareId={propsForFields.blowout_location.value}
-                  />
-                </Flex>
+                  {formData.conditioning_checkbox === true ? (
+                    <InputStepFormField
+                      title={t(
+                        'form:step_edit_form.field.conditioning.conditioning_volume.label'
+                      )}
+                      caption={t(
+                        'form:step_edit_form.field.conditioning.conditioning_volume.caption',
+                        { min: 0, max: maxConditioningVolume }
+                      )}
+                      padding="0"
+                      {...propsForFields.conditioning_volume}
+                      showTooltip={false}
+                      errorToShow={getFormLevelError(
+                        'conditioning_volume',
+                        mappedErrorsToField
+                      )}
+                    />
+                  ) : null}
+                </CheckboxExpandStepFormField>
               ) : null}
-            </CheckboxExpandStepFormField>
-          ) : null}
+              {delayComponent}
+            </>
+          ) : (
+            <>
+              {delayComponent}
+              {mixComponent}
+              <CheckboxExpandStepFormField
+                title={i18n.format(
+                  t('form:step_edit_form.field.pushOut.title'),
+                  'capitalize'
+                )}
+                fieldProps={propsForFields.pushOut_checkbox}
+              >
+                {formData.pushOut_checkbox === true ? (
+                  <InputStepFormField
+                    showTooltip={false}
+                    padding="0"
+                    title={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.label'
+                    )}
+                    caption={t(
+                      'form:step_edit_form.field.pushOut.pushOut_volume.caption',
+                      { min: 0, max: maxPushoutVolume }
+                    )}
+                    {...propsForFields.pushOut_volume}
+                    units={t('application:units.microliter')}
+                    errorToShow={getFormLevelError(
+                      'pushOut_volume',
+                      mappedErrorsToField
+                    )}
+                  />
+                ) : null}
+              </CheckboxExpandStepFormField>
+              <CheckboxExpandStepFormField
+                title={i18n.format(
+                  t('form:step_edit_form.field.blowout.label'),
+                  'capitalize'
+                )}
+                fieldProps={propsForFields.blowout_checkbox}
+              >
+                {formData.blowout_checkbox === true ? (
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing6}
+                    width="100^"
+                  >
+                    <BlowoutLocationField
+                      {...propsForFields.blowout_location}
+                      options={getBlowoutLocationOptionsForForm({
+                        path: formData.path,
+                        stepType: formData.stepType,
+                      })}
+                      errorToShow={getFormLevelError(
+                        'blowout_location',
+                        mappedErrorsToField
+                      )}
+                      padding="0"
+                    />
+                    <FlowRateField
+                      key="blowout_flowRate"
+                      {...propsForFields.blowout_flowRate}
+                      pipetteId={formData.pipette}
+                      flowRateType="blowout"
+                      volume={propsForFields.volume?.value ?? 0}
+                      tiprack={propsForFields.tipRack.value}
+                      padding="0"
+                    />
+                    <BlowoutOffsetField
+                      {...propsForFields.blowout_z_offset}
+                      sourceLabwareId={propsForFields.aspirate_labware.value}
+                      destLabwareId={propsForFields.dispense_labware.value}
+                      blowoutLabwareId={propsForFields.blowout_location.value}
+                    />
+                  </Flex>
+                ) : null}
+              </CheckboxExpandStepFormField>
+              {formData.path === 'multiDispense' ? (
+                <DisposalField
+                  aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
+                  aspirate_airGap_volume={formData.aspirate_airGap_volume}
+                  path={formData.path}
+                  pipette={formData.pipette}
+                  propsForFields={propsForFields}
+                  stepType={formData.stepType}
+                  volume={formData.volume}
+                  mappedErrorsToField={mappedErrorsToField}
+                />
+              ) : null}
+            </>
+          )}
           <CheckboxExpandStepFormField
             title={i18n.format(
               t('form:step_edit_form.field.touchTip.label'),
@@ -583,17 +611,6 @@ export const SecondStepsMoveLiquidTools = ({
               />
             ) : null}
           </CheckboxExpandStepFormField>
-          {formData.path === 'multiDispense' && tab === 'dispense' && (
-            <DisposalField
-              aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
-              aspirate_airGap_volume={formData.aspirate_airGap_volume}
-              path={formData.path}
-              pipette={formData.pipette}
-              propsForFields={propsForFields}
-              stepType={formData.stepType}
-              volume={formData.volume}
-            />
-          )}
         </Flex>
         {enableLiquidClasses ? (
           <ResetSettingsField

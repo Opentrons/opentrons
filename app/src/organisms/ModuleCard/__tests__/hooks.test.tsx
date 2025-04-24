@@ -8,6 +8,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
 
 import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   mockHeaterShaker,
@@ -35,6 +36,7 @@ import type { State } from '/app/redux/types'
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux-resources/analytics')
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -195,6 +197,9 @@ describe('useLatchControls', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
   })
 
   afterEach(() => {
@@ -270,6 +275,9 @@ describe('useModuleOverflowMenu', () => {
     })
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
     } as any)
   })
 

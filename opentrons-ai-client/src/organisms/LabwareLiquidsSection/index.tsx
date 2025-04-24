@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
@@ -25,11 +25,16 @@ export const LIQUIDS_FIELD_NAME = 'liquids'
 
 export function LabwareLiquidsSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
-  const { setValue, watch } = useFormContext()
+  const { setValue, watch, trigger } = useFormContext()
   const [displayLabwareModal, setDisplayLabwareModal] = useState(false)
 
   const labwares: DisplayLabware[] = watch(LABWARES_FIELD_NAME) ?? []
   const liquids: string[] = watch(LIQUIDS_FIELD_NAME) ?? []
+
+  // trigger form validation on mount for when users come back to this section after moving on
+  useEffect(() => {
+    void trigger([LABWARES_FIELD_NAME, LIQUIDS_FIELD_NAME])
+  })
 
   return (
     <Flex

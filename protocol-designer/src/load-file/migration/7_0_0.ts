@@ -1,7 +1,7 @@
 import mapValues from 'lodash/mapValues'
+import { getAllLabwareDefs } from '@opentrons/shared-data'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import { getOnlyLatestDefs } from '../../labware-defs'
 import { uuid } from '../../utils'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
 
@@ -64,7 +64,7 @@ export const migrateFile = (
     ].labwareLocationUpdate
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
 
-  const allLatestDefs = getOnlyLatestDefs()
+  const allLabwareDefs = getAllLabwareDefs()
 
   const getIsAdapter = (labwareId: string): boolean => {
     const labwareEntity = labware[labwareId]
@@ -151,11 +151,11 @@ export const migrateFile = (
       const {
         parameters: adapterParameters,
         version: adapterVersion,
-      } = allLatestDefs[adapterUri]
+      } = allLabwareDefs[adapterUri]
       const {
         parameters: labwareParameters,
         version: labwareVersion,
-      } = allLatestDefs[labwareUri]
+      } = allLabwareDefs[labwareUri]
       const adapterId = mappedLabwareIds[command.params.labwareId].newAdapterId
 
       const loadAdapterCommand: LoadLabwareCreateCommand = {
@@ -198,8 +198,8 @@ export const migrateFile = (
     const loadName = labwareDefinition.parameters.loadName
     if (ADAPTER_LABWARE_COMBO_LOAD_NAMES.includes(loadName)) {
       const { adapterUri, labwareUri } = getAdapterAndLabwareSplitInfo(defId)
-      const adapterLabwareDef = allLatestDefs[adapterUri]
-      const labwareDef = allLatestDefs[labwareUri]
+      const adapterLabwareDef = allLabwareDefs[adapterUri]
+      const labwareDef = allLabwareDefs[labwareUri]
       acc[adapterUri] = adapterLabwareDef
       acc[labwareUri] = labwareDef
     } else {

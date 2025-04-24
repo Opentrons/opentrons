@@ -2,10 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import {
-  useInfoBanners,
-  useLPCCommands,
-} from '/app/organisms/LabwarePositionCheck/hooks'
+import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
 import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
 import {
   AttachProbe,
@@ -44,7 +41,6 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   const LPCHandlerUtils = useLPCCommands({
     ...props,
   })
-  const bannerUtils = useInfoBanners()
 
   // Clean up state on LPC close.
   useEffect(() => {
@@ -58,7 +54,6 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
     LPCHandlerUtils,
     proceedStep,
     goBackLastStep,
-    bannerUtils,
   })
 
   return (
@@ -67,7 +62,6 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
       proceedStep={proceedStep}
       goBackLastStep={goBackLastStep}
       commandUtils={{ ...LPCHandlerUtils, headerCommands }}
-      bannerUtils={bannerUtils}
     />
   )
 }

@@ -98,7 +98,9 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
           hovered,
           selected,
           title:
-            id === '__initial_setup__' ? t('starting_deck') : t('ending_deck'),
+            id === START_TERMINAL_ITEM_ID
+              ? t('starting_deck')
+              : t('ending_deck'),
           onClick,
           onMouseEnter,
           onMouseLeave,

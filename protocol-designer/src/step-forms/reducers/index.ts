@@ -95,7 +95,6 @@ import type {
   CreatePipettesAction,
   DeleteModuleAction,
   DeletePipettesAction,
-  EditModuleAction,
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
   SubstituteStepFormPipettesAction,
@@ -125,7 +124,6 @@ export type UnsavedFormActions =
   | CreateModuleAction
   | DeleteModuleAction
   | SelectTerminalItemAction
-  | EditModuleAction
   | SubstituteStepFormPipettesAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
@@ -191,7 +189,6 @@ export const unsavedForm = (
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
-    case 'EDIT_MODULE':
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
@@ -266,7 +263,6 @@ export type SavedStepFormsActions =
   | DuplicateLabwareAction
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
-  | EditModuleAction
   | ToggleIsGripperRequiredAction
   | CreateDeckFixtureAction
   | DeleteDeckFixtureAction
@@ -522,19 +518,6 @@ export const savedStepForms = (
 
         return savedForm
       })
-    }
-
-    case 'EDIT_MODULE': {
-      const moduleId = action.payload.id
-      return mapValues(savedStepForms, (savedForm: FormData, formId) =>
-        _editModuleFormUpdate({
-          moduleId,
-          savedForm,
-          formId,
-          rootState,
-          nextModuleModel: action.payload.model,
-        })
-      )
     }
 
     case 'MOVE_DECK_ITEM': {
@@ -1017,72 +1000,46 @@ export const labwareInvariantProperties: Reducer<
     ): NormalizedLabwareById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const labwareDefinitions = file?.labwareDefinitions
+      const labwareDefinitionsFromFile = file.labwareDefinitions
       const allLabware = getAllDefinitions()
       let labware: NormalizedLabwareById = {}
-      if (labwareDefinitions != null) {
-        labware = Object.entries(metadata.labware).reduce(
-          (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
-            if (labwareDefinitions[labwareLoadInfo.labwareDefURI] == null) {
-              console.error(
-                `expected to find matching labware definiton with labwareDefURI ${labwareLoadInfo.labwareDefURI} but could not`
-              )
-            }
-            const displayCategory =
-              labwareDefinitions[labwareLoadInfo.labwareDefURI]?.metadata
-                .displayCategory ?? 'otherLabware'
 
-            const displayCategoryCount = Object.values(acc).filter(
-              lw => lw.displayCategory === displayCategory
-            ).length
+      labware = Object.entries(metadata.labware).reduce(
+        (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
+          const labwareDefURI = labwareLoadInfo.labwareDefURI
+          const definition =
+            //  labwareDefinitionsFromFile from file are either customLabware for py
+            //  or all labwareDefs for JSON
+            labwareDefinitionsFromFile?.[labwareDefURI] ??
+            allLabware[labwareDefURI]
 
-            acc[id] = {
-              labwareDefURI: labwareLoadInfo.labwareDefURI,
-              pythonName: getLabwarePythonName(
-                displayCategory,
-                displayCategoryCount + 1
-              ),
+          if (definition == null) {
+            console.error(
+              `Expected to find matching labware definition in the JSON file or Opentrons labware library but could not with labwareDefUri ${labwareDefURI}`
+            )
+          }
+
+          const displayCategory =
+            definition?.metadata.displayCategory ?? 'otherLabware'
+
+          const displayCategoryCount = Object.values(acc).filter(
+            lw => lw.displayCategory === displayCategory
+          ).length
+
+          acc[id] = {
+            labwareDefURI,
+            pythonName: getLabwarePythonName(
               displayCategory,
-            }
+              displayCategoryCount + 1
+            ),
+            displayCategory,
+          }
 
-            return acc
-          },
-          {}
-        )
-        //  if loading a python file - should include all labwares that are
-        //  not custom labwares
-      } else {
-        labware = Object.entries(metadata.labware).reduce(
-          (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
-            const labwareDefinition = allLabware[labwareLoadInfo.labwareDefURI]
+          return acc
+        },
+        {}
+      )
 
-            if (labwareDefinition == null) {
-              console.error(
-                `expected to find matching labware definition in the opentrons labware library but could not with labwareDefUri ${labwareLoadInfo.labwareDefURI}`
-              )
-            }
-
-            const displayCategory =
-              labwareDefinition?.metadata.displayCategory ?? 'otherLabware'
-
-            const displayCategoryCount = Object.values(acc).filter(
-              lw => lw.displayCategory === displayCategory
-            ).length
-
-            acc[id] = {
-              labwareDefURI: labwareLoadInfo.labwareDefURI,
-              pythonName: getLabwarePythonName(
-                displayCategory,
-                displayCategoryCount + 1
-              ),
-              displayCategory,
-            }
-
-            return acc
-          },
-          {}
-        )
-      }
       return { ...labware, ...state }
     },
     EDIT_MULTIPLE_LABWARE_PYTHON_NAME: (
@@ -1151,17 +1108,6 @@ export const moduleInvariantProperties: Reducer<
         },
       }
     },
-
-    EDIT_MODULE: (
-      state: ModuleEntities,
-      action: EditModuleAction
-    ): ModuleEntities => ({
-      ...state,
-      [action.payload.id]: {
-        ...state[action.payload.id],
-        model: action.payload.model,
-      },
-    }),
     DELETE_MODULE: (
       state: ModuleEntities,
       action: DeleteModuleAction

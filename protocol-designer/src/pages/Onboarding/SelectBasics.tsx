@@ -25,12 +25,12 @@ import {
 import { uuid } from '@opentrons/step-generation'
 
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
+import { BasicsButtons } from '../../components/molecules'
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
-import { BasicsButtons } from './BasicsButtons'
 import { WizardBody } from './WizardBody'
 
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { WizardFixtureType } from '../../components/organisms'
+import type { Fixtures } from '../../components/organisms'
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
@@ -48,6 +48,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const fixtures = watch('fixtures')
   const modules = watch('modules')
   const hasGripper = watch('hasGripper')
+  const hasThermocycer = watch('hasThermocycler')
+  const hasWasteChute = watch('hasWasteChute')
 
   const robotType = fields?.robotType
   const has96Channel = pipettesByMount.left.pipetteName === 'p1000_96'
@@ -63,7 +65,11 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     (pipettesByMount.right.pipetteName == null ||
       pipettesByMount.right.tiprackDefURI == null)
 
-  const isDisabled = robotType == null || noPipette
+  const isDisabled =
+    robotType == null ||
+    noPipette ||
+    (robotType === FLEX_ROBOT_TYPE &&
+      (hasGripper == null || hasThermocycer == null || hasWasteChute == null))
 
   const resetPipetteFields = (): void => {
     setPipetteType(null)
@@ -97,7 +103,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
   useEffect(() => {
     handleScrollToBottom()
-  }, [pipetteModal])
+  }, [hasGripper, hasThermocycer, hasWasteChute])
 
   const handleSwapMounts = (): void => {
     const leftPipetteName = pipettesByMount.left.pipetteName
@@ -111,14 +117,14 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('pipettesByMount.right.tiprackDefURI', leftTiprackDefURI)
   }
 
-  const flexTrashFixture: WizardFixtureType = {
+  const flexTrashFixture: Fixtures = {
     [uuid()]: {
       cutoutId: 'cutoutA3',
       name: 'trashBin',
       cutoutFixtureId: 'trashBinAdapter',
     },
   }
-  const ot2TrashFixture: WizardFixtureType = {
+  const ot2TrashFixture: Fixtures = {
     [uuid()]: {
       cutoutId: 'cutout12',
       name: 'trashBin',
@@ -165,6 +171,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
       setValue('fixtures', filteredFixtures)
     }
+    setValue('hasWasteChute', value)
   }
 
   const handleSelectThermocycler = (value: boolean): void => {
@@ -192,6 +199,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       )
       setValue('modules', updatedModules)
     }
+    setValue('hasThermocycler', value)
   }
 
   return (
@@ -374,8 +382,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
           {robotType === FLEX_ROBOT_TYPE && !noPipette && (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              ref={ref}
               gridGap={SPACING.spacing60}
+              ref={ref}
             >
               <BasicsButtons
                 type="gripper"
@@ -384,28 +392,33 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 onChange={value => {
                   setValue('hasGripper', value)
                 }}
-                isSelected={hasGripper}
+                selected={hasGripper}
               />
-              <BasicsButtons
-                type="thermocycler"
-                header={t('are_you_using_thermocycler')}
-                onChange={value => {
-                  handleSelectThermocycler(value)
-                }}
-                isSelected={Object.values(modules).some(
-                  mod => mod.type === THERMOCYCLER_MODULE_TYPE
-                )}
-              />
-              <BasicsButtons
-                type="wasteChute"
-                header={t('are_you_using_waste_chute')}
-                onChange={value => {
-                  handlSelectWasteChute(value)
-                }}
-                isSelected={Object.values(fixtures).some(
-                  fixture => fixture.name === 'wasteChute'
-                )}
-              />
+              {hasGripper != null ? (
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing60}
+                >
+                  <BasicsButtons
+                    type="thermocycler"
+                    header={t('are_you_using_thermocycler')}
+                    onChange={value => {
+                      handleSelectThermocycler(value)
+                    }}
+                    selected={hasThermocycer}
+                  />
+                  {hasThermocycer != null ? (
+                    <BasicsButtons
+                      type="wasteChute"
+                      header={t('are_you_using_waste_chute')}
+                      onChange={value => {
+                        handlSelectWasteChute(value)
+                      }}
+                      selected={hasWasteChute}
+                    />
+                  ) : null}
+                </Flex>
+              ) : null}
             </Flex>
           )}
         </WizardBody>
