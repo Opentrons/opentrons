@@ -119,6 +119,7 @@ export function useFailedLabwareUtils({
       getLabwareDisplayNamesFromFailedCmd(
         protocolAnalysis,
         recentRelevantFailedLabwareCmd,
+        errorKind,
         runRecord
       ),
     [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key, errorKind]
@@ -356,7 +357,6 @@ export function getFailedLabwareQuantity(
         cmd.commandType === 'flexStacker/retrieve' ||
         cmd.commandType === 'flexStacker/store'
     )
-    console.log('result based: ', storeOrRetrieveLabwareLast)
     let quantity = 0
     if (
       storeOrRetrieveLabwareLast != null &&
@@ -402,18 +402,15 @@ export function getFailedLabwareQuantity(
 }
 
 export function getRelevantLabwareIdFromFailedCmd(
-  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
+  errorKind: ErrorKind
 ): string | null {
   const isStackerError = (
     error?: RunCommandError | null
   ): error is RunCommandFlexStackerError =>
     error != null &&
     error.isDefined &&
-    [
-      'flexStackerStallOrCollision',
-      'flexStackerShuttleMissing',
-      'flexStackerHopperLabwareFailed',
-    ].includes(error.errorType)
+    STACKER_ERROR_KINDS.includes(errorKind)
   if (recentRelevantFailedLabwareCmd == null) {
     return null
   } else if (isStackerError(recentRelevantFailedLabwareCmd?.error)) {
@@ -431,10 +428,12 @@ export function getRelevantLabwareIdFromFailedCmd(
 export function getLabwareDisplayNamesFromFailedCmd(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
+  errorKind: ErrorKind,
   runRecord?: Run
 ): { name: string | null; nickname: string | null } | null {
   const labwareId = getRelevantLabwareIdFromFailedCmd(
-    recentRelevantFailedLabwareCmd
+    recentRelevantFailedLabwareCmd,
+    errorKind
   )
   if (labwareId == null) {
     return null

@@ -35,9 +35,13 @@ export function ManualReplaceLwAndRetry(
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { homeShuttle } = recoveryCommands
 
+  const homeShuttleRoutes = [LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+    MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+  ]
+
   const primaryBtnOnClick = (): Promise<void> => {
     return handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
-      if (route === LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE) {
+      if (homeShuttleRoutes.includes(route)) {
         void homeShuttle().then(() => {
           proceedToRouteAndStep(route, buildNextStep())
         })
@@ -100,7 +104,7 @@ export function ManualReplaceLwAndRetry(
             {...props}
             leftColTitle={t('prepare_track_for_homing')}
             leftColBodyText={buildBodyText()}
-            primaryBtnCopy={t('continue')}
+            primaryBtnCopy={t('home_now')}
             primaryBtnOnClick={primaryBtnOnClick}
           />
         )
