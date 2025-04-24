@@ -1,5 +1,4 @@
 import { Trans, useTranslation } from 'react-i18next'
-
 import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'

@@ -1,17 +1,17 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import ViewportList from 'react-viewport-list'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import ViewportList from 'react-viewport-list'
-
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   constructInvariantContextFromRunCommands,
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
-import {
-  FLEX_ROBOT_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  getSimplestDeckConfigForProtocol,
-} from '@opentrons/shared-data'
+
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
@@ -25,13 +25,13 @@ import {
   PrimaryButton,
   SPACING,
 } from '../..'
-import { PipetteMountViz } from './PipetteVisuals'
 import { getLabwareDefinitionsFromCommands } from '../CommandText/useCommandTextString/utils/getLabwareDefinitionsFromCommands'
+import { CommandItem } from './CommandItem'
+import { PipetteMountViz } from './PipetteVisuals'
 import {
   getAllWellContentsForActiveItem,
   wellFillFromWellContents,
 } from './utils'
-import { CommandItem } from './CommandItem'
 
 import type { ComponentProps } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'

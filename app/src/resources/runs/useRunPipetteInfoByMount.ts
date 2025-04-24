@@ -1,11 +1,12 @@
 import last from 'lodash/last'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
-  getPipetteNameSpecs,
   getLabwareDefURI,
   getLoadedLabwareDefinitionsByUri,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
-import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '/app/redux/pipettes'
+
+import { INCOMPATIBLE, INEXACT_MATCH, MATCH } from '/app/redux/pipettes'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useAttachedPipetteCalibrations,
@@ -13,14 +14,15 @@ import {
 } from '/app/resources/instruments'
 
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
+
 import type {
-  PickUpTipRunTimeCommand,
-  LoadPipetteRunTimeCommand,
   LabwareDefinition2,
+  LoadPipetteRunTimeCommand,
+  PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
-  Mount,
   AttachedPipette,
+  Mount,
   PipetteInfo,
 } from '/app/redux/pipettes/types'
 

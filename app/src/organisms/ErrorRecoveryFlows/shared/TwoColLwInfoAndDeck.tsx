@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   Flex,
@@ -7,16 +8,16 @@ import {
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
-import { useTranslation } from 'react-i18next'
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+
 import { RECOVERY_MAP } from '../constants'
+import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { ComponentProps } from 'react'
-import type { RecoveryContentProps } from '../types'
 import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import type { RecoveryContentProps } from '../types'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps

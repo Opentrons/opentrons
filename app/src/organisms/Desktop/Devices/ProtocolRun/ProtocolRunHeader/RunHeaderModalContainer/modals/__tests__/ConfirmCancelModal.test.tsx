@@ -1,19 +1,22 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
+
 import {
   RUN_STATUS_RUNNING,
-  RUN_STATUS_STOPPED,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useTrackEvent } from '/app/redux/analytics'
+
 import { ConfirmCancelModal } from '../ConfirmCancelModal'
 
 import type { ComponentProps } from 'react'

@@ -1,16 +1,17 @@
 import path from 'path'
-import glob from 'glob'
 import Ajv from 'ajv'
-import { describe, expect, it, beforeAll, test } from 'vitest'
+import glob from 'glob'
+import range from 'lodash/range'
+import { beforeAll, describe, expect, it, test } from 'vitest'
 
 import schema from '../../labware/schemas/2.json'
+import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
+
 import type {
   InnerWellGeometry,
   LabwareDefinition2,
   LabwareWell,
 } from '../types'
-import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
-import range from 'lodash/range'
 
 const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/2')
@@ -130,7 +131,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
 
   // this labware has a lip
-  'evotip_flex_96_labware/1.json': standard96WellNames,
+  'ev_resin_tips_flex_96_labware/1.json': standard96WellNames,
 
   // Presumably a bug. Fixed in v3 of this labware.
   'nest_1_reservoir_195ml/1.json': new Set(['A1']),

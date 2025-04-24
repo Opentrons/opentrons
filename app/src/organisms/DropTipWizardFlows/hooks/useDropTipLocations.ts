@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-
 import {
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
@@ -10,9 +9,9 @@ import {
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
-  RobotType,
-  CutoutConfig,
   AddressableAreaName,
+  CutoutConfig,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { ValidDropTipBlowoutLocation } from '../types'
 

@@ -5,9 +5,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

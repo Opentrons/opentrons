@@ -4,11 +4,12 @@ import { screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-import { TwoColTextAndImage } from '../TwoColTextAndImage'
-import { RECOVERY_MAP } from '../../constants'
 
-import type { ComponentProps } from 'react'
+import { RECOVERY_MAP } from '../../constants'
+import { TwoColTextAndImage } from '../TwoColTextAndImage'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')

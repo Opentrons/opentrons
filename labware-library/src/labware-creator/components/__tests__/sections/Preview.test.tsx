@@ -1,12 +1,16 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { when } from 'vitest-when'
+
 import { render, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
+
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
+import { FORM_LEVEL_ERRORS } from '../../../formLevelValidation'
 import { getLabwareName } from '../../../utils'
 import { Preview } from '../../sections/Preview'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { FORM_LEVEL_ERRORS } from '../../../formLevelValidation'
+
 import type { FormikConfig } from 'formik'
 import type { LabwareFields } from '../../../fields'
 

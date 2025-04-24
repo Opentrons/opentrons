@@ -1,19 +1,20 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
+
 import { RECOVERY_MAP } from '../constants'
 import {
   HoldingLabware,
   ReleaseLabware,
+  RecoveryDoorOpenSpecial,
+  RetryStepInfo,
+  SkipStepInfo,
   TwoColLwInfoAndDeck,
   TwoColTextAndFailedStepNextStep,
-  RetryStepInfo,
-  RecoveryDoorOpenSpecial,
-  SkipStepInfo,
 } from '../shared'
+import { TwoColTextAndImage } from '../shared/TwoColTextAndImage'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps, RouteStep } from '../types'
-import { TwoColTextAndImage } from '../shared/TwoColTextAndImage'
 
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps

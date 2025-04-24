@@ -1,6 +1,5 @@
-import { useTranslation } from 'react-i18next'
 import { Controller } from 'react-hook-form'
-
+import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,

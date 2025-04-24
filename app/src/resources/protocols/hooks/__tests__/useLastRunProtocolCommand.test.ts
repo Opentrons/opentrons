@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-
 import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { useLastRunProtocolCommand } from '../useLastRunProtocolCommand'

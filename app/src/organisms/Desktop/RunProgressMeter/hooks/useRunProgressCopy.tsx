@@ -1,18 +1,19 @@
 import { useMemo } from 'react'
-
+import { useTranslation } from 'react-i18next'
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
-import { useTranslation } from 'react-i18next'
 import {
-  LegacyStyledText,
   CommandText,
   getCommandTextData,
   getLabwareDefinitionsFromCommands,
+  LegacyStyledText,
 } from '@opentrons/components'
-import { TERMINAL_RUN_STATUSES } from '../constants'
+
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
+
+import { TERMINAL_RUN_STATUSES } from '../constants'
 
 import type { ReactNode } from 'react'
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
@@ -141,7 +142,8 @@ export function useRunProgressCopy({
     },
     errorDetails: runCommandDetails?.data?.error?.errorType ?? '',
     params: runCommandDetails?.data?.params ?? undefined,
-    runId: runId ?? '',
+    analysis,
+    runId,
   })
 
   return {

@@ -2,9 +2,9 @@ import { RECOVERY_MAP } from '../constants'
 import {
   HoldingLabware,
   ReleaseLabware,
+  RecoveryDoorOpenSpecial,
   SkipStepInfo,
   TwoColLwInfoAndDeck,
-  RecoveryDoorOpenSpecial,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 

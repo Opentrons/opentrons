@@ -8,6 +8,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { getMainPagePortalEl } from '../../../../../../components/organisms'
 import { ThermocyclerProfileModal } from './ThermocyclerProfileModal'
 

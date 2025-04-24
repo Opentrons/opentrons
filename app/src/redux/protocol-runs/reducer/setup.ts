@@ -1,5 +1,6 @@
 import * as Constants from '../constants'
-import type { RunSetupStatus, ProtocolRunAction } from '../types'
+
+import type { ProtocolRunAction, RunSetupStatus } from '../types'
 
 const INITIAL_SETUP_STEP_STATE = { complete: false, required: true }
 

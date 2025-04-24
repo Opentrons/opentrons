@@ -1,13 +1,14 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
+import { getAddressableAreaDisplayName } from '../getAddressableAreaDisplayName'
+import { getFinalMoveToAddressableAreaCmd } from '../getFinalAddressableAreaCmd'
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
-import { getWellRange } from '../getWellRange'
+import { getLabwareDefinitionsFromCommands } from '../getLabwareDefinitionsFromCommands'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getLabwareName } from '../getLabwareName'
 import { getLoadedLabware } from '../getLoadedLabware'
-import { getLabwareDefinitionsFromCommands } from '../getLabwareDefinitionsFromCommands'
-import { getFinalMoveToAddressableAreaCmd } from '../getFinalAddressableAreaCmd'
-import { getAddressableAreaDisplayName } from '../getAddressableAreaDisplayName'
+import { getWellRange } from '../getWellRange'
+
 import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
 import type { GetCommandText } from '../..'
 

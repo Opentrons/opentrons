@@ -9,7 +9,10 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
+
 import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
+
+import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfig,
   CutoutId,
@@ -17,7 +20,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { FormModule, FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
-import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfigExtended,
   InitialDeckStateModules,

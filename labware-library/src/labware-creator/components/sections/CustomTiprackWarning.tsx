@@ -1,6 +1,7 @@
 import { useFormikContext } from 'formik'
-import { SectionBody } from './SectionBody'
+
 import styles from '../../styles.module.css'
+import { SectionBody } from './SectionBody'
 
 import type { LabwareFields } from '../../fields'
 

@@ -1,26 +1,30 @@
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import {
-  useModulesQuery,
   useInstrumentsQuery,
+  useModulesQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
-import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { InstrumentsAndModules } from '../InstrumentsAndModules'
+import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
+import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+
 import { GripperCard } from '../GripperCard'
+import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
-import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+
 import type * as Components from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {

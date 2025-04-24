@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-
 import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
 
 import type { ComponentProps, MouseEventHandler } from 'react'

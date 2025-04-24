@@ -1,7 +1,8 @@
 import { FIXED_TRASH_ID } from '@opentrons/shared-data'
+
 import type {
-  LoadLabwareRunTimeCommand,
   LabwareLocation,
+  LoadLabwareRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 

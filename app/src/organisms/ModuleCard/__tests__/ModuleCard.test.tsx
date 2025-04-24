@@ -1,41 +1,41 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
+import { when } from 'vitest-when'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getIsHeaterShakerAttached } from '/app/redux/config'
-import {
-  mockMagneticModule,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-  mockHeaterShaker,
-} from '/app/redux/modules/__fixtures__'
-import { mockRobot } from '/app/redux/robot-api/__fixtures__'
-import { useIsEstopNotDisengaged } from '/app/resources/devices'
-import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
+import {
+  mockHeaterShaker,
+  mockMagneticModule,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+} from '/app/redux/modules/__fixtures__'
+import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
+import { mockRobot } from '/app/redux/robot-api/__fixtures__'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
+
+import { ModuleCard } from '..'
+import { ErrorInfo } from '../ErrorInfo'
+import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
+import { FlexStackerModuleData } from '../FlexStackerModuleData'
+import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 import { MagneticModuleData } from '../MagneticModuleData'
+import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
-import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
-import { FlexStackerModuleData } from '../FlexStackerModuleData'
-import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
-import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
-import { ErrorInfo } from '../ErrorInfo'
-import { ModuleCard } from '..'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 import type {
+  FlexStackerModule,
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
-  FlexStackerModule,
 } from '/app/redux/modules/types'
 
 vi.mock('../ErrorInfo')

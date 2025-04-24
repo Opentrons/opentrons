@@ -1,9 +1,10 @@
-import { screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getDevtoolsEnabled, toggleDevtools } from '/app/redux/config'
+
 import { EnableDevTools } from '../EnableDevTools'
 
 vi.mock('/app/redux/config')

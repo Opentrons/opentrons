@@ -1,6 +1,6 @@
-import type * as React from 'react'
-
 import styles from './styles.module.css'
+
+import type * as React from 'react'
 
 export interface LowercaseTextProps {
   /** text to display in lowercase */

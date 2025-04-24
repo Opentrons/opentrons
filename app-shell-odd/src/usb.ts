@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { join } from 'path'
 import { flatten } from 'lodash'
-import { createLogger } from './log'
+
 import {
   robotMassStorageDeviceAdded,
   robotMassStorageDeviceEnumerated,
@@ -13,7 +13,9 @@ import {
   ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
   ROBOT_MASS_STORAGE_DEVICE_REMOVED,
 } from './constants'
-import type { Dispatch, Action } from './types'
+import { createLogger } from './log'
+
+import type { Action, Dispatch } from './types'
 
 const FLEX_USB_MOUNT_DIR = '/media/'
 const FLEX_USB_DEVICE_DIR = '/dev/'

@@ -1,12 +1,16 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { when } from 'vitest-when'
+
 import { render, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
+
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState } from '../../../fields'
+import { isEveryFieldHidden } from '../../../utils'
 import { Footprint } from '../../sections/Footprint'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { isEveryFieldHidden } from '../../../utils'
+
 import type { FormikConfig } from 'formik'
 import type { LabwareFields } from '../../../fields'
 

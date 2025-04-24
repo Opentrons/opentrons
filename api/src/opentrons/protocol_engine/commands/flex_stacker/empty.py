@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from __future__ import annotations
 from typing import Optional, Literal, TYPE_CHECKING, Annotated
 from typing_extensions import Type
 

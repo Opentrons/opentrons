@@ -8,12 +8,13 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   SIZE_AUTO,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 interface ProtocolStatsProps {

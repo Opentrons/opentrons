@@ -3,22 +3,24 @@ import {
   getPipetteSpecsV2,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getDefaultPushOutVolume } from '../../utils'
-import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
+
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 import type { PDMetadata } from '../../file-types'
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>

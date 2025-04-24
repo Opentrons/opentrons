@@ -2,15 +2,16 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { getRobotType } from '../../../../../../file-data/selectors'
+
 import { CheckboxStepFormField } from '../../../../../../components/molecules'
+import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipment,
   getCurrentFormCanBeSaved,
 } from '../../../../../../step-forms/selectors'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import { MoveLabwareField } from './MoveLabwareField'
 import { LabwareLocationField } from './LabwareLocationField'
+import { MoveLabwareField } from './MoveLabwareField'
 
 import type { StepFormProps } from '../../types'
 

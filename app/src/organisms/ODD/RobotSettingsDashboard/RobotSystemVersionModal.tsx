@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -9,6 +8,7 @@ import {
   ReleaseNotes,
   SPACING,
 } from '@opentrons/components'
+
 import { SmallButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { OddModal } from '/app/molecules/OddModal'

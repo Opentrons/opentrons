@@ -1,6 +1,8 @@
 import { useQuery } from 'react-query'
 import { getProtocols } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
 import type { UseQueryResult } from 'react-query'
 import type { HostConfig, Protocols } from '@opentrons/api-client'
 

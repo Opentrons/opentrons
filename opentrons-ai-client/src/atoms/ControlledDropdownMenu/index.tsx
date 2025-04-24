@@ -1,6 +1,7 @@
-import { DropdownMenu } from '@opentrons/components'
-import type { DropdownBorder, DropdownOption } from '@opentrons/components'
 import { Controller } from 'react-hook-form'
+import { DropdownMenu } from '@opentrons/components'
+
+import type { DropdownBorder, DropdownOption } from '@opentrons/components'
 
 interface ControlledDropdownMenuProps {
   id?: string

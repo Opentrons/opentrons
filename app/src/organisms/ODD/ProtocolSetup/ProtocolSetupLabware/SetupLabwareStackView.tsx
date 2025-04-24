@@ -1,32 +1,33 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-
 import {
+  ALIGN_CENTER,
+  COLORS,
   DeckInfoLabel,
-  Tag,
-  StyledText,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   getWellFillFromLabwareId,
-  LabwareRender,
-  truncateString,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  COLORS,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  LabwareRender,
+  SPACING,
+  StyledText,
+  Tag,
+  truncateString,
 } from '@opentrons/components'
 
-import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
+
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 import type { LabwareByLiquidId } from '@opentrons/components'
-import type { StackItem, LabwareInStack } from '/app/transformations/commands'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { LabwareInStack, StackItem } from '/app/transformations/commands'
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);

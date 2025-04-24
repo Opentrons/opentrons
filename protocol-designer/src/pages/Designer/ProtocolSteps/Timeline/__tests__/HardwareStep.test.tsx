@@ -1,16 +1,19 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../assets/localization'
+import { getRobotType } from '../../../../../file-data/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../../steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
 } from '../../../../../ui/steps'
-import { START_TERMINAL_ITEM_ID } from '../../../../../steplist'
 import { selectTerminalItem } from '../../../../../ui/steps/actions/actions'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
-import { getRobotType } from '../../../../../file-data/selectors'
 import { HardwareStep } from '../HardwareStep'
 
 import type { ComponentProps } from 'react'

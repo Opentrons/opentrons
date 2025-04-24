@@ -1,9 +1,10 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { Provider } from 'jotai'
+import { describe, expect, it, vi } from 'vitest'
+
+import { CreateProtocol } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { CreateProtocol } from '..'
-import { Provider } from 'jotai'
 import {
   fillApplicationSectionAndClickConfirm,
   fillInstrumentsSectionAndClickConfirm,
@@ -11,6 +12,7 @@ import {
   fillModulesSectionAndClickConfirm,
   fillProtocolFormatSectionAndClickConfirm,
 } from '../../../resources/utils/createProtocolTestUtils'
+
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()

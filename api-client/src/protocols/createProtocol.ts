@@ -1,11 +1,12 @@
 import { POST, request } from '../request'
+
 import type { ResponsePromise } from '../request'
+import type {
+  RunTimeParameterFilesCreateData,
+  RunTimeParameterValuesCreateData,
+} from '../runs'
 import type { HostConfig } from '../types'
 import type { Protocol } from './types'
-import type {
-  RunTimeParameterValuesCreateData,
-  RunTimeParameterFilesCreateData,
-} from '../runs'
 
 export function createProtocol(
   config: HostConfig,

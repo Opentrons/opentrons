@@ -1,7 +1,8 @@
+import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import { Flex } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { Tag as TagComponent } from './index'
-import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TagComponent> = {

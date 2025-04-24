@@ -14,14 +14,18 @@ Welcome to the v8.4.0 release of the Opentrons App! This release includes update
 
 ### New Features
 
-- Run Flex protocols with updated liquid handling commands, optimized for liquid class properties like viscosity.
-- During a protocol, use the Flex Gripper to remove lids from new tip racks on the deck.
+- Run Flex protocols with updated liquid handling commands, including pipetting relative to liquid meniscus.
+- Run protocols that use the Flex Gripper to remove lids from new tip racks on the deck.
 - Run protocols with stacked Opentrons Tough Auto-Sealing Lids.
 
 ### Improvements
 
-- Apply default labware offsets to the same labware across your Flex deck. Click **Labware offsets** when setting up a protocol in the Opentrons App to view, apply, and create labware offsets.
-- Improvements to error recovery allow you to resume your Flex protocol when the door is opened or a second error occurs.
+- More flexible and reliable Labware Position Check workflow. Click **Labware offsets** during run setup to view, apply, and create labware offsets.
+  - Check individual labware, in any order.
+  - Create and apply default labware offsets to the same labware across your Flex deck.
+  - Save and reuse as many offsets as you need from previous runs.
+  - Better compatibility with protocols that have runtime parameters.
+- Error recovery now allows you to resume your Flex protocol when the door is opened or a second error occurs.
 
 ### Bug Fixes
 

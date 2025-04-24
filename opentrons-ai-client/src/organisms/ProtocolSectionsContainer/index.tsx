@@ -1,3 +1,8 @@
+import { useEffect } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useAtom } from 'jotai'
+import styled from 'styled-components'
 import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
@@ -6,20 +11,16 @@ import {
   LargeButton,
   SPACING,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+import { COLUMN } from '@opentrons/shared-data'
+
 import { Accordion } from '../../molecules/Accordion'
-import styled from 'styled-components'
 import { ApplicationSection } from '../../organisms/ApplicationSection'
 import { createProtocolAtom } from '../../resources/atoms'
-import { useAtom } from 'jotai'
 import { InstrumentsSection } from '../InstrumentsSection'
-import { ModulesSection } from '../ModulesSection'
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
-import { StepsSection } from '../StepsSection'
-import { useFormContext } from 'react-hook-form'
-import { COLUMN } from '@opentrons/shared-data'
+import { ModulesSection } from '../ModulesSection'
 import { ProtocolFormatSection } from '../ProtocolFormatSection'
-import { useEffect } from 'react'
+import { StepsSection } from '../StepsSection'
 
 export const PROTOCOL_FORMAT_STEP = 0
 export const APPLICATION_STEP = 1

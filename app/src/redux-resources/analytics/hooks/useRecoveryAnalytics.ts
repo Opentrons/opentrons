@@ -9,7 +9,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 
-import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
+import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
 
 type InitialActionType = 'cancel-run' | 'launch-recovery'
 type CommandResult = 'succeeded' | 'failed'

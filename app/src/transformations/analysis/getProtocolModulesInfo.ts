@@ -1,10 +1,12 @@
 import {
-  SPAN7_8_10_11_SLOT,
-  getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
+  getModuleDef2,
   getPositionFromSlotId,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
+
 import { getModuleInitialLoadInfo } from '../commands'
+
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,

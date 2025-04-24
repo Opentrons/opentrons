@@ -1,10 +1,11 @@
+import { ZERO_OFFSET } from '../../constants'
 import {
   curryWithoutPython,
   indentPyLines,
   reduceCommandCreators,
 } from '../../utils'
-import { ZERO_OFFSET } from '../../constants'
 import { dispenseInPlace, moveToAddressableArea } from '../atomic'
+
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface DispenseInWasteChuteArgs {

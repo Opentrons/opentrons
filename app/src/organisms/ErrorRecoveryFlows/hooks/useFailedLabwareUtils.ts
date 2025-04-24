@@ -1,43 +1,43 @@
 import { useEffect, useMemo, useState } from 'react'
-import without from 'lodash/without'
 import { useTranslation } from 'react-i18next'
-
+import without from 'lodash/without'
+import {
+  getLabwareDisplayLocation,
+  getLoadedLabware,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
+
+import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
+import { getErrorKind } from '../utils'
+
+import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
   DisplayLocationSlotOnlyParams,
   WellGroup,
 } from '@opentrons/components'
-import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
-  LabwareDefinition2,
-  LoadedLabware,
-  PickUpTipRunTimeCommand,
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
-  LiquidProbeRunTimeCommand,
-  MoveLabwareRunTimeCommand,
-  FlexStackerRetrieveRunTimeCommand,
-  LabwareLocation,
-  LoadedModule,
   Failed,
-  RunCommandFlexStackerError,
+  FlexStackerRetrieveRunTimeCommand,
+  LabwareDefinition2,
+  LabwareLocation,
+  LiquidProbeRunTimeCommand,
+  LoadedLabware,
+  LoadedModule,
+  MoveLabwareRunTimeCommand,
+  PickUpTipRunTimeCommand,
   RunCommandError,
+  RunCommandFlexStackerError,
 } from '@opentrons/shared-data'
-
-import {
-  getLoadedLabware,
-  getLabwareDisplayLocation,
-} from '@opentrons/components'
-import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
-import { getErrorKind } from '../utils'
 import type { ErrorRecoveryFlowsProps } from '..'
-import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { ErrorKind } from '../types'
+import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 
 interface UseFailedLabwareUtilsProps {
   failedCommand: FailedCommandBySource | null
@@ -106,7 +106,7 @@ export function useFailedLabwareUtils({
         failedCommand,
         runCommands,
       }),
-    [failedCommandByRunRecord?.key, runCommands?.meta.totalLength]
+    [failedCommand, runCommands]
   )
   const relevantPickUpTipCommand = getRelevantPickUpTipCommand(
     failedCommandByRunRecord,
@@ -121,7 +121,7 @@ export function useFailedLabwareUtils({
         recentRelevantFailedLabwareCmd,
         runRecord
       ),
-    [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key, errorKind]
+    [protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
   )
   const relevantPickUpTipCmdDetails = useMemo(
     () =>
@@ -130,16 +130,16 @@ export function useFailedLabwareUtils({
         relevantPickUpTipCommand,
         runRecord
       ),
-    [protocolAnalysis?.id, relevantPickUpTipCommand?.key]
+    [protocolAnalysis, relevantPickUpTipCommand, runRecord]
   )
 
   const failedLabware = useMemo(
     () => getLabwareInfoFrom(recentRelevantFailedLabwareCmd, runRecord),
-    [recentRelevantFailedLabwareCmd?.key]
+    [recentRelevantFailedLabwareCmd, runRecord]
   )
   const relevantPickUpTipLabware = useMemo(
     () => getLabwareInfoFrom(relevantPickUpTipCommand, runRecord),
-    [recentRelevantFailedLabwareCmd?.key]
+    [relevantPickUpTipCommand, runRecord]
   )
   const relevantPickUpTipLwLocs = useRelevantFailedLwLocations({
     failedLabware: relevantPickUpTipLabware,

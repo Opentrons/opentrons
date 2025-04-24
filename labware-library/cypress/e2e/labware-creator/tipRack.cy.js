@@ -1,4 +1,5 @@
-import { navigateToUrl, fileHelper } from '../../support/e2e'
+import { fileHelper, navigateToUrl } from '../../support/e2e'
+
 const fileHolder = fileHelper('generic_1_tiprack_20ul')
 
 describe('Create a Tip Rack', () => {

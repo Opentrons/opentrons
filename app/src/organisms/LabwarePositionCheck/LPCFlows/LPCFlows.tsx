@@ -1,12 +1,12 @@
 import { LPCWizardContainer } from '/app/organisms/LabwarePositionCheck/LPCWizardContainer'
 
+import type { LabwareOffset } from '@opentrons/api-client'
 import type {
-  RobotType,
   CompletedProtocolAnalysis,
   DeckConfiguration,
   LabwareDefinition2,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 
 // Inject the props specific to the legacy LPC flows, too.

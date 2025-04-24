@@ -1,18 +1,45 @@
-import { describe, it, expect, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
-
+import { describe, expect, it, vi } from 'vitest'
 import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
+
+import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
+import {
+  getFailedLabwareQuantity,
+  getLabwareDisplayNamesFromFailedCmd,
+  getRelevantFailedLabwareCmdFrom,
+  getRelevantWellName,
+  useFailedLabwareUtils,
+  useRelevantFailedLwLocations,
+} from '../useFailedLabwareUtils'
+
 import type { RunCommandSummary } from '@opentrons/api-client'
 
-import {
-  getRelevantWellName,
-  getRelevantFailedLabwareCmdFrom,
-  useRelevantFailedLwLocations,
-  useFailedLabwareUtils,
-  getLabwareDisplayNamesFromFailedCmd,
-  getFailedLabwareQuantity,
-} from '../useFailedLabwareUtils'
-import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
+vi.mock('@opentrons/shared-data', async () => {
+  const actual = await vi.importActual('@opentrons/shared-data')
+  return {
+    ...actual,
+    getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
+    getAllLabwareDefs: vi.fn(() => ({
+      'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
+        some: 'definition',
+      },
+    })),
+    getLoadedLabwareDefinitionsByUri: vi.fn(() => ({
+      'some/uri': { some: 'definition' },
+    })),
+  }
+})
+
+vi.mock('@opentrons/components', async () => {
+  const actual = await vi.importActual('@opentrons/components')
+  return {
+    ...actual,
+    getLabwareDisplayLocation: vi.fn(params =>
+      params.location ? `Slot ${params.location.slotName}` : ''
+    ),
+    getLoadedLabware: vi.fn(() => ({ displayName: 'Mock Nickname' })),
+  }
+})
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')

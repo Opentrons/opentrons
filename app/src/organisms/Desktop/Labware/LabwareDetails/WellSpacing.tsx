@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 import { getSpacingDiagram } from '@opentrons/components'
-import { LabeledValue } from './StyledComponents/LabeledValue'
+
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
+import { LabeledValue } from './StyledComponents/LabeledValue'
 
 import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
 
