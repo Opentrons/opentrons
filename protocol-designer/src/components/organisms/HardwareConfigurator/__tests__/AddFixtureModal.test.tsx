@@ -3,10 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
+import { editDeckConfiguration } from '../../../../step-forms/actions'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
 
+vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../step-forms/selectors')
 const render = (props: ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
     i18nInstance: i18n,
@@ -25,10 +29,15 @@ describe('AddFixtureModal', () => {
       deckConfig: [
         { cutoutId: 'cutoutA1', cutoutFixtureId: 'magneticBlockV1' },
       ],
-      setUpdatedDeckConfig: vi.fn(),
       setValue: vi.fn(),
       hasGripper: false,
     }
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      labware: {},
+      modules: {},
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
+    })
   })
 
   it('should render the fixture modal and clicking on the fixtures can select the trash bin', () => {
@@ -39,6 +48,7 @@ describe('AddFixtureModal', () => {
     screen.getByText('Trash bin')
     fireEvent.click(screen.getByText('Add'))
     expect(props.setValue).toHaveBeenCalled()
+    expect(vi.mocked(editDeckConfiguration)).toHaveBeenCalled()
   })
   it('should render the fixture modal and clicking on the modules can select the thermocycler', () => {
     render(props)
@@ -51,5 +61,6 @@ describe('AddFixtureModal', () => {
     screen.getByText('Temperature Module GEN2')
     fireEvent.click(screen.getAllByText('Add')[1])
     expect(props.setValue).toHaveBeenCalled()
+    expect(vi.mocked(editDeckConfiguration)).toHaveBeenCalled()
   })
 })

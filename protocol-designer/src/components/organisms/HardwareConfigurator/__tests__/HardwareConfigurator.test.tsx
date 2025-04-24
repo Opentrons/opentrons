@@ -1,24 +1,17 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
-import { DeckConfigurator } from '@opentrons/components'
 
 import { HardwareConfigurator } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { useDeckConfigurationEditing } from '../useDeckConfigurationEditing'
+import { getDeckConfiguration } from '../../../../step-forms/selectors'
+import { HardwareConfiguratorContainer } from '../HardwareConfiguratorContainer'
 
 import type { ComponentProps } from 'react'
-import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('../useDeckConfigurationEditing')
-vi.mock('@opentrons/components', async importOriginal => {
-  const actual = await importOriginal<typeof OpentronsComponents>()
-  return {
-    ...actual,
-    DeckConfigurator: vi.fn(),
-  }
-})
-
+vi.mock('../HardwareConfiguratorContainer')
+vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../step-forms/selectors')
 const render = (props: ComponentProps<typeof HardwareConfigurator>) => {
   return renderWithProviders(<HardwareConfigurator {...props} />, {
     i18nInstance: i18n,
@@ -34,19 +27,14 @@ describe('HardwareConfigurator', () => {
       hasGripper: false,
       fixtures: {},
     }
-    vi.mocked(DeckConfigurator).mockReturnValue(
-      <div>mock DeckConfigurator</div>
+    vi.mocked(getDeckConfiguration).mockReturnValue({ deckConfig: [] })
+    vi.mocked(HardwareConfiguratorContainer).mockReturnValue(
+      <div>mock HardwareConfiguratorContainer</div>
     )
-    vi.mocked(useDeckConfigurationEditing).mockReturnValue({
-      addFixtureModal: <div>mock modal</div>,
-      addFixtureToCutout: vi.fn(),
-      removeFixtureFromCutout: vi.fn(),
-    })
   })
 
-  it('should render the deck configurator and modal', () => {
+  it('should render the HardwareConfiguratorContainer', () => {
     render(props)
-    screen.getByText('mock DeckConfigurator')
-    screen.getByText('mock modal')
+    screen.getByText('mock HardwareConfiguratorContainer')
   })
 })

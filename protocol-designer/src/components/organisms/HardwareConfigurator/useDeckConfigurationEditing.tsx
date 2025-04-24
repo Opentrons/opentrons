@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import {
   ABSORBANCE_READER_CUTOUTS,
   ABSORBANCE_READER_V1,
@@ -31,14 +32,16 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { editDeckConfiguration } from '../../../step-forms/actions'
 import { AddFixtureModal } from './AddFixtureModal'
 
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
+  DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { FormModules } from '../../../step-forms'
@@ -59,21 +62,26 @@ interface DeckConfigurationEditingProps {
 }
 export function useDeckConfigurationEditing(
   deckConfig: DeckConfiguration,
-  setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>,
   modules: FormModules | InitialDeckStateModules,
   fixtures: Fixtures,
   hasGripper: boolean,
   setValue?: UseFormSetValue<WizardFormState>,
-  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
+  updateInitialDeckState?: (
+    value: CutoutConfigExtended[],
+    newDeckConfig?: DeckConfiguration
+  ) => void
 ): DeckConfigurationEditingProps {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const dispatch = useDispatch()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
 
   const addFixtureToCutout = (cutoutId: CutoutId): void => {
     setTargetCutoutId(cutoutId)
   }
 
-  const removeFixtureFromCutout = (
+  //  removing fixture from changing configuration in the
+  //  onboarding flow where state is stored using react-hook-form
+  const removeFixtureFromCutoutForOnboarding = (
     cutoutId: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ): void => {
@@ -100,48 +108,31 @@ export function useDeckConfigurationEditing(
     )
     setValue?.('modules', fixturedModules)
 
-    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-    }
+    const newDeckConfig = getNewConfig(
+      cutoutId,
+      deckConfig,
+      cutoutFixtureId,
+      deckDef
+    )
+    dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
+  }
 
-    const fixtureGroup =
-      deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
-        ?.fixtureGroup ?? {}
+  //  removing fixture from changing configuration in the
+  //  edit hardware sections where state is stored using redux
+  const removeFixtureFromCutoutForEditing = (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ): void => {
+    const thermocyclerCutoutFixtureId =
+      cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
+      cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
 
-    let newDeckConfig = deckConfig
-    if (cutoutId in fixtureGroup) {
-      const groupMap =
-        fixtureGroup[cutoutId]?.find(group =>
-          Object.entries(group).every(([cId, cfId]) =>
-            deckConfig.find(
-              config =>
-                config.cutoutId === cId && config.cutoutFixtureId === cfId
-            )
-          )
-        ) ?? {}
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        cutoutConfig.cutoutId in groupMap
-          ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              type: undefined,
-            }
-          : cutoutConfig
-      )
-    } else {
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        cutoutConfig.cutoutId === cutoutId
-          ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              type: undefined,
-            }
-          : cutoutConfig
-      )
-    }
+    const newDeckConfig = getNewConfig(
+      cutoutId,
+      deckConfig,
+      cutoutFixtureId,
+      deckDef
+    )
     let type = 'stagingAreaAndMagneticBlock' as CutoutConfigExtended['type']
     if (MODULE_MODELS.includes(cutoutFixtureId as ModuleModel)) {
       type = cutoutFixtureId as ModuleModel
@@ -160,13 +151,18 @@ export function useDeckConfigurationEditing(
         type = 'stagingAreaAndWasteChute'
       }
     }
-    updateInitialDeckState?.([{ cutoutId, cutoutFixtureId, type }])
-    setUpdatedDeckConfig(newDeckConfig)
+    updateInitialDeckState?.(
+      [{ cutoutId, cutoutFixtureId, type }],
+      newDeckConfig
+    )
   }
 
   return {
     addFixtureToCutout,
-    removeFixtureFromCutout,
+    removeFixtureFromCutout:
+      setValue != null
+        ? removeFixtureFromCutoutForOnboarding
+        : removeFixtureFromCutoutForEditing,
     addFixtureModal:
       targetCutoutId != null ? (
         <AddFixtureModal
@@ -177,7 +173,6 @@ export function useDeckConfigurationEditing(
           fixtures={fixtures}
           modules={modules}
           deckConfig={deckConfig}
-          setUpdatedDeckConfig={setUpdatedDeckConfig}
           setValue={setValue}
           hasGripper={hasGripper}
           updateInitialDeckState={updateInitialDeckState}
@@ -317,4 +312,54 @@ export const getAvailableOptions = (
   }
 
   return availableOptions
+}
+
+export const getNewConfig = (
+  cutoutId: CutoutId,
+  deckConfig: DeckConfiguration,
+  cutoutFixtureId: CutoutFixtureId,
+  deckDef: DeckDefinition
+): DeckConfiguration => {
+  let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+  if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+    replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+    replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+  }
+
+  const fixtureGroup =
+    deckDef.cutoutFixtures.find(({ id }) => id === cutoutFixtureId)
+      ?.fixtureGroup ?? {}
+
+  let newDeckConfig = deckConfig
+  if (cutoutId in fixtureGroup) {
+    const groupMap =
+      fixtureGroup[cutoutId]?.find(group =>
+        Object.entries(group).every(([cId, cfId]) =>
+          deckConfig.find(
+            config => config.cutoutId === cId && config.cutoutFixtureId === cfId
+          )
+        )
+      ) ?? {}
+    newDeckConfig = deckConfig.map(cutoutConfig =>
+      cutoutConfig.cutoutId in groupMap
+        ? {
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            type: undefined,
+          }
+        : cutoutConfig
+    )
+  } else {
+    newDeckConfig = deckConfig.map(cutoutConfig =>
+      cutoutConfig.cutoutId === cutoutId
+        ? {
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            type: undefined,
+          }
+        : cutoutConfig
+    )
+  }
+  return newDeckConfig
 }

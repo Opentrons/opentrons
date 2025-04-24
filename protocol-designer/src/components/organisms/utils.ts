@@ -1,19 +1,26 @@
 import {
   getAreSlotsVerticallyAdjacent,
   getModuleType,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 
 import { ALL_MODULE_SLOTS_OT2 } from '../../modules'
 import { DEFAULT_SLOT_MAP_OT2 } from '../../pages/Onboarding/constants'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 
 import type {
   AddressableArea,
   AddressableAreaName,
+  CutoutId,
   DeckDefinition,
   ModuleModel,
+  ModuleType,
 } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../step-forms'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  ModuleOnDeck,
+} from '../../step-forms'
 
 export const getSlotsWithCollisions = (
   deckDef: DeckDefinition,
@@ -38,6 +45,38 @@ export const getSlotsWithCollisions = (
     },
     []
   )
+}
+
+export const getLabwareNotCompatibleWithModule = (
+  moduleType: ModuleType,
+  labware: AllTemporalPropertiesForTimelineFrame['labware'],
+  cutoutId: CutoutId,
+  tcSlot: string
+): string | null => {
+  const slot = cutoutId.split('cutout')[1]
+  const isThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
+  const labwareOnSlot = Object.values(labware).find(lw => lw.slot === slot)
+  const isLabwareOnOtherTCSlot = isThermocycler
+    ? Object.values(labware).some(({ slot }) => slot === tcSlot)
+    : false
+
+  if (isLabwareOnOtherTCSlot) {
+    return tcSlot
+  } else {
+    const isCompatible =
+      labwareOnSlot != null
+        ? getLabwareIsCompatible(labwareOnSlot.def, moduleType)
+        : true
+    return isCompatible ? null : slot
+  }
+}
+
+export const getSlotHasLabware = (
+  labware: AllTemporalPropertiesForTimelineFrame['labware'],
+  cutoutId: CutoutId
+): boolean => {
+  const slot = cutoutId.split('cutout')[1]
+  return Object.values(labware).some(lw => lw.slot === slot)
 }
 
 //  NOTE: used to get the next available module slot for OT-2
