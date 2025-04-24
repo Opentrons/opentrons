@@ -1,5 +1,6 @@
 import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import { LabwareRenderOnDeck } from './LabwareRenderOnDeck'
+
 import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
 

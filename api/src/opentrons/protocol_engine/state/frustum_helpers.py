@@ -371,7 +371,7 @@ def find_volume_at_well_height(
     max_height = volumetric_capacity[-1][0]
     if target_height < 0 or target_height > max_height:
         raise InvalidLiquidHeightFound(
-            "Invalid target height {target_height} mm; max well height is {max_height} mm."
+            f"Invalid target height {target_height} mm; max well height is {max_height} mm."
         )
     # volumes in volumetric_capacity are relative to each frustum,
     # so we have to find the volume of all the full sections enclosed

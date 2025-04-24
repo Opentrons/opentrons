@@ -1,10 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { LabwareUploadModal } from '..'
-import { getLabwareUploadMessage } from '../../../../labware-defs/selectors'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 import { dismissLabwareUploadMessage } from '../../../../labware-defs/actions'
+import { getLabwareUploadMessage } from '../../../../labware-defs/selectors'
 
 vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../labware-defs/actions')

@@ -1,9 +1,9 @@
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { SPACING } from '../../ui-style-constants/index'
 import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
+import { SPACING } from '../../ui-style-constants/index'
 
 interface InfoScreenProps {
   content: string

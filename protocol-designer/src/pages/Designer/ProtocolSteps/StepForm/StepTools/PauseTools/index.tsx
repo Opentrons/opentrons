@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -12,20 +11,20 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  getModuleDisplayName,
 } from '@opentrons/shared-data'
 
+import {
+  InputStepFormField,
+  TextAreaField,
+} from '../../../../../../components/molecules'
 import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../../../../constants'
-import {
-  InputStepFormField,
-  TextAreaField,
-} from '../../../../../../components/molecules'
 import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
 import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'

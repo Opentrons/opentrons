@@ -1,6 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { Footer } from '.'
 import { COLORS, Flex } from '@opentrons/components'
+
+import { Footer } from '.'
+
+import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Footer> = {
   title: 'AI/Molecules/Footer',

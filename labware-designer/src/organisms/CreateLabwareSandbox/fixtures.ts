@@ -1,6 +1,6 @@
 import type {
-  RegularLabwareProps,
   IrregularLabwareProps,
+  RegularLabwareProps,
 } from '@opentrons/shared-data'
 
 export const IRREGULAR_OPTIONS: IrregularLabwareProps = {

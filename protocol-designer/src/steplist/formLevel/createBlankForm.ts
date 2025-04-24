@@ -1,10 +1,12 @@
 import { getDefaultsForStepType } from './getDefaultsForStepType'
+
 import type {
-  StepType,
-  StepIdType,
   BlankForm,
   FormData,
+  StepIdType,
+  StepType,
 } from '../../form-types'
+
 interface NewFormArgs {
   stepId: StepIdType
   stepType: StepType

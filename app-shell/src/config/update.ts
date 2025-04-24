@@ -4,13 +4,12 @@ import union from 'lodash/union'
 import without from 'lodash/without'
 
 import {
-  UPDATE_VALUE,
-  TOGGLE_VALUE,
-  RESET_VALUE,
   ADD_UNIQUE_VALUE,
+  RESET_VALUE,
   SUBTRACT_VALUE,
+  TOGGLE_VALUE,
+  UPDATE_VALUE,
 } from '../constants'
-
 import { DEFAULTS } from './migrate'
 
 import type { ConfigValueChangeAction } from '@opentrons/app/src/redux/config/types'

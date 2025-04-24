@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_FLEX_START,
   COLORS,
@@ -7,9 +6,9 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'

@@ -2,6 +2,7 @@ import { round } from 'lodash'
 import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { SPACING } from '@opentrons/components'
 import {
   getAllLiquidClassDefs,
@@ -86,6 +87,7 @@ const getMaxUiFlowRate = (args: {
   const travelMmCorrected = travelMm * correctionMultiplier
   return targetVolume / (travelMmCorrected / maxPlungerSpeed)
 }
+import type { FieldProps } from '../types'
 
 interface FlowRateFieldProps extends FieldProps {
   flowRateType: FlowRateType

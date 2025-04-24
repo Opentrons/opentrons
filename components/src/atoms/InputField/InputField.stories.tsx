@@ -5,7 +5,9 @@ import {
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
+
 import { InputField as InputFieldComponent } from './index'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof InputFieldComponent> = {

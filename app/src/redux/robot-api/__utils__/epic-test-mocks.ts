@@ -1,12 +1,12 @@
-import { vi, expect } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
+import { expect, vi } from 'vitest'
 
-import * as RobotApiHttp from '../http'
+import { mockRequestMeta, mockRobot } from '../__fixtures__'
 import * as DiscoverySelectors from '../../discovery/selectors'
-import { mockRobot, mockRequestMeta } from '../__fixtures__'
+import * as RobotApiHttp from '../http'
 
 import type { State } from '../../types'
-import type { RobotHost, RobotApiResponse } from '../types'
+import type { RobotApiResponse, RobotHost } from '../types'
 
 vi.mock('../http')
 vi.mock('../../discovery/selectors')

@@ -68,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (8.3.0) support the following version ranges: 
+Opentrons robots running the latest software (8.4.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.23    |          8.4.0               |
++-------------+------------------------------+
 |     2.22    |          8.3.0               |
 +-------------+------------------------------+
 |     2.21    |          8.2.0               |
@@ -138,9 +140,16 @@ This table lists the correspondence between Protocol API versions and robot soft
 Changes in API Versions
 =======================
 
+Version 2.23
+-------------
+- Wells now have a :py:meth:`~.Well.meniscus` location that corresponds to the top of the liquid, either as set in the protocol or measured by probing with a pipette tip. See :ref:`well-meniscus`.
+- Load and move labware lids with a new ``lid`` parameter of :py:meth:`~.ProtocolContext.load_labware` and standalone methods. See :ref:`loading-lids` and :ref:`moving-lids`.
+- Updated :py:meth:`.set_offset` to match new Labware Position Check behavior in Opentrons App v8.4.0.
+
 Version 2.22
 -------------
-This version includes beta features for our commercial partners. 
+- Improvements to loading liquids. Use the new :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, and :py:meth:`.Labware.load_empty` methods instead of ``Well.load_liquid()``, which is now deprecated.
+- Beta features for our commercial partners.
 
 Version 2.21
 ------------

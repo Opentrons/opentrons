@@ -1,11 +1,12 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { TipSelection } from '../TipSelection'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { WellSelection } from '../../../WellSelection'
+import { TipSelection } from '../TipSelection'
 
 import type { ComponentProps } from 'react'
 

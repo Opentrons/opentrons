@@ -1,5 +1,6 @@
-import { Manager, Reference, Popper } from 'react-popper'
+import { Manager, Popper, Reference } from 'react-popper'
 import cx from 'classnames'
+
 import styles from './tooltips.module.css'
 
 import type {

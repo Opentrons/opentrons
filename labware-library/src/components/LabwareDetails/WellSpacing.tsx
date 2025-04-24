@@ -1,20 +1,19 @@
 // well dimensions and spacing for details page
 import round from 'lodash/round'
 import { getSpacingDiagram } from '@opentrons/components'
+
 import {
-  SPACING,
-  X_OFFSET,
-  Y_OFFSET,
-  X_SPACING,
-  Y_SPACING,
-  NA,
-  VARIOUS,
   MM,
+  NA,
+  SPACING,
+  VARIOUS,
+  X_OFFSET,
+  X_SPACING,
+  Y_OFFSET,
+  Y_SPACING,
 } from '../../localization'
-
-import styles from './styles.module.css'
-
 import { LabeledValueTable, LowercaseText } from '../ui'
+import styles from './styles.module.css'
 
 import type { LabwareWellGroupProperties } from '../../types'
 

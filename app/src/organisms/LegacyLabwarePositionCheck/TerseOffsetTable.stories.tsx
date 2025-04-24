@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -14,9 +13,11 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+
 import { TerseOffsetTable } from './ResultsSummary'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export default {

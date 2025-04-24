@@ -1,12 +1,12 @@
 import { POST, request } from '../request'
 
 import type { ResponsePromise } from '../request'
+import type { VectorOffset } from '../runs'
 import type {
   HostConfig,
   LabwareOffsetLocationSequenceComponent,
 } from '../types'
 import type { ANY_LOCATION, StoredLabwareOffset } from './types'
-import type { VectorOffset } from '../runs'
 
 export interface StoredLabwareOffsetCreate {
   definitionUri: string

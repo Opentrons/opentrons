@@ -1,5 +1,6 @@
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
+
 import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
 
 export function useRunStartedOrLegacySessionInProgress(): boolean {

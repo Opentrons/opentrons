@@ -1,15 +1,16 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
+import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 
-import type { Diff } from '../utils/thermocyclerStateDiff'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   ThermocyclerStateStepArgs,
 } from '../types'
+import type { Diff } from '../utils/thermocyclerStateDiff'
 
 vi.mock('../utils/thermocyclerStateDiff')
 

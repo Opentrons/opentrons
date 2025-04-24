@@ -6,9 +6,11 @@ import {
   linearInterpolate,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
-import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
+
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
+import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
+
 import type {
   BlowoutProperties,
   ByTipTypeSetting,
@@ -336,7 +338,7 @@ const getTouchTipFields = (
   return {
     [`${liquidHandlingAction}_touchTip_checkbox`]: enable,
     [`${liquidHandlingAction}_touchTip_mmFromTop`]: params?.zOffset ?? null,
-    [`${liquidHandlingAction}_touchTip_mmFromEdge`]: params?.mmToEdge ?? null,
+    [`${liquidHandlingAction}_touchTip_mmFromEdge`]: params?.mmFromEdge ?? null,
     [`${liquidHandlingAction}_touchTip_speed`]: params?.speed ?? null,
   }
 }
@@ -415,7 +417,11 @@ const getSubmergeRetractFields = (args: {
   } = args
 
   // all common submerge and retract fields
-  const { delay, offset, speed, positionReference } = submergeRetractLookup
+  const { delay, speed } = submergeRetractLookup
+  const { positionReference, offset } =
+    'startPosition' in submergeRetractLookup
+      ? submergeRetractLookup.startPosition
+      : submergeRetractLookup.endPosition
   const fullPrefix = `${liquidHandlingAction}_${tipMovement}` as SubmergeRetractAspirateDispensePrefix
   const offsetFields = getOffsetFields(offset, fullPrefix)
   const PositionReferenceFields = getPositionReferenceFields(
@@ -504,14 +510,20 @@ const getNoLiquidClassValuesMoveLiquid = (
       singleDispense.pushOutByVolume as Array<[number, number]>
     ) ?? 0
 
-  const aspirateOffsetFields = getOffsetFields(aspirate.offset, 'aspirate')
-  const dispenseOffsetFields = getOffsetFields(dispense.offset, 'dispense')
+  const aspirateOffsetFields = getOffsetFields(
+    aspirate.aspiratePosition.offset,
+    'aspirate'
+  )
+  const dispenseOffsetFields = getOffsetFields(
+    dispense.dispensePosition.offset,
+    'dispense'
+  )
   const aspiratePositionReferenceFields = getPositionReferenceFields(
-    aspirate.positionReference,
+    aspirate.aspiratePosition.positionReference,
     'aspirate'
   )
   const dispensePositionReferenceFields = getPositionReferenceFields(
-    dispense.positionReference,
+    dispense.dispensePosition.positionReference,
     'dispense'
   )
 
@@ -530,7 +542,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     aspirate_retract_x_position: 0,
     aspirate_retract_y_position: 0,
     aspirate_touchTip_speed: aspirate.retract.touchTip.params?.speed,
-    aspirate_touchTip_mmFromEdge: aspirate.retract.touchTip.params?.mmToEdge,
+    aspirate_touchTip_mmFromEdge: aspirate.retract.touchTip.params?.mmFromEdge,
     aspirate_touchTip_mmFromTop: aspirate.retract.touchTip.params?.zOffset,
   }
   const dispenseFields = {
@@ -550,7 +562,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     pushOut_checkbox: pushOutVolume > 0,
     pushOut_volume: pushOutVolume,
     dispense_touchTip_speed: dispense.retract.touchTip.params?.speed,
-    dispense_touchTip_mmFromEdge: dispense.retract.touchTip.params?.mmToEdge,
+    dispense_touchTip_mmFromEdge: dispense.retract.touchTip.params?.mmFromEdge,
     dispense_touchTip_mmFromTop: dispense.retract.touchTip.params?.zOffset,
   }
   return {
@@ -601,7 +613,7 @@ const getNoLiquidClassValuesMix = (
     'aspirate'
   )
   const aspiratePositionReferenceFields = getPositionReferenceFields(
-    aspirate.positionReference,
+    aspirate.aspiratePosition.positionReference,
     'mix'
   )
   const dispenseFlowRateFields = getFlowRateFields(
@@ -625,7 +637,7 @@ const getNoLiquidClassValuesMix = (
     pushOut_checkbox: pushOutVolume > 0,
     pushOut_volume: pushOutVolume,
     mix_touchTip_speed: singleDispense.retract.touchTip.params?.speed,
-    mix_touchTip_mmFromEdge: singleDispense.retract.touchTip.params?.mmToEdge,
+    mix_touchTip_mmFromEdge: singleDispense.retract.touchTip.params?.mmFromEdge,
     mix_touchTip_mmFromTop: singleDispense.retract.touchTip.params?.zOffset,
   }
 
@@ -669,24 +681,30 @@ const getLiquidClassValuesMoveLiquid = (args: {
   const { path, tipRack, volume: rawVolume } = rawForm
   const volume = Number(rawVolume)
   const {
-    positionReference: aspiratePositionReference,
-    offset: aspirateOffset,
     flowRateByVolume: aspirateFlowRateByVolume,
+    aspiratePosition,
     preWet,
     mix: aspirateMix,
     delay: aspirateDelay,
   } = aspirate
+  const {
+    positionReference: aspiratePositionReference,
+    offset: aspirateOffset,
+  } = aspiratePosition
 
   const dispense =
     multiDispense != null && path === 'multiDispense'
       ? multiDispense
       : singleDispense
   const {
-    positionReference: dispensePositionReference,
-    offset: dispenseOffset,
     flowRateByVolume: dispenseFlowRateByVolume,
+    dispensePosition,
     delay: dispenseDelay,
   } = dispense
+  const {
+    positionReference: dispensePositionReference,
+    offset: dispenseOffset,
+  } = dispensePosition
   const { pushOutByVolume } = singleDispense // always get pushOut from singleDispense
   const dispenseMix = 'mix' in dispense ? dispense.mix : null
   const {
@@ -861,11 +879,11 @@ const getLiquidClassValuesMix = (args: {
   const volume = Number(rawVolume)
   const { aspirate, singleDispense } = liquidClassValuesForTip
   const {
-    positionReference,
-    offset,
     flowRateByVolume: aspirateFlowRateByVolume,
+    aspiratePosition,
     delay: aspirateDelay,
   } = aspirate
+  const { positionReference, offset } = aspiratePosition
   const {
     flowRateByVolume: dispenseFlowRateByVolume,
     delay: dispenseDelay,

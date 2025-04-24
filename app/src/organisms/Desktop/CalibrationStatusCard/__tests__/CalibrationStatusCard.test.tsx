@@ -1,18 +1,19 @@
 import { MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { CalibrationStatusCard } from '..'
 import { useCalibrationTaskList } from '../../Devices/hooks'
 import {
-  expectedBadDeckTaskList,
   expectedBadDeckAndPipetteOffsetTaskList,
+  expectedBadDeckTaskList,
   expectedBadEverythingTaskList,
   expectedBadPipetteOffsetTaskList,
-  expectedBadTipLengthTaskList,
   expectedBadTipLengthAndOffsetTaskList,
+  expectedBadTipLengthTaskList,
   expectedIncompleteDeckCalTaskList,
   expectedTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'

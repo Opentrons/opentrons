@@ -1,8 +1,7 @@
-import { useState, useEffect, Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,8 +17,8 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
   SPACING,
-  TOOLTIP_TOP_START,
   Tooltip,
+  TOOLTIP_TOP_START,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -27,17 +26,20 @@ import {
   getLabwareDefIsStandard,
   getUniqueWellProperties,
 } from '@opentrons/shared-data'
+
 import { Slideout } from '/app/atoms/Slideout'
-import { getWellLabel } from './helpers/labels'
-import { WellCount } from './WellCount'
-import { WellProperties } from './WellProperties'
-import { Dimensions } from './Dimensions'
-import { WellDimensions } from './WellDimensions'
-import { WellSpacing } from './WellSpacing'
-import { ManufacturerDetails } from './ManufacturerDetails'
-import { InsertDetails } from './InsertDetails'
-import { Gallery } from './Gallery'
+
 import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
+import { Dimensions } from './Dimensions'
+import { Gallery } from './Gallery'
+import { getWellLabel } from './helpers/labels'
+import { InsertDetails } from './InsertDetails'
+import { ManufacturerDetails } from './ManufacturerDetails'
+import { WellCount } from './WellCount'
+import { WellDimensions } from './WellDimensions'
+import { WellProperties } from './WellProperties'
+import { WellSpacing } from './WellSpacing'
+
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 const CLOSE_ICON_STYLE = css`

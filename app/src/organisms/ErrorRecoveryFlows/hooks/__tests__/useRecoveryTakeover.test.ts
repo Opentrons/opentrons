@@ -1,13 +1,14 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
 import { useSelector } from 'react-redux'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useRecoveryTakeover } from '../useRecoveryTakeover'
 import { getUserId } from '/app/redux/config'
 import {
   useClientDataRecovery,
   useUpdateClientDataRecovery,
 } from '/app/resources/client_data'
+
+import { useRecoveryTakeover } from '../useRecoveryTakeover'
 
 import type { Mock } from 'vitest'
 

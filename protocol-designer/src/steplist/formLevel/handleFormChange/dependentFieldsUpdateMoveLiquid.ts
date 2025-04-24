@@ -3,9 +3,10 @@ import pick from 'lodash/pick'
 import round from 'lodash/round'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+
 import {
   getMinPipetteVolume,
   getPipetteCapacity,
@@ -15,14 +16,15 @@ import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
+  DISPOSAL_VOL_DIGITS,
   fieldHasChanged,
+  getAllWellsFromPrimaryWells,
   getChannels,
   getDefaultWells,
-  getAllWellsFromPrimaryWells,
   getMaxDisposalVolumeForMultidispense,
   volumeInCapacityForMulti,
-  DISPOSAL_VOL_DIGITS,
 } from './utils'
+
 import type {
   LabwareEntities,
   PipetteEntities,

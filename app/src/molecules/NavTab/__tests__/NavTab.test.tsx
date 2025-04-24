@@ -1,9 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, beforeEach } from 'vitest'
+
 import { MemoryRouter } from 'react-router-dom'
-import { SPACING, COLORS, TYPOGRAPHY, BORDERS } from '@opentrons/components'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+
 import { NavTab } from '..'
 
 import type { ComponentProps } from 'react'

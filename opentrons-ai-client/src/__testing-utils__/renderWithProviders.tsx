@@ -1,12 +1,12 @@
 // render using targetted component using @testing-library/react
 // with wrapping providers for i18next and redux
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { I18nextProvider } from 'react-i18next'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { render } from '@testing-library/react'
-
-import { useHydrateAtoms } from 'jotai/utils'
 import { Provider } from 'jotai'
+import { useHydrateAtoms } from 'jotai/utils'
 
+import type { RenderOptions, RenderResult } from '@testing-library/react'
 import type {
   ComponentProps,
   ComponentType,
@@ -14,7 +14,6 @@ import type {
   ReactElement,
   ReactNode,
 } from 'react'
-import type { RenderOptions, RenderResult } from '@testing-library/react'
 
 interface HydrateAtomsProps {
   initialValues: Array<[any, any]>

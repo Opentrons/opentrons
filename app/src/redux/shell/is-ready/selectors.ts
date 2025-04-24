@@ -1,4 +1,5 @@
 import { getIsOnDevice } from '../../config'
+
 import type { State } from '../../types'
 
 export function getIsShellReady(state: State): boolean {

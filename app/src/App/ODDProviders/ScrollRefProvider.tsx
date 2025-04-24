@@ -1,4 +1,5 @@
 import { createContext, useCallback, useState } from 'react'
+
 import type { FC, ReactNode } from 'react'
 
 export interface SharedScrollRefContextType {

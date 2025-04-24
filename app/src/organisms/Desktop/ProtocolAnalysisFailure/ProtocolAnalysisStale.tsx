@@ -1,17 +1,17 @@
+import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { useTranslation, Trans } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Banner,
   Btn,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
+
 import { analyzeProtocol } from '/app/redux/protocol-storage'
 
 import type { MouseEventHandler } from 'react'

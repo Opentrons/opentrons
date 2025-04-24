@@ -1,46 +1,46 @@
 import { useMemo } from 'react'
-
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { useRouteUpdateActions } from './useRouteUpdateActions'
-import { useRecoveryCommands } from './useRecoveryCommands'
-import { useRecoveryTipStatus } from './useRecoveryTipStatus'
-import { useRecoveryRouting } from './useRecoveryRouting'
-import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { getNextSteps } from '../utils'
-import { useDeckMapUtils } from './useDeckMapUtils'
+import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
+import { getRunningStepCountsFrom } from '/app/resources/protocols'
 import {
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
-import { useRecoveryActionMutation } from './useRecoveryActionMutation'
-import { useRecoveryToasts } from './useRecoveryToasts'
-import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
-import { useShowDoorInfo } from './useShowDoorInfo'
+
+import { getNextSteps } from '../utils'
 import { useCleanupRecoveryState } from './useCleanupRecoveryState'
+import { useDeckMapUtils } from './useDeckMapUtils'
+import { useFailedLabwareUtils } from './useFailedLabwareUtils'
 import { useFailedPipetteUtils } from './useFailedPipetteUtils'
-import { getRunningStepCountsFrom } from '/app/resources/protocols'
+import { useRecoveryActionMutation } from './useRecoveryActionMutation'
+import { useRecoveryCommands } from './useRecoveryCommands'
+import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
+import { useRecoveryRouting } from './useRecoveryRouting'
+import { useRecoveryTipStatus } from './useRecoveryTipStatus'
+import { useRecoveryToasts } from './useRecoveryToasts'
+import { useRouteUpdateActions } from './useRouteUpdateActions'
+import { useShowDoorInfo } from './useShowDoorInfo'
 
 import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
-import type { IRecoveryMap, RouteStep, RecoveryRoute } from '../types'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
-import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
-import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
-import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
-import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
+import type { IRecoveryMap, RecoveryRoute, RouteStep } from '../types'
 import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
+import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
+import type { UseFailedPipetteUtilsResult } from './useFailedPipetteUtils'
+import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
+import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type {
   CurrentRecoveryOptionUtils,
   SubMapUtils,
 } from './useRecoveryRouting'
-import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
-import type { StepCounts } from '/app/resources/protocols/hooks'
-import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
+import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
+import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseShowDoorInfoResult } from './useShowDoorInfo'
-import type { UseFailedPipetteUtilsResult } from './useFailedPipetteUtils'
 
 export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
@@ -95,7 +95,6 @@ export function useERUtils({
   // Note that pageLength: 999 is ok only because we fetch this on mount. We use 999 because it should hopefully
   // provide the commands necessary for ER without taxing the server too heavily. This is NOT intended for produciton!
   const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
-    cursor: 0,
     pageLength: 999,
   })
 
@@ -105,7 +104,7 @@ export function useERUtils({
         protocolAnalysis?.commands ?? [],
         failedCommand?.byRunRecord ?? null
       ),
-    [protocolAnalysis != null, failedCommand]
+    [protocolAnalysis, failedCommand]
   )
 
   const analytics = useRecoveryAnalytics()

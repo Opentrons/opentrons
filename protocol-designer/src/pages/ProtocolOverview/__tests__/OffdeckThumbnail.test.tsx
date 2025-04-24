@@ -1,9 +1,12 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { FLEX_ROBOT_TYPE, fixture12Trough } from '@opentrons/shared-data'
+
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
+import { fixture12Trough, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
 import { getRobotType } from '../../../file-data/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
@@ -11,8 +14,8 @@ import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-con
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../top-selectors/well-contents')
 vi.mock('../../../labware-ingred/selectors')

@@ -3,10 +3,11 @@
 // a user to do this.
 
 import {
-  navigateToUrl,
   fileHelper,
+  navigateToUrl,
   wellBottomImageLocator,
 } from '../../support/e2e'
+
 const fileHolder = fileHelper('testpro_80_wellplate_100ul')
 
 context('Well Plates', () => {

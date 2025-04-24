@@ -1,21 +1,21 @@
 // render using targetted component using @testing-library/react
 // with wrapping providers for i18next and redux
 
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { I18nextProvider } from 'react-i18next'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
-import { vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { createStore } from 'redux'
+import { vi } from 'vitest'
 
+import type { RenderOptions, RenderResult } from '@testing-library/react'
+import type { PreloadedState, Store } from 'redux'
 import type {
   ComponentProps,
   ComponentType,
   PropsWithChildren,
   ReactElement,
 } from 'react'
-import type { RenderResult, RenderOptions } from '@testing-library/react'
-import type { PreloadedState, Store } from 'redux'
 
 export interface RenderWithProvidersOptions<State> extends RenderOptions {
   initialState?: State

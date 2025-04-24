@@ -1,5 +1,6 @@
 import { getLabwareDefURI } from '.'
-import type { RunTimeCommand, LabwareDefinition2 } from '..'
+
+import type { LabwareDefinition2, RunTimeCommand } from '..'
 
 export interface LabwareDefinitionsByUri {
   [defURI: string]: LabwareDefinition2

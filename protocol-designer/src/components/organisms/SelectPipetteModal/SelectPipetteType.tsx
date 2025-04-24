@@ -7,7 +7,9 @@ import {
   StyledText,
   WRAP,
 } from '@opentrons/components'
+
 import { PIPETTE_TYPES } from '../../../pages/Onboarding/constants'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { PipetteMount, RobotType } from '@opentrons/shared-data'

@@ -1,16 +1,17 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { AnnouncementModal } from '../../../components/organisms'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getHasOptedIn } from '../../../analytics/selectors'
-import { getFeatureFlagData } from '../../../feature-flags/selectors'
-import { getCanClearHintDismissals } from '../../../tutorial/selectors'
-import { clearAllHintDismissals } from '../../../tutorial/actions'
-import { optIn } from '../../../analytics/actions'
-import { setFeatureFlags } from '../../../feature-flags/actions'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { Settings } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { optIn } from '../../../analytics/actions'
+import { getHasOptedIn } from '../../../analytics/selectors'
+import { i18n } from '../../../assets/localization'
+import { AnnouncementModal } from '../../../components/organisms'
+import { setFeatureFlags } from '../../../feature-flags/actions'
+import { getFeatureFlagData } from '../../../feature-flags/selectors'
+import { clearAllHintDismissals } from '../../../tutorial/actions'
+import { getCanClearHintDismissals } from '../../../tutorial/selectors'
 
 vi.mock('../../../components/organisms')
 vi.mock('../../../feature-flags/actions')

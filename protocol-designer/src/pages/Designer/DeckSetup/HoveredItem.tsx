@@ -1,10 +1,12 @@
 import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import { LabwareRender } from '@opentrons/components'
-import { selectors } from '../../../labware-ingred/selectors'
+
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { selectors } from '../../../labware-ingred/selectors'
 import { LabwareLabel } from '../LabwareLabel'
+
 import type { DeckLabelProps } from '@opentrons/components'
 import type { CoordinateTuple } from '@opentrons/shared-data'
 

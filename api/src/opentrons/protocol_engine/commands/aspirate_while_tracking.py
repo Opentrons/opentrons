@@ -105,6 +105,7 @@ class AspirateWhileTrackingImplementation(
                 " so the plunger can be reset in a known safe position."
             )
         state_update = StateUpdate()
+
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
@@ -112,6 +113,7 @@ class AspirateWhileTrackingImplementation(
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            operation_volume=-params.volume,
         )
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):

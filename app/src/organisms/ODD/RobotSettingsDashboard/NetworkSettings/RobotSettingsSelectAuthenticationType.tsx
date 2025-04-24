@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
-
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
 import { SelectAuthenticationType } from '../../NetworkSettings'
 
 import type { Dispatch, SetStateAction } from 'react'

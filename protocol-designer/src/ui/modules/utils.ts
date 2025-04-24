@@ -9,14 +9,15 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import type { DropdownOption } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
-import type {
-  ModuleOnDeck,
-  LabwareOnDeck,
-  InitialDeckSetup,
-} from '../../step-forms/types'
 import type { SavedStepFormState } from '../../step-forms'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleOnDeck,
+} from '../../step-forms/types'
 
 export function getModuleOnDeckByType(
   initialDeckSetup: InitialDeckSetup,

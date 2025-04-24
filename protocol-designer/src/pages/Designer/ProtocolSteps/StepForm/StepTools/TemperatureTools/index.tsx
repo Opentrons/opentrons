@@ -7,12 +7,13 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
 } from '../../../../../../components/molecules'
+import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { StepFormProps } from '../../types'

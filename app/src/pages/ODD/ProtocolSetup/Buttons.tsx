@@ -1,13 +1,12 @@
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   Btn,
   COLORS,
-  SPACING,
   DISPLAY_FLEX,
-  JUSTIFY_CENTER,
   Icon,
+  JUSTIFY_CENTER,
+  SPACING,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'

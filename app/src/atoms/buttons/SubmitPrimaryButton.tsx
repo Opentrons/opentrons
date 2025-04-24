@@ -1,10 +1,10 @@
 import styled from 'styled-components'
 import {
-  SPACING,
-  COLORS,
   BORDERS,
-  TYPOGRAPHY,
+  COLORS,
+  SPACING,
   styleProps,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { MouseEvent } from 'react'

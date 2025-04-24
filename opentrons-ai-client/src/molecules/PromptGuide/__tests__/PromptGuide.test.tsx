@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-
 import { PromptGuide } from '../index'
 
 const LABWARE_LIBRARY_URL = 'https://labware.opentrons.com/'
