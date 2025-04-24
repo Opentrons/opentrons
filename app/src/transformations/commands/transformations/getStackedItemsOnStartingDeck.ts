@@ -40,6 +40,7 @@ export interface LabwareInStack {
 export interface ModuleInStack {
   moduleModel: ModuleModel
   moduleId: string
+  moduleSlotName: string
 }
 
 export type StackItem = LabwareInStack | ModuleInStack
@@ -219,9 +220,14 @@ export function getStackedItemsOnStartingDeck(
                   lm.model !== FLEX_STACKER_MODULE_V1
               )
               if (module == null) return sequenceAcc
+              const moduleSlotName =
+                module.location.slotName === SPAN7_8_10_11_SLOT
+                  ? '7'
+                  : module.location.slotName
               const moduleStackItem: ModuleInStack = {
                 moduleId: sequenceItem.moduleId,
                 moduleModel: module.model,
+                moduleSlotName,
               }
               if (
                 module.model === THERMOCYCLER_MODULE_V2 ||
@@ -300,7 +306,7 @@ export function getStackedItemsOnStartingDeck(
     }, {})
 
   // add stacker labware after as we don't want the order of these commands reversed
-  return commands
+  const allLabwareOnDeck = commands
     .filter((command): command is
       | FlexStackerSetStoredLabwareRunTimeCommand
       | FlexStackerFillRunTimeCommand =>
@@ -360,6 +366,7 @@ export function getStackedItemsOnStartingDeck(
           labwareInHopper.push({
             moduleModel: stackerModule.model,
             moduleId: command.params.moduleId,
+            moduleSlotName: stackerModule.location.slotName,
           })
 
           return { ...acc, [hopperLocation]: labwareInHopper }
@@ -387,6 +394,31 @@ export function getStackedItemsOnStartingDeck(
       }
       return { ...acc, [location]: stackFromCommand }
     }, labwareAndLidOnDeck)
+
+  const labwareAndModulesOnDeck = loadedModules.reduce<StackedItemsOnDeck>(
+    (acc, module) => {
+      const moduleId = module.id
+      if (
+        Object.values(acc).some(stack =>
+          stack.find(
+            (stackItem): stackItem is ModuleInStack =>
+              'moduleId' in stackItem && stackItem.moduleId === moduleId
+          )
+        )
+      ) {
+        return acc
+      } else {
+        const moduleOnDeck = {
+          moduleModel: module.model,
+          moduleId,
+          moduleSlotName: module.location.slotName,
+        }
+        return { ...acc, [module.location.slotName]: [moduleOnDeck] }
+      }
+    },
+    allLabwareOnDeck
+  )
+  return labwareAndModulesOnDeck
 }
 
 export function getLabwareLiquidRenderInfoFromStack(

@@ -22,25 +22,34 @@ export function getLabwareDefinitionsByURIForProtocol(
         command.commandType === 'flexStacker/setStoredLabware'
     )
     .reduce<LabwareDefinitionsByURI>((acc, command) => {
-      const labwareDefMap: LabwareDefinitionsByURI = {}
+      let labwareDefMap: LabwareDefinitionsByURI = {}
       const primaryLabwareDefinition = command.result?.primaryLabwareDefinition
       const lidLabwareDefinition = command.result?.lidLabwareDefinition
       const adapterLabwareDefinition = command.result?.adapterLabwareDefinition
       if (primaryLabwareDefinition == null) return acc
       const primaryDefUri = getLabwareDefURI(primaryLabwareDefinition)
       if (!Object.keys(acc).includes(primaryDefUri)) {
-        labwareDefMap.primaryDefUri = primaryLabwareDefinition
+        labwareDefMap = {
+          ...labwareDefMap,
+          [primaryDefUri]: primaryLabwareDefinition,
+        }
       }
       if (lidLabwareDefinition != null) {
         const lidDefUri = getLabwareDefURI(lidLabwareDefinition)
         if (!Object.keys(acc).includes(lidDefUri)) {
-          labwareDefMap.lidDefUri = lidLabwareDefinition
+          labwareDefMap = {
+            ...labwareDefMap,
+            [lidDefUri]: lidLabwareDefinition,
+          }
         }
       }
       if (adapterLabwareDefinition != null) {
         const adapterDefUri = getLabwareDefURI(adapterLabwareDefinition)
         if (!Object.keys(acc).includes(adapterDefUri)) {
-          labwareDefMap.adapterDefUri = adapterLabwareDefinition
+          labwareDefMap = {
+            ...labwareDefMap,
+            [adapterDefUri]: adapterLabwareDefinition,
+          }
         }
       }
       return {

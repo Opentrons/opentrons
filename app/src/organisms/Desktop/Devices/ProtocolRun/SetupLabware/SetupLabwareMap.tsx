@@ -13,7 +13,6 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
   FLEX_STACKER_MODULE_V1,
@@ -35,7 +34,11 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { ModuleInStack, StackItem } from '/app/transformations/commands'
+import type {
+  ModuleInStack,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
 
 interface SetupLabwareMapProps {
   runId: string
@@ -73,98 +76,100 @@ export function SetupLabwareMap({
   if (protocolAnalysis == null) return null
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
-  const deckDef = getDeckDefFromRobotType(robotType)
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
-  const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
-  const modulesOnDeck = protocolModulesInfo.map(module => {
-    const slotAndStackOnModule = Object.entries(
-      startingDeck
-    ).find(([key, value]) =>
+
+  const modulesOnDeck = Object.entries(startingDeck)
+    .filter(([key, value]) =>
       value.some(
-        (stackItem): stackItem is ModuleInStack =>
-          'moduleId' in stackItem && stackItem.moduleId === module.moduleId
+        (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
       )
     )
-    const slotName = slotAndStackOnModule?.[0]
-    const stackOnModule = slotAndStackOnModule?.[1]
+    .map(([slotName, stackedItems]) => {
+      const stackOnModule = stackedItems.filter(
+        (stackedItem): stackedItem is LabwareInStack =>
+          'labwareId' in stackedItem
+      )
+      const module = stackedItems.find(
+        (item): item is ModuleInStack => 'moduleId' in item
+      )
 
-    const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
-    const topLabwareDefinition =
-      topLabwareInfo != null && 'labwareId' in topLabwareInfo
-        ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
-        : null
-    const topLabwareId =
-      topLabwareInfo != null && 'labwareId' in topLabwareInfo
-        ? topLabwareInfo.labwareId
-        : ''
-    const topLabwareDisplayName =
-      topLabwareInfo != null && 'labwareId' in topLabwareInfo
-        ? topLabwareInfo.displayName
-        : ''
+      const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
+      const topLabwareDefinition =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
+          : null
+      const topLabwareId =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? topLabwareInfo.labwareId
+          : ''
+      const topLabwareDisplayName =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? topLabwareInfo.displayName
+          : ''
 
-    const isLabwareStacked = stackOnModule != null && stackOnModule.length > 2
-    const wellFill = getWellFillFromLabwareId(
-      topLabwareId,
-      protocolAnalysis.liquids,
-      labwareByLiquidId
-    )
+      const isLabwareStacked = stackOnModule != null && stackOnModule.length > 1
+      const wellFill = getWellFillFromLabwareId(
+        topLabwareId,
+        protocolAnalysis.liquids,
+        labwareByLiquidId
+      )
 
-    return {
-      moduleModel: module.moduleDef.model,
-      moduleLocation: { slotName: module.slotName },
-      innerProps:
-        module.moduleDef.model === THERMOCYCLER_MODULE_V1
-          ? { lidMotorState: 'open' }
-          : {},
+      return {
+        moduleModel: module?.moduleModel ?? ('' as ModuleModel),
+        moduleLocation: { slotName: module?.moduleSlotName ?? slotName },
+        innerProps:
+          module?.moduleModel === THERMOCYCLER_MODULE_V1
+            ? { lidMotorState: 'open' }
+            : {},
 
-      nestedLabwareDef: topLabwareDefinition,
-      nestedLabwareWellFill: wellFill,
-      highlightLabware: hoverLabwareId === topLabwareId,
-      stacked: isLabwareStacked,
-      moduleChildren: (
-        // open modal
-        <g
-          onClick={() => {
-            if (stackOnModule != null) {
-              setSelectedStack({
-                slotName: slotName ?? module.slotName,
-                stack: stackOnModule,
-              })
-            }
-          }}
-          onMouseEnter={() => {
-            if (topLabwareDefinition != null && topLabwareId != null) {
-              setHoverLabwareId(topLabwareId)
-            }
-          }}
-          onMouseLeave={() => {
-            setHoverLabwareId(null)
-          }}
-          cursor={'pointer'}
-        >
-          {topLabwareDefinition != null && topLabwareInfo != null ? (
-            <LabwareInfoOverlay
-              definition={topLabwareDefinition}
-              labwareId={topLabwareId}
-              displayName={topLabwareDisplayName}
-              runId={runId}
-              labwareHasLiquid={Object.values(wellFill).length > 0}
-              xOffset={
-                module.moduleDef.model === FLEX_STACKER_MODULE_V1
-                  ? STACKER_HOPPER_LABWARE_X_OFFSET
-                  : 0
+        nestedLabwareDef: topLabwareDefinition,
+        nestedLabwareWellFill: wellFill,
+        highlightLabware: hoverLabwareId === topLabwareId,
+        stacked: isLabwareStacked,
+        moduleChildren: (
+          // open modal
+          <g
+            onClick={() => {
+              if (stackOnModule != null) {
+                setSelectedStack({
+                  slotName: slotName,
+                  stack: stackOnModule,
+                })
               }
-              yOffset={
-                module.moduleDef.model === FLEX_STACKER_MODULE_V1
-                  ? STACKER_HOPPER_LABWARE_Y_OFFSET
-                  : 0
+            }}
+            onMouseEnter={() => {
+              if (topLabwareDefinition != null && topLabwareId != null) {
+                setHoverLabwareId(topLabwareId)
               }
-            />
-          ) : null}
-        </g>
-      ),
-    }
-  })
+            }}
+            onMouseLeave={() => {
+              setHoverLabwareId(null)
+            }}
+            cursor={'pointer'}
+          >
+            {topLabwareDefinition != null && topLabwareInfo != null ? (
+              <LabwareInfoOverlay
+                definition={topLabwareDefinition}
+                labwareId={topLabwareId}
+                displayName={topLabwareDisplayName}
+                runId={runId}
+                labwareHasLiquid={Object.values(wellFill).length > 0}
+                xOffset={
+                  module?.moduleModel === FLEX_STACKER_MODULE_V1
+                    ? STACKER_HOPPER_LABWARE_X_OFFSET
+                    : 0
+                }
+                yOffset={
+                  module?.moduleModel === FLEX_STACKER_MODULE_V1
+                    ? STACKER_HOPPER_LABWARE_Y_OFFSET
+                    : 0
+                }
+              />
+            ) : null}
+          </g>
+        ),
+      }
+    })
 
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
