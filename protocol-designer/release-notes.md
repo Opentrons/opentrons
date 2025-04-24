@@ -25,10 +25,15 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 ### Improved Features
 
 - Protocol Designer includes a warning when you clear a slot with labware, a module, or a fixture used in a protocol step.
+- More robust validation when uploading custom labware.
 
 ### Bug Fixes
 
 - Transfer step details show correct aspirate and dispense volumes when distributing liquid (a single aspirate and multiple dispenses).
+- While mixing, the pipette no longer lifts between mixes due to a newly created customizable push out field.
+- When uploading a protocol and the drop tip location is unknown, users can now manually select the new location from the Drop Tip Location dropdown.
+- Correctly migrate adapter/labware combo definitions into their singular definitions when uploading a protocol that is older than version 7.0.0.
+- When adding a disposal volume, a blow out location is now required.
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.4.0 or newer.
 
