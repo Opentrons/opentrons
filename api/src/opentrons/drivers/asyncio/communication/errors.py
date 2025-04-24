@@ -47,7 +47,7 @@ class GCodeCacheFull(ErrorResponse):
         super().__init__(port, response, command)
 
 
-class TaskInitializing(ErrorResponse):
+class TaskNotReady(ErrorResponse):
     def __init__(self, port: str, response: str, command: str) -> None:
         super().__init__(port, response, command)
 
