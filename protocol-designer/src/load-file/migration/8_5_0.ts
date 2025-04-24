@@ -4,13 +4,11 @@ import {
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
 
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
 import { getDefaultPushOutVolume } from '../../utils'
-import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
@@ -18,36 +16,16 @@ import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { Ingredients } from '@opentrons/step-generation'
 import type { PDMetadata } from '../../file-types'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export const migrateFile = (
-  appData: ProtocolFile<DesignerApplicationData>
+  appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const {
-    designerApplication,
-    commands,
-    labwareDefinitions,
-    liquids,
-    robot,
-  } = appData
+  const { designerApplication, commands, labwareDefinitions } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const { savedStepForms, ingredients } = designerApplication.data
-  const migratedIngredients: Ingredients = Object.entries(
-    ingredients
-  ).reduce<Ingredients>((acc, [id, ingredient]) => {
-    acc[id] = {
-      displayName: ingredient.name ?? '',
-      liquidClass: ingredient.liquidClass,
-      description: ingredient.description ?? null,
-      liquidGroupId: id,
-      displayColor: liquids[id].displayColor ?? swatchColors(id),
-    }
-    return acc
-  }, {})
+  const { savedStepForms } = designerApplication.data
 
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
@@ -217,26 +195,6 @@ export const migrateFile = (
     {}
   )
 
-  const updatedInitialStep = Object.values(savedStepForms).reduce(
-    (acc, form) => {
-      const { id } = form
-      if (id === '__INITIAL_DECK_SETUP_STEP__') {
-        return {
-          ...acc,
-          [id]: {
-            ...form,
-            ...getAdditionalEquipmentLocationUpdate(
-              commands,
-              robot.model,
-              savedStepForms
-            ),
-          },
-        }
-      }
-      return acc
-    },
-    {}
-  )
   return {
     ...appData,
     metadata: {
@@ -247,11 +205,8 @@ export const migrateFile = (
       ...designerApplication,
       data: {
         ...designerApplication.data,
-        ingredients: migratedIngredients,
-        ...equipmentLoadInfoFromCommands,
         savedStepForms: {
           ...designerApplication.data.savedStepForms,
-          ...updatedInitialStep,
           ...savedStepsWithUpdatedMoveLiquidFields,
           ...savedStepsWithUpdatedMixFields,
         },
