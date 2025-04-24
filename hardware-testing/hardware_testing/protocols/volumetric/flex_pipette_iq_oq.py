@@ -290,6 +290,7 @@ def load_liquid_dye(
 
     ret: Dict[float, List[Well]] = {v: [] for v in volumes}
     src_wells: List[Well] = [w for r in reservoirs_dye for w in r.wells()]
+    # FIXME: use runtime-parameters to set well lcoations
     current_src_well = src_wells.pop(0)  # initial pop!
     for test_ul, (liquid, trials) in liquid_and_trials_by_volume.items():
         ul_per_aspirate = test_ul * pipette.channels
@@ -378,6 +379,7 @@ def run(ctx: ProtocolContext) -> None:
     if diluent_tips.is_adapter:
         diluent_tips = cast(Labware, diluent_tips.child)
     pip_for_dil.pick_up_tip(diluent_tips)
+    pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
     for ul in volumes:
         if ul < DYE_READER_IDEAL_UL:
             dest_columns = [
@@ -395,6 +397,8 @@ def run(ctx: ProtocolContext) -> None:
     pip_for_dil.drop_tip()
 
     # TRANSFER DYE
+    # FIXME: add LLD here
+    # FIXME: add meniscus-relative pipetting to shared-data
     for ul in volumes:
         source = dye_wells_by_volume[ul]
         dest = dest_wells_by_volume[ul]
