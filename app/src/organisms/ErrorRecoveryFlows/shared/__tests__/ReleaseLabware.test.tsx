@@ -1,3 +1,5 @@
+import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -7,11 +9,6 @@ import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/__fixtures__'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
 
-import { GripperReleaseLabware } from '../GripperReleaseLabware'
-
-import type { Mock } from 'vitest'
-import type { ComponentProps } from 'react'
-import type { Mock } from 'vitest'
 import { RECOVERY_MAP } from '../../constants'
 
 vi.mock('/app/assets/videos/error-recovery/Gripper_Release.webm', () => ({

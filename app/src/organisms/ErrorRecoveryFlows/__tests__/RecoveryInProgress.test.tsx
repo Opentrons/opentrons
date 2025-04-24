@@ -7,7 +7,6 @@ import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import { RECOVERY_MAP } from '../constants'
 import {
-  GRIPPER_RELEASE_COUNTDOWN_S,
   RecoveryInProgress,
   useReleaseLabware,
   RELEASE_COUNTDOWN_S,
