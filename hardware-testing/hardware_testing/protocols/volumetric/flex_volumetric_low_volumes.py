@@ -575,7 +575,7 @@ def transfer_diluent_or_baseline(
         t_cls = get_transfer_class_for_strategies(
             ctx, multi, strategies=(_Strategy.DILUENT, _Strategy.DILUENT)
         )
-        multi.transfer_liquid(t_cls, diluent_ul, diluent_well, column, new_tip="never")
+        multi.transfer_with_liquid_class(t_cls, diluent_ul, diluent_well, column, new_tip="never")
         # is this well running low?
         min_diluent_in_well = DEAD_VOL_PER_LABWARE[diluent_well.parent.load_name]
         if diluent_well.current_liquid_volume() < min_diluent_in_well:
@@ -616,7 +616,7 @@ def transfer_dye_to_pcr_column(
     #       to track when wells have ran out of volume (or over-flowed)
     if not ctx.is_simulating():
         pipette.require_liquid_presence(dye_well)
-    pipette.transfer_liquid(
+    pipette.transfer_with_liquid_class(
         transfer_class,
         column_ul_per_well,
         source=[dye_well] * len(column),
@@ -670,7 +670,7 @@ def transfer_dye_to_photo_plate(
         pipette,
         strategies=(strategy["aspirate"], strategy["dispense"]),
     )
-    pipette.transfer_liquid(t_cls, trial_ul, src, dst, new_tip="never")
+    pipette.transfer_with_liquid_class(t_cls, trial_ul, src, dst, new_tip="never")
     pipette.drop_tip()
 
 
