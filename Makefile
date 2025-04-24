@@ -189,7 +189,7 @@ test-e2e:
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
 PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
-WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR))
+WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR)/python)
 
 .PHONY: test-py
 test-py: $(PYTHON_TEST_TARGETS)
