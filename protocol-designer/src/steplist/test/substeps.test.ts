@@ -1,4 +1,5 @@
-import { it, describe } from 'vitest'
+import { describe, it } from 'vitest'
+
 // TODO IMMEDIATELY: mock step-generation fns:
 // consolidate,
 // distribute,

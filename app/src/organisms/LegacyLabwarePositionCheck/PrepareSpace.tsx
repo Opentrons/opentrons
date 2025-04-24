@@ -1,26 +1,26 @@
-import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
 import {
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  RESPONSIVENESS,
-  SPACING,
-  Flex,
-  DIRECTION_ROW,
-  JUSTIFY_CENTER,
-  TYPOGRAPHY,
-  JUSTIFY_FLEX_END,
-  PrimaryButton,
-  BaseDeck,
   ALIGN_FLEX_START,
+  BaseDeck,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  RESPONSIVENESS,
   SecondaryButton,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
+import { getModuleType, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { getIsOnDevice } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { ReactNode } from 'react'

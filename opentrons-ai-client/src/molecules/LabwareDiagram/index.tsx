@@ -1,6 +1,8 @@
 import { css } from 'styled-components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 import { labwareImages } from './labware-images'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const IMAGE_MAX_WIDTH = '96px'
 export function LabwareDiagram({

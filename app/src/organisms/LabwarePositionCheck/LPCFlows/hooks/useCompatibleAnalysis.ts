@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-
 import {
   useCreateProtocolAnalysisMutation,
   useProtocolAnalysisAsDocumentQuery,

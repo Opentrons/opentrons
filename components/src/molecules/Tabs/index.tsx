@@ -1,10 +1,11 @@
 import { css } from 'styled-components'
+
 import { Tooltip } from '../../atoms'
-import { COLORS, BORDERS } from '../../helix-design-system'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn, Flex } from '../../primitives'
-import { POSITION_RELATIVE, DIRECTION_ROW } from '../../styles'
+import { DIRECTION_ROW, POSITION_RELATIVE } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
-import { TYPOGRAPHY, SPACING, RESPONSIVENESS } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 const DEFAULT_TAB_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}

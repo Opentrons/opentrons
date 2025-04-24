@@ -1,21 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import {
-  FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_V1,
-  fixture24Tuberack,
-  getDeckDefFromRobotType,
-  getAllLabwareDefs,
-} from '@opentrons/shared-data'
 import { Module } from '@opentrons/components'
-import { getSelectedTerminalItemId } from '../../../../ui/steps'
+import {
+  fixture24Tuberack,
+  FLEX_ROBOT_TYPE,
+  getAllLabwareDefs,
+  getDeckDefFromRobotType,
+  HEATERSHAKER_MODULE_V1,
+} from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { LabwareOnDeck } from '../../../../components/organisms'
+import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { LabwareOnDeck } from '../../../../components/organisms'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
 

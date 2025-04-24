@@ -1,10 +1,10 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { robotSettingsEpic } from '..'
 import * as RobotAdminSelectors from '../../../robot-admin/selectors'
 import * as Actions from '../../actions'
 import * as Selectors from '../../selectors'
-import { robotSettingsEpic } from '..'
 
 import type { Action, State } from '../../../types'
 

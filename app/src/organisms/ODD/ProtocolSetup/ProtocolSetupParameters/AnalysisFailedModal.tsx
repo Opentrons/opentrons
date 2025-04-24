@@ -5,8 +5,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 

@@ -1,8 +1,8 @@
+import { getErrorRecoveryPolicy } from '@opentrons/api-client'
 import {
   useHost,
   useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
-import { getErrorRecoveryPolicy } from '@opentrons/api-client'
 
 import type {
   HostConfig,

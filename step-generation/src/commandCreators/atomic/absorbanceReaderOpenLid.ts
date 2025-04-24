@@ -1,6 +1,7 @@
-import { uuid } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
+import { uuid } from '../../utils'
+
 import type { AbsorbanceReaderOpenLidCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 

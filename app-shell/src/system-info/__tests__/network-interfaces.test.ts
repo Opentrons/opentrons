@@ -1,10 +1,10 @@
 import os from 'os'
 import noop from 'lodash/noop'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  getActiveInterfaces,
   createNetworkInterfaceMonitor,
+  getActiveInterfaces,
 } from '../network-interfaces'
 
 vi.mock('os')

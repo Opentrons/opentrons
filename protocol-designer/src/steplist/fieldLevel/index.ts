@@ -1,61 +1,62 @@
 import {
-  requiredField,
-  minimumWellCount,
-  nonZero,
+  MAX_HEATER_SHAKER_DURATION_SECONDS,
+  MAX_HEATER_SHAKER_MODULE_RPM,
+  MAX_HEATER_SHAKER_MODULE_TEMP,
+  MAX_TC_BLOCK_TEMP,
+  MAX_TC_DURATION_SECONDS,
+  MAX_TC_LID_TEMP,
+  MAX_TC_PROFILE_VOLUME,
+  MAX_TEMP_MODULE_TEMP,
+  MIN_HEATER_SHAKER_DURATION_SECONDS,
+  MIN_HEATER_SHAKER_MODULE_RPM,
+  MIN_HEATER_SHAKER_MODULE_TEMP,
+  MIN_TC_BLOCK_TEMP,
+  MIN_TC_DURATION_SECONDS,
+  MIN_TC_LID_TEMP,
+  MIN_TC_PROFILE_VOLUME,
+  MIN_TEMP_MODULE_TEMP,
+} from '../../constants'
+import { getStagingAreaAddressableAreas } from '../../utils'
+import {
   composeErrors,
-  minFieldValue,
-  maxFieldValue,
-  temperatureRangeFieldValue,
-  realNumber,
   isTimeFormat,
   isTimeFormatMinutesSeconds,
+  maxFieldValue,
+  minFieldValue,
+  minimumWellCount,
+  nonZero,
+  realNumber,
+  requiredField,
+  temperatureRangeFieldValue,
 } from './errors'
 import {
-  maskToInteger,
+  composeMaskers,
+  defaultTo,
   maskToFloat,
+  maskToInteger,
   maskToTime,
   numberOrNull,
   onlyPositiveNumbers,
-  defaultTo,
-  composeMaskers,
   trimDecimals,
 } from './processing'
-import {
-  MIN_TEMP_MODULE_TEMP,
-  MAX_TEMP_MODULE_TEMP,
-  MIN_HEATER_SHAKER_MODULE_TEMP,
-  MAX_HEATER_SHAKER_MODULE_TEMP,
-  MIN_TC_BLOCK_TEMP,
-  MAX_TC_BLOCK_TEMP,
-  MIN_TC_LID_TEMP,
-  MAX_TC_LID_TEMP,
-  MIN_TC_DURATION_SECONDS,
-  MAX_TC_DURATION_SECONDS,
-  MIN_HEATER_SHAKER_MODULE_RPM,
-  MAX_HEATER_SHAKER_MODULE_RPM,
-  MIN_HEATER_SHAKER_DURATION_SECONDS,
-  MAX_HEATER_SHAKER_DURATION_SECONDS,
-  MIN_TC_PROFILE_VOLUME,
-  MAX_TC_PROFILE_VOLUME,
-} from '../../constants'
-import { getStagingAreaAddressableAreas } from '../../utils'
-import type {
-  PipetteEntity,
-  InvariantContext,
-  LabwareEntities,
-  WasteChuteEntities,
-  StagingAreaEntities,
-} from '@opentrons/step-generation'
-import type { ValueMasker, ValueCaster } from './processing'
-import type {
-  LabwareOrAdditionalEquipmentEntity,
-  StepFieldName,
-} from '../../form-types'
+
 import type {
   AddressableAreaName,
   CutoutId,
   LabwareLocation,
 } from '@opentrons/shared-data'
+import type {
+  InvariantContext,
+  LabwareEntities,
+  PipetteEntity,
+  StagingAreaEntities,
+  WasteChuteEntities,
+} from '@opentrons/step-generation'
+import type {
+  LabwareOrAdditionalEquipmentEntity,
+  StepFieldName,
+} from '../../form-types'
+import type { ValueCaster, ValueMasker } from './processing'
 
 export type { StepFieldName }
 

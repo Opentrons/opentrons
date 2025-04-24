@@ -1,19 +1,18 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Box,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  Modal,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'

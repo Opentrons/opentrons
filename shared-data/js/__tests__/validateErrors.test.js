@@ -1,7 +1,6 @@
 // Tests for error data validation
-import { describe, expect, it } from 'vitest'
-
 import Ajv from 'ajv'
+import { describe, expect, it } from 'vitest'
 
 import errorDefinitions from '../../errors/definitions/1/errors.json'
 import errorSchema from '../../errors/schemas/1.json'

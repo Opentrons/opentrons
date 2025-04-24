@@ -3,30 +3,32 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_END,
+  Modal,
+  OVERFLOW_AUTO,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+} from '@opentrons/components'
+import {
   FLEX_ROBOT_TYPE,
   getAllPipetteNames,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import {
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  Flex,
-  OVERFLOW_AUTO,
-  SPACING,
-  Modal,
-  SecondaryButton,
-  PrimaryButton,
-  JUSTIFY_END,
-} from '@opentrons/components'
+
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { getTiprackOptions } from '../../../pages/Onboarding/utils'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getMainPagePortalEl } from '../Portal'
+import { getTiprackOptions } from '../../../pages/Onboarding/utils'
 import { IncompatibleTipsModal } from '../IncompatibleTipsModal'
-import { SelectPipetteType } from './SelectPipetteType'
+import { getMainPagePortalEl } from '../Portal'
 import { SelectPipetteGen } from './SelectPipetteGen'
-import { SelectPipetteVolume } from './SelectPipetteVolume'
 import { SelectPipetteTips } from './SelectPipetteTips'
+import { SelectPipetteType } from './SelectPipetteType'
+import { SelectPipetteVolume } from './SelectPipetteVolume'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {

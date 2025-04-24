@@ -1,6 +1,6 @@
 import { useHistoricRunDetails } from './useHistoricRunDetails'
 
-import type { LabwareOffset, HostConfig } from '@opentrons/api-client'
+import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 import type { UseNotifyAllRunsQueryOptions } from '/app/resources/runs'
 
 interface HistoricOffset extends LabwareOffset {

@@ -3,12 +3,10 @@
 import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
-
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
 import { App } from './App'
 import { createLogger } from './logger'
-
 import { uiInitialized } from './redux/shell'
 import { store } from './redux/store'
 

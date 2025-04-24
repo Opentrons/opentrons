@@ -15,13 +15,13 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { uuid } from '../../utils'
-import { ModuleDiagram } from './ModuleDiagram'
-import { WizardBody } from './WizardBody'
-import { DEFAULT_SLOT_MAP_OT2, OT2_SUPPORTED_MODULE_MODELS } from './constants'
 import { HandleEnter } from '../../components/atoms'
 import { ModuleEmptySelectorButtons } from '../../components/organisms'
+import { uuid } from '../../utils'
+import { DEFAULT_SLOT_MAP_OT2, OT2_SUPPORTED_MODULE_MODELS } from './constants'
+import { ModuleDiagram } from './ModuleDiagram'
 import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
+import { WizardBody } from './WizardBody'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { FormModule } from '../../step-forms'

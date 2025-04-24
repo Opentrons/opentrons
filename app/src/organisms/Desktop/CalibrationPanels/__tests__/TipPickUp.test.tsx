@@ -1,10 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
 import * as Sessions from '/app/redux/sessions'
+import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
+
 import { TipPickUp } from '../TipPickUp'
 
 import type { ComponentProps } from 'react'

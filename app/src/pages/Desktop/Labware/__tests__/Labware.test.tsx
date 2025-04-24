@@ -1,19 +1,21 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import {
-  useTrackEvent,
-  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
-} from '/app/redux/analytics'
-import { LabwareCard } from '/app/organisms/Desktop/Labware/LabwareCard'
-import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/Labware/AddCustomLabwareSlideout'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { useLabwareFailure, useNewLabwareName } from '../hooks'
-import { Labware } from '..'
 import { useAllLabware } from '/app/local-resources/labware'
+import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/Labware/AddCustomLabwareSlideout'
+import { LabwareCard } from '/app/organisms/Desktop/Labware/LabwareCard'
+import { useToaster } from '/app/organisms/ToasterOven'
+import {
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
+
+import { Labware } from '..'
+import { useLabwareFailure, useNewLabwareName } from '../hooks'
 
 vi.mock('/app/organisms/Desktop/Labware/LabwareCard')
 vi.mock('/app/organisms/Desktop/Labware/AddCustomLabwareSlideout')

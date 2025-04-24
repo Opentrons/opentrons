@@ -1,19 +1,21 @@
 import {
-  SPAN7_8_10_11_SLOT,
-  getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
+  getModuleDef2,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
+
+import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
+
 import type {
   CompletedProtocolAnalysis,
+  LabwareDefinition2,
   LoadLabwareRunTimeCommand,
-  ProtocolAnalysisOutput,
   LoadModuleRunTimeCommand,
-  RunTimeCommand,
   ModuleLocation,
   ModuleModel,
-  LabwareDefinition2,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
-import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
 
 interface ModuleInSlot {
   moduleModel: ModuleModel

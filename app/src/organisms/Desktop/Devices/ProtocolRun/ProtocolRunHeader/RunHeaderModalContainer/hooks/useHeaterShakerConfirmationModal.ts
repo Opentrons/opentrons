@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux'
-
 import { useConditionalConfirm } from '@opentrons/components'
 
 import { getIsHeaterShakerAttached } from '/app/redux/config'

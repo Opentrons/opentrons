@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   BORDERS,
   COLORS,
@@ -14,8 +13,8 @@ import {
 
 import { Divider } from '/app/atoms/structure'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {

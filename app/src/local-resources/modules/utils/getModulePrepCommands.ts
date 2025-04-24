@@ -1,18 +1,19 @@
 import {
-  THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import type {
+  HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
+  TCCloseLidCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
-  TemperatureModuleDeactivateCreateCommand,
   TCOpenLidCreateCommand,
-  HeaterShakerCloseLatchCreateCommand,
-  TCCloseLidCreateCommand,
+  TemperatureModuleDeactivateCreateCommand,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 

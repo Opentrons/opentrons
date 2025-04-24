@@ -2,29 +2,31 @@ import { useSelector } from 'react-redux'
 import flatMap from 'lodash/flatMap'
 import { ProtocolTimelineScrubber } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import {
   getInitialRobotState,
   getRobotStateTimeline,
   getRobotType,
 } from '../../file-data/selectors'
-import { uuid } from '../../utils'
+import { getLoadCommands } from '../../file-data/selectors/utils'
+import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import {
   getInitialDeckSetup,
   getInvariantContext,
   getLiquidEntities,
 } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
-import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
-import { getLoadCommands } from '../../file-data/selectors/utils'
+import { uuid } from '../../utils'
+
 import type {
   AddressableAreaName,
   CompletedProtocolAnalysis,
   LabwareLocation,
   Liquid,
-  LoadModuleRunTimeCommand,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
+  LoadModuleRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 

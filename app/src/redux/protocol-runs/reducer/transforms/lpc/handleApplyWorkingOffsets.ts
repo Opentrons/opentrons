@@ -1,7 +1,11 @@
 import isEqual from 'lodash/isEqual'
-
 import { ANY_LOCATION } from '@opentrons/api-client'
 
+import type {
+  LabwareOffsetLocationSequenceComponent,
+  StoredLabwareOffset,
+  VectorOffset,
+} from '@opentrons/api-client'
 import type {
   ApplyWorkingOffsetsAction,
   LocationSpecificOffsetDetails,
@@ -9,11 +13,6 @@ import type {
   LPCWizardState,
   LwGeometryDetails,
 } from '/app/redux/protocol-runs'
-import type {
-  StoredLabwareOffset,
-  VectorOffset,
-  LabwareOffsetLocationSequenceComponent,
-} from '@opentrons/api-client'
 
 export function handleApplyWorkingOffsets(
   state: LPCWizardState,

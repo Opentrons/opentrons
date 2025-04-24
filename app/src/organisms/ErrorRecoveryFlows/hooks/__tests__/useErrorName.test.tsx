@@ -1,8 +1,8 @@
+import { render, renderHook, screen } from '@testing-library/react'
 import { describe, it } from 'vitest'
-import { renderHook, render, screen } from '@testing-library/react'
 
-import { useErrorName } from '../useErrorName'
 import { ERROR_KINDS } from '../../constants'
+import { useErrorName } from '../useErrorName'
 
 describe('useErrorName', () => {
   const testCases = Object.keys(ERROR_KINDS)

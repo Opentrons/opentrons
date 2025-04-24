@@ -1,6 +1,9 @@
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
 import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
-import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import {
   AttachProbe,
   BeforeBeginning,
@@ -8,7 +11,6 @@ import {
   HandleLabware,
   LPCComplete,
 } from '/app/organisms/LabwarePositionCheck/steps'
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import {
   closeLPC,
   goBackLastStep as goBackStepDispatch,
@@ -16,13 +18,14 @@ import {
   proceedStep as proceedStepDispatch,
   selectCurrentStep,
 } from '/app/redux/protocol-runs'
-import type { LPCStep } from '/app/redux/protocol-runs'
-import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+
 import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
 import { LPCRobotInMotion } from './LPCRobotInMotion'
+
+import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import type { LPCStep } from '/app/redux/protocol-runs'
 
 export interface LPCWizardFlexProps extends Omit<LPCFlowsProps, 'robotType'> {}
 

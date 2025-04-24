@@ -1,13 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
 import {
-  makeContext,
-  getSuccessResult,
   getInitialRobotStateStandard,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
 import { delayLocationHelper } from '../utils'
-import type { RobotState, InvariantContext } from '../types'
+
+import type { InvariantContext, RobotState } from '../types'
 
 const mockWasteChuteId = 'wasteChuteId'
 let invariantContext: InvariantContext = {

@@ -1,4 +1,4 @@
-import { describe, it, vi, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -8,13 +8,15 @@ import {
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
-import { createModule } from '../../../step-forms/actions'
+
 import { deleteModule } from '../../../modules'
+import { createModule } from '../../../step-forms/actions'
 import {
   createDeckFixture,
   deleteDeckFixture,
 } from '../../../step-forms/actions/additionalItems'
 import { updateInitialDeckState } from '../util'
+
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 vi.mock('../../../step-forms/actions')

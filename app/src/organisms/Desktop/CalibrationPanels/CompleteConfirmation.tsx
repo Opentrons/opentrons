@@ -8,10 +8,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   PrimaryButton,
   SIZE_3,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

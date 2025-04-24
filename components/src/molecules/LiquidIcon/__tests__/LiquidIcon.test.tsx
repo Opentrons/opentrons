@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest'
-import { renderWithProviders } from '../../../testing/utils'
 import { screen } from '@testing-library/react'
-import { SPACING } from '../../../ui-style-constants'
-import { BORDERS, COLORS } from '../../../helix-design-system'
+import { describe, expect, it } from 'vitest'
 
 import { LiquidIcon } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING } from '../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 
