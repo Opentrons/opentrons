@@ -1,18 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
+import { DIRECTION_COLUMN, Divider, Flex, SPACING, StyledText } from '@opentrons/components'
 
 import {
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../feature-flags/selectors'
-import {
-  Flex,
-  Divider,
-  DIRECTION_COLUMN,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
