@@ -377,6 +377,78 @@ describe('getFailedLabwareQuantity', () => {
     })
   })
 
+  it('should return the quantity for stacker error kinds based on result property', () => {
+    const errors = [
+      ERROR_KINDS.SHUTTLE_MISSING,
+      ERROR_KINDS.LABWARE_MISSING_IN_HOPPER,
+      ERROR_KINDS.STALL_WHILE_STACKING,
+    ]
+    errors.forEach(errorType => {
+      const failedLocalRetriveCommand = {
+        ...failedCommand,
+        commandType: 'flexStacker/retrieve',
+        error: {
+          isDefined: true,
+          errorType,
+        },
+      }
+      const localRunCommands = {
+        data: [
+          {
+            id: 'set-stored-labware-1',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 2,
+            },
+          } as any,
+          {
+            id: 'retrive-id-1',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'retrive-id-2',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+          } as any,
+          {
+            id: 'set-stored-labware',
+            commandType: 'flexStacker/setStoredLabware',
+            params: {
+              initialCount: 5,
+            },
+          } as any,
+          {
+            id: 'retrive-id',
+            commandType: 'flexStacker/retrieve',
+            params: {
+              moduleId: 'module-id',
+            },
+            result: {
+              primaryLocationSequence: [1, 2, 3, 4],
+            },
+          } as any,
+          { ...failedLocalRetriveCommand },
+        ] as RunCommandSummary[],
+        meta: {
+          totalLength: 10,
+          pageLength: 1,
+        },
+        links: {},
+      }
+      const result = getFailedLabwareQuantity(
+        localRunCommands,
+        failedLocalRetriveCommand,
+        errorType
+      )
+      expect(result).toEqual('Quantity: 4')
+    })
+  })
+
   it('should return 0 if there is no commands in list', () => {
     const emptyRunCommands = {
       data: [{ ...failedRetriveCommand }] as RunCommandSummary[],

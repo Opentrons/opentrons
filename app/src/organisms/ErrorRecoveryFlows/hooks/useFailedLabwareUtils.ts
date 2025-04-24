@@ -345,41 +345,58 @@ export function getFailedLabwareQuantity(
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
-    
+
     const commandsBeforefailedCmd = runCommands?.data.slice(
       0,
       failedCommandIndex ?? 0
     )
 
     const storeOrRetrieveLabwareLast = commandsBeforefailedCmd?.findLast(
-      cmd => cmd.commandType === 'flexStacker/retrieve' || cmd.commandType === 'flexStacker/store'
+      cmd =>
+        cmd.commandType === 'flexStacker/retrieve' ||
+        cmd.commandType === 'flexStacker/store'
     )
-    if (storeOrRetrieveLabwareLast != null){
-      const quantity = storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve' ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length() : storeOrRetrieveLabwareLast?.result?.eventualDestinationLocationSequence.length()
-    }
-    const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
-      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
-    )
-    const itemsToCheck = commandsBeforefailedCmd?.slice(
-      setStoredLabwareLastIndex ?? 0,
-      failedCommandIndex ?? 0
-    )
-
+    console.log('result based: ', storeOrRetrieveLabwareLast)
+    let quantity = 0
     if (
-      setStoredLabwareLast != null &&
-      'initialCount' in setStoredLabwareLast.params
+      storeOrRetrieveLabwareLast != null &&
+      'result' in storeOrRetrieveLabwareLast
     ) {
-      const total = setStoredLabwareLast?.params.initialCount ?? 0
-      const retreiveCmds =
-        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/retrieve')
-          .length ?? 0
-      const storeCmds =
-        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
-          .length ?? 0
-      return 'Quantity: ' + (total - retreiveCmds + storeCmds)
-    } else {
-      return 'Quantity: 0'
+      quantity =
+        storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
+          ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length
+          : storeOrRetrieveLabwareLast?.result
+              ?.eventualDestinationLocationSequence.length
     }
+    // in case there is no result calculate based on setStoredLabware count
+    else {
+      const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
+        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+      )
+      const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
+        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+      )
+      const itemsToCheck = commandsBeforefailedCmd?.slice(
+        setStoredLabwareLastIndex ?? 0,
+        failedCommandIndex ?? 0
+      )
+
+      if (
+        setStoredLabwareLast != null &&
+        'initialCount' in setStoredLabwareLast.params
+      ) {
+        const total = setStoredLabwareLast?.params.initialCount ?? 0
+        const retreiveCmds =
+          itemsToCheck?.filter(
+            cmd => cmd.commandType === 'flexStacker/retrieve'
+          ).length ?? 0
+        const storeCmds =
+          itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
+            .length ?? 0
+        quantity = total - retreiveCmds + storeCmds
+      }
+    }
+    return `Quantity: ${quantity}`
   }
   return null
 }
