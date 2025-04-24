@@ -1735,7 +1735,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[Location, WellCore]],
-        dest: Tuple[Location, WellCore],
+        dest: Union[Tuple[Location, WellCore], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],

@@ -633,7 +633,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         liquid_class: LiquidClass,
         volume: float,
         source: List[Tuple[types.Location, LegacyWellCore]],
-        dest: Tuple[types.Location, LegacyWellCore],
+        dest: Union[Tuple[types.Location, LegacyWellCore], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         starting_tip: Optional[LegacyWellCore],

@@ -20,7 +20,9 @@ from . import validation
 class TransferInfo:
 
     sources_list: List[Well]
-    destinations_list: List[Well]
+    destinations_list: Union[
+        List[Well], TrashBin, WasteChute
+    ]  # TODO rename this maybe?
     tip_policy: TransferTipPolicyV2
     tip_racks: List[Labware]
     trash_location: Union[Location, TrashBin, WasteChute]
@@ -28,7 +30,7 @@ class TransferInfo:
 
 def verify_and_normalize_transfer_args(
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
-    dest: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+    dest: Union[Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute],
     tip_policy: TransferTipPolicyV2Type,
     last_tip_picked_up_from: Optional[Well],
     tip_racks: List[Labware],
@@ -38,7 +40,11 @@ def verify_and_normalize_transfer_args(
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
 ) -> TransferInfo:
     flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(source)
-    flat_dests_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(dest)
+    if not isinstance(dest, (TrashBin, WasteChute)):
+        flat_dests_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(dest)
+    else:
+        # If trash bin or waste chute, set this to empty to have less isinstance checks after this
+        flat_dests_list = []
     if not target_all_wells and nozzle_map.tip_count > 1:
         flat_sources_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
             flat_sources_list, nozzle_map
@@ -84,7 +90,9 @@ def verify_and_normalize_transfer_args(
 
     return TransferInfo(
         sources_list=flat_sources_list,
-        destinations_list=flat_dests_list,
+        destinations_list=flat_dests_list
+        if not isinstance(dest, (TrashBin, WasteChute))
+        else dest,
         tip_policy=valid_new_tip,
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,

@@ -281,8 +281,8 @@ class TransferComponentsExecutor:
         NOTE: For most of our built-in definitions, we will keep _mix_ off because it is a very application specific thing.
         We should mention in our docs that users should adjust this property according to their application.
         """
-        if not mix_properties.enabled or isinstance(
-            self._target_location, (TrashBin, WasteChute)
+        if not mix_properties.enabled or not isinstance(
+            self._target_location, Location,
         ):
             return
         # Assertion only for mypy purposes

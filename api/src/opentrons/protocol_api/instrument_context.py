@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast
+from typing import Any, List, Optional, Sequence, Union, cast, Tuple
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -32,7 +32,7 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
 )
 
-from .core.common import InstrumentCore, ProtocolCore
+from .core.common import InstrumentCore, ProtocolCore, WellCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
@@ -1606,7 +1606,11 @@ class InstrumentContext(publisher.CommandPublisher):
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
         dest: Union[
-            labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
+            labware.Well,
+            Sequence[labware.Well],
+            Sequence[Sequence[labware.Well]],
+            TrashBin,
+            WasteChute,
         ],
         new_tip: TransferTipPolicyV2Type = "once",
         trash_location: Optional[
@@ -1662,12 +1666,23 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
-        if len(transfer_args.sources_list) != len(transfer_args.destinations_list):
-            raise ValueError(
-                "Sources and destinations should be of the same length in order to perform a transfer."
-                " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
-                " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
-            )
+
+        verified_dest: Union[
+            List[Tuple[types.Location, WellCore]], TrashBin, WasteChute
+        ]
+        if isinstance(transfer_args.destinations_list, (TrashBin, WasteChute)):
+            verified_dest = transfer_args.destinations_list
+        else:
+            if len(transfer_args.sources_list) != len(transfer_args.destinations_list):
+                raise ValueError(
+                    "Sources and destinations should be of the same length in order to perform a transfer."
+                    " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
+                    " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
+                )
+            verified_dest = [
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in transfer_args.destinations_list
+            ]
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1686,10 +1701,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=well), well._core)
                     for well in transfer_args.sources_list
                 ],
-                dest=[
-                    (types.Location(types.Point(), labware=well), well._core)
-                    for well in transfer_args.destinations_list
-                ],
+                dest=verified_dest,
                 new_tip=transfer_args.tip_policy,
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
@@ -1765,6 +1777,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        assert not isinstance(transfer_args.destinations_list, (TrashBin, WasteChute))
         if len(transfer_args.sources_list) != 1:
             raise ValueError(
                 f"Source should be a single well (or resolve to a single transfer for multi-channel) "
@@ -1818,7 +1831,7 @@ class InstrumentContext(publisher.CommandPublisher):
         source: Union[
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
-        dest: Union[labware.Well, Sequence[labware.Well]],
+        dest: Union[labware.Well, Sequence[labware.Well], TrashBin, WasteChute],
         new_tip: TransferTipPolicyV2Type = "once",
         trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
@@ -1873,17 +1886,26 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
-        if len(transfer_args.destinations_list) != 1:
-            raise ValueError(
-                f"Destination should be a single well (or resolve to a single transfer for multi-channel) "
-                f"but received {transfer_args.destinations_list}."
+        verified_dest: Union[Tuple[types.Location, WellCore], TrashBin, WasteChute]
+        if isinstance(transfer_args.destinations_list, (TrashBin, WasteChute)):
+            verified_dest = transfer_args.destinations_list
+        else:
+            if len(transfer_args.destinations_list) != 1:
+                raise ValueError(
+                    f"Destination should be a single well (or resolve to a single transfer for multi-channel) "
+                    f"but received {transfer_args.destinations_list}."
+                )
+            verified_dest = (
+                types.Location(
+                    types.Point(), labware=transfer_args.destinations_list[0]
+                ),
+                transfer_args.destinations_list[0]._core,
             )
         if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
             raise RuntimeError(
                 'Tip transfer policy "per source" incompatible with consolidate.'
             )
 
-        verified_dest = transfer_args.destinations_list[0]
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.consolidate_with_liquid_class(
@@ -1901,10 +1923,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=well), well._core)
                     for well in transfer_args.sources_list
                 ],
-                dest=(
-                    types.Location(types.Point(), labware=verified_dest),
-                    verified_dest._core,
-                ),
+                dest=verified_dest,
                 new_tip=transfer_args.tip_policy,
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
