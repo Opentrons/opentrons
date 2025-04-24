@@ -262,7 +262,24 @@ async def _main() -> None:
     await hw_api.home()
     await hw_api.home_plunger(mount)
     await hw_api.set_lights(rails=True)
-    await hw_api.update_nozzle_configuration_for_mount(mount, starting_nozzle="A1", back_left_nozzle="A1", front_right_nozzle="H1")
+    x_direction, y_direction = 1, 1
+    if args.partial_tip_config is not None:
+        partial_tip_dict = {
+            "left-col": ["A1", "H1", 12, -1, 0],
+            "right-col": ["A12", "H12", 12, 1, 0],
+            "top-row": ["A1", "A12", 8, 0, -1],
+            "bottom-row": ["H1", "H12", 8, 0, 1],
+            "A1": ["A1", "A1", 12, -1, 0],
+            "H12": ["H12", "H12", 12, 1, 0],
+        }
+        back_left_nozzle = partial_tip_dict[args.partial_tip_config][0]
+        front_right_nozzle = partial_tip_dict[args.partial_tip_config][1]
+        PIPETTE_CHANNELS = partial_tip_dict[args.partial_tip_config][2]
+        x_direction = partial_tip_dict[args.partial_tip_config][3]
+        y_direction = partial_tip_dict[args.partial_tip_config][4]
+    await hw_api.update_nozzle_configuration_for_mount(mount, starting_nozzle=back_left_nozzle,
+                                                       back_left_nozzle=back_left_nozzle,
+                                                       front_right_nozzle=front_right_nozzle)
     plunger_pos = get_plunger_positions_ot3(hw_api, mount)
     print(plunger_pos)
     home_position = await hw_api.current_position_ot3(mount)
@@ -296,8 +313,8 @@ async def _main() -> None:
             # Iterate each nozzle onto the dial indicator to measure the flatness
             for nozzle_count in range(1, PIPETTE_CHANNELS + 1):
                 cp = CriticalPoint.NOZZLE
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
-                                        nozzle_loc[Axis.Y] + y_offset,
+                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset * x_direction,
+                                        nozzle_loc[Axis.Y] + y_offset * y_direction,
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
                 await asyncio.sleep(2)
@@ -377,8 +394,8 @@ async def _main() -> None:
                     tip_measurement = gauge.read()
                     print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
                     print("\r", end="")
-                    tip_position = Point(dial_loc[0] + x_offset,
-                                            dial_loc[1] + y_offset,
+                    tip_position = Point(dial_loc[0] + x_offset * x_direction,
+                                            dial_loc[1] + y_offset * y_direction,
                                             dial_loc[2])
                     measurements.append(tip_measurement)
                     if tip_count % NOZZLE_COLUMNS == 0:
@@ -433,6 +450,14 @@ if __name__ == "__main__":
         "D2",
         "D3",
     ]
+    partial_tip_configs = [
+        "left-col",
+        "right-col"
+        "top-row",
+        "bottom-row",
+        "A1",
+        "H12",
+    ]
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--trough", action="store_true")
@@ -444,6 +469,7 @@ if __name__ == "__main__":
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="D1")
     parser.add_argument("--dial_indicator", action="store_true")
     parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
+    parser.add_argument("--partial_tip_config", type=str, choices=partial_tip_configs)
     args = parser.parse_args()
     path = '/data/testing_data/'
     cal_fn = 'calibrations.json'
