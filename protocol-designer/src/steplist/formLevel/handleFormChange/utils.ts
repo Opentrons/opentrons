@@ -12,7 +12,7 @@ import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import type {
   BlowoutProperties,
   ByTipTypeSetting,
-  Coordinates,
+  Vector3D,
   DelayProperties,
   LabwareDefinition2,
   LiquidHandlingPropertyByVolume,
@@ -276,7 +276,7 @@ type SubmergeRetractAspirateDispensePrefix =
   | 'dispense_retract'
 
 const getOffsetFields = (
-  offset: Coordinates,
+  offset: Vector3D,
   prefix: string
 ): Record<string, number> => {
   return {

@@ -41,7 +41,7 @@ import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
 import type { TFunction } from 'i18next'
-import type { LoadedPipette, Coordinates } from '@opentrons/shared-data'
+import type { LoadedPipette, Vector3D } from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
 import type {
   LPCWizardState,
@@ -171,7 +171,7 @@ interface CheckLabwareContentProps extends CheckLabwareProps {
   handleGoBack: () => void
   handleResetJog: () => void
   setJoggedPosition: (vector: VectorOffset) => void
-  liveOffset: Coordinates
+  liveOffset: Vector3D
   isLwTiprack: boolean
 }
 
