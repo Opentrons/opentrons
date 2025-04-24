@@ -13,7 +13,12 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, LoadedPipette
+from opentrons.protocol_engine import (
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    LoadedPipette,
+)
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors.exceptions import (
@@ -313,11 +318,13 @@ def test_current_liquid_volume(
 
 
 @pytest.mark.parametrize("operation_volume", [0.0, 100, -100, 2, -4, 5])
+@pytest.mark.parametrize("mount", [Mount.LEFT, "left"])
 def test_estimate_liquid_height_after_pipetting(
     decoy: Decoy,
     subject: WellCore,
     mock_engine_client: EngineClient,
     operation_volume: float,
+    mount: Mount | str,
 ) -> None:
     """Make sure estimate_liquid_height_after_pipetting returns the correct value and does not raise an error."""
     fake_well_geometry = InnerWellGeometry(
@@ -361,13 +368,19 @@ def test_estimate_liquid_height_after_pipetting(
             volume=operation_volume,
         )
     ).then_return(fake_final_height)
-    decoy.when(mock_engine_client.state.pipettes.get_by_mount(MountType.LEFT)).then_return(
-        LoadedPipette(id="pipette-id", pipetteName=PipetteNameType.P300_SINGLE, mount=MountType.LEFT)
+    decoy.when(
+        mock_engine_client.state.pipettes.get_by_mount(MountType.LEFT)
+    ).then_return(
+        LoadedPipette(
+            id="pipette-id",
+            pipetteName=PipetteNameType.P300_SINGLE,
+            mount=MountType.LEFT,
+        )
     )
 
     # make sure that no error was raised
     final_height = subject.estimate_liquid_height_after_pipetting(
-        operation_volume=operation_volume, mount=Mount.LEFT
+        operation_volume=operation_volume, mount=mount
     )
     assert final_height == fake_final_height
 

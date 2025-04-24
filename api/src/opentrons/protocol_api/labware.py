@@ -349,7 +349,7 @@ class Well:
     @requires_version(2, 21)
     def estimate_liquid_height_after_pipetting(
         self,
-        mount: Mount,
+        mount: Mount | str,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Check the height of the liquid within a well.

@@ -1911,7 +1911,9 @@ class GeometryView:
 
         if volume:
             if pipette_id is None:
-                raise ValueError("cannot get liquid handling offset without pipette id.")
+                raise ValueError(
+                    "cannot get liquid handling offset without pipette id."
+                )
             liquid_height_after = self.get_well_height_after_liquid_handling(
                 labware_id=labware_id,
                 well_name=well_name,

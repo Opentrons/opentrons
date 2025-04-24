@@ -129,7 +129,7 @@ class LegacyWellCore(AbstractWellCore):
 
     def estimate_liquid_height_after_pipetting(
         self,
-        mount: Mount,
+        mount: Mount | str,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Estimate what the liquid height will be after pipetting, without raising an error."""

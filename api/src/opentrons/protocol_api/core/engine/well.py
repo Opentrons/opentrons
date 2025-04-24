@@ -182,13 +182,16 @@ class WellCore(AbstractWellCore):
 
     def estimate_liquid_height_after_pipetting(
         self,
-        mount: Mount,
+        mount: Mount | str,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Return an estimate of liquid height after pipetting without raising an error."""
         labware_id = self.labware_id
         well_name = self._name
-        mount_type = MountType.from_hw_mount(mount)
+        if isinstance(mount, Mount):
+            mount_type = MountType.from_hw_mount(mount)
+        else:
+            mount_type = MountType(mount)
         pipette_from_mount = self._engine_client.state.pipettes.get_by_mount(mount_type)
         if pipette_from_mount is None:
             raise PipetteNotAttachedError(f"No pipette present on mount {mount}")

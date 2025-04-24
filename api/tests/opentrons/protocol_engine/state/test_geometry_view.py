@@ -4208,7 +4208,6 @@ def test_virtual_get_well_height_after_liquid_handling_no_error(
         well_plate_def
     )
 
-
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         _TEST_INNER_WELL_GEOMETRY
     )
