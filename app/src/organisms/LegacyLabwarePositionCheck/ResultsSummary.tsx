@@ -52,7 +52,7 @@ import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type { TFunction } from 'i18next'
 
 const LPC_HELP_LINK_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 
 interface ResultsSummaryProps extends ResultsSummaryStep {
   protocolData: CompletedProtocolAnalysis

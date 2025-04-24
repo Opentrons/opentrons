@@ -51,7 +51,7 @@ import type { Jog } from '/app/molecules/JogControls'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
 
 interface JogToWellProps {
   handleConfirmPositionAndApply: () => void

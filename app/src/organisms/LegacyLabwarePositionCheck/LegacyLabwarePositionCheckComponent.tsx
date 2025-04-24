@@ -193,17 +193,14 @@ export const LegacyLabwarePositionCheckComponent = (
     { workingOffsets: [], tipPickUpOffset: null }
   )
 
-  const allWorkingOffsets = useMemo(() => {
+  const allAppliedOffsets = useMemo(() => {
     return workingOffsets.reduce<LegacyLabwareOffsetCreateData[]>(
-      (acc, { initialPosition, finalPosition, labwareId, location }) => {
+      (acc, { labwareId, location }) => {
         const definitionUri =
           protocolData?.labware.find(l => l.id === labwareId)?.definitionUri ??
           null
-        if (
-          finalPosition == null ||
-          initialPosition == null ||
-          definitionUri == null
-        ) {
+
+        if (definitionUri == null) {
           return acc
         }
 
@@ -213,11 +210,7 @@ export const LegacyLabwarePositionCheckComponent = (
             definitionUri,
             location
           )?.vector ?? IDENTITY_VECTOR
-        const vector = getVectorSum(
-          existingOffset,
-          getVectorDifference(finalPosition, initialPosition)
-        )
-        return [...acc, { definitionUri, location, vector }]
+        return [...acc, { definitionUri, location, vector: existingOffset }]
       },
       []
     )
@@ -469,7 +462,7 @@ export const LegacyLabwarePositionCheckComponent = (
       <ResultsSummary
         {...currentStep}
         protocolData={protocolData}
-        allAppliedOffsets={allWorkingOffsets}
+        allAppliedOffsets={allAppliedOffsets}
         onCloseClick={onCloseClick}
         {...{
           workingOffsets,

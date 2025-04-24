@@ -17,6 +17,7 @@ import {
   StyledText,
   ToggleGroup,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   getSavedStepForms,
   getUnsavedForm,
@@ -51,10 +52,9 @@ import { DraggableSidebar } from './DraggableSidebar'
 import { TimelineEditHardware } from './TimelineEditHardware'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DeckSlot } from '../../../types'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
-const STEP_SUMMARY_HEIGHT = '14.7rem'
+const STEP_SUMMARY_HEIGHT = '18.2rem'
 
 interface ProtocolStepsProps {
   isZoomedIn: boolean
@@ -80,6 +80,8 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
+  const isOffDeck = deckView === rightString
+
   // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
 
@@ -148,10 +150,12 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing24}
             width={
-              isZoomedIn ||
+              (isZoomedIn && !isOffDeck) ||
               (selectedTerminalItemId === HARDWARE_ID &&
                 robotType === OT2_ROBOT_TYPE)
                 ? '90%'
+                : isZoomedIn && isOffDeck
+                ? '100%'
                 : CONTENT_MAX_WIDTH
             }
             justifyContent={JUSTIFY_CENTER}
@@ -200,7 +204,7 @@ export function ProtocolSteps(props: ProtocolStepsProps): JSX.Element {
                   robotType={robotType}
                 />
               ) : (
-                <OffDeck />
+                <OffDeck setOverflowMenu={showLiquidOverflowMenu} />
               )}
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                 <>

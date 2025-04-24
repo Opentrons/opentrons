@@ -48,6 +48,7 @@ export function useActionButtonProperties({
   runStatus,
   robotName,
   runId,
+  currentRunId,
   confirmAttachment,
   confirmMissingSteps,
   robotAnalyticsData,

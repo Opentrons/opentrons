@@ -19,7 +19,12 @@ import {
   goBackEditOffsetSubstep,
   applyWorkingOffsets,
   selectIsAnyOffsetHardCoded,
+  selectSnackbarStatus,
 } from '/app/redux/protocol-runs'
+import {
+  useLPCToasts,
+  useLPCSnackbars,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -84,10 +89,12 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectStepInfo: vi.fn(),
   goBackEditOffsetSubstep: vi.fn(),
   applyWorkingOffsets: vi.fn(),
+  selectSnackbarStatus: vi.fn(),
 }))
 vi.mock('/app/redux/config', () => ({
   getIsOnDevice: vi.fn(),
 }))
+vi.mock('/app/organisms/LabwarePositionCheck/hooks')
 
 const render = (props: ComponentProps<typeof LPCLabwareDetails>) => {
   const mockState = {
@@ -110,9 +117,13 @@ describe('LPCLabwareDetails', () => {
   let props: ComponentProps<typeof LPCLabwareDetails>
   let mockDispatch: Mock
   let mockSaveWorkingOffsets: Mock
+  let mockMakeSnackbar: Mock
+  let mockMakeSuccessToast: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn()
+    mockMakeSnackbar = vi.fn()
+    mockMakeSuccessToast = vi.fn()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     mockSaveWorkingOffsets = vi.fn(() => Promise.resolve('mock-data'))
 
@@ -150,6 +161,13 @@ describe('LPCLabwareDetails', () => {
     vi.mocked(applyWorkingOffsets).mockReturnValue({
       type: 'APPLY_WORKING_OFFSETS',
     } as any)
+    vi.mocked(selectSnackbarStatus).mockImplementation(() => () => null)
+    vi.mocked(useLPCSnackbars).mockReturnValue({
+      makeSuccessSnackbar: mockMakeSnackbar,
+    } as any)
+    vi.mocked(useLPCToasts).mockReturnValue({
+      makeSuccessToast: mockMakeSuccessToast,
+    })
   })
 
   it('passes correct header props to LPCContentContainer', () => {
@@ -184,5 +202,31 @@ describe('LPCLabwareDetails', () => {
     expect(mockDispatch).toHaveBeenCalledTimes(2)
     expect(applyWorkingOffsets).toHaveBeenCalledWith(props.runId, 'mock-data')
     expect(goBackEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
+    expect(mockMakeSuccessToast).not.toHaveBeenCalled()
+  })
+
+  it('make a success toast if on an odd on save click', async () => {
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+
+    render(props)
+
+    const primaryButton = screen.getByTestId('primary-button')
+    primaryButton.click()
+
+    await act(async () => {
+      await expect(mockSaveWorkingOffsets).toHaveBeenCalled()
+    })
+
+    expect(mockMakeSuccessToast).toHaveBeenCalled()
+  })
+
+  it('calls make success snackbar if the snackbar status is not null', () => {
+    vi.mocked(selectSnackbarStatus).mockImplementation(() => () =>
+      'locationSpecificAdjusted'
+    )
+
+    render(props)
+
+    expect(mockMakeSnackbar).toHaveBeenCalled()
   })
 })
