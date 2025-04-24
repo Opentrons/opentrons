@@ -5,7 +5,7 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.api_support.util import APIVersionError
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 
 from opentrons.protocol_engine.types.liquid_level_detection import (
     SimulatedProbeResult,
@@ -129,6 +129,7 @@ class LegacyWellCore(AbstractWellCore):
 
     def estimate_liquid_height_after_pipetting(
         self,
+        mount: Mount,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Estimate what the liquid height will be after pipetting, without raising an error."""

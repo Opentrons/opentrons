@@ -39,6 +39,7 @@ from opentrons.types import (
     Point,
     NozzleMapInterface,
     MeniscusTrackingTarget,
+    Mount,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -348,6 +349,7 @@ class Well:
     @requires_version(2, 21)
     def estimate_liquid_height_after_pipetting(
         self,
+        mount: Mount,
         operation_volume: float,
     ) -> LiquidTrackingType:
         """Check the height of the liquid within a well.
@@ -360,7 +362,7 @@ class Well:
         """
 
         projected_final_height = self._core.estimate_liquid_height_after_pipetting(
-            operation_volume=operation_volume,
+            operation_volume=operation_volume, mount=mount
         )
         return projected_final_height
 

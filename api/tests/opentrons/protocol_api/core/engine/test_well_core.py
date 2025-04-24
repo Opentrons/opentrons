@@ -10,9 +10,10 @@ from opentrons_shared_data.labware.labware_definition import (
     RectangularWellDefinition2,
     CircularWellDefinition2,
 )
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, LoadedPipette
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors.exceptions import (
@@ -21,7 +22,7 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import UnsupportedAPIError
-from opentrons.types import Point
+from opentrons.types import Point, Mount, MountType
 from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     ConicalFrustum,
@@ -355,14 +356,18 @@ def test_estimate_liquid_height_after_pipetting(
         mock_engine_client.state.geometry.get_well_height_after_liquid_handling_no_error(
             labware_id="labware-id",
             well_name="well-name",
+            pipette_id="pipette-id",
             initial_height=initial_liquid_height,
             volume=operation_volume,
         )
     ).then_return(fake_final_height)
+    decoy.when(mock_engine_client.state.pipettes.get_by_mount(MountType.LEFT)).then_return(
+        LoadedPipette(id="pipette-id", pipetteName=PipetteNameType.P300_SINGLE, mount=MountType.LEFT)
+    )
 
     # make sure that no error was raised
     final_height = subject.estimate_liquid_height_after_pipetting(
-        operation_volume=operation_volume,
+        operation_volume=operation_volume, mount=Mount.LEFT
     )
     assert final_height == fake_final_height
 
