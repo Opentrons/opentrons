@@ -40,6 +40,11 @@ class AbstractThermocyclerDriver(ABC):
         ...
 
     @abstractmethod
+    async def check_lid_status_for_real_this_time(self) -> ThermocyclerLidStatus:
+        """Send a get lid limit switch status command."""
+        ...
+
+    @abstractmethod
     async def set_lid_temperature(self, temp: float) -> None:
         """Set the lid temperature"""
         ...
@@ -97,3 +102,5 @@ class AbstractThermocyclerDriver(ABC):
     async def jog_lid(self, angle: float) -> None:
         """Send the Jog Lid command."""
         ...
+    
+
