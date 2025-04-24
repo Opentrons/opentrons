@@ -160,7 +160,6 @@ export function FirstStepMixTools({
           ) : null}
         </>
       ) : null}
-      <Divider marginY="0" />
       {userSelectedDropTipLocation && enableReturnTip ? (
         <>
           <Divider marginY="0" />
