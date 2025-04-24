@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  TYPOGRAPHY,
   LegacyStyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 

@@ -1,26 +1,22 @@
 import type { Agent } from 'http'
-
 import type {
-  HealthResponse,
-  ServerHealthResponse,
-  HealthErrorResponse,
-  HealthPollerResult,
-  DiscoveryClientRobot,
-} from '../types'
-
-import type { MdnsBrowserService } from '../mdns-browser'
-
-import type {
-  HEALTH_STATUS_UNREACHABLE,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_OK,
+  HEALTH_STATUS_UNREACHABLE,
 } from '../constants'
-
+import type { MdnsBrowserService } from '../mdns-browser'
 import type {
-  INITIALIZE_STATE,
-  SERVICE_FOUND,
+  DiscoveryClientRobot,
+  HealthErrorResponse,
+  HealthPollerResult,
+  HealthResponse,
+  ServerHealthResponse,
+} from '../types'
+import type {
   HEALTH_POLLED,
+  INITIALIZE_STATE,
   REMOVE_ROBOT,
+  SERVICE_FOUND,
 } from './actions'
 
 /**

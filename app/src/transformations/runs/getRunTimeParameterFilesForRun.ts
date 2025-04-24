@@ -1,5 +1,5 @@
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunTimeParameterFilesCreateData } from '@opentrons/api-client'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 /**
  * prepares object to send to endpoints requiring RunTimeParameterFilesCreateData

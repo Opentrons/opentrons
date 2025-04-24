@@ -1,11 +1,13 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { COLORS } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 
 import type { ComponentProps } from 'react'
-import { COLORS } from '@opentrons/components'
 import type { ChipType } from '@opentrons/components'
 
 const render = (props: ComponentProps<typeof HeaterShakerModuleData>) => {

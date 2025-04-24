@@ -1,6 +1,5 @@
-import { useTranslation } from 'react-i18next'
-import { uuid } from '@opentrons/step-generation'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Btn,
@@ -23,13 +22,15 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
+import { uuid } from '@opentrons/step-generation'
+
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { BasicsButtons } from '../../components/molecules'
+import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { WizardBody } from './WizardBody'
+
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { Fixtures } from '../../components/organisms'
-
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {

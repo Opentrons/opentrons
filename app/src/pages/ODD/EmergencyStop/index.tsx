@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,16 +8,15 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
+import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
 import { MediumButton } from '/app/atoms/buttons'
 import { StepMeter } from '/app/atoms/StepMeter'
-
-import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
 
 const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 

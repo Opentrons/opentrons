@@ -1,5 +1,6 @@
 import { I18nextProvider } from 'react-i18next'
 import { COLORS, Flex, SPACING } from '@opentrons/components'
+
 import { i18n } from '../../i18n'
 import { Accordion } from './index'
 

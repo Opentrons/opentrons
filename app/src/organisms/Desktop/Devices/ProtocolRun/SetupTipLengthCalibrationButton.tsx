@@ -1,17 +1,16 @@
 import { useTranslation } from 'react-i18next'
-
 import {
-  Box,
-  Flex,
-  Link,
-  LegacyTooltip,
-  useHoverTooltip,
   ALIGN_CENTER,
+  Box,
+  COLORS,
+  Flex,
+  LegacyTooltip,
+  Link,
   SIZE_4,
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
-  COLORS,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -20,11 +19,12 @@ import {
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useAttachedPipettes } from '/app/resources/instruments'
-import { useRunHasStarted } from '/app/resources/runs'
-import { useDeckCalibrationData } from '../hooks'
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useRunHasStarted } from '/app/resources/runs'
+
+import { useDeckCalibrationData } from '../hooks'
 
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

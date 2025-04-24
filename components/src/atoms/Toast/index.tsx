@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { css } from 'styled-components'
 
-import { Btn, Flex, Link } from '../../primitives'
-import { Icon } from '../../icons'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { truncateString } from '../../utils'
+import { Icon } from '../../icons'
+import { Btn, Flex, Link } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -13,14 +11,17 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   NO_WRAP,
 } from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { truncateString } from '../../utils'
 import { LegacyStyledText } from '../StyledText'
+
 import type {
   DefaultTheme,
   FlattenSimpleInterpolation,
   ThemedCssFunction,
 } from 'styled-components'
-import type { StyleProps } from '../../primitives'
 import type { IconName, IconProps } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 export const SUCCESS_TOAST: 'success' = 'success'
 export const WARNING_TOAST: 'warning' = 'warning'

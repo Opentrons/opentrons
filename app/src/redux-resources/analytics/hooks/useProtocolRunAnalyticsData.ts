@@ -4,13 +4,12 @@ import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useProtocolMetadata } from '/app/resources/protocols'
 import { useProtocolDetailsForRun, useRunTimestamps } from '/app/resources/runs'
+import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
-
-import type { State } from '/app/redux/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
+import type { State } from '/app/redux/types'
 
 type GetProtocolRunAnalyticsData = () => Promise<{
   protocolRunAnalyticsData: ProtocolAnalyticsData

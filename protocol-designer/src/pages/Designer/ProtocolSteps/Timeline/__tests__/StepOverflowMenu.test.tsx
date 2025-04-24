@@ -1,13 +1,12 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
-import {
-  getMultiSelectItemIds,
-  actions as stepsActions,
-} from '../../../../../ui/steps'
 import { analyticsEvent } from '../../../../../analytics/actions'
+import { i18n } from '../../../../../assets/localization'
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
@@ -15,6 +14,10 @@ import {
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../../step-forms/selectors'
+import {
+  getMultiSelectItemIds,
+  actions as stepsActions,
+} from '../../../../../ui/steps'
 import {
   hoverOnStep,
   toggleViewSubstep,

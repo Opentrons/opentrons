@@ -1,7 +1,8 @@
-import { useUpdateClientData } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
+import { useUpdateClientData } from '@opentrons/react-api-client'
 
 import { getUserId } from '/app/redux/config'
+
 import { KEYS } from '../constants'
 
 import type {

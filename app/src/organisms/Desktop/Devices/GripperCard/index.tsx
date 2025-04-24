@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -8,12 +8,14 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getGripperDisplayName } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
+import { getGripperDisplayName } from '@opentrons/shared-data'
+
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { AboutGripperSlideout } from './AboutGripperSlideout'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
+
+import { AboutGripperSlideout } from './AboutGripperSlideout'
 
 import type { MouseEventHandler } from 'react'
 import type { BadGripper, GripperData } from '@opentrons/api-client'

@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
-import { SPACING, COLORS } from '@opentrons/components'
-import { Line } from '../index'
+import { COLORS, SPACING } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+
+import { Line } from '../index'
 
 import type { ComponentProps } from 'react'
 

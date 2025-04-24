@@ -7,12 +7,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { OddModal } from '/app/molecules/OddModal'
+
 import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {

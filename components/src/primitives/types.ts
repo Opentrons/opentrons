@@ -1,6 +1,6 @@
 // known style types
+import type { CSSProperties, StyledComponent } from 'styled-components'
 import type { ComponentType } from 'react'
-import type { StyledComponent, CSSProperties } from 'styled-components'
 
 export interface ColorProps {
   color?: string

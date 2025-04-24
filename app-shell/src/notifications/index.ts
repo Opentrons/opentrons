@@ -1,15 +1,15 @@
-import { connectionStore } from './store'
 import {
-  establishConnections,
   cleanUpUnreachableRobots,
-  getHealthyRobotDataForNotifyConnections,
   closeConnectionsForcefullyFor,
+  establishConnections,
+  getHealthyRobotDataForNotifyConnections,
 } from './connect'
-import { subscribe } from './subscribe'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
+import { subscribe } from './subscribe'
 
-import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 import type { BrowserWindow } from 'electron'
+import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 import type { Action, Dispatch } from '../types'
 import type { RobotData } from './connect'
 

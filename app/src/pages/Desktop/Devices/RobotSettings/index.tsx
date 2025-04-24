@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams, Navigate } from 'react-router-dom'
-
+import { useSelector } from 'react-redux'
+import { Navigate, useParams } from 'react-router-dom'
 import {
   Banner,
   BORDERS,
@@ -9,31 +9,30 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   SIZE_6,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { useSelector } from 'react-redux'
 
-import {
-  CONNECTABLE,
-  UNREACHABLE,
-  REACHABLE,
-  OPENTRONS_USB,
-} from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
-import { getRobotUpdateSession } from '/app/redux/robot-update'
-import { getDevtoolsEnabled } from '/app/redux/config'
-import { useRobot } from '/app/redux-resources/robots'
 import { Line } from '/app/atoms/structure'
 import { NavTab } from '/app/molecules/NavTab'
-import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
-import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
-import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
+import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
+import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
+import { useRobot } from '/app/redux-resources/robots'
+import { getDevtoolsEnabled } from '/app/redux/config'
+import {
+  CONNECTABLE,
+  OPENTRONS_USB,
+  REACHABLE,
+  UNREACHABLE,
+} from '/app/redux/discovery'
+import { getRobotUpdateSession } from '/app/redux/robot-update'
+import { appShellRequestor } from '/app/redux/shell/remote'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 

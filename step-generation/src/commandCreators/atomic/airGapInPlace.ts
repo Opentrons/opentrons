@@ -1,5 +1,6 @@
-import { uuid } from '../../utils'
 import { pipetteDoesNotExist } from '../../errorCreators'
+import { uuid } from '../../utils'
+
 import type { AirGapInPlaceParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 

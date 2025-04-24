@@ -6,12 +6,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FLEX_MAX_CONTENT,
+  LegacyStyledText,
   Link,
+  Modal,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'

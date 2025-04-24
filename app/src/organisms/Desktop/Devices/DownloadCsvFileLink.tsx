@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   Flex,
@@ -10,6 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCsvFileRawQuery } from '@opentrons/react-api-client'
+
 import { downloadFile } from './utils'
 
 interface DownloadCsvFileLinkProps {

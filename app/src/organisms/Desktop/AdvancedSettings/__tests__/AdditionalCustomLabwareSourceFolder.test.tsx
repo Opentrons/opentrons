@@ -1,14 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getCustomLabwareDirectory } from '/app/redux/custom-labware'
 import {
-  useTrackEvent,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+  useTrackEvent,
 } from '/app/redux/analytics'
+import { getCustomLabwareDirectory } from '/app/redux/custom-labware'
 
 import { AdditionalCustomLabwareSourceFolder } from '../AdditionalCustomLabwareSourceFolder'
-import { renderWithProviders } from '/app/__testing-utils__'
 
 vi.mock('/app/redux/custom-labware')
 vi.mock('/app/redux/analytics')

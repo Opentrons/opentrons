@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  Link,
-  SPACING,
-  Modal,
   LegacyStyledText,
+  Link,
+  Modal,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

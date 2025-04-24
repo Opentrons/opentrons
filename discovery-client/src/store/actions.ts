@@ -1,6 +1,5 @@
-import type { HealthPollerResult } from '../types'
 import type { MdnsBrowserService } from '../mdns-browser'
-
+import type { HealthPollerResult } from '../types'
 import type * as Types from './types'
 
 export const SERVICE_FOUND: 'mdns:SERVICE_FOUND' = 'mdns:SERVICE_FOUND'

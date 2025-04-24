@@ -1,3 +1,6 @@
+import { verifyImportProtocolPage } from '../support/Import'
+import { StepBuilder } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
 import {
   ThermocyclerEditor,
   ThermoProfile,
@@ -5,9 +8,6 @@ import {
   ThermoState,
   ThermoVerifications,
 } from '../support/Thermocycler'
-import { TestFilePath, getTestFile } from '../support/TestFiles'
-import { verifyImportProtocolPage } from '../support/Import'
-import { StepBuilder } from '../support/StepBuilder'
 import { TimelineSteps } from '../support/Timeline'
 
 describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {

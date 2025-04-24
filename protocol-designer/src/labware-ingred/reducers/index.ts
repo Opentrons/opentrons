@@ -1,47 +1,49 @@
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
-import mapValues from 'lodash/mapValues'
-import pickBy from 'lodash/pickBy'
+
 import { getPDMetadata } from '../../file-types'
+
 import type { Reducer } from 'redux'
 import type {
-  SingleLabwareLiquidState,
-  LocationLiquidState,
   LabwareLiquidState,
   LiquidEntities,
   LiquidEntity,
+  LocationLiquidState,
+  SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
+import type { LoadFileAction } from '../../load-file'
 import type { Action, DeckSlot } from '../../types'
 import type {
-  DisplayLabware,
-  ZoomedIntoSlotInfoState,
-  GenerateNewProtocolState,
-} from '../types'
-import type { LoadFileAction } from '../../load-file'
-import type {
-  RemoveWellsContentsAction,
-  CreateContainerAction,
-  DeleteLiquidGroupAction,
-  DuplicateLabwareAction,
-  EditLiquidGroupAction,
-  SelectLiquidAction,
-  SetWellContentsAction,
-  RenameLabwareAction,
-  DeleteContainerAction,
-  OpenAddLabwareModalAction,
-  OpenIngredientSelectorAction,
   CloseIngredientSelectorAction,
+  CreateContainerAction,
+  DeleteContainerAction,
+  DeleteLiquidGroupAction,
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
-  SelectLabwareAction,
-  SelectNestedLabwareAction,
-  SelectModuleAction,
-  SelectFixtureAction,
-  ZoomedIntoSlotAction,
-  GenerateNewProtocolAction,
+  DuplicateLabwareAction,
+  EditLiquidGroupAction,
   EditMultipleLiquidGroupsAction,
+  GenerateNewProtocolAction,
+  OpenAddLabwareModalAction,
+  OpenIngredientSelectorAction,
+  RemoveWellsContentsAction,
+  RenameLabwareAction,
+  SelectFixtureAction,
+  SelectLabwareAction,
+  SelectLiquidAction,
+  SelectModuleAction,
+  SelectNestedLabwareAction,
+  SetWellContentsAction,
+  ZoomedIntoSlotAction,
 } from '../actions'
+import type {
+  DisplayLabware,
+  GenerateNewProtocolState,
+  ZoomedIntoSlotInfoState,
+} from '../types'
 
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot

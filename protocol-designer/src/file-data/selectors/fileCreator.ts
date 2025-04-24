@@ -1,14 +1,14 @@
-import { createSelector } from 'reselect'
 import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
+import { createSelector } from 'reselect'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STANDARD_DECKID,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
-  FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
 import {
   pythonCustomLabwareDict,
@@ -17,15 +17,16 @@ import {
   pythonMetadata,
   pythonRequirements,
 } from '@opentrons/step-generation'
+
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getStepGroups } from '../../step-forms/selectors'
-import { getFileMetadata, getRobotType } from './fileFields'
+import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
+import { getFileMetadata, getRobotType } from './fileFields'
 import {
   getLabwareLoadInfo,
   getLoadCommands,
@@ -33,13 +34,6 @@ import {
   getPipettesLoadInfo,
 } from './utils'
 
-import type { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
-import type {
-  PipetteEntity,
-  LabwareEntities,
-  PipetteEntities,
-  Ingredients,
-} from '@opentrons/step-generation'
 import type {
   CommandAnnotationV1Mixin,
   CommandV10Mixin,
@@ -51,13 +45,20 @@ import type {
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { Selector } from '../../types'
+import type { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
+import type {
+  Ingredients,
+  LabwareEntities,
+  PipetteEntities,
+  PipetteEntity,
+} from '@opentrons/step-generation'
 import type {
   PDMetadata,
   PDPythonFile,
   PythonDesignerApplication,
 } from '../../file-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { Selector } from '../../types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')

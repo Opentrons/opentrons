@@ -1,9 +1,9 @@
 // create logger function
-import { app } from 'electron'
-import { inspect } from 'util'
-import fse from 'fs-extra'
 import path from 'path'
+import { inspect } from 'util'
 import dateFormat from 'dateformat'
+import { app } from 'electron'
+import fse from 'fs-extra'
 import winston from 'winston'
 
 import { getConfig } from './config'

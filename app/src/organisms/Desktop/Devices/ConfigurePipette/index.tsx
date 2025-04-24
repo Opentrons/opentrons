@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { Box } from '@opentrons/components'
 
-import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
+import { ConfigForm } from './ConfigForm'
+
 import type {
   PipetteSettingsFieldsMap,
   UpdatePipetteSettingsData,

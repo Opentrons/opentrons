@@ -103,7 +103,7 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=1.0,
+            run_current=1.2,
             hold_current=0.75,
             move_params=MoveParams(
                 max_speed=200.0,
@@ -115,7 +115,7 @@ STACKER_MOTION_CONFIG = {
     StackerAxis.Z: {
         "home": AxisParams(
             run_current=1.5,
-            hold_current=1.8,
+            hold_current=1.5,
             move_params=MoveParams(
                 max_speed=10.0,
                 acceleration=100.0,
@@ -124,7 +124,7 @@ STACKER_MOTION_CONFIG = {
         ),
         "move": AxisParams(
             run_current=1.5,
-            hold_current=0.5,
+            hold_current=1.5,
             move_params=MoveParams(
                 max_speed=150.0,
                 acceleration=500.0,

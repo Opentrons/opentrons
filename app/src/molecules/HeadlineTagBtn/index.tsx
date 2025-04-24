@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
@@ -12,6 +11,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { SmallButton } from '/app/atoms/buttons'
 
 export interface HeadlineTagBtnProps {

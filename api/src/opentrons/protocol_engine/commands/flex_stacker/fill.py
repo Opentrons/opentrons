@@ -21,7 +21,6 @@ from ...types import (
     InStackerHopperLocation,
 )
 from .common import (
-    INITIAL_COUNT_DESCRIPTION,
     INITIAL_STORED_LABWARE_DESCRIPTION,
     build_ids_to_fill,
     build_or_assign_labware_to_hopper,
@@ -62,7 +61,15 @@ class FillParams(BaseModel):
     )
 
     count: Optional[Annotated[int, Field(ge=1)]] = Field(
-        None, description=INITIAL_COUNT_DESCRIPTION
+        None,
+        description=(
+            "How full the labware pool should now be. If None, default to the maximum amount "
+            "of the currently-configured labware the pool can hold. "
+            "If this number is larger than the maximum the pool can hold, it will be clamped to "
+            "the maximum. If this number is smaller than the current amount of labware the pool "
+            "holds, it will be clamped to that minimum. Do not use the value in the parameters as "
+            "an outside observer; instead, use the count value from the results."
+        ),
     )
     labwareToStore: list[StackerStoredLabwareGroup] | None = Field(
         None, description=INITIAL_STORED_LABWARE_DESCRIPTION

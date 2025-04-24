@@ -14,6 +14,7 @@ import {
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 

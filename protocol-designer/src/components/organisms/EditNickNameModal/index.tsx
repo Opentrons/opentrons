@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -14,10 +14,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { getMainPagePortalEl } from '../Portal'
+
 import { renameLabware } from '../../../labware-ingred/actions'
+import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { HandleEnter } from '../../atoms'
+import { getMainPagePortalEl } from '../Portal'
+
 import type { ThunkDispatch } from '../../../types'
 
 const MAX_NICK_NAME_LENGTH = 115

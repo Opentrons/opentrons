@@ -1,35 +1,36 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
 import dns from 'dns'
-import fse from 'fs-extra'
 import path from 'path'
-import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
-import { createLogger } from './log'
-import { registerDiscovery } from './discovery'
-import { registerUpdateBrightness } from './system'
-import { registerRobotSystemUpdate } from './system-update'
-import { registerAppRestart } from './restart'
+import { app, ipcMain } from 'electron'
+import fse from 'fs-extra'
+
 import {
   getConfig,
-  getStore,
   getOverrides,
+  getStore,
   registerConfig,
   resetStore,
 } from './config'
-import systemd from './systemd'
-import { registerDataFiles, watchForMassStorage } from './usb'
-import {
-  registerNotify,
-  establishBrokerConnection,
-  closeBrokerConnection,
-} from './notifications'
+import { registerDiscovery } from './discovery'
 import { setUserDataPath } from './early'
+import { createLogger } from './log'
 import { registerResourceMonitor } from './monitor'
+import {
+  closeBrokerConnection,
+  establishBrokerConnection,
+  registerNotify,
+} from './notifications'
+import { registerAppRestart } from './restart'
+import { registerUpdateBrightness } from './system'
+import { registerRobotSystemUpdate } from './system-update'
+import systemd from './systemd'
+import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
+import { registerDataFiles, watchForMassStorage } from './usb'
 
-import type { OTLogger } from './log'
 import type { BrowserWindow } from 'electron'
-import type { Action, Dispatch, Logger } from './types'
 import type { LogEntry } from 'winston'
+import type { OTLogger } from './log'
+import type { Action, Dispatch, Logger } from './types'
 
 /**
  * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail

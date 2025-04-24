@@ -11,12 +11,11 @@ import {
 } from '@opentrons/shared-data'
 
 import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
-
 import type {
-  LabwareEntities,
-  RobotState,
   DeckSlot,
+  LabwareEntities,
   LabwareEntity,
+  RobotState,
 } from '../types'
 
 export const getIsHeaterShakerEastWestWithLatchOpen = (

@@ -1,7 +1,8 @@
 import { memo } from 'react'
+
 import { C_BLACK, C_BLUE } from '../../../styles/colors'
-import { RobotCoordsText } from '../../Deck'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
+import { RobotCoordsText } from '../../Deck'
 
 import type { MemoExoticComponent } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

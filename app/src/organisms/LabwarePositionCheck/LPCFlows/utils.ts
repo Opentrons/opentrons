@@ -1,5 +1,5 @@
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { ANY_LOCATION } from '@opentrons/api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import type {
   LabwareOffset,

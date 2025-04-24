@@ -1,12 +1,12 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { WellLocation } from './support'
 import type {
   Coordinates,
+  GantryMount,
   MotorAxes,
   MotorAxis,
-  GantryMount,
 } from '../../js/types'
+import type { WellLocation } from './support'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'

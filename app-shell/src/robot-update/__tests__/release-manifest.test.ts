@@ -1,6 +1,6 @@
 import fse from 'fs-extra'
 import tempy from 'tempy'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Http from '../../http'
 import { downloadManifest } from '../release-manifest'

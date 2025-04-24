@@ -1,43 +1,43 @@
+import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
+import type { CommandAnnotation } from '../commandAnnotation/types'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
-  HEATERSHAKER_MODULE_V1,
-  ABSORBANCE_READER_V1,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
+  EXTENSION,
+  FLEX,
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   GEN1,
   GEN2,
-  FLEX,
-  LEFT,
-  RIGHT,
   GRIPPER_V1,
   GRIPPER_V1_1,
   GRIPPER_V1_2,
   GRIPPER_V1_3,
-  EXTENSION,
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  LEFT,
+  MAGDECK,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
-  FLEX_STACKER_MODULE_V1,
-  FLEX_STACKER_MODULE_TYPE,
-  POSITION_REFERENCE_LIQUID_MENISCUS,
-  POSITION_REFERENCE_CENTER,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
   POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_LIQUID_MENISCUS,
   POSITION_REFERENCE_TOP,
+  RIGHT,
+  TEMPDECK,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
 } from './constants'
-import type { RunTimeCommand, LoadedLabwareLocation } from '../command/types'
-import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
-import type { CommandAnnotation } from '../commandAnnotation/types'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -727,13 +727,17 @@ type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {
   duration: number
 }
+export interface TipPosition {
+  positionReference: PositionReference
+  offset: Coordinates
+}
 export interface DelayProperties {
   enable: boolean
   params?: DelayParams
 }
 interface TouchTipParams {
   zOffset: number
-  mmToEdge: number
+  mmFromEdge: number
   speed: number
 }
 export interface TouchTipProperties {
@@ -758,14 +762,12 @@ export interface BlowoutProperties {
   params?: BlowoutParams
 }
 export interface Submerge {
-  positionReference: PositionReference
-  offset: Coordinates
+  startPosition: TipPosition
   speed: number
   delay: DelayProperties
 }
 interface BaseRetract {
-  positionReference: PositionReference
-  offset: Coordinates
+  endPosition: TipPosition
   speed: number
   airGapByVolume: LiquidHandlingPropertyByVolume
   touchTip: TouchTipProperties
@@ -778,24 +780,25 @@ export interface RetractDispense extends BaseRetract {
 interface BaseLiquidHandlingProperties<RetractType> {
   submerge: Submerge
   retract: RetractType
-  positionReference: PositionReference
-  offset: Coordinates
   flowRateByVolume: LiquidHandlingPropertyByVolume
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
 export interface AspirateProperties
   extends BaseLiquidHandlingProperties<RetractAspirate> {
+  aspiratePosition: TipPosition
   preWet: boolean
   mix: MixProperties
 }
 export interface SingleDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
+  dispensePosition: TipPosition
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
 export interface MultiDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
+  dispensePosition: TipPosition
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }

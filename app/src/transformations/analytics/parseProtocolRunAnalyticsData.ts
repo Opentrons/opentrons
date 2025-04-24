@@ -1,11 +1,11 @@
-import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { hash } from '/app/redux/analytics/hash'
 import { getRobotSerialNumber } from '/app/redux/discovery'
+import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '/app/redux/protocol-storage/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage/types'
 
 export const parseProtocolRunAnalyticsData = (
   protocolAnalysis: ProtocolAnalysisOutput | null,

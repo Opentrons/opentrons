@@ -1,24 +1,26 @@
-import { createSelector } from 'reselect'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
+import omitBy from 'lodash/omitBy'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
-import omitBy from 'lodash/omitBy'
+import { createSelector } from 'reselect'
+
+import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 import { getSelectedWells } from '../../well-selection/selectors'
-import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
+import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
 import { getWellContentsAllLabware } from './getWellContentsAllLabware'
-import type * as StepGeneration from '@opentrons/step-generation'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type * as StepGeneration from '@opentrons/step-generation'
 import type {
+  ContentsByWell,
   WellContents,
   WellContentsByLabware,
-  ContentsByWell,
 } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
 
