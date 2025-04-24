@@ -94,6 +94,7 @@ import type {
   ChangeBatchEditFieldAction,
   CreateModuleAction,
   CreatePipettesAction,
+  DeckConfigurationState,
   DeleteModuleAction,
   DeletePipettesAction,
   ResetBatchEditFieldChangesAction,

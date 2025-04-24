@@ -1,3 +1,4 @@
+import { beforeEach, describe,  it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
@@ -6,19 +7,10 @@ import { HardwareConfiguratorContainer } from '../HardwareConfiguratorContainer'
 import { HardwareConfigurator } from '..'
 
 import type { ComponentProps } from 'react'
-import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../HardwareConfiguratorContainer')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../step-forms/selectors')
-vi.mock('@opentrons/components', async importOriginal => {
-  const actual = await importOriginal<typeof OpentronsComponents>()
-  return {
-    ...actual,
-    DeckConfigurator: vi.fn(),
-  }
-})
-
 const render = (props: ComponentProps<typeof HardwareConfigurator>) => {
   return renderWithProviders(<HardwareConfigurator {...props} />, {
     i18nInstance: i18n,
