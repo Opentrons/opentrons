@@ -40,6 +40,7 @@ volume_test = 1000
 PIPETTE_CHANNELS = 96
 NOZZLE_COLUMNS = 12
 NOZZLE_TO_NOZZLE_MM = 9
+CYCLES = 1
 
 def dial_indicator_setup(port):
     gauge = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=port)
@@ -315,8 +316,8 @@ async def _main() -> None:
             # Iterate each nozzle onto the dial indicator to measure the flatness
             for nozzle_count in range(1, PIPETTE_CHANNELS + 1):
                 cp = CriticalPoint.NOZZLE
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset * -y_direction,
-                                        nozzle_loc[Axis.Y] + y_offset * -x_direction,
+                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset * -abs(y_direction),
+                                        nozzle_loc[Axis.Y] + y_offset * -abs(x_direction),
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
                 await asyncio.sleep(2)
@@ -388,8 +389,8 @@ async def _main() -> None:
                 print(f"=== CYCLE: {i + 1} ===\n")
                 for tip_count in range(1, PIPETTE_CHANNELS + 1):
                     cp = CriticalPoint.TIP
-                    tip_position = Point(dial_loc[0] + x_offset * -y_direction,
-                                         dial_loc[1] + y_offset * -x_direction,
+                    tip_position = Point(dial_loc[0] + x_offset * -abs(y_direction),
+                                         dial_loc[1] + y_offset * -abs(x_direction),
                                          dial_loc[2])
                     await move_to_point(hw_api, mount, tip_position, cp)
                     await asyncio.sleep(2)
@@ -447,6 +448,7 @@ async def _main() -> None:
                 # print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
                 # await hw_api.pick_up_tip(mount,
                 #                         tip_length=(tip_length[args.tip_size]-tip_overlap))
+            await hw_api.home_z(mount)
 
         except KeyboardInterrupt:
             await hw_api.disengage_axes([Axis.X, Axis.Y])
@@ -472,7 +474,7 @@ if __name__ == "__main__":
     ]
     partial_tip_configs = [
         "left-col",
-        "right-col"
+        "right-col",
         "top-row",
         "bottom-row",
         "A1",
