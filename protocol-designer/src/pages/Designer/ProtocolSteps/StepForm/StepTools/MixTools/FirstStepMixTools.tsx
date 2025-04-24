@@ -1,5 +1,11 @@
 import { useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Divider,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 
 import { InputStepFormField } from '../../../../../../components/molecules'
 import {
@@ -45,7 +51,7 @@ export function FirstStepMixTools({
   userSelectedPickUpTipLocation,
   userSelectedDropTipLocation,
 }: FirstStepMixToolsProps): JSX.Element {
-  const { t } = useTranslation(['application', 'form'])
+  const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].spec.channels === 96
@@ -109,14 +115,30 @@ export function FirstStepMixTools({
         showTooltip={false}
       />
       <Divider marginY="0" />
-      <ChangeTipField
-        {...propsForFields.changeTip}
-        aspirateWells={formData.aspirate_wells}
-        dispenseWells={formData.dispense_wells}
-        path={formData.path}
-        stepType={formData.stepType}
-        tooltipContent={null}
-      />
+      <Flex
+        paddingX={SPACING.spacing16}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+      >
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t('protocol_steps:tip_management')}
+        </StyledText>
+        <ChangeTipField
+          {...propsForFields.changeTip}
+          aspirateWells={formData.aspirate_wells}
+          dispenseWells={formData.dispense_wells}
+          path={formData.path}
+          stepType={formData.stepType}
+          isDisposalLocation={false}
+          tooltipContent={null}
+          padding="0"
+        />
+        <DropTipField
+          {...propsForFields.dropTip_location}
+          tooltipContent={null}
+          padding="0"
+        />
+      </Flex>
       {enableReturnTip ? (
         <>
           <PickUpTipField {...propsForFields.pickUpTip_location} />
@@ -137,11 +159,6 @@ export function FirstStepMixTools({
           ) : null}
         </>
       ) : null}
-      <Divider marginY="0" />
-      <DropTipField
-        {...propsForFields.dropTip_location}
-        tooltipContent={null}
-      />
       {userSelectedDropTipLocation && enableReturnTip ? (
         <>
           <Divider marginY="0" />
