@@ -48,10 +48,6 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-from logging import getLogger
-
-log = getLogger(__name__)
-
 
 StoreCommandType = Literal["flexStacker/store"]
 
@@ -148,7 +144,6 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
 
         pool_list = stacker_state.get_pool_definition_ordered_list()
         assert pool_list is not None
-        log.warning(f"lw_ids: {len(labware_ids)} pool_list: {len(pool_list)}")
         if len(labware_ids) != len(pool_list):
             raise CannotPerformModuleAction(
                 f"Cannot store labware stack that does not correspond with the configuration of Flex Stacker in {location}"
