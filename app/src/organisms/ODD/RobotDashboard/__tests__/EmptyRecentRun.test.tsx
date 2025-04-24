@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { EmptyRecentRun } from '../EmptyRecentRun'
 
 const PNG_FILE_NAME =

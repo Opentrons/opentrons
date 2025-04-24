@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-
 import {
   BORDERS,
   COLORS,
@@ -9,14 +8,14 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { getNetworkInterfaces } from '/app/redux/networking'
 import { getLocalRobot } from '/app/redux/discovery'
+import { getNetworkInterfaces } from '/app/redux/networking'
 
 import type { State } from '/app/redux/types'
 

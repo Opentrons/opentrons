@@ -1,6 +1,8 @@
 import pick from 'lodash/pick'
-import { chainPatchUpdaters, fieldHasChanged } from './utils'
+
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
+import { chainPatchUpdaters, fieldHasChanged } from './utils'
+
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 

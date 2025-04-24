@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual'
-
 import {
   getVectorDifference,
   getVectorSum,
@@ -11,12 +10,12 @@ import { RESET_TO_DEFAULT } from '../constants'
 import type { VectorOffset } from '@opentrons/api-client'
 import type {
   DefaultOffsetDetails,
-  LocationSpecificOffsetDetails,
-  WorkingOffset,
   ExistingOffset,
+  LocationSpecificOffsetDetails,
+  OffsetLocationDetails,
   WorkingDefaultOffset,
   WorkingLocationSpecificOffset,
-  OffsetLocationDetails,
+  WorkingOffset,
 } from '../types'
 
 // Returns the most recent vector offset from offset details.
@@ -125,24 +124,21 @@ export function createUpdatedWorkingLocationSpecificOffset(
       initialPosition: position,
       finalPosition: null,
     }
-  } else if (currentWorkingOffset.confirmedVector === RESET_TO_DEFAULT) {
-    return {
-      ...currentWorkingOffset,
-      finalPosition: null,
-      confirmedVector: RESET_TO_DEFAULT,
-    }
   }
   // Update final position and calculate confirmed vector.
   else {
+    const validConfirmedVector =
+      currentWorkingOffset.confirmedVector !== RESET_TO_DEFAULT
+        ? currentWorkingOffset.confirmedVector
+        : null
+
     return {
       ...currentWorkingOffset,
       finalPosition: position,
       confirmedVector: calculateConfirmedVector(
         currentWorkingOffset.initialPosition,
         position,
-        currentWorkingOffset.confirmedVector ??
-          mostValidVector ??
-          IDENTITY_VECTOR
+        validConfirmedVector ?? mostValidVector ?? IDENTITY_VECTOR
       ),
     }
   }

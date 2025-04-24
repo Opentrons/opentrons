@@ -16,7 +16,10 @@ from opentrons.protocol_engine.errors.error_occurrence import (
 )
 
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+from opentrons.protocols.advanced_control.transfers.common import (
+    TransferTipPolicyV2,
+    TransferTipPolicyV2Type,
+)
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as mock_tx_liquid_utils,
 )
@@ -247,6 +250,7 @@ def test_move_to(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
+            check_for_movement_conflicts=False,
         ),
         times=1,
     )
@@ -268,6 +272,7 @@ def test_move_to_well(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
+            check_for_movement_conflicts=False,
         ),
         times=1,
     )
@@ -2206,11 +2211,13 @@ def test_distribute_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-def test_distribute_liquid_raises_if_tip_policy_per_source(
+@pytest.mark.parametrize("new_tip", ["always", "per source"])
+def test_distribute_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
+    new_tip: TransferTipPolicyV2Type,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
@@ -2222,15 +2229,14 @@ def test_distribute_liquid_raises_if_tip_policy_per_source(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    with pytest.raises(
-        RuntimeError, match='"per source" incompatible with distribute.'
-    ):
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    with pytest.raises(ValueError, match="Incompatible `new_tip` value"):
         subject.distribute_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=mock_well,
             dest=[mock_well],
-            new_tip="per source",
+            new_tip=new_tip,
             trash_location=trash_location,
         )
 
@@ -2425,7 +2431,7 @@ def test_consolidate_liquid_raises_for_bad_tip_policy(
             volume=10,
             source=[mock_well],
             dest=mock_well,
-            new_tip="twice",  # type: ignore[arg-type]
+            new_tip="whenever",  # type: ignore[arg-type]
         )
 
 
@@ -2488,15 +2494,17 @@ def test_consolidate_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-def test_consolidate_liquid_raises_if_tip_policy_per_source(
+@pytest.mark.parametrize("new_tip", ["always", "per source"])
+def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
+    new_tip: TransferTipPolicyV2Type,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if the tip policy is "per source"."""
+    """It should raise errors if the tip policy is "per source" or "always"."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
@@ -2504,15 +2512,13 @@ def test_consolidate_liquid_raises_if_tip_policy_per_source(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    with pytest.raises(
-        RuntimeError, match='"per source" incompatible with consolidate.'
-    ):
+    with pytest.raises(ValueError, match="Incompatible `new_tip` value."):
         subject.consolidate_with_liquid_class(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well],
             dest=mock_well,
-            new_tip="per source",
+            new_tip=new_tip,
             trash_location=trash_location,
         )
 

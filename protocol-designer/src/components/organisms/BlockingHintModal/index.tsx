@@ -4,18 +4,20 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
-  COLORS,
   Check,
+  COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
   PrimaryButton,
-  SPACING,
   SecondaryButton,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { actions } from '../../../tutorial'
 import { getMainPagePortalEl } from '../Portal'
+
 import type { ReactNode } from 'react'
 import type { HintKey } from '../../../tutorial'
 

@@ -1,31 +1,30 @@
 // app-shell self-update tests
-import { when } from 'vitest-when'
 import { rm } from 'fs-extra'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import tempy from 'tempy'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import * as Cfg from '../../config'
 import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../../constants'
-import {
-  manageDriver,
-  createUpdateDriver,
-  CURRENT_SYSTEM_VERSION,
-} from '../handler'
 import { FLEX_MANIFEST_URL } from '../constants'
 import { getSystemUpdateDir as _getSystemUpdateDir } from '../directories'
-import { getProvider as _getWebProvider } from '../from-web'
 import { getProvider as _getUsbProvider } from '../from-usb'
-
-import type { UpdateProvider } from '../types'
-import type { UpdateDriver } from '../handler'
-import type { WebUpdateSource } from '../from-web'
-import type { USBUpdateSource } from '../from-usb'
-import type { Dispatch } from '../../types'
+import { getProvider as _getWebProvider } from '../from-web'
+import {
+  createUpdateDriver,
+  CURRENT_SYSTEM_VERSION,
+  manageDriver,
+} from '../handler'
 
 import type {
   ConfigInitializedAction,
   ConfigValueUpdatedAction,
 } from '@opentrons/app/src/redux/config'
+import type { Dispatch } from '../../types'
+import type { USBUpdateSource } from '../from-usb'
+import type { WebUpdateSource } from '../from-web'
+import type { UpdateDriver } from '../handler'
+import type { UpdateProvider } from '../types'
 
 vi.unmock('electron-updater') // ?
 vi.mock('electron-updater')

@@ -1,5 +1,6 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
 import { getSavedStepForms } from '../../../../../step-forms/selectors'

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import {
+  Chip,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -7,23 +8,23 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  Chip,
 } from '@opentrons/components'
+
+import {
+  MODULE_INFO_CONTAINER_STYLE,
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+  MODULE_INFO_HEADER_TEXT_STYLE,
+  MODULE_INFO_SUB_CONTAINER_STYLE,
+} from './constants'
+
+import type { ChipType } from '@opentrons/components'
 import type {
   LatchStatus,
   SpeedStatus,
   TemperatureStatus,
 } from '/app/redux/modules/api-types'
 import type { HeaterShakerModule } from '/app/redux/modules/types'
-import type { ChipType } from '@opentrons/components'
-
-import {
-  MODULE_INFO_CONTAINER_STYLE,
-  MODULE_INFO_SUB_CONTAINER_STYLE,
-  MODULE_INFO_DETAIL_CONTAINER_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-} from './constants'
 
 interface HeaterShakerModuleDataProps {
   moduleData: HeaterShakerModule['data']

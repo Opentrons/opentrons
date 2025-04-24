@@ -1,10 +1,12 @@
 import pick from 'lodash/pick'
 import { css } from 'styled-components'
+
 import { LegacyStyledText, StyledText } from '../../atoms'
+import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-import { Flex } from '../../primitives'
 import { useCommandTextString } from './useCommandTextString'
+
 import type { ComponentProps } from 'react'
 import type {
   LabwareDefinition2,
@@ -12,11 +14,11 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
+import type { CommandTextData } from '../ProtocolTimelineScrubber/types'
 import type {
   GetTCRunExtendedProfileCommandTextResult,
   GetTCRunProfileCommandTextResult,
 } from './useCommandTextString'
-import type { CommandTextData } from '../ProtocolTimelineScrubber/types'
 
 export * from './useCommandTextString'
 interface LegacySTProps {

@@ -1,5 +1,5 @@
 // top nav bar component
-import { SubdomainNav, MainNav } from '../website-navigation'
+import { MainNav, SubdomainNav } from '../website-navigation'
 import styles from './styles.module.css'
 
 export { Breadcrumbs } from './Breadcrumbs'

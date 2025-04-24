@@ -9,10 +9,10 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { getPipetteNameOnMount } from '../getPipetteNameOnMount'
-import { getLiquidDisplayName } from '../getLiquidDisplayName'
-import { getLabwareName } from '../getLabwareName'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
+import { getLabwareName } from '../getLabwareName'
+import { getLiquidDisplayName } from '../getLiquidDisplayName'
+import { getPipetteNameOnMount } from '../getPipetteNameOnMount'
 
 import type { GetCommandText } from '../..'
 

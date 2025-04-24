@@ -15,6 +15,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+
 import type { ModuleModel, ModuleType, RobotType } from '@opentrons/shared-data'
 import type { Gen, PipetteType, PipetteVolumes } from './types'
 

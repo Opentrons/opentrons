@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux'
-
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '/app/redux/protocol-storage'

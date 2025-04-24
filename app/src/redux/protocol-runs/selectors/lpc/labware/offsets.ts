@@ -1,37 +1,38 @@
 import { createSelector } from 'reselect'
 
 import {
-  getAreAllOffsetsHardCoded,
-  getDefaultOffsetDetailsForAllLabware,
-  getLocationSpecificOffsetDetailsForAllLabware,
-  getMissingLSOffsets,
-  getSelectedLabwareWithOffsetDetails,
-  getWorkingOffsetsByUri,
-  getTotalCountLocationSpecificOffsets,
-  getCountMissingLSOffsetsWithoutDefault,
-  getIsNecessaryDefaultOffsetMissing,
-  getTotalCountNonHardCodedLocationSpecificOffsets,
-  getIsAnyNecessaryDefaultOffsetMissing,
-  getFlexSlotNameOnly,
-} from '../transforms'
-
+  OFFSET_KIND_DEFAULT,
+  OFFSET_KIND_LOCATION_SPECIFIC,
+  RESET_TO_DEFAULT,
+} from '/app/redux/protocol-runs/constants'
 import {
   findDefaultOffsetWithFallbacks,
   findLocationSpecificOffsetWithFallbacks,
   getMostRecentVectorFrom,
 } from '/app/redux/protocol-runs/utils'
-import {
-  OFFSET_KIND_DEFAULT,
-  OFFSET_KIND_LOCATION_SPECIFIC,
-  RESET_TO_DEFAULT,
-} from '/app/redux/protocol-runs/constants'
 
+import {
+  getAreAllOffsetsHardCoded,
+  getCountMissingLSOffsetsWithoutDefault,
+  getDefaultOffsetDetailsForAllLabware,
+  getFlexSlotNameOnly,
+  getIsAnyNecessaryDefaultOffsetMissing,
+  getIsNecessaryDefaultOffsetMissing,
+  getLocationSpecificOffsetDetailsForAllLabware,
+  getMissingLSOffsets,
+  getSelectedLabwareWithOffsetDetails,
+  getTotalCountLocationSpecificOffsets,
+  getTotalCountNonHardCodedLocationSpecificOffsets,
+  getWorkingOffsetsByUri,
+} from '../transforms'
+
+import type { TFunction } from 'i18next'
+import type { Selector } from 'reselect'
 import type {
   LabwareOffsetCreateData,
   StoredLabwareOffsetCreate,
   VectorOffset,
 } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 import type {
   DefaultOffsetDetails,
   LocationSpecificOffsetDetails,
@@ -39,9 +40,8 @@ import type {
   LPCOffsetKind,
   WorkingOffset,
 } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
 import type { WorkingOffsetsByUri } from '../transforms'
-import type { TFunction } from 'i18next'
-import type { Selector } from 'reselect'
 
 export const selectAreOffsetsApplied = (
   runId: string

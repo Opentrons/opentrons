@@ -99,6 +99,14 @@ class TipState:
         ), "Last air gap volume doe not match the volume being removed"
         self.last_liquid_and_air_gap_in_tip.air_gap = 0
 
+    def delete_last_air_gap_and_liquid(self) -> None:
+        air_gap_in_tip = self.last_liquid_and_air_gap_in_tip.air_gap
+        liquid_in_tip = self.last_liquid_and_air_gap_in_tip.liquid
+        if air_gap_in_tip:
+            self.delete_air_gap(air_gap_in_tip)
+        if liquid_in_tip:
+            self.delete_liquid(volume=liquid_in_tip)
+
 
 class TransferType(Enum):
     ONE_TO_ONE = "one_to_one"
@@ -554,6 +562,9 @@ class TransferComponentsExecutor:
                     if isinstance(trash_location, Location)
                     else None
                 )
+            # A non-multi-dispense blowout will only have air and maybe droplets in the tip
+            # since we only blowout after dispensing the full tip contents.
+            # So delete the air gap from tip state
             last_air_gap = self._tip_state.last_liquid_and_air_gap_in_tip.air_gap
             self._tip_state.delete_air_gap(last_air_gap)
             self._tip_state.ready_to_aspirate = False
@@ -640,6 +651,10 @@ class TransferComponentsExecutor:
                 well_core=None,
                 in_place=True,
             )
+            # A blowout will remove all air gap and liquid (disposal volume) from the tip
+            # so delete them from tip state (although practically, there will not be
+            # any air gaps in the tip before blowing out in the destination well)
+            self._tip_state.delete_last_air_gap_and_liquid()
             self._tip_state.ready_to_aspirate = False
 
         # A retract will perform total of two air gaps if we need to blow out in source or trash:
@@ -727,8 +742,9 @@ class TransferComponentsExecutor:
                     if isinstance(trash_location, Location)
                     else None
                 )
-            last_air_gap = self._tip_state.last_liquid_and_air_gap_in_tip.air_gap
-            self._tip_state.delete_air_gap(last_air_gap)
+            # A blowout will remove all air gap and liquid (disposal volume) from the tip
+            # so delete them from tip state
+            self._tip_state.delete_last_air_gap_and_liquid()
             self._tip_state.ready_to_aspirate = False
 
             # Do touch tip and air gap again after blowing out into source well or trash

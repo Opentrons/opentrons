@@ -1,7 +1,7 @@
 import type {
-  RunTimeCommand,
-  RunCommandError,
   Failed,
+  RunCommandError,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 export interface GetCommandsParams {

@@ -11,8 +11,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { getMainPagePortalEl } from '../Portal'
 import { useConfirmationContent } from './useConfirmationContent'
+
 import type { FormData } from '../../../form-types'
 
 interface AdvancedSettingsUpdateConfirmationModalProps {

@@ -1,4 +1,4 @@
-import { Flex, BORDERS, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import { BORDERS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'
 

@@ -1,6 +1,7 @@
 import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import { LabwareLabel } from '../LabwareLabel'
 import { LabwareRenderOnDeck } from './LabwareRenderOnDeck'
+
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,

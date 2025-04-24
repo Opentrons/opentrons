@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import {
   _allReducers,
-  SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
+  SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
 } from '../reducers'
 

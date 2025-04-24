@@ -5,11 +5,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  Link,
-  PrimaryButton,
-  Modal,
-  SPACING,
   LegacyStyledText,
+  Link,
+  Modal,
+  PrimaryButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

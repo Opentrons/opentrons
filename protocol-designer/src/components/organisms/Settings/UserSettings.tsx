@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   Btn,
@@ -14,8 +13,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { actions as tutorialActions } from '../../../tutorial'
 import { actions as featureFlagActions } from '../../../feature-flags'
+import { actions as tutorialActions } from '../../../tutorial'
 import { ToggleButton } from '../../atoms/ToggleButton'
 
 import type { FlagTypes } from '../../../feature-flags'

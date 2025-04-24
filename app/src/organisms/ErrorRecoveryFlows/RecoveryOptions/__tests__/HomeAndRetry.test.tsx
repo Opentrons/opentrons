@@ -1,13 +1,14 @@
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
-import { SelectRecoveryOption } from '../SelectRecoveryOption'
-import { HomeAndRetry } from '../HomeAndRetry'
 import { TipSelection } from '../../shared/TipSelection'
+import { HomeAndRetry } from '../HomeAndRetry'
+import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import type { ComponentProps } from 'react'
 

@@ -1,9 +1,11 @@
-import { describe, it, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../testing/utils'
+
 import { BORDERS, COLORS } from '../../../helix-design-system'
-import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { PrimaryButton } from '../PrimaryButton'
 
 import type { ComponentProps } from 'react'

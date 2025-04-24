@@ -1,11 +1,13 @@
 import { createRef } from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
-import { getLiquidEntities } from '../../../../step-forms/selectors'
-import * as labwareIngredActions from '../../../../labware-ingred/actions'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { LiquidsOverflowMenu } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import * as labwareIngredActions from '../../../../labware-ingred/actions'
+import { selectors } from '../../../../labware-ingred/selectors'
+import { getLiquidEntities } from '../../../../step-forms/selectors'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -38,6 +40,10 @@ describe('SlotOverflowMenu', () => {
       showLiquidsModal: vi.fn(),
       overflowWrapperRef: createRef(),
     }
+    vi.mocked(selectors.getZoomedInSlot).mockReturnValue({
+      slot: null,
+      cutout: null,
+    })
     vi.mocked(getLiquidEntities).mockReturnValue({
       '0': {
         displayColor: 'mockColor',

@@ -1,16 +1,17 @@
-import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
 import * as auth0 from '@auth0/auth0-react'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { renderWithProviders } from './__testing-utils__'
 import { i18n } from './i18n'
+import { Footer } from './molecules/Footer'
+import { Header } from './molecules/Header'
+import { HeaderWithMeter } from './molecules/HeaderWithMeter'
 import { Loading } from './molecules/Loading'
 import { OpentronsAI } from './OpentronsAI'
 import { Landing } from './pages/Landing'
-import { useGetAccessToken } from './resources/hooks'
-import { Header } from './molecules/Header'
-import { Footer } from './molecules/Footer'
-import { HeaderWithMeter } from './molecules/HeaderWithMeter'
 import { headerWithMeterAtom } from './resources/atoms'
+import { useGetAccessToken } from './resources/hooks'
 
 vi.mock('@auth0/auth0-react')
 

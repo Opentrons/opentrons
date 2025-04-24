@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ListButtonRadioButton } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

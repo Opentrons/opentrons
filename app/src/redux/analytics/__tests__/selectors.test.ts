@@ -1,10 +1,10 @@
-import { vi, describe, it, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import * as Selectors from '../selectors'
 import * as SessionsSelectors from '../../sessions/selectors'
+import * as Selectors from '../selectors'
 
-import type { State } from '../../types'
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
+import type { State } from '../../types'
 
 vi.mock('../../sessions/selectors')
 

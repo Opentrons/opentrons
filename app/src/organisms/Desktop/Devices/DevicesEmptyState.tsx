@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -10,12 +9,12 @@ import {
   FONT_WEIGHT_REGULAR,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   POSITION_ABSOLUTE,
   PrimaryButton,
-  SPACING_5,
   SPACING,
-  LegacyStyledText,
+  SPACING_5,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

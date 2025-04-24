@@ -5,19 +5,20 @@ import {
   labwareSchemaV2 as labwareSchema,
   validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
-import { sameIdentity } from './compare'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  UncheckedLabwareFile,
-  CheckedLabwareFile,
-} from '@opentrons/app/src/redux/custom-labware/types'
 import {
   DUPLICATE_LABWARE_FILE,
   INVALID_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
   VALID_LABWARE_FILE,
 } from '../constants'
+import { sameIdentity } from './compare'
+
+import type {
+  CheckedLabwareFile,
+  UncheckedLabwareFile,
+} from '@opentrons/app/src/redux/custom-labware/types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const ajv = new Ajv()
 const validateDefinition = ajv.compile(labwareSchema)

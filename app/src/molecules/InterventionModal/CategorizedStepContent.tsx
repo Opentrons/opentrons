@@ -1,22 +1,21 @@
 import { css } from 'styled-components'
-
 import {
-  StyledText,
-  Flex,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
   JUSTIFY_FLEX_START,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { Command, CommandIndex } from '../Command'
 
+import type { CommandTextData } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandTextData } from '@opentrons/components'
 import type { NonSkeletonCommandState } from '../Command'
 
 export interface CommandWithIndex {

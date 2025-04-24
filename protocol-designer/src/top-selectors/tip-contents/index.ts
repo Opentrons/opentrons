@@ -1,22 +1,25 @@
-import { createSelector } from 'reselect'
-import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
-import {
-  START_TERMINAL_ITEM_ID,
-  END_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-  HARDWARE_ID,
-} from '../../steplist'
+import reduce from 'lodash/reduce'
+import { createSelector } from 'reselect'
+
+import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  END_TERMINAL_ITEM_ID,
+  HARDWARE_ID,
+  PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
+} from '../../steplist'
 import {
   getActiveItem,
   getSelectedStepId,
   getSelectedTerminalItemId,
 } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
-import { selectors as fileDataSelectors } from '../../file-data'
+
 import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../../types'
+
 export const getMissingTipsByLabwareId: Selector<Record<
   string,
   WellGroup

@@ -1,18 +1,18 @@
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
-
+import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_END,
   Modal,
   PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
-  Icon,
 } from '@opentrons/components'
+
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 import { getMainPagePortalEl } from './Portal'
 

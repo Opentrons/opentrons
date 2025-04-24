@@ -6,9 +6,11 @@ import {
   linearInterpolate,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
-import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
+
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
+import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
+
 import type {
   BlowoutProperties,
   ByTipTypeSetting,

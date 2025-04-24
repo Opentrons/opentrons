@@ -1,10 +1,9 @@
 import { css } from 'styled-components'
-
 import {
-  Icon,
-  Btn,
   ALIGN_CENTER,
+  Btn,
   COLORS,
+  Icon,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 

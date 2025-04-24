@@ -1,8 +1,8 @@
-import { VIEWPORT, Tag, DeckInfoLabel } from '@opentrons/components'
+import { DeckInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { DeckInfoLabelTextTag as DeckInfoLabelTextTagComponent } from '.'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'App/Molecules/DeckInfoLabelTextTag',

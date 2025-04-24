@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { useDrag } from '../useDrag'
+
 import type { ElementPosition } from '../useDrag'
 
 const mockPosition: ElementPosition = {

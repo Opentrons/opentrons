@@ -1,24 +1,25 @@
 import {
+  FLEX_STACKER_MODULE_V1,
+  getCutoutDisplayName,
   getLabwareDefURI,
   getLabwareDisplayName,
-  getCutoutDisplayName,
-  getSlotFromAddressableAreaName,
   getModuleModelFromAddressableArea,
+  getSlotFromAddressableAreaName,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
+
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
 
 import type {
+  AddressableAreaName,
+  CutoutId,
   LabwareDefinition2,
   LabwareLocation,
+  LabwareLocationSequence,
   ModuleModel,
   RobotType,
-  LabwareLocationSequence,
-  CutoutId,
-  AddressableAreaName,
 } from '@opentrons/shared-data'
 import type { LoadedLabwares, LoadedModules } from './types'
 

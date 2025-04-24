@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -10,21 +9,21 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Link,
-  SPACING_AUTO,
   SPACING,
+  SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import {
+  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import {
   changeCustomLabwareDirectory,
   getCustomLabwareDirectory,
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
-import {
-  useTrackEvent,
-  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
-} from '/app/redux/analytics'
 
 import type { Dispatch } from '/app/redux/types'
 

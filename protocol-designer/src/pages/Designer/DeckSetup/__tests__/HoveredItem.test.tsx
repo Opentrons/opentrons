@@ -1,10 +1,13 @@
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../__testing-utils__'
 import { LabwareRender } from '@opentrons/components'
-import { selectors } from '../../../../labware-ingred/selectors'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { HoveredItem } from '../HoveredItem'
 
 import type { ComponentProps } from 'react'

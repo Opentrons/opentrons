@@ -1,5 +1,7 @@
 import capitalize from 'lodash/capitalize'
+
 import { displayAsTube, getLabwareName } from './utils'
+
 import type {
   LabwareDefinition2,
   WellBottomShape,

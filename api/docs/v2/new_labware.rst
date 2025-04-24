@@ -292,16 +292,16 @@ Equivalently, using ``rows_by_name``::
 
 .. _labeling-liquids:
 
-*************************
-Labeling Liquids in Wells
-*************************
+****************************
+Labeling Liquids in Labware
+****************************
 
-Optionally, you can specify the liquids that should be in various wells at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, or group of wells, in well plates and reservoirs. You can view the initial liquid setup:
+Optionally, you can specify the liquids that should be in labware at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, group of wells, or an entire labware. You can view the initial liquid setup:
 
 - For Flex protocols, on the touchscreen.
 - For Flex or OT-2 protocols, in the Opentrons App (v6.3.0 or higher).
 
-To use these optional methods, first create a liquid object with :py:meth:`.ProtocolContext.define_liquid` and then label individual wells by calling :py:meth:`.Well.load_liquid`.
+To use these optional methods, first create a liquid object with :py:meth:`.ProtocolContext.define_liquid` and then label individual wells by calling :py:meth:`.Labware.load_liquid`.
 
 Let's examine how these two methods work. The following examples demonstrate how to define colored water samples for a well plate and reservoir.
 
@@ -334,18 +334,38 @@ The ``display_color`` parameter accepts a hex color code, which adds a color to 
 Labeling Wells and Reservoirs
 =============================
 
-This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate each well with a particular liquid: 
+This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate wells in each labware with a particular liquid: 
 
 .. code-block:: python
 
-        well_plate["A1"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["A2"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["B1"].load_liquid(liquid=blueWater, volume=50)
-        well_plate["B2"].load_liquid(liquid=blueWater, volume=50)
-        reservoir["A1"].load_liquid(liquid=greenWater, volume=200)
-        reservoir["A2"].load_liquid(liquid=blueWater, volume=200)
+        ## load entire well plate with greenWater
+        plate.load_liquid(
+            wells=plate.wells(), # using accessor
+            volume=50,
+            liquid=greenWater
+        )
+
+        ## load entire reservoir with blueWater
+        reservoir.load_liquid(
+            wells=[A1], # using list of well names
+            volume=50,
+            liquid=blueWater
+        )
+
+``load_liquid`` makes it easy to load an entire well plate with a single command. Let's say you only need to load liquid in a few wells, or want to load multiple liquids or volumes in the same labware. 
+
+.. code-block:: python
+
+    plate.load_liquid_by_well({'A1': 200, 'A2': 100, 'A3': 50}, greenWater)
+    plate.load_liquid_by_well({'B1': 200, 'B2': 100, 'B3': 50}, blueWater)
+
+
+You can also use :py:meth:`.Labware.load_empty` to label individual wells or an entire labware as empty at the beginning of your protocol. 
         
 .. versionadded:: 2.14
+    Use ``Well.load_liquid()`` to label liquid in individual wells. 
+.. versionadded:: 2.22
+    Use ``Labware.load_liquid``, ``Labware.load_liquid_by_well``, or ``Labware.load_empty`` to label liquid in individual wells or an entire labware. 
 
 This information is available after you import your protocol to the app or send it to Flex. A summary of liquids appears on the protocol detail page, and well-by-well detail is available on the run setup page (under Initial Liquid Setup in the app, or under Liquids on Flex).
 
@@ -356,6 +376,8 @@ Labeling vs Handling Liquids
 ============================
 
 The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). This amount is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well at the start of the protocol. You need to use a method like :py:meth:`.transfer` to physically move liquids from a source to a destination.
+
+Although it's optional to define and load liquids in your protocol, you can use a starting liquid volume to specify pipette movements relative to a liquid location, like the :ref:`meniscus <well-meniscus>`, in your protocol. 
 
 
 .. _v2-location-within-wells:

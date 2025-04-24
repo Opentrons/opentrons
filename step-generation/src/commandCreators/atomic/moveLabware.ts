@@ -7,9 +7,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
-import * as warningCreators from '../../warningCreators'
 import {
   formatPyStr,
   getCutoutIdByAddressableArea,
@@ -19,6 +19,8 @@ import {
   PROTOCOL_CONTEXT_NAME,
   uuid,
 } from '../../utils'
+import * as warningCreators from '../../warningCreators'
+
 import type {
   AddressableAreaName,
   CreateCommand,

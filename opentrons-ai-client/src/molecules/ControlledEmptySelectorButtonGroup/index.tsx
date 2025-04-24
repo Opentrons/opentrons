@@ -1,7 +1,9 @@
-import { Flex, WRAP, SPACING, EmptySelectorButton } from '@opentrons/components'
 import { Controller, useFormContext } from 'react-hook-form'
-import type { DisplayModules } from '../../organisms/ModulesSection'
+import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
+
 import { MODULES_FIELD_NAME } from '../../organisms/ModulesSection'
+
+import type { DisplayModules } from '../../organisms/ModulesSection'
 
 export function ControlledEmptySelectorButtonGroup({
   modules,

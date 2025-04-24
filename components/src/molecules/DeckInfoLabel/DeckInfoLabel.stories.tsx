@@ -1,7 +1,7 @@
+import { DeckInfoLabel } from '.'
 import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { DeckInfoLabel } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

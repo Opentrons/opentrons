@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
-
 import { useRunLoadedLabwareDefinitions } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import type { UseQueryOptions } from 'react-query'
 import type { AxiosError } from 'axios'
+import type { UseQueryOptions } from 'react-query'
 import type {
   HostConfig,
   RunLoadedLabwareDefinitions,

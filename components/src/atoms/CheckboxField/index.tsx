@@ -1,14 +1,15 @@
 import { css } from 'styled-components'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS, BORDERS } from '../../helix-design-system'
-import { Flex, Box } from '../../primitives'
+
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import { Box, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_AUTO,
   CURSOR_POINTER,
   JUSTIFY_CENTER,
 } from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { ChangeEventHandler, ComponentProps, ReactNode } from 'react'
 

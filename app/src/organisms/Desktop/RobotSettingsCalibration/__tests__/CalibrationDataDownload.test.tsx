@@ -1,27 +1,35 @@
-import { when } from 'vitest-when'
+import { fireEvent, screen } from '@testing-library/react'
 import {
-  describe,
-  it,
-  expect,
-  vi,
+  afterAll,
   beforeAll,
   beforeEach,
-  afterAll,
+  describe,
+  expect,
+  it,
+  vi,
 } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
 
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 import {
   useInstrumentsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
-import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  useTrackEvent,
+  useDeckCalibrationData,
+  usePipetteOffsetCalibrations,
+  useTipLengthCalibrations,
+} from '/app/organisms/Desktop/Devices/hooks'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import {
@@ -35,14 +43,8 @@ import {
   mockTipLengthCalibration3,
 } from '/app/redux/calibration/tip-length/__fixtures__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import {
-  useDeckCalibrationData,
-  usePipetteOffsetCalibrations,
-  useTipLengthCalibrations,
-} from '/app/organisms/Desktop/Devices/hooks'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { renderWithProviders } from '/app/__testing-utils__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
 // file-saver has circular dep, need to mock with factory to prevent error
