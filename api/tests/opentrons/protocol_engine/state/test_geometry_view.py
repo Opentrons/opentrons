@@ -1773,6 +1773,10 @@ def test_get_well_position_with_meniscus_and_literal_volume_offset(
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
         well_plate_def
@@ -1843,7 +1847,10 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
-
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
         well_plate_def
@@ -1940,6 +1947,10 @@ def test_get_well_position_raises_validation_error(
     )
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         _TEST_INNER_WELL_GEOMETRY
+    )
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
     )
     decoy.when(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
@@ -4184,17 +4195,27 @@ def test_virtual_get_well_height_after_liquid_handling_no_error(
     decoy: Decoy,
     subject: GeometryView,
     mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    well_plate_def: LabwareDefinition,
     initial_liquid_height: LiquidTrackingType,
 ) -> None:
     """Make sure SimulatedLiquidProbe doesn't change geometry behavior."""
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
         _TEST_INNER_WELL_GEOMETRY
     )
     operation_volume = 1000.0
-
     result_estimate = subject.get_well_height_after_liquid_handling_no_error(
         labware_id="labware-id",
         well_name="B2",
+        pipette_id="pipette-id",
         initial_height=initial_liquid_height,
         volume=operation_volume,
     )
@@ -4228,12 +4249,22 @@ def test_virtual_find_height_and_volume(
 def test_get_liquid_handling_z_change(
     decoy: Decoy,
     subject: GeometryView,
+    well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
     mock_well_view: WellView,
 ) -> None:
     """Test for get_liquid_handling_z_change math."""
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+
     decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
         RectangularWellDefinition3.model_construct(totalLiquidVolume=1100000)  # type: ignore[call-arg]
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
     )
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
         _TEST_INNER_WELL_GEOMETRY
@@ -4251,7 +4282,10 @@ def test_get_liquid_handling_z_change(
     )
     # make sure that liquid handling z change math stays the same
     change = subject.get_liquid_handling_z_change(
-        labware_id="labware-id", well_name="A1", operation_volume=199.0
+        labware_id="labware-id",
+        well_name="A1",
+        pipette_id="pipette-id",
+        operation_volume=199.0,
     )
     expected_change = 3.2968
     assert isclose(change, expected_change)
