@@ -40,7 +40,7 @@ import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analy
 
 import type {
   CompletedProtocolAnalysis,
-  Coordinates,
+  Vector3D,
   CreateCommand,
   DropTipCreateCommand,
   RobotType,
@@ -128,7 +128,7 @@ export const LegacyLabwarePositionCheckComponent = (
     (
       state: {
         workingOffsets: WorkingOffset[]
-        tipPickUpOffset: Coordinates | null
+        tipPickUpOffset: Vector3D | null
       },
       action: RegisterPositionAction
     ) => {
@@ -225,8 +225,8 @@ export const LegacyLabwarePositionCheckComponent = (
 
   const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
   const calculateAndApplyOffset = (
-    initialPosition: Coordinates | null,
-    finalPosition: Coordinates | null,
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
     labwareId: string,
     location: LegacyLabwareOffsetLocation
   ): Promise<void> => {
@@ -347,7 +347,7 @@ export const LegacyLabwarePositionCheckComponent = (
     axis: Axis,
     dir: Sign,
     step: StepSize,
-    onSuccess?: (position: Coordinates | null) => void
+    onSuccess?: (position: Vector3D | null) => void
   ): void => {
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
@@ -361,9 +361,7 @@ export const LegacyLabwarePositionCheckComponent = (
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess?.(
-            (data?.data?.result?.position ?? null) as Coordinates | null
-          )
+          onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
           setFatalError(`error issuing jog command: ${e.message}`)

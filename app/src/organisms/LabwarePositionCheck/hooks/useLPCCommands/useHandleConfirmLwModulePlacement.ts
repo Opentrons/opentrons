@@ -6,7 +6,7 @@ import {
 
 import type {
   MoveLabwareCreateCommand,
-  Coordinates,
+  Vector3D,
   CreateCommand,
   LabwareLocation,
 } from '@opentrons/shared-data'
@@ -26,7 +26,7 @@ export interface UseHandleConfirmPlacementResult {
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ) => Promise<Coordinates>
+  ) => Promise<Vector3D>
 }
 
 export function useHandleConfirmLwModulePlacement({
@@ -38,7 +38,7 @@ export function useHandleConfirmLwModulePlacement({
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ): Promise<Coordinates> => {
+  ): Promise<Vector3D> => {
     const confirmCommands: CreateCommand[] = [
       ...buildMoveLabwareCommand(offsetLocationDetails),
       ...moduleInitDuringLPCCommands(analysis),

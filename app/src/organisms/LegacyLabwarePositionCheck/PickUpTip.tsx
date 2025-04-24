@@ -33,7 +33,7 @@ import type {
   CreateCommand,
   MoveLabwareCreateCommand,
   RobotType,
-  Coordinates,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type { Jog } from '/app/molecules/JogControls/types'
@@ -55,8 +55,8 @@ interface PickUpTipProps extends PickUpTipStep {
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
   calculateAndApplyOffset: (
-    initialPosition: Coordinates | null,
-    finalPosition: Coordinates | null,
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
     labwareId: string,
     location: LegacyLabwareOffsetLocation
   ) => Promise<void>
