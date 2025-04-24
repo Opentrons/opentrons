@@ -1722,6 +1722,9 @@ class OT3Controller(FlexBackend):
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._status_bar_controller.set_enabled(enabled)
 
+    def get_status_bar_enabled(self) -> bool:
+        return self._status_bar_controller.get_enabled()
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._status_bar_controller.get_current_state()
 

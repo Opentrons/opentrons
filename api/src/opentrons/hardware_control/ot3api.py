@@ -597,6 +597,9 @@ class OT3API(
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._backend.set_status_bar_enabled(enabled)
 
+    def get_status_bar_enabled(self) -> bool:
+        return self._backend.get_status_bar_enabled()
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()
 
