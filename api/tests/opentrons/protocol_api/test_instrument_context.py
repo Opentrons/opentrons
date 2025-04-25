@@ -1493,8 +1493,15 @@ def test_measure_liquid_height(
         original_error=lnfe,
         message=f"{lnfe.errorType}: {lnfe.detail}",
     )
+    decoy.when(mock_well.current_liquid_height()).then_return(123)
     decoy.when(
-        mock_instrument_core.liquid_probe_without_recovery(
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
+    )
+    assert subject.measure_liquid_height(mock_well) == 123
+    decoy.when(
+        mock_instrument_core.liquid_probe_with_recovery(
             mock_well._core, mock_well.top()
         )
     ).then_raise(errorToRaise)

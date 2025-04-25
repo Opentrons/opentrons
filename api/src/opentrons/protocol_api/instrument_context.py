@@ -2698,7 +2698,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
-        return self._core.liquid_probe_without_recovery(well._core, loc)
+        self._core.liquid_probe_with_recovery(well._core, loc)
+        return well.current_liquid_height()
 
     def _raise_if_configuration_not_supported_by_pipette(
         self, style: NozzleLayout
