@@ -3,12 +3,12 @@ import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 
 import { initializeMixpanel } from './analytics/mixpanel'
-import { initializeSentry } from './resources/sentry'
 import { App } from './App'
 import { i18n } from './assets/localization'
 import { GlobalStyle } from './components/atoms'
 import { configureStore } from './configureStore'
 import { initialize } from './initialize'
+import { initializeSentry } from './resources/sentry'
 
 // initialize Redux
 const store = configureStore()

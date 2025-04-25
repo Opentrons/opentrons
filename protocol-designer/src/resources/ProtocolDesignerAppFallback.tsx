@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { v4 as uuidv4 } from 'uuid'
 import { captureException } from '@sentry/react'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   AlertPrimaryButton,

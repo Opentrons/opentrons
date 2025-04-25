@@ -1,10 +1,12 @@
 import {
+  browserTracingIntegration,
   init,
   replayIntegration,
-  browserTracingIntegration,
 } from '@sentry/react'
-import { getIsProduction } from '../networking/opentronsWebApi'
+
 import { getHasOptedIn } from '../analytics/selectors'
+import { getIsProduction } from '../networking/opentronsWebApi'
+
 import type { BaseState } from '../types'
 
 let isSentryInitialized = false
