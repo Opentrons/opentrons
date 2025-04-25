@@ -46,7 +46,12 @@ class UnsafeFlexStackerOpenLatchImpl(
     async def execute(
         self, params: UnsafeFlexStackerOpenLatchParams
     ) -> SuccessData[UnsafeFlexStackerOpenLatchResult]:
-        """Execute the stacker UnsafeFlexStackerOpenLatch command."""
+        """Execute the stacker UnsafeFlexStackerOpenLatch command.
+
+        Opening the latch could result in labware falling down the stacker hopper,
+        resulting in an error state. This command should be used with care, outside of
+        a protocol and followed by a close latch command.
+        """
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )

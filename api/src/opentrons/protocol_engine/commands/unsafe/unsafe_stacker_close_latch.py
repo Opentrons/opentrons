@@ -45,7 +45,12 @@ class UnsafeFlexStackerCloseLatchImpl(
     async def execute(
         self, params: UnsafeFlexStackerCloseLatchParams
     ) -> SuccessData[UnsafeFlexStackerCloseLatchResult]:
-        """Execute the stacker UnsafeFlexStackerCloseLatch command."""
+        """Execute the stacker UnsafeFlexStackerCloseLatch command.
+
+        Closing the latch modifies the state of the flex stacker and affects its
+        ability to execute the next command. This command should be used with care
+        outside of a protocol.
+        """
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )

@@ -68,7 +68,12 @@ class UnsafeFlexStackerPrepareShuttleImpl(
     async def execute(
         self, params: UnsafeFlexStackerPrepareShuttleParams
     ) -> _ExecuteReturn:
-        """Execute the stacker prepare shuttle command."""
+        """Execute the stacker prepare shuttle command.
+
+        Moving the shuttle directly affects the state of the flex stacker and
+        could affect its ability to execute the next command. This command
+        should be used with care.
+        """
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
