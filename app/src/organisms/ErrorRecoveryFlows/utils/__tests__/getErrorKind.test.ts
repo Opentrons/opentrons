@@ -88,7 +88,7 @@ describe('getErrorKind', () => {
       errorType: 'someHithertoUnknownDefinedErrorType',
       expectedError: ERROR_KINDS.GENERAL_ERROR,
     },
-        {
+    {
       commandType: 'aspirate',
       errorType: 'someHithertoUnknownDefinedErrorType',
       expectedError: ERROR_KINDS.GENERAL_ERROR,

@@ -1,8 +1,8 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   HoldingLabware,
-  ReleaseLabware,
   RecoveryDoorOpenSpecial,
+  ReleaseLabware,
   SkipStepInfo,
   TwoColLwInfoAndDeck,
 } from '../shared'

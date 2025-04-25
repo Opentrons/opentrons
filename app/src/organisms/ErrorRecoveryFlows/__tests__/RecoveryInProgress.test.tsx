@@ -8,8 +8,8 @@ import { mockRecoveryContentProps } from '../__fixtures__'
 import { RECOVERY_MAP } from '../constants'
 import {
   RecoveryInProgress,
-  useReleaseLabware,
   RELEASE_COUNTDOWN_S,
+  useReleaseLabware,
 } from '../RecoveryInProgress'
 
 import type { ComponentProps } from 'react'

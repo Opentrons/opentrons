@@ -4,8 +4,8 @@ import { LegacyStyledText } from '@opentrons/components'
 import { RECOVERY_MAP } from '../constants'
 import {
   HoldingLabware,
-  ReleaseLabware,
   RecoveryDoorOpenSpecial,
+  ReleaseLabware,
   RetryStepInfo,
   SkipStepInfo,
   TwoColLwInfoAndDeck,
