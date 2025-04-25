@@ -199,6 +199,7 @@ class HardwarePipettingHandler(PipettingHandler):
             labware_id=labware_id,
             well_name=well_name,
             operation_volume=volume * -1,
+            pipette_id=pipette_id,
         )
         if isinstance(aspirate_z_distance, SimulatedProbeResult):
             raise InvalidLiquidHeightFound(
@@ -234,6 +235,7 @@ class HardwarePipettingHandler(PipettingHandler):
             labware_id=labware_id,
             well_name=well_name,
             operation_volume=volume,
+            pipette_id=pipette_id,
         )
         if isinstance(dispense_z_distance, SimulatedProbeResult):
             raise InvalidLiquidHeightFound(

@@ -120,8 +120,7 @@ export const ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS: 'languageUpdatedDe
  * LPC Analytics
  */
 
-export const ANALYTICS_LPC_ANALYSIS_KIND: 'analytics:lpcAnalysisKind' =
-  'analytics:lpcAnalysisKind'
+export const ANALYTICS_LPC_ANALYSIS_KIND: 'lpcAnalysisKind' = 'lpcAnalysisKind'
 
 /**
  * Module Actions Analytics
