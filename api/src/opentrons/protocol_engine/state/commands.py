@@ -340,9 +340,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
         succeeded_command = action.command
         self._state.command_history.set_command_succeeded(succeeded_command)
 
-    def _handle_fail_command_action(
+    def _handle_fail_command_action(  # noqa: C901
         self, action: FailCommandAction
-    ) -> None:  # noqa: C901
+    ) -> None:
         prev_entry = self.state.command_history.get(action.command_id)
 
         if isinstance(action.error, EnumeratedError):  # The error was undefined.
