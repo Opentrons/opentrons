@@ -1,4 +1,4 @@
-import { round } from 'lodash'
+import round from 'lodash/round'
 import { describe, expect, it } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'

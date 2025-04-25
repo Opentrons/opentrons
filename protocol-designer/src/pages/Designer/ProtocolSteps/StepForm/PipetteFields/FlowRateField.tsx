@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { round } from 'lodash'
 
 import { SPACING } from '@opentrons/components'
 import {
@@ -125,16 +124,14 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
     pipette != null &&
     referenceVolumeFlowRate != null &&
     matchingTipLiquidSpecs != null
-      ? round(
-          getMaxUiFlowRate({
-            targetVolume: referenceVolumeFlowRate,
-            channels: pipette.spec.channels,
-            robotType,
-            tipLiquidSpecs: matchingTipLiquidSpecs,
-            flowRateType,
-            correctionVolume: correctionVolume ?? 0,
-          })
-        )
+      ? getMaxUiFlowRate({
+          targetVolume: referenceVolumeFlowRate,
+          channels: pipette.spec.channels,
+          robotType,
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          flowRateType,
+          correctionVolume: correctionVolume ?? 0,
+        })
       : null
 
   const isFlowRateOutOfBounds =
