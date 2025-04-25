@@ -196,14 +196,25 @@ class GeometryView:
 
         return self._get_highest_z_from_labware_data(labware_data)
 
+    def is_deck_obstacle(self, lw_data: LoadedLabware) -> bool:
+        """Check if the labware is a deck obstacle."""
+        # is it offdeck?
+        if isinstance(
+            lw_data.location, InStackerHopperLocation
+        ) or lw_data.location in [OFF_DECK_LOCATION, SYSTEM_LOCATION]:
+            return False
+        # is it a lid?
+        if self._labware.get_labware_by_lid_id(lw_data.id) is not None:
+            return False
+        return True
+
     def get_all_obstacle_highest_z(self) -> float:
         """Get the highest Z-point across all obstacles that the instruments need to fly over."""
         highest_labware_z = max(
             (
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
-                if lw_data.location != OFF_DECK_LOCATION
-                and not self._labware.get_labware_by_lid_id(lw_data.id)
+                if self.is_deck_obstacle(lw_data)
             ),
             default=0.0,
         )

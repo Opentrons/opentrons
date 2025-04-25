@@ -49,6 +49,8 @@ from opentrons_shared_data.labware import load_definition as load_labware_defini
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
+    LabwareLocation,
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
@@ -789,7 +791,16 @@ def test_get_all_obstacle_highest_z_no_equipment(
     assert result == 0
 
 
+@pytest.mark.parametrize(
+    "non_deck_location",
+    (
+        OFF_DECK_LOCATION,
+        SYSTEM_LOCATION,
+        InStackerHopperLocation(moduleId="stacker-module-id"),
+    ),
+)
 def test_get_all_obstacle_highest_z(
+    non_deck_location: LabwareLocation,
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
@@ -804,11 +815,11 @@ def test_get_all_obstacle_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         offsetId="plate-offset-id",
     )
-    off_deck_lw = LoadedLabware(
+    non_deck_lw = LoadedLabware(
         id="off-deck-plate-id",
         loadName="off-deck-plate-load-name",
         definitionUri="off-deck-plate-definition-uri",
-        location=OFF_DECK_LOCATION,
+        location=non_deck_location,
         offsetId="plate-offset-id",
     )
     reservoir = LoadedLabware(
@@ -820,15 +831,15 @@ def test_get_all_obstacle_highest_z(
     )
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    off_deck_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    non_deck_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(mock_module_view.get_all()).then_return([])
     decoy.when(mock_addressable_area_view.get_all()).then_return([])
 
-    decoy.when(mock_labware_view.get_all()).then_return([plate, off_deck_lw, reservoir])
+    decoy.when(mock_labware_view.get_all()).then_return([plate, non_deck_lw, reservoir])
     decoy.when(mock_labware_view.get("plate-id")).then_return(plate)
-    decoy.when(mock_labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
+    decoy.when(mock_labware_view.get("off-deck-plate-id")).then_return(non_deck_lw)
     decoy.when(mock_labware_view.get("reservoir-id")).then_return(reservoir)
 
     decoy.when(mock_labware_view.get_dimensions(labware_id="plate-id")).then_return(
@@ -848,7 +859,7 @@ def test_get_all_obstacle_highest_z(
     )
     decoy.when(
         mock_labware_view.get_labware_offset_vector("off-deck-plate-id")
-    ).then_return(off_deck_lw_offset)
+    ).then_return(non_deck_lw_offset)
     decoy.when(mock_labware_view.get_labware_offset_vector("reservoir-id")).then_return(
         reservoir_offset
     )
