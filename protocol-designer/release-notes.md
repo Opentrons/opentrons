@@ -30,10 +30,10 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 ### Bug Fixes
 
 - Transfer step details show correct aspirate and dispense volumes when distributing liquid (a single aspirate and multiple dispenses).
-- During a mix, `push_out=0` by default for all mixes except for the last, to avoid multiple push out actions. You can choose your own push out volume in a mix step menu.
+- During a mix, push out is set to 0 by default for all mixes except for the last, to avoid multiple push out actions. You can choose your own push out volume in a mix step menu.
 - Choose a new tip drop location from the dropdown menu when an uploaded protocol is missing a drop tip location.
-- Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier. (could still use "migrate" here if we want)
-- When adding a disposal volume, a blow out location is now required.
+- Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier.
+- When adding a disposal volume, a blowout location is now required.
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.4.0 or newer.
 
