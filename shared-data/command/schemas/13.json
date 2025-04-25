@@ -754,6 +754,46 @@
       "title": "CalibratePipetteParams",
       "type": "object"
     },
+    "CloseGripperJawCreate": {
+      "description": "CloseGripperJaw command request model.",
+      "properties": {
+        "commandType": {
+          "const": "robot/closeGripperJaw",
+          "default": "robot/closeGripperJaw",
+          "enum": ["robot/closeGripperJaw"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CloseGripperJawParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CloseGripperJawCreate",
+      "type": "object"
+    },
+    "CloseGripperJawParams": {
+      "description": "Payload required to close a gripper.",
+      "properties": {
+        "force": {
+          "description": "The force the gripper should use to hold the jaws, falls to default if none is provided.",
+          "title": "Force",
+          "type": "number"
+        }
+      },
+      "title": "CloseGripperJawParams",
+      "type": "object"
+    },
     "CloseLabwareLatchCreate": {
       "description": "A request to create a Heater-Shaker's close latch command.",
       "properties": {
@@ -4024,6 +4064,40 @@
       "title": "OnLabwareLocation",
       "type": "object"
     },
+    "OpenGripperJawCreate": {
+      "description": "openGripperJaw command request model.",
+      "properties": {
+        "commandType": {
+          "const": "robot/openGripperJaw",
+          "default": "robot/openGripperJaw",
+          "enum": ["robot/openGripperJaw"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/OpenGripperJawParams"
+        }
+      },
+      "required": ["params"],
+      "title": "OpenGripperJawCreate",
+      "type": "object"
+    },
+    "OpenGripperJawParams": {
+      "description": "Payload required to release a gripper.",
+      "properties": {},
+      "title": "OpenGripperJawParams",
+      "type": "object"
+    },
     "OpenLabwareLatchCreate": {
       "description": "A request to create a Heater-Shaker's open labware latch command.",
       "properties": {
@@ -6258,80 +6332,6 @@
       "title": "WellOrigin",
       "type": "string"
     },
-    "closeGripperJawCreate": {
-      "description": "closeGripperJaw command request model.",
-      "properties": {
-        "commandType": {
-          "const": "robot/closeGripperJaw",
-          "default": "robot/closeGripperJaw",
-          "enum": ["robot/closeGripperJaw"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/closeGripperJawParams"
-        }
-      },
-      "required": ["params"],
-      "title": "closeGripperJawCreate",
-      "type": "object"
-    },
-    "closeGripperJawParams": {
-      "description": "Payload required to close a gripper.",
-      "properties": {
-        "force": {
-          "description": "The force the gripper should use to hold the jaws, falls to default if none is provided.",
-          "title": "Force",
-          "type": "number"
-        }
-      },
-      "title": "closeGripperJawParams",
-      "type": "object"
-    },
-    "openGripperJawCreate": {
-      "description": "openGripperJaw command request model.",
-      "properties": {
-        "commandType": {
-          "const": "robot/openGripperJaw",
-          "default": "robot/openGripperJaw",
-          "enum": ["robot/openGripperJaw"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/openGripperJawParams"
-        }
-      },
-      "required": ["params"],
-      "title": "openGripperJawCreate",
-      "type": "object"
-    },
-    "openGripperJawParams": {
-      "description": "Payload required to release a gripper.",
-      "properties": {},
-      "title": "openGripperJawParams",
-      "type": "object"
-    },
     "opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate": {
       "description": "A request to execute an Absorbance Reader close lid command.",
       "properties": {
@@ -6750,11 +6750,11 @@
       "prepareToAspirate": "#/$defs/PrepareToAspirateCreate",
       "reloadLabware": "#/$defs/ReloadLabwareCreate",
       "retractAxis": "#/$defs/RetractAxisCreate",
-      "robot/closeGripperJaw": "#/$defs/closeGripperJawCreate",
+      "robot/closeGripperJaw": "#/$defs/CloseGripperJawCreate",
       "robot/moveAxesRelative": "#/$defs/MoveAxesRelativeCreate",
       "robot/moveAxesTo": "#/$defs/MoveAxesToCreate",
       "robot/moveTo": "#/$defs/MoveToCreate",
-      "robot/openGripperJaw": "#/$defs/openGripperJawCreate",
+      "robot/openGripperJaw": "#/$defs/OpenGripperJawCreate",
       "savePosition": "#/$defs/SavePositionCreate",
       "setRailLights": "#/$defs/SetRailLightsCreate",
       "setStatusBar": "#/$defs/SetStatusBarCreate",
@@ -7069,10 +7069,10 @@
       "$ref": "#/$defs/MoveToCreate"
     },
     {
-      "$ref": "#/$defs/openGripperJawCreate"
+      "$ref": "#/$defs/OpenGripperJawCreate"
     },
     {
-      "$ref": "#/$defs/closeGripperJawCreate"
+      "$ref": "#/$defs/CloseGripperJawCreate"
     }
   ]
 }
