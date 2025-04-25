@@ -1,6 +1,8 @@
 import { forwardRef } from 'react'
 import styled, { css } from 'styled-components'
 
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -9,12 +11,10 @@ import {
   NO_WRAP,
   TEXT_ALIGN_RIGHT,
 } from '../../styles'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { Tooltip } from '../Tooltip'
 import { useHoverTooltip } from '../../tooltips'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
+import { Tooltip } from '../Tooltip'
 
 import type {
   ChangeEventHandler,

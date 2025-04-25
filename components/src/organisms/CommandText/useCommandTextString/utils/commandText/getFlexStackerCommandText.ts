@@ -1,16 +1,18 @@
+import { getLabwareDefURI } from '@opentrons/shared-data'
+
+import { getLabwareDisplayLocation } from '../../utils/getLabwareDisplayLocation'
+
 import type {
+  FlexStackerEmptyRunTimeCommand,
+  FlexStackerFillRunTimeCommand,
+  FlexStackerRetrieveRunTimeCommand,
   FlexStackerSetStoredLabwareRunTimeCommand,
   FlexStackerStoreRunTimeCommand,
-  FlexStackerRetrieveRunTimeCommand,
-  FlexStackerFillRunTimeCommand,
-  FlexStackerEmptyRunTimeCommand,
-  RunTimeCommand,
-  LabwareDefinition3,
   LabwareDefinition2,
+  LabwareDefinition3,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
-import { getLabwareDefURI } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
-import { getLabwareDisplayLocation } from '../../utils/getLabwareDisplayLocation'
 
 export type FlexStackerCommand =
   | FlexStackerSetStoredLabwareRunTimeCommand

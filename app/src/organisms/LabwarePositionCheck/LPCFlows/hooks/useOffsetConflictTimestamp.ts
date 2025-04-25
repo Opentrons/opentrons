@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import {
   selectAreOffsetsApplied,
   selectConflictTimestampInfo,
@@ -9,11 +8,12 @@ import {
   selectInitialRunRecordOffsets,
   updateConflictTimestamp,
 } from '/app/redux/protocol-runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type {
-  StoredLabwareOffset,
-  Run,
   LabwareOffset,
+  Run,
+  StoredLabwareOffset,
 } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 

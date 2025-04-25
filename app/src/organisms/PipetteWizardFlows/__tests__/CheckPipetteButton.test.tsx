@@ -1,9 +1,10 @@
-import { fireEvent, waitFor, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+
 import { CheckPipetteButton } from '../CheckPipetteButton'
 
 import type { ComponentProps } from 'react'

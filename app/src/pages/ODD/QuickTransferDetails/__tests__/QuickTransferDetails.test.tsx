@@ -1,32 +1,33 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { Route, MemoryRouter, Routes } from 'react-router-dom'
 
 import {
   useCreateRunMutation,
   useHost,
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '/app/transformations/commands'
-import { formatTimeWithUtcLabel } from '/app/resources/runs'
+import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
   ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
   ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
 } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { DeleteTransferConfirmationModal } from '../../QuickTransferDashboard/DeleteTransferConfirmationModal'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+
 import { QuickTransferDetails } from '..'
+import { DeleteTransferConfirmationModal } from '../../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
 
 import type { HostConfig } from '@opentrons/api-client'
 

@@ -1,9 +1,8 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-
-import { makeEvent } from '../make-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as SystemInfo from '../../system-info'
 import * as Fixtures from '../../system-info/__fixtures__'
+import { makeEvent } from '../make-event'
 
 import type { State } from '../../types'
 

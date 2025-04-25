@@ -1,7 +1,7 @@
-import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { ModuleSteps, ModuleVerifications } from '../support/ModuleSteps'
-import { UniversalSteps } from '../support/UniversalSteps'
+import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Plate Reader Happy Path Single-Wavelength', () => {
   beforeEach(() => {
@@ -45,7 +45,6 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.EditProtocolA())
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
@@ -63,7 +62,6 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('D2'))
 
     steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Armadillo 96 Well Plate'))
     steps.add(SetupSteps.AddStep())

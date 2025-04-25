@@ -1,8 +1,11 @@
 import uniq from 'lodash/uniq'
 
-import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
+import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import { getAllLiquidClassDefs } from '../liquidClasses'
+
+import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -12,8 +15,6 @@ import type {
   RobotType,
   ThermalAdapterName,
 } from '../types'
-import { getAllLiquidClassDefs } from '../liquidClasses'
-import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'

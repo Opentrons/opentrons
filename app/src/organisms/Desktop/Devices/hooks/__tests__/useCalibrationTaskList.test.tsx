@@ -1,19 +1,22 @@
-import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
-import { when } from 'vitest-when'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import {
-  useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
   useCalibrationStatusQuery,
+  useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
-import { useCalibrationTaskList } from '../useCalibrationTaskList'
+
+import { i18n } from '/app/i18n'
 import { useAttachedPipettes } from '/app/resources/instruments'
+
 import {
-  TASK_COUNT,
+  expectedTaskList,
   mockAttachedPipettesResponse,
   mockBadDeckCalibration,
   mockBadPipetteOffsetCalibrations,
@@ -22,15 +25,15 @@ import {
   mockCompletePipetteOffsetCalibrations,
   mockCompleteTipLengthCalibrations,
   mockIncompleteDeckCalibration,
-  mockSingleAttachedPipetteResponse,
   mockIncompletePipetteOffsetCalibrations,
   mockIncompleteTipLengthCalibrations,
-  expectedTaskList,
+  mockSingleAttachedPipetteResponse,
+  TASK_COUNT,
 } from '../__fixtures__/taskListFixtures'
-import { i18n } from '/app/i18n'
+import { useCalibrationTaskList } from '../useCalibrationTaskList'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/resources/instruments')

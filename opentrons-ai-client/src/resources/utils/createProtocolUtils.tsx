@@ -1,22 +1,35 @@
+import startCase from 'lodash/startCase'
+
 import {
   getFlexNameConversion,
   getLabwareDisplayName,
   getPipetteSpecsV2,
   splitLabwareDefURI,
 } from '@opentrons/shared-data'
-import type { PipetteName } from '@opentrons/shared-data'
+
 import { OTHER } from '../../organisms/ApplicationSection'
 import {
-  TWO_PIPETTES,
-  OPENTRONS_OT2,
-  OPENTRONS_FLEX,
   FLEX_GRIPPER,
   NO_PIPETTES,
+  OPENTRONS_FLEX,
+  OPENTRONS_OT2,
+  TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
-import type { UseFormWatch } from 'react-hook-form'
-import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import { getOnlyLatestDefs } from './labware'
+
+import type { UseFormWatch } from 'react-hook-form'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import type { CreatePrompt } from '../types'
+
+export function generatePromptPreviewProtocolFormatItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { protocol_format = 'Python' } = watch()
+
+  return [protocol_format]
+}
 
 export function generatePromptPreviewApplicationItems(
   watch: UseFormWatch<CreateProtocolFormData>,
@@ -222,6 +235,10 @@ export function generatePromptPreviewData(
 }> {
   return [
     {
+      title: t('protocol_format_title'),
+      items: generatePromptPreviewProtocolFormatItems(watch, t),
+    },
+    {
       title: t('application_title'),
       items: generatePromptPreviewApplicationItems(watch, t),
     },
@@ -251,6 +268,8 @@ export function generateChatPrompt(
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
   ) => void
 ): string {
+  const protocolFormat = `- ${startCase(values.protocol_format)}`
+
   const robotType = t(values.instruments.robot)
   const scientificApplication = `- ${t(
     values.application.scientificApplication
@@ -339,6 +358,8 @@ export function generateChatPrompt(
     : values.steps
 
   const prompt = `${t('create_protocol_prompt_robot', { robotType })}\n${t(
+    'protocol_format'
+  )}:\n${protocolFormat}\n\n${t(
     'application_title'
   )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
     'pipette_mounts'
@@ -372,8 +393,11 @@ export function generateChatPrompt(
     ),
     liquids: values.liquids,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake: false,
-    fake_id: 0,
+    fake: values.protocol_format === 'Protocol Designer',
+    fake_key:
+      values.protocol_format === 'Protocol Designer'
+        ? 'pd serial diliution'
+        : undefined,
   })
 
   return prompt

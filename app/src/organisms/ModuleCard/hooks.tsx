@@ -1,11 +1,12 @@
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
+
 import {
   MenuItem,
   NO_WRAP,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -13,13 +14,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {
+  FlexStackerPrepareShuttleCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
@@ -30,9 +32,7 @@ import type {
   TCDeactivateLidCreateCommand,
   TCOpenLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
-  FlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-
 import type { AttachedModule } from '/app/redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {

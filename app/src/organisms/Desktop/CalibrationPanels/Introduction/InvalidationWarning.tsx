@@ -1,11 +1,13 @@
+import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
   Banner,
+  Flex,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+
 import * as Sessions from '/app/redux/sessions'
 
 interface InvalidationWarningProps {

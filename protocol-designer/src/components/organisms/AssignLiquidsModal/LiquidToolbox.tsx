@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   Banner,
   Btn,
@@ -19,20 +20,21 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getLiquidEntities } from '../../../step-forms/selectors'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import * as fieldProcessors from '../../../steplist/fieldLevel/processing'
+
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { getLiquidClassDisplayName } from '../../../liquid-defs/utils'
-import { getSelectedWells } from '../../../well-selection/selectors'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import {
   removeWellsContents,
   setWellContents,
 } from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { getLiquidClassDisplayName } from '../../../liquid-defs/utils'
+import { getLiquidEntities } from '../../../step-forms/selectors'
+import * as fieldProcessors from '../../../steplist/fieldLevel/processing'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { deselectAllWells } from '../../../well-selection/actions'
+import { getSelectedWells } from '../../../well-selection/selectors'
+import { LINK_BUTTON_STYLE } from '../../atoms'
 import { DefineLiquidsModal } from '../DefineLiquidsModal'
 import { LiquidCard } from './LiquidCard'
 

@@ -1,6 +1,6 @@
-import { css } from 'styled-components'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -20,6 +20,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   isTimeFormatMinutesSeconds,
@@ -31,7 +32,7 @@ import {
   maskToTime,
 } from '../../../../../../steplist/fieldLevel/processing'
 import { uuid } from '../../../../../../utils'
-import { getTimeFromString, getStepIndex } from './utils'
+import { getStepIndex, getTimeFromString } from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'

@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { COLORS } from '@opentrons/components'
-import { i18n } from '../../../../../../../assets/localization'
+
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../../assets/localization'
 import { InputStepFormField } from '../../../../../../../components/molecules'
 import { PositionField } from '../../../PipetteFields'
 import { MultiInputField } from '../MultiInputField'

@@ -1,5 +1,6 @@
-import { getModulePythonName } from '../utils'
 import { getModuleEntities } from '../step-forms/selectors'
+import { getModulePythonName } from '../utils'
+
 import type { ModuleEntity } from '@opentrons/step-generation'
 import type { ModuleEntities } from '../step-forms'
 import type { DeleteModuleAction } from '../step-forms/actions'

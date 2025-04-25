@@ -2,11 +2,11 @@
 
 import { mockRobot } from '../../robot-api/__fixtures__'
 
-import type { RobotSettings } from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
+import type { RobotSettings } from '../types'
 
 export const mockRobotSettings: RobotSettings = [
   { id: 'foo', title: 'Foo', description: 'foobar', value: true },

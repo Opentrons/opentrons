@@ -1,28 +1,32 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { OT3_PIPETTES, isFlexPipette } from '@opentrons/shared-data'
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
-  useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
+  useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
+import { isFlexPipette, OT3_PIPETTES } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData } from '../../../Devices/hooks'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useRunStatuses } from '/app/resources/runs'
+
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
 } from '../__fixtures__'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { useDeckCalibrationData } from '../../../Devices/hooks'
 import { OverflowMenu } from '../OverflowMenu'
 
 import type { ComponentProps } from 'react'

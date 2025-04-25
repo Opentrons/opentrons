@@ -1,6 +1,7 @@
 import {
   APPLIED_OFFSETS_TO_RUN,
   APPLY_WORKING_OFFSETS,
+  CLEAR_SNACKBAR_STATUS,
   CLEAR_WORKING_OFFSETS,
   FINISH_LPC,
   GO_BACK_HANDLE_LW_SUBSTEP,
@@ -32,6 +33,7 @@ import {
   proceedToNextHandleLwSubstep,
   updateLPCLabwareInfoFrom,
   updateOffsetsForURI,
+  updateSnackbarState,
 } from './transforms'
 
 import type {
@@ -64,7 +66,10 @@ export function LPCReducer(
       case UPDATE_LPC_LABWARE: {
         return {
           ...state,
-          labwareInfo: action.payload.labware,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: action.payload.labware,
+          },
         }
       }
 
@@ -149,6 +154,7 @@ export function LPCReducer(
       case RESET_OFFSET_TO_DEFAULT: {
         const lwUri = action.payload.labwareUri
         const updatedLwDetails = updateOffsetsForURI(state, action)
+        const updatedSnackbarState = updateSnackbarState(state, action)
 
         return {
           ...state,
@@ -161,6 +167,10 @@ export function LPCReducer(
                 ...updatedLwDetails,
               },
             },
+          },
+          ui: {
+            ...state.ui,
+            showSnackbar: updatedSnackbarState,
           },
         }
       }
@@ -283,6 +293,16 @@ export function LPCReducer(
           ui: {
             ...state.ui,
             showDefaultOffsetInfoBanner: !state.ui.showDefaultOffsetInfoBanner,
+          },
+        }
+      }
+
+      case CLEAR_SNACKBAR_STATUS: {
+        return {
+          ...state,
+          ui: {
+            ...state.ui,
+            showSnackbar: null,
           },
         }
       }

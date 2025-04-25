@@ -1,9 +1,9 @@
 import cx from 'classnames'
+
 import { Icon } from '../icons'
-
-import type { ComponentProps, ChangeEventHandler } from 'react'
-
 import styles from './forms.module.css'
+
+import type { ChangeEventHandler, ComponentProps } from 'react'
 
 /**
  * Checkbox Field Properties.

@@ -1,9 +1,10 @@
-import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import first from 'lodash/first'
 import flatten from 'lodash/flatten'
 import last from 'lodash/last'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -16,16 +17,17 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  WASTE_CHUTE_CUTOUT,
   getModuleDisplayName,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { LINE_CLAMP_TEXT_STYLE } from '../../../components/atoms'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
 } from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../components/atoms'
 import { formatTime } from '../utils'
 
 import type { FormData } from '../../../form-types'

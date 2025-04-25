@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   Box,
   COLORS,
@@ -7,12 +8,13 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
 } from '../../../../../../components/molecules'
+import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { StepFormProps } from '../../types'

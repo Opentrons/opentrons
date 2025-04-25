@@ -1,4 +1,5 @@
 """Test magnetic module core."""
+
 import pytest
 from decoy import Decoy
 
@@ -12,6 +13,7 @@ from opentrons.protocol_engine.types import ModuleModel
 
 from opentrons.protocol_api.core.engine.module_core import MagneticModuleCore
 from opentrons.protocol_api.core.engine.exceptions import InvalidMagnetEngageHeightError
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
@@ -34,10 +36,17 @@ def mock_sync_module_hardware(decoy: Decoy) -> MagDeckHardware:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
 def subject(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: MagDeckHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> MagneticModuleCore:
     """Get a mock of MagneticModuleCore."""
     return MagneticModuleCore(
@@ -45,6 +54,7 @@ def subject(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -52,6 +62,7 @@ def test_create(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: MagDeckHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should be able to create a magnetic module core."""
     result = MagneticModuleCore(
@@ -59,6 +70,7 @@ def test_create(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
     assert result.module_id == "1234"

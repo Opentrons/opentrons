@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+
 import { BaseDeck, Flex, getWellFillFromLabwareId } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -6,8 +7,8 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
@@ -15,8 +16,8 @@ import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/P
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 import type {
-  StackedItemsOnDeck,
   ModuleInStack,
+  StackedItemsOnDeck,
   StackItem,
 } from '/app/transformations/commands'
 

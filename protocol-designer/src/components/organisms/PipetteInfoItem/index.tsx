@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   Btn,
   COLORS,
@@ -12,8 +13,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { LINK_BUTTON_STYLE } from '../../atoms'
+
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteInfoItemProps {

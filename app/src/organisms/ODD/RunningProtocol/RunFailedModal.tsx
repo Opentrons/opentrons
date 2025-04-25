@@ -3,31 +3,31 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   OVERFLOW_AUTO,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { getHighestPriorityError } from '/app/transformations/runs'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type {
   RunCommandErrors,
   RunError,
   RunStatus,
 } from '@opentrons/api-client'
 import type { RunCommandError } from '@opentrons/shared-data'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface RunFailedModalProps {
   runId: string

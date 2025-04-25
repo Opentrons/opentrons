@@ -1,20 +1,23 @@
 import {
+  FLEX_ROBOT_TYPE,
   getCutoutDisplayName,
+  getFlexNameConversion,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   isFlexPipette,
-  FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
-  getFlexNameConversion,
 } from '@opentrons/shared-data'
+
 import {
+  CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
   formatPyStr,
   indentPyLines,
-  CUSTOM_LABWARE_DICT_NAME,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
+
+import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
@@ -27,7 +30,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 
 const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
 
@@ -119,9 +121,9 @@ export function getLoadAdapters(
         parentName = moduleEntities[adapterSlot].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
-        locationArg = `location=${formatPyStr(
-          adapterSlot === 'offDeck' ? OFF_DECK : adapterSlot
-        )}`
+        locationArg = `location=${
+          adapterSlot === 'offDeck' ? OFF_DECK : formatPyStr(adapterSlot)
+        }`
       }
 
       const isStandard = getLabwareDefIsStandard(def)
@@ -183,9 +185,9 @@ export function getLoadLabware(
         parentName = moduleEntities[labwareSlot].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
-        locationArg = `location=${formatPyStr(
-          labwareSlot === 'offDeck' ? OFF_DECK : labwareSlot
-        )}`
+        locationArg = `location=${
+          labwareSlot === 'offDeck' ? OFF_DECK : formatPyStr(labwareSlot)
+        }`
       }
       const labelArg = hasNickname
         ? `label=${formatPyStr(labwareNicknamesById[id])}`

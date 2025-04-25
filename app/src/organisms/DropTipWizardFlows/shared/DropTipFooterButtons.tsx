@@ -2,17 +2,17 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  PrimaryButton,
   AlertPrimaryButton,
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  Box,
+  PrimaryButton,
   RESPONSIVENESS,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
-import { TextOnlyButton, SmallButton } from '../../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
 
 interface DropTipFooterButtonsProps {
   primaryBtnOnClick: () => void

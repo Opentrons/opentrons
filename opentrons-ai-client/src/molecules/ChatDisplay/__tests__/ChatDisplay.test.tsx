@@ -1,10 +1,10 @@
+import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-
 import { ChatDisplay } from '../index'
-import { useForm, FormProvider } from 'react-hook-form'
 
 import type { ComponentProps } from 'react'
 

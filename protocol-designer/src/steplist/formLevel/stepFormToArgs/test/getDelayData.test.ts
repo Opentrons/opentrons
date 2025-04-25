@@ -1,5 +1,6 @@
-import { it, describe, expect } from 'vitest'
-import { getMoveLiquidDelayData, getMixDelayData } from '../getDelayData'
+import { describe, expect, it } from 'vitest'
+
+import { getMixDelayData, getMoveLiquidDelayData } from '../getDelayData'
 
 describe('getMoveLiquidDelayData', () => {
   it('should return null if checkbox field is false', () => {

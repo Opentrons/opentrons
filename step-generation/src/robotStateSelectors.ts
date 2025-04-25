@@ -1,17 +1,21 @@
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
 import min from 'lodash/min'
+
 import {
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
+  getLabwareDefIsStandard,
   getLabwareDefURI,
   getTiprackVolume,
   orderWells,
-  THERMOCYCLER_MODULE_TYPE,
   SINGLE,
-  getLabwareDefIsStandard,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import { COLUMN_4_SLOTS } from './constants'
+
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
   InvariantContext,
@@ -19,7 +23,6 @@ import type {
   RobotState,
   ThermocyclerModuleState,
 } from './types'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']

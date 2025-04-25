@@ -52,7 +52,7 @@ async def test_home_command(
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=0,
+        contained_labware_bottom_first=[],
         max_pool_count=0,
         pool_overlap=0,
     )
@@ -87,7 +87,7 @@ async def test_home_command_with_stall_detected(
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=0,
+        contained_labware_bottom_first=[],
         max_pool_count=0,
         pool_overlap=0,
     )
@@ -108,5 +108,6 @@ async def test_home_command_with_stall_detected(
             id=err_id,
             createdAt=err_timestamp,
             wrappedErrors=[matchers.Anything()],
+            errorInfo={},
         )
     )

@@ -1,14 +1,17 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+
 import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
+
 import type { FormData, StepIdType } from '../../../../form-types'
 import type { ModuleOnDeck } from '../../../../step-forms'
 

@@ -1,4 +1,5 @@
-import { getTiprackVolume, getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, getTiprackVolume } from '@opentrons/shared-data'
+
 import type { PipetteEntity } from '@opentrons/step-generation'
 
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns

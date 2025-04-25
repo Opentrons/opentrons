@@ -1,9 +1,12 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { getStateAndContextTempTCModules } from '../fixtures'
+
 import { setTemperature } from '../commandCreators/atomic/setTemperature'
-import type { InvariantContext, RobotState } from '../types'
+import { getStateAndContextTempTCModules } from '../fixtures'
+
 import type { TemperatureParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'

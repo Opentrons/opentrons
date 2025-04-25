@@ -8,13 +8,14 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
 import type { RobotUpdateInfo } from '/app/redux/robot-update/types'

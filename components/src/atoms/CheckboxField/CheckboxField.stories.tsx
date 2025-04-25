@@ -1,7 +1,8 @@
 import * as React from 'react'
+
 import { CheckboxField as CheckboxFieldComponent } from './index'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Library/Atoms/Checkbox Field',

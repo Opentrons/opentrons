@@ -1,3 +1,8 @@
+import { useEffect, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -7,22 +12,24 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-import { useState } from 'react'
 import { COLUMN } from '@opentrons/shared-data'
-import { ControlledAddTextAreaFields } from '../../molecules/ControlledAddTextAreaFields'
+
 import { ControlledTextAreaField } from '../../atoms/ControlledTextAreaField'
+import { ControlledAddTextAreaFields } from '../../molecules/ControlledAddTextAreaFields'
 
 export const STEPS_FIELD_NAME = 'steps'
 
 export function StepsSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
-  const { setValue, watch } = useFormContext()
+  const { setValue, watch, trigger } = useFormContext()
   const [isIndividualStep, setIsIndividualStep] = useState(true)
 
   const steps = watch(STEPS_FIELD_NAME) ?? []
+
+  // trigger form validation on mount for when users come back to this section after moving on
+  useEffect(() => {
+    void trigger([STEPS_FIELD_NAME])
+  })
 
   return (
     <Flex

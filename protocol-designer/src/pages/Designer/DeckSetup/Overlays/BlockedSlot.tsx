@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -9,13 +10,15 @@ import {
   WasteChute,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { SlotOverlay } from './SlotOverlay'
+
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 
 interface BlockedSlotProps {

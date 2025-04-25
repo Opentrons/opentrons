@@ -6,16 +6,16 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { restartRobot } from '/app/redux/robot-admin'
 
-import type { Dispatch } from '/app/redux/types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface RestartRobotConfirmationModalProps {
   robotName: string

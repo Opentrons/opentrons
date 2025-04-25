@@ -1,29 +1,29 @@
 import { useEffect } from 'react'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { useErrorRecoverySettings } from '@opentrons/react-api-client'
-
-import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
-import { useProtocolDropTipModal } from '../modals'
 import {
-  useCloseCurrentRun,
-  useCurrentRunCommands,
-  useIsRunCurrent,
-} from '/app/resources/runs'
-import { isTerminalRunStatus } from '../../utils'
-import { useTipAttachmentStatus } from '/app/resources/instruments'
-import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+  RUN_STATUS_IDLE,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
+import { useErrorRecoverySettings } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import type { RobotType } from '@opentrons/shared-data'
+import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
+import { useTipAttachmentStatus } from '/app/resources/instruments'
+import { useCurrentRunCommands, useIsRunCurrent } from '/app/resources/runs'
+
+import { isTerminalRunStatus } from '../../utils'
+import { useProtocolDropTipModal } from '../modals'
+
 import type { Run, RunStatus } from '@opentrons/api-client'
+import type { RobotType } from '@opentrons/shared-data'
+import type { DropTipWizardFlowsProps } from '/app/organisms/DropTipWizardFlows'
 import type {
   PipetteWithTip,
   TipAttachmentStatusResult,
 } from '/app/resources/instruments'
-import type { DropTipWizardFlowsProps } from '/app/organisms/DropTipWizardFlows'
-import type { UseProtocolDropTipModalResult } from '../modals'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
+import type { UseProtocolDropTipModalResult } from '../modals'
 
 export type RunHeaderDropTipWizProps =
   | { showDTWiz: true; dtWizProps: DropTipWizardFlowsProps }
@@ -34,6 +34,7 @@ export interface UseRunHeaderDropTipParams {
   runRecord: Run | null
   robotType: RobotType
   runStatus: RunStatus | null
+  closeCurrentRun: () => void
 }
 
 export interface UseRunHeaderDropTipResult {
@@ -48,11 +49,11 @@ export function useRunHeaderDropTip({
   runRecord,
   robotType,
   runStatus,
+  closeCurrentRun,
 }: UseRunHeaderDropTipParams): UseRunHeaderDropTipResult {
   const isRunCurrent = useIsRunCurrent(runId)
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
 
-  const { closeCurrentRun } = useCloseCurrentRun()
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
 
   const {
@@ -107,12 +108,14 @@ export function useRunHeaderDropTip({
 
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
+  const isRunTerminatingOrTerminal =
+    isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_STOP_REQUESTED
   const runSummaryNoFixit = useCurrentRunCommands(
     {
       includeFixitCommands: false,
       pageLength: 1,
     },
-    { enabled: isTerminalRunStatus(runStatus) }
+    { enabled: isRunTerminatingOrTerminal }
   )
 
   // Manage tip checking
@@ -127,7 +130,7 @@ export function useRunHeaderDropTip({
         runSummaryNoFixit != null &&
         !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled) &&
         isRunCurrent &&
-        isTerminalRunStatus(runStatus)
+        isRunTerminatingOrTerminal
       ) {
         void determineTipStatus()
       }
@@ -138,13 +141,18 @@ export function useRunHeaderDropTip({
   // This marks the robot as "not busy" if drop tip CTAs are unnecessary.
   useEffect(() => {
     if (
-      runStatus === RUN_STATUS_STOPPED &&
+      isRunTerminatingOrTerminal &&
       isRunCurrent &&
       (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE)
     ) {
       closeCurrentRun()
     }
-  }, [runStatus, isRunCurrent, enteredER, initialPipettesWithTipsCount])
+  }, [
+    isRunTerminatingOrTerminal,
+    isRunCurrent,
+    enteredER,
+    initialPipettesWithTipsCount,
+  ])
 
   return {
     dropTipModalUtils,

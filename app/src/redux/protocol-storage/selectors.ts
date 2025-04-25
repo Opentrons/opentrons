@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect'
+
 import { getGroupedCommands } from './utils'
 
 import type { State } from '../types'

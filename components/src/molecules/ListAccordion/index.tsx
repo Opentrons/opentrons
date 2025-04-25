@@ -2,19 +2,19 @@ import { useState } from 'react'
 import { css } from 'styled-components'
 
 import { ListTable } from '../../atoms/ListTable'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import { Box, Flex } from '../../primitives'
 import {
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   CURSOR_POINTER,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
-import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
-import { Flex, Box } from '../../primitives'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
-import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { ListTableProps } from '../../atoms/ListTable'
 
 const TRANSITION_STYLE = 'all 150ms ease-in'

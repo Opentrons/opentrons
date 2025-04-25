@@ -1,12 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
   LEFT,
+  NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
-  NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
+
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
+
 import type { PipetteWizardStep } from '../types'
 
 describe('getPipetteWizardSteps', () => {

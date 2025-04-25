@@ -15,9 +15,9 @@ import {
 } from '@opentrons/components'
 
 import { LANGUAGES } from '/app/i18n'
-import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
 
 import type { ChangeEvent } from 'react'

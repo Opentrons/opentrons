@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
+
 import { getLiquidClassDisplayName } from '../../../liquid-defs/utils'
+
 import type { StepType } from '../../../form-types'
 
 export function useConfirmationContent(

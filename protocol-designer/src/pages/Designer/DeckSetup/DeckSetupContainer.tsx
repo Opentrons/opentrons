@@ -1,6 +1,7 @@
-import { useMemo, useState, Fragment } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -27,15 +28,17 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+
 import { FixedTrashText } from '../../../components/molecules'
-import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
+import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { DeckSetupDetails } from './DeckSetupDetails'
-import { DECK_SETUP_TOOLS_WIDTH_REM, DeckSetupTools } from './DeckSetupTools'
+import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
@@ -48,15 +51,13 @@ import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
-  ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60
-const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem' // for Protocol Steps
+const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -140,8 +141,6 @@ export function DeckSetupContainer(
   }, '')
 
   const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
-  const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
-  const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -344,8 +343,6 @@ export function DeckSetupContainer(
                   <DeckSetupDetails
                     selectedZoomInSlot={zoomIn.slot ?? undefined}
                     hoveredLabware={hoveredLabware}
-                    hoveredModule={hoveredModule}
-                    hoveredFixture={hoveredFixture}
                     hover={hoverSlot}
                     terminalItemId={terminalItemId}
                     setHover={setHoverSlot}
@@ -369,11 +366,7 @@ export function DeckSetupContainer(
           </Flex>
         </Flex>
         {zoomIn.slot != null && zoomIn.cutout != null ? (
-          <DeckSetupTools
-            onDeckProps={{
-              setHoveredFixture,
-              setHoveredModule,
-            }}
+          <DeckSetupToolbox
             onCloseClick={() => {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
               animateZoom({

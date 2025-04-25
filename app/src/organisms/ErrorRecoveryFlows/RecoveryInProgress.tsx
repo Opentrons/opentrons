@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { RECOVERY_MAP } from './constants'
 import {
-  Flex,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   RESPONSIVENESS,
-  DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
 
 import { InProgressModal } from '/app/molecules/InProgressModal'
 
-import type { RobotMovingRoute, RecoveryContentProps } from './types'
+import { RECOVERY_MAP } from './constants'
+
+import type { RecoveryContentProps, RobotMovingRoute } from './types'
 
 export function RecoveryInProgress({
   recoveryMap,

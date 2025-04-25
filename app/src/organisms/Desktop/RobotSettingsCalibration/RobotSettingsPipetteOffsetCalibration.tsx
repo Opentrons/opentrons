@@ -3,16 +3,17 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { usePipetteOffsetCalibrations } from '../Devices/hooks'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+
+import { usePipetteOffsetCalibrations } from '../Devices/hooks'
 import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 

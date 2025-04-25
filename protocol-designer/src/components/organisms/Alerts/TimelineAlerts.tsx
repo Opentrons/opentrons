@@ -1,13 +1,14 @@
 import { memo } from 'react'
-
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   Banner,
   DIRECTION_COLUMN,
   Flex,
   StyledText,
 } from '@opentrons/components'
+
 import { getRobotStateTimeline } from '../../../file-data/selectors'
 import { ErrorContents } from './ErrorContents'
 

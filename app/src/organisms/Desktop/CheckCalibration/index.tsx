@@ -2,37 +2,38 @@ import { useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
+import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
-import * as Sessions from '/app/redux/sessions'
+import { getTopPortalEl } from '/app/App/portal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import {
-  Introduction,
+  ConfirmExit,
   DeckSetup,
-  TipPickUp,
-  TipConfirmation,
-  SaveZPoint,
-  SaveXYPoint,
+  Introduction,
+  LoadingState,
   MeasureNozzle,
   MeasureTip,
-  LoadingState,
-  ConfirmExit,
+  SaveXYPoint,
+  SaveZPoint,
+  TipConfirmation,
+  TipPickUp,
 } from '/app/organisms/Desktop/CalibrationPanels'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getTopPortalEl } from '/app/App/portal'
-import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
+import * as Sessions from '/app/redux/sessions'
 import { CHECK_PIPETTE_RANK_FIRST } from '/app/redux/sessions'
+
+import { ResultsSummary } from './ResultsSummary'
+import { ReturnTip } from './ReturnTip'
 
 import type { ComponentType } from 'react'
 import type { Mount } from '@opentrons/components'
+import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type {
   CalibrationLabware,
   RobotCalibrationCheckPipetteRank,
   RobotCalibrationCheckStep,
   SessionCommandParams,
 } from '/app/redux/sessions/types'
-import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type { CalibrationCheckParentProps } from './types'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'

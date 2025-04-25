@@ -1,13 +1,13 @@
 import {
   useAllSessionsQuery,
+  useCurrentAllSubsystemUpdatesQuery,
   useEstopQuery,
   useHost,
-  useCurrentAllSubsystemUpdatesQuery,
 } from '@opentrons/react-api-client'
 
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
-import { useIsFlex } from '/app/redux-resources/robots'
 
 const ROBOT_STATUS_POLL_MS = 30000
 

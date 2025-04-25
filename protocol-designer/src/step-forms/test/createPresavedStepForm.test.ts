@@ -1,20 +1,23 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
+  fixtureP10SingleV2Specs,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
-  fixtureP10SingleV2Specs,
 } from '@opentrons/shared-data'
 import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
+
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
 } from '../../constants'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
+
 import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 
 const stepId = 'stepId123'

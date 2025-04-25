@@ -1,10 +1,11 @@
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import {
   airGapInPlace,
   moveToAddressableArea,
   prepareToAspirate,
 } from '../atomic'
+
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface AirGapInWasteChuteArgs {

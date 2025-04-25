@@ -1,13 +1,15 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   Btn,
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LINE_CLAMP_TEXT_STYLE,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
@@ -19,32 +21,34 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../../components/atoms'
-import {
-  END_TERMINAL_ITEM_ID,
-  START_TERMINAL_ITEM_ID,
-  actions as steplistActions,
-} from '../../../../steplist'
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
-import { actions as stepsActions } from '../../../../ui/steps'
 import { getFileMetadata } from '../../../../file-data/selectors'
-import {
-  selectDropdownItem,
-  selectTerminalItem,
-} from '../../../../ui/steps/actions/actions'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import {
   getInitialDeckSetup,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
-import { TerminalItemStep } from './TerminalItemStep'
+import {
+  END_TERMINAL_ITEM_ID,
+  START_TERMINAL_ITEM_ID,
+  actions as steplistActions,
+} from '../../../../steplist'
+import { actions as stepsActions } from '../../../../ui/steps'
+import {
+  selectDropdownItem,
+  selectTerminalItem,
+} from '../../../../ui/steps/actions/actions'
 import { AddStepButton } from './AddStepButton'
-import { PresavedStep } from './PresavedStep'
 import { DraggableSteps } from './DraggableSteps'
+import { HardwareStep } from './HardwareStep'
+import { PresavedStep } from './PresavedStep'
+import { TerminalItemStep } from './TerminalItemStep'
 
 import type { StepIdType } from '../../../../form-types'
 import type { ThunkDispatch } from '../../../../types'
 
-const SIDEBAR_MIN_WIDTH_FOR_ICON = 179
+const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
+const SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT = 100
 interface TimelineToolboxProps {
   sidebarWidth: number
 }
@@ -68,7 +72,7 @@ export const TimelineToolbox = ({
   const hasTrash = Object.values(additionalEquipmentOnDeck).some(
     ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
   )
-  const isSidebarWidthSmall = sidebarWidth < 162
+  const isWidthForBackText = sidebarWidth < SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT
   const protocolName = fileMetadata.protocolName
 
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
@@ -100,7 +104,7 @@ export const TimelineToolbox = ({
   const handleGoBack = (): void => {
     if (hasTrash) {
       navigate('/overview')
-      dispatch(selectTerminalItem('__initial_setup__'))
+      dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
       dispatch(
         selectDropdownItem({
           selection: null,
@@ -112,6 +116,11 @@ export const TimelineToolbox = ({
     }
   }
 
+  const name: string =
+    protocolName != null && protocolName !== ''
+      ? protocolName
+      : t('protocol_overview:untitled_protocol')
+
   return (
     <Toolbox
       position={POSITION_RELATIVE}
@@ -121,25 +130,27 @@ export const TimelineToolbox = ({
       title={
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
-            desktopStyle="bodyLargeSemiBold"
+            desktopStyle="bodyDefaultSemiBold"
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+            css={LINE_CLAMP_TEXT_STYLE(1)}
           >
-            {protocolName != null && protocolName !== ''
-              ? protocolName
-              : t('protocol_overview:untitled_protocol')}
+            {name}
           </StyledText>
           <Btn css={LINK_BUTTON_STYLE} onClick={handleGoBack}>
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-              <Icon name="chevron-left" size="12px" />
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {isSidebarWidthSmall ? t('back') : t('back_to_overview')}
+              <Icon name="chevron-left" size="0.75rem" minWidth="0.75rem" />
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                css={isWidthForBackText ? undefined : LINE_CLAMP_TEXT_STYLE(1)}
+              >
+                {isWidthForBackText ? t('back') : t('back_to_overview')}
               </StyledText>
             </Flex>
           </Btn>
         </Flex>
       }
       titlePadding={SPACING.spacing12}
-      childrenPadding={SPACING.spacing12}
+      childrenPadding="0px"
       confirmButton={
         formData != null ? undefined : (
           <AddStepButton hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON} />
@@ -151,28 +162,34 @@ export const TimelineToolbox = ({
         gridGap={SPACING.spacing4}
         width="100%"
       >
-        <StyledText
-          desktopStyle="bodyLargeSemiBold"
-          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+        <HardwareStep sidebarWidth={sidebarWidth} />
+        <Flex
+          padding={SPACING.spacing12}
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
         >
-          {t('timeline')}
-        </StyledText>
-        <TerminalItemStep
-          id={START_TERMINAL_ITEM_ID}
-          sidebarWidth={sidebarWidth}
-        />
-        <DraggableSteps
-          orderedStepIds={orderedStepIds}
-          reorderSteps={(stepIds: StepIdType[]) => {
-            dispatch(steplistActions.reorderSteps(stepIds))
-          }}
-          sidebarWidth={sidebarWidth}
-        />
-        <PresavedStep sidebarWidth={sidebarWidth} />
-        <TerminalItemStep
-          id={END_TERMINAL_ITEM_ID}
-          sidebarWidth={sidebarWidth}
-        />
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('timeline')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            <TerminalItemStep
+              id={START_TERMINAL_ITEM_ID}
+              sidebarWidth={sidebarWidth}
+            />
+            <DraggableSteps
+              orderedStepIds={orderedStepIds}
+              reorderSteps={(stepIds: StepIdType[]) => {
+                dispatch(steplistActions.reorderSteps(stepIds))
+              }}
+              sidebarWidth={sidebarWidth}
+            />
+            <PresavedStep sidebarWidth={sidebarWidth} />
+            <TerminalItemStep
+              id={END_TERMINAL_ITEM_ID}
+              sidebarWidth={sidebarWidth}
+            />
+          </Flex>
+        </Flex>
       </Flex>
     </Toolbox>
   )

@@ -1,13 +1,17 @@
-import { COLORS, SPACING } from '@opentrons/components'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { COLORS, SPACING } from '@opentrons/components'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+
 import { ModuleIcon } from '../'
 
 import type { ComponentProps } from 'react'
-import type { AttachedModule } from '/app/redux/modules/types'
 import type * as OpentronsComponents from '@opentrons/components'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()

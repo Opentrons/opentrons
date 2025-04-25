@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect'
+
 import { getFlagsFromQueryParams } from './utils'
+
 import type { BaseState, Selector } from '../types'
 import type { Flags } from './types'
 

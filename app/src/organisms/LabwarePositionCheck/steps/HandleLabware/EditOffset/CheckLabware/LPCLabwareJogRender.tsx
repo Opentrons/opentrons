@@ -1,6 +1,6 @@
-import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -17,14 +17,13 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 
+import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
+import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
 import {
   selectActivePipette,
   selectIsSelectedLwTipRack,
   selectSelectedLwDef,
 } from '/app/redux/protocol-runs'
-
-import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
-import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'

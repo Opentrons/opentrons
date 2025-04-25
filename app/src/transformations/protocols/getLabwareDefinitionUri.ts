@@ -1,5 +1,6 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import type { ProtocolFile, LoadedLabware } from '@opentrons/shared-data'
+
+import type { LoadedLabware, ProtocolFile } from '@opentrons/shared-data'
 
 // Delete this util once there is a better identifier for labware offsets on the backend
 export function getLabwareDefinitionUri(

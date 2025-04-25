@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ComponentProps, Dispatch } from 'react'
 
 import {
   DIRECTION_COLUMN,
@@ -8,13 +7,15 @@ import {
   RadioButton,
   SPACING,
 } from '@opentrons/components'
+
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import type { ComponentProps, Dispatch } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   ChangeTipOptions,
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface SelectTipFrequencyProps {

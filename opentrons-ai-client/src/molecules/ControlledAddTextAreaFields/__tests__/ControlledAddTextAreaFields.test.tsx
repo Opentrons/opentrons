@@ -1,9 +1,10 @@
+import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import { ControlledAddTextAreaFields } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { ControlledAddTextAreaFields } from '..'
-import { FormProvider, useForm } from 'react-hook-form'
 import { LIQUIDS_FIELD_NAME } from '../../../organisms/LabwareLiquidsSection'
 
 const TestFormProviderComponent = ({

@@ -1,6 +1,6 @@
 import type {
-  CommonCommandRunTimeInfo,
   CommonCommandCreateInfo,
+  CommonCommandRunTimeInfo,
   OnDeckLabwareLocation,
 } from '.'
 import type { MotorAxes } from '../../js/types'

@@ -1,15 +1,17 @@
 import { useState } from 'react'
+
 import {
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN_REVERSE,
+  Flex,
   JUSTIFY_CENTER,
   POSITION_FIXED,
+  Snackbar,
   SPACING,
   Toast,
-  Snackbar,
 } from '@opentrons/components'
+
 import { uuid } from '../../../utils'
 import { KitchenContext } from './KitchenContext'
 

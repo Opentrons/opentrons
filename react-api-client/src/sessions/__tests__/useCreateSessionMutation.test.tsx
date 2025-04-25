@@ -1,19 +1,21 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   createSession,
   SESSION_TYPE_DECK_CALIBRATION,
 } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useCreateSessionMutation } from '..'
 
+import { useCreateSessionMutation } from '..'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
 import type {
+  CreateSessionData,
   HostConfig,
   Response,
   Session,
-  CreateSessionData,
 } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')

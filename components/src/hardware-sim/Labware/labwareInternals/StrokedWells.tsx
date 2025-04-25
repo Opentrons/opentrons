@@ -1,10 +1,11 @@
 import { memo } from 'react'
 import map from 'lodash/map'
-import { Well } from './Well'
-import { COLORS } from '../../../helix-design-system'
 
-import type { MemoExoticComponent, ReactNode } from 'react'
+import { COLORS } from '../../../helix-design-system'
+import { Well } from './Well'
+
 import type { CSSProperties } from 'styled-components'
+import type { MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export interface StrokedWellProps {

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   Btn,
@@ -19,6 +20,7 @@ import {
   getModuleDisplayName,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
 import type { RobotType } from '@opentrons/shared-data'
