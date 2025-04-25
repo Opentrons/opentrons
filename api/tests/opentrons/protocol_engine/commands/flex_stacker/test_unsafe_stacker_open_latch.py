@@ -1,4 +1,4 @@
-"""Test Flex Stacker close latch command implementation."""
+"""Test Flex Stacker open latch command implementation."""
 
 import pytest
 from decoy import Decoy
@@ -11,33 +11,34 @@ from opentrons.protocol_engine.state.module_substates import (
     FlexStackerId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.commands import flex_stacker
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.flex_stacker.close_latch import (
-    CloseLatchImpl,
+from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_open_latch import (
+    UnsafeFlexStackerOpenLatchImpl,
+    UnsafeFlexStackerOpenLatchParams,
+    UnsafeFlexStackerOpenLatchResult,
 )
 
 
 @pytest.fixture
 def subject(
     state_view: StateView, equipment: EquipmentHandler, model_utils: ModelUtils
-) -> CloseLatchImpl:
-    """Get a CloseLatch command to test."""
-    return CloseLatchImpl(
+) -> UnsafeFlexStackerOpenLatchImpl:
+    """Get a UnsafeFlexStackerOpenLatch command to test."""
+    return UnsafeFlexStackerOpenLatchImpl(
         state_view=state_view, equipment=equipment, model_utils=model_utils
     )
 
 
-async def test_close_latch_command(
+async def test_open_latch_command(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: CloseLatchImpl,
+    subject: UnsafeFlexStackerOpenLatchImpl,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should return a success data."""
-    data = flex_stacker.CloseLatchParams(moduleId=stacker_id)
+    data = UnsafeFlexStackerOpenLatchParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -54,6 +55,6 @@ async def test_close_latch_command(
 
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.close_latch(), times=1)
+    decoy.verify(await stacker_hardware.open_latch(), times=1)
 
-    assert result == SuccessData(public=flex_stacker.CloseLatchResult())
+    assert result == SuccessData(public=UnsafeFlexStackerOpenLatchResult())
