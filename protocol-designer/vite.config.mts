@@ -1,13 +1,15 @@
 import path from 'path'
-import { defineConfig } from 'vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
-import { sentryVitePlugin } from '@sentry/vite-plugin'
+import { defineConfig } from 'vite'
+
 import { versionForProject } from '../scripts/git-version.mjs'
+
 import type { UserConfig } from 'vite'
 
 // eslint-disable-next-line import/no-default-export
@@ -42,7 +44,7 @@ export default defineConfig(
           },
         },
         sentryVitePlugin({
-          org: 'opentrons-at',
+          org: 'opentrons-sw',
           project: 'protocol-designer',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
           telemetry: false,
