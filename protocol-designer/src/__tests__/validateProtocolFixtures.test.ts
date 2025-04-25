@@ -3,6 +3,7 @@ import Ajv from 'ajv'
 import glob from 'glob'
 import last from 'lodash/last'
 import { describe, expect, it } from 'vitest'
+
 import {
   commandSchemaV7,
   labwareSchemaV2,

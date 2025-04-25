@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import first from 'lodash/first'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,

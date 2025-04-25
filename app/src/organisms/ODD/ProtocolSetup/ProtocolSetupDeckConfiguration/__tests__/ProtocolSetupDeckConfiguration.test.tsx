@@ -1,6 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import { BaseDeck } from '@opentrons/components'
 import {
   useModulesQuery,

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import { Box } from '@opentrons/components'
 
 import { ConfigErrorBanner } from './ConfigErrorBanner'

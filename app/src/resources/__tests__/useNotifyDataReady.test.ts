@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import { useHost } from '@opentrons/react-api-client'
 
 import { useTrackEvent } from '/app/redux/analytics'

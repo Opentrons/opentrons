@@ -7,17 +7,17 @@ on:
     paths:
       - 'Makefile'
       - 'components/**'
-      - 'app/**/*.stories.*'
-      - 'app/src/atoms/**/*'
-      - 'app/src/molecules/**/*'
+      - 'app/**.stories.*'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
   push:
     paths:
       - 'components/**'
-      - 'app/**/*.stories.*'
-      - 'app/src/atoms/**/*'
-      - 'app/src/molecules/**/*'
+      - 'app/**.stories.*'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
     branches:

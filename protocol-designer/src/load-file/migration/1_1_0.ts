@@ -3,6 +3,7 @@ import isUndefined from 'lodash/isUndefined'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
+
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { getLegacyLabwareDef } from '../../labware-defs'

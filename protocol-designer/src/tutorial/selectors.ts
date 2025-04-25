@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty'
 import { createSelector } from 'reselect'
+
 import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,

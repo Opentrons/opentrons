@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import snakeCase from 'lodash/snakeCase'
+
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,

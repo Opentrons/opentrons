@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
+
 import {
   COLORS,
   LegacyStyledText,

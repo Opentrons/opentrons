@@ -52,6 +52,31 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
   })
 }
 
+const checkExtents = (labwareDef: LabwareDefinition3): void => {
+  test('extents.total should be oriented correctly', () => {
+    const {
+      total: { backLeftBottom, frontRightTop },
+    } = labwareDef.extents
+    expect(backLeftBottom.x).toBeLessThanOrEqual(frontRightTop.x)
+    expect(backLeftBottom.y).toBeGreaterThanOrEqual(frontRightTop.y)
+    expect(backLeftBottom.z).toBeLessThanOrEqual(frontRightTop.z)
+  })
+  test('extents.footprint should be oriented correctly', () => {
+    const {
+      footprint: { backLeft, frontRight },
+    } = labwareDef.extents
+    expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
+    expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+  })
+  test('extents.footprint should be contained inside extents.total', () => {
+    const { footprint, total } = labwareDef.extents
+    expect(footprint.backLeft.x).toBeGreaterThanOrEqual(total.backLeftBottom.x)
+    expect(footprint.backLeft.y).toBeLessThanOrEqual(total.backLeftBottom.y)
+    expect(footprint.frontRight.x).toBeLessThanOrEqual(total.frontRightTop.x)
+    expect(footprint.frontRight.y).toBeGreaterThanOrEqual(total.frontRightTop.y)
+  })
+}
+
 describe(`test labware definitions with schema v3`, () => {
   const definitionPaths = glob.sync(globPattern, {
     cwd: definitionsDir,
@@ -80,6 +105,7 @@ describe(`test labware definitions with schema v3`, () => {
       expect(valid).toBe(true)
     })
 
+    checkExtents(labwareDef)
     checkGeometryDefinitions(labwareDef)
   })
 })

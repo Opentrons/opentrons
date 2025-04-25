@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
 
 import {

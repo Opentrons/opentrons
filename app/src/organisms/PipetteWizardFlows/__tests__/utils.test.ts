@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'

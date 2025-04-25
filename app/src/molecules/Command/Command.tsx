@@ -1,4 +1,5 @@
 import { omit } from 'lodash'
+
 import {
   ALIGN_CENTER,
   BORDERS,

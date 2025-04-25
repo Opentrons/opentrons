@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,

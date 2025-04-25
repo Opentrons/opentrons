@@ -1,5 +1,6 @@
 import { SketchPicker } from 'react-color'
 import { Controller } from 'react-hook-form'
+
 import { Flex, POSITION_ABSOLUTE } from '@opentrons/components'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 

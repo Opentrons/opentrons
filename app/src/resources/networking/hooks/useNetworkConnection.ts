@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { useInterval } from '@opentrons/components'
 
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'

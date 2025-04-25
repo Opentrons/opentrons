@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
+
 import {
   getLabwareDisplayLocation,
   getLoadedLabware,

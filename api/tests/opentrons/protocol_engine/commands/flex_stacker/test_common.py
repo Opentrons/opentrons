@@ -1791,55 +1791,6 @@ async def test_build_n_labware_happypath_primary_and_lid_and_adapter(
             id="generate-all-from-empty",
         ),
         pytest.param(
-            None,
-            3,
-            2,
-            [
-                StackerStoredLabwareGroup(
-                    primaryLabwareId="generated-1",
-                    adapterLabwareId=None,
-                    lidLabwareId=None,
-                ),
-            ],
-            id="generate-all-from-nonempty",
-        ),
-        pytest.param(
-            None,
-            4,
-            0,
-            [
-                StackerStoredLabwareGroup(
-                    primaryLabwareId="generated-1",
-                    adapterLabwareId=None,
-                    lidLabwareId=None,
-                ),
-                StackerStoredLabwareGroup(
-                    primaryLabwareId="generated-2",
-                    adapterLabwareId=None,
-                    lidLabwareId=None,
-                ),
-                StackerStoredLabwareGroup(
-                    primaryLabwareId="generated-3",
-                    adapterLabwareId=None,
-                    lidLabwareId=None,
-                ),
-            ],
-            id="generate-too-many-from-empty",
-        ),
-        pytest.param(
-            None,
-            4,
-            2,
-            [
-                StackerStoredLabwareGroup(
-                    primaryLabwareId="generated-1",
-                    adapterLabwareId=None,
-                    lidLabwareId=None,
-                ),
-            ],
-            id="generate-too-many-from-nonempty",
-        ),
-        pytest.param(
             [
                 StackerStoredLabwareGroup(
                     primaryLabwareId="specified-1",
@@ -1990,6 +1941,7 @@ def test_build_ids_to_fill_variants(
     )
 
 
+@pytest.mark.parametrize("using_list", [True, False])
 @pytest.mark.parametrize(
     "specified_count,current_count",
     [
@@ -2006,30 +1958,56 @@ def test_build_ids_to_fill_variants(
     ],
 )
 def test_build_ids_to_fill_fails_on_too_many_specified(
+    using_list: bool,
     specified_count: int,
     current_count: int,
     model_utils: ModelUtils,
 ) -> None:
     """It should prevent you from specifying too many labware."""
-    specified = [
-        StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{idx}",
-            adapterLabwareId=None,
-            lidLabwareId=None,
-        )
-        for idx in range(specified_count)
-    ]
+    if using_list:
+        specified_labware_list = [
+            StackerStoredLabwareGroup(
+                primaryLabwareId=f"primary-id-{idx}",
+                adapterLabwareId=None,
+                lidLabwareId=None,
+            )
+            for idx in range(specified_count)
+        ]
+        specified_labware_count = None
+    else:
+        specified_labware_list = None
+        specified_labware_count = specified_count
+
     with pytest.raises(
         CommandPreconditionViolated,
-        match=".*were requested to be stored, but the stacker can store only.*",
+        match=".*were requested to be stored, but the stacker can hold only.*",
     ):
         subject.build_ids_to_fill(
             False,
             False,
-            specified,
-            None,
+            specified_labware_list,
+            specified_labware_count,
             2,
             current_count,
+            model_utils,
+        )
+
+
+def test_build_ids_to_fill_fails_on_already_at_capacity(
+    model_utils: ModelUtils,
+) -> None:
+    """If nothing is specified but already at max, it should fail."""
+    with pytest.raises(
+        CommandPreconditionViolated,
+        match=".*already full.*",
+    ):
+        subject.build_ids_to_fill(
+            False,
+            False,
+            None,
+            None,
+            2,
+            2,
             model_utils,
         )
 

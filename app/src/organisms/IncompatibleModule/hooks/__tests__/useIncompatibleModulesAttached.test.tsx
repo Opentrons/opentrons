@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { useIncompatibleModulesAttached } from '..'

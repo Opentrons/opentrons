@@ -1,4 +1,5 @@
 import startCase from 'lodash/startCase'
+
 import {
   getFlexNameConversion,
   getLabwareDisplayName,

@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,

@@ -1,5 +1,6 @@
 import Ajv from 'ajv'
 import sortBy from 'lodash/sortBy'
+
 import {
   getLabwareDefIsStandard,
   labwareSchemaV2 as labwareSchema,

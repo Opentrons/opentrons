@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import last from 'lodash/last'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,

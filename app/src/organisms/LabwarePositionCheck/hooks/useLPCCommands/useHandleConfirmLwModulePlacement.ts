@@ -6,10 +6,10 @@ import {
 
 import type { VectorOffset } from '@opentrons/api-client'
 import type {
-  Coordinates,
   CreateCommand,
   LabwareLocation,
   MoveLabwareCreateCommand,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
@@ -26,7 +26,7 @@ export interface UseHandleConfirmPlacementResult {
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ) => Promise<Coordinates>
+  ) => Promise<Vector3D>
 }
 
 export function useHandleConfirmLwModulePlacement({
@@ -38,7 +38,7 @@ export function useHandleConfirmLwModulePlacement({
     offsetLocationDetails: OffsetLocationDetails,
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
-  ): Promise<Coordinates> => {
+  ): Promise<Vector3D> => {
     const confirmCommands: CreateCommand[] = [
       ...buildMoveLabwareCommand(offsetLocationDetails),
       ...moduleInitDuringLPCCommands(analysis),

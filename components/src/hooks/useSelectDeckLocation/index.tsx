@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
+
 import {
   FLEX_CUTOUT_BY_SLOT_ID,
   FLEX_ROBOT_TYPE,

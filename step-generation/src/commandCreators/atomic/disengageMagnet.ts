@@ -1,4 +1,5 @@
 import assert from 'assert'
+
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   ALIGN_FLEX_END,
   Btn,

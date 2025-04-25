@@ -2,6 +2,7 @@
 import { app } from 'electron'
 import Store from 'electron-store'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as DiscoveryClient from '@opentrons/discovery-client'
 
 import { finishDiscovery, startDiscovery } from '../actions'

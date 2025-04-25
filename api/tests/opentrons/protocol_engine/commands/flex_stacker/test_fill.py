@@ -40,6 +40,7 @@ from opentrons.protocol_engine.errors import (
     FlexStackerLabwarePoolNotYetDefinedError,
     ModuleNotLoadedError,
 )
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import DeckSlotName
 
@@ -72,13 +73,52 @@ def _contained_labware(count: int) -> list[StackerStoredLabwareGroup]:
 
 
 @pytest.mark.parametrize(
+    "current_stored,count_param,max_pool_count",
+    [
+        pytest.param(_contained_labware(3), 3, 3, id="already-full"),
+        pytest.param(_contained_labware(0), 4, 3, id="empty-fill-more-than-max"),
+        pytest.param(_contained_labware(1), 3, 3, id="nonempty-fill-more-than-max"),
+    ],
+)
+async def test_fill_by_count_exceeding_max(
+    decoy: Decoy,
+    state_view: StateView,
+    model_utils: ModelUtils,
+    equipment: EquipmentHandler,
+    subject: FillImpl,
+    current_stored: list[StackerStoredLabwareGroup],
+    count_param: int,
+    max_pool_count: int,
+    flex_50uL_tiprack: LabwareDefinition,
+) -> None:
+    """It should fill a valid stacker's labware pool."""
+    module_id = "some-module-id"
+    stacker_state = FlexStackerSubState(
+        module_id=cast(FlexStackerId, module_id),
+        pool_primary_definition=flex_50uL_tiprack,
+        pool_adapter_definition=None,
+        pool_lid_definition=None,
+        contained_labware_bottom_first=current_stored,
+        max_pool_count=max_pool_count,
+        pool_overlap=0,
+    )
+    decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
+        stacker_state
+    )
+    params = FillParams(
+        moduleId=module_id,
+        count=count_param,
+        message="some-message",
+        strategy=StackerFillEmptyStrategy.LOGICAL,
+    )
+    with pytest.raises(CommandPreconditionViolated):
+        await subject.execute(params)
+
+
+@pytest.mark.parametrize(
     "current_stored,count_param,max_pool_count,expected_new_labware",
     [
         pytest.param([], 3, 3, 3, id="empty-to-full"),
-        pytest.param(_contained_labware(3), 3, 3, 0, id="full-noop"),
-        pytest.param(_contained_labware(3), 1, 3, 0, id="size-minimum"),
-        pytest.param(_contained_labware(1), 2, 3, 1, id="fill-not-to-full"),
-        pytest.param(_contained_labware(1), 4, 3, 2, id="capped-by-max"),
         pytest.param(
             _contained_labware(1),
             None,

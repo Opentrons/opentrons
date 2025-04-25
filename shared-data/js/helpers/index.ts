@@ -108,6 +108,12 @@ export const RETIRED_LABWARE = [
   // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
   // https://opentrons.atlassian.net/browse/RLAB-230
   'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  // adapter/labware combo defs
+  'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
+  'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
+  'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
 ]
 
 export const getLabwareDisplayName = (

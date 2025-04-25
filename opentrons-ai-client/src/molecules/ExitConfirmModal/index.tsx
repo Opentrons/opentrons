@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
+
 import {
   AlertPrimaryButton,
   DIRECTION_COLUMN,

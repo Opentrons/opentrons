@@ -2,6 +2,7 @@ import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import startCase from 'lodash/startCase'
 import without from 'lodash/without'
+
 import { SINGLE } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,

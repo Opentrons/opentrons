@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
   COLORS,
   DIRECTION_COLUMN,

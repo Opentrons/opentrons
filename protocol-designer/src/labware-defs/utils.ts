@@ -1,4 +1,5 @@
 import groupBy from 'lodash/groupBy'
+
 import {
   getAllDefinitions as _getAllDefinitions,
   getAllLegacyDefinitions,

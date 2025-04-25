@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+
 import { getLabwareDisplayLocation } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,

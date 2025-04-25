@@ -1,6 +1,7 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
+
 import {
   ALL,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,

@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
+
 import {
   ALIGN_CENTER,
   Banner,

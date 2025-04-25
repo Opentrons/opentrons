@@ -1,5 +1,6 @@
 import { useReducer } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   DeprecatedCheckboxField,
   INPUT_TYPE_PASSWORD,

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import debounce from 'lodash/debounce'
+
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
 import { selectActivePipette } from '/app/redux/protocol-runs'
@@ -8,7 +9,7 @@ import { selectActivePipette } from '/app/redux/protocol-runs'
 import { moveRelativeCommand, moveToWellCommands } from './commands'
 
 import type { VectorOffset } from '@opentrons/api-client'
-import type { Coordinates } from '@opentrons/shared-data'
+import type { Vector3D } from '@opentrons/shared-data'
 import type {
   Axis,
   Jog,
@@ -54,7 +55,7 @@ export function useHandleJog({
       axis: Axis
       dir: Sign
       step: StepSize
-      onSuccess?: (position: Coordinates | null) => void
+      onSuccess?: (position: Vector3D | null) => void
     }>
   >([])
   const processingRef = useRef(false)
@@ -82,9 +83,7 @@ export function useHandleJog({
         timeout: JOG_COMMAND_TIMEOUT_MS,
       })
         .then(data => {
-          onSuccess?.(
-            (data?.data?.result?.position ?? null) as Coordinates | null
-          )
+          onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
           setErrorMessage(`Error issuing jog command: ${e.message}`)
@@ -132,7 +131,7 @@ export function useHandleJog({
       axis: Axis,
       dir: Sign,
       step: StepSize,
-      onSuccess?: (position: Coordinates | null) => void
+      onSuccess?: (position: Vector3D | null) => void
     ): void => {
       if (queueRef.current.length < MAX_QUEUED_JOGS) {
         queueRef.current.push({ axis, dir, step, onSuccess })

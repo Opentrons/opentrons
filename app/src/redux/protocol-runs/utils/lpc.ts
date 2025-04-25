@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+
 import {
   getVectorDifference,
   getVectorSum,

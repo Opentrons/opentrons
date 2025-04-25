@@ -1,4 +1,5 @@
 import reduce from 'lodash/reduce'
+
 import {
   getModuleType,
   NON_CONNECTING_MODULE_TYPES,

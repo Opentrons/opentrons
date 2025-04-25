@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import omitBy from 'lodash/omitBy'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   useInstrumentsQuery,
   useModulesQuery,

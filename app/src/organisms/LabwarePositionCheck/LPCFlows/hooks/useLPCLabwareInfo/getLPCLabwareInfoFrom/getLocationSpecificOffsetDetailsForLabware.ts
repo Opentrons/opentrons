@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+
 import { ANY_LOCATION } from '@opentrons/api-client'
 
 import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'

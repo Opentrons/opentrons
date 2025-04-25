@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { COLORS } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {

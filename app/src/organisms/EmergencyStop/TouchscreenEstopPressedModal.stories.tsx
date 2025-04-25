@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+
 import { VIEWPORT } from '@opentrons/components'
 
 import { configReducer } from '/app/redux/config/reducer'
