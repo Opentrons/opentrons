@@ -890,4 +890,4 @@ async def test_set_stored_labware_exceeding_max(
     ).then_return(2)
 
     with pytest.raises(CommandPreconditionViolated):
-        result = await subject.execute(params)
+        await subject.execute(params)

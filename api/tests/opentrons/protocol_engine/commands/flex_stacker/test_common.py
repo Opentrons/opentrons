@@ -1986,7 +1986,7 @@ def test_build_ids_to_fill_fails_on_too_many_specified(
             False,
             False,
             specified_labware_list,
-            specified_count,
+            specified_labware_count,
             2,
             current_count,
             model_utils,

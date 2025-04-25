@@ -112,7 +112,7 @@ async def test_fill_by_count_exceeding_max(
         strategy=StackerFillEmptyStrategy.LOGICAL,
     )
     with pytest.raises(CommandPreconditionViolated):
-        result = await subject.execute(params)
+        await subject.execute(params)
 
 
 @pytest.mark.parametrize(
