@@ -1,4 +1,5 @@
 import keyBy from 'lodash/keyBy'
+
 import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { InstrumentDiagram as InstrumentDiagramComponent } from './InstrumentDiagram'

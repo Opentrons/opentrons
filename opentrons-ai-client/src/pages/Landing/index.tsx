@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
+
 import {
   ALIGN_CENTER,
   BORDERS,

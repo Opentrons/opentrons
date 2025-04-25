@@ -1,5 +1,6 @@
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
+
 import {
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getModuleDisplayName,

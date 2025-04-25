@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 

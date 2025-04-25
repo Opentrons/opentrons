@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
+
 import {
   ABSORBANCE_READER_TYPE,
   getLabwareDefURI,
@@ -79,6 +80,7 @@ import type {
   StepFormErrors,
 } from '../../steplist/types'
 import type { BaseState, DeckSlot } from '../../types'
+import type { DeckConfigurationState } from '../actions'
 import type {
   BatchEditFormChangesState,
   PresavedStepFormState,
@@ -967,3 +969,7 @@ export const getFormLevelWarningsPerStep: Selector<
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )
+
+export const getDeckConfiguration = (
+  state: BaseState
+): DeckConfigurationState => rootSelector(state).deckConfiguration

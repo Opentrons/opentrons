@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import { createSelector } from 'reselect'
+
 import { COLUMN, getWellNamePerMultiTip, SINGLE } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
 

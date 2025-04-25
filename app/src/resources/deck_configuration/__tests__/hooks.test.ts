@@ -1,5 +1,6 @@
 import { beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import {
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,

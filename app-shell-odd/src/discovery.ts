@@ -3,6 +3,7 @@ import { app } from 'electron'
 import Store from 'electron-store'
 import groupBy from 'lodash/groupBy'
 import throttle from 'lodash/throttle'
+
 import {
   createDiscoveryClient,
   DEFAULT_PORT,

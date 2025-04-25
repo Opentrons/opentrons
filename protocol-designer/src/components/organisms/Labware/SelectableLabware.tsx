@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import reduce from 'lodash/reduce'
+
 import { COLORS } from '@opentrons/components'
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
 

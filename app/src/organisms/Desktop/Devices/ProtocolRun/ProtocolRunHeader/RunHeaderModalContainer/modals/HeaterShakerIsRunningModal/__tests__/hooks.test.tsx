@@ -2,6 +2,7 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'

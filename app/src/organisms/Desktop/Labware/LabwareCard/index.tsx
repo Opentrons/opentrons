@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import startCase from 'lodash/startCase'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,

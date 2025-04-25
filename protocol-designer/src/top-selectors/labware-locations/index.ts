@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import { createSelector } from 'reselect'
+
 import {
   FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,

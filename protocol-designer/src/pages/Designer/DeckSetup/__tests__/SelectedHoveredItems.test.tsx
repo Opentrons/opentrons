@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { screen } from '@testing-library/react'
+
 import { Module } from '@opentrons/components'
 import {
   fixture24Tuberack,

@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+
 import {
   MAGNETIC_BLOCK_D3_ADDRESSABLE_AREA,
   MAGNETIC_BLOCK_V1_FIXTURE,

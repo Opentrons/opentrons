@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { round } from 'lodash'
+
 import {
   DIRECTION_COLUMN,
   Divider,

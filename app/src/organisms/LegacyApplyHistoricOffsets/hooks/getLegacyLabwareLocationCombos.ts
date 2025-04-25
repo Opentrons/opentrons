@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+
 import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getLabwareDefURI,

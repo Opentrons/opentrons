@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'

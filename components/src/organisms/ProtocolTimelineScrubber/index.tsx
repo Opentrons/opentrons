@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import ViewportList from 'react-viewport-list'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
+
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,

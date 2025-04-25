@@ -15,8 +15,8 @@ module.exports = {
   plugins: ['@ianvs/prettier-plugin-sort-imports'],
   importOrder: [
     '^(react)(.*)$',
-    // Special case for @ebay/nice-modal-react.
     '<THIRD_PARTY_MODULES>',
+    '',
     '^@opentrons/(.*)$',
     '',
     '^/(.*)/(?!assets)(.*)$',

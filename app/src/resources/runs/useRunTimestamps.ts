@@ -1,4 +1,5 @@
 import last from 'lodash/last'
+
 import {
   RUN_ACTION_TYPE_PAUSE,
   RUN_ACTION_TYPE_PLAY,

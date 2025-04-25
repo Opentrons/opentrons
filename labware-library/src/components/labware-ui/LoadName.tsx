@@ -1,5 +1,6 @@
 // labware load name with copy button
 import { useEffect, useRef, useState } from 'react'
+
 import { DeprecatedTooltip, IconButton } from '@opentrons/components'
 
 import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'

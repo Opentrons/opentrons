@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import noop from 'lodash/noop'
+
 import {
   ALIGN_CENTER,
   DeckInfoLabel,

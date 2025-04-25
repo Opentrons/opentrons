@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
+
 import {
   COLORS,
   DIRECTION_COLUMN,

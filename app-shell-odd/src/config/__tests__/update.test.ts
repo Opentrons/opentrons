@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import * as Cfg from '@opentrons/app/src/redux/config'
 
 import { getNextValue, shouldUpdate } from '../update'

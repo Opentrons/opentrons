@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+
 import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 
 import type { LabwareOffset } from '@opentrons/api-client'

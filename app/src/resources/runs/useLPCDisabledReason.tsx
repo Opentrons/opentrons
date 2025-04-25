@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
+
 import {
   FLEX_ROBOT_TYPE,
   getLoadedLabwareDefinitionsByUri,

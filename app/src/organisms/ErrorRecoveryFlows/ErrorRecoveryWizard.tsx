@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import { CURSOR_POINTER, StyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from './constants'

@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+
 import { fixture96Plate } from '@opentrons/shared-data'
 
 import { configReducer } from '/app/redux/config/reducer'

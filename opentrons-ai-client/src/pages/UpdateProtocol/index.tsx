@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { CSSTransition } from 'react-transition-group'
 import { useAtom } from 'jotai'
 import styled from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,

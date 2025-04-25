@@ -1,4 +1,5 @@
 import upperCase from 'lodash/upperCase'
+
 import {
   consolidate,
   distribute,
