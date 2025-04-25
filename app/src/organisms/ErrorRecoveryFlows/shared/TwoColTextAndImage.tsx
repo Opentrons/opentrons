@@ -10,11 +10,11 @@ import {
 
 import { TwoColumn } from '/app/molecules/InterventionModal'
 
-import { RECOVERY_MAP } from '../constants'
+import { RECOVERY_MAP, REENGAGE_LATCH_ROUTES } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
-import type { RecoveryContentProps, RouteStep } from '../types'
+import type { RecoveryContentProps } from '../types'
 
 export function TwoColTextAndImage(
   props: RecoveryContentProps
@@ -35,16 +35,11 @@ export function TwoColTextAndImage(
   const { closeLabwareLatch } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
-  const reengageLatchRoutes: RouteStep[] = [
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH,
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH,
-  ]
-
   const primaryOnClick = (): void => {
     switch (route) {
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (reengageLatchRoutes.includes(step)) {
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
           void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
             void closeLabwareLatch().then(() => {
               void proceedNextStep()
@@ -66,7 +61,7 @@ export function TwoColTextAndImage(
         return t('load_labware_shuttle_onto_track')
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (reengageLatchRoutes.includes(step)) {
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('prepare_for_stacker_latch_reengage')
         } else {
           return t('empty_stacker_of_labware_above_latch')
@@ -85,7 +80,7 @@ export function TwoColTextAndImage(
         return t('take_any_necessary_precautions_before_loading_shuttle')
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (reengageLatchRoutes.includes(step)) {
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('stacker_latch_will_reengage')
         } else {
           return t('empty_stacker_of_labware_above_latch_labware_stuck')
@@ -102,7 +97,7 @@ export function TwoColTextAndImage(
     switch (route) {
       case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
       case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (reengageLatchRoutes.includes(step)) {
+        if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('re_engage_latch')
         } else {
           return t('continue')
