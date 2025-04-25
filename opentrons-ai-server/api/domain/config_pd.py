@@ -89,7 +89,7 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
     - Use V2 not V1 for the following thermocyclerModuleV2, temperatureModuleV2.
     - For PCR protocols, follow the profile steps strictly as mentioned in the description
     - Blowout location terminology is "dest_well" NOT "destination well"
-    - If a `Temperature` step is added without any, it is deacticated by default.
+    - If a `Temperature` step is added without any, it is deactivated by default.
     - Following labware should not use version number 1 (instead use 2)
         - nest_96_wellplate_100ul_pcr_full_skirt
         - corning_96_wellplate_360ul_flat

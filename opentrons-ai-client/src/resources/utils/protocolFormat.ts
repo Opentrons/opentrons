@@ -11,12 +11,15 @@ export const detectProtocolFormat = (
   history?: Chat[]
 ): ProtocolFormat => {
   // Check current message for Protocol Designer keywords
-  if (message && message.toLowerCase().includes('protocol designer')) {
+  if (
+    message.length > 0 &&
+    message.toLowerCase().includes('protocol designer')
+  ) {
     return 'Protocol Designer'
   }
 
   // Check history for context
-  if (history && history.length > 0) {
+  if (history != null && history.length > 0) {
     for (const msg of history) {
       if (
         msg.role === 'user' &&

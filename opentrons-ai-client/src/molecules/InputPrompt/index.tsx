@@ -182,7 +182,7 @@ export function InputPrompt(): JSX.Element {
     // If it's a new protocol, set the protocol_format property
     if (isNewProtocol) {
       createProtocol.protocol_format = detectProtocolFormat(
-        String(createProtocol.prompt)
+        createProtocol.prompt
       )
     }
 

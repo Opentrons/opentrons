@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+
 import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
@@ -51,11 +52,7 @@ export function ProtocolFormatSection(): JSX.Element | null {
       />
       {/* Only show banner when Protocol Designer is selected */}
       {selectedFormat === PD && (
-        <Banner
-          type="informing"
-          marginBottom={SPACING.spacing16}
-          height={SIZE_3}
-        >
+        <Banner type="informing" marginBottom={SPACING.spacing16} height="4rem">
           {t('pd_prompt_warning')}
         </Banner>
       )}
