@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,16 +18,17 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { getRobotType } from '../../../../file-data/selectors'
+import { HARDWARE_ID } from '../../../../steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
 } from '../../../../ui/steps'
-import { HARDWARE_ID } from '../../../../steplist'
 import {
   hoverOnTerminalItem,
   selectTerminalItem,
 } from '../../../../ui/steps/actions/actions'
-import { getRobotType } from '../../../../file-data/selectors'
 import { PX_SIDEBAR_MIN_WIDTH_FOR_ICON } from './StepContainer'
 
 import type { ThunkDispatch } from '../../../../types'

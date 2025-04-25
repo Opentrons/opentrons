@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any, List
-from typing_extensions import TypedDict  # note: need this instead of typing for py<3.12
+from typing_extensions import (
+    TypedDict,
+    assert_type,
+)  # note: need this instead of typing for py<3.12
 
 from pydantic.json_schema import SkipJsonSchema
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
+)
 from opentrons_shared_data.errors.exceptions import (
     FailedGripperPickupError,
     LabwareDroppedError,
@@ -17,6 +25,7 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerShuttleError,
 )
+from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.types import Point
@@ -50,7 +59,7 @@ from .command import (
 )
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
-from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
+
 
 from opentrons.hardware_control.modules.types import PlatformState
 
@@ -178,7 +187,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         self._run_control = run_control
 
     async def _labware_movement_stacker_validation(
-        self, module_id: str
+        self, module_id: str, labware_to_move: str
     ) -> FlexStackerShuttleError | None:
         # Validate that a Flex Stacker is in position to receive labware
         stacker_sub = self._state_view.modules.get_flex_stacker_substate(module_id)
@@ -197,6 +206,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                             error=e,
                         )
                     ],
+                    errorInfo={"labwareId": labware_to_move},
                 )
 
         return None
@@ -247,7 +257,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 # slide" to dropoffs in the waste chute in order to guarantee that the
                 # labware can drop fully through the chute before the gripper jaws close.
                 post_drop_slide_offset = Point(
-                    x=(current_labware_definition.dimensions.xDimension / 2.0)
+                    x=(_labware_x_dimension(current_labware_definition) / 2.0)
                     + (GRIPPER_PADDLE_WIDTH / 2.0)
                     + _TRASH_CHUTE_DROP_BUFFER_MM,
                     y=0,
@@ -340,7 +350,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 and module.model == ModuleModel.FLEX_STACKER_MODULE_V1
             ):
                 module_location_error = await self._labware_movement_stacker_validation(
-                    module.id
+                    module.id, params.labwareId
                 )
 
         # Allow propagation of ModuleNotLoadedError.
@@ -561,3 +571,14 @@ class MoveLabwareCreate(BaseCommandCreate[MoveLabwareParams]):
     params: MoveLabwareParams
 
     _CommandCls: Type[MoveLabware] = MoveLabware
+
+
+def _labware_x_dimension(labware_definition: LabwareDefinition) -> float:
+    if isinstance(labware_definition, LabwareDefinition2):
+        return labware_definition.dimensions.xDimension
+    else:
+        assert_type(labware_definition, LabwareDefinition3)
+        return (
+            labware_definition.extents.total.frontRightTop.x
+            - labware_definition.extents.total.backLeftBottom.x
+        )

@@ -1,11 +1,13 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
-import { getSessions } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useAllSessionsQuery } from '..'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getSessions } from '@opentrons/api-client'
+
+import { useAllSessionsQuery } from '..'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
 import type { UseQueryOptions } from 'react-query'
 import type { HostConfig, Response, Sessions } from '@opentrons/api-client'
 

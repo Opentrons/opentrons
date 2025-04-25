@@ -1,19 +1,19 @@
-import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   Box,
   COLORS,
-  BORDERS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
 } from '@opentrons/components'
+import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
-import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
+import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
-import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
+import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
+import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
 import { useIsFlex } from '/app/redux-resources/robots'
 

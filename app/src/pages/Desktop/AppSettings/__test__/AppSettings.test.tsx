@@ -1,16 +1,16 @@
-import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter, Routes } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { i18n } from '/app/i18n'
+import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import * as Config from '/app/redux/config'
+
+import { AppSettings } from '..'
+import { AdvancedSettings } from '../AdvancedSettings'
 import { GeneralSettings } from '../GeneralSettings'
 import { PrivacySettings } from '../PrivacySettings'
-import { AdvancedSettings } from '../AdvancedSettings'
-import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
-import { AppSettings } from '..'
 
 vi.mock('/app/redux/config')
 vi.mock('../GeneralSettings')

@@ -1,25 +1,29 @@
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
+  Flex,
+  JUSTIFY_FLEX_END,
   PrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
-  JUSTIFY_FLEX_END,
-  Flex,
 } from '@opentrons/components'
-import { getIsOnDevice } from '/app/redux/config'
+
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { SmallButton } from '/app/atoms/buttons'
+import { getIsOnDevice } from '/app/redux/config'
+
 import {
   SUCCESSFULLY_ATTACHED,
   SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
   SUCCESSFULLY_CALIBRATED,
   SUCCESSFULLY_DETACHED,
 } from './constants'
+
 import type { GripperWizardStepProps, SuccessStep } from './types'
 
 const HEADER_STYLE = css`

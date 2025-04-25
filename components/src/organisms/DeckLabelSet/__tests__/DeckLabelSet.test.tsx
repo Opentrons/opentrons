@@ -1,10 +1,10 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../testing/utils'
+import { DeckLabelSet } from '..'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { DeckLabel } from '../../../molecules/DeckLabel'
-import { DeckLabelSet } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

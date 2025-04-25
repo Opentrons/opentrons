@@ -1,15 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
+
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { SelectPipetteModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
-import { getTiprackOptions } from '../../../../pages/Onboarding/utils'
 import { createCustomTiprackDef } from '../../../../labware-defs/actions'
+import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { getTiprackOptions } from '../../../../pages/Onboarding/utils'
 import { IncompatibleTipsModal } from '../../IncompatibleTipsModal'
-import { SelectPipetteModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

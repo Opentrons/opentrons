@@ -1,6 +1,7 @@
-import { useMemo, useState, Fragment } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -27,14 +28,15 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+
 import { FixedTrashText } from '../../../components/molecules'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
-import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {

@@ -18,14 +18,19 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  ABSORBANCE_READER_CUTOUTS,
+  ABSORBANCE_READER_V1,
+  ABSORBANCE_READER_V1_FIXTURE,
+  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getCutoutDisplayName,
   getFixtureDisplayName,
-  ABSORBANCE_READER_CUTOUTS,
-  ABSORBANCE_READER_V1_FIXTURE,
-  ABSORBANCE_READER_V1,
   HEATER_SHAKER_CUTOUTS,
-  HEATERSHAKER_MODULE_V1_FIXTURE,
   HEATERSHAKER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_LEFT_CUTOUTS,
@@ -34,8 +39,8 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_CUTOUTS,
-  TEMPERATURE_MODULE_V2_FIXTURE,
   TEMPERATURE_MODULE_V2,
+  TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
@@ -43,22 +48,17 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FIXTURES,
-  FLEX_STACKER_MODULE_V1,
-  FLEX_STACKER_V1_FIXTURE,
-  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import type { ModalProps } from '@opentrons/components'
 import type {
   CutoutConfig,
-  CutoutId,
   CutoutFixtureId,
+  CutoutId,
 } from '@opentrons/shared-data'
-import type { ModalProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface AddFixtureModalProps {

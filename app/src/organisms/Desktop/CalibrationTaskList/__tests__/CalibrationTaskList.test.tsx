@@ -1,26 +1,27 @@
 import { MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useRunHasStarted } from '/app/resources/runs'
+
 import { CalibrationTaskList } from '..'
+import { useCalibrationTaskList } from '../../Devices/hooks'
 import {
-  mockDeckCalLauncher,
-  mockTipLengthCalLauncher,
-  mockPipOffsetCalLauncher,
   expectedBadDeckAndPipetteOffsetTaskList,
   expectedBadEverythingTaskList,
   expectedBadTipLengthAndOffsetTaskList,
-  expectedTaskList,
   expectedIncompleteDeckCalTaskList,
-  expectedIncompleteRightMountTaskList,
   expectedIncompleteLeftMountTaskList,
+  expectedIncompleteRightMountTaskList,
+  expectedTaskList,
+  mockDeckCalLauncher,
+  mockPipOffsetCalLauncher,
+  mockTipLengthCalLauncher,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import { useCalibrationTaskList } from '../../Devices/hooks'
-import { useAttachedPipettes } from '/app/resources/instruments'
-import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
-import { useRunHasStarted } from '/app/resources/runs'
 
 vi.mock('../../Devices/hooks')
 vi.mock('/app/resources/runs')

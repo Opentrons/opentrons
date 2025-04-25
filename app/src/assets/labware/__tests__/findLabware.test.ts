@@ -1,9 +1,9 @@
-import { describe, it, vi, afterEach, expect } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { fixtureTiprack10ul, fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import { getLatestLabwareDef } from '../getLabware'
 import { findLabwareDefWithCustom } from '../findLabware'
+import { getLatestLabwareDef } from '../getLabware'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

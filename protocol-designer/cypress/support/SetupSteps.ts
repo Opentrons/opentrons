@@ -1009,7 +1009,7 @@ export const SetupVerifications = {
       cy.contains('Select source wells')
       cy.contains('Destination labware')
       cy.contains('Volume per well')
-      cy.contains('Tip handling')
+      cy.contains('Tip management')
       cy.contains('Tip drop location')
     },
   }),

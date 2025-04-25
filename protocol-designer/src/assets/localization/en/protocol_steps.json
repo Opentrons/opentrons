@@ -82,8 +82,8 @@
     "transfer_disposal": "<text>Transferring</text><tag/><text>from</text><semiBoldText>{{sourceWells}} of {{source}}</semiBoldText><text>to</text><semiBoldText>{{destination}}</semiBoldText>"
   },
   "multi_dispense_options": "Disposal volume",
-  "multiAspirate": "Consolidate path",
-  "multiDispense": "Distribute path",
+  "multiAspirate": "Consolidate",
+  "multiDispense": "Distribute",
   "new_location": "New location",
   "no_tiprack": "No tiprack available",
   "off_deck": "Off-Deck",
@@ -126,7 +126,7 @@
   "select_tiprack": "Select a tiprack",
   "select_volume": "Select a volume",
   "shake": "Shake",
-  "single": "Single path",
+  "single": "Single transfer",
   "single_nozzle": "Single",
   "speed": "Speed",
   "starting_deck": "Starting deck",
@@ -162,7 +162,11 @@
   "time": "Time",
   "timeline": "Timeline",
   "tiprack": "Tiprack",
-  "tip_handling": "Tip handling",
+  "tip_handling": {
+    "title": "Tip pickup behavior",
+    "tooltip": "Choose tip pickup frequency for aspirations"
+  },
+  "tip_management": "Tip management",
   "tip_position": "{{prefix}} tip position",
   "touch_tip_position": "Touch tip position from top",
   "valid_range": "Valid range between {{min}} - {{max}} {{unit}}",

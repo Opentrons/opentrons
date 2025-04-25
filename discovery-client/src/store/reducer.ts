@@ -1,33 +1,30 @@
-import { combineReducers } from 'redux'
 import isEqual from 'lodash/isEqual'
 import keyBy from 'lodash/keyBy'
 import omit from 'lodash/omit'
+import { combineReducers } from 'redux'
 
 import {
-  HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
 } from '../constants'
-
 import * as Actions from './actions'
 
 import type { Reducer } from 'redux'
-
 import type {
+  HealthErrorResponse,
   HealthResponse,
   ServerHealthResponse,
-  HealthErrorResponse,
 } from '../types'
-
 import type {
-  State,
   Action,
-  RobotState,
-  HostState,
-  RobotsByNameMap,
-  HostsByIpMap,
   Address,
   HealthStatus,
+  HostsByIpMap,
+  HostState,
+  RobotsByNameMap,
+  RobotState,
+  State,
 } from './types'
 
 const INITIAL_STATE: State = {

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   Banner,
@@ -21,20 +22,19 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
 
-import { usePlacePlateReaderLid } from '/app/resources/modules'
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
+import { usePlacePlateReaderLid } from '/app/resources/modules'
 
 import type { MouseEventHandler } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type {
-  OddModalHeaderBaseProps,
   ModalSize,
+  OddModalHeaderBaseProps,
 } from '/app/molecules/OddModal/types'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.

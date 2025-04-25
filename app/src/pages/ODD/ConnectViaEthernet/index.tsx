@@ -1,22 +1,23 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  DIRECTION_COLUMN,
   Flex,
   SPACING,
   useInterval,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
 import { NetworkDetailsModal } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
-import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { getLocalRobot } from '/app/redux/discovery'
-import { TitleHeader } from './TitleHeader'
-import { DisplayConnectionStatus } from './DisplayConnectionStatus'
+import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 
-import type { State, Dispatch } from '/app/redux/types'
+import { DisplayConnectionStatus } from './DisplayConnectionStatus'
+import { TitleHeader } from './TitleHeader'
+
+import type { Dispatch, State } from '/app/redux/types'
 
 const STATUS_REFRESH_MS = 5000
 

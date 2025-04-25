@@ -1,11 +1,16 @@
-import { beforeEach, describe, it, expect, test } from 'vitest'
+import { beforeEach, describe, expect, it, test } from 'vitest'
+
 import {
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   fixtureTiprack300ul,
   getLabwareDefURI,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { transfer } from '../commandCreators/compound/transfer'
+import { FIXED_TRASH_ID } from '../constants'
 import {
+  AIR_GAP_META,
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
   delayCommand,
@@ -17,24 +22,22 @@ import {
   getFlowRateAndOffsetParamsTransferLike,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeAirGapAfterAspirateHelper,
   makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
+  makeDispenseAirGapHelper,
   makeDispenseHelper,
+  makeMoveToWellHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  makeDispenseAirGapHelper,
-  makeMoveToWellHelper,
-  makeAirGapAfterAspirateHelper,
-  AIR_GAP_META,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '../constants'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
-import { transfer } from '../commandCreators/compound/transfer'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
 

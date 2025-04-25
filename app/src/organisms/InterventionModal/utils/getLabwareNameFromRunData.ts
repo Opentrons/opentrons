@@ -1,11 +1,11 @@
-import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import {
-  getLoadedLabware,
   getLabwareDefinitionsFromCommands,
+  getLoadedLabware,
 } from '@opentrons/components'
+import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const FIXED_TRASH_DEF_URIS = [
   'opentrons/opentrons_1_trash_850ml_fixed/1',

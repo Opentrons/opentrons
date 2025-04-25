@@ -1,6 +1,7 @@
-import styled from 'styled-components'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
+import styled from 'styled-components'
+
 import {
   ALIGN_FLEX_START,
   Box,
@@ -11,7 +12,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Spacing',

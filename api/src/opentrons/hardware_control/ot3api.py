@@ -333,20 +333,16 @@ class OT3API(
         self, door_state: DoorState, module_serial: str | None = None
     ) -> None:
         mod_log.info(f"Updating the window or module switch status: {door_state}")
-        if self.door_state == DoorState.CLOSED or (
-            self.door_state == DoorState.OPEN
-            and self.module_door_serial == module_serial
-        ):
-            self.door_state = door_state
-            self.module_door_serial = module_serial
-            for cb in self._callbacks:
-                hw_event = DoorStateNotification(
-                    new_state=door_state, module_serial=module_serial
-                )
-                try:
-                    cb(hw_event)
-                except Exception:
-                    mod_log.exception("Errored during door state event callback")
+        self.door_state = door_state
+        self.module_door_serial = module_serial
+        for cb in self._callbacks:
+            hw_event = DoorStateNotification(
+                new_state=door_state, module_serial=module_serial
+            )
+            try:
+                cb(hw_event)
+            except Exception:
+                mod_log.exception("Errored during door state event callback")
 
     def _update_estop_state(self, event: HardwareEvent) -> "List[Future[None]]":
         if not isinstance(event, EstopStateNotification):
@@ -600,6 +596,9 @@ class OT3API(
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._backend.set_status_bar_enabled(enabled)
+
+    def get_status_bar_enabled(self) -> bool:
+        return self._backend.get_status_bar_enabled()
 
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()

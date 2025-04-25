@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import { ModalShell } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -12,11 +13,11 @@ import * as RobotApi from '/app/redux/robot-api'
 import * as Sessions from '/app/redux/sessions'
 import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
 
-import type { State } from '/app/redux/types'
 import type { DashboardCalDeckInvoker } from '/app/organisms/Desktop/Devices/hooks/useCalibrationTaskList'
+import type { RequestState } from '/app/redux/robot-api/types'
 import type { DeckCalibrationSession } from '/app/redux/sessions'
 import type { SessionCommandString } from '/app/redux/sessions/types'
-import type { RequestState } from '/app/redux/robot-api/types'
+import type { State } from '/app/redux/types'
 
 // deck calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [

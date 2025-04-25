@@ -1,10 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { OddModalHeader } from '../OddModalHeader'
+
 import { OddModal } from '../OddModal'
+import { OddModalHeader } from '../OddModalHeader'
 
 import type { ComponentProps } from 'react'
 

@@ -1,4 +1,5 @@
 import last from 'lodash/last'
+
 import {
   ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
@@ -6,29 +7,31 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import { PAUSE_UNTIL_TEMP } from '../../../../constants'
+import * as fileDataSelectors from '../../../../file-data/selectors'
 import {
-  getUnsavedForm,
-  getUnsavedFormIsPristineSetTempForm,
-  getUnsavedFormIsPristineHeaterShakerForm,
-  getOrderedStepIds,
   getInitialDeckSetup,
+  getOrderedStepIds,
+  getUnsavedForm,
+  getUnsavedFormIsPristineHeaterShakerForm,
+  getUnsavedFormIsPristineSetTempForm,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { PAUSE_UNTIL_TEMP } from '../../../../constants'
-import { uuid } from '../../../../utils'
-import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
-import { addStep, selectDropdownItem } from '../actions'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../../../tutorial'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import type { StepType, StepIdType, FormData } from '../../../../form-types'
+import { uuid } from '../../../../utils'
+import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
+import { addStep, selectDropdownItem } from '../actions'
+
+import type { FormData, StepIdType, StepType } from '../../../../form-types'
 import type { ThunkAction } from '../../../../types'
 import type {
-  DuplicateStepAction,
   DuplicateMultipleStepsAction,
+  DuplicateStepAction,
   SelectMultipleStepsAction,
 } from '../types'
 

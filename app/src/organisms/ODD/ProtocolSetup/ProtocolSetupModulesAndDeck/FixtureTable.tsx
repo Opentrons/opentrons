@@ -1,17 +1,18 @@
-import { useState, Fragment } from 'react'
-import { useSelector } from 'react-redux'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
   Chip,
+  COLORS,
   DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -27,10 +28,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -40,8 +41,8 @@ import type {
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type { SetupScreens } from '../types'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type { SetupScreens } from '../types'
 
 interface FixtureTableProps {
   robotType: RobotType

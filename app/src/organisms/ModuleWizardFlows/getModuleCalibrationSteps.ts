@@ -1,4 +1,5 @@
 import { SECTIONS } from './constants'
+
 import type { ModuleCalibrationWizardStep } from './types'
 
 export const getModuleCalibrationSteps = (): ModuleCalibrationWizardStep[] => {

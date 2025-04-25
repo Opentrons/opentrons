@@ -1,16 +1,20 @@
 import mapValues from 'lodash/mapValues'
+
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { uuid } from '../../utils'
+
 import type {
-  ProtocolFileV7,
   MoveToAddressableAreaCreateCommand,
+  ProtocolFileV7,
 } from '@opentrons/shared-data'
+import type { CreateCommand as CreateCommandV7 } from '@opentrons/shared-data/protocol/types/schemaV7'
 import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
@@ -23,7 +27,6 @@ import type {
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV8'
-import type { CreateCommand as CreateCommandV7 } from '@opentrons/shared-data/protocol/types/schemaV7'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration is to schema v8 and updates fixed trash by

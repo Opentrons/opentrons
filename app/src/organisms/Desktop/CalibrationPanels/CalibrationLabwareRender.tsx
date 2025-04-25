@@ -1,20 +1,21 @@
 import {
-  LabwareRender,
-  LabwareNameOverlay,
-  RobotCoordsForeignDiv,
-  RobotCoordsText,
   C_MED_DARK_GRAY,
   C_MED_GRAY,
   C_MED_LIGHT_GRAY,
   FONT_WEIGHT_SEMIBOLD,
+  LabwareNameOverlay,
+  LabwareRender,
+  RobotCoordsForeignDiv,
+  RobotCoordsText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
+import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
+
 import styles from './styles.module.css'
 
 import type {
-  LabwareDefinition2,
   CoordinateTuple,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 const SHORT = 'SHORT'

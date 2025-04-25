@@ -1,10 +1,10 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../testing/utils'
 import { ListAccordion } from '..'
 import { ListTable } from '../../../atoms/ListTable'
 import { Icon } from '../../../icons'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

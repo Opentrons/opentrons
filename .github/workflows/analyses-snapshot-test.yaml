@@ -25,7 +25,7 @@ on:
       - '!api/docs/**'
       - '!api/release-notes-internal.md'
       - '!api/release-notes.md'
-      - 'shared-data/**/*'
+      - 'shared-data/**'
       - '!shared-data/js/**'
       - '.github/workflows/analyses-snapshot-test.yaml'
       - 'analyses-snapshot-testing/**'

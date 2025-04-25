@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -18,24 +18,26 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { ACTIONS } from '../constants'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { FlowRateEntry } from './FlowRate'
-import { PipettePath } from './PipettePath'
-import { TipPositionEntry } from './TipPosition'
-import { Mix } from './Mix'
-import { Delay } from './Delay'
-import { TouchTip } from './TouchTip'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
+
+import { ACTIONS } from '../constants'
 import { AirGap } from './AirGap'
 import { BlowOut } from './BlowOut'
+import { Delay } from './Delay'
+import { FlowRateEntry } from './FlowRate'
+import { Mix } from './Mix'
+import { PipettePath } from './PipettePath'
+import { TipPositionEntry } from './TipPosition'
+import { TouchTip } from './TouchTip'
 
 import type { Dispatch } from 'react'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
 } from '../types'
+
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>

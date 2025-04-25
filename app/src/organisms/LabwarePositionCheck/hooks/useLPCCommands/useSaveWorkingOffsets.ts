@@ -1,5 +1,5 @@
-import { useSelector } from 'react-redux'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 import {
   useCreateLabwareOffsetsMutation,
@@ -9,8 +9,8 @@ import {
 import { selectPendingOffsetOperations } from '/app/redux/protocol-runs'
 
 import type { StoredLabwareOffset } from '@opentrons/api-client'
-import type { SavedOffsets } from '/app/redux/protocol-runs'
 import type { UseLPCCommandChildProps } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/types'
+import type { SavedOffsets } from '/app/redux/protocol-runs'
 
 export interface UseBuildOffsetsToApplyResult {
   // Update the server with the current working offsets, returning the updated offsets.

@@ -1,21 +1,21 @@
-import toPairs from 'lodash/toPairs'
 import pick from 'lodash/pick'
+import toPairs from 'lodash/toPairs'
+
 import { AlertItem } from '@opentrons/components'
+
 import {
   getLabel,
   IRREGULAR_LABWARE_ERROR,
-  LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
   LOOSE_TIP_FIT_ERROR,
-  LINK_CUSTOM_LABWARE_FORM,
-  LINK_REQUEST_ADAPTER_FORM,
   MUST_BE_A_NUMBER_ERROR,
   REQUIRED_FIELD_ERROR,
 } from '../../fields'
-import { LinkOut } from '../LinkOut'
 
-import type { FormikTouched, FormikErrors } from 'formik'
+import type { FormikErrors, FormikTouched } from 'formik'
 import type { LabwareFields } from '../../fields'
+
 export interface Props {
   values: LabwareFields
   fieldList: Array<keyof LabwareFields>
@@ -28,9 +28,8 @@ export const IrregularLabwareAlert = (): JSX.Element => (
     type="error"
     title={
       <>
-        Your labware is not compatible with the Labware Creator. Please fill out{' '}
-        <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut> to request
-        a custom labware definition.
+        Your labware is not compatible with the Labware Creator. Please contact
+        Opentrons Support to request a custom labware definition.
       </>
     }
   />
@@ -41,9 +40,8 @@ export const LabwareTooSmallAlert = (): JSX.Element => (
     type="error"
     title={
       <>
-        Your labware is too small to fit in a slot properly. Please fill out{' '}
-        <LinkOut href={LINK_REQUEST_ADAPTER_FORM}>this form</LinkOut> to request
-        an adapter.
+        Your labware is too small to fit in a slot properly. Please contact
+        Opentrons Support to request an adapter.
       </>
     }
   />
@@ -54,9 +52,8 @@ export const LabwareTooLargeAlert = (): JSX.Element => (
     type="error"
     title={
       <>
-        Your labware is too large to fit in a single slot properly. Please fill
-        out <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut> to
-        request a custom labware definition.
+        Your labware is too large to fit in a single slot properly. Please
+        contact Opentrons Support to request a custom labware definition.
       </>
     }
   />

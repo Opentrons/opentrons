@@ -1,16 +1,20 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { i18n } from '../../../assets/localization'
+
+import { Hardware } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
+import { FlexHardware } from '../../../components/organisms'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
-import { FlexHardware, Ot2Modules } from '../../../components/organisms'
-import { Hardware } from '..'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
+vi.mock('../../../feature-flags/selectors')
+vi.mock('../../../tutorial/selectors')
 vi.mock('../../../components/organisms/FlexHardware')
 vi.mock('../../../components/organisms/Ot2Modules')
 const render = () => {
@@ -28,11 +32,11 @@ describe('Hardware', () => {
   beforeEach(() => {
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mockProtocolName',
+      created: 123,
     })
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
     vi.mocked(FlexHardware).mockReturnValue(<div>mock FlexHardware</div>)
-    vi.mocked(Ot2Modules).mockReturnValue(<div>mock Ot2Modules</div>)
   })
   it('renders the hardware info for a flex', () => {
     render()
@@ -51,6 +55,5 @@ describe('Hardware', () => {
     screen.getByText(
       'Place the modules that you are using for this protocol onto the deck.'
     )
-    screen.getByText('mock Ot2Modules')
   })
 })

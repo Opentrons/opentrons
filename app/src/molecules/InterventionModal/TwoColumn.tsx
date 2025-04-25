@@ -1,8 +1,9 @@
-import { Flex, Box, DIRECTION_ROW, SPACING, WRAP } from '@opentrons/components'
-import type { StyleProps } from '@opentrons/components'
+import { Box, DIRECTION_ROW, Flex, SPACING, WRAP } from '@opentrons/components'
+
 import { TWO_COLUMN_ELEMENT_MIN_WIDTH } from './constants'
 
 import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 export interface TwoColumnProps extends StyleProps {
   children: [ReactNode, ReactNode]

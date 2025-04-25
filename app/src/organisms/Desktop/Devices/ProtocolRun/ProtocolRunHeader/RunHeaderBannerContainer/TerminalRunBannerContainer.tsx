@@ -1,16 +1,17 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  SPACING,
-  TYPOGRAPHY,
-  Banner,
-  JUSTIFY_SPACE_BETWEEN,
-  Flex,
-  StyledText,
-  Link,
-  ALIGN_CENTER,
-} from '@opentrons/components'
 import { RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import {
+  ALIGN_CENTER,
+  Banner,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+
 import {
   useCloseCurrentRun,
   useIsRunCurrent,

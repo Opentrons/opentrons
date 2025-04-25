@@ -1,19 +1,20 @@
-import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
-  useInstrumentsQuery,
   useAllPipetteOffsetCalibrationsQuery,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
-import { mockRecentAnalysis } from '../__fixtures__'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
 import { ProtocolSetupInstruments } from '..'
+import { mockRecentAnalysis } from '../__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')

@@ -1,25 +1,28 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
+  fixtureTiprack300ul as _fixtureTiprack300ul,
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
-  fixtureTiprack300ul as _fixtureTiprack300ul,
 } from '@opentrons/shared-data'
+
 import {
-  makeContext,
-  makeState,
-  getTipColumn,
-  getTiprackTipstate,
-  DEFAULT_PIPETTE,
-} from '../fixtures'
-import {
-  sortLabwareBySlot,
-  getNextTiprack,
   _getNextTip,
   getModuleState,
+  getNextTiprack,
+  sortLabwareBySlot,
 } from '../'
+import {
+  DEFAULT_PIPETTE,
+  getTipColumn,
+  getTiprackTipstate,
+  makeContext,
+  makeState,
+} from '../fixtures'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext } from '../types'
+
 let invariantContext: InvariantContext
 
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2

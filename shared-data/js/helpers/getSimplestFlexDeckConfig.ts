@@ -1,16 +1,16 @@
+import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 import { FLEX_ROBOT_TYPE } from '../constants'
 import { getAddressableAreaFromSlotId } from '../fixtures'
-import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
 import type {
+  CompletedProtocolAnalysis,
   CutoutConfig,
   CutoutFixture,
-  DeckDefinition,
-  DeckConfiguration,
-  CompletedProtocolAnalysis,
   CutoutFixtureGroup,
+  DeckConfiguration,
+  DeckDefinition,
 } from '../types'
 
 export interface CutoutConfigProtocolSpec extends CutoutConfig {

@@ -1,11 +1,11 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { appendUniqValidLocCombo } from '../appendUniqValidLocCombo'
 
-import type { LabwareLocationInfoWithLocSeq } from '..'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareLocationInfoWithLocSeq } from '..'
 
 vi.mock('@opentrons/shared-data', () => ({
   FLEX_STAGING_ADDRESSABLE_AREAS: ['A1', 'C2'],

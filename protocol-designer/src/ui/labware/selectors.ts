@@ -1,31 +1,33 @@
-import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import { createSelector } from 'reselect'
+
 import {
   TRASH_BIN_DISPLAY_NAME,
   WASTE_CHUTE_DISPLAY_NAME,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   getIsTiprack,
   getLabwareDisplayName,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import * as stepFormSelectors from '../../step-forms/selectors'
+
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import * as stepFormSelectors from '../../step-forms/selectors'
 import { getLabwareLatestSlotFromCurrentStepIndex } from './utils'
 
-import type {
-  LabwareEntity,
-  AdditionalEquipmentEntity,
-} from '@opentrons/step-generation'
 import type { DropdownOption } from '@opentrons/components'
 import type { RobotType } from '@opentrons/shared-data'
-import type { Selector } from '../../types'
+import type {
+  AdditionalEquipmentEntity,
+  LabwareEntity,
+} from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
 } from '../../step-forms'
+import type { Selector } from '../../types'
 
 export const getLabwareNicknamesById: Selector<
   Record<string, string>

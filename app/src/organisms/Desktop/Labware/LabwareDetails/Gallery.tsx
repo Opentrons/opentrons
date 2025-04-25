@@ -8,8 +8,8 @@ import {
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
   RobotWorkSpace,
-  SPACING_AUTO,
   SPACING,
+  SPACING_AUTO,
 } from '@opentrons/components'
 
 import { labwareImages } from './labware-images'

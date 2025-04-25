@@ -1,13 +1,17 @@
-import { beforeEach, describe, it, expect } from 'vitest'
-import { FIXED_TRASH_ID } from '../constants'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
-  WASTE_CHUTE_CUTOUT,
   fixtureTiprack300ul,
   getLabwareDefURI,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { distribute } from '../commandCreators/compound/distribute'
+import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   blowoutHelper,
+  blowoutInPlaceHelper,
   DEFAULT_PIPETTE,
   delayCommand,
   delayWithOffset,
@@ -18,25 +22,24 @@ import {
   getRobotInitialStateNoTipsRemain,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeAirGapAfterAspirateHelper,
   makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
-  makeDispenseHelper,
   makeDispenseAirGapHelper,
+  makeDispenseHelper,
+  makeMoveToWellHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  blowoutInPlaceHelper,
-  makeMoveToWellHelper,
-  makeAirGapAfterAspirateHelper,
 } from '../fixtures'
-import { distribute } from '../commandCreators/compound/distribute'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '../utils/misc'
+
 import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { DistributeArgs, InvariantContext, RobotState } from '../types'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../utils/misc'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

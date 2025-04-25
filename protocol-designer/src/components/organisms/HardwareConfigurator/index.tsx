@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { DeckConfigurator } from '@opentrons/components'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SIMPLEST_DECK_CONFIG,
@@ -9,7 +10,12 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
+
+import { editDeckConfiguration } from '../../../step-forms/actions'
+import { getDeckConfiguration } from '../../../step-forms/selectors'
+import { HardwareConfiguratorContainer } from './HardwareConfiguratorContainer'
+
+import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfig,
   CutoutId,
@@ -17,7 +23,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { FormModule, FormModules } from '../../../step-forms'
 import type { Fixtures, WizardFormState } from '../types'
-import type { UseFormSetValue } from 'react-hook-form'
 import type {
   CutoutConfigExtended,
   InitialDeckStateModules,
@@ -29,7 +34,10 @@ interface HardwareConfiguratorProps {
   hasGripper: boolean
   fixtures: Fixtures
   setValue?: UseFormSetValue<WizardFormState>
-  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
+  updateInitialDeckState?: (
+    value: CutoutConfigExtended[],
+    newDeckConfig?: DeckConfiguration
+  ) => void
 }
 export function HardwareConfigurator(
   props: HardwareConfiguratorProps
@@ -41,7 +49,8 @@ export function HardwareConfigurator(
     fixtures,
     updateInitialDeckState,
   } = props
-
+  const dispatch = useDispatch()
+  const { deckConfig } = useSelector(getDeckConfiguration)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const simpleDeckConfig: DeckConfiguration = FLEX_SIMPLEST_DECK_CONFIG.filter(
     ({ cutoutId }) => {
@@ -86,37 +95,27 @@ export function HardwareConfigurator(
       cutoutFixtureId: ae.cutoutFixtureId,
     })
   )
-  const deckConfig: DeckConfiguration = [
-    ...simpleDeckConfig,
-    ...moduleConfig,
-    ...additionalEquipmentConfig,
-  ]
-  const [updatedDeckConfig, setUpdatedDeckConfig] = useState<DeckConfiguration>(
-    deckConfig
-  )
-  const {
-    addFixtureModal,
-    addFixtureToCutout,
-    removeFixtureFromCutout,
-  } = useDeckConfigurationEditing(
-    updatedDeckConfig,
-    setUpdatedDeckConfig,
-    modules,
-    fixtures,
-    hasGripper ?? false,
-    setValue,
-    updateInitialDeckState
-  )
 
+  //  initiate deck config
+  useEffect(() => {
+    dispatch(
+      editDeckConfiguration({
+        deckConfig: [
+          ...simpleDeckConfig,
+          ...moduleConfig,
+          ...additionalEquipmentConfig,
+        ],
+      })
+    )
+  }, [])
   return (
-    <>
-      {addFixtureModal}
-      <DeckConfigurator
-        editableCutoutIds={updatedDeckConfig.map(({ cutoutId }) => cutoutId)}
-        deckConfig={updatedDeckConfig}
-        handleClickAdd={addFixtureToCutout}
-        handleClickRemove={removeFixtureFromCutout}
-      />
-    </>
+    <HardwareConfiguratorContainer
+      modules={modules}
+      hasGripper={hasGripper ?? false}
+      fixtures={fixtures}
+      deckConfig={deckConfig}
+      setValue={setValue}
+      updateInitialDeckState={updateInitialDeckState}
+    />
   )
 }

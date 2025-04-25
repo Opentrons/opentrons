@@ -1,12 +1,12 @@
 // epics to control the buildroot migration / update flow
 import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'
-import { of, interval, concat, EMPTY } from 'rxjs'
+import { concat, EMPTY, interval, of } from 'rxjs'
 import {
   filter,
   map,
-  switchMap,
   mergeMap,
+  switchMap,
   takeUntil,
   withLatestFrom,
 } from 'rxjs/operators'
@@ -14,71 +14,65 @@ import {
 // imported directly to avoid circular dependencies between discovery and shell
 import { getAllRobots, getRobotApiVersion } from '../discovery'
 import {
-  startDiscovery,
   finishDiscovery,
   removeRobot,
+  startDiscovery,
 } from '../discovery/actions'
-
-import { GET, POST, fetchRobotApi } from '../robot-api'
-
 import {
   RESTART_PATH,
   RESTART_STATUS_CHANGED,
   RESTART_SUCCEEDED_STATUS,
   restartRobotSuccess,
 } from '../robot-admin'
-
+import { fetchRobotApi, GET, POST } from '../robot-api'
 import {
-  getRobotUpdateTargetVersion,
-  getRobotUpdateSession,
-  getRobotUpdateSessionRobotName,
-  getRobotUpdateRobot,
-} from './selectors'
-
-import {
-  startRobotUpdate,
-  startBuildrootPremigration,
-  readUserRobotUpdateFile,
-  readSystemRobotUpdateFile,
   createSession,
   createSessionSuccess,
+  readSystemRobotUpdateFile,
+  readUserRobotUpdateFile,
   robotUpdateStatus,
-  uploadRobotUpdateFile,
   setRobotUpdateSessionStep,
+  startBuildrootPremigration,
+  startRobotUpdate,
   unexpectedRobotUpdateError,
+  uploadRobotUpdateFile,
 } from './actions'
-
 import {
-  PREMIGRATION_RESTART,
-  GET_TOKEN,
-  PROCESS_FILE,
-  COMMIT_UPDATE,
-  RESTART,
-  FINISHED,
   AWAITING_FILE,
+  COMMIT_UPDATE,
   DONE,
+  DOWNLOAD_FILE,
+  FINISHED,
+  GET_TOKEN,
+  PREMIGRATION_RESTART,
+  PROCESS_FILE,
   READY_FOR_RESTART,
-  ROBOTUPDATE_START_UPDATE,
-  ROBOTUPDATE_FILE_INFO,
+  RESTART,
   ROBOTUPDATE_CREATE_SESSION,
   ROBOTUPDATE_CREATE_SESSION_SUCCESS,
-  DOWNLOAD_FILE,
+  ROBOTUPDATE_FILE_INFO,
+  ROBOTUPDATE_START_UPDATE,
 } from './constants'
+import {
+  getRobotUpdateRobot,
+  getRobotUpdateSession,
+  getRobotUpdateSessionRobotName,
+  getRobotUpdateTargetVersion,
+} from './selectors'
 
 import type { Observable } from 'rxjs'
-import type { State, Action, Epic } from '../types'
 import type { ViewableRobot } from '../discovery/types'
-import type { RobotApiResponse } from '../robot-api/types'
 import type { RestartStatusChangedAction } from '../robot-admin/types'
-
+import type { RobotApiResponse } from '../robot-api/types'
+import type { Action, Epic, State } from '../types'
 import type {
-  RobotUpdateAction,
-  StartRobotUpdateAction,
   CreateSessionAction,
   CreateSessionSuccessAction,
+  RobotUpdateAction,
+  RobotUpdateFileInfoAction,
   RobotUpdateSession,
   RobotUpdateStatusAction,
-  RobotUpdateFileInfoAction,
+  StartRobotUpdateAction,
   UpdateSessionStage,
 } from './types'
 

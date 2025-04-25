@@ -1,8 +1,9 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   useLightsQuery,
   useSetLightsMutation,
@@ -10,9 +11,9 @@ import {
 
 import { useLights } from '../useLights'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
 import type { Mock } from 'vitest'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 

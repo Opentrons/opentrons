@@ -1,4 +1,5 @@
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
+
 import type { RobotState } from '../'
 
 export const absorbanceReaderCollision = (

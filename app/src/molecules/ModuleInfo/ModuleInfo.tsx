@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,18 +8,19 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   RobotCoordsForeignObject,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
 import {
-  getModuleDisplayName,
   getModuleDef2,
+  getModuleDisplayName,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
 import { useRunHasStarted } from '/app/resources/runs'
+
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { PhysicalPort } from '/app/redux/modules/api-types'
 

@@ -1,22 +1,22 @@
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import {
+  filter,
+  ignoreElements,
   map,
   mapTo,
-  filter,
   pairwise,
   tap,
-  ignoreElements,
 } from 'rxjs/operators'
 
-import { alertTriggered, ALERT_APP_UPDATE_AVAILABLE } from '../alerts'
 import { createLogger } from '../../logger'
+import { ALERT_APP_UPDATE_AVAILABLE, alertTriggered } from '../alerts'
 import { getUpdateChannel } from '../config'
-import { getAvailableShellUpdate, checkShellUpdate } from './update'
 import { remote } from './remote'
+import { checkShellUpdate, getAvailableShellUpdate } from './update'
 
 import type { OperatorFunction } from 'rxjs'
-import type { Epic, Action } from '../types'
+import type { Action, Epic } from '../types'
 
 const { ipcRenderer } = remote
 

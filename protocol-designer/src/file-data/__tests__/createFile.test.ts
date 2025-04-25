@@ -1,12 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import Ajv from 'ajv'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   commandSchemaV8,
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
   labwareSchemaV2,
-  protocolSchemaV8,
   OT2_ROBOT_TYPE,
+  protocolSchemaV8,
 } from '@opentrons/shared-data'
 import {
   fixture_12_trough,
@@ -14,23 +15,25 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
+
+import {
+  dismissedWarnings,
+  fileMetadata,
+  ingredients,
+  ingredLocations,
+  labwareDefsByURI,
+  labwareEntities,
+  labwareNicknamesById,
+  pipetteEntities,
+} from '../__fixtures__/createFile/commonFields'
+import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import {
   createFile,
   createPythonFile,
   getLabwareDefinitionsInUse,
 } from '../selectors'
-import {
-  fileMetadata,
-  dismissedWarnings,
-  ingredients,
-  ingredLocations,
-  labwareEntities,
-  labwareNicknamesById,
-  labwareDefsByURI,
-  pipetteEntities,
-} from '../__fixtures__/createFile/commonFields'
-import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,

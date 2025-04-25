@@ -1,12 +1,14 @@
 // filter labware by category
 import { Link } from 'react-router-dom'
 import cx from 'classnames'
-import { getAllCategories, buildFiltersUrl } from '../../filters'
+
+import { buildFiltersUrl, getAllCategories } from '../../filters'
 import {
-  PLURAL_CATEGORY_LABELS_BY_CATEGORY,
   CATEGORY,
+  PLURAL_CATEGORY_LABELS_BY_CATEGORY,
 } from '../../localization'
 import styles from './styles.module.css'
+
 import type { FilterParams } from '../../types'
 
 export interface FilterCategoryProps {

@@ -9,10 +9,10 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../../robot-api/operators'
-import type { Action, Epic } from '../../../types'
-import type { FetchTipLengthCalibrationsAction } from '../types'
-import type { AllTipLengthCalibrations } from '../../api-types'
 import type { RobotApiErrorResponse } from '../../../robot-api/types'
+import type { Action, Epic } from '../../../types'
+import type { AllTipLengthCalibrations } from '../../api-types'
+import type { FetchTipLengthCalibrationsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchTipLengthCalibrationsAction> = action => ({
   method: GET,

@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+
 import { getIsOnDevice, getOnDeviceDisplaySettings } from '/app/redux/config'
 
 export const useIsUnboxingFlowOngoing = (): boolean => {

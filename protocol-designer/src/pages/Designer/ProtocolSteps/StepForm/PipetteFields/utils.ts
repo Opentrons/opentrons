@@ -1,15 +1,25 @@
-import { getWellRatio } from '../../../../../steplist/utils'
-import type { PathOption, StepType } from '../../../../../form-types'
-import { getPipetteCapacity } from '../../../../../pipettes/pipetteData'
+import round from 'lodash/round'
 
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { getPipetteCapacity } from '../../../../../pipettes/pipetteData'
 import {
-  volumeInCapacityForMultiDispense,
   volumeInCapacityForMultiAspirate,
+  volumeInCapacityForMultiDispense,
 } from '../../../../../steplist/formLevel/handleFormChange/utils'
+import { getWellRatio } from '../../../../../steplist/utils'
+
+import type {
+  PipetteChannels,
+  RobotType,
+  SupportedTip,
+} from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import type { PathOption, StepType } from '../../../../../form-types'
+import type { FlowRateType } from '../../../../../resources/types'
 
 export interface DisabledChangeTipArgs {
   aspirateWells?: string[]
@@ -176,4 +186,70 @@ export function getDisabledPathMap(
     }
   }
   return disabledPathMap
+}
+
+// Copied from opentrons/api/src/opentrons/config/defaults_ot3.py
+export const MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S = 15
+export const MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S = 70
+// Copied from opentrons/api/src/opentrons/config/defaults_ot2.py
+export const MAX_PLUNGER_SPEED_OT2 = 125
+
+export const CHANNELS_MAPPED_TO_MAX_PLUNGER_SPEED: Record<
+  PipetteChannels,
+  number
+> = {
+  1: MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S,
+  8: MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S,
+  96: MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S,
+}
+
+const _getPipetteAccuracyUlPerMm = (
+  targetVolume: number,
+  tipLiquidSpecs: SupportedTip,
+  flowRateType: FlowRateType
+): number => {
+  const transformedFlowRateType =
+    flowRateType === 'blowout' ? 'dispense' : flowRateType
+  const flowRateFunction = tipLiquidSpecs[transformedFlowRateType].default['1']
+  let pipetteAccuracyUlPerMm = null
+  for (let i = 0; i < flowRateFunction.length; i++) {
+    const [x, y, z] = flowRateFunction[i]
+    if (targetVolume <= x) {
+      pipetteAccuracyUlPerMm = y * targetVolume + z
+      return pipetteAccuracyUlPerMm
+    }
+  }
+  const lastEntry = flowRateFunction[flowRateFunction.length - 1]
+  return lastEntry[1] * targetVolume + lastEntry[2]
+}
+
+export const getMaxUiFlowRate = (args: {
+  targetVolume: number
+  channels: PipetteChannels
+  robotType: RobotType
+  tipLiquidSpecs: SupportedTip
+  flowRateType: FlowRateType
+  correctionVolume: number
+}): number => {
+  const {
+    targetVolume,
+    channels,
+    robotType,
+    tipLiquidSpecs,
+    flowRateType,
+    correctionVolume,
+  } = args
+  const pipetteAccuracyUlPerMm = _getPipetteAccuracyUlPerMm(
+    targetVolume,
+    tipLiquidSpecs,
+    flowRateType
+  )
+  const maxPlungerSpeed =
+    robotType === OT2_ROBOT_TYPE
+      ? MAX_PLUNGER_SPEED_OT2
+      : CHANNELS_MAPPED_TO_MAX_PLUNGER_SPEED[channels]
+  const correctionMultiplier = 1.0 + correctionVolume / targetVolume
+  const travelMm = targetVolume / pipetteAccuracyUlPerMm
+  const travelMmCorrected = travelMm * correctionMultiplier
+  return round(targetVolume / (travelMmCorrected / maxPlungerSpeed))
 }

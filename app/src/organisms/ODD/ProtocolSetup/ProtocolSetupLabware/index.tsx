@@ -1,70 +1,71 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  getLabwareInfoByLiquidId,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   Box,
   Chip,
-  Tag,
-  ListButton,
   COLORS,
   DeckInfoLabel,
-  StyledText,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  getLabwareInfoByLiquidId,
   Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  ListButton,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
+  StyledText,
+  Tag,
   TYPOGRAPHY,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
+import {
+  useCreateLiveCommandMutation,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  useCreateLiveCommandMutation,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
 
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import {
-  getStackedItemsOnStartingDeck,
-  getLabwareLiquidRenderInfoFromStack,
-} from '/app/transformations/commands'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import {
+  getLabwareLiquidRenderInfoFromStack,
+  getStackedItemsOnStartingDeck,
+} from '/app/transformations/commands'
+
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
+import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
-import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 import type {
-  StackItem,
-  ModuleInStack,
   LabwareInStack,
+  ModuleInStack,
+  StackItem,
 } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
-import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

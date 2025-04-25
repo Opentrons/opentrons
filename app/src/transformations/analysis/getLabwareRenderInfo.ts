@@ -1,12 +1,13 @@
 import { getPositionFromSlotId } from '@opentrons/shared-data'
+
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
-  ProtocolAnalysisOutput,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 export interface LabwareRenderInfoById {

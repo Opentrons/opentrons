@@ -1,38 +1,39 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { renderHook, act, screen } from '@testing-library/react'
+import { act, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { mockRecoveryContentProps } from '../__fixtures__'
-import {
-  ErrorRecoveryContent,
-  useERWizard,
-  ErrorRecoveryComponent,
-} from '../ErrorRecoveryWizard'
 import { RECOVERY_MAP } from '../constants'
 import {
-  SelectRecoveryOption,
-  RetryStep,
-  RetryNewTips,
+  ErrorRecoveryComponent,
+  ErrorRecoveryContent,
+  useERWizard,
+} from '../ErrorRecoveryWizard'
+import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
+import { RecoveryError } from '../RecoveryError'
+import { RecoveryInProgress } from '../RecoveryInProgress'
+import {
   CancelRun,
-  ManageTips,
-  RetrySameTips,
-  FillWellAndRetrySameTips,
   FillWellAndRetryNewTips,
+  FillWellAndRetrySameTips,
+  HomeAndRetry,
+  IgnoreErrorSkipStep,
+  ManageTips,
+  ManualMoveLwAndSkip,
+  ManualReplaceLwAndRetry,
+  RetryNewTips,
+  RetrySameTips,
+  RetryStep,
+  SelectRecoveryOption,
   SkipStepNewTips,
   SkipStepSameTips,
-  IgnoreErrorSkipStep,
-  ManualReplaceLwAndRetry,
-  ManualMoveLwAndSkip,
-  HomeAndRetry,
 } from '../RecoveryOptions'
-import { RecoveryInProgress } from '../RecoveryInProgress'
-import { RecoveryError } from '../RecoveryError'
-import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
 import {
-  useErrorDetailsModal,
   ErrorDetailsModal,
   RecoveryDoorOpenSpecial,
+  useErrorDetailsModal,
 } from '../shared'
 
 import type { ComponentProps } from 'react'

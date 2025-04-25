@@ -16,6 +16,7 @@ import {
   TYPOGRAPHY,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
+
 import flexGripper from '/app/assets/images/flex_gripper.png'
 
 import { MenuOverlay } from './MenuOverlay'

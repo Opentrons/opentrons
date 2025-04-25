@@ -1,14 +1,15 @@
 // main application wrapper component
-import { useRef, useEffect } from 'react'
-import cx from 'classnames'
+import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
+import cx from 'classnames'
+
 import { DefinitionRoute } from '../../definitions'
 import { useFilters } from '../../filters'
-import { Nav, Breadcrumbs } from '../Nav'
+import { LabwareDetails } from '../LabwareDetails'
+import { LabwareList } from '../LabwareList'
+import { Breadcrumbs, Nav } from '../Nav'
 import { Sidebar } from '../Sidebar'
 import { Page } from './Page'
-import { LabwareList } from '../LabwareList'
-import { LabwareDetails } from '../LabwareDetails'
 import styles from './styles.module.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'

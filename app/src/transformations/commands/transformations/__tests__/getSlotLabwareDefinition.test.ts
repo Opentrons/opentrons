@@ -1,6 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
+
 import { getSlotLabwareDefinition } from '../getSlotLabwareDefinition'
+
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const LABWARE_ID =

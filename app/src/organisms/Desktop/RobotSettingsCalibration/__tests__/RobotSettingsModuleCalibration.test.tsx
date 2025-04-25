@@ -1,10 +1,12 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
-import { i18n } from '/app/i18n'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
-import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
+
 import { ModuleCalibrationItems } from '../CalibrationDetails/ModuleCalibrationItems'
+import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 
 import type { ComponentProps } from 'react'
 

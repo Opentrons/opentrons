@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import {
   ALIGN_FLEX_START,
   Box,
@@ -10,13 +11,14 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   RobotCoordsForeignDiv,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 interface LabwareInfoProps {
   displayName: string
   labwareId: string

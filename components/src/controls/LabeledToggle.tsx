@@ -1,6 +1,6 @@
 import { LabeledControl } from './LabeledControl'
-import { ToggleButton } from './ToggleButton'
 import styles from './styles.module.css'
+import { ToggleButton } from './ToggleButton'
 
 import type { ReactNode } from 'react'
 

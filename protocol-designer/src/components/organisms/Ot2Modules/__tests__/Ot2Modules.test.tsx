@@ -1,29 +1,55 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { DeckFromLayers } from '@opentrons/components'
 import {
+  fixture96Plate,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { DeckFromLayers, DropdownMenu } from '@opentrons/components'
+
+import { Ot2Modules } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
-import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
+import {
+  getDisableModuleRestrictions,
+  getEnableMutlipleTempsOT2,
+} from '../../../../feature-flags/selectors'
 import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../../modules'
 import { createModule } from '../../../../step-forms/actions'
-import { Ot2Modules } from '..'
+import { createModuleEntityAndChangeForm } from '../../../../step-forms/actions/thunks'
+import {
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '../../../../step-forms/selectors'
+import { getDismissedHints } from '../../../../tutorial/selectors'
+import { MagnetModuleChangeContent } from '../../../molecules'
+import { ConfirmDeleteEntityInUseModal } from '../../ConfirmDeleteEntityInUseModal'
+import { useKitchen } from '../../Kitchen/hooks'
+import { getModuleOnSlot } from '../util'
+
 import type * as Components from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../modules')
+vi.mock('../../Kitchen/hooks')
+vi.mock('../../../../tutorial/selectors')
+vi.mock('../../../../step-forms/actions/thunks')
+vi.mock('../../ConfirmDeleteEntityInUseModal')
+vi.mock('../../../molecules')
+vi.mock('../util')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
     ...actual,
     DeckFromLayers: vi.fn(),
-    DropdownMenu: vi.fn(),
   }
 })
 
@@ -33,26 +59,70 @@ const render = () => {
   })
 }
 
+const mockModules = {
+  temp: {
+    model: TEMPERATURE_MODULE_V1,
+    type: TEMPERATURE_MODULE_TYPE,
+    id: 'temp',
+    pythonName: 'mockPythonName',
+    moduleState: {} as any,
+    slot: '1',
+  },
+  mag: {
+    model: MAGNETIC_MODULE_V1,
+    type: MAGNETIC_MODULE_TYPE,
+    id: 'mag',
+    pythonName: 'mockPythonName',
+    moduleState: {} as any,
+    slot: '3',
+  },
+}
+const mockMakeSnackbar = vi.fn()
 describe('Ot2Modules', () => {
   beforeEach(() => {
+    vi.mocked(getEnableMutlipleTempsOT2).mockReturnValue(false)
+    vi.mocked(MagnetModuleChangeContent).mockReturnValue(
+      <div>mock MagnetModuleChangeContent</div>
+    )
+    vi.mocked(ConfirmDeleteEntityInUseModal).mockReturnValue(
+      <div>mock ConfirmDeleteEntityInUseModal</div>
+    )
+    vi.mocked(useKitchen).mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      eatToast: vi.fn(),
+      bakeToast: vi.fn(),
+    })
+    vi.mocked(getModuleOnSlot).mockReturnValue({
+      isModuleInUse: false,
+      moduleId: 'temp',
+    })
+    vi.mocked(getSavedStepForms).mockReturnValue({})
+    vi.mocked(getDismissedHints).mockReturnValue([])
+    vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)
+    vi.mocked(DeckFromLayers).mockReturnValue(<div>mock DeckFromLayers</div>)
+    vi.mocked(getAllModuleSlotsByTypeOt2).mockReturnValue([
+      {
+        name: '1',
+        value: '1',
+      },
+      {
+        name: '3',
+        value: '3',
+      },
+      {
+        name: '4',
+        value: '4',
+      },
+    ])
+  })
+
+  it('should render all the module buttons and deck and hitting a button calls the createModule action', () => {
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: {},
       labware: {},
       additionalEquipmentOnDeck: {},
     })
-    vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)
-    vi.mocked(DeckFromLayers).mockReturnValue(<div>mock DeckFromLayers</div>)
-    vi.mocked(DropdownMenu).mockReturnValue(<div>mock DropdownMenu</div>)
-    vi.mocked(getAllModuleSlotsByTypeOt2).mockReturnValue([
-      {
-        name: '1',
-        value: '1',
-      },
-    ])
-  })
-
-  it('should render all the module buttons and deck and hitting a button calls the createModule action', () => {
     render()
     screen.getByText('Modules')
     screen.getByText('Heater-Shaker Module GEN1')
@@ -72,22 +142,97 @@ describe('Ot2Modules', () => {
   it('should render a temperature module on slot 1 and removing it calls the deleteModule action', () => {
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
-      modules: {
-        temp: {
-          model: 'temperatureModuleV1',
-          type: 'temperatureModuleType',
-          id: 'temp',
-          pythonName: 'mockPythonName',
-          moduleState: {} as any,
-          slot: '1',
-        },
-      },
+      modules: mockModules,
       labware: {},
       additionalEquipmentOnDeck: {},
     })
     render()
-    screen.getByText('Deck slot')
-    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+    screen.getAllByText('Deck slot')
+    fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0])
     expect(vi.mocked(deleteModule)).toHaveBeenCalledWith({ moduleId: 'temp' })
+  })
+  it('shoulder render the conflict in slot due to module snackbar', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: mockModules,
+      labware: {},
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    fireEvent.click(screen.getByText('3'))
+    fireEvent.click(screen.getAllByText('1')[1])
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'Cannot move to this slot due to a module conflict'
+    )
+  })
+  it('should render the conflict in slot due to labware snackbar', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: mockModules,
+      labware: {
+        labware: {
+          id: 'labware',
+          labwareDefURI: 'mockUri',
+          pythonName: 'mockPythonName',
+          def: fixture96Plate as LabwareDefinition2,
+          slot: '4',
+        },
+      },
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    fireEvent.click(screen.getByText('3'))
+    fireEvent.click(screen.getByText('4'))
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'Cannot move to this slot because the ANSI 96 Standard Microplate is incompatible with this module'
+    )
+  })
+  it('should call the createModuleEntityAndChangeForm action when moving a module in use', () => {
+    vi.mocked(getModuleOnSlot).mockReturnValue({
+      isModuleInUse: true,
+      moduleId: 'temp',
+    })
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: mockModules,
+      labware: {},
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    fireEvent.click(screen.getByText('3'))
+    fireEvent.click(screen.getByText('4'))
+    expect(vi.mocked(createModuleEntityAndChangeForm)).toHaveBeenCalledWith({
+      model: MAGNETIC_MODULE_V1,
+      moduleSteps: [],
+      pauseSteps: [],
+      slot: '4',
+      type: MAGNETIC_MODULE_TYPE,
+    })
+  })
+  it('should render the ConfirmDeleteEntityInUseModal when trying to delete a module in use', () => {
+    vi.mocked(getModuleOnSlot).mockReturnValue({
+      isModuleInUse: true,
+      moduleId: 'temp',
+    })
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: mockModules,
+      labware: {},
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0])
+    screen.getByText('mock ConfirmDeleteEntityInUseModal')
+  })
+  it('should render 2 temperature module GEN2 buttons when the useFacing flag is turned on', () => {
+    vi.mocked(getEnableMutlipleTempsOT2).mockReturnValue(true)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: {},
+      labware: {},
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    expect(screen.getAllByText('Temperature Module GEN2')).toHaveLength(2)
   })
 })

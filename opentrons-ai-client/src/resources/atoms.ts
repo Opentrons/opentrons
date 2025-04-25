@@ -1,5 +1,6 @@
 // jotai's atoms
 import { atom } from 'jotai'
+
 import type {
   Chat,
   ChatData,
@@ -27,7 +28,6 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
   liquids: [],
   steps: [],
   fake: true,
-  fake_id: 0,
 })
 
 /** CreateProtocolChatAtom is for the prefilled userprompt when navigating to the chat page from Update Protocol page */
@@ -38,7 +38,6 @@ export const updateProtocolChatAtom = atom<UpdatePrompt>({
   update_type: 'adapt_python_protocol',
   update_details: '',
   fake: false,
-  fake_id: 0,
 })
 
 /** Regenerate protocol atom */

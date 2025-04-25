@@ -1,6 +1,6 @@
 import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
-import { UniversalSteps } from '../support/UniversalSteps'
 import { StepBuilder } from '../support/StepBuilder'
+import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel - Happy Path', () => {
   beforeEach(() => {

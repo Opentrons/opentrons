@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react'
-import styled from 'styled-components'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -23,16 +24,16 @@ import {
   useGripperDisplayName,
   usePipetteNameSpecs,
 } from '/app/local-resources/instruments'
-import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import type { MouseEventHandler } from 'react'
 import type { InstrumentData } from '@opentrons/api-client'
 import type {
   GripperModel,
-  PipetteName,
   LoadedPipette,
+  PipetteName,
 } from '@opentrons/shared-data'
 import type { Mount } from '/app/redux/pipettes/types'
 

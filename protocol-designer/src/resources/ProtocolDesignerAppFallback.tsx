@@ -13,12 +13,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions } from '../load-file'
 import { analyticsEvent } from '../analytics/actions'
+import { actions } from '../load-file'
 
 import type { FallbackProps } from 'react-error-boundary'
-import type { ThunkDispatch } from '../types'
 import type { AnalyticsEvent } from '../analytics/mixpanel'
+import type { ThunkDispatch } from '../types'
 
 export function ProtocolDesignerAppFallback({
   error,

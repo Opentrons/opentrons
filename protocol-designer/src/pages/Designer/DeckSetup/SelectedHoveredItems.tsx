@@ -1,23 +1,26 @@
 import { useSelector } from 'react-redux'
+
 import { Module } from '@opentrons/components'
 import {
   getAllLabwareDefs,
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { selectors } from '../../../labware-ingred/selectors'
+
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { selectors } from '../../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { ModuleLabel } from './ModuleLabel'
 import { FixtureRender } from './FixtureRender'
+import { ModuleLabel } from './ModuleLabel'
 import { SelectedLabwareRender } from './SelectedLabwareRender'
 import { SelectedModuleLabwareRender } from './SelectedModuleLabwareRender'
+
+import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type { DeckLabelProps } from '@opentrons/components'
 
 interface SelectedHoveredItemsProps {
   deckDef: DeckDefinition

@@ -13,7 +13,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getPipetteSpecsV2, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 

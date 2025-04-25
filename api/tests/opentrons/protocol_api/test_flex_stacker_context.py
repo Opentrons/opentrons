@@ -1,11 +1,12 @@
 """Tests for Protocol API Flex Stacker contexts."""
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
+from opentrons.types import DeckSlotName
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api import FlexStackerContext
+from opentrons.protocol_api import FlexStackerContext, Labware
 from opentrons.protocol_api.core.common import (
     ProtocolCore,
     LabwareCore,
@@ -13,11 +14,16 @@ from opentrons.protocol_api.core.common import (
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
+from . import versions_at_or_above
+
 
 @pytest.fixture
 def mock_core(decoy: Decoy) -> FlexStackerCore:
     """Get a mock module implementation core."""
-    return decoy.mock(cls=FlexStackerCore)
+    core = decoy.mock(cls=FlexStackerCore)
+    decoy.when(core.get_display_name()).then_return("mock stacker core")
+    decoy.when(core.get_deck_slot()).then_return(DeckSlotName.SLOT_D3)
+    return core
 
 
 @pytest.fixture
@@ -47,12 +53,6 @@ def mock_broker(decoy: Decoy) -> LegacyBroker:
 
 
 @pytest.fixture
-def api_version() -> APIVersion:
-    """Get an API version to apply to the interface."""
-    return APIVersion(2, 23)
-
-
-@pytest.fixture
 def subject(
     api_version: APIVersion,
     mock_core: FlexStackerCore,
@@ -70,6 +70,9 @@ def subject(
     )
 
 
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+)
 def test_get_serial_number(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
@@ -79,14 +82,36 @@ def test_get_serial_number(
     assert result == "12345"
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 23)])
+@pytest.mark.parametrize(
+    "message,count", [("hello", 2), ("hello", None), (None, 2), (None, None)]
+)
+def test_fill_old_args(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    subject: FlexStackerContext,
+    message: str | None,
+    count: int | None,
+) -> None:
+    """It should pass args to the core."""
+    subject.fill(message, count)  # type: ignore[arg-type]
+    decoy.verify(mock_core.fill(count, message))
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+)
 def test_fill(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
     """It should pass args to the core."""
-    subject.fill("hello", 2)
-    decoy.verify(mock_core.fill("hello", 2))
+    subject.fill(2, "hello")
+    decoy.verify(mock_core.fill(2, "hello"))
 
 
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+)
 def test_empty(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
@@ -95,6 +120,9 @@ def test_empty(
     decoy.verify(mock_core.empty("goodbye"))
 
 
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+)
 def test_set_stored_labware(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
@@ -114,3 +142,186 @@ def test_set_stored_labware(
             count=2,
         )
     )
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+)
+def test_get_max_storable_labware_from_list(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: FlexStackerContext,
+) -> None:
+    """It should filter its arguments and responses."""
+    base_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
+    for idx, core in enumerate(base_cores):
+        decoy.when(core.get_well_columns()).then_return([])
+        decoy.when(core.get_display_name()).then_return(f"core-{idx}")
+        decoy.when(mock_core_map.get_or_add(core, matchers.Anything())).then_do(
+            lambda lw, builder: builder(lw)
+        )
+    base_lw = [
+        Labware(
+            core=core,
+            api_version=APIVersion(2, 24),
+            protocol_core=mock_protocol_core,
+            core_map=subject._core_map,
+        )
+        for core in base_cores
+    ]
+    decoy.when(mock_core.get_max_storable_labware_from_list(base_cores)).then_return(
+        base_cores[:3]
+    )
+    assert subject.get_max_storable_labware_from_list(base_lw) == base_lw[:3]
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+)
+def test_get_current_storable_labware_from_list(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: FlexStackerContext,
+) -> None:
+    """It should filter its arguments and responses."""
+    base_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
+    for idx, core in enumerate(base_cores):
+        decoy.when(core.get_well_columns()).then_return([])
+        decoy.when(core.get_display_name()).then_return(f"core-{idx}")
+        decoy.when(mock_core_map.get_or_add(core, matchers.Anything())).then_do(
+            lambda lw, builder: builder(lw)
+        )
+    base_lw = [
+        Labware(
+            core=core,
+            api_version=APIVersion(2, 24),
+            protocol_core=mock_protocol_core,
+            core_map=subject._core_map,
+        )
+        for core in base_cores
+    ]
+    decoy.when(
+        mock_core.get_current_storable_labware_from_list(base_cores)
+    ).then_return(base_cores[:3])
+    assert subject.get_current_storable_labware_from_list(base_lw) == base_lw[:3]
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+)
+def test_get_max_storable_labware(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    subject: FlexStackerContext,
+) -> None:
+    """It should filter its arguments and responses."""
+    decoy.when(mock_core.get_max_storable_labware()).then_return(3)
+    assert subject.get_max_storable_labware() == 3
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+)
+def test_get_current_storable_labware(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    subject: FlexStackerContext,
+) -> None:
+    """It should filter its arguments and responses."""
+    decoy.when(mock_core.get_current_storable_labware()).then_return(3)
+    assert subject.get_current_storable_labware() == 3
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+)
+def test_get_stored_labware(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: FlexStackerContext,
+) -> None:
+    """It should wrap the response in Labwares."""
+    base_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
+    for idx, core in enumerate(base_cores):
+        decoy.when(core.get_well_columns()).then_return([])
+        decoy.when(core.get_display_name()).then_return(f"core-{idx}")
+        decoy.when(mock_core_map.get_or_add(core, matchers.Anything())).then_do(
+            lambda lw, builder: builder(lw)
+        )
+    base_lw = [
+        Labware(
+            core=core,
+            api_version=APIVersion(2, 24),
+            protocol_core=mock_protocol_core,
+            core_map=subject._core_map,
+        )
+        for core in base_cores
+    ]
+    decoy.when(mock_core.get_stored_labware()).then_return(base_cores)
+    assert subject.get_stored_labware() == base_lw
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+)
+@pytest.mark.parametrize("message", ["hello", None])
+def test_fill_items(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: FlexStackerContext,
+    message: str | None,
+) -> None:
+    """It should wrap the response in Labwares."""
+    base_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
+    for idx, core in enumerate(base_cores):
+        decoy.when(core.get_well_columns()).then_return([])
+        decoy.when(core.get_display_name()).then_return(f"core-{idx}")
+
+    base_lw = [
+        Labware(
+            core=core,
+            api_version=APIVersion(2, 24),
+            protocol_core=mock_protocol_core,
+            core_map=subject._core_map,
+        )
+        for core in base_cores
+    ]
+    subject.fill_items(base_lw, message)
+    decoy.verify(mock_core.fill_items(base_cores, message))
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+)
+def test_set_stored_labware_items(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: FlexStackerContext,
+) -> None:
+    """It should wrap the response in Labwares."""
+    base_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
+    for idx, core in enumerate(base_cores):
+        decoy.when(core.get_well_columns()).then_return([])
+        decoy.when(core.get_display_name()).then_return(f"core-{idx}")
+
+    base_lw = [
+        Labware(
+            core=core,
+            api_version=APIVersion(2, 24),
+            protocol_core=mock_protocol_core,
+            core_map=subject._core_map,
+        )
+        for core in base_cores
+    ]
+    subject.set_stored_labware_items(base_lw)
+    decoy.verify(mock_core.set_stored_labware_items(base_cores))

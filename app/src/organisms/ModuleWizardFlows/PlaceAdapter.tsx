@@ -2,43 +2,44 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
+
+import {
+  Flex,
+  LegacyStyledText,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getCalibrationAdapterLoadName,
+  getModuleDisplayName,
+  HEATERSHAKER_MODULE_MODELS,
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_MODELS,
+  THERMOCYCLER_MODULE_MODELS,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+} from '@opentrons/shared-data'
+
 import HeaterShaker_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
 import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
 import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
 import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
 import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
-
-import {
-  Flex,
-  RESPONSIVENESS,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import {
-  getCalibrationAdapterLoadName,
-  getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_MODELS,
-  TEMPERATURE_MODULE_MODELS,
-  THERMOCYCLER_MODULE_MODELS,
-  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-} from '@opentrons/shared-data'
-
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+
 import { LEFT_SLOTS } from './constants'
 
-import type { DeckConfiguration, CreateCommand } from '@opentrons/shared-data'
-import type { ModuleCalibrationWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
 import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
+import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration

@@ -1,13 +1,13 @@
 import type {
   AddressableAreaName,
-  CommonCommandRunTimeInfo,
+  AspirateProperties,
   CommonCommandCreateInfo,
+  CommonCommandRunTimeInfo,
   LabwareDefinition2,
   LabwareOffset,
-  PipetteName,
   ModuleModel,
-  AspirateProperties,
   MultiDispenseProperties,
+  PipetteName,
   SingleDispenseProperties,
 } from '../../js'
 

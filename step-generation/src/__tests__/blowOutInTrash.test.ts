@@ -1,4 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+import { blowOutInTrash } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
@@ -6,7 +8,7 @@ import {
   makeContext,
 } from '../fixtures'
 import { PROTOCOL_CONTEXT_NAME } from '../utils'
-import { blowOutInTrash } from '../commandCreators/compound'
+
 import type { CutoutId } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 

@@ -1,19 +1,23 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { FLEX_ROBOT_TYPE, fixture96Plate } from '@opentrons/shared-data'
-import { i18n } from '../../../../assets/localization'
+
+import { fixture96Plate, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { deleteContainer } from '../../../../labware-ingred/actions'
+import { i18n } from '../../../../assets/localization'
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { getRobotType } from '../../../../file-data/selectors'
+import { deleteContainer } from '../../../../labware-ingred/actions'
+import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getDismissedHints } from '../../../../tutorial/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import { getDismissedHints } from '../../../../tutorial/selectors'
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
 import { LabwareTools } from '../LabwareTools'
 
