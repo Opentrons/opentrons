@@ -19,23 +19,23 @@ if TYPE_CHECKING:
     from ...state.state import StateView
 
 
-openGripperJawCommandType = Literal["robot/openGripperJaw"]
+OpenGripperJawCommandType = Literal["robot/openGripperJaw"]
 
 
-class openGripperJawParams(BaseModel):
+class OpenGripperJawParams(BaseModel):
     """Payload required to release a gripper."""
 
     pass
 
 
-class openGripperJawResult(BaseModel):
+class OpenGripperJawResult(BaseModel):
     """Result data from the execution of a openGripperJaw command."""
 
     pass
 
 
-class openGripperJawImplementation(
-    AbstractCommandImpl[openGripperJawParams, SuccessData[openGripperJawResult]]
+class OpenGripperJawImplementation(
+    AbstractCommandImpl[OpenGripperJawParams, SuccessData[OpenGripperJawResult]]
 ):
     """openGripperJaw command implementation."""
 
@@ -49,38 +49,38 @@ class openGripperJawImplementation(
         self._state_view = state_view
 
     async def execute(
-        self, params: openGripperJawParams
-    ) -> SuccessData[openGripperJawResult]:
+        self, params: OpenGripperJawParams
+    ) -> SuccessData[OpenGripperJawResult]:
         """Release the gripper."""
         if self._state_view.config.use_virtual_gripper:
-            return SuccessData(public=openGripperJawResult())
+            return SuccessData(public=OpenGripperJawResult())
 
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
 
         await ot3_hardware_api.home_gripper_jaw()
         return SuccessData(
-            public=openGripperJawResult(),
+            public=OpenGripperJawResult(),
         )
 
 
-class openGripperJaw(
-    BaseCommand[openGripperJawParams, openGripperJawResult, ErrorOccurrence]
+class OpenGripperJaw(
+    BaseCommand[OpenGripperJawParams, OpenGripperJawResult, ErrorOccurrence]
 ):
     """openGripperJaw command model."""
 
-    commandType: openGripperJawCommandType = "robot/openGripperJaw"
-    params: openGripperJawParams
-    result: Optional[openGripperJawResult] = None
+    commandType: OpenGripperJawCommandType = "robot/openGripperJaw"
+    params: OpenGripperJawParams
+    result: Optional[OpenGripperJawResult] = None
 
     _ImplementationCls: Type[
-        openGripperJawImplementation
-    ] = openGripperJawImplementation
+        OpenGripperJawImplementation
+    ] = OpenGripperJawImplementation
 
 
-class openGripperJawCreate(BaseCommandCreate[openGripperJawParams]):
+class OpenGripperJawCreate(BaseCommandCreate[OpenGripperJawParams]):
     """openGripperJaw command request model."""
 
-    commandType: openGripperJawCommandType = "robot/openGripperJaw"
-    params: openGripperJawParams
+    commandType: OpenGripperJawCommandType = "robot/openGripperJaw"
+    params: OpenGripperJawParams
 
-    _CommandCls: Type[openGripperJaw] = openGripperJaw
+    _CommandCls: Type[OpenGripperJaw] = OpenGripperJaw

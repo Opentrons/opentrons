@@ -21,14 +21,14 @@ if TYPE_CHECKING:
     from ...state.state import StateView
 
 
-closeGripperJawCommandType = Literal["robot/closeGripperJaw"]
+CloseGripperJawCommandType = Literal["robot/closeGripperJaw"]
 
 
 def _remove_default(s: dict[str, Any]) -> None:
     s.pop("default", None)
 
 
-class closeGripperJawParams(BaseModel):
+class CloseGripperJawParams(BaseModel):
     """Payload required to close a gripper."""
 
     force: float | SkipJsonSchema[None] = Field(
@@ -38,16 +38,16 @@ class closeGripperJawParams(BaseModel):
     )
 
 
-class closeGripperJawResult(BaseModel):
-    """Result data from the execution of a closeGripperJaw command."""
+class CloseGripperJawResult(BaseModel):
+    """Result data from the execution of a CloseGripperJaw command."""
 
     pass
 
 
-class closeGripperJawImplementation(
-    AbstractCommandImpl[closeGripperJawParams, SuccessData[closeGripperJawResult]]
+class CloseGripperJawImplementation(
+    AbstractCommandImpl[CloseGripperJawParams, SuccessData[CloseGripperJawResult]]
 ):
-    """closeGripperJaw command implementation."""
+    """CloseGripperJaw command implementation."""
 
     def __init__(
         self,
@@ -59,38 +59,38 @@ class closeGripperJawImplementation(
         self._state_view = state_view
 
     async def execute(
-        self, params: closeGripperJawParams
-    ) -> SuccessData[closeGripperJawResult]:
+        self, params: CloseGripperJawParams
+    ) -> SuccessData[CloseGripperJawResult]:
         """Release the gripper."""
         if self._state_view.config.use_virtual_gripper:
             return SuccessData(
-                public=closeGripperJawResult(),
+                public=CloseGripperJawResult(),
             )
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
         await ot3_hardware_api.grip(force_newtons=params.force)
         return SuccessData(
-            public=closeGripperJawResult(),
+            public=CloseGripperJawResult(),
         )
 
 
-class closeGripperJaw(
-    BaseCommand[closeGripperJawParams, closeGripperJawResult, ErrorOccurrence]
+class CloseGripperJaw(
+    BaseCommand[CloseGripperJawParams, CloseGripperJawResult, ErrorOccurrence]
 ):
-    """closeGripperJaw command model."""
+    """CloseGripperJaw command model."""
 
-    commandType: closeGripperJawCommandType = "robot/closeGripperJaw"
-    params: closeGripperJawParams
-    result: Optional[closeGripperJawResult] = None
+    commandType: CloseGripperJawCommandType = "robot/closeGripperJaw"
+    params: CloseGripperJawParams
+    result: Optional[CloseGripperJawResult] = None
 
     _ImplementationCls: Type[
-        closeGripperJawImplementation
-    ] = closeGripperJawImplementation
+        CloseGripperJawImplementation
+    ] = CloseGripperJawImplementation
 
 
-class closeGripperJawCreate(BaseCommandCreate[closeGripperJawParams]):
-    """closeGripperJaw command request model."""
+class CloseGripperJawCreate(BaseCommandCreate[CloseGripperJawParams]):
+    """CloseGripperJaw command request model."""
 
-    commandType: closeGripperJawCommandType = "robot/closeGripperJaw"
-    params: closeGripperJawParams
+    commandType: CloseGripperJawCommandType = "robot/closeGripperJaw"
+    params: CloseGripperJawParams
 
-    _CommandCls: Type[closeGripperJaw] = closeGripperJaw
+    _CommandCls: Type[CloseGripperJaw] = CloseGripperJaw
