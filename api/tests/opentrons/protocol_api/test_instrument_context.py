@@ -59,7 +59,13 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.types import Location, Mount, Point, NozzleMapInterface
+from opentrons.types import (
+    Location,
+    Mount,
+    Point,
+    NozzleMapInterface,
+    MeniscusTrackingTarget,
+)
 
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.errors.exceptions import (
@@ -550,6 +556,53 @@ def test_blow_out_to_well_location(
             location=input_location, well_core=mock_well._core, in_place=False
         ),
         times=1,
+    )
+
+
+def test_blow_out_to_well_meniscus_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should blow out to a well location."""
+    liquid_height = 10.0
+    well_bottom = Point(2, 2, 2)
+    relative_height = 3
+    mock_well = decoy.mock(cls=Well)
+    input_location_absolute = Location(
+        point=well_bottom + Point(0, 0, liquid_height) + Point(0, 0, relative_height),
+        labware=mock_well,
+    )
+    decoy.when(mock_well.current_liquid_height()).then_return(liquid_height)
+    decoy.when(mock_well.bottom(liquid_height + relative_height)).then_return(
+        Location(
+            point=well_bottom + Point(0, 0, liquid_height + relative_height),
+            labware=mock_well,
+        )
+    )
+
+    input_location = Location(
+        point=Point(0, 0, relative_height),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.END,
+    )
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+
+    subject.blow_out(location=input_location)
+
+    mock_instrument_core.blow_out(
+        location=input_location_absolute, well_core=mock_well._core, in_place=False
     )
 
 
