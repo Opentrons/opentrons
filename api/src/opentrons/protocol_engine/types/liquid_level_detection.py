@@ -84,7 +84,9 @@ class SimulatedProbeResult(BaseModel):
         self.operations_after_probe.append(volume)
 
 
-LiquidTrackingType = SimulatedProbeResult | float
+# Work around https://github.com/pydantic/pydantic/issues/6830 - do not change the order of
+# this union
+LiquidTrackingType = float | SimulatedProbeResult
 
 
 class LoadedVolumeInfo(BaseModel):

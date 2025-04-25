@@ -3,7 +3,11 @@
 import pytest
 from pydantic import ValidationError, BaseModel
 
-from opentrons.protocol_engine.types import HexColor, SimulatedProbeResult
+from opentrons.protocol_engine.types import (
+    HexColor,
+    SimulatedProbeResult,
+    LiquidTrackingType,
+)
 
 
 @pytest.mark.parametrize("hex_color", ["#F00", "#FFCC00CC", "#FC0C", "#98e2d1"])
@@ -23,15 +27,23 @@ def test_handles_invalid_hex(invalid_hex_color: str) -> None:
         HexColor.model_validate_json(f'"{invalid_hex_color}"')
 
 
-class TestModel(BaseModel):
+class _TestModel(BaseModel):
     """Test model for deserializing SimulatedProbeResults."""
 
-    value: float | SimulatedProbeResult
+    value: LiquidTrackingType
 
 
-def test_deserializes_simulated_liquid_probe() -> None:
+def test_roundtrips_simulated_liquid_probe() -> None:
     """Should be able to roundtrip our simulated results."""
-    base = TestModel(value=SimulatedProbeResult())
+    base = _TestModel(value=SimulatedProbeResult())
     serialized = base.model_dump_json()
-    deserialized = TestModel.model_validate_json(serialized)
+    deserialized = _TestModel.model_validate_json(serialized)
     assert isinstance(deserialized.value, SimulatedProbeResult)
+
+
+def test_roundtrips_nonsimulated_liquid_probe() -> None:
+    """Should be able to roundtrip our simulated results."""
+    base = _TestModel(value=10.0)
+    serialized = base.model_dump_json()
+    deserialized = _TestModel.model_validate_json(serialized)
+    assert deserialized.value == 10.0
