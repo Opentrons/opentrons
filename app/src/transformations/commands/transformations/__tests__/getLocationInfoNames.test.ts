@@ -1,9 +1,12 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   getLabwareDisplayName,
   getLabwareStackCountAndLocation,
 } from '@opentrons/shared-data'
+
 import { getLocationInfoNames } from '../getLocationInfoNames'
+
 import type { ModuleModel } from '@opentrons/shared-data'
 
 const ADAPTER_DISPLAY_NAME = 'Opentrons 96 Flat Bottom Adapter'

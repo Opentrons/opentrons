@@ -1,27 +1,30 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
-import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
+
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { dispense } from '../commandCreators/atomic/dispense'
 import {
-  absorbanceReaderCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
   getRobotStateWithTipStandard,
-  makeContext,
-  getErrorResult,
   getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { dispense } from '../commandCreators/atomic/dispense'
+import {
+  absorbanceReaderCollision,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
 import type { DispenseAtomicCommandParams } from '../commandCreators/atomic/dispense'
 import type { InvariantContext, RobotState } from '../types'
 

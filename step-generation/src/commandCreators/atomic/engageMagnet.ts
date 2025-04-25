@@ -1,7 +1,10 @@
 import assert from 'assert'
+
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
+import { uuid } from '../../utils'
+
 import type { EngageMagnetParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 

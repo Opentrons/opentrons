@@ -1,24 +1,28 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
+
 import {
-  FLEX_ROBOT_TYPE,
-  THERMOCYCLER_MODULE_V1,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
+  FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../assets/localization'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { getRobotType } from '../../../../file-data/selectors'
+import { createCustomLabwareDef } from '../../../../labware-defs/actions'
+import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
+import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getInitialDeckSetup,
   getPermittedTipracks,
   getPipetteEntities,
 } from '../../../../step-forms/selectors'
 import { getHas96Channel } from '../../../../utils'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { createCustomLabwareDef } from '../../../../labware-defs/actions'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
 import { LabwareTools } from '../LabwareTools'
 
 import type { ComponentProps } from 'react'

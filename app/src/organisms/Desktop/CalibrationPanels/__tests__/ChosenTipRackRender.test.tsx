@@ -1,8 +1,9 @@
-import { it, describe, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it } from 'vitest'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { ChosenTipRackRender } from '../ChosenTipRackRender'
 
 import type { ComponentProps } from 'react'

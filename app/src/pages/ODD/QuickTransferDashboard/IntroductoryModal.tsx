@@ -1,16 +1,17 @@
 import { useTranslation } from 'react-i18next'
+
 import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
   SPACING,
   StyledText,
-  Flex,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { OddModal } from '/app/molecules/OddModal'
-import { SmallButton } from '/app/atoms/buttons'
 
 import imgSrc from '/app/assets/images/on-device-display/odd-abstract-6.png'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 
 interface IntroductoryModalProps {
   onClose: () => void

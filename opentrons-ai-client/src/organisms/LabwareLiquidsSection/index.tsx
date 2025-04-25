@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -8,11 +11,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import { LabwareModal } from '../LabwareModal'
-import { ControlledLabwareListItems } from '../../molecules/ControlledLabwareListItems'
+
 import { ControlledAddTextAreaFields } from '../../molecules/ControlledAddTextAreaFields'
+import { ControlledLabwareListItems } from '../../molecules/ControlledLabwareListItems'
+import { LabwareModal } from '../LabwareModal'
 
 export interface DisplayLabware {
   labwareURI: string

@@ -1,12 +1,14 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { DropdownStepFormField } from '../../../../../components/molecules'
+import { getRobotStateAtActiveItem } from '../../../../../top-selectors/labware-locations'
 import {
   getDisposalOptions,
   getLabwareOptions,
 } from '../../../../../ui/labware/selectors'
 import { hoverSelection } from '../../../../../ui/steps/actions/actions'
-import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getRobotStateAtActiveItem } from '../../../../../top-selectors/labware-locations'
+
 import type { FieldProps } from '../types'
 
 export function LabwareField(props: FieldProps): JSX.Element {

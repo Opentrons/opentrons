@@ -2,13 +2,14 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
-  RUN_STATUS_FINISHING,
 } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
@@ -16,7 +17,7 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 
 import type { ComponentProps } from 'react'

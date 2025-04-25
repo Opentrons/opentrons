@@ -1,14 +1,18 @@
-import { screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useConditionalConfirm } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getReachableRobots, getUnreachableRobots } from '/app/redux/discovery'
 import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { ClearUnavailableRobots } from '../ClearUnavailableRobots'
+
 import type * as OpentronsComponents from '@opentrons/components'
 
 const mockConfirm = vi.fn()

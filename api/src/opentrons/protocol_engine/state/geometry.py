@@ -7,6 +7,7 @@ from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict, Set
 from dataclasses import dataclass
 from functools import cached_property
+from math import isclose
 
 from opentrons.types import (
     Point,
@@ -487,7 +488,7 @@ class GeometryView:
                     raise OperationLocationNotInWellError(
                         f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location that could be below the bottom of the well"
                     )
-        elif z_offset < 0:
+        elif z_offset < 0 and not isclose(z_offset, 0, abs_tol=0.0000001):
             if isinstance(well_location, LiquidHandlingWellLocation):
                 raise OperationLocationNotInWellError(
                     f"Specifying {well_location.origin} with an offset of {well_location.offset} and a volume offset of {well_location.volumeOffset} results in an operation location below the bottom of the well"

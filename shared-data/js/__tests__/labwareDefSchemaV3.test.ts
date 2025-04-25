@@ -1,11 +1,11 @@
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 import { describe, expect, it, test } from 'vitest'
 
-import Ajv from 'ajv'
+import schema from '../../labware/schemas/3.json'
 
 import type { LabwareDefinition3 } from '../types'
-import schema from '../../labware/schemas/3.json'
 
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/3')
 const definitionsDir = path.join(__dirname, '../../labware/definitions/3')
@@ -64,9 +64,7 @@ describe(`test labware definitions with schema v3`, () => {
   const allPaths = definitionPaths.concat(fixturePaths)
 
   test("paths didn't break, which would give false positives", () => {
-    // todo(mm, 2025-03-17): Update this to .toBeGreaterThan(0) when some
-    // schema 3 definitions exist.
-    expect(definitionPaths.length).toStrictEqual(0)
+    expect(definitionPaths.length).toBeGreaterThan(0)
 
     expect(fixturePaths.length).toBeGreaterThan(0)
   })

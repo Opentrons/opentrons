@@ -11,9 +11,10 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../../utils'
-import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
+
 import { LabwareOnDeck } from '../../components/organisms'
+import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
+import { getStagingAreaAddressableAreas } from '../../utils'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -24,8 +25,8 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   InitialDeckSetup,
-  ModuleOnDeck,
   LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
 } from '../../step-forms'
 
 interface DeckSetupDetailsProps {

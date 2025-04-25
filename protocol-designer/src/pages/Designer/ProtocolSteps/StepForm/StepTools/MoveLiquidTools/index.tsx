@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux'
+
 import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
-import { useAssignLiquidClass } from './hooks'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
+import { useAssignLiquidClass } from './hooks'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 

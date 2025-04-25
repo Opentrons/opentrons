@@ -1,14 +1,14 @@
 import ReactDOM from 'react-dom/client'
-import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
 
-import { configureStore } from './configureStore'
-import { initialize } from './initialize'
 import { initializeMixpanel } from './analytics/mixpanel'
 import { initializeSentry } from './resources/sentry'
-import { i18n } from './assets/localization'
 import { App } from './App'
+import { i18n } from './assets/localization'
 import { GlobalStyle } from './components/atoms'
+import { configureStore } from './configureStore'
+import { initialize } from './initialize'
 
 // initialize Redux
 const store = configureStore()

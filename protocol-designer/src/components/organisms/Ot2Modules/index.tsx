@@ -1,6 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,7 +9,6 @@ import {
   DeckFromLayers,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_FLEX_START,
   ListItem,
   ListItemCustomize,
   Module,
@@ -34,33 +34,35 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  getSavedStepForms,
-  getInitialDeckSetup,
-} from '../../../step-forms/selectors'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+
 import {
   getDisableModuleRestrictions,
   getEnableMutlipleTempsOT2,
 } from '../../../feature-flags/selectors'
-import { createModule } from '../../../step-forms/actions'
-import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
 import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../modules'
 import { SlotWarning } from '../../../pages/Designer/DeckSetup/SlotWarning'
-import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
-import { getDismissedHints } from '../../../tutorial/selectors'
-import { createModuleEntityAndChangeForm } from '../../../step-forms/actions/thunks'
 import { OT2_SUPPORTED_MODULE_MODELS } from '../../../pages/Onboarding/constants'
+import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
+import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { createModule } from '../../../step-forms/actions'
+import { createModuleEntityAndChangeForm } from '../../../step-forms/actions/thunks'
+import {
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '../../../step-forms/selectors'
+import { getDismissedHints } from '../../../tutorial/selectors'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
 import { FixedTrashText, MagnetModuleChangeContent } from '../../molecules'
-import { ModuleEmptySelectorButtons } from '../ModuleEmptySelectorButtons'
-import { useKitchen } from '../Kitchen/hooks'
-import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
-import { getNextAvailableModuleSlot, getSlotsWithCollisions } from '../utils'
 import { useBlockingHint } from '../BlockingHintModal'
+import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
+import { useKitchen } from '../Kitchen/hooks'
+import { ModuleEmptySelectorButtons } from '../ModuleEmptySelectorButtons'
+import { getNextAvailableModuleSlot, getSlotsWithCollisions } from '../utils'
 import { getModuleOnSlot } from './util'
+
 import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
-import type { OT2ModuleType, ThunkDispatch } from '../../../types'
 import type { StepType } from '../../../form-types'
+import type { OT2ModuleType, ThunkDispatch } from '../../../types'
 
 type MagneticModuleModels =
   | typeof MAGNETIC_MODULE_V1
@@ -288,16 +290,21 @@ export function Ot2Modules(): JSX.Element {
         />
       ) : null}
       {changeModuleWarning}
-      <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap={WRAP} width="100%">
+      <Flex flexWrap={WRAP} width="100%">
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1.27"
-          width="100%"
+          minWidth="30.375rem"
           paddingTop={SPACING.spacing120}
         >
-          <StyledText desktopStyle="headingSmallBold">
-            {t('protocol_overview:modules')}
-          </StyledText>
+          {filteredSupportedModules.length > 0 ? (
+            <StyledText
+              desktopStyle="headingSmallBold"
+              paddingBottom={SPACING.spacing20}
+            >
+              {t('protocol_overview:modules')}
+            </StyledText>
+          ) : null}
           <ModuleEmptySelectorButtons
             modules={filteredSupportedModules}
             addModule={moduleModel => {
@@ -378,9 +385,14 @@ export function Ot2Modules(): JSX.Element {
             </Flex>
           ) : null}
         </Flex>
-        <Flex flex="1.27" minWidth="50%">
+        <Flex
+          flex="1.27"
+          maxHeight="35rem"
+          minWidth="50%"
+          paddingTop={SPACING.spacing80}
+        >
           <RobotCoordinateSpaceWithRef
-            height="80%"
+            height="100%"
             width="100%"
             deckDef={deckDef}
             viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}

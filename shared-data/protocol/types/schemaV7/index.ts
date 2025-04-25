@@ -1,11 +1,11 @@
 import type {
-  LoadedPipette,
+  Liquid,
   LoadedLabware,
   LoadedModule,
-  Liquid,
+  LoadedPipette,
 } from '../../../js'
-import type { CreateCommand, RunTimeCommand } from './command'
 import type { LabwareDefinition2, RobotType } from '../../../js/types'
+import type { CreateCommand, RunTimeCommand } from './command'
 
 export * from './command'
 

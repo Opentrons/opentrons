@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  StyledText,
-  RESPONSIVENESS,
   COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   NO_WRAP,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { selectTotalOrMissingOffsetRequiredCountForLwCopy } from '/app/redux/protocol-runs'

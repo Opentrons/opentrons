@@ -2,43 +2,44 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
-  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '@opentrons/react-api-client'
 
+import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
   useUpdateRecoveryPolicyWithStrategy,
 } from '/app/resources/runs'
-import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
-import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 
+import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
+
+import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
+import type { WellGroup } from '@opentrons/components'
 import type {
-  CreateCommand,
-  LoadedLabware,
-  MoveToCoordinatesCreateCommand,
   AspirateInPlaceRunTimeCommand,
   BlowoutInPlaceRunTimeCommand,
+  CreateCommand,
   DispenseInPlaceRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
-  PrepareToAspirateRunTimeCommand,
+  LoadedLabware,
   MoveLabwareParams,
+  MoveToCoordinatesCreateCommand,
+  PrepareToAspirateRunTimeCommand,
   RunCommandError,
   RunCommandErrorOverpressure,
   RunCommandErrorTipPhysicallyAttached,
 } from '@opentrons/shared-data'
-import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
-import type { WellGroup } from '@opentrons/components'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
+import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
+import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommand, RecoveryRoute, RouteStep } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
-import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
-import type { RecoveryToasts } from './useRecoveryToasts'
-import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
-import type { ErrorRecoveryFlowsProps } from '..'
+import type { RecoveryToasts } from './useRecoveryToasts'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
-import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
+import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 
 interface UseRecoveryCommandsParams {
   runId: string
@@ -108,19 +109,23 @@ export function useRecoveryCommands({
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const { makeSuccessToast } = recoveryToastUtils
 
+  const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
+    console.warn(`Error executing "fixit" command: ${e}`)
+    analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
+    void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+
+    return Promise.reject(new Error(`Could not execute command: ${e}`))
+  }
+
   // TODO(jh, 11-21-24): Some commands return a 200 with an error body. We should catch these and propagate the error.
   const chainRunRecoveryCommands = useCallback(
     (
       commands: CreateCommand[],
       continuePastFailure: boolean = false
     ): Promise<CommandData[]> =>
-      chainRunCommands(commands, continuePastFailure).catch(e => {
-        console.warn(`Error executing "fixit" command: ${e}`)
-        analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
+      chainRunCommands(commands, continuePastFailure)
         // the catch never occurs if continuePastCommandFailure is "true"
-        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
-        return Promise.reject(new Error(`Could not execute command: ${e}`))
-      }),
+        .catch((e: Error) => reportAndRouteFailedCmd(e)),
     [analytics, selectedRecoveryOption]
   )
 
@@ -208,7 +213,9 @@ export function useRecoveryCommands({
     )
 
     if (pickUpTipCmd == null) {
-      return Promise.reject(new Error('Invalid use of pickUpTips command'))
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of pickUpTips command')
+      )
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd])
     }
@@ -239,13 +246,12 @@ export function useRecoveryCommands({
         return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
           .then(() => Promise.resolve())
           .catch((e: Error) =>
-            Promise.reject(
+            reportAndRouteFailedCmd(
               new Error(`Failed to update recovery policy: ${e.message}`)
             )
           )
       } else {
-        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
-        return Promise.reject(
+        return reportAndRouteFailedCmd(
           new Error('Could not execute command. No failed command.')
         )
       }
@@ -334,7 +340,9 @@ export function useRecoveryCommands({
       unvalidatedFailedCommand
     )
     if (moveLabwareCmd == null) {
-      return Promise.reject(new Error('Invalid use of MoveLabware command'))
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of MoveLabware command')
+      )
     } else {
       return chainRunRecoveryCommands([moveLabwareCmd])
     }

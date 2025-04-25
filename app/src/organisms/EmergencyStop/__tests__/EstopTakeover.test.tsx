@@ -1,21 +1,24 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import { useEstopQuery } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { EstopMissingModal } from '../EstopMissingModal'
-import { EstopPressedModal } from '../EstopPressedModal'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+
 import {
   ENGAGED,
   LOGICALLY_ENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
 } from '../constants'
-import { getLocalRobot } from '/app/redux/discovery'
-import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { EstopMissingModal } from '../EstopMissingModal'
+import { EstopPressedModal } from '../EstopPressedModal'
 import { EstopTakeover } from '../EstopTakeover'
 
 import type { ComponentProps } from 'react'

@@ -1,5 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
+  fixture96Plate,
+  fixtureP300MultiV2Specs,
+  fixtureP1000SingleV2Specs,
+  fixtureTiprack1000ul,
+  fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -7,12 +13,8 @@ import {
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
-  fixture96Plate,
-  fixtureP1000SingleV2Specs,
-  fixtureP300MultiV2Specs,
-  fixtureTiprack1000ul,
-  fixtureTiprackAdapter,
 } from '@opentrons/shared-data'
+
 import {
   getDefineLiquids,
   getLoadAdapters,
@@ -25,6 +27,7 @@ import {
   pythonMetadata,
   pythonRequirements,
 } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,

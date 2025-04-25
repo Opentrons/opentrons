@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { setFeatureFlags } from '../../../../feature-flags/actions'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { IncompatibleTipsModal } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import { setFeatureFlags } from '../../../../feature-flags/actions'
 
 import type { ComponentProps } from 'react'
 

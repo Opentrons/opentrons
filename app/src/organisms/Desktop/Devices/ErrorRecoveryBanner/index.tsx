@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  Flex,
   Banner,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -12,8 +12,8 @@ import {
 import { getUserId } from '/app/redux/config'
 import { useClientDataRecovery } from '/app/resources/client_data'
 
-import type { RecoveryIntent } from '/app/resources/client_data'
 import type { StyleProps } from '@opentrons/components'
+import type { RecoveryIntent } from '/app/resources/client_data'
 
 const CLIENT_DATA_INTERVAL_MS = 5000
 

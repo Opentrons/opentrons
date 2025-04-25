@@ -1,8 +1,10 @@
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
+
 import { useRunStartedOrLegacySessionInProgress } from '..'
 
 import type { UseQueryResult } from 'react-query'

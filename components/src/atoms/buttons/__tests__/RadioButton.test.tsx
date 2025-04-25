@@ -1,8 +1,10 @@
 import '@testing-library/jest-dom/vitest'
-import { screen, queryByAttribute } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../testing/utils'
+
+import { queryByAttribute, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 import { SPACING } from '../../../ui-style-constants'
 import { RadioButton } from '../RadioButton'
 

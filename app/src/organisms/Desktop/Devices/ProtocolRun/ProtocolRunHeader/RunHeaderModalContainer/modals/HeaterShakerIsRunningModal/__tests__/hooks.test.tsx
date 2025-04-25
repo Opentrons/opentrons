@@ -1,16 +1,17 @@
 import { Provider } from 'react-redux'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
+import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 
-import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/resources/runs')

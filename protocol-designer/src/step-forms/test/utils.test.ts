@@ -1,6 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
 import { getIdsInRange, getUnoccupiedSlotForTrash } from '../utils'
+
 import type { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
 
 describe('getIdsInRange', () => {

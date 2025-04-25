@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
   Btn,
   Flex,
@@ -7,6 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { selectTerminalItem } from '../../../ui/steps/actions/actions'
 import { LINK_BUTTON_STYLE } from '../../atoms'

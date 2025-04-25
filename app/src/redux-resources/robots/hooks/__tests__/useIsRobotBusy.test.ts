@@ -1,18 +1,20 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   useAllSessionsQuery,
   useCurrentAllSubsystemUpdatesQuery,
   useEstopQuery,
 } from '@opentrons/react-api-client'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
-import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import type { UseQueryResult } from 'react-query'
-import type { Sessions, Runs } from '@opentrons/api-client'
+import { useIsRobotBusy } from '../useIsRobotBusy'
+
 import type { AxiosError } from 'axios'
+import type { UseQueryResult } from 'react-query'
+import type { Runs, Sessions } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')

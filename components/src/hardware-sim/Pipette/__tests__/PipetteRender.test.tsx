@@ -1,17 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { fixtureTiprack300ul as _fixtureTiprack300ul } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../testing/utils'
 import { RobotCoordsForeignDiv } from '../../Deck/RobotCoordsForeignDiv'
-import { PipetteRender } from '../PipetteRender'
-import { EmanatingNozzle } from '../EmanatingNozzle'
-import { EightEmanatingNozzles } from '../EightEmanatingNozzles'
 import {
-  SINGLE_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_HEIGHT,
-  MULTI_CHANNEL_PIPETTE_WIDTH,
   MULTI_CHANNEL_PIPETTE_HEIGHT,
+  MULTI_CHANNEL_PIPETTE_WIDTH,
+  SINGLE_CHANNEL_PIPETTE_HEIGHT,
+  SINGLE_CHANNEL_PIPETTE_WIDTH,
 } from '../constants'
+import { EightEmanatingNozzles } from '../EightEmanatingNozzles'
+import { EmanatingNozzle } from '../EmanatingNozzle'
+import { PipetteRender } from '../PipetteRender'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

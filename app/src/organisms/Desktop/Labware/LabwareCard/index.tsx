@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
+import startCase from 'lodash/startCase'
 
 import {
   ALIGN_CENTER,
@@ -8,20 +8,22 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  DISPLAY_GRID,
 } from '@opentrons/components'
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
+
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export interface LabwareCardProps {

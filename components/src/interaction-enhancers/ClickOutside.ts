@@ -1,4 +1,5 @@
 import { Component } from 'react'
+
 import type { RefCallback } from 'react'
 
 interface ClickOutsideChildParams {

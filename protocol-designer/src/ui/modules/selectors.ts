@@ -1,5 +1,6 @@
-import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
+import { createSelector } from 'reselect'
+
 import {
   ABSORBANCE_READER_TYPE,
   getLabwareDisplayName,
@@ -7,19 +8,21 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
-  getModuleLabwareOptions,
   getLabwareOnModule,
-  getModuleOnDeckByType,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
+  getModuleLabwareOptions,
+  getModuleOnDeckByType,
   getModulesOnDeckByType,
 } from './utils'
+
 import type { DropdownOption } from '@opentrons/components'
-import type { Selector } from '../../types'
 import type { LabwareNamesByModuleId } from '../../steplist/types'
+import type { Selector } from '../../types'
 
 export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,

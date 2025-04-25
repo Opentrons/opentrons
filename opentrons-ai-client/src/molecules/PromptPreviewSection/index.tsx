@@ -1,15 +1,16 @@
+import React from 'react'
 import styled from 'styled-components'
+
 import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
+  SPACING,
   StyledText,
   Tag,
-  DIRECTION_COLUMN,
   WRAP,
-  SPACING,
-  COLORS,
-  BORDERS,
 } from '@opentrons/components'
-import React from 'react'
 
 export interface PromptPreviewSectionProps {
   title: string

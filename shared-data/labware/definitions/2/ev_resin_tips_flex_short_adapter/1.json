@@ -4,11 +4,11 @@
     "brand": "Opentrons",
     "brandId": ["999-00254"],
     "links": [
-      "https://opentrons.com/products/opentrons-flex-evotip-adapter-set/"
+      "https://opentrons.com/products/opentrons-flex-adapter-set-for-3rd-party-evotips/"
     ]
   },
   "metadata": {
-    "displayName": "Opentrons Flex Evotip Short Adapter",
+    "displayName": "Opentrons Flex EV Resin Tips Short Adapter for Third-party Evotips",
     "displayCategory": "adapter",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -30,7 +30,7 @@
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotip_flex_short_adapter"
+    "loadName": "ev_resin_tips_flex_short_adapter"
   },
   "namespace": "opentrons",
   "version": 1,

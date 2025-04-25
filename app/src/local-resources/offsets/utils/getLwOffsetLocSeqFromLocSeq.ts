@@ -1,12 +1,12 @@
 import type {
+  LabwareOffsetLocationSequence,
+  OnAddressableAreaOffsetLocationSequenceComponent,
+} from '@opentrons/api-client'
+import type {
   LabwareLocationSequence,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
-import type {
-  LabwareOffsetLocationSequence,
-  OnAddressableAreaOffsetLocationSequenceComponent,
-} from '@opentrons/api-client'
 
 // Returns the offset location sequence, which is used to get/store offsets from the server,
 // and drive LPC UI.

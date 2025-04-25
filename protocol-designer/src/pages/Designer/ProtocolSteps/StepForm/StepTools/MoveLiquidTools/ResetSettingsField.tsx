@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -9,6 +10,7 @@ import {
   StyledText,
   TertiaryButton,
 } from '@opentrons/components'
+
 import type { LiquidHandlingTab } from '../../types'
 
 interface ResetSettingsFieldProps {

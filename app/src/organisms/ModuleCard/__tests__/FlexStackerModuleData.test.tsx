@@ -1,8 +1,11 @@
 import { screen } from '@testing-library/react'
-import { COLORS } from '@opentrons/components'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
 
 import type { ComponentProps } from 'react'

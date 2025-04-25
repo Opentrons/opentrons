@@ -1,11 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { CONNECTABLE, REACHABLE } from '../../discovery'
 import {
-  getRobotRestarting,
   getNextRestartStatus,
   getResetConfigOptions,
+  getRobotRestarting,
 } from '../selectors'
+
 import type { ConnectivityStatus } from '../../discovery/types'
 import type { State } from '../../types'
 

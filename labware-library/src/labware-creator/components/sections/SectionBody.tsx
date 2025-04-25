@@ -1,5 +1,6 @@
-import type * as React from 'react'
 import styles from './SectionBody.module.css'
+
+import type * as React from 'react'
 
 interface Props {
   children: React.ReactNode

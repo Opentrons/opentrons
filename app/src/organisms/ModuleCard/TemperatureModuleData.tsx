@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next'
+
 import { Chip, Flex, StyledText } from '@opentrons/components'
-import type { TemperatureStatus } from '/app/redux/modules/api-types'
+
 import {
   MODULE_INFO_DETAIL_CONTAINER_STYLE,
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
+
+import type { TemperatureStatus } from '/app/redux/modules/api-types'
 
 interface TemperatureModuleProps {
   moduleStatus: TemperatureStatus

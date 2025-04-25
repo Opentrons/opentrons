@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { protocolRunReducer } from '../reducer'
 import {
   updateRunSetupStepsComplete,
   updateRunSetupStepsRequired,
 } from '../actions'
 import * as Constants from '../constants'
+import { protocolRunReducer } from '../reducer'
 
 describe('protocol runs reducer', () => {
   const INITIAL = {

@@ -1,11 +1,12 @@
-import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
+
 import { useDeckCalibrationData } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 

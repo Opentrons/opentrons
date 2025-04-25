@@ -1,18 +1,20 @@
 import * as React from 'react'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   VIEWPORT,
 } from '@opentrons/components'
 
 import { Snackbar } from './index'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Helix/Atoms/Snackbar',

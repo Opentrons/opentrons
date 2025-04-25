@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import first from 'lodash/first'
 
 import {
   ALIGN_CENTER,
@@ -17,24 +17,25 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import {
-  useUploadCsvFileMutation,
   ApiHostProvider,
+  useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
+import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useRobotType } from '/app/redux-resources/robots'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { appShellRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
-import { useRobotType } from '/app/redux-resources/robots'
 
 import type { MouseEventHandler } from 'react'
 import type { StyleProps } from '@opentrons/components'

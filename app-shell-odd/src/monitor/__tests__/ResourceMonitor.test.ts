@@ -1,22 +1,22 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck -- Get around private method access warnings.
 
+import { exec } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
 import {
-  vi,
-  describe,
-  beforeEach,
-  afterEach,
   afterAll,
-  it,
+  afterEach,
+  beforeEach,
+  describe,
   expect,
+  it,
+  vi,
 } from 'vitest'
-import { exec } from 'child_process'
 
-import { ResourceMonitor, PARENT_PROCESSES } from '../ResourceMonitor'
 import { UI_INITIALIZED } from '../../constants'
+import { PARENT_PROCESSES, ResourceMonitor } from '../ResourceMonitor'
 
 vi.mock('child_process')
 vi.mock('../../log', async importOriginal => {

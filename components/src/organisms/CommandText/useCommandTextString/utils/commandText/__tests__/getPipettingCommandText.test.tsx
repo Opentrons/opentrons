@@ -1,19 +1,20 @@
-import { screen } from '@testing-library/react'
-import { vi, describe, it, beforeEach } from 'vitest'
 import { useTranslation } from 'react-i18next'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../../../../testing/utils'
-import { i18n } from '../../../../../../i18n'
-import { getPipettingCommandText } from '../getPipettingCommandText'
 import { getLabwareDefURI } from '@opentrons/shared-data'
+
+import { i18n } from '../../../../../../i18n'
+import { renderWithProviders } from '../../../../../../testing/utils'
+import { getAddressableAreaDisplayName } from '../../getAddressableAreaDisplayName'
+import { getFinalMoveToAddressableAreaCmd } from '../../getFinalAddressableAreaCmd'
 import { getFinalLabwareLocation } from '../../getFinalLabwareLocation'
-import { getWellRange } from '../../getWellRange'
 import { getLabwareDefinitionsFromCommands } from '../../getLabwareDefinitionsFromCommands'
+import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
 import { getLabwareName } from '../../getLabwareName'
 import { getLoadedLabware } from '../../getLoadedLabware'
-import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
-import { getFinalMoveToAddressableAreaCmd } from '../../getFinalAddressableAreaCmd'
-import { getAddressableAreaDisplayName } from '../../getAddressableAreaDisplayName'
+import { getWellRange } from '../../getWellRange'
+import { getPipettingCommandText } from '../getPipettingCommandText'
 
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getFinalLabwareLocation')

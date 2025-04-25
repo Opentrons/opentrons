@@ -246,6 +246,7 @@ class HardwarePipettingHandler(PipettingHandler):
                 flow_rate=flow_rate,
                 volume=adjusted_volume,
                 push_out=push_out,
+                is_full_dispense=is_full_dispense,
             )
         return adjusted_volume
 

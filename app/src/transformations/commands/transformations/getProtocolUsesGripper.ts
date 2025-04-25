@@ -1,6 +1,6 @@
 import type {
-  ProtocolAnalysisOutput,
   CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 export function getProtocolUsesGripper(

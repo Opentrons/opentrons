@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -13,14 +12,15 @@ import {
   TOOLTIP_BOTTOM,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useLPCDisabledReason } from '/app/resources/runs'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectLabwareOffsetsToAddToRun,
   selectTotalCountNonHardCodedLSOffsets,
 } from '/app/redux/protocol-runs'
+import { useLPCDisabledReason } from '/app/resources/runs'
 
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
 

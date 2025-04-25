@@ -1,17 +1,19 @@
 import { useTranslation } from 'react-i18next'
+
 import {
+  DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
-  Flex,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
+
 import { LabwareListItem } from './LabwareListItem'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
-  StackItem,
   LabwareDefinitionsByURI,
+  StackItem,
 } from '/app/transformations/commands'
 
 interface OffDeckLabwareListProps {

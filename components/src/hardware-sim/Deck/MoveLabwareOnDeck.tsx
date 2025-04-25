@@ -1,29 +1,29 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { animated, easings, useSpring } from '@react-spring/web'
 import styled from 'styled-components'
-import { animated, useSpring, easings } from '@react-spring/web'
+
 import {
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import { LabwareRender } from '../Labware'
 
 import { COLORS } from '../../helix-design-system'
-import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 import { BaseDeck } from '../BaseDeck'
-
-import type {
-  LoadedLabware,
-  LoadedModule,
-  Coordinates,
-  LabwareDefinition2,
-  LabwareLocation,
-  RobotType,
-  DeckDefinition,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
+import { LabwareRender } from '../Labware'
+import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 
 import type { ReactNode } from 'react'
+import type {
+  Coordinates,
+  DeckConfiguration,
+  DeckDefinition,
+  LabwareDefinition2,
+  LabwareLocation,
+  LoadedLabware,
+  LoadedModule,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
 const getModulePosition = (

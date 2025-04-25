@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { NoQuickTransfers } from '../NoQuickTransfers'
-import { screen } from '@testing-library/react'
 
 const render = () => {
   return renderWithProviders(<NoQuickTransfers />, { i18nInstance: i18n })

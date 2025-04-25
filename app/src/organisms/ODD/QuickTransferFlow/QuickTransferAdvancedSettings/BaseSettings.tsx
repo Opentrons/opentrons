@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,6 +15,7 @@ import {
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 

@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+
 import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
 import { ControlledInputField } from '../../atoms/ControlledInputField'
 

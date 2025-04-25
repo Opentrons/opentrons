@@ -1,23 +1,33 @@
-import { describe, it, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { i18n } from '/app/i18n'
+import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
 import {
   FillWell,
   RetryWithSameTips,
 } from '/app/organisms/ErrorRecoveryFlows/shared'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
 import { CancelRun } from '../CancelRun'
+import {
+  FillWellAndRetrySameTips,
+  SkipToNextStep,
+} from '../FillWellAndRetrySameTips'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
-import { FillWellAndRetrySameTips } from '../FillWellAndRetrySameTips'
 
+import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
 vi.mock('../CancelRun')
 vi.mock('../SelectRecoveryOption')
-vi.mock('/app/organisms/ErrorRecoveryFlows/shared')
+vi.mock('/app/organisms/ErrorRecoveryFlows/shared/SelectRecoveryOption')
+vi.mock('/app/organisms/ErrorRecoveryFlows/shared/FillWell')
+vi.mock('/app/organisms/ErrorRecoveryFlows/shared/RetryWithSameTips')
+vi.mock('/app/atoms/InlineNotification')
 
 const render = (props: ComponentProps<typeof FillWellAndRetrySameTips>) => {
   return renderWithProviders(<FillWellAndRetrySameTips {...props} />, {
@@ -25,7 +35,13 @@ const render = (props: ComponentProps<typeof FillWellAndRetrySameTips>) => {
   })[0]
 }
 
-describe('FillWellAndSkip', () => {
+const renderSkipToNextStep = (props: ComponentProps<typeof SkipToNextStep>) => {
+  return renderWithProviders(<SkipToNextStep {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('FillWellAndRetrySameTips', () => {
   let props: ComponentProps<typeof FillWellAndRetrySameTips>
 
   beforeEach(() => {
@@ -91,5 +107,86 @@ describe('FillWellAndSkip', () => {
     }
     render(props)
     screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
+  })
+})
+
+describe('SkipToNextStep', () => {
+  let props: ComponentProps<typeof SkipToNextStep>
+  let mockhandleMotionRouting: Mock
+  let mockGoBackPrevStep: Mock
+  let mockProceedToRouteAndStep: Mock
+  let mockSkipFailedCommand: Mock
+
+  beforeEach(() => {
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
+    mockGoBackPrevStep = vi.fn()
+    mockProceedToRouteAndStep = vi.fn()
+    mockSkipFailedCommand = vi.fn(() => Promise.resolve())
+
+    props = {
+      ...mockRecoveryContentProps,
+      routeUpdateActions: {
+        handleMotionRouting: mockhandleMotionRouting,
+        goBackPrevStep: mockGoBackPrevStep,
+        proceedToRouteAndStep: mockProceedToRouteAndStep,
+      } as any,
+      recoveryCommands: {
+        skipFailedCommand: mockSkipFailedCommand,
+      } as any,
+    }
+
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+
+  it(`calls proceedToRouteAndStep when selectedRecoveryOption is ${RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE} and secondary button is clicked`, () => {
+    props = {
+      ...props,
+      currentRecoveryOptionUtils: {
+        ...props.currentRecoveryOptionUtils,
+        selectedRecoveryOption: RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
+      },
+    }
+    renderSkipToNextStep(props)
+    clickButtonLabeled('Go back')
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE
+    )
+  })
+
+  it('calls goBackPrevStep when selectedRecoveryOption is not IGNORE_AND_SKIP and secondary button is clicked', () => {
+    renderSkipToNextStep(props)
+    clickButtonLabeled('Go back')
+    expect(mockGoBackPrevStep).toHaveBeenCalled()
+  })
+
+  it('calls the correct routeUpdateActions and recoveryCommands in the correct order when the primary button is clicked', async () => {
+    renderSkipToNextStep(props)
+    clickButtonLabeled('Continue run now')
+    await waitFor(() => {
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
+      )
+    })
+    await waitFor(() => {
+      expect(mockSkipFailedCommand).toHaveBeenCalled()
+    })
+
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSkipFailedCommand.mock.invocationCallOrder[0]
+    )
+  })
+
+  it('renders the appropriate inline notification', () => {
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'If using static meniscus pipetting, liquid tracking may be less accurate when skipping liquid presence detection.',
+      }),
+      {}
+    )
   })
 })

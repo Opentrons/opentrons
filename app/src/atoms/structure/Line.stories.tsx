@@ -3,12 +3,13 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Line as LineComponent } from './index'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof LineComponent> = {

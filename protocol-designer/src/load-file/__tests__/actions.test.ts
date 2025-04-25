@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { createFile } from '../../file-data/selectors/fileCreator'
 import { getFileMetadata } from '../../file-data/selectors/fileFields'
 import { saveProtocolFile } from '../actions'

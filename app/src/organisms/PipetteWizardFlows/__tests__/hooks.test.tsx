@@ -1,17 +1,20 @@
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
+  LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
-  LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+
 import { i18n } from '/app/i18n'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
+
 import { FLOWS } from '../constants'
 import { usePipetteFlowWizardHeaderText } from '../hooks'
 

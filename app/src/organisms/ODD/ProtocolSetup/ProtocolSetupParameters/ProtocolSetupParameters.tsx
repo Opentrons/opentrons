@@ -1,13 +1,8 @@
-import { useEffect, useState, Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import {
-  useCreateProtocolAnalysisMutation,
-  useCreateRunMutation,
-  useHost,
-  useUploadCsvFileMutation,
-} from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
+import { useNavigate } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -15,33 +10,41 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  useCreateProtocolAnalysisMutation,
+  useCreateRunMutation,
+  useHost,
+  useUploadCsvFileMutation,
+} from '@opentrons/react-api-client'
+import {
   formatRunTimeParameterValue,
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
+import { useScrollRef } from '/app/App/hooks'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { ResetValuesModal } from './ResetValuesModal'
+
+import { ProtocolSetupStep } from '../ProtocolSetupStep'
+import { ChooseCsvFile } from './ChooseCsvFile'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
-import { ChooseCsvFile } from './ChooseCsvFile'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { ProtocolSetupStep } from '../ProtocolSetupStep'
-import { useScrollRef } from '/app/App/hooks'
+import { ResetValuesModal } from './ResetValuesModal'
+
+import type { FileData } from '@opentrons/api-client'
 import type {
-  CompletedProtocolAnalysis,
   ChoiceParameter,
+  CompletedProtocolAnalysis,
   CsvFileParameter,
+  CsvFileParameterFileData,
   NumberParameter,
   RunTimeParameter,
   ValueRunTimeParameter,
-  CsvFileParameterFileData,
 } from '@opentrons/shared-data'
 import type { ProtocolSetupStepStatus } from '../ProtocolSetupStep'
-import type { FileData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
   protocolId: string

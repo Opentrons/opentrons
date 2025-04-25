@@ -1,23 +1,25 @@
 import {
-  getModuleType,
   getLabwareDefURI,
+  getModuleType,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
+
+import { uuid } from '.'
+import { GRIPPER_LOCATION } from '../constants'
+
 import type {
   LoadLabwareRunTimeCommand,
-  RunTimeCommand,
   PickUpTipRunTimeCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
-  PipetteEntities,
   ModuleEntities,
+  PipetteEntities,
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
-import { uuid } from '.'
-import { GRIPPER_LOCATION } from '../constants'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
