@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
+  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
@@ -95,10 +96,6 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { chainRunCommands } = useChainRunCommands(
-    runId,
-    unvalidatedFailedCommand?.id
-  )
   const {
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
@@ -107,6 +104,13 @@ export function useRecoveryCommands({
   } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
+  const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
+  const { chainRunCommands } = useChainRunCommands(
+    runId,
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
+  )
+
   const { makeSuccessToast } = recoveryToastUtils
 
   const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
