@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import { Box, SIZE_6 } from '@opentrons/components'
 
 import { LegacyInputField as InputFieldComponent } from './LegacyInputField'

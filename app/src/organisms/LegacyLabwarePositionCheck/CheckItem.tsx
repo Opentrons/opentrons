@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import omit from 'lodash/omit'
+
 import {
   DIRECTION_COLUMN,
   Flex,

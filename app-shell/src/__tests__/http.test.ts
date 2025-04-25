@@ -1,6 +1,7 @@
 import isError from 'lodash/isError'
 import fetch from 'node-fetch'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
 
 import * as Http from '../http'

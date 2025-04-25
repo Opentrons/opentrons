@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query'
+
 import { getModules } from '@opentrons/api-client'
 import { MODULE_MODELS } from '@opentrons/shared-data'
 

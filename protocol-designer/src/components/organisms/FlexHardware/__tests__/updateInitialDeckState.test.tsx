@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import {
   fixture12Trough,
   HEATERSHAKER_MODULE_TYPE,

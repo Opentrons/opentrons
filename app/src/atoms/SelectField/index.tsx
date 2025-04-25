@@ -1,5 +1,6 @@
 import find from 'lodash/find'
 import { css } from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,

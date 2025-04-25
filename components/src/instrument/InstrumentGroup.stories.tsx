@@ -1,5 +1,6 @@
 import keyBy from 'lodash/keyBy'
 import reduce from 'lodash/reduce'
+
 import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { InstrumentGroup as InstrumentGroupComponent } from './InstrumentGroup'

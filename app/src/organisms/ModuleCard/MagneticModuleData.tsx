@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import { Chip, Flex, StyledText } from '@opentrons/components'
 import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 

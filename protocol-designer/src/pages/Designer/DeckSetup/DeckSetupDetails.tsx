@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
+
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,

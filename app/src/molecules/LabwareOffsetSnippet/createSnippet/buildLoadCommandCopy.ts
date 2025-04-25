@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
 import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'

@@ -1,4 +1,5 @@
 import cx from 'classnames'
+
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_V1,

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   COLORS,

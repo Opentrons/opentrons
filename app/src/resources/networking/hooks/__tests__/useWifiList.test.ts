@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { useWifiQuery } from '@opentrons/react-api-client'
 

@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import { LegacyStyledText, SPACING } from '@opentrons/components'
 
 import type { ReactNode } from 'react'

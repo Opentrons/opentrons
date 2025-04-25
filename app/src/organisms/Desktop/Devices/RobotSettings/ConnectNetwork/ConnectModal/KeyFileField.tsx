@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { SelectField } from '@opentrons/components'
 
 import { useConnectFormField } from './form-state'

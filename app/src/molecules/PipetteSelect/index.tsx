@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import groupBy from 'lodash/groupBy'
+
 import { Box, Flex } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,

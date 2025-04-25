@@ -1,5 +1,6 @@
 import floor from 'lodash/floor'
 import round from 'lodash/round'
+
 import {
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,

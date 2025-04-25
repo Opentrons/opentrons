@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query'
+
 import { getDeckConfiguration } from '@opentrons/api-client'
 
 import { useHost } from '../api'

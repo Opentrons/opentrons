@@ -1,4 +1,5 @@
 import { memo } from 'react'
+
 import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
 
 import { COLORS } from '../../../helix-design-system'

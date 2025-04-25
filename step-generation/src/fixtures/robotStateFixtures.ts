@@ -1,5 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
+
 import {
   fixture12Trough as _fixture12Trough,
   fixture96Plate as _fixture96Plate,

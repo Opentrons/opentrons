@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import noop from 'lodash/noop'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import * as SystemInfo from '@opentrons/app/src/redux/system-info'
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'

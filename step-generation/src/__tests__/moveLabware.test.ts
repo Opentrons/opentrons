@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   HEATERSHAKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,

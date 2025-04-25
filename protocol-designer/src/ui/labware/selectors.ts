@@ -1,6 +1,7 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
+
 import {
   TRASH_BIN_DISPLAY_NAME,
   WASTE_CHUTE_DISPLAY_NAME,

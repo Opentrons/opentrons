@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
+
 import {
   COLORS,
   DIRECTION_COLUMN,

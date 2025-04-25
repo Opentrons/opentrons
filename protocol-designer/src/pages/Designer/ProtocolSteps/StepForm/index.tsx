@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
+
 import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 

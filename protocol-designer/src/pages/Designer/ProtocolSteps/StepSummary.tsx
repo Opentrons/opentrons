@@ -4,6 +4,7 @@ import first from 'lodash/first'
 import flatten from 'lodash/flatten'
 import last from 'lodash/last'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,

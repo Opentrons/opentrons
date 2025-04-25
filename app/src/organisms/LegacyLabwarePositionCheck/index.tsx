@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { useSelector } from 'react-redux'
+
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getIsOnDevice } from '/app/redux/config'

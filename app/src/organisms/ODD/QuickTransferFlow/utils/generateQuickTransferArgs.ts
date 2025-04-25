@@ -1,5 +1,6 @@
 import intersection from 'lodash/intersection'
 import uuidv1 from 'uuid/v4'
+
 import {
   getAllDefinitions,
   getLabwareDefURI,

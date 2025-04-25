@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
+
 import {
   AlertPrimaryButton,
   COLORS,

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,

@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+
 import { DeckConfigurator } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../../__testing-utils__'

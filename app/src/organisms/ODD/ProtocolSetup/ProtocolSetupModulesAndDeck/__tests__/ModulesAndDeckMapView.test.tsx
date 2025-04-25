@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+
 import { BaseDeck } from '@opentrons/components'
 import {
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,

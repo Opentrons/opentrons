@@ -1,5 +1,6 @@
 import merge from 'lodash/merge'
 import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,

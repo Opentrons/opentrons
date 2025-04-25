@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
+
 import { Box, getFootprintDiagram, SPACING } from '@opentrons/components'
 
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'

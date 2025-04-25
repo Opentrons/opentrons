@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { ModalShell } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'

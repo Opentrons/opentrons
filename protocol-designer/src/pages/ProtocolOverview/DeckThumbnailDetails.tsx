@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import values from 'lodash/values'
+
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,

@@ -4,6 +4,7 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import { handleActions } from 'redux-actions'
+
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
   getAllDefinitions,

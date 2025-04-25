@@ -1,5 +1,6 @@
 import orderBy from 'lodash/orderBy'
 import uniqBy from 'lodash/uniqBy'
+
 import { useWifiQuery } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'

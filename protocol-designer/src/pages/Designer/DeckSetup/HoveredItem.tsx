@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
+
 import { LabwareRender } from '@opentrons/components'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'

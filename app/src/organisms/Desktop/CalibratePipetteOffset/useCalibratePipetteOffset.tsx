@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { SpinnerModalPage } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'

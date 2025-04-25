@@ -3,6 +3,7 @@ import mapKeys from 'lodash/mapKeys'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
+
 import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 
 import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'

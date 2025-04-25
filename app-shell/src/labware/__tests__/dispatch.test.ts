@@ -1,6 +1,7 @@
 import electron from 'electron'
 import fse from 'fs-extra'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
 import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
 import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'

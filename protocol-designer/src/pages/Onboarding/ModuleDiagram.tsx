@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,

@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+
 import {
   COLORS,
   DIRECTION_COLUMN,

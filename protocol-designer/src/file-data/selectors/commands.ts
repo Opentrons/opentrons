@@ -3,6 +3,7 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import uniqBy from 'lodash/uniqBy'
 import { createSelector } from 'reselect'
+
 import * as StepGeneration from '@opentrons/step-generation'
 
 import { getAllWellsForLabware } from '../../constants'

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,

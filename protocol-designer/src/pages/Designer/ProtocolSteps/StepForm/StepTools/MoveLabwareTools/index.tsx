@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 

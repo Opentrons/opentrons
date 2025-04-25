@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
+
 import {
   DIRECTION_COLUMN,
   Flex,
