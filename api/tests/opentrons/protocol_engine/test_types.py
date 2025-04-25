@@ -7,6 +7,7 @@ from opentrons.protocol_engine.types import (
     HexColor,
     SimulatedProbeResult,
     LiquidTrackingType,
+    WellInfoSummary,
 )
 
 
@@ -47,3 +48,23 @@ def test_roundtrips_nonsimulated_liquid_probe() -> None:
     serialized = base.model_dump_json()
     deserialized = _TestModel.model_validate_json(serialized)
     assert deserialized.value == 10.0
+
+
+@pytest.mark.parametrize("height", [None, 10.0, SimulatedProbeResult()])
+def test_roundtrips_well_info_summary(height: LiquidTrackingType | None) -> None:
+    """It should round trip a WellInfoSummary."""
+    inp = WellInfoSummary(
+        labware_id="hi",
+        well_name="lo",
+        loaded_volume=None,
+        probed_height=height,
+        probed_volume=height,
+    )
+    outp = WellInfoSummary.model_validate_json(inp.model_dump_json())
+    if isinstance(height, SimulatedProbeResult):
+        assert outp.labware_id == inp.labware_id
+        assert outp.well_name == inp.well_name
+        assert isinstance(outp.probed_height, SimulatedProbeResult)
+        assert isinstance(outp.probed_volume, SimulatedProbeResult)
+    else:
+        assert outp == inp
