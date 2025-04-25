@@ -1,5 +1,6 @@
 import { round } from 'lodash'
 import { describe, expect, it } from 'vitest'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -175,7 +176,7 @@ describe('getMaxUiFlowRate', () => {
     const args = {
       targetVolume: 50,
       channels: 1,
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
@@ -192,7 +193,7 @@ describe('getMaxUiFlowRate', () => {
     const args = {
       targetVolume: 20,
       channels: 1,
-      robotType: 'OT-3 Standard',
+      robotType: FLEX_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'dispense',
       correctionVolume: 0,
@@ -209,7 +210,7 @@ describe('getMaxUiFlowRate', () => {
     const args = {
       targetVolume: 80,
       channels: 8,
-      robotType: 'OT-3 Standard',
+      robotType: FLEX_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'blowout',
       correctionVolume: 0,
@@ -226,7 +227,7 @@ describe('getMaxUiFlowRate', () => {
     const args = {
       targetVolume: 5,
       channels: 96,
-      robotType: 'OT-3 Standard',
+      robotType: FLEX_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
@@ -243,7 +244,7 @@ describe('getMaxUiFlowRate', () => {
     const args = {
       targetVolume: 50,
       channels: 1,
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'dispense',
       correctionVolume: 10,
@@ -262,7 +263,7 @@ describe('getMaxUiFlowRate', () => {
     const largeVolumeArgs = {
       targetVolume: 150,
       channels: 1 as PipetteChannels,
-      robotType: 'OT-3 Standard',
+      robotType: FLEX_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
