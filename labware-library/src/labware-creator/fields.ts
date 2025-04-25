@@ -33,9 +33,6 @@ export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
 export const LABWARE_TOO_SMALL_ERROR = 'LABWARE_TOO_SMALL_ERROR'
 export const LABWARE_TOO_LARGE_ERROR = 'LABWARE_TOO_LARGE_ERROR'
 
-export const LINK_REQUEST_ADAPTER_FORM =
-  'https://docs.google.com/forms/d/e/1FAIpQLScvsHlXQrtIhIQYO0zr6mYwmzOCGpYPqepeDIorFIyj2jT-UQ/viewform'
-
 export type ImportErrorKey =
   | 'INVALID_FILE_TYPE'
   | 'INVALID_JSON_FILE'
