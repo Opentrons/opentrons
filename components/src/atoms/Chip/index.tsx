@@ -93,48 +93,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
   const iconColor = CHIP_PROPS_BY_TYPE[type].iconColor
 
-  const MEDIUM_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
-    grid-gap: ${SPACING.spacing4};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: ${SPACING.spacing8}
-        ${background === false ? 0 : SPACING.spacing16};
-      grid-gap: ${SPACING.spacing8};
-    }
-  `
-
-  const SMALL_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
-    grid-gap: ${SPACING.spacing4};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: ${SPACING.spacing4}
-        ${background === false ? 0 : SPACING.spacing8};
-      grid-gap: ${SPACING.spacing4};
-    }
-  `
-
   const smallSize = iconName === 'connection-status' ? '0.5rem' : '0.75rem'
-  const ICON_STYLE = css`
-    width: ${chipSize === 'medium' ? '1rem' : smallSize};
-    height: ${chipSize === 'medium' ? '1rem' : smallSize};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-      height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-    }
-  `
-
-  const TEXT_STYLE = css`
-    ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${chipSize === 'medium'
-        ? TYPOGRAPHY.bodyTextSemiBold
-        : TYPOGRAPHY.smallBodyTextSemiBold}
-    }
-  `
 
   return (
     <Flex
@@ -156,7 +115,7 @@ export function Chip(props: ChipProps): JSX.Element {
           name={icon}
           color={iconColor}
           aria-label={`icon_${text}`}
-          css={ICON_STYLE}
+          css={ICON_STYLE(chipSize, smallSize)}
         >
           {pulseIcon ? (
             <animate
@@ -180,6 +139,40 @@ export function Chip(props: ChipProps): JSX.Element {
   )
 }
 
+const WEB_MEDIUM_TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeH4};
+  line-height: ${TYPOGRAPHY.lineHeight20};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`
+const WEB_SMALL_TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeP};
+  line-height: ${TYPOGRAPHY.lineHeight16};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`
+
+const ICON_STYLE = (
+  chipSize: ChipSize,
+  smallSize: string
+): FlattenSimpleInterpolation => css`
+  width: ${chipSize === 'medium' ? '1rem' : smallSize};
+  height: ${chipSize === 'medium' ? '1rem' : smallSize};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
+    height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
+  }
+`
+
+const TEXT_STYLE = (chipSize: ChipSize): FlattenSimpleInterpolation => css`
+  ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${chipSize === 'medium'
+      ? TYPOGRAPHY.bodyTextSemiBold
+      : TYPOGRAPHY.smallBodyTextSemiBold}
+  }
+`
+
 const MEDIUM_CONTAINER_STYLE = (
   background?: boolean
 ): FlattenSimpleInterpolation => css`
@@ -202,35 +195,4 @@ const SMALL_CONTAINER_STYLE = (
     padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
   }
-`
-
-const ICON_STYLE = (chipSize: ChipSize): FlattenSimpleInterpolation => css`
-  width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
-  height: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-    height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-  }
-`
-
-const TEXT_STYLE = (chipSize: ChipSize): FlattenSimpleInterpolation => css`
-  ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${chipSize === 'medium'
-      ? TYPOGRAPHY.bodyTextSemiBold
-      : TYPOGRAPHY.smallBodyTextSemiBold}
-  }
-`
-
-const WEB_MEDIUM_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeH4};
-  line-height: ${TYPOGRAPHY.lineHeight20};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-`
-const WEB_SMALL_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeP};
-  line-height: ${TYPOGRAPHY.lineHeight16};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
