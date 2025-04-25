@@ -2021,6 +2021,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         aspirate_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=source_well,
+                well_volume_difference=-volume,
                 position_reference=aspirate_props.aspirate_position.position_reference,
                 offset=aspirate_props.aspirate_position.offset,
             )
