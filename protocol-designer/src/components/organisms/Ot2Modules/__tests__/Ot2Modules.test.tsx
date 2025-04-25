@@ -162,7 +162,7 @@ describe('Ot2Modules', () => {
     fireEvent.click(screen.getByText('3'))
     fireEvent.click(screen.getAllByText('1')[1])
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
-      'Cannot move to this slot due to a module conflict'
+      'Cannot add module to this slot due to a module conflict'
     )
   })
   it('should render the conflict in slot due to labware snackbar', () => {
@@ -184,7 +184,63 @@ describe('Ot2Modules', () => {
     fireEvent.click(screen.getByText('3'))
     fireEvent.click(screen.getByText('4'))
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
-      'Cannot move to this slot because the ANSI 96 Standard Microplate is incompatible with this module'
+      'Cannot add module to this slot because the ANSI 96 Standard Microplate is incompatible with this module'
+    )
+  })
+  it('should render the conflict in slot due to a labware in tc slot snackbar', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: {},
+      labware: {
+        labware: {
+          id: 'labware',
+          labwareDefURI: 'mockUri',
+          pythonName: 'mockPythonName',
+          def: fixture96Plate as LabwareDefinition2,
+          slot: '8',
+        },
+      },
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    fireEvent.click(screen.getByText('Thermocycler Module GEN1'))
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'Cannot add the Thermocycler due to a conflict with slot 8.'
+    )
+  })
+  it('should render the conflict in slot due to 3 labware in tc slot snackbar', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: {},
+      labware: {
+        labware: {
+          id: 'labware',
+          labwareDefURI: 'mockUri',
+          pythonName: 'mockPythonName',
+          def: fixture96Plate as LabwareDefinition2,
+          slot: '8',
+        },
+        labware2: {
+          id: 'labware2',
+          labwareDefURI: 'mockUri',
+          pythonName: 'mockPythonName',
+          def: fixture96Plate as LabwareDefinition2,
+          slot: '10',
+        },
+        labware3: {
+          id: 'labware3',
+          labwareDefURI: 'mockUri',
+          pythonName: 'mockPythonName',
+          def: fixture96Plate as LabwareDefinition2,
+          slot: '11',
+        },
+      },
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    fireEvent.click(screen.getByText('Thermocycler Module GEN1'))
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'Cannot add the Thermocycler due to conflicts with slots 8, 10 and 11.'
     )
   })
   it('should call the createModuleEntityAndChangeForm action when moving a module in use', () => {
