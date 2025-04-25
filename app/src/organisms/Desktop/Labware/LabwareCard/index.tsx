@@ -19,7 +19,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+import {
+  getLabwareDefIsStandard,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
 
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
@@ -35,7 +38,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const apiName = definition.parameters.loadName
-  const displayName = definition?.metadata.displayName
+  const displayName = getLabwareDisplayName(definition)
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = !getLabwareDefIsStandard(definition)
   const xDimensionOverride =
