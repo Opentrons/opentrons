@@ -955,7 +955,7 @@ const getLiquidClassValuesMix = (args: {
   return values
 }
 
-const getReferenceVolumesForByVolumeInterpolation = (args: {
+export const getReferenceVolumesForByVolumeInterpolation = (args: {
   rawForm: FormData
   pipetteSpecs: PipetteV2Specs
   tiprackDefinition: LabwareDefinition2 | null

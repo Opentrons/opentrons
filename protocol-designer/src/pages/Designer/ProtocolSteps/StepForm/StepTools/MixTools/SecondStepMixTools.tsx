@@ -141,6 +141,7 @@ export function SecondStepMixTools({
           flowRateType={tab}
           volume={propsForFields.volume?.value ?? 0}
           tiprack={propsForFields.tipRack.value}
+          formData={formData}
         />
         <Divider marginY="0" />
         {tab === 'aspirate' ? (
@@ -263,6 +264,7 @@ export function SecondStepMixTools({
                       flowRateType="blowout"
                       volume={propsForFields.volume?.value ?? 0}
                       tiprack={propsForFields.tipRack.value}
+                      formData={formData}
                       padding="0"
                     />
                     <BlowoutOffsetField

@@ -319,6 +319,7 @@ export const SecondStepsMoveLiquidTools = ({
           volume={propsForFields.volume?.value ?? 0}
           tiprack={propsForFields.tipRack.value}
           showTooltip={false}
+          formData={formData}
         />
         <Divider marginY="0" />
         {hideWellOrderField ? null : (
@@ -506,6 +507,7 @@ export const SecondStepsMoveLiquidTools = ({
                       volume={propsForFields.volume?.value ?? 0}
                       tiprack={propsForFields.tipRack.value}
                       padding="0"
+                      formData={formData}
                     />
                     <BlowoutOffsetField
                       {...propsForFields.blowout_z_offset}
@@ -526,6 +528,7 @@ export const SecondStepsMoveLiquidTools = ({
                   stepType={formData.stepType}
                   volume={formData.volume}
                   mappedErrorsToField={mappedErrorsToField}
+                  formData={formData}
                 />
               ) : null}
             </>
