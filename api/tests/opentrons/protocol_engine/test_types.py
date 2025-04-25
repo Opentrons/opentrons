@@ -24,6 +24,8 @@ def test_handles_invalid_hex(invalid_hex_color: str) -> None:
 
 
 class TestModel(BaseModel):
+    """Test model for deserializing SimulatedProbeResults."""
+
     value: float | SimulatedProbeResult
 
 
