@@ -68,7 +68,7 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
 
 
 @pytest.fixture(scope="session")
@@ -2031,7 +2031,7 @@ def test_is_flex_deck_with_thermocycler(
 )
 def test_stacker_max_pool_count_by_height(
     labware_def: LabwareDefinition,
-    lid_def: LabwareDefinition,
+    lid_def: LabwareDefinition | None,
     expected_pool_count: float,
     flex_stacker_v1_def: ModuleDefinition,
 ) -> None:
@@ -2051,12 +2051,17 @@ def test_stacker_max_pool_count_by_height(
         },
     )
 
+    # The following math relies on properties only in labware schema 2
+    # (this test predates labware schema 3).
+    assert labware_def.schemaVersion == 2
+    assert lid_def is None or lid_def.schemaVersion == 2
+
     lid_overlap = (
         lid_def.stackingOffsetWithLabware.get(
-            labware_def.parameters.loadName, Vector(x=0, y=0, z=0)
+            labware_def.parameters.loadName, Vector3D(x=0, y=0, z=0)
         )
         if lid_def is not None
-        else Vector(x=0, y=0, z=0)
+        else Vector3D(x=0, y=0, z=0)
     )
     pool_height = (
         labware_def.dimensions.zDimension
@@ -2067,11 +2072,11 @@ def test_stacker_max_pool_count_by_height(
     )
     pool_overlap = (
         labware_def.stackingOffsetWithLabware.get(
-            lid_def.parameters.loadName, Vector(x=0, y=0, z=0)
+            lid_def.parameters.loadName, Vector3D(x=0, y=0, z=0)
         )
         if lid_def is not None
         else labware_def.stackingOffsetWithLabware.get(
-            labware_def.parameters.loadName, Vector(x=0, y=0, z=0)
+            labware_def.parameters.loadName, Vector3D(x=0, y=0, z=0)
         )
     )
 

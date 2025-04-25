@@ -15,7 +15,6 @@ import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 
 import type { ReactNode } from 'react'
 import type {
-  Coordinates,
   DeckConfiguration,
   DeckDefinition,
   LabwareDefinition2,
@@ -23,6 +22,7 @@ import type {
   LoadedLabware,
   LoadedModule,
   RobotType,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
@@ -30,7 +30,7 @@ const getModulePosition = (
   deckDef: DeckDefinition,
   moduleId: string,
   loadedModules: LoadedModule[]
-): Coordinates | null => {
+): Vector3D | null => {
   const loadedModule = loadedModules.find(m => m.id === moduleId)
   if (loadedModule == null) return null
   const modSlot = deckDef.locations.addressableAreas.find(
@@ -63,7 +63,7 @@ function getLabwareCoordinates({
   location: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
-}): Coordinates | null {
+}): Vector3D | null {
   if (location === 'offDeck' || location === 'systemLocation') {
     return null
   } else if ('labwareId' in location) {

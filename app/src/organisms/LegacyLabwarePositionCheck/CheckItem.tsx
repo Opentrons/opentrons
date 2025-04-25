@@ -40,11 +40,11 @@ import type {
 } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  Coordinates,
   CreateCommand,
   LabwareLocation,
   MoveLabwareCreateCommand,
   RobotType,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
@@ -64,8 +64,8 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   setFatalError: (errorMessage: string) => void
   isApplyingOffsets: boolean
   calculateAndApplyOffset: (
-    initialPosition: Coordinates | null,
-    finalPosition: Coordinates | null,
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
     labwareId: string,
     location: LegacyLabwareOffsetLocation
   ) => Promise<void>

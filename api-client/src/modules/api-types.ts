@@ -1,8 +1,4 @@
-import type {
-  Coordinates,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType, Vector3D } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {
@@ -22,7 +18,7 @@ type ModuleOffsetSource =
   | 'unknown'
 
 export interface ModuleOffset {
-  offset: Coordinates
+  offset: Vector3D
   slot?: string
   source?: ModuleOffsetSource
   last_modified?: string
