@@ -10,18 +10,19 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
-import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
+
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+
 import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '/app/redux/modules/types'

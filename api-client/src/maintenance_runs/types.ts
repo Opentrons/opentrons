@@ -5,11 +5,11 @@ import type {
   LoadedPipette,
 } from '@opentrons/shared-data'
 import type {
-  RunCommandSummary,
-  LegacyLabwareOffsetCreateData,
   LabwareOffsetCreateData,
-  RunStatus,
+  LegacyLabwareOffsetCreateData,
   RunAction,
+  RunCommandSummary,
+  RunStatus,
 } from '../runs'
 
 export interface MaintenanceRunData {

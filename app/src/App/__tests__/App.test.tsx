@@ -1,16 +1,16 @@
-import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getIsOnDevice, getConfig } from '/app/redux/config'
+import { getConfig, getIsOnDevice } from '/app/redux/config'
 
+import { App } from '../'
 import { DesktopApp } from '../DesktopApp'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
-import { App } from '../'
 
 import type { State } from '/app/redux/types'
-import { renderWithProviders } from '/app/__testing-utils__'
 
 vi.mock('/app/redux/config')
 vi.mock('../DesktopApp')

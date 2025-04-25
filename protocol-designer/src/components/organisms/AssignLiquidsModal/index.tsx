@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,16 +18,18 @@ import {
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
+
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { getSelectedWells } from '../../../well-selection/selectors'
-import { SelectableLabware } from '../Labware/SelectableLabware'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { deselectWells, selectWells } from '../../../well-selection/actions'
+import { getSelectedWells } from '../../../well-selection/selectors'
 import { NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { LiquidButton } from '../../molecules'
+import { SelectableLabware } from '../Labware/SelectableLabware'
+import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { LiquidToolbox } from './LiquidToolbox'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
 

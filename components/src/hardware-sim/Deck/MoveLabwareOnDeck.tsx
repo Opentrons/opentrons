@@ -1,36 +1,36 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { animated, easings, useSpring } from '@react-spring/web'
 import styled from 'styled-components'
-import { animated, useSpring, easings } from '@react-spring/web'
+
 import {
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import { LabwareRender } from '../Labware'
 
 import { COLORS } from '../../helix-design-system'
-import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 import { BaseDeck } from '../BaseDeck'
-
-import type {
-  LoadedLabware,
-  LoadedModule,
-  Coordinates,
-  LabwareDefinition2,
-  LabwareLocation,
-  RobotType,
-  DeckDefinition,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
+import { LabwareRender } from '../Labware'
+import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 
 import type { ReactNode } from 'react'
+import type {
+  DeckConfiguration,
+  DeckDefinition,
+  LabwareDefinition2,
+  LabwareLocation,
+  LoadedLabware,
+  LoadedModule,
+  RobotType,
+  Vector3D,
+} from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
 const getModulePosition = (
   deckDef: DeckDefinition,
   moduleId: string,
   loadedModules: LoadedModule[]
-): Coordinates | null => {
+): Vector3D | null => {
   const loadedModule = loadedModules.find(m => m.id === moduleId)
   if (loadedModule == null) return null
   const modSlot = deckDef.locations.addressableAreas.find(
@@ -63,7 +63,7 @@ function getLabwareCoordinates({
   location: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
-}): Coordinates | null {
+}): Vector3D | null {
   if (location === 'offDeck' || location === 'systemLocation') {
     return null
   } else if ('labwareId' in location) {

@@ -1,11 +1,14 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { fixtureP300SingleV2Specs } from '@opentrons/shared-data'
+import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
+
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '../utils'
-import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '../../../../form-types'

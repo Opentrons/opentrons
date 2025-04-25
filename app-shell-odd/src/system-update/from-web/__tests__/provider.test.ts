@@ -1,10 +1,10 @@
-import { vi, describe, it, expect, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { LocalAbortError } from '../../../http'
 import { getProvider } from '../provider'
-import { getOrDownloadManifest as _getOrDownloadManifest } from '../release-manifest'
 import { cleanUpAndGetOrDownloadReleaseFiles as _cleanUpAndGetOrDownloadReleaseFiles } from '../release-files'
+import { getOrDownloadManifest as _getOrDownloadManifest } from '../release-manifest'
 
 vi.mock('../../../log')
 vi.mock('../release-manifest', async importOriginal => {

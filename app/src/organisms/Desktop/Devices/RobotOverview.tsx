@@ -1,5 +1,5 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -11,39 +11,40 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAuthorization } from '@opentrons/react-api-client'
 
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '/app/assets/images/FLEX.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { ToggleButton } from '/app/atoms/buttons'
-import { getConfig } from '/app/redux/config'
 import {
-  useRobot,
   useIsRobotBusy,
   useIsRobotViewable,
+  useRobot,
 } from '/app/redux-resources/robots'
+import { getConfig } from '/app/redux/config'
 import {
   CONNECTABLE,
   getRobotAddressesByName,
   getRobotModelByName,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { RobotStatusHeader } from './RobotStatusHeader'
-import { ReachableBanner } from './ReachableBanner'
-import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { useLights } from '/app/resources/devices'
+
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { CalibrationStatusBanner } from './CalibrationStatusBanner'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
+import { ReachableBanner } from './ReachableBanner'
+import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
+import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { State } from '/app/redux/types'
 

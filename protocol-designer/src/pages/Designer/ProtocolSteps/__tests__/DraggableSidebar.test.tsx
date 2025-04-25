@@ -1,10 +1,12 @@
-import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { getFileMetadata } from '../../../../file-data/selectors'
-import { renderWithProviders } from '../../../../__testing-utils__'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { DraggableSidebar } from '../DraggableSidebar'
+
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 

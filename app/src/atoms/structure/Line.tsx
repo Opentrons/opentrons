@@ -1,4 +1,5 @@
-import { Box, BORDERS } from '@opentrons/components'
+import { BORDERS, Box } from '@opentrons/components'
+
 import type { ComponentProps } from 'react'
 
 type Props = ComponentProps<typeof Box>

@@ -1,12 +1,13 @@
-import { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   AlertModal,
+  LegacyStyledText,
   SPACING,
   SpinnerModalPage,
-  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -18,33 +19,34 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Line } from '/app/atoms/structure'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { CONNECTABLE } from '/app/redux/discovery'
+import * as RobotApi from '/app/redux/robot-api'
+import * as Sessions from '/app/redux/sessions'
+import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { useRunStatuses } from '/app/resources/runs'
+
 import { CalibrateDeck } from '../CalibrateDeck'
 import { CalibrationStatusCard } from '../CalibrationStatusCard'
 import { CheckCalibration } from '../CheckCalibration'
-import { useRunStatuses } from '/app/resources/runs'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { HowCalibrationWorksModal } from '../HowCalibrationWorksModal'
-import { CONNECTABLE } from '/app/redux/discovery'
-import * as RobotApi from '/app/redux/robot-api'
-import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
-import * as Sessions from '/app/redux/sessions'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { CalibrationHealthCheck } from './CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
+import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
-import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type {
-  SessionCommandString,
   DeckCalibrationSession,
+  SessionCommandString,
 } from '/app/redux/sessions/types'
-import type { State, Dispatch } from '/app/redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const CALS_FETCH_MS = 5000
 

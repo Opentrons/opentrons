@@ -1,5 +1,6 @@
 import { css } from 'styled-components'
-import { Btn, StyledText, COLORS, RESPONSIVENESS } from '@opentrons/components'
+
+import { Btn, COLORS, RESPONSIVENESS, StyledText } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'

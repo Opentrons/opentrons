@@ -1,5 +1,7 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { maskToFloat, trimDecimals } from '../processing'
+
 describe('Value Casters', () => {
   describe('maskToFloat', () => {
     it('returns string representation of integer when the input is an integer', () => {

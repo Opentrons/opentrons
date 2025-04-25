@@ -1,8 +1,8 @@
 import { GET, request } from '../request'
 
-import type { DownloadedCsvFileResponse } from './types'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
+import type { DownloadedCsvFileResponse } from './types'
 
 export function getCsvFileRaw(
   config: HostConfig,

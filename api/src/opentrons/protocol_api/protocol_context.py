@@ -196,6 +196,7 @@ class ProtocolContext(CommandPublisher):
                 core=self._core.load_robot(),
                 protocol_core=self._core,
                 api_version=self._api_version,
+                broker=broker,
             )
         except APIVersionError:
             self._robot = None
@@ -1363,6 +1364,8 @@ class ProtocolContext(CommandPublisher):
     ) -> LiquidClass:
         """
         Define a liquid class for use in the protocol.
+        ..
+            This is intended for Opentrons internal use only and is not a guaranteed API.
 
         :meta private:
         """

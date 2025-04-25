@@ -4,20 +4,21 @@ import i18n from 'i18next'
 import { css } from 'styled-components'
 
 import {
-  SPACING,
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
   RadioButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { ODD_ONLY, DESKTOP_ONLY, RECOVERY_MAP } from '../constants'
 import { RecoveryRadioGroup } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryRadioGroup'
 
-import type { JSX } from 'react'
+import { DESKTOP_ONLY, ODD_ONLY, RECOVERY_MAP } from '../constants'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
+
 import type { TFunction } from 'i18next'
+import type { JSX } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 type HoldingLabwareOption = 'yes' | 'no'

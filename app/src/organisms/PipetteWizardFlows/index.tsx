@@ -1,54 +1,55 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import {
-  useConditionalConfirm,
   COLORS,
   ModalShell,
+  useConditionalConfirm,
 } from '@opentrons/components'
-import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 import {
-  useHost,
-  useDeleteMaintenanceRunMutation,
   ApiHostProvider,
+  useDeleteMaintenanceRunMutation,
+  useHost,
 } from '@opentrons/react-api-client'
+import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
-import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
+import { getTopPortalEl } from '/app/App/portal'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { getIsOnDevice } from '/app/redux/config'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
+
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { getIsOnDevice } from '/app/redux/config'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import { usePipetteFlowWizardHeaderText } from './hooks'
+import { AttachProbe } from './AttachProbe'
+import { BeforeBeginning } from './BeforeBeginning'
+import { Carriage } from './Carriage'
+import { FLOWS, SECTIONS } from './constants'
+import { DetachPipette } from './DetachPipette'
+import { DetachProbe } from './DetachProbe'
+import { ExitModal } from './ExitModal'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProtocol'
-import { FLOWS, SECTIONS } from './constants'
-import { BeforeBeginning } from './BeforeBeginning'
-import { AttachProbe } from './AttachProbe'
-import { DetachProbe } from './DetachProbe'
-import { Results } from './Results'
-import { ExitModal } from './ExitModal'
-import { MountPipette } from './MountPipette'
-import { DetachPipette } from './DetachPipette'
-import { Carriage } from './Carriage'
+import { usePipetteFlowWizardHeaderText } from './hooks'
 import { MountingPlate } from './MountingPlate'
+import { MountPipette } from './MountPipette'
+import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
+import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type {
-  LoadedPipette,
   CreateCommand,
+  LoadedPipette,
   PipetteMount,
 } from '@opentrons/shared-data'
-import type { CommandData, HostConfig } from '@opentrons/api-client'
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000

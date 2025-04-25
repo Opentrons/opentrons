@@ -1,6 +1,7 @@
 import { CUSTOM_LABWARE_DICT_NAME } from '@opentrons/step-generation'
-import { migration } from './migration'
+
 import { selectors as fileDataSelectors } from '../file-data'
+import { migration } from './migration'
 import { saveFile, savePythonFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
@@ -12,6 +13,7 @@ import type {
   LoadFileAction,
   NewProtocolFields,
 } from './types'
+
 export interface FileUploadMessageAction {
   type: 'FILE_UPLOAD_MESSAGE'
   payload: FileUploadMessage

@@ -1,7 +1,8 @@
-import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
 import { useCallback, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -15,9 +16,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getHint } from '../../../tutorial/selectors'
+
 import { removeHint } from '../../../tutorial/actions'
+import { getHint } from '../../../tutorial/selectors'
 import { getMainPagePortalEl } from '../Portal'
+
 import type { HintKey } from '../../../tutorial'
 
 export const HintsModal = (): JSX.Element | null => {

@@ -1,10 +1,11 @@
 import execa from 'execa'
 import { usb } from 'usb'
-import { vi, it, expect, describe, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
-import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
+
 import { isWindows } from '../../os'
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 
 import type { createLogger } from '../../log'
 

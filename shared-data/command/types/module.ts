@@ -1,10 +1,10 @@
 import type {
-  CommonCommandRunTimeInfo,
   CommonCommandCreateInfo,
+  CommonCommandRunTimeInfo,
   RunCommandFlexStackerError,
 } from '.'
-import type { LabwareLocationSequence } from './setup'
 import type { LabwareDefinition2 } from '../../js'
+import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
   | MagneticModuleEngageMagnetRunTimeCommand

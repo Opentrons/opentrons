@@ -1,12 +1,14 @@
+import { useFormContext } from 'react-hook-form'
 import styled from 'styled-components'
+
 import { BORDERS, PrimaryButton } from '@opentrons/components'
+
 import {
-  reagentTransfer,
+  flexPcr,
   flexReagentTransfer,
   pcr,
-  flexPcr,
+  reagentTransfer,
 } from '../../assets/prompts'
-import { useFormContext } from 'react-hook-form'
 
 interface PromptButtonProps {
   buttonText: string

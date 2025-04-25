@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -22,8 +22,8 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
-import type { RecoveryContentProps } from '../types'
 import type { ERUtilsResults } from '../hooks'
+import type { RecoveryContentProps } from '../types'
 
 export function CancelRun(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props

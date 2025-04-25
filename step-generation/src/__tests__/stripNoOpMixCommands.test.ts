@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { _stripNoOpMixCommands } from '../utils/stripNoOpCommands'
+
 import type { CreateCommand } from '@opentrons/shared-data'
 
 describe('_stripNoOpMixCommands', () => {

@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
+
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
 import type { RecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/types'

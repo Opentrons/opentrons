@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux'
 import { getConfig } from '../config'
 import { trackEvent } from './mixpanel'
 
-import type { State } from '../types'
 import type { Config } from '../config/types'
+import type { State } from '../types'
 import type { AnalyticsEvent } from './types'
 
 /**

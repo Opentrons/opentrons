@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DISPLAY_INLINE,
-  StyledText,
   CommandText,
+  DISPLAY_INLINE,
+  Flex,
+  StyledText,
 } from '@opentrons/components'
 
 import type { ComponentProps } from 'react'

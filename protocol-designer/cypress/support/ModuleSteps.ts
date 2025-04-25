@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { StepThunk } from './StepBuilder'
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {

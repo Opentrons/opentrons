@@ -1,14 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { FileUploadMessagesModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { getFileUploadMessages } from '../../../../load-file/selectors'
+import { i18n } from '../../../../assets/localization'
+import { getEnablePythonExport } from '../../../../feature-flags/selectors'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
 } from '../../../../load-file/actions'
-import { getEnablePythonExport } from '../../../../feature-flags/selectors'
-import { FileUploadMessagesModal } from '..'
+import { getFileUploadMessages } from '../../../../load-file/selectors'
 
 vi.mock('../../../../load-file/selectors')
 vi.mock('../../../../load-file/actions')

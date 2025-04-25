@@ -1,6 +1,6 @@
+import { COLORS } from '../helix-design-system'
 import { Box } from '../primitives'
 import { SPACING } from '../ui-style-constants'
-import { COLORS } from '../helix-design-system'
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
 

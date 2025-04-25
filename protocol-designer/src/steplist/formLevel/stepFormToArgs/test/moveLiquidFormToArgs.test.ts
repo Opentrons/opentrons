@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
@@ -8,13 +9,15 @@ import {
   fixture_96_plate,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
+import { getOrderedWells } from '../../../utils'
 import {
-  moveLiquidFormToArgs,
   getAirGapData,
   getMixData,
+  moveLiquidFormToArgs,
 } from '../moveLiquidFormToArgs'
-import { getOrderedWells } from '../../../utils'
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,

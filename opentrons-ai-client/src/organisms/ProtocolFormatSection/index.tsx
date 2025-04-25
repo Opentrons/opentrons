@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+
 import {
   Banner,
   DIRECTION_COLUMN,
@@ -7,7 +9,7 @@ import {
   SIZE_3,
   SPACING,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+
 import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
 
 export const PD = 'Protocol Designer'

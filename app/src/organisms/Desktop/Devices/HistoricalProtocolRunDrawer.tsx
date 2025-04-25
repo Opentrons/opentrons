@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -20,6 +21,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCsvFileQuery } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
@@ -27,11 +29,12 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
 } from '@opentrons/shared-data'
-import { useCsvFileQuery } from '@opentrons/react-api-client'
-import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { useDeckCalibrationData } from './hooks'
+
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
+import { DownloadCsvFileLink } from './DownloadCsvFileLink'
+import { useDeckCalibrationData } from './hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'

@@ -1,5 +1,5 @@
-import type { FileMetadataFields, SaveFileMetadataAction } from './types'
 import type { WorkerResponse } from '../timelineMiddleware/types'
+import type { FileMetadataFields, SaveFileMetadataAction } from './types'
 
 export const saveFileMetadata = (
   payload: FileMetadataFields

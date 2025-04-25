@@ -1,12 +1,13 @@
 import { css } from 'styled-components'
+
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'

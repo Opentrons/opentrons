@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { uuid } from '@opentrons/step-generation'
+
 import {
   Btn,
   COLORS,
@@ -18,17 +19,23 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleType,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   MODULE_MODELS,
   SINGLE_CENTER_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { uuid } from '@opentrons/step-generation'
+
+import { editDeckConfiguration } from '../../../step-forms/actions'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { useKitchen } from '../Kitchen/hooks'
+import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
+import type { ModalProps } from '@opentrons/components'
 import type {
   CutoutConfig,
   CutoutId,
@@ -36,10 +43,9 @@ import type {
   FlexModuleCutoutFixtureId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ModalProps } from '@opentrons/components'
 import type { FormModules, ModuleOnDeck } from '../../../step-forms'
-import type { Fixtures, WizardFormState } from '../types'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import type { Fixtures, WizardFormState } from '../types'
 
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId
@@ -54,7 +60,6 @@ interface AddFixtureModalProps {
   modules: FormModules | InitialDeckStateModules
   fixtures: Fixtures
   deckConfig: DeckConfiguration
-  setUpdatedDeckConfig: Dispatch<SetStateAction<DeckConfiguration>>
   hasGripper: boolean
   //  used for setting the value in react-hook-form for the onboarding flow
   setValue?: UseFormSetValue<WizardFormState>
@@ -93,12 +98,14 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     modules,
     fixtures,
     deckConfig,
-    setUpdatedDeckConfig,
     setValue,
     hasGripper,
     updateInitialDeckState,
   } = props
   const { t, i18n } = useTranslation('shared')
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const { labware } = initialDeckSetup
+  const dispatch = useDispatch()
   const { makeSnackbar } = useKitchen()
   const initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only magnetic block can be configured in column 2
     ? 'moduleOptions'
@@ -276,7 +283,26 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         }
         setValue?.('fixtures', updatedFixtures)
       }
-      setUpdatedDeckConfig(newDeckConfig)
+      const labwareNotCompatible =
+        newModule != null
+          ? getLabwareNotCompatibleWithModule(
+              newModule.type === 'stagingAreaAndMagneticBlock'
+                ? MAGNETIC_BLOCK_TYPE
+                : getModuleType(newModule.type as ModuleModel),
+              labware,
+              newModule.cutoutId,
+              'B1'
+            )
+          : null
+      const hasLabware =
+        newFixture != null
+          ? (newFixture.type === 'wasteChute' ||
+              newFixture.type === 'trashBin') &&
+            getSlotHasLabware(labware, cutoutId)
+          : false
+      if (labwareNotCompatible == null && !hasLabware) {
+        dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
+      }
       updateInitialDeckState?.(addedCutoutConfigs)
       closeModal()
     }

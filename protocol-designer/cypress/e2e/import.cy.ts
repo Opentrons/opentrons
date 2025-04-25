@@ -1,6 +1,6 @@
 import {
-  verifyOldProtocolModal,
   verifyImportProtocolPage,
+  verifyOldProtocolModal,
 } from '../support/Import'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
 

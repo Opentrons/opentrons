@@ -1,6 +1,16 @@
-import { Route, Navigate, Routes, useNavigate } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+
 import { Box } from '@opentrons/components'
+
+import {
+  FileUploadMessagesModal,
+  GateModal,
+  HintsModal,
+  Kitchen,
+  LabwareUploadModal,
+  Navigation,
+} from './components/organisms'
 import {
   Designer,
   Hardware,
@@ -10,14 +20,6 @@ import {
   ProtocolOverview,
   Settings,
 } from './pages'
-import {
-  FileUploadMessagesModal,
-  GateModal,
-  Kitchen,
-  LabwareUploadModal,
-  Navigation,
-  HintsModal,
-} from './components/organisms'
 import { ProtocolDesignerAppFallback } from './resources/ProtocolDesignerAppFallback'
 
 import type { RouteProps } from './types'

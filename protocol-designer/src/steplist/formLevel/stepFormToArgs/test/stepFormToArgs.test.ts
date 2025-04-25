@@ -1,6 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
+
 import { _castForm } from '../index'
+
 import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedMagnetFormData,

@@ -1,12 +1,14 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { dropTip } from '../commandCreators/atomic/dropTip'
 import {
-  makeStateArgsStandard,
+  DEFAULT_PIPETTE,
+  getSuccessResult,
   makeContext,
   makeState,
-  getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeStateArgsStandard,
 } from '../fixtures'
-import { dropTip } from '../commandCreators/atomic/dropTip'
+
 import type { InvariantContext, RobotState } from '../types'
 
 const mockDropTipLocation = 'mockLocation'

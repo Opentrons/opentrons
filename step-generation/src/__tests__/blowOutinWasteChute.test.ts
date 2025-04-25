@@ -1,12 +1,15 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import { blowOutInWasteChute } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
-import { blowOutInWasteChute } from '../commandCreators/compound'
+
 import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')

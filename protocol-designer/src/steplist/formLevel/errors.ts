@@ -9,13 +9,13 @@ import {
   ABSORBANCE_READER_MAX_WAVELENGTH_NM,
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
   ABSORBANCE_READER_READ,
-  MIN_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V1,
-  MIN_ENGAGE_HEIGHT_V2,
   MAX_ENGAGE_HEIGHT_V2,
+  MIN_ENGAGE_HEIGHT_V1,
+  MIN_ENGAGE_HEIGHT_V2,
   PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
@@ -43,8 +43,9 @@ import type {
   HydratedThermocyclerFormData,
   StepFieldName,
 } from '../../form-types'
-import type { ModuleEntities } from '../../step-forms'
 import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
+import type { ModuleEntities } from '../../step-forms'
+
 /*******************
  ** Error Messages **
  ********************/

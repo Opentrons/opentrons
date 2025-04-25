@@ -1,11 +1,12 @@
 import styled from 'styled-components'
+
 import {
+  BORDERS,
+  COLORS,
   NewPrimaryBtn,
   SPACING,
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
   styleProps,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`

@@ -1,19 +1,21 @@
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Modal,
-  Flex,
+  ALIGN_CENTER,
   Btn,
-  JUSTIFY_SPACE_BETWEEN,
-  SecondaryButton,
-  PrimaryButton,
-  SPACING,
-  StyledText,
   DIRECTION_COLUMN,
   DropdownMenu,
-  ALIGN_CENTER,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
+
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 import { WellOrderVisualization } from './WellOrderVisualization'

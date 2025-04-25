@@ -1,24 +1,25 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { COLORS } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { COLORS } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
-import { i18n } from '/app/i18n'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
-import { Results } from '../Results'
-import { FLOWS } from '../constants'
 
-import type { ComponentProps } from 'react'
+import { FLOWS } from '../constants'
+import { Results } from '../Results'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/robot-settings/hooks')

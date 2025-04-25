@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Flex } from '../../primitives'
-import { COLORS } from '../../helix-design-system'
-import { SPACING } from '../../ui-style-constants'
-import { ALIGN_FLEX_END, DIRECTION_COLUMN, OVERFLOW_SCROLL } from '../../styles'
+
 import { LegacyStyledText } from '../../atoms'
-import { COMMAND_WIDTH_PX } from './index'
+import { COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
+import { ALIGN_FLEX_END, DIRECTION_COLUMN, OVERFLOW_SCROLL } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
 import { CommandText } from '../CommandText'
+import { COMMAND_WIDTH_PX } from './index'
 import { getCommandTextData } from './utils'
+
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,

@@ -1,13 +1,15 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
-import { useHandleClientAppliedOffsets } from '../useHandleClientAppliedOffsets'
 import { useDispatch, useSelector } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { appliedOffsetsToRun } from '/app/redux/protocol-runs'
 import {
   useClientDataLPC,
   useUpdateClientLPC,
 } from '/app/resources/client_data/'
-import { appliedOffsetsToRun } from '/app/redux/protocol-runs'
 import { useIsRunCurrent } from '/app/resources/runs'
+
+import { useHandleClientAppliedOffsets } from '../useHandleClientAppliedOffsets'
 
 vi.mock('react-redux')
 vi.mock('/app/resources/client_data/')
@@ -61,7 +63,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -76,7 +78,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
@@ -91,7 +93,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
@@ -106,7 +108,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -121,7 +123,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -136,7 +138,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).toHaveBeenCalledTimes(1)
@@ -151,7 +153,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(RUN_ID)
+      useHandleClientAppliedOffsets(true, RUN_ID)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
@@ -166,7 +168,7 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(null)
+      useHandleClientAppliedOffsets(true, null)
     })
 
     expect(mockClearClientData).toHaveBeenCalled()
@@ -181,10 +183,18 @@ describe('useHandleClientAppliedOffsets', () => {
     })
 
     renderHook(() => {
-      useHandleClientAppliedOffsets(null)
+      useHandleClientAppliedOffsets(true, null)
     })
 
     expect(mockClearClientData).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
+
+  it('should not dispatch if the robot is not a Flex', () => {
+    renderHook(() => {
+      useHandleClientAppliedOffsets(false, null)
+    })
+
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })
