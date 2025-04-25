@@ -138,6 +138,8 @@
   "source": "Source",
   "starting_well": "starting well",
   "storage_limit_reached": "Storage limit reached",
+  "submerge_before_aspirating": "Submerge before aspirating",
+  "submerge_before_dispensing": " Submerge before dispensing",
   "submerge": "Submerge",
   "tip_change_frequency": "Tip change frequency",
   "tip_drop_location": "Tip drop location",

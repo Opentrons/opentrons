@@ -4,6 +4,7 @@ import { Mix } from '../QuickTransferAdvancedSettings/Mix'
 import { Delay } from '../QuickTransferAdvancedSettings/Delay'
 import { TouchTip } from '../QuickTransferAdvancedSettings/TouchTip'
 import { AirGap } from '../QuickTransferAdvancedSettings/AirGap'
+import { Submerge } from '../QuickTransferCommonSettings/Submerge'
 import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../constants'
 
 import type { ComponentType, Dispatch } from 'react'
@@ -29,6 +30,7 @@ const SettingComponentMap: Partial<
   [SETTING_OPTIONS.ASPIRATE_DELAY]: Delay,
   [SETTING_OPTIONS.ASPIRATE_TOUCH_TIP]: TouchTip,
   [SETTING_OPTIONS.ASPIRATE_AIR_GAP]: AirGap,
+  [SETTING_OPTIONS.ASPIRATE_SUBMERGE]: Submerge,
   // ToDo(kk:04/03/2025) add pre-wet tip
   // [SETTING_OPTIONS.PRE_WET_TIP]: PreWetTip,
 }
