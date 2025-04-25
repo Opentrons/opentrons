@@ -276,7 +276,10 @@ async def _main() -> None:
         back_left_nozzle = partial_tip_dict[args.partial_tip_config][0]
         front_right_nozzle = partial_tip_dict[args.partial_tip_config][1]
         CYCLES = partial_tip_dict[args.partial_tip_config][2]
-        PIPETTE_CHANNELS = int(96 / CYCLES)
+        if args.partial_tip_config == "A1" or args.partial_tip_config == "H12":
+            PIPETTE_CHANNELS = 1
+        else:
+            PIPETTE_CHANNELS = int(96 / CYCLES)
         NOZZLE_COLUMNS = partial_tip_dict[args.partial_tip_config][5]
         x_direction = partial_tip_dict[args.partial_tip_config][3]
         y_direction = partial_tip_dict[args.partial_tip_config][4]
