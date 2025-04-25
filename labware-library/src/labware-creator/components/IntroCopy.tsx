@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 
-import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
 import styles from '../styles.module.css'
 import { LinkOut } from './LinkOut'
 
@@ -36,13 +35,7 @@ export const IntroCopy = (): JSX.Element => (
         an adapter.
       </li>
     </ol>
-    <p>
-      For all other custom labware, please use this{' '}
-      <LinkOut href={LINK_CUSTOM_LABWARE_FORM} className={styles.link}>
-        request form
-      </LinkOut>
-      .
-    </p>
+    <p>For all other custom labware, please contact Opentrons Support.</p>
 
     <div className={styles.callout}>
       <p>
