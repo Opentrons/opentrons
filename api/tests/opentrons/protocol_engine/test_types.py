@@ -50,6 +50,12 @@ def test_roundtrips_nonsimulated_liquid_probe() -> None:
     assert deserialized.value == 10.0
 
 
+def test_fails_deser_wrong_string() -> None:
+    """Should fail to deserialize the wrong string."""
+    with pytest.raises(ValidationError):
+        _TestModel.model_validate_json('{"value": "not the right string"}')
+
+
 @pytest.mark.parametrize("height", [None, 10.0, SimulatedProbeResult()])
 def test_roundtrips_well_info_summary(height: LiquidTrackingType | None) -> None:
     """It should round trip a WellInfoSummary."""
