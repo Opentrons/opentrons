@@ -455,7 +455,7 @@ const buildHomeShuttle = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-    commandType: 'flexStacker/prepareShuttle',
+    commandType: 'unsafe/flexStacker/prepareShuttle',
     params: {
       moduleId: moduleId,
     },
