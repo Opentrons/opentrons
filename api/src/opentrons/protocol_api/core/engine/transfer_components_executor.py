@@ -178,35 +178,6 @@ class TransferComponentsExecutor:
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
         )
-        # prep_before_moving_to_submerge = (
-        #     post_submerge_action == "aspirate"
-        #     and volume_for_pipette_mode_configuration is not None
-        # )
-        # if prep_before_moving_to_submerge:
-        #     # Move to the tip probe start position
-        #     self._instrument.move_to(
-        #         location=Location(
-        #             point=self._target_well.get_top(
-        #                 LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z
-        #             ),
-        #             labware=self._target_location.labware,
-        #         ),
-        #         well_core=self._target_well,
-        #         force_direct=False,
-        #         minimum_z_height=None,
-        #         speed=None,
-        #     )
-        #     self._remove_air_gap(location=submerge_start_location)
-        #     if (
-        #         self._transfer_type != TransferType.MANY_TO_ONE
-        #         and self._instrument.get_liquid_presence_detection()
-        #     ):
-        #         self._instrument.liquid_probe_with_recovery(
-        #             well_core=self._target_well, loc=submerge_start_location
-        #         )
-        #     # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
-        #     self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
-        #     self._instrument.prepare_to_aspirate()
         tx_utils.raise_if_location_inside_liquid(
             location=submerge_start_location,
             well_location=self._target_location,

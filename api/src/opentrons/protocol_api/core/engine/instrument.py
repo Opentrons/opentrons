@@ -3,6 +3,7 @@
 from __future__ import annotations
 from contextlib import contextmanager
 from itertools import dropwhile
+from copy import deepcopy
 from typing import (
     Optional,
     TYPE_CHECKING,
@@ -1957,7 +1958,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
         source_loc, source_well = source
         last_liquid_and_airgap_in_tip = (
-            tip_contents[-1]
+            deepcopy(tip_contents[-1])  # don't modify caller's object
             if tip_contents
             else tx_comps_executor.LiquidAndAirGapPair(
                 liquid=0,
