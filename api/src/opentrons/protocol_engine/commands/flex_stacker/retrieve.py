@@ -11,6 +11,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
+    FlexStackerShuttleLabwareError,
 )
 
 from ..command import (
@@ -39,6 +40,7 @@ from .common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
     FlexStackerHopperError,
+    FlexStackerLabwareRetrieveError,
     primary_location_sequence,
     adapter_location_sequence,
     lid_location_sequence,
@@ -54,6 +56,7 @@ RecoverableExceptions = Union[
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
+    FlexStackerShuttleLabwareError,
 ]
 
 
@@ -143,7 +146,8 @@ _ExecuteReturn = Union[
     SuccessData[RetrieveResult],
     DefinedErrorData[FlexStackerStallOrCollisionError]
     | DefinedErrorData[FlexStackerShuttleError]
-    | DefinedErrorData[FlexStackerHopperError],
+    | DefinedErrorData[FlexStackerHopperError]
+    | DefinedErrorData[FlexStackerLabwareRetrieveError],
 ]
 
 
@@ -170,12 +174,14 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         DefinedErrorData[FlexStackerStallOrCollisionError]
         | DefinedErrorData[FlexStackerShuttleError]
         | DefinedErrorData[FlexStackerHopperError]
+        | DefinedErrorData[FlexStackerLabwareRetrieveError]
     ):
         """Handle a recoverable error raised during command execution."""
         error_map = {
             FlexStackerStallError: FlexStackerStallOrCollisionError,
             FlexStackerShuttleMissingError: FlexStackerShuttleError,
             FlexStackerHopperLabwareError: FlexStackerHopperError,
+            FlexStackerShuttleLabwareError: FlexStackerLabwareRetrieveError,
         }
         return DefinedErrorData(
             public=error_map[type(error)](
@@ -269,6 +275,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 FlexStackerStallError,
                 FlexStackerShuttleMissingError,
                 FlexStackerHopperLabwareError,
+                FlexStackerShuttleLabwareError,
             ) as e:
                 return self.handle_recoverable_error(
                     e, to_retrieve.primaryLabwareId, state_update

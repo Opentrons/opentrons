@@ -199,6 +199,8 @@ describe('ErrorRecoveryContent', () => {
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
     LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
 
   let props: ComponentProps<typeof ErrorRecoveryContent>
@@ -481,6 +483,25 @@ describe('ErrorRecoveryContent', () => {
 
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
+
+  it.each([
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+  ])(
+    'returns appropriate view when the route is $recoveryOption',
+    recoveryOption => {
+      props = {
+        ...props,
+        recoveryMap: {
+          ...props.recoveryMap,
+          route: recoveryOption,
+        },
+      }
+      renderRecoveryContent(props)
+
+      screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    }
+  )
 
   it(`returns RecoveryError when the route is ${ERROR_WHILE_RECOVERING.ROUTE}`, () => {
     props = {
