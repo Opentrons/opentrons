@@ -10,6 +10,7 @@ from typing import (
     Union,
     Mapping,
     cast,
+    Any
 )
 
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -787,6 +788,22 @@ class ProtocolContext(CommandPublisher):
             if drop_offset
             else None
         )
+
+        def _get_name(d: Any) -> str:
+            if isinstance(d, str):
+                return str(d)
+            elif isinstance(d, (Labware, DeckLocation)):
+                return str(d.name)
+            elif isinstance(d, ModuleContext):
+                return str(d.type)
+            elif isinstance(d, WasteChute):
+                return "WasteChute"
+            else:
+                return "unknown"
+
+        src_name = _get_name(labware.parent)
+        dst_name = _get_name(new_location)
+        print(f"ctx\tmove_labware\t---\t---\t\t\t\t\t\t\t\t\t{labware.name}\t{src_name}\t{dst_name}")
         with publish_context(
             broker=self.broker,
             command=cmds.move_labware(
@@ -1154,6 +1171,7 @@ class ProtocolContext(CommandPublisher):
         If both ``seconds`` and ``minutes`` are specified, they will be added together.
         """
         delay_time = seconds + minutes * 60
+        print(f"ctx\tdelay\t---\t---\t\t\t\t\t\t\t\t{delay_time}")
         self._core.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)

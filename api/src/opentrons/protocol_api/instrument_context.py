@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from typing import Any, List, Optional, Sequence, Union, cast, Dict, Tuple
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -116,6 +116,28 @@ class InstrumentContext(publisher.CommandPublisher):
             labware.Labware, TrashBin, WasteChute, None
         ] = trash
         self.requested_as = requested_as
+        self._num_print_tabs: int = -1
+
+    def _print_debug_info(self, cmd: str, msg: str) -> None:
+        d = "\t".join([
+            cmd if i == self._num_print_tabs else "---"
+            for i in range(3)
+        ])
+        print(f"{self.name}\t{d}\t{msg}")
+
+    def _get_well_info_from_location(self, loc: Any) -> Tuple[str, str, str]:
+        if isinstance(loc, labware.Well):
+            w = loc
+            mm_from_bottom = "---"
+            mm_from_top = "---"
+        elif isinstance(loc, types.Location) and loc.labware and loc.labware.is_well:
+            w = loc.labware.as_well()
+            mm_from_bottom = str(loc.point.z - w.bottom(0.0).point.z)
+            mm_from_top = str(loc.point.z - w.top(0.0).point.z)
+        else:
+            return "---", "---", "---"
+        well_name = f"{w.parent.name}[{str(w.well_name)}]"
+        return mm_from_bottom, mm_from_top, well_name
 
     @property
     @requires_version(2, 0)
@@ -218,6 +240,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ``pipette.aspirate(location=plate['A1'])``
 
         """
+        self._num_print_tabs += 1
         _log.debug(
             "aspirate {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -260,6 +283,16 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
+        mm_from_bottom, mm_from_top, well_name = self._get_well_info_from_location(move_to_location)
+        self._print_debug_info("aspirate",
+                               f"{c_vol}\t"  # volume
+                               f"{self.current_volume}\t"  # current
+                               f"{int(flow_rate * rate)}\t"  # flow_rate
+                               f"\t"  # push_out
+                               f"{well_name}\t"  # well
+                               f"{mm_from_bottom}\t"  # bottom
+                               f"{mm_from_top}")  # top
+
         if (
             self.api_version >= APIVersion(2, 20)
             and well is not None
@@ -290,6 +323,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 is_meniscus=is_meniscus,
             )
 
+        self._num_print_tabs -= 1
         return self
 
     @requires_version(2, 0)
@@ -378,6 +412,7 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.17
             Behavior of the ``volume`` parameter.
         """
+        self._num_print_tabs += 1
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
                 api_element="Parameter push_out",
@@ -435,6 +470,16 @@ class InstrumentContext(publisher.CommandPublisher):
 
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
+        mm_from_bottom, mm_from_top, well_name = self._get_well_info_from_location(move_to_location)
+        self._print_debug_info("dispense",
+                               f"{c_vol}\t"  # volume
+                               f"{self.current_volume}\t"  # current
+                               f"{int(flow_rate * rate)}\t"  # flow_rate
+                               f"{push_out}\t"  # push_out
+                               f"{well_name}\t"  # well
+                               f"{mm_from_bottom}\t"  # bottom
+                               f"{mm_from_top}")  # top
+
         if isinstance(target, (TrashBin, WasteChute)):
             with publisher.publish_context(
                 broker=self.broker,
@@ -478,6 +523,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 is_meniscus=is_meniscus,
             )
 
+        self._num_print_tabs -= 1
         return self
 
     @requires_version(2, 0)
@@ -524,6 +570,7 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
         """
+        self._num_print_tabs += 1
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
                 volume, repetitions, location if location else "current position", rate
@@ -541,6 +588,16 @@ class InstrumentContext(publisher.CommandPublisher):
         if self.api_version >= APIVersion(2, 16):
             dispense_kwargs["push_out"] = 0.0
 
+        mm_from_bottom, mm_from_top, well_name = self._get_well_info_from_location(location)
+        self._print_debug_info("mix",
+                               f"{c_vol}\t"  # volume
+                               f"{self.current_volume}\t"  # current
+                               f"\t"  # flow_rate
+                               f"\t"  # push_out
+                               f"{well_name}\t"  # well
+                               f"{mm_from_bottom}\t"  # bottom
+                               f"{mm_from_top}")  # top
+
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.mix(
@@ -557,6 +614,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     self.aspirate(volume, rate=rate)
                     repetitions -= 1
                 self.dispense(volume, rate=rate)
+        self._num_print_tabs -= 1
         return self
 
     @requires_version(2, 0)
@@ -588,6 +646,7 @@ class InstrumentContext(publisher.CommandPublisher):
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :returns: This instance.
         """
+        self._num_print_tabs += 1
         well: Optional[labware.Well] = None
         move_to_location: types.Location
 
@@ -615,6 +674,14 @@ class InstrumentContext(publisher.CommandPublisher):
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
         elif isinstance(target, (TrashBin, WasteChute)):
+            self._print_debug_info("blow_out",
+                                   f"\t"  # volume
+                                   f"{self.current_volume}\t"  # current
+                                   f"\t"  # flow_rate
+                                   f"\t"  # push_out
+                                   f"trash\t"  # well
+                                   f"\t"  # bottom
+                                   f"")  # top
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.blow_out_in_disposal_location(
@@ -628,6 +695,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
             return self
 
+        mm_from_bottom, mm_from_top, well_name = self._get_well_info_from_location(move_to_location)
+        self._print_debug_info("blow_out",
+                               f"\t"  # volume
+                               f"{self.current_volume}\t"  # current
+                               f"\t"  # flow_rate
+                               f"\t"  # push_out
+                               f"{well_name}\t"  # well
+                               f"{mm_from_bottom}\t"  # bottom
+                               f"{mm_from_top}")  # top
+
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.blow_out(instrument=self, location=move_to_location),
@@ -637,7 +714,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 well_core=well._core if well is not None else None,
                 in_place=target.in_place,
             )
-
+        self._num_print_tabs -= 1
         return self
 
     def _determine_speed(self, speed: float) -> float:
@@ -686,6 +763,7 @@ class InstrumentContext(publisher.CommandPublisher):
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :returns: This instance.
         """
+        self._num_print_tabs += 1
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
 
@@ -720,6 +798,8 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             move_to_location = well.top(z=v_offset)
 
+        mm_from_bottom, mm_from_top, well_name = self._get_well_info_from_location(move_to_location)
+
         self._core.touch_tip(
             location=move_to_location,
             well_core=well._core,
@@ -727,6 +807,7 @@ class InstrumentContext(publisher.CommandPublisher):
             z_offset=v_offset,
             speed=checked_speed,
         )
+        self._num_print_tabs -= 1
         return self
 
     @publisher.publish(command=cmds.air_gap)
@@ -769,6 +850,7 @@ class InstrumentContext(publisher.CommandPublisher):
            the well. At or above API version 2.22, air gap volume is not counted as liquid
            when dispensing into a well.
         """
+        self._num_print_tabs += 1
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
 
@@ -778,13 +860,15 @@ class InstrumentContext(publisher.CommandPublisher):
         if not loc or not loc.labware.is_well:
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
+        c_vol = self._core.get_available_volume() if volume is None else volume
+        flow_rate = self._core.get_aspirate_flow_rate()
+        mm_from_bottom, mm_from_top, well_name = self._get_well_info_from_location(target)
         self.move_to(target, publish=False)
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
-            c_vol = self._core.get_available_volume() if volume is None else volume
-            flow_rate = self._core.get_aspirate_flow_rate()
             self._core.air_gap_in_place(c_vol, flow_rate)
         else:
             self.aspirate(volume)
+        self._num_print_tabs -= 1
         return self
 
     @publisher.publish(command=cmds.return_tip)
@@ -800,6 +884,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param home_after: See the ``home_after`` parameter of :py:meth:`drop_tip`.
         """
+        self._num_print_tabs += 1
         if not self._core.has_tip():
             _log.warning("Pipette has no tip to return")
 
@@ -808,8 +893,16 @@ class InstrumentContext(publisher.CommandPublisher):
         if not isinstance(loc, labware.Well):
             raise TypeError(f"Last tip location should be a Well but it is: {loc}")
 
+        self._print_debug_info("drop_tip",
+                               f"\t"  # volume
+                               f"\t"  # current
+                               f"\t"  # flow_rate
+                               f"\t"  # push_out
+                               f"{loc}\t"  # well
+                               f"\t"  # bottom
+                               f"")  # top
         self.drop_tip(loc, home_after=home_after)
-
+        self._num_print_tabs -= 1
         return self
 
     @requires_version(2, 0)
@@ -913,6 +1006,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance.
         """
+        self._num_print_tabs += 1
 
         if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
             raise UnsupportedAPIError(
@@ -1033,6 +1127,15 @@ class InstrumentContext(publisher.CommandPublisher):
             else self.api_version >= _PREP_AFTER_ADDED_IN
         )
 
+        self._print_debug_info("pick_up_tip",
+                               f"\t"  # volume
+                               f"\t"  # current
+                               f"\t"  # flow_rate
+                               f"\t"  # push_out
+                               f"{tip_rack.name}[{well.well_name}]\t"  # well
+                               f"\t"  # bottom
+                               f"")  # top
+
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=well),
@@ -1046,7 +1149,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         self._last_tip_picked_up_from = well
-
+        self._num_print_tabs -= 1
         return self
 
     @requires_version(2, 0)
@@ -1115,6 +1218,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance.
         """
+        self._num_print_tabs += 1
         alternate_drop_location: bool = False
         if location is None:
             trash_container = self.trash_container
@@ -1123,6 +1227,14 @@ class InstrumentContext(publisher.CommandPublisher):
             if isinstance(trash_container, labware.Labware):
                 well = trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
+                self._print_debug_info("drop_tip",
+                                       f"\t"  # volume
+                                       f"\t"  # current
+                                       f"\t"  # flow_rate
+                                       f"\t"  # push_out
+                                       f"trash\t"  # well
+                                       f"\t"  # bottom
+                                       f"")  # top
                 with publisher.publish_context(
                     broker=self.broker,
                     command=cmds.drop_tip_in_disposal_location(
@@ -1162,6 +1274,14 @@ class InstrumentContext(publisher.CommandPublisher):
             # offset or the XY center if none is provided.
             if self.api_version < _DISPOSAL_LOCATION_OFFSET_ADDED_IN:
                 alternate_drop_location = True
+            self._print_debug_info("drop_tip",
+                                   f"\t"  # volume
+                                   f"\t"  # current
+                                   f"\t"  # flow_rate
+                                   f"\t"  # push_out
+                                   f"trash\t"  # well
+                                   f"\t"  # bottom
+                                   f"")  # top
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.drop_tip_in_disposal_location(
@@ -1174,6 +1294,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     alternate_tip_drop=alternate_drop_location,
                 )
             self._last_tip_picked_up_from = None
+            self._num_print_tabs -= 1
             return self
 
         else:
@@ -1183,6 +1304,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 " or `Well` (e.g. `tiprack.wells()[0]`)."
                 f" However, it is {location}"
             )
+
+        self._print_debug_info("drop_tip",
+                               f"\t"  # volume
+                               f"\t"  # current
+                               f"\t"  # flow_rate
+                               f"\t"  # push_out
+                               f"{well.well_name}\t"  # well
+                               f"\t"  # bottom
+                               f"")  # top
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1196,6 +1326,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         self._last_tip_picked_up_from = None
+        self._num_print_tabs -= 1
         return self
 
     @requires_version(2, 0)
@@ -1253,6 +1384,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance.
         """
+        self._num_print_tabs += 1
         _log.debug("Distributing {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "distribute"
         kwargs["disposal_volume"] = kwargs.get("disposal_volume", self.min_volume)
@@ -1261,7 +1393,7 @@ class InstrumentContext(publisher.CommandPublisher):
         instrument.validate_blowout_location(
             self.api_version, "distribute", blowout_location
         )
-
+        self._num_print_tabs -= 1
         return self.transfer(volume, source, dest, **kwargs)
 
     @publisher.publish(command=cmds.consolidate)
@@ -1285,6 +1417,7 @@ class InstrumentContext(publisher.CommandPublisher):
                        ``disposal_volume`` and ``mix_before`` are ignored.
         :returns: This instance.
         """
+        self._num_print_tabs += 1
         _log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "consolidate"
         kwargs["mix_before"] = (0, 0)
@@ -1293,7 +1426,7 @@ class InstrumentContext(publisher.CommandPublisher):
         instrument.validate_blowout_location(
             self.api_version, "consolidate", blowout_location
         )
-
+        self._num_print_tabs -= 1
         return self.transfer(volume, source, dest, **kwargs)
 
     @publisher.publish(command=cmds.transfer)
@@ -1401,6 +1534,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance.
         """
+        self._num_print_tabs += 1
         _log.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
         blowout_location = kwargs.get("blowout_location")
@@ -1503,6 +1637,7 @@ class InstrumentContext(publisher.CommandPublisher):
             transfer_options,
         )
         self._execute_transfer(plan)
+        self._num_print_tabs -= 1
         return self
 
     def _execute_transfer(self, plan: v1_transfer.TransferPlan) -> None:
@@ -1672,6 +1807,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
         """
+        self._num_print_tabs += 1
         with ExitStack() as contexts:
             if isinstance(location, (TrashBin, WasteChute)):
                 if publish:
@@ -1710,6 +1846,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     speed=speed,
                 )
 
+        self._num_print_tabs -= 1
         return self
 
     @requires_version(2, 22)

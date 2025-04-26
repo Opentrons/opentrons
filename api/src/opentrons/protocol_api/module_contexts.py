@@ -370,6 +370,7 @@ class TemperatureModuleContext(ModuleContext):
 
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
+        print(f"temp_deck\tset_temperature\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t{celsius}")
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
 
@@ -395,6 +396,7 @@ class TemperatureModuleContext(ModuleContext):
     @requires_version(2, 0)
     def deactivate(self) -> None:
         """Stop heating or cooling, and turn off the fan."""
+        print(f"temp_deck\tdeactivate\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t")
         self._core.deactivate()
 
     @property
@@ -561,12 +563,14 @@ class ThermocyclerContext(ModuleContext):
     @requires_version(2, 0)
     def open_lid(self) -> str:
         """Open the lid."""
+        print(f"cycler\topen_lid\t---\t---\t\t\t\t\t\t\t\t\t\t\t")
         return self._core.open_lid().value
 
     @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self) -> str:
         """Close the lid."""
+        print(f"cycler\tclose_lid\t---\t---\t\t\t\t\t\t\t\t\t\t\t")
         return self._core.close_lid().value
 
     @publish(command=cmds.thermocycler_set_block_temp)
@@ -604,6 +608,7 @@ class ThermocyclerContext(ModuleContext):
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
+        print(f"cycler\tset_block_temp\t---\t---\t\t\t\t\t\t\t\t{seconds}\t\t\t\t{temperature}")
         self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
@@ -625,6 +630,7 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` is reached.
 
         """
+        print(f"cycler\tset_lid_temperature\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t{temperature}")
         self._core.set_target_lid_temperature(celsius=temperature)
         self._core.wait_for_lid_temperature()
 
@@ -655,6 +661,17 @@ class ThermocyclerContext(ModuleContext):
         """
         repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
         validated_steps = validation.ensure_thermocycler_profile_steps(steps)
+        temp_str = ",".join([
+            str(s["temperature"])
+            for s in validated_steps
+        ])
+        sec_str = ",".join([
+            str(s["hold_time_seconds"])
+            for s in validated_steps
+        ])
+        if len(sec_str) == 9:  # NOTE: (sigler) maybe it's just my terminal (???)
+            sec_str += "\t"
+        print(f"cycler\texecute_profile\t---\t---\t\t\t\t\t\t\t\t{sec_str}\t\t\t\t{temp_str}")
         self._core.execute_profile(
             steps=validated_steps,
             repetitions=repetitions,
@@ -665,18 +682,21 @@ class ThermocyclerContext(ModuleContext):
     @requires_version(2, 0)
     def deactivate_lid(self) -> None:
         """Turn off the lid heater."""
+        print(f"cycler\tdeactivate_lid\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t")
         self._core.deactivate_lid()
 
     @publish(command=cmds.thermocycler_deactivate_block)
     @requires_version(2, 0)
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller."""
+        print(f"cycler\tdeactivate_block\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t")
         self._core.deactivate_block()
 
     @publish(command=cmds.thermocycler_deactivate)
     @requires_version(2, 0)
     def deactivate(self) -> None:
         """Turn off both the well block temperature controller and the lid heater."""
+        print(f"cycler\tdeactivate\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t")
         self._core.deactivate()
 
     @property
@@ -931,6 +951,7 @@ class HeaterShakerContext(ModuleContext):
         :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
         """
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
+        print(f"shaker\tset_speed\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t\t\t{rpm}")
         self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
 
     @requires_version(2, 13)
@@ -969,6 +990,7 @@ class HeaterShakerContext(ModuleContext):
 
         Decelerating to 0 rpm typically only takes a few seconds.
         """
+        print(f"shaker\tdeactivate_shaker\t---\t---\t\t\t\t\t\t\t\t\t\t\t\t")
         self._core.deactivate_shaker()
 
     @requires_version(2, 13)
