@@ -798,32 +798,13 @@ class TransferComponentsExecutor:
     def _remove_air_gap(self, location: Location) -> None:
         """Remove a previously added air gap."""
         last_air_gap = self._tip_state.last_liquid_and_air_gap_in_tip.air_gap
-        if last_air_gap == 0:
-            return
-
         dispense_props = self._transfer_properties.dispense
-        correction_volume = dispense_props.correction_by_volume.get_for_volume(
-            last_air_gap
-        )
-        # The minimum flow rate should be air_gap_volume per second
-        flow_rate = max(
-            dispense_props.flow_rate_by_volume.get_for_volume(last_air_gap),
-            last_air_gap,
-        )
-        self._instrument.dispense(
+        self._instrument.remove_air_gap_during_transfer_with_liquid_class(
+            last_air_gap=last_air_gap,
+            dispense_props=dispense_props,
             location=location,
-            well_core=None,
-            volume=last_air_gap,
-            rate=1,
-            flow_rate=flow_rate,
-            in_place=True,
-            push_out=0,
-            correction_volume=correction_volume,
         )
         self._tip_state.delete_air_gap(last_air_gap)
-        dispense_delay = dispense_props.delay
-        if dispense_delay.enabled and dispense_delay.duration:
-            self._instrument.delay(dispense_delay.duration)
 
 
 def absolute_point_from_position_reference_and_offset(

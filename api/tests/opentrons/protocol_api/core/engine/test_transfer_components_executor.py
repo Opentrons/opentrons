@@ -141,17 +141,11 @@ def test_submerge(
             minimum_z_height=None,
             speed=None,
         ),
-        mock_instrument_core.dispense(
+        mock_instrument_core.remove_air_gap_during_transfer_with_liquid_class(
+            last_air_gap=air_gap_volume,
+            dispense_props=sample_transfer_props.dispense,
             location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_core=None,
-            volume=air_gap_volume,
-            rate=1,
-            flow_rate=expected_air_gap_flow_rate,
-            in_place=True,
-            push_out=0,
-            correction_volume=air_gap_correction_by_vol,
         ),
-        mock_instrument_core.delay(0.5),
         mock_instrument_core.move_to(
             location=Location(Point(1, 2, 3), labware=None),
             well_core=source_well,

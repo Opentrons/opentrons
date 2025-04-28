@@ -2011,9 +2011,7 @@ def test_aspirate_liquid_class_using_volume_config_without_lpd(
             transfer_properties=test_transfer_properties,
             target_location=Location(Point(1, 2, 3), labware=None),
             target_well=source_well,
-            tip_state=TipState(
-                last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
-            ),
+            tip_state=TipState(),  # air gap would have been removed during volume config
             transfer_type=TransferType.ONE_TO_ONE,
         )
     ).then_return(mock_transfer_components_executor)
@@ -2356,6 +2354,106 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
             tip_contents=[],
             volume_for_pipette_mode_configuration=None,
         )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 23)))
+@pytest.mark.parametrize(
+    argnames=[
+        "air_gap_volume",
+        "air_gap_flow_rate_by_vol",
+        "expected_air_gap_flow_rate",
+    ],
+    argvalues=[(0.123, 123, 123), (1.23, 0.123, 1.23)],
+)
+def test_remove_air_gap_during_transfer_with_liquid_class(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    air_gap_volume: float,
+    air_gap_flow_rate_by_vol: float,
+    expected_air_gap_flow_rate: float,
+    version: APIVersion,
+) -> None:
+    """It should remove ait gap by calling dispense and delay with liquid class props."""
+    test_transfer_props = decoy.mock(cls=TransferProperties)
+    air_gap_correction_by_vol = 0.321
+
+    test_transfer_props.dispense.delay.duration = 321
+    test_transfer_props.dispense.delay.enabled = True
+
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    decoy.when(
+        test_transfer_props.dispense.flow_rate_by_volume.get_for_volume(air_gap_volume)
+    ).then_return(air_gap_flow_rate_by_vol)
+    decoy.when(
+        test_transfer_props.dispense.correction_by_volume.get_for_volume(air_gap_volume)
+    ).then_return(air_gap_correction_by_vol)
+    subject.remove_air_gap_during_transfer_with_liquid_class(
+        last_air_gap=air_gap_volume,
+        dispense_props=test_transfer_props.dispense,
+        location=Location(Point(1, 2, 3), labware=None),
+    )
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.DispenseInPlaceParams(
+                pipetteId="abc123",
+                volume=air_gap_volume,
+                flowRate=expected_air_gap_flow_rate,
+                pushOut=0,
+                correctionVolume=air_gap_correction_by_vol,
+            )
+        ),
+        mock_protocol_core.delay(321, None),
+    )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 23)))
+def test_remove_air_gap_during_transfer_with_liquid_class_handles_delays(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """It should remove ait gap by calling dispense and delay with liquid class props."""
+    test_transfer_props = decoy.mock(cls=TransferProperties)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    test_transfer_props.dispense.delay.enabled = False
+
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    decoy.when(
+        test_transfer_props.dispense.flow_rate_by_volume.get_for_volume(air_gap_volume)
+    ).then_return(air_gap_flow_rate_by_vol)
+    decoy.when(
+        test_transfer_props.dispense.correction_by_volume.get_for_volume(air_gap_volume)
+    ).then_return(air_gap_correction_by_vol)
+
+    subject.remove_air_gap_during_transfer_with_liquid_class(
+        last_air_gap=air_gap_volume,
+        dispense_props=test_transfer_props.dispense,
+        location=Location(Point(1, 2, 3), labware=None),
+    )
+    decoy.verify(
+        mock_protocol_core.delay(seconds=matchers.Anything(), msg=None),
+        times=0,
+    )
+
+    test_transfer_props.dispense.delay.enabled = True
+    test_transfer_props.dispense.delay.duration = 321
+
+    subject.remove_air_gap_during_transfer_with_liquid_class(
+        last_air_gap=air_gap_volume,
+        dispense_props=test_transfer_props.dispense,
+        location=Location(Point(1, 2, 3), labware=None),
+    )
+    decoy.verify(
+        mock_protocol_core.delay(seconds=321, msg=None),
+        times=1,
+    )
 
 
 def test_dispense_liquid_class(

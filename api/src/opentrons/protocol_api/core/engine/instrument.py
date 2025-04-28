@@ -1977,37 +1977,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 minimum_z_height=None,
                 speed=None,
             )
-
-            def remove_air_gap() -> None:
-                last_air_gap = last_liquid_and_airgap_in_tip.air_gap
-                if last_air_gap == 0:
-                    return
-
-                dispense_props = transfer_properties.dispense
-                correction_volume = dispense_props.correction_by_volume.get_for_volume(
-                    last_air_gap
-                )
-                # The minimum flow rate should be air_gap_volume per second
-                flow_rate = max(
-                    dispense_props.flow_rate_by_volume.get_for_volume(last_air_gap),
-                    last_air_gap,
-                )
-                self.dispense(
-                    location=prep_location,
-                    well_core=None,
-                    volume=last_air_gap,
-                    rate=1,
-                    flow_rate=flow_rate,
-                    in_place=True,
-                    push_out=0,
-                    correction_volume=correction_volume,
-                )
-                last_liquid_and_airgap_in_tip.air_gap = 0
-                dispense_delay = dispense_props.delay
-                if dispense_delay.enabled and dispense_delay.duration:
-                    self.delay(dispense_delay.duration)
-
-            remove_air_gap()
+            self.remove_air_gap_during_transfer_with_liquid_class(
+                last_air_gap=last_liquid_and_airgap_in_tip.air_gap,
+                dispense_props=transfer_properties.dispense,
+                location=prep_location,
+            )
+            last_liquid_and_airgap_in_tip.air_gap = 0
             if (
                 transfer_type != tx_comps_executor.TransferType.MANY_TO_ONE
                 and self.get_liquid_presence_detection()
@@ -2079,7 +2054,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         new_tip_contents = tip_contents[0:-1] + [last_contents]
         return new_tip_contents
 
-    def _remove_air_gap_before_transfer_with_liquid_class(
+    def remove_air_gap_during_transfer_with_liquid_class(
         self,
         last_air_gap: float,
         dispense_props: SingleDispenseProperties,
@@ -2107,6 +2082,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             push_out=0,
             correction_volume=correction_volume,
         )
+        dispense_delay = dispense_props.delay
+        if dispense_delay.enabled and dispense_delay.duration:
+            self.delay(dispense_delay.duration)
 
     def dispense_liquid_class(
         self,
