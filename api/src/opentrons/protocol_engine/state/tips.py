@@ -31,8 +31,6 @@ _TipRackStateByWellName = Dict[str, _TipRackWellState]
 # precomputed list of wells to TipStore.
 @dataclass
 class _PipetteInfo:
-    channels: int
-    active_channels: int
     nozzle_map: NozzleMap
 
 
@@ -77,8 +75,6 @@ class TipStore(HasState[TipState], HandlesActions):
             self._state.pipette_info_by_pipette_id[
                 state_update.pipette_config.pipette_id
             ] = _PipetteInfo(
-                channels=state_update.pipette_config.config.channels,
-                active_channels=state_update.pipette_config.config.channels,
                 nozzle_map=state_update.pipette_config.config.nozzle_map,
             )
 
@@ -93,9 +89,6 @@ class TipStore(HasState[TipState], HandlesActions):
             pipette_info = self._state.pipette_info_by_pipette_id[
                 state_update.pipette_nozzle_map.pipette_id
             ]
-            pipette_info.active_channels = (
-                state_update.pipette_nozzle_map.nozzle_map.tip_count
-            )
             pipette_info.nozzle_map = state_update.pipette_nozzle_map.nozzle_map
 
         if state_update.loaded_labware != update_types.NO_CHANGE:
