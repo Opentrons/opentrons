@@ -79,9 +79,8 @@ def patch_mock_raise_if_location_inside_liquid(
     argnames=[
         "air_gap_volume",
         "air_gap_flow_rate_by_vol",
-        "expected_air_gap_flow_rate",
     ],
-    argvalues=[(0.123, 123, 123), (1.23, 0.123, 1.23)],
+    argvalues=[(0.123, 123), (1.23, 0.123)],
 )
 def test_submerge(
     decoy: Decoy,
@@ -89,7 +88,6 @@ def test_submerge(
     sample_transfer_props: TransferProperties,
     air_gap_volume: float,
     air_gap_flow_rate_by_vol: float,
-    expected_air_gap_flow_rate: float,
 ) -> None:
     """Should perform the expected submerge steps."""
     source_well = decoy.mock(cls=WellCore)
@@ -227,9 +225,8 @@ def test_submerge_without_starting_air_gap(
     argnames=[
         "air_gap_volume",
         "air_gap_flow_rate_by_vol",
-        "expected_air_gap_flow_rate",
     ],
-    argvalues=[(0.123, 123, 123), (1.23, 0.123, 1.23)],
+    argvalues=[(0.123, 123), (1.23, 0.123)],
 )
 def test_submerge_with_trash_location(
     decoy: Decoy,
@@ -237,7 +234,6 @@ def test_submerge_with_trash_location(
     sample_transfer_props: TransferProperties,
     air_gap_volume: float,
     air_gap_flow_rate_by_vol: float,
-    expected_air_gap_flow_rate: float,
 ) -> None:
     """Should perform the expected submerge steps."""
     air_gap_correction_by_vol = 0.321
@@ -265,7 +261,6 @@ def test_submerge_with_trash_location(
     subject.submerge(
         submerge_properties=sample_transfer_props.dispense.submerge,
         post_submerge_action="dispense",
-        volume_for_pipette_mode_configuration=123,
     )
 
     decoy.verify(
@@ -276,17 +271,11 @@ def test_submerge_with_trash_location(
             minimum_z_height=None,
             speed=None,
         ),
-        mock_instrument_core.dispense(
+        mock_instrument_core.remove_air_gap_during_transfer_with_liquid_class(
+            last_air_gap=air_gap_volume,
+            dispense_props=sample_transfer_props.dispense,
             location=mock_trash_bin,
-            well_core=None,
-            volume=air_gap_volume,
-            rate=1,
-            flow_rate=expected_air_gap_flow_rate,
-            in_place=True,
-            push_out=0,
-            correction_volume=air_gap_correction_by_vol,
         ),
-        mock_instrument_core.delay(0.5),
         mock_instrument_core.delay(1.1),
     )
 

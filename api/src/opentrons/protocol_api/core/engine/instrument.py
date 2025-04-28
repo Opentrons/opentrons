@@ -2067,7 +2067,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self,
         last_air_gap: float,
         dispense_props: SingleDispenseProperties,
-        location: Location,
+        location: Union[Location, TrashBin, WasteChute],
     ) -> None:
         """Remove an air gap that was previously added during a transfer."""
         if last_air_gap == 0:
