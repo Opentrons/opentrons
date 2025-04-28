@@ -650,6 +650,10 @@ class PipetteView:
         """Return the max channels of the pipette."""
         return self.get_config(pipette_id).channels
 
+    def get_active_channels(self, pipette_id: str) -> int:
+        """Get the number of channels being used in the given pipette's configuration."""
+        return self.get_nozzle_configuration(pipette_id).tip_count
+
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""
         return self.get_config(pipette_id).min_volume

@@ -1010,12 +1010,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
     def get_channels(self) -> int:
-        return self._engine_client.state.tips.get_pipette_channels(self._pipette_id)
+        return self._engine_client.state.pipettes.get_channels(self._pipette_id)
 
     def get_active_channels(self) -> int:
-        return self._engine_client.state.tips.get_pipette_active_channels(
-            self._pipette_id
-        )
+        return self._engine_client.state.pipettes.get_active_channels(self._pipette_id)
 
     def get_nozzle_map(self) -> NozzleMapInterface:
         return self._engine_client.state.pipettes.get_nozzle_configuration(

@@ -409,14 +409,6 @@ class TipView:
                         return well_name
         return None
 
-    def get_pipette_channels(self, pipette_id: str) -> int:
-        """Return the given pipette's number of channels."""
-        return self._state.pipette_info_by_pipette_id[pipette_id].channels
-
-    def get_pipette_active_channels(self, pipette_id: str) -> int:
-        """Get the number of channels being used in the given pipette's configuration."""
-        return self._state.pipette_info_by_pipette_id[pipette_id].active_channels
-
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
         """Get whether a well in a labware has a clean tip.
 
