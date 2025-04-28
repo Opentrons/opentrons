@@ -44,6 +44,7 @@ from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
     labware_definition_type_adapter,
 )
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.labware import load_definition as load_labware_definition
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -1388,6 +1389,50 @@ def test_get_well_position(
         y=slot_pos[1] - 2 + well_def.y,
         z=slot_pos[2] + 3 + well_def.z + well_def.depth,
     )
+
+
+@pytest.mark.parametrize(
+    "probed_height", [-1.0, 0.0, 5.0, 10.0, 1000.0, SimulatedProbeResult()]
+)
+def test_validate_probed_height(
+    decoy: Decoy,
+    subject: GeometryView,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    probed_height: LiquidTrackingType,
+) -> None:
+    """Test validation for probed liquid heights."""
+    labware_id = "labware-id"
+    pipette_id = "pipette-id"
+    well_name = "B2"
+    well_def = well_plate_def.wells[well_name]
+    decoy.when(
+        mock_labware_view.get_well_definition(labware_id, well_name)
+    ).then_return(well_def)
+    fake_min_height = 0.5
+    well_depth = well_def.depth
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id=pipette_id)
+    ).then_return(fake_min_height)
+    # Only invalid floats should raise an error
+    if isinstance(probed_height, float):
+        if probed_height < fake_min_height or probed_height > well_depth:
+            with pytest.raises(PipetteLiquidNotFoundError):
+                subject.validate_probed_height(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    pipette_id=pipette_id,
+                    probed_height=probed_height,
+                )
+    # floats within bounds and SimulatedProbeResult should not cause an error
+    else:
+        subject.validate_probed_height(
+            labware_id=labware_id,
+            well_name=well_name,
+            pipette_id=pipette_id,
+            probed_height=probed_height,
+        )
 
 
 def test_get_well_height(

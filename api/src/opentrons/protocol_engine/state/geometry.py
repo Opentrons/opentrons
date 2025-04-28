@@ -17,7 +17,10 @@ from opentrons.types import (
     MeniscusTrackingTarget,
 )
 
-from opentrons_shared_data.errors.exceptions import InvalidStoredData
+from opentrons_shared_data.errors.exceptions import (
+    InvalidStoredData,
+    PipetteLiquidNotFoundError,
+)
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.deck.types import CutoutFixture
@@ -497,6 +500,30 @@ class GeometryView:
                 raise OperationLocationNotInWellError(
                     f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location below the bottom of the well"
                 )
+
+    def validate_probed_height(
+        self,
+        labware_id: str,
+        well_name: str,
+        pipette_id: str,
+        probed_height: LiquidTrackingType,
+    ) -> None:
+        """Raise an error if a probed liquid height is not within well bounds."""
+        if isinstance(probed_height, SimulatedProbeResult):
+            return
+        lld_min_height = self._pipettes.get_current_tip_lld_settings(
+            pipette_id=pipette_id
+        )
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_depth = well_def.depth
+        if probed_height < lld_min_height:
+            raise PipetteLiquidNotFoundError(
+                f"Liquid Height of {probed_height} mm is lower minumum allowed lld height {lld_min_height} mm."
+            )
+        if probed_height > well_depth:
+            raise PipetteLiquidNotFoundError(
+                f"Liquid Height of {probed_height} mm is greater than maximum well height {well_depth} mm."
+            )
 
     def get_well_position(
         self,
