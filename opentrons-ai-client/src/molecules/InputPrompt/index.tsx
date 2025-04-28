@@ -157,35 +157,6 @@ export function InputPrompt(): JSX.Element {
 
       const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
 
-      // Build a history array that conforms to the server schema (role + content).
-      // If this chat is dealing with a Protocol Designer conversation and a history
-      // item contains a `protocol_content`, strip out `labwareDefinitions` and
-      // append the remaining JSON to its content.
-      const sanitizedHistory =
-        currentProtocolFormat !== 'Protocol Designer'
-          ? chatHistory
-          : chatHistory.map(msg => {
-              if (msg.protocol_content != null) {
-                // Use helper to parse the protocol content into a plain object
-                const rawPdJson = parseProtocolContent(msg.protocol_content)
-
-                // Remove labwareDefinitions without using the `delete` operator
-                const {
-                  labwareDefinitions: _omit,
-                  ...pdWithoutLabwareDefs
-                } = rawPdJson
-
-                return {
-                  role: msg.role,
-                  content: `${msg.content}\n\n${JSON.stringify(
-                    pdWithoutLabwareDefs
-                  )}`,
-                }
-              }
-
-              return { role: msg.role, content: msg.content }
-            })
-
       const config = {
         url,
         method: 'POST',
