@@ -1,5 +1,6 @@
 import Ajv from 'ajv'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   commandSchemaV8,
   fixtureP10SingleV2Specs,

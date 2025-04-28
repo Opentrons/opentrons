@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { SelectAuthenticationType as SelectAuthenticationTypeComponent } from '/app/organisms/ODD/NetworkSettings'

@@ -1,6 +1,7 @@
 import execa from 'execa'
 import { usb } from 'usb'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 
 import { isWindows } from '../../os'

@@ -2,6 +2,7 @@
 
 from logging import getLogger
 import enum
+from typing_extensions import assert_type
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict, Set
@@ -19,7 +20,11 @@ from opentrons.types import (
 
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
+)
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
@@ -444,15 +449,29 @@ class GeometryView:
         )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's origin, without calibration."""
-        slot_pos = self.get_labware_parent_position(labware_id)
-        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
+        """Get the deck coordinates of a labware's origin.
 
-        return Point(
-            x=slot_pos.x + origin_offset.x,
-            y=slot_pos.y + origin_offset.y,
-            z=slot_pos.z + origin_offset.z,
-        )
+        This includes module calibration but excludes the calibration of the given labware.
+        """
+        slot_front_left = self.get_labware_parent_position(labware_id)
+        definition = self._labware.get_definition(labware_id)
+
+        if isinstance(definition, LabwareDefinition2):
+            slot_front_left_to_labware_front_left = Point(
+                definition.cornerOffsetFromSlot.x,
+                definition.cornerOffsetFromSlot.y,
+                definition.cornerOffsetFromSlot.z,
+            )
+            return slot_front_left + slot_front_left_to_labware_front_left
+        else:
+            assert_type(definition, LabwareDefinition3)
+            # todo(mm, 2025-03-03): This needs more work to correctly handle labware schema 3.
+            # This is currently assuming the labware's wells are in quadrant I and the
+            # labware sits as far in the -x, -y direction as the slot allows. We instead
+            # need to have the labware sit in the -x, +y direction (depending on the slot
+            # and labware's locating features) and allow for the labware's wells to be
+            # in quadrant IV.
+            return slot_front_left
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
@@ -520,6 +539,7 @@ class GeometryView:
                 well_location=well_location,
                 well_depth=well_depth,
                 operation_volume=operation_volume,
+                pipette_id=pipette_id,
             )
             if not isinstance(offset_adjustment, SimulatedProbeResult):
                 offset = offset.model_copy(update={"z": offset.z + offset_adjustment})
@@ -532,21 +552,6 @@ class GeometryView:
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
-        )
-
-    def get_nominal_well_position(
-        self,
-        labware_id: str,
-        well_name: str,
-    ) -> Point:
-        """Get the well position without calibration offsets."""
-        parent_pos = self.get_labware_parent_nominal_position(labware_id)
-        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        return Point(
-            x=parent_pos.x + origin_offset.x + well_def.x,
-            y=parent_pos.y + origin_offset.y + well_def.y,
-            z=parent_pos.z + origin_offset.z + well_def.z + well_def.depth,
         )
 
     def _get_relative_liquid_handling_well_location(
@@ -620,8 +625,7 @@ class GeometryView:
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)
-        definition = self._labware.get_definition(lw_data.id)
-        z_dim = definition.dimensions.zDimension
+        z_dim = self._labware.get_dimensions(labware_id=lw_data.id).z
         height_over_labware: float = 0
         if isinstance(lw_data.location, ModuleLocation):
             # Note: when calculating highest z of stacked labware, height-over-labware
@@ -1844,6 +1848,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
+        pipette_id: str,
         operation_volume: float,
     ) -> float:
         """Get the change in height from a liquid handling operation."""
@@ -1853,6 +1858,7 @@ class GeometryView:
         final_height = self.get_well_height_after_liquid_handling(
             labware_id=labware_id,
             well_name=well_name,
+            pipette_id=pipette_id,
             initial_height=initial_handling_height,
             volume=operation_volume,
         )
@@ -1873,6 +1879,7 @@ class GeometryView:
         well_name: str,
         well_location: WellLocationType,
         well_depth: float,
+        pipette_id: Optional[str] = None,
         operation_volume: Optional[float] = None,
     ) -> LiquidTrackingType:
         """Return a z-axis distance that accounts for well handling height and operation volume.
@@ -1906,9 +1913,14 @@ class GeometryView:
                 volume = well_location.volumeOffset
 
         if volume:
+            if pipette_id is None:
+                raise ValueError(
+                    "cannot get liquid handling offset without pipette id."
+                )
             liquid_height_after = self.get_well_height_after_liquid_handling(
                 labware_id=labware_id,
                 well_name=well_name,
+                pipette_id=pipette_id,
                 initial_height=initial_handling_height,
                 volume=volume,
             )
@@ -2030,6 +2042,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
+        pipette_id: str,
         initial_height: LiquidTrackingType,
         volume: float,
     ) -> LiquidTrackingType:
@@ -2044,7 +2057,14 @@ class GeometryView:
             initial_volume = find_volume_at_well_height(
                 target_height=initial_height, well_geometry=well_geometry
             )
-            final_volume = initial_volume + volume
+            final_volume = initial_volume + (
+                volume
+                * self.get_nozzles_per_well(
+                    labware_id=labware_id,
+                    target_well_name=well_name,
+                    pipette_id=pipette_id,
+                )
+            )
             return find_height_at_well_volume(
                 target_volume=final_volume, well_geometry=well_geometry
             )
@@ -2058,6 +2078,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
+        pipette_id: str,
         initial_height: LiquidTrackingType,
         volume: float,
     ) -> LiquidTrackingType:
@@ -2073,7 +2094,14 @@ class GeometryView:
             initial_volume = find_volume_at_well_height(
                 target_height=initial_height, well_geometry=well_geometry
             )
-            final_volume = initial_volume + volume
+            final_volume = initial_volume + (
+                volume
+                * self.get_nozzles_per_well(
+                    labware_id=labware_id,
+                    target_well_name=well_name,
+                    pipette_id=pipette_id,
+                )
+            )
             well_volume = find_height_at_well_volume(
                 target_volume=final_volume,
                 well_geometry=well_geometry,
@@ -2209,15 +2237,20 @@ class GeometryView:
         if len(definitions) == 0:
             return 0
         if len(definitions) == 1:
-            return definitions[0].dimensions.zDimension
+            return self._labware.get_dimensions(labware_definition=definitions[0]).z
         total_height = 0.0
         upper_def: LabwareDefinition = definitions[0]
         for lower_def in definitions[1:]:
             overlap = self._labware.get_labware_overlap_offsets(
                 upper_def, lower_def.parameters.loadName
             ).z
-            total_height += upper_def.dimensions.zDimension - overlap
+            total_height += (
+                self._labware.get_dimensions(labware_definition=upper_def).z - overlap
+            )
             upper_def = lower_def
+        return (
+            total_height + self._labware.get_dimensions(labware_definition=upper_def).z
+        )
         return total_height + upper_def.dimensions.zDimension
 
     def get_height_of_stacker_labware_pool(self, module_id: str) -> float:

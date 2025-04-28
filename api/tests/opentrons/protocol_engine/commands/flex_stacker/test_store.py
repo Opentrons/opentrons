@@ -137,7 +137,17 @@ async def test_store_raises_if_carriage_logically_empty(
         await subject.execute(data)
 
 
+@pytest.mark.parametrize(
+    "contained_labware_count,max_pool_count",
+    [
+        (0, 0),
+        (1, 0),
+        (0, 1),
+    ],
+)
 async def test_store_raises_if_not_configured(
+    contained_labware_count: int,
+    max_pool_count: int,
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
@@ -151,8 +161,8 @@ async def test_store_raises_if_not_configured(
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        contained_labware_bottom_first=_contained_labware(1),
-        max_pool_count=0,
+        contained_labware_bottom_first=_contained_labware(contained_labware_count),
+        max_pool_count=max_pool_count,
         pool_overlap=0,
     )
     decoy.when(

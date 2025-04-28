@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -21,6 +21,8 @@ vi.mock('@opentrons/components', async () => {
 
 let mockProceedNextStep: Mock
 let mockGoBackPrevStep: Mock
+let mockCloseLabwareLatch: Mock
+let mockHandleMotionRouting: Mock
 
 const render = (props: ComponentProps<typeof TwoColTextAndImage>) => {
   return renderWithProviders(<TwoColTextAndImage {...props} />, {
@@ -34,15 +36,21 @@ describe('TwoColTextAndImage', () => {
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
     mockGoBackPrevStep = vi.fn()
+    mockCloseLabwareLatch = vi.fn().mockResolvedValue(undefined)
+    mockHandleMotionRouting = vi.fn().mockResolvedValue(undefined)
 
     props = {
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
         goBackPrevStep: mockGoBackPrevStep,
+        handleMotionRouting: mockHandleMotionRouting,
       },
       recoveryMap: {
         route: RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
         step: RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE,
+      },
+      recoveryCommands: {
+        closeLabwareLatch: mockCloseLabwareLatch,
       },
     } as any
   })
@@ -51,6 +59,27 @@ describe('TwoColTextAndImage', () => {
     render(props)
     clickButtonLabeled('Continue')
     expect(mockProceedNextStep).toHaveBeenCalled()
+  })
+
+  it(`calls proceedNextStep and closeLabwareLatch when primary button is clicked for ${RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE}`, async () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+      step:
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH,
+    }
+    render(props)
+    clickButtonLabeled('Re-engage latch')
+    expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+      true,
+      RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE
+    )
+
+    await waitFor(() => {
+      expect(mockCloseLabwareLatch).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockProceedNextStep).toHaveBeenCalled()
+    })
   })
 
   it(`passes correct title for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE}`, () => {

@@ -135,6 +135,19 @@ class FlexStackerHopperError(ErrorOccurrence):
     errorInfo: FailedLabware
 
 
+class FlexStackerLabwareRetrieveError(ErrorOccurrence):
+    """Returned when the labware was not able to get to the shuttle."""
+
+    isDefined: bool = True
+    errorType: Literal[
+        "flexStackerLabwareRetrieveFailed"
+    ] = "flexStackerLabwareRetrieveFailed"
+
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
+    errorInfo: FailedLabware
+
+
 @dataclass
 class _LabwareDefPair:
     definition: LabwareDefinition
@@ -717,31 +730,32 @@ def _count_from_lw_list_or_initial_count(
     max_pool_count: int,
     current_count: int,
 ) -> int:
-    if initial_count is None and initial_lw is None:
-        return max_pool_count - current_count
-    if initial_count is None and initial_lw is not None:
-        if len(initial_lw) > (max_pool_count - current_count):
-            raise CommandPreconditionViolated(
-                f"{len(initial_lw)} labware groups were requested to be stored, but the stacker can store only {max_pool_count}"
-            )
-        return len(initial_lw)
-    if initial_count is not None and initial_lw is None:
-        return min(
-            max(initial_count - current_count, 0), (max_pool_count - current_count)
-        )
-    if initial_count is not None and initial_lw is not None:
-        if len(initial_lw) != initial_count:
+    """Count the number of labware to be added to the stacker."""
+    capacity = max(max_pool_count - current_count, 0)
+
+    if initial_count is not None:
+        if initial_lw and len(initial_lw) != initial_count:
             raise CommandPreconditionViolated(
                 "If initialCount and initialStoredLabware are both specified, the number of labware must equal the count"
             )
-        if initial_count > (max_pool_count - current_count):
+        to_store_count = initial_count
+    elif initial_lw is not None:
+        to_store_count = len(initial_lw)
+    else:
+        # neither initialCount nor initialStoredLabware are specified
+        if not capacity:
             raise CommandPreconditionViolated(
-                f"{len(initial_lw)} labware groups were requested to be stored, but the stacker can store only {max_pool_count}"
+                "No labware groups were specified to be stored, but the stacker is already full"
             )
-        return initial_count
-    raise CommandPreconditionViolated(
-        f"{initial_lw} and {initial_count} are not valid combinations of initialCount and initialStoredLabware"
-    )
+        return capacity
+
+    if to_store_count > capacity:
+        error_text = f" and is already holding {current_count}" if current_count else ""
+        raise CommandPreconditionViolated(
+            f"{to_store_count} labware groups were requested to be stored, "
+            f"but the stacker can hold only {max_pool_count}{error_text}"
+        )
+    return to_store_count
 
 
 def _build_one_labware_group(

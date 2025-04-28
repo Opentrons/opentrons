@@ -8,16 +8,13 @@ import { mockRecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/__fi
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
-import {
-  GripperIsHoldingLabware,
-  HOLDING_LABWARE_OPTIONS,
-} from '../GripperIsHoldingLabware'
+import { HOLDING_LABWARE_OPTIONS, HoldingLabware } from '../HoldingLabware'
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof GripperIsHoldingLabware>) => {
-  return renderWithProviders(<GripperIsHoldingLabware {...props} />, {
+const render = (props: ComponentProps<typeof HoldingLabware>) => {
+  return renderWithProviders(<HoldingLabware {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -27,8 +24,8 @@ let mockProceedNextStep: Mock
 let mockHandleMotionRouting: Mock
 let mockHomeExceptPlungers: Mock
 
-describe('GripperIsHoldingLabware', () => {
-  let props: ComponentProps<typeof GripperIsHoldingLabware>
+describe('HoldingLabware', () => {
+  let props: ComponentProps<typeof HoldingLabware>
   beforeEach(() => {
     mockProceedToRouteAndStep = vi.fn(() => Promise.resolve())
     mockProceedNextStep = vi.fn(() => Promise.resolve())
@@ -46,10 +43,22 @@ describe('GripperIsHoldingLabware', () => {
     }
   })
 
-  it('renders appropriate title copy', () => {
+  it('renders appropriate gripper title copy', () => {
     render(props)
 
     screen.getByText('First, is the gripper holding labware?')
+  })
+
+  it('renders appropriate latch title copy', () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+      step:
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS
+          .CONFIRM_LABWARE_IN_LATCH,
+    }
+    render(props)
+
+    screen.getByText('Is there labware stuck on the stacker latch?')
   })
 
   HOLDING_LABWARE_OPTIONS.forEach(option => {
@@ -124,6 +133,70 @@ describe('GripperIsHoldingLabware', () => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
         RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
+      )
+    })
+  })
+
+  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE}`, async () => {
+    render({
+      ...props,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption:
+          RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+      } as any,
+    })
+
+    fireEvent.click(screen.getAllByLabelText('No')[0])
+    clickButtonLabeled('Continue')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(true)
+    })
+
+    await waitFor(() => {
+      expect(mockHomeExceptPlungers).toHaveBeenCalled()
+    })
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    })
+
+    await waitFor(() => {
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.CONFIRM_RETRY
+      )
+    })
+  })
+
+  it(`proceeds to the correct step when the no option is clicked for ${RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE}`, async () => {
+    render({
+      ...props,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption:
+          RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+      } as any,
+    })
+
+    fireEvent.click(screen.getAllByLabelText('No')[0])
+    clickButtonLabeled('Continue')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(true)
+    })
+
+    await waitFor(() => {
+      expect(mockHomeExceptPlungers).toHaveBeenCalled()
+    })
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    })
+
+    await waitFor(() => {
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
       )
     })
   })

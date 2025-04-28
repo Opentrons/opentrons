@@ -110,7 +110,7 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="footprintXDimension"]').clear().type('20')
     cy.get('#Footprint span')
       .contains(
-        'Your labware is too small to fit in a slot properly. Please fill out this form to request an adapter.'
+        'Your labware is too small to fit in a slot properly. Please contact Opentrons Support to request an adapter.'
       )
       .should('exist')
 
@@ -118,7 +118,7 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="footprintXDimension"]').clear().type('2000')
     cy.get('#Footprint span')
       .contains(
-        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
+        'Your labware is too large to fit in a single slot properly. Please contact Opentrons Support to request a custom labware definition.'
       )
       .should('exist')
 
@@ -126,7 +126,7 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="footprintYDimension"]').clear().type('20')
     cy.get('#Footprint span')
       .contains(
-        'Your labware is too small to fit in a slot properly. Please fill out this form to request an adapter.'
+        'Your labware is too small to fit in a slot properly. Please contact Opentrons Support to request an adapter.'
       )
       .should('exist')
 
@@ -134,7 +134,7 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="footprintYDimension"]').clear().type('2000')
     cy.get('#Footprint span')
       .contains(
-        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
+        'Your labware is too large to fit in a single slot properly. Please contact Opentrons Support to request a custom labware definition.'
       )
       .should('exist')
 

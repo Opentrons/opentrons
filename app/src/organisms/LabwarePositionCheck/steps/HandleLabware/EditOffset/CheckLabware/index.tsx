@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -41,7 +42,7 @@ import {
 
 import type { TFunction } from 'i18next'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { Coordinates, LoadedPipette } from '@opentrons/shared-data'
+import type { LoadedPipette, Vector3D } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type {
   LPCWizardState,
@@ -169,7 +170,7 @@ interface CheckLabwareContentProps extends CheckLabwareProps {
   handleGoBack: () => void
   handleResetJog: () => void
   setJoggedPosition: (vector: VectorOffset) => void
-  liveOffset: Coordinates
+  liveOffset: Vector3D
   isLwTiprack: boolean
 }
 

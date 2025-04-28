@@ -2,6 +2,7 @@ import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
 import uniqBy from 'lodash/uniqBy'
 import values from 'lodash/values'
+
 import {
   getIsTiprack,
   getLabwareDefURI,

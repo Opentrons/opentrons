@@ -2,6 +2,7 @@ import produce from 'immer'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   fixture12Trough as _fixture12Trough,
   fixture96Plate as _fixture96Plate,

@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import flatMap from 'lodash/flatMap'
+
 import { ProtocolTimelineScrubber } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 

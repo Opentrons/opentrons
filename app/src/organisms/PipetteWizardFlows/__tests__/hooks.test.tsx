@@ -1,6 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   LEFT,
   NINETY_SIX_CHANNEL,

@@ -17,10 +17,11 @@ from opentrons.protocol_engine.state.module_substates import (
     FlexStackerId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.commands import flex_stacker
 from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
-from opentrons.protocol_engine.commands.flex_stacker.prepare_shuttle import (
-    PrepareShuttleImpl,
+from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_prepare_shuttle import (
+    UnsafeFlexStackerPrepareShuttleImpl,
+    UnsafeFlexStackerPrepareShuttleParams,
+    UnsafeFlexStackerPrepareShuttleResult,
 )
 
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
@@ -29,9 +30,9 @@ from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 @pytest.fixture
 def subject(
     state_view: StateView, equipment: EquipmentHandler, model_utils: ModelUtils
-) -> PrepareShuttleImpl:
-    """Get a PrepareShuttle command to test."""
-    return PrepareShuttleImpl(
+) -> UnsafeFlexStackerPrepareShuttleImpl:
+    """Get a UnsafeFlexStackerPrepareShuttle command to test."""
+    return UnsafeFlexStackerPrepareShuttleImpl(
         state_view=state_view, equipment=equipment, model_utils=model_utils
     )
 
@@ -40,12 +41,12 @@ async def test_home_command(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: PrepareShuttleImpl,
+    subject: UnsafeFlexStackerPrepareShuttleImpl,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should return a success data."""
-    data = flex_stacker.PrepareShuttleParams(moduleId=stacker_id)
+    data = UnsafeFlexStackerPrepareShuttleParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -64,14 +65,14 @@ async def test_home_command(
 
     decoy.verify(await stacker_hardware.home_all(False), times=1)
 
-    assert result == SuccessData(public=flex_stacker.PrepareShuttleResult())
+    assert result == SuccessData(public=UnsafeFlexStackerPrepareShuttleResult())
 
 
 async def test_home_command_with_stall_detected(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: PrepareShuttleImpl,
+    subject: UnsafeFlexStackerPrepareShuttleImpl,
     model_utils: ModelUtils,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
@@ -80,7 +81,7 @@ async def test_home_command_with_stall_detected(
     err_id = "error-id"
     err_timestamp = datetime(year=2025, month=3, day=19)
 
-    data = flex_stacker.PrepareShuttleParams(moduleId=stacker_id)
+    data = UnsafeFlexStackerPrepareShuttleParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,

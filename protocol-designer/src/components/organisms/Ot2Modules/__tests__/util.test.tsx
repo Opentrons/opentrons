@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,

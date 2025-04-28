@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -24,6 +25,7 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareDefIsStandard,
+  getLabwareDisplayName,
   getUniqueWellProperties,
 } from '@opentrons/shared-data'
 
@@ -73,7 +75,8 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const { metadata, parameters, brand, wells, ordering } = definition
-  const apiName = definition.parameters.loadName
+  const displayName = getLabwareDisplayName(definition)
+  const apiName = parameters.loadName
   const { displayVolumeUnits } = metadata
   const wellGroups = getUniqueWellProperties(definition)
   const wellLabel = getWellLabel(definition)
@@ -114,7 +117,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
-          {props.labware.definition.metadata.displayName}
+          {displayName}
         </LegacyStyledText>
         <Link
           onClick={props.onClose}

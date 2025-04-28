@@ -340,7 +340,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
         succeeded_command = action.command
         self._state.command_history.set_command_succeeded(succeeded_command)
 
-    def _handle_fail_command_action(self, action: FailCommandAction) -> None:
+    def _handle_fail_command_action(  # noqa: C901
+        self, action: FailCommandAction
+    ) -> None:
         prev_entry = self.state.command_history.get(action.command_id)
 
         if isinstance(action.error, EnumeratedError):  # The error was undefined.
@@ -383,9 +385,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.command_history.get_setup_queue_ids()
             )
         elif prev_entry.command.intent == CommandIntent.FIXIT:
-            other_command_ids_to_fail = list(
-                self._state.command_history.get_fixit_queue_ids()
-            )
+            if (
+                action.type == ErrorRecoveryType.CONTINUE_WITH_ERROR
+                or action.type == ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE
+            ):
+                other_command_ids_to_fail = []
+            else:
+                other_command_ids_to_fail = list(
+                    self._state.command_history.get_fixit_queue_ids()
+                )
         elif (
             prev_entry.command.intent == CommandIntent.PROTOCOL
             or prev_entry.command.intent is None

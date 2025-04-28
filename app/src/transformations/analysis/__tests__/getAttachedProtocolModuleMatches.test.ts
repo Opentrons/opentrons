@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
   getModuleDef2,
   TEMPERATURE_MODULE_V2_FIXTURE,

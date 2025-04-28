@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
+
 import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { FLOWS } from './constants'

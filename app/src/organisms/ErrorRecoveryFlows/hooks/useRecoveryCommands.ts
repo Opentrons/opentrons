@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react'
 import head from 'lodash/head'
+
 import {
+  useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
@@ -70,6 +72,10 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   releaseGripperJaws: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
+  releaseLabwareLatch: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
+  closeLabwareLatch: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
   homeExceptPlungers: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   moveLabwareWithoutPause: () => Promise<CommandData[]>
@@ -94,10 +100,6 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { chainRunCommands } = useChainRunCommands(
-    runId,
-    unvalidatedFailedCommand?.id
-  )
   const {
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
@@ -106,6 +108,13 @@ export function useRecoveryCommands({
   } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
+  const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
+  const { chainRunCommands } = useChainRunCommands(
+    runId,
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
+  )
+
   const { makeSuccessToast } = recoveryToastUtils
 
   const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
@@ -317,6 +326,28 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
 
+  const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
+    const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
+    if (buildOpenLatchCommand == null) {
+      return Promise.reject(
+        new Error('Invalid use of open labware latch command')
+      )
+    } else {
+      return chainRunRecoveryCommands([buildOpenLatchCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
+  const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
+    const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
+    if (buildCloseLatchCommand == null) {
+      return Promise.reject(
+        new Error('Invalid use of close labware latch command')
+      )
+    } else {
+      return chainRunRecoveryCommands([buildCloseLatchCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
   const homeExceptPlungers = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_EXCEPT_PLUNGERS])
   }, [chainRunRecoveryCommands])
@@ -354,6 +385,8 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     releaseGripperJaws,
+    releaseLabwareLatch,
+    closeLabwareLatch,
     homeExceptPlungers,
     moveLabwareWithoutPause,
     skipFailedCommand,
@@ -422,7 +455,47 @@ const buildHomeShuttle = (
       ? storeOrRetriveFailedCommandParams.moduleId
       : ''
   return {
-    commandType: 'flexStacker/prepareShuttle',
+    commandType: 'unsafe/flexStacker/prepareShuttle',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildOpenLatch = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'flexStacker/openLatch',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildCloseLatch = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'flexStacker/closeLatch',
     params: {
       moduleId: moduleId,
     },

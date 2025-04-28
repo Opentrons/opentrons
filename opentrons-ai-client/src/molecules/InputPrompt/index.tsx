@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import styled, { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
+
 import {
   ALIGN_CENTER,
   BORDERS,

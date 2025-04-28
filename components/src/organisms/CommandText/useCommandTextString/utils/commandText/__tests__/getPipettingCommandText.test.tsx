@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { i18n } from '../../../../../../i18n'

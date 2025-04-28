@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { FLEX_STANDARD_MODEL, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'

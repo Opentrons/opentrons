@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   Box,
   COLORS,

@@ -4,6 +4,7 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import { createSelector } from 'reselect'
+
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,

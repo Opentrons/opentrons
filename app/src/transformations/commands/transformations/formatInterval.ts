@@ -1,4 +1,5 @@
 import { intervalToDuration } from 'date-fns'
+
 import { formatDuration } from '@opentrons/components'
 
 /**

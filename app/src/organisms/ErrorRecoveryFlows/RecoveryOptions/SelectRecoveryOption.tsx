@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
 import { css } from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -194,8 +195,16 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return LABWARE_MISSING_IN_HOPPER_OPTIONS
     case ERROR_KINDS.SHUTTLE_MISSING:
       return SHUTTLE_MISSING_OPTIONS
+    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+      return LABWARE_MISSING_IN_SHUTTLE_OPTIONS
   }
 }
+
+export const LABWARE_MISSING_IN_SHUTTLE_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+  RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
 
 export const SHUTTLE_MISSING_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,

@@ -1,5 +1,6 @@
 import { uniq } from 'lodash'
 import { css } from 'styled-components'
+
 import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
 
 import { CategorizedStepContent, TwoColumn } from '.'

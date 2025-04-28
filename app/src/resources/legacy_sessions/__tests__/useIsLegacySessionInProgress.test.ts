@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { useIsLegacySessionInProgress } from '../useIsLegacySessionInProgress'

@@ -3,6 +3,7 @@ import { app } from 'electron'
 import Store from 'electron-store'
 import noop from 'lodash/noop'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   finishDiscovery,
   startDiscovery,

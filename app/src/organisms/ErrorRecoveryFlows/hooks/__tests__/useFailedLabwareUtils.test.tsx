@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
 import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'

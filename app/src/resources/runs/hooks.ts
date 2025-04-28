@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
@@ -17,7 +18,7 @@ import {
   setCommandIntent,
 } from './utils'
 
-import type { HostConfig } from '@opentrons/api-client'
+import type { ErrorRecoveryPolicy, HostConfig } from '@opentrons/api-client'
 import type {
   CreateMaintenanceRunType,
   useCreateMaintenanceCommandMutation,
@@ -65,7 +66,8 @@ export function useCreateRunCommandMutation(
 
 export function useChainRunCommands(
   runId: string,
-  failedCommandId?: string
+  failedCommandId?: string,
+  recoveryPolicy?: ErrorRecoveryPolicy
 ): {
   chainRunCommands: (
     commands: CreateCommand[],
@@ -88,7 +90,8 @@ export function useChainRunCommands(
         commands,
         createRunCommand,
         continuePastCommandFailure,
-        setIsLoading
+        setIsLoading,
+        recoveryPolicy
       ),
     isCommandMutationLoading: isLoading,
   }

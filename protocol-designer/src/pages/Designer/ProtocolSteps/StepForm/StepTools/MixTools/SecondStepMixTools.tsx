@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -140,6 +141,7 @@ export function SecondStepMixTools({
           flowRateType={tab}
           volume={propsForFields.volume?.value ?? 0}
           tiprack={propsForFields.tipRack.value}
+          formData={formData}
         />
         <Divider marginY="0" />
         {tab === 'aspirate' ? (
@@ -262,6 +264,7 @@ export function SecondStepMixTools({
                       flowRateType="blowout"
                       volume={propsForFields.volume?.value ?? 0}
                       tiprack={propsForFields.tipRack.value}
+                      formData={formData}
                       padding="0"
                     />
                     <BlowoutOffsetField

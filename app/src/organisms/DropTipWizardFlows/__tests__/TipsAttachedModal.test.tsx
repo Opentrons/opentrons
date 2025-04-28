@@ -1,6 +1,7 @@
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { LEFT } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'

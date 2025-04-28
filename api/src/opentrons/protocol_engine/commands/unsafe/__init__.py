@@ -16,6 +16,7 @@ their shapes if we're confident that it won't break something in robot-server's
 persistent storage.
 """
 
+
 from .unsafe_blow_out_in_place import (
     UnsafeBlowOutInPlaceCommandType,
     UnsafeBlowOutInPlaceParams,
@@ -72,6 +73,30 @@ from .unsafe_manual_retrieve import (
     UnsafeManualRetrieveCreate,
 )
 
+from .unsafe_stacker_close_latch import (
+    UnsafeFlexStackerCloseLatchCommandType,
+    UnsafeFlexStackerCloseLatchParams,
+    UnsafeFlexStackerCloseLatchResult,
+    UnsafeFlexStackerCloseLatch,
+    UnsafeFlexStackerCloseLatchCreate,
+)
+
+from .unsafe_stacker_open_latch import (
+    UnsafeFlexStackerOpenLatchCommandType,
+    UnsafeFlexStackerOpenLatchParams,
+    UnsafeFlexStackerOpenLatchResult,
+    UnsafeFlexStackerOpenLatch,
+    UnsafeFlexStackerOpenLatchCreate,
+)
+
+from .unsafe_stacker_prepare_shuttle import (
+    UnsafeFlexStackerPrepareShuttleCommandType,
+    UnsafeFlexStackerPrepareShuttleParams,
+    UnsafeFlexStackerPrepareShuttleResult,
+    UnsafeFlexStackerPrepareShuttle,
+    UnsafeFlexStackerPrepareShuttleCreate,
+)
+
 __all__ = [
     # Unsafe blow-out-in-place command models
     "UnsafeBlowOutInPlaceCommandType",
@@ -115,4 +140,22 @@ __all__ = [
     "UnsafeManualRetrieveResult",
     "UnsafeManualRetrieve",
     "UnsafeManualRetrieveCreate",
+    # Unsafe flex stacker close latch
+    "UnsafeFlexStackerCloseLatchCommandType",
+    "UnsafeFlexStackerCloseLatchParams",
+    "UnsafeFlexStackerCloseLatchResult",
+    "UnsafeFlexStackerCloseLatch",
+    "UnsafeFlexStackerCloseLatchCreate",
+    # Unsafe flex stacker open latch
+    "UnsafeFlexStackerOpenLatchCommandType",
+    "UnsafeFlexStackerOpenLatchParams",
+    "UnsafeFlexStackerOpenLatchResult",
+    "UnsafeFlexStackerOpenLatch",
+    "UnsafeFlexStackerOpenLatchCreate",
+    # Unsafe flex stacker prepare shuttle
+    "UnsafeFlexStackerPrepareShuttleCommandType",
+    "UnsafeFlexStackerPrepareShuttleParams",
+    "UnsafeFlexStackerPrepareShuttleResult",
+    "UnsafeFlexStackerPrepareShuttle",
+    "UnsafeFlexStackerPrepareShuttleCreate",
 ]

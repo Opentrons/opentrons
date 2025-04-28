@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import i18n from 'i18next'
 import { css } from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -26,10 +27,11 @@ export const HOLDING_LABWARE_OPTIONS: HoldingLabwareOption[] = [
   'no',
 ] as const
 
-export function GripperIsHoldingLabware({
+export function HoldingLabware({
   routeUpdateActions,
   currentRecoveryOptionUtils,
   recoveryCommands,
+  recoveryMap,
 }: RecoveryContentProps): JSX.Element {
   const {
     proceedNextStep,
@@ -37,12 +39,15 @@ export function GripperIsHoldingLabware({
     goBackPrevStep,
     handleMotionRouting,
   } = routeUpdateActions
+  const { route } = recoveryMap
   const { homeExceptPlungers } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     MANUAL_MOVE_AND_SKIP,
     MANUAL_REPLACE_AND_RETRY,
     OPTION_SELECTION,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
 
   const [selectedOption, setSelectionOption] = useState<HoldingLabwareOption>(
@@ -50,6 +55,15 @@ export function GripperIsHoldingLabware({
   )
   const { t } = useTranslation(['error_recovery', 'shared'])
 
+  const buildTitle = (): string => {
+    switch (route) {
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        return t('is_there_labware_stuck_on_the_stacker_latch')
+      default:
+        return t('first_is_gripper_holding_labware')
+    }
+  }
   const handleNoOption = (): void => {
     // The "yes" option also contains a home, but it occurs later in the control flow,
     // after the user has extricated the labware from the gripper jaws.
@@ -67,6 +81,16 @@ export function GripperIsHoldingLabware({
             return proceedToRouteAndStep(
               MANUAL_REPLACE_AND_RETRY.ROUTE,
               MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
+            )
+          case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+            return proceedToRouteAndStep(
+              REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+              REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.CONFIRM_RETRY
+            )
+          case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+            return proceedToRouteAndStep(
+              MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+              MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
             )
           default: {
             console.error('Unexpected recovery option for gripper routing.')
@@ -97,7 +121,7 @@ export function GripperIsHoldingLabware({
           oddStyle="level4HeaderSemiBold"
           desktopStyle="headingSmallBold"
         >
-          {t('first_is_gripper_holding_labware')}
+          {buildTitle()}
         </StyledText>
         <Flex css={ODD_ONLY}>
           <ODDGripperHoldingLwOptions

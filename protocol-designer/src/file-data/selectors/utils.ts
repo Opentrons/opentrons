@@ -1,6 +1,7 @@
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+
 import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
 
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'

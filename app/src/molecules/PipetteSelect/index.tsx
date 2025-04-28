@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import groupBy from 'lodash/groupBy'
+
 import { Box, Flex } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -51,7 +52,7 @@ const specToOption = ({
   label: displayName,
 })
 
-export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
+export function PipetteSelect(props: PipetteSelectProps): JSX.Element {
   const { tabIndex, enableNoneOption, nameBlocklist = [] } = props
   const { t } = useTranslation('shared')
   const NONE = t('none')

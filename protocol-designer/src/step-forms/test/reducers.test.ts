@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,

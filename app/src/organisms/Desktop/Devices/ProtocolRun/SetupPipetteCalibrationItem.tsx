@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   Banner,

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 
 import { getLabwareIsCustom } from '../labwareModuleCompatibility'

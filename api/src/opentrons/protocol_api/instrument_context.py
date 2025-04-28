@@ -665,7 +665,20 @@ class InstrumentContext(publisher.CommandPublisher):
                     "Blow_out being performed on a tiprack. "
                     "Please re-check your code"
                 )
-            move_to_location = target.location or target.well.top()
+            if target.location:
+                # because the lower levels of blowout don't handle LiquidHandlingWellLocation and
+                # there is no "operation_volume" for blowout we need to convert the relative location
+                # given with a .meniscus to an absolute point. To maintain the meniscus behavior
+                # we can just add the offset to the current liquid height.
+                if target.location.meniscus_tracking:
+                    move_to_location = target.well.bottom(
+                        target.well.current_liquid_height()  # type: ignore [arg-type]
+                        + target.location.point.z
+                    )
+                else:
+                    move_to_location = target.location
+            else:
+                move_to_location = target.well.top()
             well = target.well
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
@@ -2806,7 +2819,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
-        return self._core.liquid_probe_without_recovery(well._core, loc)
+        self._core.liquid_probe_with_recovery(well._core, loc)
+        return well.current_liquid_height()
 
     def _raise_if_configuration_not_supported_by_pipette(
         self, style: NozzleLayout

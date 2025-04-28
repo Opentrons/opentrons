@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
 import styled from 'styled-components'
+
 import {
   BORDERS,
   COLORS,

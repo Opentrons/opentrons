@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_END,

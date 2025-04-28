@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import uniq from 'lodash/uniq'
+
 import {
   ALIGN_STRETCH,
   DIRECTION_COLUMN,

@@ -14,7 +14,7 @@ enum MixContent {
   SelectWells = 'Select wells',
   VolumePerWell = 'Volume per well',
   MixRepetitions = 'Mix repetitions',
-  TipHandling = 'Tip handling',
+  TipManagement = 'Tip management',
   TipDropLocation = 'Tip drop location',
   ChooseOption = 'Choose option',
   Reservoir = 'Axygen 1 Well Reservoir 90 mL',
@@ -25,10 +25,10 @@ enum MixContent {
   ClickAndDragWellSelect = 'Click and drag to select wells',
   PipettePreselect = 'Flex 1-Channel 1000 µL',
   TiprackPreselect = 'Opentrons Flex 96 Tip Rack 1000 µL',
-  BeforeEveryAsp = 'Before every aspirate',
-  OnceAtStartStep = 'Once at the start of step',
-  PerSourceWell = 'Per source well',
-  PerDestWell = 'Per destination well',
+  BeforeEveryAsp = 'Always',
+  OnceAtStartStep = 'Once',
+  PerSourceWell = 'Per source',
+  PerDestWell = 'Per destination',
   Never = 'Never',
   WasteChute = 'Waste chute',
   AspFlowRate = 'Aspirate flow rate',
@@ -442,7 +442,7 @@ export const MixVerifications = {
       cy.contains(MixContent.MixRepetitions)
         .should('exist')
         .should('be.visible')
-      cy.contains(MixContent.TipHandling).should('exist').should('be.visible')
+      cy.contains(MixContent.TipManagement).should('exist').should('be.visible')
       cy.contains(MixContent.TipDropLocation)
         .should('exist')
         .should('be.visible')
