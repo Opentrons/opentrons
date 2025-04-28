@@ -2000,6 +2000,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_volume_difference=-volume,
                 position_reference=aspirate_props.aspirate_position.position_reference,
                 offset=aspirate_props.aspirate_position.offset,
+                mount=self.get_mount(),
             )
         )
         aspirate_location = Location(aspirate_point, labware=source_loc.labware)
@@ -2135,6 +2136,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_volume_difference=volume,
                 position_reference=dispense_props.dispense_position.position_reference,
                 offset=dispense_props.dispense_position.offset,
+                mount=self.get_mount(),
             )
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)
@@ -2216,6 +2218,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_volume_difference=volume,
                 position_reference=dispense_props.dispense_position.position_reference,
                 offset=dispense_props.dispense_position.offset,
+                mount=self.get_mount(),
             )
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)

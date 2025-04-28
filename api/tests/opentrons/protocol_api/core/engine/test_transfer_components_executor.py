@@ -27,7 +27,7 @@ from opentrons.protocols.advanced_control.transfers import (
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
 )
-from opentrons.types import Location, Point
+from opentrons.types import Location, Point, Mount
 
 
 @pytest.fixture
@@ -1685,7 +1685,9 @@ def test_absolute_point_from_position_reference_and_offset(
     decoy.when(well.get_top(0)).then_return(well_top_point)
     decoy.when(well.get_center()).then_return(well_center_point)
     decoy.when(
-        well.estimate_liquid_height_after_pipetting(operation_volume=123)
+        well.estimate_liquid_height_after_pipetting(
+            operation_volume=123, mount=Mount.RIGHT
+        ),
     ).then_return(estimated_liquid_height)
     decoy.when(well.get_bottom(12)).then_return(Point(4, 5, 18))
 
@@ -1695,6 +1697,7 @@ def test_absolute_point_from_position_reference_and_offset(
             well_volume_difference=123,
             position_reference=position_reference,
             offset=offset,
+            mount=Mount.RIGHT,
         )
         == expected_result
     )
@@ -1711,4 +1714,5 @@ def test_absolute_point_from_position_reference_and_offset_raises_errors(
             well_volume_difference=123,
             position_reference="PositionReference",  # type: ignore[arg-type]
             offset=Coordinate(x=0, y=0, z=0),
+            mount=Mount.RIGHT,
         )

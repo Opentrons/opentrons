@@ -22,7 +22,7 @@ from opentrons.protocol_api._liquid_properties import (
     TouchTipProperties,
 )
 from opentrons.protocol_engine.errors import TouchTipDisabledError
-from opentrons.types import Location, Point
+from opentrons.types import Location, Point, Mount
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
 )
@@ -174,6 +174,7 @@ class TransferComponentsExecutor:
             well_volume_difference=0,
             position_reference=submerge_properties.start_position.position_reference,
             offset=submerge_properties.start_position.offset,
+            mount=self._instrument.get_mount(),
         )
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
@@ -332,6 +333,7 @@ class TransferComponentsExecutor:
             well_volume_difference=0,
             position_reference=retract_props.end_position.position_reference,
             offset=retract_props.end_position.offset,
+            mount=self._instrument.get_mount(),
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -430,6 +432,7 @@ class TransferComponentsExecutor:
             well_volume_difference=0,
             position_reference=retract_props.end_position.position_reference,
             offset=retract_props.end_position.offset,
+            mount=self._instrument.get_mount(),
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -573,6 +576,7 @@ class TransferComponentsExecutor:
             well_volume_difference=0,
             position_reference=retract_props.end_position.position_reference,
             offset=retract_props.end_position.offset,
+            mount=self._instrument.get_mount(),
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
@@ -812,6 +816,7 @@ def absolute_point_from_position_reference_and_offset(
     well_volume_difference: float,
     position_reference: PositionReference,
     offset: Coordinate,
+    mount: Mount,
 ) -> Point:
     """Return the absolute point, given the well, the position reference and offset.
 
@@ -830,6 +835,7 @@ def absolute_point_from_position_reference_and_offset(
             reference_point = well.get_center()
         case PositionReference.LIQUID_MENISCUS:
             estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
+                mount=mount,
                 operation_volume=well_volume_difference,
             )
             if isinstance(estimated_liquid_height, (float, int)):

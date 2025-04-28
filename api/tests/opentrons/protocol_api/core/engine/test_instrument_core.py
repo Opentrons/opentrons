@@ -1919,6 +1919,7 @@ def test_aspirate_liquid_class_for_transfer_without_volume_config(
             well_volume_difference=-123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2003,6 +2004,7 @@ def test_aspirate_liquid_class_using_volume_config_without_lpd(
             well_volume_difference=-123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2113,6 +2115,7 @@ def test_aspirate_liquid_class_using_volume_config_and_lpd(
             well_volume_difference=-123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2224,6 +2227,7 @@ def test_aspirate_liquid_class_does_not_do_lpd_for_consolidate(
             well_volume_difference=-123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2274,6 +2278,7 @@ def test_aspirate_liquid_class_for_consolidate(
             well_volume_difference=-123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2481,6 +2486,7 @@ def test_dispense_liquid_class(
             well_volume_difference=123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2560,6 +2566,7 @@ def test_dispense_liquid_class_during_multi_dispense(
             well_volume_difference=123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=1, y=3, z=2),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2643,6 +2650,7 @@ def test_last_dispense_liquid_class_during_multi_dispense(
             well_volume_difference=123,
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=1, y=3, z=2),
+            mount=Mount.LEFT,
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
