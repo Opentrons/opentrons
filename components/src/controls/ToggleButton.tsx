@@ -2,9 +2,10 @@ import { css } from 'styled-components'
 
 import { COLORS } from '../helix-design-system'
 import { Icon } from '../icons'
-import { Btn, Flex, StyleProps } from '../primitives'
+import { Btn, Flex } from '../primitives'
 
 import type { MouseEvent } from 'react'
+import type { StyleProps } from '../primitives'
 
 const TOGGLE_DISABLED_STYLES = css`
   color: ${COLORS.grey50};
