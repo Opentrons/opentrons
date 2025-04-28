@@ -127,6 +127,7 @@ class BatchLabwareLocationUpdate:
     """The new offsets of each id."""
 
 
+# todo(mm, 2025-04-28): Combine with BatchLoadedLabwareUpdate.
 @dataclasses.dataclass
 class LoadedLabwareUpdate:
     """An update that loads a new labware."""
